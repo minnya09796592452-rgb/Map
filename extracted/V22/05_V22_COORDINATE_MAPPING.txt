@@ -1,0 +1,43 @@
+
+V22 COORDINATE MAPPING AUDIT
+============================================================
+
+Known source evidence to cross-check:
+
+StrandedWorld:
+    ZONE_TERRAIN_SIZE = 250f
+    ZONE_HEIGHTMAP_SIZE = 257
+    ZONE_HEIGHTMAP_HEIGHT = 150
+    TERRAIN_Y_POSITION = -100
+
+ZoneObjectGenerator.GenerateGridData:
+    heights = terrainData.GetHeights(0, 0, 257, 257)
+
+    y = 150f * heights[i, j] + -100f
+
+    x = terrain.transform.position.x
+        + (125f / 128f) * j
+
+    z = terrain.transform.position.z
+        + (125f / 128f) * i
+
+Therefore, if these exact source lines are found:
+
+    grid column j -> world X
+    grid row i    -> world Z
+    world Y       -> normalized_height * 150 - 100
+
+Horizontal sample interval:
+    250 / 256 = 0.9765625
+
+Expected normalized vertical range:
+    0.0 -> -100 world units
+    1.0 -> 50 world units
+
+IMPORTANT:
+    These are source-derived world-unit conversions.
+    They are not automatically meters.
+
+TerrainData.size assignment, transform rotation,
+Mission 3 zone index and exact zone position must be
+independently verified. Do not infer missing values.

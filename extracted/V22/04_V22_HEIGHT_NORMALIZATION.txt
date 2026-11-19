@@ -1,0 +1,18 @@
+V22 HEIGHT BINARY VALIDATION
+=================================================================
+Path: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+Bytes: 132098
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+Expected SHA match: True
+Samples: 66049
+Dimensions: 257 x 257
+Encoding: UInt16 little-endian
+Decode: float32(ushort) / float32(65535)
+
+Min normalized: 0.000000000000
+Max normalized: 0.703868150711
+Mean normalized: 0.465015180655
+Median normalized: 0.607568502426
+Zero samples: 8275
+Max sample index: i=119, j=128
+Max raw ushort: 46128

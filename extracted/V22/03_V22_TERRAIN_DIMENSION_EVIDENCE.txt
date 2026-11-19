@@ -1,0 +1,537 @@
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/AmplifyImpostors/AmplifyImpostor.cs
+000291: 				Matrix4x4 cameraRotationMatrix = GetCameraRotationMatrix(impostorType, horizontalFrames, num, l, m);
+000292: 				for (int n = 0; n < count; n++)
+000293: 				{
+000294: 					if (!(list[n] == null))
+000295: 					{
+000296: 						if (bounds.size == Vector3.zero)
+000297: 						{
+000298: 							bounds = list[n].sharedMesh.bounds.Transform(m_rootTransform.worldToLocalMatrix * Renderers[n].localToWorldMatrix);
+000299: 						}
+000300: 						else
+000301: 						{
+000302: 							bounds.Encapsulate(list[n].sharedMesh.bounds.Transform(m_rootTransform.worldToLocalMatrix * Renderers[n].localToWorldMatrix));
+000303: 						}
+000304: 					}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/CellObjectSettings.cs
+000055: 
+000056: 	public PlacementModifier[] PlacementModifiers => _placementModifiers;
+000057: 
+000058: 	public PlacementValidator[] PlacementValidators => _placementValidators;
+000059: 
+000060: 	Vector3 IPlacementSettings.Size => _prefab.GetBounds().size;
+000061: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/FlockFishRenderer.cs
+000049: 	{
+000050: 		_active = active;
+000051: 		if (_active)
+000052: 		{
+000053: 			_bounds.center = transform.position;
+000054: 			_bounds.size = Vector3.one * 3f;
+000055: 		}
+000056: 	}
+000057: 
+000058: 	public override void SetMesh(Mesh mesh)
+000059: 	{
+000060: 		_mesh = mesh;
+000061: 	}
+000062: 
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/FlockFishRenderer.cs
+000087: 	}
+000088: 
+000089: 	private void DoBounds()
+000090: 	{
+000091: 		Vector3 zero = Vector3.zero;
+000092: 		_bounds.size = Vector3.zero;
+000093: 		for (int i = 0; i < _matrices.Count; i++)
+000094: 		{
+000095: 			Vector3 vector = _matrices[i].GetColumn(3);
+000096: 			zero += vector;
+000097: 			_bounds.Encapsulate(vector);
+000098: 		}
+000099: 		zero /= (float)_matrices.Count;
+000100: 		_bounds.center = zero;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/Ghost.cs
+000134: 		if (craftable.ColliderType == GhostCollider.ColliderType.NONE)
+000135: 		{
+000136: 			Bounds bounds = _renderer.GetBounds();
+000137: 			BoxCollider component = _activeCollider.GetComponent<BoxCollider>();
+000138: 			component.center = bounds.center;
+000139: 			component.size = bounds.size;
+000140: 		}
+000141: 		_activeCollider.gameObject.tag = craftable.gameObject.tag;
+000142: 		_activeCollider.gameObject.SetActive(value: true);
+000143: 	}
+000144: 
+000145: 	public void IgnoreCollider(Collider collider, bool ignore)
+000146: 	{
+000147: 		_activeCollider.IgnoreCollider(collider, ignore);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/PileCollider.cs
+000054: 	}
+000055: 
+000056: 	private void RecalculateColliderBounds()
+000057: 	{
+000058: 		Bounds bounds = _rendering.Renderer.GetBounds(_pile.SlotStorage.GetStoredCount());
+000059: 		_collider.size = bounds.size;
+000060: 		_collider.center = bounds.center;
+000061: 	}
+000062: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Ocean/StructureBuoyancy.cs
+000109: 		_rigidbody.velocity = Vector3.zero;
+000110: 		_rigidbody.angularVelocity = Vector3.zero;
+000111: 		_rigidbody.useGravity = false;
+000112: 		_rigidbody.isKinematic = true;
+000113: 		_bouyancyCollider.center = Vector3.zero;
+000114: 		_bouyancyCollider.size = Vector3.zero;
+000115: 		Bounds bounds = _bouyancyCollider.bounds;
+000116: 		for (int i = 0; i < RaftBuoyancys.Count; i++)
+000117: 		{
+000118: 			RaftBuoyancy raftBuoyancy = RaftBuoyancys[i];
+000119: 			bounds.Encapsulate(raftBuoyancy.Collider.bounds);
+000120: 		}
+000121: 		_bouyancyCollider.center = bounds.center;
+000122: 		_bouyancyCollider.size = bounds.size;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Ocean/StructureBuoyancy.cs
+000117: 		{
+000118: 			RaftBuoyancy raftBuoyancy = RaftBuoyancys[i];
+000119: 			bounds.Encapsulate(raftBuoyancy.Collider.bounds);
+000120: 		}
+000121: 		_bouyancyCollider.center = bounds.center;
+000122: 		_bouyancyCollider.size = bounds.size;
+000123: 		_voxelHalfHeight = _bouyancyCollider.bounds.size.y / 2f;
+000124: 		_voxels = SliceIntoVoxels();
+000125: 		CreateWaveQueries();
+000126: 		float num = _rigidbody.mass / _density;
+000127: 		float y = 1000f * Mathf.Abs(Physics.gravity.y) * num;
+000128: 		_localArchimedesForce = new Vector3(0f, y, 0f) / _voxels.Count;
+000129: 		transform.rotation = rotation;
+000130: 		transform.position = position;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/BoxColliderSerializer.cs
+000014: 
+000015: 	public override void Load(JObject data, Collider instance)
+000016: 	{
+000017: 		base.Load(data, instance);
+000018: 		((BoxCollider)instance).center = JSerializer.Deserialize<Vector3>(data.GetField("center"));
+000019: 		((BoxCollider)instance).size = JSerializer.Deserialize<Vector3>(data.GetField("size"));
+000020: 	}
+000021: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/AddAutoShoreMask.cs
+000122: 		{
+000123: 			Ocean.LogWarning("The terrain data is null. The shore mask will not be created.");
+000124: 			enabled = false;
+000125: 			return;
+000126: 		}
+000127: 		Vector3 size = component.terrainData.size;
+000128: 		resolution = Mathf.Clamp(resolution, 32, 4096);
+000129: 		m_width = size.x;
+000130: 		m_height = size.z;
+000131: 		float level = Ocean.Instance.level;
+000132: 		float[] data = ShoreMaskGenerator.CreateHeightMap(component);
+000133: 		int heightmapResolution = component.terrainData.heightmapResolution;
+000134: 		InterpolatedArray2f heightMap = new InterpolatedArray2f(data, heightmapResolution, heightmapResolution, 1, wrap: false);
+000135: 		if (useHeightMask || useNormalMask || useFoamMask)
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/WaveSpectrum.cs
+000694: 	private void CreateBuffers()
+000695: 	{
+000696: 		GetFourierSize(out var size, out var isCpu);
+000697: 		if (m_bufferSettings.beenCreated)
+000698: 		{
+000699: 			if (m_bufferSettings.size == size && m_bufferSettings.isCpu == isCpu)
+000700: 			{
+000701: 				return;
+000702: 			}
+000703: 			while (m_scheduler.HasTasks())
+000704: 			{
+000705: 				UpdateSpectrumScheduler();
+000706: 			}
+000707: 			Release();
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/WaveSpectrum.cs
+000721: 		m_conditions = new WaveSpectrumCondition[2];
+000722: 		m_displacementMaps = new RenderTexture[4];
+000723: 		m_slopeMaps = new RenderTexture[2];
+000724: 		m_foamMaps = new RenderTexture[1];
+000725: 		m_bufferSettings.beenCreated = true;
+000726: 		m_bufferSettings.size = size;
+000727: 		m_bufferSettings.isCpu = isCpu;
+000728: 	}
+000729: 
+000730: 	private void CreateRenderTextures()
+000731: 	{
+000732: 		int size = m_bufferSettings.size;
+000733: 		int ansio = 9;
+000734: 		RenderTextureFormat format = RenderTextureFormat.ARGBFloat;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/DynamicImposterManager.cs
+000156: 	public ImposterTexture GetRenderTexture(DynamicImpostor newOwner, int size)
+000157: 	{
+000158: 		for (int i = 0; i < freeImposterTextures.Count; i++)
+000159: 		{
+000160: 			ImposterTexture imposterTexture = freeImposterTextures[i];
+000161: 			if (imposterTexture.size == size)
+000162: 			{
+000163: 				freeImposterTextures.Remove(imposterTexture);
+000164: 				imposterTexture.owner = newOwner;
+000165: 				return imposterTexture;
+000166: 			}
+000167: 		}
+000168: 		RenderTexture renderTexture = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32);
+000169: 		renderTexture.antiAliasing = 1;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/DynamicImposterManager.cs
+000167: 		}
+000168: 		RenderTexture renderTexture = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32);
+000169: 		renderTexture.antiAliasing = 1;
+000170: 		ImposterTexture imposterTexture2 = new ImposterTexture();
+000171: 		imposterTexture2.owner = newOwner;
+000172: 		imposterTexture2.size = size;
+000173: 		imposterTexture2.createdTime = (imposterTexture2.lastUsedTime = Time.frameCount);
+000174: 		imposterTexture2.texture = renderTexture;
+000175: 		imposterTextures.Add(imposterTexture2);
+000176: 		return imposterTexture2;
+000177: 	}
+000178: 
+000179: 	public void ReleaseRenderTexture(ImposterTexture imposterTexture)
+000180: 	{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor/LE_DensityBounds.cs
+000042: 		for (int i = 0; i < numberOfBounds; i++)
+000043: 		{
+000044: 			for (int j = 0; j < numberOfBounds; j++)
+000045: 			{
+000046: 				bounds[i, j] = new DensityBound(default, 0);
+000047: 				bounds[i, j].Bound.size = new Vector3(boundSize, 200f, boundSize);
+000048: 				bounds[i, j].Bound.center = new Vector3(250f, 0f, 250f) - new Vector3(i * boundSize, 0f, j * boundSize);
+000049: 				GameObject gameObject = Object.Instantiate(densityProjector, new Vector3(250f, 150f, 250f) - new Vector3(i * boundSize, 0f, j * boundSize), Quaternion.identity);
+000050: 				gameObject.transform.parent = densityGridParent;
+000051: 				gameObject.transform.rotation = Quaternion.LookRotation(Vector3.down);
+000052: 				bounds[i, j].densityMat = new Material(gameObject.GetComponent<Projector>().material);
+000053: 				gameObject.GetComponent<Projector>().material = bounds[i, j].densityMat;
+000054: 			}
+000055: 		}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.Logic/LE_LogicTerrain.cs
+000178: 	private void OnTerrainEditBrushSizeChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+000179: 	{
+000180: 		float value = p_args.Value;
+000181: 		value *= value;
+000182: 		value = Mathf.Max(0.002f, value);
+000183: 		m_GUI3dTerrain.Size = value;
+000184: 		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+000185: 	}
+000186: 
+000187: 	private void OnTerrainEditBrushAmountChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+000188: 	{
+000189: 		float value = p_args.Value;
+000190: 		value = Mathf.Max(0.002f, value);
+000191: 		m_GUI3dTerrain.Amount = (m_isHeightRaise ? value : (0f - value));
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+000246: 			}
+000247: 			if (m_isReadingTerrainSetHeight)
+000248: 			{
+000249: 				Terrain component = m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>();
+000250: 				float num = component.SampleHeight(m_cursorHitInfo.point);
+000251: 				m_targetRelativeValue = Mathf.Clamp01(num / component.terrainData.size.y);
+000252: 				m_isTerrainSetHeightReadInFrame = Time.frameCount;
+000253: 				return;
+000254: 			}
+000255: 			switch (m_editMode)
+000256: 			{
+000257: 			case LE_ETerrainEditMode.CHANGE_HEIGHT:
+000258: 				m_terrainMgr.ChangeHeight(Mathf.Sign(Amount) * Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+000259: 				break;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+000331: 
+000332: 	private void UpdateBrushProjector(bool p_isHit, RaycastHit p_hitInfo)
+000333: 	{
+000334: 		if (p_isHit)
+000335: 		{
+000336: 			Vector3 size = m_terrainMgr.TerrainData.size;
+000337: 			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+000338: 			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+000339: 			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+000340: 			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+000341: 			if (BrushProjector.transform.childCount > 0)
+000342: 			{
+000343: 				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+000344: 			}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+000334: 		if (p_isHit)
+000335: 		{
+000336: 			Vector3 size = m_terrainMgr.TerrainData.size;
+000337: 			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+000338: 			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+000339: 			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+000340: 			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+000341: 			if (BrushProjector.transform.childCount > 0)
+000342: 			{
+000343: 				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+000344: 			}
+000345: 		}
+000346: 		else
+000347: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+000335: 		{
+000336: 			Vector3 size = m_terrainMgr.TerrainData.size;
+000337: 			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+000338: 			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+000339: 			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+000340: 			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+000341: 			if (BrushProjector.transform.childCount > 0)
+000342: 			{
+000343: 				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+000344: 			}
+000345: 		}
+000346: 		else
+000347: 		{
+000348: 			BrushProjector.orthographicSize = 0f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+000354: 	}
+000355: 
+000356: 	private Vector2 GetRelativeLocalLocation(RaycastHit hit)
+000357: 	{
+000358: 		Terrain component = hit.transform.gameObject.GetComponent<Terrain>();
+000359: 		Vector3 size = component.terrainData.size;
+000360: 		Vector3 vector = hit.transform.InverseTransformPoint(hit.point);
+000361: 		Vector2 zero = Vector2.zero;
+000362: 		zero.x = vector.z / size.z;
+000363: 		zero.y = vector.x / size.x;
+000364: 		float num = 1f / (float)(component.terrainData.heightmapResolution - 1);
+000365: 		float num2 = 1f / (float)(component.terrainData.heightmapResolution - 1);
+000366: 		zero.x = Mathf.Round(zero.x / num) * num;
+000367: 		zero.y = Mathf.Round(zero.y / num2) * num2;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+000159: 		if (zone?.Terrain == null)
+000160: 		{
+000161: 			return Vector3.up;
+000162: 		}
+000163: 		Vector3 vector = worldPosition - zone.Terrain.transform.position;
+000164: 		return zone.Terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.z, vector.z));
+000165: 	}
+000166: 
+000167: 	public bool InBounds(Vector3 worldPosition)
+000168: 	{
+000169: 		Zone zone = GetZone(worldPosition);
+000170: 		if (zone == null)
+000171: 		{
+000172: 			return false;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZoneTerrainPointSampler.cs
+000023: 		}
+000024: 		sample = default;
+000025: 		sample.Point = worldPosition;
+000026: 		sample.Point.y = terrain.SampleHeight(worldPosition) + -100f;
+000027: 		Vector3 vector = worldPosition - terrain.transform.position;
+000028: 		sample.Normal = terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, terrain.terrainData.size.z, vector.z));
+000029: 		return true;
+000030: 	}
+000031: }
