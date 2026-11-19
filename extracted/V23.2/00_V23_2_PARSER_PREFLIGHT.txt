@@ -1,0 +1,9 @@
+CASTAWAY-DEPTHS V23.2 PARSER PREFLIGHT
+============================================
+python: 3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]
+platform: Linux-6.17.0-PRoot-Distro-aarch64-with-glibc2.41
+machine: aarch64
+unitypy: AVAILABLE
+unitypy_version: 1.25.4
+unitypy_module: /root/venvs/castaway-v232/lib/python3.13/site-packages/UnityPy/__init__.py
+status: ASSET_PARSING_ENABLED

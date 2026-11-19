@@ -1,0 +1,4158 @@
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp-firstpass/FilePath.cs
+LINES: 1-115
+000001: using System;
+000002: using System.IO;
+000003: using Beam;
+000004: using Beam.Utilities;
+000005: using UnityEngine;
+000006: 
+000007: public static class FilePath
+000008: {
+000009: 	public static readonly string LEGACY_USER_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+000010: 
+000011: 	public static readonly string LEGACY_SAVE_FOLDER = PathTools.Combine(LEGACY_USER_FOLDER, "Stranded Deep/Data/");
+000012: 
+000013: 	public static readonly string USER_FOLDER = Application.persistentDataPath;
+000014: 
+000015: 	public static readonly string SAVE_ROOT = "Data/";
+000016: 
+000017: 	public static readonly string SAVE_FOLDER = PathTools.Combine(USER_FOLDER, SAVE_ROOT);
+000018: 
+000019: 	public static readonly string ASSET_BUNDLES_FOLDER = PathTools.Combine(Application.dataPath, "Data/Bundles/");
+000020: 
+000021: 	public const string SAVE_SLOT_FOLDER_PREFIX = "Slot";
+000022: 
+000023: 	public const string SAVE_FILE_NAME = "data";
+000024: 
+000025: 	public const string OPTIONS_FILE_NAME = "Options.json";
+000026: 
+000027: 	public static readonly string OPTIONS_FILE = PathTools.Combine(SAVE_FOLDER, "Options.json");
+000028: 
+000029: 	public const string PLAYER_PREFAB_PATH = "Prefabs/Player";
+000030: 
+000031: 	public const string PREFAB_REFERENCE_FILE = "Prefabs/Prefabs";
+000032: 
+000033: 	public const string PREFAB_LEGACY_MAPPING_FILE = "Prefabs/PrefabsLegacyMappping";
+000034: 
+000035: 	public const string CRAFTING_COMBOS_FILE = "CraftingCombinations";
+000036: 
+000037: 	public const string BUILDING_COMBOS_FILE = "BuildingCombinations";
+000038: 
+000039: 	public const string BAD_WORDS_FILE = "bad-words";
+000040: 
+000041: 	public const string SCREENSHOTS_EXTENSION = ".bytes";
+000042: 
+000043: 	public const string DEFAULT_BACKGROUND_NAME = "default";
+000044: 
+000045: 	public const string DYNAMIC_BACKGROUND_NAME = "dynamic";
+000046: 
+000047: 	public const string DYNAMIC_BACKGROUND_NAME_COOP = "dynamic_COOP";
+000048: 
+000049: 	public const string WORLD_FOLDER_NAME = "World";
+000050: 
+000051: 	public const string HEIGHTMAPS_FOLDER_NAME = "Heightmaps";
+000052: 
+000053: 	public const string LOCAL_MAPS_FOLDER_NAME = "Maps";
+000054: 
+000055: 	public static string WORLD_FOLDER = PathTools.Combine(SAVE_FOLDER, GetSlotFolderName(0), "World");
+000056: 
+000057: 	public static string HEIGHTMAPS_FOLDER = PathTools.Combine(SAVE_FOLDER, GetSlotFolderName(0), "Heightmaps");
+000058: 
+000059: 	public static readonly string LOCAL_MAPS_FOLDER = PathTools.Combine(SAVE_FOLDER, "Maps");
+000060: 
+000061: 	public static readonly string MODS_ROOT_FOLDER = PathTools.Combine(Application.dataPath, "Mods");
+000062: 
+000063: 	public static readonly string MODS_MAPS_FOLDER = PathTools.Combine(MODS_ROOT_FOLDER, "Maps");
+000064: 
+000065: 	public static readonly string MODS_LOCALIZATION_FOLDER = PathTools.Combine(MODS_ROOT_FOLDER, "Localization");
+000066: 
+000067: 	public static readonly string DEFAULT_MAPS_FOLDER = PathTools.Combine(Application.dataPath, "Data/Default Maps/");
+000068: 
+000069: 	public const string PREFS_FALLBACK_FOLDER_NAME = ".prefs/";
+000070: 
+000071: 	public static readonly string PREFS_FALLBACK_FOLDER = PathTools.Combine(SAVE_FOLDER, ".prefs/");
+000072: 
+000073: 	public const string PREFS_SESSION_KEY = "__aus_s";
+000074: 
+000075: 	public const string PREFS_TOTAL_KEY = "__aus_t";
+000076: 
+000077: 	private static readonly string[] _layout = new string[14]
+000078: 	{
+000079: 		SAVE_ROOT ?? "",
+000080: 		SAVE_ROOT + "/Maps",
+000081: 		SAVE_ROOT + "/Slot0",
+000082: 		SAVE_ROOT + "/Slot0/World",
+000083: 		SAVE_ROOT + "/Slot0/Heightmaps",
+000084: 		SAVE_ROOT + "/Slot1",
+000085: 		SAVE_ROOT + "/Slot1/World",
+000086: 		SAVE_ROOT + "/Slot1/Heightmaps",
+000087: 		SAVE_ROOT + "/Slot2",
+000088: 		SAVE_ROOT + "/Slot2/World",
+000089: 		SAVE_ROOT + "/Slot2/Heightmaps",
+000090: 		SAVE_ROOT + "/Slot3",
+000091: 		SAVE_ROOT + "/Slot3/World",
+000092: 		SAVE_ROOT + "/Slot3/Heightmaps"
+000093: 	};
+000094: 
+000095: 	public static string GetSlotFolderName(int slotNumber)
+000096: 	{
+000097: 		return "Slot" + slotNumber;
+000098: 	}
+000099: 
+000100: 	public static string GetSaveFileSuffix(GameMode mode)
+000101: 	{
+000102: 		switch (mode)
+000103: 		{
+000104: 		case GameMode.Coop_2:
+000105: 		case GameMode.Coop_3:
+000106: 		case GameMode.Coop_4:
+000107: 			return "_COOP";
+000108: 		case GameMode.Coop_Server:
+000109: 		case GameMode.Coop_Client:
+000110: 			return "_MP_COOP";
+000111: 		default:
+000112: 			return string.Empty;
+000113: 		}
+000114: 	}
+000115: 
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Atmosphere.cs
+LINES: 282-323
+000282: 					{
+000283: 						array[i + j * num + k * num * height] = pixels[i + j * num * num2 + k * num];
+000284: 					}
+000285: 				}
+000286: 			}
+000287: 			Texture3D texture3D = new Texture3D(num, height, num2, TextureFormat.ARGB32, mipChain: false);
+000288: 			texture3D.wrapMode = TextureWrapMode.Clamp;
+000289: 			texture3D.filterMode = FilterMode.Bilinear;
+000290: 			texture3D.SetPixels(array);
+000291: 			texture3D.Apply();
+000292: 			return texture3D;
+000293: 		}
+000294: 		Debug.LogError("Atmosphere::ConvertLookUpTable(): Couldn't load 3D LUT texture. Texture3D will be disabled.");
+000295: 		return null;
+000296: 	}
+000297: 
+000298: 	private void SetStaticShaderUniforms()
+000299: 	{
+000300: 		float value = (float)(new FastRandom(StrandedWorld.WORLD_SEED).NextDouble() * 1000.0);
+000301: 		Shader.SetGlobalFloat("_RandomSeed", value);
+000302: 		Shader.SetGlobalFloat("_SkyFade", 0f);
+000303: 		Shader.SetGlobalFloat("_StormFade", 0f);
+000304: 	}
+000305: 
+000306: 	private void SetDynamicShaderUniforms()
+000307: 	{
+000308: 		Shader.SetGlobalColor("_SunColor", _sunIlluminary.Light.color.linear);
+000309: 		Shader.SetGlobalFloat("_SunIntensity", _sunIlluminary.Light.intensity);
+000310: 		Shader.SetGlobalVector("_SunPosition", _sunIlluminary.Transform.position);
+000311: 		Shader.SetGlobalVector("_SunDirection", _sunIlluminary.Transform.forward * -1f);
+000312: 		Shader.SetGlobalVector("_MoonDirection", _moonIlluminary.Transform.forward * -1f);
+000313: 	}
+000314: 
+000315: 	public void SetMaterialUniforms(Material material)
+000316: 	{
+000317: 		if (!(material == null))
+000318: 		{
+000319: 			material.SetTexture("_Transmittance", _transmittance);
+000320: 			material.SetTexture("_Inscatter", _inscatterEncoded);
+000321: 			material.SetTexture("_Irradiance", _irradiance);
+000322: 			material.SetFloat("_MieG", _mieG);
+000323: 			material.SetFloat("Rg", 6360000f);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/AtmosphereStorm.cs
+LINES: 68-109
+000068: 	protected virtual void OnWeatherStopped()
+000069: 	{
+000070: 		WeatherStopped?.Invoke();
+000071: 	}
+000072: 
+000073: 	private void Start()
+000074: 	{
+000075: 		Shader.SetGlobalFloat("_SheetLightning", 0f);
+000076: 		Singleton<GameTime>.Instance.NewDayTick += GameTime_NewDayTick;
+000077: 		Singleton<GameTime>.Instance.HourChanged += GameTime_HourChanged;
+000078: 		for (int i = 0; i < _weatherEvents.Count; i++)
+000079: 		{
+000080: 			_weatherEvents[i].Started += WeatherEvent_Started;
+000081: 			_weatherEvents[i].Stopped += WeatherEvent_Stopped;
+000082: 		}
+000083: 		EventManager.AddListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000084: 		if (Game.Mode.IsMaster())
+000085: 		{
+000086: 			SetState(StrandedWorld.WORLD_SEED, 0);
+000087: 		}
+000088: 	}
+000089: 
+000090: 	protected override void OnDestroy()
+000091: 	{
+000092: 		if ((bool)Singleton<GameTime>.Instance)
+000093: 		{
+000094: 			Singleton<GameTime>.Instance.NewDayTick -= GameTime_NewDayTick;
+000095: 			Singleton<GameTime>.Instance.HourChanged -= GameTime_HourChanged;
+000096: 		}
+000097: 		for (int i = 0; i < _weatherEvents.Count; i++)
+000098: 		{
+000099: 			_weatherEvents[i].Started -= WeatherEvent_Started;
+000100: 			_weatherEvents[i].Stopped -= WeatherEvent_Stopped;
+000101: 		}
+000102: 		EventManager.RemoveListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000103: 		WeatherStarted = null;
+000104: 		WeatherStopped = null;
+000105: 		base.OnDestroy();
+000106: 	}
+000107: 
+000108: 	private void SetState(int seed, int iter)
+000109: 	{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs
+LINES: 344-423
+000344: 		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 0);
+000345: 		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+000346: 	}
+000347: 
+000348: 	private void CheckShelter()
+000349: 	{
+000350: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000351: 		{
+000352: 			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
+000353: 			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
+000354: 			{
+000355: 				playerEffect.Protected = true;
+000356: 			}
+000357: 		}
+000358: 	}
+000359: 
+000360: 	private bool AllPlayersOverLand()
+000361: 	{
+000362: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000363: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000364: 		{
+000365: 			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+000366: 			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+000367: 			{
+000368: 				return false;
+000369: 			}
+000370: 			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+000371: 			{
+000372: 				return false;
+000373: 			}
+000374: 			if (hitInfo.point.y < -5f)
+000375: 			{
+000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()
+000399: 	{
+000400: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000401: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000402: 		{
+000403: 			if (!allPlayer.IsNullOrDestroyed())
+000404: 			{
+000405: 				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+000406: 				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+000407: 				{
+000408: 					return true;
+000409: 				}
+000410: 			}
+000411: 		}
+000412: 		return false;
+000413: 	}
+000414: 
+000415: 	private bool AnyPlayerKnockedOut()
+000416: 	{
+000417: 		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+000418: 		{
+000419: 			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
+000420: 			{
+000421: 				return true;
+000422: 			}
+000423: 		}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Language/LocalizationTerms.cs
+LINES: 893-948
+000893: 	public const string MAP_MSG_ERROR_LOADING_DEFAULT_MAP = "MAP_MSG_ERROR_LOADING_DEFAULT_MAP";
+000894: 
+000895: 	public const string MAP_MSG_ERROR_LOADING_DEFAULT_MAP_FILES_NOT_FOUND = "MAP_MSG_ERROR_LOADING_DEFAULT_MAP_FILES_NOT_FOUND";
+000896: 
+000897: 	public const string MAP_MSG_ERROR_LOADING_MISSION_MAPS = "MAP_MSG_ERROR_LOADING_MISSION_MAPS";
+000898: 
+000899: 	public const string MAP_MSG_ERROR_LOADING_MAP = "MAP_MSG_ERROR_LOADING_MAP";
+000900: 
+000901: 	public const string MAP_MSG_ERROR_LOADING_MAP_FILES_NOT_FOUND = "MAP_MSG_ERROR_LOADING_MAP_FILES_NOT_FOUND";
+000902: 
+000903: 	public const string MAP_MSG_ERROR_LOADING_MAPS = "MAP_MSG_ERROR_LOADING_MAPS";
+000904: 
+000905: 	public const string WORLD_MSG_SUCCESS = "WORLD_MSG_SUCCESS";
+000906: 
+000907: 	public const string WORLD_MSG_WORLD_DIR_NOT_FOUND = "WORLD_MSG_WORLD_DIR_NOT_FOUND";
+000908: 
+000909: 	public const string WORLD_MSG_SEED_FILE_MISSING = "WORLD_MSG_SEED_FILE_MISSING";
+000910: 
+000911: 	public const string WORLD_MSG_EMPTY_WORLD_FOLDER = "WORLD_MSG_EMPTY_WORLD_FOLDER";
+000912: 
+000913: 	public const string WORLD_MSG_MISSING_MAP_FOLDER = "WORLD_MSG_MISSING_MAP_FOLDER";
+000914: 
+000915: 	public const string WORLD_MSG_MISSING_WORLD_FOLDER = "WORLD_MSG_MISSING_WORLD_FOLDER";
+000916: 
+000917: 	public const string WORLD_MSG_ERROR_SAVING_WORLD_STORAGE = "WORLD_MSG_ERROR_SAVING_WORLD_STORAGE";
+000918: 
+000919: 	public const string WORLD_MSG_ERROR_SAVING_WORLD_SEED = "WORLD_MSG_ERROR_SAVING_WORLD_SEED";
+000920: 
+000921: 	public const string WORLD_MSG_ERROR_SAVING_WORLD = "WORLD_MSG_ERROR_SAVING_WORLD";
+000922: 
+000923: 	public const string WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE = "WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE";
+000924: 
+000925: 	public const string WORLD_MSG_ERROR_LOADING_WORLD_SEED = "WORLD_MSG_ERROR_LOADING_WORLD_SEED";
+000926: 
+000927: 	public const string WORLD_MSG_MAP_VERSION_EXCEPTION = "WORLD_MSG_MAP_VERSION_EXCEPTION";
+000928: 
+000929: 	public const string WORLD_MSG_ERROR_LOADING_MAP = "WORLD_MSG_ERROR_LOADING_MAP";
+000930: 
+000931: 	public const string WORLD_MSG_ERROR_LOADING_WORLD_MAPS = "WORLD_MSG_ERROR_LOADING_WORLD_MAPS";
+000932: 
+000933: 	public const string MAP_EDITOR_NEW_MAP_TITLE = "MAP_EDITOR_NEW_MAP_TITLE";
+000934: 
+000935: 	public const string MAP_EDITOR_BUTTON_TERRAIN = "MAP_EDITOR_BUTTON_TERRAIN";
+000936: 
+000937: 	public const string MAP_EDITOR_BUTTON_OBJECTS = "MAP_EDITOR_BUTTON_OBJECTS";
+000938: 
+000939: 	public const string MAP_EDITOR_BUTTON_CAMERA = "MAP_EDITOR_BUTTON_CAMERA";
+000940: 
+000941: 	public const string MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL = "MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL";
+000942: 
+000943: 	public const string MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_SIZE = "MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_SIZE";
+000944: 
+000945: 	public const string MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_AMOUNT = "MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_AMOUNT";
+000946: 
+000947: 	public const string MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_RAISE = "MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_RAISE";
+000948: 
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Language/LocalizationTerms.cs
+LINES: 987-1028
+000987: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_VALUE_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_VALUE_LABEL";
+000988: 
+000989: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_OCTAVES_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_OCTAVES_LABEL";
+000990: 
+000991: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BLEND_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BLEND_LABEL";
+000992: 
+000993: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BUTTON_GEN_PERLIN = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BUTTON_GEN_PERLIN";
+000994: 
+000995: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_LABEL";
+000996: 
+000997: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MIN_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MIN_LABEL";
+000998: 
+000999: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MAX_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MAX_LABEL";
+001000: 
+001001: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BLEND_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BLEND_LABEL";
+001002: 
+001003: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BUTTON_NORMALIZE = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BUTTON_NORMALIZE";
+001004: 
+001005: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_CUSTOM_HEIGHTMAPS_LABEL = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_CUSTOM_HEIGHTMAPS_LABEL";
+001006: 
+001007: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_GENERATE = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_GENERATE";
+001008: 
+001009: 	public const string MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_SMOOTH_HEIGHTMAP = "MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_SMOOTH_HEIGHTMAP";
+001010: 
+001011: 	public const string MAP_EDITOR_OBJECTS_LABEL_DRAG_AND_DROP = "MAP_EDITOR_OBJECTS_LABEL_DRAG_AND_DROP";
+001012: 
+001013: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_ITEMS = "MAP_EDITOR_OBJECTS_CATEGORY_ITEMS";
+001014: 
+001015: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_TREES = "MAP_EDITOR_OBJECTS_CATEGORY_TREES";
+001016: 
+001017: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_ROCKS = "MAP_EDITOR_OBJECTS_CATEGORY_ROCKS";
+001018: 
+001019: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_ANIMALS = "MAP_EDITOR_OBJECTS_CATEGORY_ANIMALS";
+001020: 
+001021: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_STRUCTURES = "MAP_EDITOR_OBJECTS_CATEGORY_STRUCTURES";
+001022: 
+001023: 	public const string MAP_EDITOR_OBJECTS_CATEGORY_MISC = "MAP_EDITOR_OBJECTS_CATEGORY_MISC";
+001024: 
+001025: 	public const string MAP_EDITOR_MAX_NUM_OBJECTS = "MAP_EDITOR_MAX_NUM_OBJECTS";
+001026: 
+001027: 	public const string MAP_EDITOR_DB_NO_SELECTION_DESC = "MAP_EDITOR_DB_NO_SELECTION_DESC";
+001028: 
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/Maps.cs
+LINES: 14-71
+000014: public static class Maps
+000015: {
+000016: 	public const string MAP_EXTENSION = ".map";
+000017: 
+000018: 	public const string MAP_PREFIX = "MAP_";
+000019: 
+000020: 	public const string MAP_EDITOR_SUFFIX = "_EDITOR";
+000021: 
+000022: 	public const string MAP_OBJECT_SUFFIX = "_OBJECT";
+000023: 
+000024: 	public const string MAP_HEIGHT_SUFFIX = "_HEIGHT";
+000025: 
+000026: 	public const string MAP_INTERNAL_ID = "INTERNAL";
+000027: 
+000028: 	public const string MAP_PROCEDURAL_ID = "INTERNAL_PROCEDURAL";
+000029: 
+000030: 	public const string MAP_MISSION_ID = "INTERNAL_MISSION";
+000031: 
+000032: 	private static List<Map> _defaultMapList;
+000033: 
+000034: 	private static List<Map> _remoteMaps;
+000035: 
+000036: 	private static List<Map> _userMapList;
+000037: 
+000038: 	public static IList<Map> DefaultMapList => _defaultMapList;
+000039: 
+000040: 	public static IEnumerable<Map> RemoteMaps => _remoteMaps;
+000041: 
+000042: 	public static IEnumerable<Map> UserMapList => _userMapList;
+000043: 
+000044: 	public static IEnumerable<Map> AllMapList => _defaultMapList.Concat(_userMapList).Concat(_remoteMaps);
+000045: 
+000046: 	static Maps()
+000047: 	{
+000048: 		_defaultMapList = new List<Map>();
+000049: 		_remoteMaps = new List<Map>();
+000050: 		_userMapList = new List<Map>();
+000051: 		Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
+000052: 	}
+000053: 
+000054: 	private static LoadingResult CreateMapFolders()
+000055: 	{
+000056: 		try
+000057: 		{
+000058: 			if (!Directory.Exists(FilePath.LOCAL_MAPS_FOLDER))
+000059: 			{
+000060: 				Directory.CreateDirectory(FilePath.LOCAL_MAPS_FOLDER);
+000061: 			}
+000062: 		}
+000063: 		catch (Exception ex)
+000064: 		{
+000065: 			return new LoadingResult
+000066: 			{
+000067: 				Message = "MAP_MSG_MAP_DIR_NOT_FOUND " + ex.Message,
+000068: 				Succeeded = false
+000069: 			};
+000070: 		}
+000071: 		return new LoadingResult
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/Maps.cs
+LINES: 264-308
+000264: 		foreach (JObject child in objects.Children)
+000265: 		{
+000266: 			if (child != null)
+000267: 			{
+000268: 				uint prefabId = Prefabs.GetPrefabId(child);
+000269: 				if (prefabId != 0 && Prefabs.GetReferenceId(child, safe: false).IsDefault())
+000270: 				{
+000271: 					Prefabs.SetReferenceId(child, MiniGuid.NewFrom(Prefabs.GetPosition(child), prefabId, 48879));
+000272: 				}
+000273: 			}
+000274: 		}
+000275: 	}
+000276: 
+000277: 	public static IEnumerable<Map> LoadDefaultMaps(out LoadingResult result)
+000278: 	{
+000279: 		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.DEFAULT_MAPS_FOLDER), out result);
+000280: 		if (list != null && list.Count > 0)
+000281: 		{
+000282: 			_defaultMapList.Clear();
+000283: 			_defaultMapList.AddRange(list);
+000284: 		}
+000285: 		return _defaultMapList;
+000286: 	}
+000287: 
+000288: 	public static IEnumerable<Map> LoadLocalMaps(out LoadingResult result)
+000289: 	{
+000290: 		_userMapList.Clear();
+000291: 		result = CreateMapFolders();
+000292: 		if (!result.Succeeded)
+000293: 		{
+000294: 			return _userMapList;
+000295: 		}
+000296: 		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.LOCAL_MAPS_FOLDER), out result);
+000297: 		if (list != null && list.Count > 0)
+000298: 		{
+000299: 			_userMapList.AddRange(list);
+000300: 		}
+000301: 		return _userMapList;
+000302: 	}
+000303: 
+000304: 	public static IEnumerable<Map> LoadRemoteMaps(IEnumerable<string> paths, out LoadingResult result)
+000305: 	{
+000306: 		IList<Map> list = LoadMaps(paths, out result);
+000307: 		if (list != null && list.Count > 0)
+000308: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs
+LINES: 2-246
+000002: using System.Collections.Generic;
+000003: using System.IO;
+000004: using System.IO.Compression;
+000005: using System.Runtime.Serialization.Formatters.Binary;
+000006: using Beam.Serialization.Json;
+000007: using Beam.Utilities;
+000008: using Funlabs;
+000009: using SharpNeatLib.Maths;
+000010: using UnityEngine;
+000011: 
+000012: namespace Beam.Terrain;
+000013: 
+000014: public static class World
+000015: {
+000016: 	public struct Bundle
+000017: 	{
+000018: 		public Map[] Maps;
+000019: 
+000020: 		public Vector2[] GenerationZonePositons;
+000021: 
+000022: 		public Vector2[] GeneratedZonePoints;
+000023: 
+000024: 		public Bundle Clear()
+000025: 		{
+000026: 			Maps = new Map[49];
+000027: 			GenerationZonePositons = (GeneratedZonePoints = null);
+000028: 			return this;
+000029: 		}
+000030: 
+000031: 		public static Bundle New()
+000032: 		{
+000033: 			return default(Bundle).Clear();
+000034: 		}
+000035: 
+000036: 		public void Save(Stream stream, byte[] header = null)
+000037: 		{
+000038: 			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Compress, leaveOpen: true);
+000039: 			if (header != null && header.Length != 0)
+000040: 			{
+000041: 				gZipStream.Write(header, 0, header.Length);
+000042: 			}
+000043: 			using BinaryWriter binaryWriter = new BinaryWriter(gZipStream);
+000044: 			for (int i = 0; i < 49; i++)
+000045: 			{
+000046: 				Map map = Maps[i];
+000047: 				using MemoryStream memoryStream = new MemoryStream();
+000048: 				using MemoryStream memoryStream2 = new MemoryStream();
+000049: 				using MemoryStream memoryStream3 = new MemoryStream();
+000050: 				map.Save(memoryStream, memoryStream2, memoryStream3);
+000051: 				byte[] array = memoryStream.ToArray();
+000052: 				byte[] array2 = memoryStream2.ToArray();
+000053: 				byte[] array3 = memoryStream3.ToArray();
+000054: 				binaryWriter.Write(array.Length);
+000055: 				binaryWriter.Write(array2.Length);
+000056: 				binaryWriter.Write(array3.Length);
+000057: 				binaryWriter.Write(array);
+000058: 				binaryWriter.Write(array2);
+000059: 				binaryWriter.Write(array3);
+000060: 			}
+000061: 			for (int j = 0; j < 49; j++)
+000062: 			{
+000063: 				binaryWriter.Write(GenerationZonePositons[j]);
+000064: 			}
+000065: 			binaryWriter.Write((ushort)GeneratedZonePoints.Length);
+000066: 			for (int k = 0; k < GeneratedZonePoints.Length; k++)
+000067: 			{
+000068: 				binaryWriter.Write(GeneratedZonePoints[k]);
+000069: 			}
+000070: 		}
+000071: 
+000072: 		public void Load(Stream stream, bool createTextures, byte[] header = null)
+000073: 		{
+000074: 			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+000075: 			if (header != null && header.Length != 0)
+000076: 			{
+000077: 				gZipStream.Read(header, 0, header.Length);
+000078: 			}
+000079: 			using BinaryReader binaryReader = new BinaryReader(gZipStream);
+000080: 			Maps = new Map[49];
+000081: 			for (int i = 0; i < 49; i++)
+000082: 			{
+000083: 				Map map = new Map();
+000084: 				int num = binaryReader.ReadInt32();
+000085: 				int num2 = binaryReader.ReadInt32();
+000086: 				int num3 = binaryReader.ReadInt32();
+000087: 				byte[] buffer = new byte[num];
+000088: 				byte[] buffer2 = new byte[num2];
+000089: 				byte[] buffer3 = new byte[num3];
+000090: 				binaryReader.Read(buffer, 0, num);
+000091: 				binaryReader.Read(buffer2, 0, num2);
+000092: 				binaryReader.Read(buffer3, 0, num3);
+000093: 				using (MemoryStream editorStream = new MemoryStream(buffer, 0, num))
+000094: 				{
+000095: 					using MemoryStream objectStream = new MemoryStream(buffer2, 0, num2);
+000096: 					using MemoryStream heightStream = new MemoryStream(buffer3, 0, num3);
+000097: 					map.Load(editorStream, objectStream, heightStream, checkVersion: false, createTextures);
+000098: 				}
+000099: 				Maps[i] = map;
+000100: 			}
+000101: 			GenerationZonePositons = new Vector2[49];
+000102: 			for (int j = 0; j < 49; j++)
+000103: 			{
+000104: 				GenerationZonePositons[j] = binaryReader.ReadVector2();
+000105: 			}
+000106: 			ushort num4 = binaryReader.ReadUInt16();
+000107: 			GeneratedZonePoints = new Vector2[num4];
+000108: 			for (int k = 0; k < num4; k++)
+000109: 			{
+000110: 				GeneratedZonePoints[k] = binaryReader.ReadVector2();
+000111: 			}
+000112: 		}
+000113: 
+000114: 		public override string ToString()
+000115: 		{
+000116: 			string text = base.ToString();
+000117: 			if (Maps.IsValid() && Maps.Length != 0)
+000118: 			{
+000119: 				int num = 0;
+000120: 				Map[] maps = Maps;
+000121: 				foreach (Map map in maps)
+000122: 				{
+000123: 					num += map.HeightmapData.GetLength(0) * map.HeightmapData.GetLength(1);
+000124: 				}
+000125: 				num /= Maps.Length;
+000126: 				int num2 = (int)Mathf.Sqrt(num);
+000127: 				text += $"\nMaps[{Maps.Length}] {num2}x{num2}";
+000128: 			}
+000129: 			if (GenerationZonePositons.IsValid())
+000130: 			{
+000131: 				text += $"\nGenerationZonePositons[{GenerationZonePositons.Length}]";
+000132: 			}
+000133: 			if (GeneratedZonePoints.IsValid())
+000134: 			{
+000135: 				text += $"\nGeneratedZonePoints[{GeneratedZonePoints.Length}]";
+000136: 			}
+000137: 			return text;
+000138: 		}
+000139: 	}
+000140: 
+000141: 	public delegate void WorldSavedCallback(LoadingResult result);
+000142: 
+000143: 	public const string WORLD_SEED_FILENAME = "Seed.sdd";
+000144: 
+000145: 	private const int NUM_MISSIONS = 4;
+000146: 
+000147: 	private static Bundle[] _worlds = new Bundle[2]
+000148: 	{
+000149: 		Bundle.New(),
+000150: 		Bundle.New()
+000151: 	};
+000152: 
+000153: 	private static int _currentWorld = 0;
+000154: 
+000155: 	public static Bundle CurrentWorld => _worlds[_currentWorld];
+000156: 
+000157: 	private static Map[] _mapList
+000158: 	{
+000159: 		get
+000160: 		{
+000161: 			return _worlds[_currentWorld].Maps;
+000162: 		}
+000163: 		set
+000164: 		{
+000165: 			_worlds[_currentWorld].Maps = value;
+000166: 		}
+000167: 	}
+000168: 
+000169: 	public static Map[] MapList => _mapList;
+000170: 
+000171: 	private static Vector2[] _generationZonePositons
+000172: 	{
+000173: 		get
+000174: 		{
+000175: 			return _worlds[_currentWorld].GenerationZonePositons;
+000176: 		}
+000177: 		set
+000178: 		{
+000179: 			_worlds[_currentWorld].GenerationZonePositons = value;
+000180: 		}
+000181: 	}
+000182: 
+000183: 	public static Vector2[] GenerationZonePositons => _generationZonePositons;
+000184: 
+000185: 	private static Vector2[] _generatedZonePoints
+000186: 	{
+000187: 		get
+000188: 		{
+000189: 			return _worlds[_currentWorld].GeneratedZonePoints;
+000190: 		}
+000191: 		set
+000192: 		{
+000193: 			_worlds[_currentWorld].GeneratedZonePoints = value;
+000194: 		}
+000195: 	}
+000196: 
+000197: 	public static Vector2[] GeneratedZonePoints => _generatedZonePoints;
+000198: 
+000199: 	public static void PushWorld(Bundle world)
+000200: 	{
+000201: 		if (_currentWorld == 1)
+000202: 		{
+000203: 			Debug.LogError("World is already back-up. This is client map flow issue.");
+000204: 		}
+000205: 		_worlds[++_currentWorld] = world;
+000206: 	}
+000207: 
+000208: 	public static void PopWorld()
+000209: 	{
+000210: 		if (_currentWorld != 0)
+000211: 		{
+000212: 			_worlds[_currentWorld].Clear();
+000213: 			_currentWorld--;
+000214: 		}
+000215: 	}
+000216: 
+000217: 	private static LoadingResult CreateWorldFolders()
+000218: 	{
+000219: 		try
+000220: 		{
+000221: 			if (!Directory.Exists(FilePath.WORLD_FOLDER))
+000222: 			{
+000223: 				Directory.CreateDirectory(FilePath.WORLD_FOLDER);
+000224: 			}
+000225: 		}
+000226: 		catch (Exception ex)
+000227: 		{
+000228: 			return new LoadingResult
+000229: 			{
+000230: 				Message = "WORLD_MSG_WORLD_DIR_NOT_FOUND " + ex.Message,
+000231: 				Succeeded = false
+000232: 			};
+000233: 		}
+000234: 		return new LoadingResult
+000235: 		{
+000236: 			Succeeded = true
+000237: 		};
+000238: 	}
+000239: 
+000240: 	public static void UpgradeLegacyWorld(out LoadingResult result)
+000241: 	{
+000242: 		Map[] array = new Map[25];
+000243: 		result = LoadWorld_(legacy: true);
+000244: 		if (result.Succeeded)
+000245: 		{
+000246: 			CopyLegacyMapsRefs(array);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs
+LINES: 265-386
+000265: 	private static void MergeLegacyMaps(Map[] legacyMaps)
+000266: 	{
+000267: 		int num = 1;
+000268: 		int num2 = 1;
+000269: 		for (int i = 0; i < 5; i++)
+000270: 		{
+000271: 			for (int j = 0; j < 5; j++)
+000272: 			{
+000273: 				Map map = legacyMaps[j * 5 + i];
+000274: 				int num3 = i + num;
+000275: 				int num4 = j + num2;
+000276: 				_mapList[num4 * 7 + num3] = map;
+000277: 			}
+000278: 		}
+000279: 	}
+000280: 
+000281: 	private static LoadingResult ValidateWorldFolders(bool legacy = false)
+000282: 	{
+000283: 		if (!File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd")))
+000284: 		{
+000285: 			return new LoadingResult
+000286: 			{
+000287: 				Message = "WORLD_MSG_SEED_FILE_MISSING",
+000288: 				Succeeded = false
+000289: 			};
+000290: 		}
+000291: 		try
+000292: 		{
+000293: 			if (Directory.GetDirectories(FilePath.WORLD_FOLDER).Length == 0)
+000294: 			{
+000295: 				return new LoadingResult
+000296: 				{
+000297: 					Message = "WORLD_MSG_EMPTY_WORLD_FOLDER",
+000298: 					Succeeded = false
+000299: 				};
+000300: 			}
+000301: 		}
+000302: 		catch (Exception ex)
+000303: 		{
+000304: 			return new LoadingResult
+000305: 			{
+000306: 				Message = ex.Message,
+000307: 				Succeeded = false
+000308: 			};
+000309: 		}
+000310: 		try
+000311: 		{
+000312: 			int num = (legacy ? 5 : 7);
+000313: 			for (int i = 0; i < num * num; i++)
+000314: 			{
+000315: 				string worldMapFolderName = GetWorldMapFolderName(i, legacy);
+000316: 				string text = PathTools.Combine(FilePath.WORLD_FOLDER, worldMapFolderName);
+000317: 				if (Directory.Exists(text))
+000318: 				{
+000319: 					string[] directories = Directory.GetDirectories(text);
+000320: 					for (int j = 0; j < directories.Length; j++)
+000321: 					{
+000322: 						string fileName = Path.GetFileName(directories[j]);
+000323: 						if (!Maps.ValidateMapFolder(PathTools.Combine(text, fileName), fileName))
+000324: 						{
+000325: 							return new LoadingResult
+000326: 							{
+000327: 								Message = "WORLD_MSG_MISSING_MAP_FOLDER " + fileName,
+000328: 								Succeeded = false
+000329: 							};
+000330: 						}
+000331: 					}
+000332: 					continue;
+000333: 				}
+000334: 				return new LoadingResult
+000335: 				{
+000336: 					Message = "WORLD_MSG_MISSING_WORLD_FOLDER",
+000337: 					Succeeded = false
+000338: 				};
+000339: 			}
+000340: 		}
+000341: 		catch (Exception ex2)
+000342: 		{
+000343: 			return new LoadingResult
+000344: 			{
+000345: 				Message = ex2.Message,
+000346: 				Succeeded = false
+000347: 			};
+000348: 		}
+000349: 		return new LoadingResult
+000350: 		{
+000351: 			Succeeded = true
+000352: 		};
+000353: 	}
+000354: 
+000355: 	private static Map CreateProceduralMap(int index, int seed)
+000356: 	{
+000357: 		Map map = new Map();
+000358: 		Zone.BiomeType biomeType = WorldTools.GenerateZoneBiome(Zone.BiomeType.RANDOM, StrandedWorld.WORLD_SEED - seed);
+000359: 		if (index == 0)
+000360: 		{
+000361: 			biomeType = Zone.BiomeType.ISLAND_SMALL;
+000362: 		}
+000363: 		float[,] heightmapData = WorldTools.GenerateZoneHeightmap(biomeType, StrandedWorld.WORLD_SEED - seed);
+000364: 		map.EditorData = new MapEditorData
+000365: 		{
+000366: 			Name = MapNameGenerator.GenerateRandomMapName(seed),
+000367: 			Id = string.Format("{0}_{1}", "INTERNAL_PROCEDURAL", index),
+000368: 			VersionNumber = 0,
+000369: 			Biome = biomeType,
+000370: 			Author = "Beam Team",
+000371: 			Description = "MAP_DESC_PROCEDURAL"
+000372: 		};
+000373: 		map.ObjectData = new JObject();
+000374: 		map.HeightmapData = heightmapData;
+000375: 		map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+000376: 		return map;
+000377: 	}
+000378: 
+000379: 	public static bool ReplaceMapWithProceduralMap(Map replaceMap, out Map proceduralMap)
+000380: 	{
+000381: 		proceduralMap = null;
+000382: 		int num = 0;
+000383: 		for (int i = 0; i < 49; i++)
+000384: 		{
+000385: 			if (_mapList[i] == replaceMap)
+000386: 			{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs
+LINES: 391-619
+000391: 			}
+000392: 			num++;
+000393: 		}
+000394: 		return false;
+000395: 	}
+000396: 
+000397: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+000398: 	{
+000399: 		for (int i = 0; i < 49; i++)
+000400: 		{
+000401: 			if (_mapList[i] == mapToReplace)
+000402: 			{
+000403: 				_mapList[i] = replacingMap;
+000404: 				break;
+000405: 			}
+000406: 		}
+000407: 	}
+000408: 
+000409: 	private static int[] CreateMissionTiles()
+000410: 	{
+000411: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000412: 		int upperBound = 48;
+000413: 		List<int> list = new List<int>();
+000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}
+000459: 			}
+000460: 			if (flag && num < Maps.DefaultMapList.Count)
+000461: 			{
+000462: 				Map map2 = Maps.DefaultMapList[num];
+000463: 				_mapList[j] = map2;
+000464: 				if (map2.EditorData.Biome == Zone.BiomeType.CARRIER)
+000465: 				{
+000466: 					map2.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Carrier") as Texture2D;
+000467: 				}
+000468: 				else if (map2.EditorData.Biome == Zone.BiomeType.MISSION)
+000469: 				{
+000470: 					map2.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Mission") as Texture2D;
+000471: 				}
+000472: 				num++;
+000473: 			}
+000474: 			else
+000475: 			{
+000476: 				int seed2 = j;
+000477: 				Map map3 = CreateProceduralMap(j, seed2);
+000478: 				_mapList[j] = map3;
+000479: 			}
+000480: 		}
+000481: 	}
+000482: 
+000483: 	public static void CreateWorldZonePoints(int seed)
+000484: 	{
+000485: 		int num = 49;
+000486: 		float num2 = 500f;
+000487: 		float num3 = num2 * 1.25f * 7f;
+000488: 		int numSamplesBeforeRejection = 30;
+000489: 		_generatedZonePoints = ZonePositionGenerator.GeneratePoints(seed, num2, new Vector2(num3, num3), numSamplesBeforeRejection);
+000490: 		_generationZonePositons = new Vector2[num];
+000491: 		FastRandom fastRandom = new FastRandom(seed);
+000492: 		List<int> list = new List<int>();
+000493: 		int upperBound = _generatedZonePoints.Length;
+000494: 		for (int i = 0; i < num; i++)
+000495: 		{
+000496: 			int num4 = fastRandom.Next(0, upperBound);
+000497: 			while (list.Contains(num4))
+000498: 			{
+000499: 				num4 = fastRandom.Next(0, upperBound);
+000500: 			}
+000501: 			if (i == 0)
+000502: 			{
+000503: 				num4 = 0;
+000504: 			}
+000505: 			list.Add(num4);
+000506: 			_generationZonePositons[i] = _generatedZonePoints[num4];
+000507: 		}
+000508: 		if (_generationZonePositons.Length < num - 1)
+000509: 		{
+000510: 			Debug.LogError("Error: Not enough island positions");
+000511: 		}
+000512: 	}
+000513: 
+000514: 	public static void SaveWorld(WorldSavedCallback callback)
+000515: 	{
+000516: 		LoadingResult loadingResult = CreateWorldFolders();
+000517: 		if (loadingResult.Succeeded)
+000518: 		{
+000519: 			loadingResult = SaveWorldSeed();
+000520: 		}
+000521: 		if (loadingResult.Succeeded)
+000522: 		{
+000523: 			loadingResult = SaveWorldMaps();
+000524: 		}
+000525: 		if (!loadingResult.Succeeded)
+000526: 		{
+000527: 			DeleteWorld(FilePath.WORLD_FOLDER);
+000528: 			callback?.Invoke(loadingResult);
+000529: 		}
+000530: 		else
+000531: 		{
+000532: 			callback?.Invoke(loadingResult);
+000533: 		}
+000534: 	}
+000535: 
+000536: 	private static void DeleteWorld(string folderPath)
+000537: 	{
+000538: 		if (string.IsNullOrWhiteSpace(folderPath))
+000539: 		{
+000540: 			return;
+000541: 		}
+000542: 		try
+000543: 		{
+000544: 			if (!Directory.Exists(folderPath))
+000545: 			{
+000546: 				return;
+000547: 			}
+000548: 			DirectoryInfo directoryInfo = new DirectoryInfo(folderPath);
+000549: 			foreach (FileInfo item in directoryInfo.EnumerateFiles())
+000550: 			{
+000551: 				item.Delete();
+000552: 			}
+000553: 			foreach (DirectoryInfo item2 in directoryInfo.EnumerateDirectories())
+000554: 			{
+000555: 				item2.Delete(recursive: true);
+000556: 			}
+000557: 		}
+000558: 		catch (Exception exception)
+000559: 		{
+000560: 			Debug.LogException(exception);
+000561: 		}
+000562: 	}
+000563: 
+000564: 	private static LoadingResult SaveWorldSeed()
+000565: 	{
+000566: 		try
+000567: 		{
+000568: 			using (FileStream serializationStream = new FileStream(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+000569: 			{
+000570: 				new BinaryFormatter().Serialize(serializationStream, StrandedWorld.LOCAL_WORLD_SEED);
+000571: 			}
+000572: 			return new LoadingResult
+000573: 			{
+000574: 				Message = "WORLD_MSG_SUCCESS",
+000575: 				Succeeded = true
+000576: 			};
+000577: 		}
+000578: 		catch (Exception ex)
+000579: 		{
+000580: 			LoadingResult result = new LoadingResult
+000581: 			{
+000582: 				Message = "WORLD_MSG_ERROR_SAVING_WORLD_SEED " + ex.Message,
+000583: 				Succeeded = false
+000584: 			};
+000585: 			Debug.LogError("World::SaveWorldSeed:: " + ex.Message);
+000586: 			return result;
+000587: 		}
+000588: 	}
+000589: 
+000590: 	private static LoadingResult SaveWorldMaps()
+000591: 	{
+000592: 		try
+000593: 		{
+000594: 			for (int i = 0; i < 49; i++)
+000595: 			{
+000596: 				string text = PathTools.Combine(FilePath.WORLD_FOLDER, i.ToString());
+000597: 				if (Directory.Exists(text))
+000598: 				{
+000599: 					Directory.Delete(text, recursive: true);
+000600: 				}
+000601: 				Directory.CreateDirectory(text);
+000602: 				Maps.DeleteMapFolder(Directory.GetDirectories(text));
+000603: 				Maps.SaveMap(_mapList[i], text);
+000604: 			}
+000605: 			return new LoadingResult
+000606: 			{
+000607: 				Message = "WORLD_MSG_SUCCESS",
+000608: 				Succeeded = true
+000609: 			};
+000610: 		}
+000611: 		catch (Exception ex)
+000612: 		{
+000613: 			LoadingResult result = new LoadingResult
+000614: 			{
+000615: 				Message = "WORLD_MSG_ERROR_SAVING_WORLD " + ex.Message,
+000616: 				Succeeded = false
+000617: 			};
+000618: 			Debug.LogError("World::SaveWorldMaps:: " + ex.Message);
+000619: 			return result;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs
+LINES: 622-730
+000622: 
+000623: 	public static LoadingResult LoadWorld()
+000624: 	{
+000625: 		return LoadWorld_();
+000626: 	}
+000627: 
+000628: 	private static LoadingResult LoadWorld_(bool legacy = false)
+000629: 	{
+000630: 		LoadingResult loadingResult = ValidateWorldFolders(legacy);
+000631: 		if (loadingResult.Succeeded)
+000632: 		{
+000633: 			LoadingResult loadingResult2 = LoadWorldSeed();
+000634: 			if (!loadingResult2.Succeeded)
+000635: 			{
+000636: 				return loadingResult2;
+000637: 			}
+000638: 			if (!legacy)
+000639: 			{
+000640: 				CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000641: 			}
+000642: 			loadingResult2 = LoadWorldMaps(legacy);
+000643: 			if (!loadingResult2.Succeeded)
+000644: 			{
+000645: 				return loadingResult2;
+000646: 			}
+000647: 			return new LoadingResult
+000648: 			{
+000649: 				Succeeded = true
+000650: 			};
+000651: 		}
+000652: 		LoadingResult result = new LoadingResult
+000653: 		{
+000654: 			Message = "WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE " + loadingResult.Message,
+000655: 			Succeeded = false
+000656: 		};
+000657: 		Debug.LogError("World::LoadWorld:: " + loadingResult.Message);
+000658: 		return result;
+000659: 	}
+000660: 
+000661: 	public static bool CheckWorldSeedFileExists()
+000662: 	{
+000663: 		return File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"));
+000664: 	}
+000665: 
+000666: 	private static LoadingResult LoadWorldSeed()
+000667: 	{
+000668: 		try
+000669: 		{
+000670: 			using (FileStream serializationStream = new FileStream(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"), FileMode.Open, FileAccess.Read))
+000671: 			{
+000672: 				StrandedWorld.SetWorldSeed(((int)new BinaryFormatter().Deserialize(serializationStream)).ToString());
+000673: 			}
+000674: 			LoadingResult result = new LoadingResult
+000675: 			{
+000676: 				Message = "WORLD_MSG_SUCCESS",
+000677: 				Succeeded = true
+000678: 			};
+000679: 			Debug.Log("World::LoadWorldSeed:: Success.");
+000680: 			return result;
+000681: 		}
+000682: 		catch (Exception ex)
+000683: 		{
+000684: 			LoadingResult result2 = new LoadingResult
+000685: 			{
+000686: 				Message = "WORLD_MSG_ERROR_LOADING_WORLD_SEED " + ex.Message,
+000687: 				Succeeded = false
+000688: 			};
+000689: 			Debug.LogError("World::LoadWorldSeed:: " + ex.Message);
+000690: 			return result2;
+000691: 		}
+000692: 	}
+000693: 
+000694: 	private static LoadingResult LoadWorldMaps(bool legacy = false)
+000695: 	{
+000696: 		LoadingResult loadingResult = new LoadingResult
+000697: 		{
+000698: 			Succeeded = true
+000699: 		};
+000700: 		try
+000701: 		{
+000702: 			int num = (legacy ? 5 : 7);
+000703: 			_mapList = new Map[num * num];
+000704: 			for (int i = 0; i < num * num; i++)
+000705: 			{
+000706: 				string worldMapFolderName = GetWorldMapFolderName(i, legacy);
+000707: 				string text = PathTools.Combine(FilePath.WORLD_FOLDER, worldMapFolderName);
+000708: 				string[] directories = Directory.GetDirectories(text);
+000709: 				for (int j = 0; j < directories.Length; j++)
+000710: 				{
+000711: 					string fileName = Path.GetFileName(directories[j]);
+000712: 					string mapPath = PathTools.Combine(text, fileName);
+000713: 					try
+000714: 					{
+000715: 						Map map = Maps.LoadMap(mapPath, fileName, checkVersion: true);
+000716: 						_mapList[i] = map;
+000717: 					}
+000718: 					catch (VersionException ex)
+000719: 					{
+000720: 						loadingResult.Message = "WORLD_MSG_MAP_VERSION_EXCEPTION";
+000721: 						loadingResult.Succeeded = false;
+000722: 						Debug.LogError("World::LoadWorldMaps:: " + ex.Message);
+000723: 						goto end_IL_0138;
+000724: 					}
+000725: 					catch (Exception ex2)
+000726: 					{
+000727: 						LoadingResult loadingResult2 = loadingResult;
+000728: 						loadingResult2.Message = loadingResult2.Message + "WORLD_MSG_ERROR_LOADING_MAP " + fileName + "\n\n" + ex2.Message;
+000729: 						loadingResult.Succeeded = false;
+000730: 						Debug.LogError("World::LoadWorldMaps:: " + ex2.Message);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs
+LINES: 251-292
+000251: 			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+000252: 		}
+000253: 		UpdateSessionToken_IsBusy(isBusy: false);
+000254: 	}
+000255: 
+000256: 	public bool GenerateZone(Zone zone)
+000257: 	{
+000258: 		if (_isGenerating)
+000259: 		{
+000260: 			return false;
+000261: 		}
+000262: 		GenerateObjects(zone, GenerateObject);
+000263: 		return true;
+000264: 	}
+000265: 
+000266: 	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
+000267: 	{
+000268: 		_isGenerating = true;
+000269: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000270: 		zone.GenerateGridData();
+000271: 		zone.GeneratedObjects.Clear();
+000272: 		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
+000273: 		if (zone.HasShelter)
+000274: 		{
+000275: 			GenerateShelter(sheltersGeneration, zone, generationCallback);
+000276: 		}
+000277: 		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
+000278: 		{
+000279: 			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
+000280: 			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
+000281: 			{
+000282: 				continue;
+000283: 			}
+000284: 			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
+000285: 			{
+000286: 				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
+000287: 				switch (zoneObjects.generationType)
+000288: 				{
+000289: 				case ZoneGenerationType.Position:
+000290: 					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
+000291: 					break;
+000292: 				case ZoneGenerationType.Procedural:
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs
+LINES: 311-352
+000311: 					case ZoneGenerationType.Procedural:
+000312: 						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
+000313: 						break;
+000314: 					}
+000315: 				}
+000316: 			}
+000317: 		}
+000318: 		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+000319: 		_isGenerating = false;
+000320: 	}
+000321: 
+000322: 	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000323: 	{
+000324: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000325: 		{
+000326: 			UnityEngine.Debug.LogError("ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.");
+000327: 			return;
+000328: 		}
+000329: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000330: 		float num = 0f;
+000331: 		if (zoneObjects.Objects.Length != 0)
+000332: 		{
+000333: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000334: 			{
+000335: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000336: 				num += zoneObject.Rarity;
+000337: 			}
+000338: 		}
+000339: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000340: 		{
+000341: 			return;
+000342: 		}
+000343: 		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+000344: 		{
+000345: 			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+000346: 			{
+000347: 				continue;
+000348: 			}
+000349: 			int num2 = 0;
+000350: 			if (zoneObjects.Objects.Length != 0)
+000351: 			{
+000352: 				float num3 = (float)_random.NextDouble() * num;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs
+LINES: 359-400
+000359: 					}
+000360: 					num3 -= zoneObjects.Objects[k].Rarity;
+000361: 				}
+000362: 			}
+000363: 			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+000364: 			Quaternion identity = Quaternion.identity;
+000365: 			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+000366: 			generationCallback(obj, position, identity, zone);
+000367: 		}
+000368: 	}
+000369: 
+000370: 	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000371: 	{
+000372: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000373: 		{
+000374: 			UnityEngine.Debug.LogError("ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.");
+000375: 			return;
+000376: 		}
+000377: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000378: 		float num = 0f;
+000379: 		if (zoneObjects.Objects.Length != 0)
+000380: 		{
+000381: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000382: 			{
+000383: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000384: 				num += zoneObject.Rarity;
+000385: 			}
+000386: 		}
+000387: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000388: 		{
+000389: 			return;
+000390: 		}
+000391: 		int detailAmountFactor = zoneObjects.detailAmountFactor;
+000392: 		int num2 = 0;
+000393: 		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
+000394: 		{
+000395: 			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
+000396: 			{
+000397: 				if (num2 >= zoneObjects.maxObjectCount)
+000398: 				{
+000399: 					return;
+000400: 				}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs
+LINES: 1-48
+000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = "Debug_SoilMap";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI.MapEditor/MapEditorSaveMenuPresenter.cs
+LINES: 110-151
+000110: 
+000111: 	private void SaveButton_Click(object sender)
+000112: 	{
+000113: 		_view.CanvasGroup.Interactable = false;
+000114: 		if (string.IsNullOrWhiteSpace(_view.NameInputField.Text))
+000115: 		{
+000116: 			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SORRY_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_NAME_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+000117: 			{
+000118: 				_view.CanvasGroup.Interactable = true;
+000119: 			};
+000120: 		}
+000121: 		else if (string.IsNullOrWhiteSpace(_view.DescriptionInputField.Text))
+000122: 		{
+000123: 			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SORRY_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_DESCRIPTION_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+000124: 			{
+000125: 				_view.CanvasGroup.Interactable = true;
+000126: 			};
+000127: 		}
+000128: 		else if (Maps.DefaultMapList.FirstOrDefault((Map map) => map.EditorData.Id == CurrentMap.EditorData.Id) != null)
+000129: 		{
+000130: 			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SAVE_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_RESERVED_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+000131: 			{
+000132: 				_view.CanvasGroup.Interactable = true;
+000133: 			};
+000134: 		}
+000135: 		else
+000136: 		{
+000137: 			OnValidateTextsSucceeded();
+000138: 		}
+000139: 	}
+000140: 
+000141: 	private void OnValidateTextsSucceeded()
+000142: 	{
+000143: 		if (Maps.UserMapList.FirstOrDefault((Map map) => map.EditorData.Id == CurrentMap.EditorData.Id) != null)
+000144: 		{
+000145: 			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SAVE_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_EXISTING_DESC", DialogueButton.YesNo);
+000146: 			dialogueBoxViewAdapter.Accept += () =>
+000147: 			{
+000148: 				SaveMap();
+000149: 				_view.CanvasGroup.Interactable = true;
+000150: 			};
+000151: 			dialogueBoxViewAdapter.Decline += () =>
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI.MapEditor/MapEditorSaveMenuPresenter.cs
+LINES: 164-205
+000164: 	{
+000165: 		DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+000166: 		{
+000167: 			_view.CanvasGroup.Interactable = true;
+000168: 		};
+000169: 	}
+000170: 
+000171: 	private void BackButton_Click(object sender)
+000172: 	{
+000173: 		Hide();
+000174: 	}
+000175: 
+000176: 	private void NameInputField_Changed(string value)
+000177: 	{
+000178: 	}
+000179: 
+000180: 	private void SaveMap()
+000181: 	{
+000182: 		CurrentMap.HeightmapData = Singleton<LE_ZoneTileGenerator>.Instance.terrain.terrainData.GetHeights(0, 0, 257, 257);
+000183: 		JObject jObject = new JObject();
+000184: 		LE_Object[] componentsInChildren = Singleton<LE_LevelEditorMain>.Instance.ObjectDumpContainer.GetComponentsInChildren<LE_Object>(includeInactive: true);
+000185: 		foreach (LE_Object lE_Object in componentsInChildren)
+000186: 		{
+000187: 			JObject jObject2 = new JObject();
+000188: 			jObject2.AddField("prefab", Prefabs.ConvertPrefabIdToLegacy(lE_Object.Id));
+000189: 			jObject2.AddField("reference", MiniGuid.New().ToString());
+000190: 			JObject data = JSerializer.Serialize(lE_Object.transform);
+000191: 			jObject2.AddField("Transform", data);
+000192: 			jObject.Add(jObject2);
+000193: 		}
+000194: 		CurrentMap.ObjectData = jObject;
+000195: 		CurrentMap.EditorData.Author = GAccountService.Get().LocalUser.UserInfo.DisplayName;
+000196: 		CurrentMap.EditorData.Name = _view.NameInputField.Text.Trim();
+000197: 		CurrentMap.EditorData.Description = _view.DescriptionInputField.Text.Trim();
+000198: 		CurrentMap.EditorData.VersionNumber++;
+000199: 		bool flag = false;
+000200: 		string text = "";
+000201: 		try
+000202: 		{
+000203: 			Maps.SaveMap(CurrentMap, FilePath.LOCAL_MAPS_FOLDER);
+000204: 			flag = true;
+000205: 		}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs
+LINES: 317-358
+000317: 			Map map = World.MapList[i];
+000318: 			UWorldMapSlot uWorldMapSlot = UnityEngine.Object.Instantiate(_view.MapSlotPrefab);
+000319: 			uWorldMapSlot.transform.SetParent(_view.MapSlotsContainer.transform, worldPositionStays: false);
+000320: 			uWorldMapSlot.SetMap(map);
+000321: 			uWorldMapSlot.Click += WorldMapSlot_Click;
+000322: 			uWorldMapSlot.Enter += WorldMapSlot_Enter;
+000323: 			uWorldMapSlot.Leave += WorldMapSlot_Leave;
+000324: 			uWorldMapSlot.Drop += WorldMapSlot_Drop;
+000325: 			if ((_reservedZoneIds.Count == 0 && i == 0) || _reservedZoneIds.Contains(map.EditorData.Id) || map.EditorData.Id.Contains("INTERNAL_MISSION"))
+000326: 			{
+000327: 				uWorldMapSlot.Map.EditorData.Valid = false;
+000328: 				uWorldMapSlot.Button.Enabled = false;
+000329: 			}
+000330: 			else
+000331: 			{
+000332: 				uWorldMapSlot.Map.EditorData.Valid = true;
+000333: 				uWorldMapSlot.Button.Enabled = true;
+000334: 			}
+000335: 			Vector2 vector = World.GenerationZonePositons[i];
+000336: 			RectTransform rectTransform = (RectTransform)uWorldMapSlot.transform;
+000337: 			rectTransform.localPosition = new Vector3(vector.x, vector.y, 0f);
+000338: 			rectTransform.sizeDelta = new Vector2(257f, 257f);
+000339: 		}
+000340: 		componentInParent.ScaleToFitContent();
+000341: 		componentInParent.SetScale(0.5f);
+000342: 		_currentMapSlot = null;
+000343: 	}
+000344: 
+000345: 	private void RefreshWorldMapSlots()
+000346: 	{
+000347: 		UWorldMapSlot[] componentsInChildren = _view.MapSlotsContainer.GetComponentsInChildren<UWorldMapSlot>();
+000348: 		foreach (UWorldMapSlot obj in componentsInChildren)
+000349: 		{
+000350: 			obj.SetState(obj.Map.EditorData.State);
+000351: 		}
+000352: 	}
+000353: 
+000354: 	public void UpdateWorldMapSlot(IWorldMapSlot slot, Map map)
+000355: 	{
+000356: 		slot.SetMap(map);
+000357: 		WorldMapSlot_Click(slot, null);
+000358: 		slot.Button.Select();
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs
+LINES: 556-630
+000556: 		{
+000557: 			ShowCreateNewWorldDialogue();
+000558: 			return;
+000559: 		}
+000560: 		LoadingResult loadingResult = World.LoadWorld();
+000561: 		if (!loadingResult.Succeeded)
+000562: 		{
+000563: 			string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_LOADING_WORLD_DESC", loadingResult.Message.Truncate());
+000564: 			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += ShowCreateNewWorldDialogue;
+000565: 		}
+000566: 		else
+000567: 		{
+000568: 			ResetWorldView();
+000569: 		}
+000570: 	}
+000571: 
+000572: 	private void CreateWorld(string seedValue)
+000573: 	{
+000574: 		StrandedWorld.SetWorldSeed(seedValue);
+000575: 		World.CreateWorld();
+000576: 		SaveWorld();
+000577: 		OnCreatedNewWorld();
+000578: 	}
+000579: 
+000580: 	public void CreateRandomWorld()
+000581: 	{
+000582: 		CreateWorld(string.Empty);
+000583: 	}
+000584: 
+000585: 	private void SaveWorld(Action onSuccess = null)
+000586: 	{
+000587: 		World.SaveWorld((LoadingResult result) =>
+000588: 		{
+000589: 			if (result.Succeeded)
+000590: 			{
+000591: 				UpdateMapsStatus();
+000592: 				onSuccess?.Invoke();
+000593: 				_mapsInserted = 0;
+000594: 				ResetDirty();
+000595: 			}
+000596: 			else
+000597: 			{
+000598: 				string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC", result.Message.Truncate());
+000599: 				DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning);
+000600: 			}
+000601: 		});
+000602: 	}
+000603: 
+000604: 	private void ResetWorldView()
+000605: 	{
+000606: 		_view.InfoLabel.Text = "CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC";
+000607: 		_view.WorldSeedLabel.Text = "#" + StrandedWorld.WORLD_SEED;
+000608: 		LoadPlayerMaps();
+000609: 		UpdateMapsStatus();
+000610: 		CreateWorldMapSlots();
+000611: 		_view.LocalMapsButton.PerformClick();
+000612: 		_view.SelectFirstButton();
+000613: 	}
+000614: 
+000615: 	private void LocalMapsButton_Click(object sender)
+000616: 	{
+000617: 		_view.LocalMapListContainer.gameObject.SetActive(value: true);
+000618: 		_view.RemoteMapListContainer.gameObject.SetActive(value: false);
+000619: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: false);
+000620: 		_view.NoMapsLabel.transform.gameObject.SetActive(value: false);
+000621: 		CreateMapListElements(Maps.UserMapList, _view.LocalMapListContainer.transform);
+000622: 	}
+000623: 
+000624: 	private void RemoteMapsButton_Click(object sender)
+000625: 	{
+000626: 		_view.LocalMapListContainer.gameObject.SetActive(value: false);
+000627: 		_view.RemoteMapListContainer.gameObject.SetActive(value: true);
+000628: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: true);
+000629: 		ShowRemoteMaps();
+000630: 	}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs
+LINES: 666-726
+000666: 	}
+000667: 
+000668: 	private void SetDirty()
+000669: 	{
+000670: 		_dirty = true;
+000671: 		_view.ApplyButton.Enabled = true;
+000672: 	}
+000673: 
+000674: 	private void ResetDirty()
+000675: 	{
+000676: 		_dirty = false;
+000677: 		_view.ApplyButton.Enabled = false;
+000678: 	}
+000679: 
+000680: 	private void ShowCreateNewWorldDialogue()
+000681: 	{
+000682: 		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_TITLE", "CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_DESC", DialogueButton.OkCancel, DialogueIcon.Information, DialogueType.Input);
+000683: 		dialogue.InputField.CharacterLimit = 8;
+000684: 		dialogue.InputField.Text = StrandedWorld.GetRandowWorldSeed().ToString();
+000685: 		dialogue.Decline += Hide;
+000686: 		dialogue.Accept += () =>
+000687: 		{
+000688: 			string seed = dialogue.InputField.Text;
+000689: 			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+000690: 			InvokeDelayed(0.3f, () =>
+000691: 			{
+000692: 				CreateWorld(seed);
+000693: 				ResetWorldView();
+000694: 				d.Destroy();
+000695: 			});
+000696: 		};
+000697: 	}
+000698: 
+000699: 	private void ShowRandomizeWorldDialogue()
+000700: 	{
+000701: 		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_SEED_DESC", DialogueButton.OkCancel, DialogueIcon.Warning, DialogueType.Input);
+000702: 		dialogue.InputField.CharacterLimit = 8;
+000703: 		dialogue.InputField.Text = StrandedWorld.GetRandowWorldSeed().ToString();
+000704: 		dialogue.Accept += () =>
+000705: 		{
+000706: 			string seed = dialogue.InputField.Text;
+000707: 			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+000708: 			InvokeDelayed(0.3f, () =>
+000709: 			{
+000710: 				DeleteSave();
+000711: 				CreateWorld(seed);
+000712: 				ResetWorldView();
+000713: 				d.Destroy();
+000714: 			});
+000715: 		};
+000716: 	}
+000717: 
+000718: 	public void ShowRandomizeWorldDialogue_NoInput(Action success, Action cancel)
+000719: 	{
+000720: 		DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_DESC", DialogueButton.OkCancel, DialogueIcon.Warning);
+000721: 		dialogueBoxViewAdapter.Accept += () =>
+000722: 		{
+000723: 			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+000724: 			InvokeDelayed(0.3f, () =>
+000725: 			{
+000726: 				DeleteSave();
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/MainMenuPresenter.cs
+LINES: 190-231
+000190: 		ControllerFocus.Instance?.Subscribe(_view);
+000191: 	}
+000192: 
+000193: 	private IEnumerator<float> Initialize_Sequence()
+000194: 	{
+000195: 		_view.CanvasGroup.Interactable = false;
+000196: 		if (Game.PreviousState == GameState.MAIN_MENU)
+000197: 		{
+000198: 			Singleton<Fader>.Instance.SetFadeColor(Color.black);
+000199: 		}
+000200: 		Singleton<Fader>.Instance.FadeOut(0f);
+000201: 		_view.Hide();
+000202: 		_loadingScreenPresenter.Show();
+000203: 		Rewired.Player input = (_currentPlayerInput = ReInput.players.GetPlayer(0));
+000204: 		bool checkFilePermissions = FilePath.CheckFilePermissions() && FilePath.CreateDirectories();
+000205: 		if (!checkFilePermissions)
+000206: 		{
+000207: 			_loadingScreenPresenter.Hide();
+000208: 			string message = Localization.GetLanguageHandler().Localize("MAIN_MENU_DB_FILE_PERMISSIONS_DESC", FilePath.SAVE_FOLDER);
+000209: 			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_WARNING_TITLE", message, "MAIN_MENU_DB_BUTTON_VISIT", "MAIN_MENU_BUTTON_QUIT", "", DialogueIcon.Warning);
+000210: 			dialogueBoxViewAdapter.Accept += () =>
+000211: 			{
+000212: 				Application.OpenURL("https://forums.strandeddeepgame.com");
+000213: 				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+000214: 			};
+000215: 			dialogueBoxViewAdapter.Decline += () =>
+000216: 			{
+000217: 				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+000218: 			};
+000219: 		}
+000220: 		while (!checkFilePermissions)
+000221: 		{
+000222: 			yield return 0f;
+000223: 		}
+000224: 		IAccountService accountService = GAccountService.Get();
+000225: 		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_INITIALIZING " + accountService.Name));
+000226: 		yield return 0f;
+000227: 		CheckAccountServicesInitialized();
+000228: 		while (!accountService.Initialized)
+000229: 		{
+000230: 			yield return 0f;
+000231: 		}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/MainMenuPresenter.cs
+LINES: 1039-1080
+001039: 			ReplicatedStartGame(mode, state, scene);
+001040: 		}
+001041: 		else if (settings.World == EGameWorldMode.Random)
+001042: 		{
+001043: 			Timing.RunCoroutine(CreateRandomWorld_Sequence(mode, state, scene));
+001044: 		}
+001045: 	}
+001046: 
+001047: 	private IEnumerator<float> CreateRandomWorld_Sequence(GameMode mode, GameState state, int scene)
+001048: 	{
+001049: 		if (mode.IsServer())
+001050: 		{
+001051: 			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+001052: 		}
+001053: 		_cartographerMenuPresenter.ShowRandomizeWorldDialogue_NoInput(() =>
+001054: 		{
+001055: 			if (mode.IsServer())
+001056: 			{
+001057: 				PlayerRegistry.LocalPeer.WorldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+001058: 			}
+001059: 			ReplicatedStartGame(mode, state, scene);
+001060: 			_newGameMenuPresenter.Suspend = false;
+001061: 		}, () =>
+001062: 		{
+001063: 			_newGameMenuPresenter.Suspend = false;
+001064: 		});
+001065: 	}
+001066: 
+001067: 	private void StartContinueGame()
+001068: 	{
+001069: 		ReplicatedStartGame(Game.Mode, GameState.LOAD_GAME, 3);
+001070: 	}
+001071: 
+001072: 	public void StartGame(GameMode mode, GameState state, int scene)
+001073: 	{
+001074: 		Time.timeScale = 1f;
+001075: 		if ((bool)_view)
+001076: 		{
+001077: 			_view.CanvasGroup.Interactable = false;
+001078: 		}
+001079: 		else
+001080: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/FlockController.cs
+LINES: 104-145
+000104: 
+000105: 	private IEnumerator Start()
+000106: 	{
+000107: 		_landingSpotController = Singleton<LandingSpotController>.Instance;
+000108: 		if (!Game.Mode.IsMaster())
+000109: 		{
+000110: 			yield break;
+000111: 		}
+000112: 		while (LevelLoader.IsLoadingScene())
+000113: 		{
+000114: 			yield return null;
+000115: 		}
+000116: 		_flockData = _flockProvider.GetFlocks();
+000117: 		CreateFlocks();
+000118: 		EventManager.AddListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000119: 		if ((bool)Singleton<StrandedWorld>.Instance)
+000120: 		{
+000121: 			_nmlZoneName = Singleton<StrandedWorld>.Instance.NmlZone.name;
+000122: 			Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000123: 			if ((bool)zone)
+000124: 			{
+000125: 				_endGameZoneName = zone.name;
+000126: 			}
+000127: 		}
+000128: 		InvokeRepeating("PollZone", 1f, 1f);
+000129: 		InvokeRepeating("PollFlockEvents", 1f, 1f);
+000130: 	}
+000131: 
+000132: 	private void OnDestroy()
+000133: 	{
+000134: 		if (!(_Instance != this))
+000135: 		{
+000136: 			_Instance = null;
+000137: 			if (Game.Mode.IsMaster())
+000138: 			{
+000139: 				EventManager.RemoveListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000140: 			}
+000141: 		}
+000142: 	}
+000143: 
+000144: 	private void EventManager_EndGameSequenceEvent(EndGameSequenceEvent e)
+000145: 	{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/GameCalendar.cs
+LINES: 179-220
+000179: 			{
+000180: 				_day = 0;
+000181: 				Month++;
+000182: 			}
+000183: 		}
+000184: 	}
+000185: 
+000186: 	public int DaysElapsed => _daysElapsed;
+000187: 
+000188: 	public int DaysAlive => DaysElapsed + 1;
+000189: 
+000190: 	public DayTickEvent NewDayTick => _newDayTick;
+000191: 
+000192: 	public MonthData CurrentMonthData => MonthsData[Month];
+000193: 
+000194: 	private void Awake()
+000195: 	{
+000196: 		_year = 2022;
+000197: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000198: 		Month = fastRandom.Next(0, 12);
+000199: 		Day = fastRandom.Next(0, DateTime.DaysInMonth(_year, Month + 1));
+000200: 		Singleton<GameTime>.Instance.DayTick += GameTime_DayTick;
+000201: 		Singleton<GameTime>.Instance.NewDayTick += GameTime_NewDayTick;
+000202: 	}
+000203: 
+000204: 	protected override void OnDestroy()
+000205: 	{
+000206: 		if (Singleton<GameTime>.Instance != null)
+000207: 		{
+000208: 			Singleton<GameTime>.Instance.DayTick -= GameTime_DayTick;
+000209: 			Singleton<GameTime>.Instance.NewDayTick -= GameTime_NewDayTick;
+000210: 		}
+000211: 		base.OnDestroy();
+000212: 	}
+000213: 
+000214: 	private void GameTime_DayTick()
+000215: 	{
+000216: 		Day++;
+000217: 		_daysElapsed++;
+000218: 	}
+000219: 
+000220: 	private void GameTime_NewDayTick()
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/LegacyUtilities.cs
+LINES: 110-155
+000110: 			if (craftingCombination9 != null && !craftingCombination9.Unlocked)
+000111: 			{
+000112: 				craftingCombination9.Unlocked = true;
+000113: 			}
+000114: 		}
+000115: 	}
+000116: 
+000117: 	private static bool IsLegacySaveFile()
+000118: 	{
+000119: 		if (SaveManager.CompareSaveFileVersion(GameMode.SinglePlayer, new Version(0, 71, 0)) == VersionStatus.Newer || SaveManager.CompareSaveFileVersion(GameMode.Coop_2, new Version(0, 71, 0)) == VersionStatus.Newer || SaveManager.CompareSaveFileVersion(GameMode.Coop_Server, new Version(0, 75, 0)) == VersionStatus.Newer)
+000120: 		{
+000121: 			return false;
+000122: 		}
+000123: 		return true;
+000124: 	}
+000125: 
+000126: 	private static bool IsLegacyWorld()
+000127: 	{
+000128: 		if (!Directory.Exists(FilePath.WORLD_FOLDER))
+000129: 		{
+000130: 			return false;
+000131: 		}
+000132: 		IEnumerable<string> enumerable = from x in Directory.GetDirectories(FilePath.WORLD_FOLDER)
+000133: 			select Path.GetFileName(x) into x
+000134: 			where !string.IsNullOrEmpty(x)
+000135: 			select x;
+000136: 		if (enumerable == null || enumerable.Count() == 0)
+000137: 		{
+000138: 			return false;
+000139: 		}
+000140: 		return enumerable.Contains("0_0");
+000141: 	}
+000142: 
+000143: 	private static void UseLegacyBackups()
+000144: 	{
+000145: 		string saveFilePath = SaveManager.GetSaveFilePath(GameMode.SinglePlayer);
+000146: 		if (File.Exists(saveFilePath + "_LEGACY"))
+000147: 		{
+000148: 			File.Move(saveFilePath, saveFilePath + "_LEGACY2");
+000149: 			File.Move(saveFilePath + "_LEGACY", saveFilePath);
+000150: 			UnityEngine.Debug.Log("Using legacy save backup for 1P upgrade...");
+000151: 		}
+000152: 		saveFilePath = SaveManager.GetSaveFilePath(GameMode.Coop_2);
+000153: 		if (File.Exists(saveFilePath + "_LEGACY"))
+000154: 		{
+000155: 			File.Move(saveFilePath, saveFilePath + "_LEGACY2");
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/LegacyUtilities.cs
+LINES: 259-301
+000259: 				int num8 = num6 + num4;
+000260: 				jObject2.Children[num8 * 7 + num7] = value;
+000261: 				num6++;
+000262: 				num5++;
+000263: 			}
+000264: 		}
+000265: 		FixRigidbodyWorldPositions_Pre_72_00(jObject2);
+000266: 		field["Zones"] = jObject2;
+000267: 		Beam.Serialization.Json.JObject field3 = field.GetField("PlayersData");
+000268: 		Vector2[] array = new Vector2[2];
+000269: 		Vector3[] array2 = new Vector3[field3.Children.Count];
+000270: 		for (int k = 0; k < field3.Children.Count; k++)
+000271: 		{
+000272: 			Beam.Serialization.Json.JObject jObject4 = field3.Children[k];
+000273: 			string zoneId = jObject4.GetField("ZoneId").GetValue<string>();
+000274: 			int num9 = World.MapList.FindIndex((Map map2) => map2.EditorData.Id == zoneId);
+000275: 			if (num9 != -1)
+000276: 			{
+000277: 				array[k] = World.GenerationZonePositons[num9];
+000278: 				Vector3 vector = ConvertLegacyWorldPositionToLocal(JSerializer.Deserialize<Vector3>(jObject4.GetField("Position")), World.GenerationZonePositons[num9]);
+000279: 				array2[k] = vector;
+000280: 				Beam.Serialization.Json.JObject value2 = JSerializer.Serialize(array2[k]);
+000281: 				jObject4["Position"] = value2;
+000282: 			}
+000283: 		}
+000284: 		Beam.Serialization.Json.JObject field4 = persistentData.GetField("PlayerRegistry");
+000285: 		for (int num10 = 0; num10 < field4.Children.Count; num10++)
+000286: 		{
+000287: 			Beam.Serialization.Json.JObject jObject5 = field4.Children[num10];
+000288: 			Beam.Serialization.Json.JObject value3 = JSerializer.Serialize(array2[num10]);
+000289: 			jObject5["Movement"]["Transform"]["localPosition"] = value3;
+000290: 		}
+000291: 		FixPiscusFollowerWorldPositions(persistentData, array);
+000292: 		Beam.Serialization.Json.JObject jObject6 = new Beam.Serialization.Json.JObject();
+000293: 		jObject6.AddField("Version", JSerializer.Serialize(BuildInformation.BuildVersion.ToPaddedString()));
+000294: 		jObject6.AddField("Persistent", persistentData);
+000295: 		Beam.Serialization.Json.JObject field5 = jObject.GetField("CustomSettings");
+000296: 		if (field5 != null)
+000297: 		{
+000298: 			jObject6.AddField("CustomSettings", field5);
+000299: 		}
+000300: 		Beam.Serialization.Json.JObject field6 = jObject.GetField("ScreenCapture");
+000301: 		if (field6 != null)
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/LegacyUtilities.cs
+LINES: 319-360
+000319: 				zero.z = newPositions[i].y;
+000320: 				jObject.AddField("CenterGridPos_" + i, JSerializer.Serialize(zero));
+000321: 			}
+000322: 			persistentData["PiscusFollower"] = jObject;
+000323: 		}
+000324: 	}
+000325: 
+000326: 	private static void FixRigidbodyWorldPositions_Pre_72_00(Beam.Serialization.Json.JObject zonesData)
+000327: 	{
+000328: 		foreach (Beam.Serialization.Json.JObject child in zonesData.Children)
+000329: 		{
+000330: 			string id = child.GetField("Id").GetValue<string>();
+000331: 			int num = World.MapList.FindIndex((Map map) => map.EditorData.Id == id);
+000332: 			if (num != -1)
+000333: 			{
+000334: 				Beam.Serialization.Json.JObject field = child.GetField("Objects");
+000335: 				if (field != null && !field.IsNull())
+000336: 				{
+000337: 					RecursiveFixRigidbodyWorldPositions(field, World.GenerationZonePositons[num]);
+000338: 				}
+000339: 			}
+000340: 		}
+000341: 	}
+000342: 
+000343: 	private static void RecursiveFixRigidbodyWorldPositions(Beam.Serialization.Json.JObject rootData, Vector3 newOrigin)
+000344: 	{
+000345: 		foreach (Beam.Serialization.Json.JObject child in rootData.Children)
+000346: 		{
+000347: 			if (child.IsNull())
+000348: 			{
+000349: 				continue;
+000350: 			}
+000351: 			Beam.Serialization.Json.JObject field = child.GetField("Rigidbody");
+000352: 			if (field != null)
+000353: 			{
+000354: 				FixRigidbodyWorldPosition(field, newOrigin);
+000355: 			}
+000356: 			Beam.Serialization.Json.JObject field2 = child.GetField("Ragdolls");
+000357: 			if (field2 != null && !field2.IsNull())
+000358: 			{
+000359: 				foreach (Beam.Serialization.Json.JObject child2 in field2.Children)
+000360: 				{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/LegacyUtilities.cs
+LINES: 417-490
+000417: 		Rewired.Player player = ReInput.players.GetPlayer(0);
+000418: 		player.controllers.maps.LoadDefaultMaps(ControllerType.Mouse);
+000419: 		player.controllers.maps.LoadDefaultMaps(ControllerType.Keyboard);
+000420: 		player.controllers.maps.LoadDefaultMaps(ControllerType.Joystick);
+000421: 		Options.InputSettings = new InputSettings();
+000422: 		Options.Save();
+000423: 		UnityEngine.Debug.Log("LegacyUtilities:: Reset input for pre-0.65.05 settings.");
+000424: 		return true;
+000425: 	}
+000426: 
+000427: 	public static bool HasSaveFilePre_74_00(GameMode mode, out string filePath)
+000428: 	{
+000429: 		filePath = string.Empty;
+000430: 		string userId = GAccountService.Get().LocalUser.UserInfo.UserId;
+000431: 		if (string.IsNullOrWhiteSpace(userId))
+000432: 		{
+000433: 			return false;
+000434: 		}
+000435: 		string text = PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, userId);
+000436: 		if (!Directory.Exists(text))
+000437: 		{
+000438: 			return false;
+000439: 		}
+000440: 		string text2 = PathTools.Combine(text, userId + FilePath.GetSaveFileExtension(mode));
+000441: 		if (!File.Exists(text2))
+000442: 		{
+000443: 			return false;
+000444: 		}
+000445: 		filePath = text2;
+000446: 		return true;
+000447: 	}
+000448: 
+000449: 	public static void MigrateSaveDataPre_74_00()
+000450: 	{
+000451: 		string filePath = string.Empty;
+000452: 		string filePath2 = string.Empty;
+000453: 		if ((0u | (HasSaveFilePre_74_00(GameMode.SinglePlayer, out filePath) ? 1u : 0u) | (HasSaveFilePre_74_00(GameMode.Coop_2, out filePath2) ? 1u : 0u)) != 0)
+000454: 		{
+000455: 			string text = PathTools.Combine(FilePath.SAVE_FOLDER, FilePath.GetSlotFolderName(0));
+000456: 			if (!Directory.Exists(text))
+000457: 			{
+000458: 				Directory.CreateDirectory(text);
+000459: 			}
+000460: 			string destFileName = PathTools.Combine(text, "data" + FilePath.GetSaveFileExtension(GameMode.SinglePlayer));
+000461: 			string destFileName2 = PathTools.Combine(text, "data" + FilePath.GetSaveFileExtension(GameMode.Coop_2));
+000462: 			if (File.Exists(filePath))
+000463: 			{
+000464: 				File.Copy(filePath, destFileName, overwrite: true);
+000465: 			}
+000466: 			if (File.Exists(filePath2))
+000467: 			{
+000468: 				File.Copy(filePath2, destFileName2, overwrite: true);
+000469: 			}
+000470: 			BeamTeam.CopyDirectory(PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Editor/World"), PathTools.Combine(text, "World"));
+000471: 			BeamTeam.CopyDirectory(PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Editor/Heightmaps"), PathTools.Combine(text, "Heightmaps"));
+000472: 			BeamTeam.CopyDirectory(PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Editor/Maps"), FilePath.LOCAL_MAPS_FOLDER);
+000473: 			string text2 = PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Options.json");
+000474: 			if (File.Exists(text2))
+000475: 			{
+000476: 				File.Copy(text2, FilePath.OPTIONS_FILE, overwrite: true);
+000477: 			}
+000478: 			string text3 = PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Editor/Screenshots/dynamic.bytes");
+000479: 			if (File.Exists(text3))
+000480: 			{
+000481: 				File.Copy(text3, PathTools.Combine(text, "dynamic.bytes"), overwrite: true);
+000482: 			}
+000483: 			string text4 = PathTools.Combine(FilePath.LEGACY_SAVE_FOLDER, "Editor/Screenshots/dynamic_COOP.bytes");
+000484: 			if (File.Exists(text4))
+000485: 			{
+000486: 				File.Copy(text4, PathTools.Combine(text, "dynamic_COOP.bytes"), overwrite: true);
+000487: 			}
+000488: 		}
+000489: 	}
+000490: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/AddAutoShoreMask.cs
+LINES: 103-156
+000103: 		m_overlays[0].FoamTex.alpha = (useEdgeFoam ? edgeFoamAlpha : 0f);
+000104: 		m_overlays[0].FoamTex.textureFoam = textureFoam;
+000105: 		m_overlays[0].FoamTex.maskAlpha = (useFoamMask ? foamMaskAlpha : 0f);
+000106: 		m_overlays[0].ClipTex.alpha = (useClipMask ? 1f : 0f);
+000107: 		m_overlays[0].ClipTex.ignoreQuerys = ignoreQuerys;
+000108: 		m_overlays[0].UpdateOverlay();
+000109: 	}
+000110: 
+000111: 	private void CreateShoreMasks()
+000112: 	{
+000113: 		Release();
+000114: 		Terrain component = GetComponent<Terrain>();
+000115: 		if (component == null)
+000116: 		{
+000117: 			Ocean.LogWarning("The AddAutoShoreMask script must be attached to a component with a Terrain. The shore mask will not be created.");
+000118: 			enabled = false;
+000119: 			return;
+000120: 		}
+000121: 		if (component.terrainData == null)
+000122: 		{
+000123: 			Ocean.LogWarning("The terrain data is null. The shore mask will not be created.");
+000124: 			enabled = false;
+000125: 			return;
+000126: 		}
+000127: 		Vector3 size = component.terrainData.size;
+000128: 		resolution = Mathf.Clamp(resolution, 32, 4096);
+000129: 		m_width = size.x;
+000130: 		m_height = size.z;
+000131: 		float level = Ocean.Instance.level;
+000132: 		float[] data = ShoreMaskGenerator.CreateHeightMap(component);
+000133: 		int heightmapResolution = component.terrainData.heightmapResolution;
+000134: 		InterpolatedArray2f heightMap = new InterpolatedArray2f(data, heightmapResolution, heightmapResolution, 1, wrap: false);
+000135: 		if (useHeightMask || useNormalMask || useFoamMask)
+000136: 		{
+000137: 			m_heightMask = ShoreMaskGenerator.CreateMask(heightMap, resolution, resolution, level, heightSpread, TextureFormat.ARGB32);
+000138: 		}
+000139: 		if (useEdgeFoam)
+000140: 		{
+000141: 			m_edgeFoam = ShoreMaskGenerator.CreateMask(heightMap, resolution, resolution, level, foamSpread, TextureFormat.ARGB32);
+000142: 		}
+000143: 		if (useClipMask)
+000144: 		{
+000145: 			m_clipMask = ShoreMaskGenerator.CreateClipMask(heightMap, resolution, resolution, level + clipOffset, TextureFormat.ARGB32);
+000146: 		}
+000147: 		if (useHeightMask)
+000148: 		{
+000149: 			m_overlays[0].HeightTex.mask = m_heightMask;
+000150: 		}
+000151: 		if (useNormalMask)
+000152: 		{
+000153: 			m_overlays[0].NormalTex.mask = m_heightMask;
+000154: 		}
+000155: 		if (useFoamMask)
+000156: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/FourierCPU.cs
+LINES: 3-264
+000003: using Ceto.Common.Threading.Tasks;
+000004: using UnityEngine;
+000005: 
+000006: namespace Ceto;
+000007: 
+000008: public class FourierCPU
+000009: {
+000010: 	private struct LookUp
+000011: 	{
+000012: 		public int j1;
+000013: 
+000014: 		public int j2;
+000015: 
+000016: 		public float wr;
+000017: 
+000018: 		public float wi;
+000019: 	}
+000020: 
+000021: 	private int m_size;
+000022: 
+000023: 	private float m_fsize;
+000024: 
+000025: 	private int m_passes;
+000026: 
+000027: 	private LookUp[] m_butterflyLookupTable;
+000028: 
+000029: 	public int size => m_size;
+000030: 
+000031: 	public int passes => m_passes;
+000032: 
+000033: 	public FourierCPU(int size)
+000034: 	{
+000035: 		if (!Mathf.IsPowerOfTwo(size))
+000036: 		{
+000037: 			throw new ArgumentException("Fourier grid size must be pow2 number");
+000038: 		}
+000039: 		m_size = size;
+000040: 		m_fsize = m_size;
+000041: 		m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+000042: 		ComputeButterflyLookupTable();
+000043: 	}
+000044: 
+000045: 	private int BitReverse(int i)
+000046: 	{
+000047: 		int num = i;
+000048: 		int num2 = 0;
+000049: 		int num3 = 1;
+000050: 		for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+000051: 		{
+000052: 			num = (((i & num4) > num4 - 1) ? 1 : 0);
+000053: 			num2 += num * num3;
+000054: 			num3 *= 2;
+000055: 		}
+000056: 		return num2;
+000057: 	}
+000058: 
+000059: 	private void ComputeButterflyLookupTable()
+000060: 	{
+000061: 		m_butterflyLookupTable = new LookUp[m_size * m_passes];
+000062: 		for (int i = 0; i < m_passes; i++)
+000063: 		{
+000064: 			int num = (int)Mathf.Pow(2f, m_passes - 1 - i);
+000065: 			int num2 = (int)Mathf.Pow(2f, i);
+000066: 			for (int j = 0; j < num; j++)
+000067: 			{
+000068: 				for (int k = 0; k < num2; k++)
+000069: 				{
+000070: 					int num3;
+000071: 					int num4;
+000072: 					int j2;
+000073: 					int j3;
+000074: 					if (i == 0)
+000075: 					{
+000076: 						num3 = j * num2 * 2 + k;
+000077: 						num4 = j * num2 * 2 + num2 + k;
+000078: 						j2 = BitReverse(num3);
+000079: 						j3 = BitReverse(num4);
+000080: 					}
+000081: 					else
+000082: 					{
+000083: 						num3 = j * num2 * 2 + k;
+000084: 						num4 = j * num2 * 2 + num2 + k;
+000085: 						j2 = num3;
+000086: 						j3 = num4;
+000087: 					}
+000088: 					float num5 = Mathf.Cos(MathF.PI * 2f * (float)(k * num) / m_fsize);
+000089: 					float num6 = Mathf.Sin(MathF.PI * 2f * (float)(k * num) / m_fsize);
+000090: 					int num7 = num3 + i * m_size;
+000091: 					m_butterflyLookupTable[num7].j1 = j2;
+000092: 					m_butterflyLookupTable[num7].j2 = j3;
+000093: 					m_butterflyLookupTable[num7].wr = num5;
+000094: 					m_butterflyLookupTable[num7].wi = num6;
+000095: 					int num8 = num4 + i * m_size;
+000096: 					m_butterflyLookupTable[num8].j1 = j2;
+000097: 					m_butterflyLookupTable[num8].j2 = j3;
+000098: 					m_butterflyLookupTable[num8].wr = 0f - num5;
+000099: 					m_butterflyLookupTable[num8].wi = 0f - num6;
+000100: 				}
+000101: 			}
+000102: 		}
+000103: 	}
+000104: 
+000105: 	private Vector4 FFT(Vector2 w, Vector4 input1, Vector4 input2)
+000106: 	{
+000107: 		input1.x += w.x * input2.x - w.y * input2.y;
+000108: 		input1.y += w.y * input2.x + w.x * input2.y;
+000109: 		input1.z += w.x * input2.z - w.y * input2.w;
+000110: 		input1.w += w.y * input2.z + w.x * input2.w;
+000111: 		return input1;
+000112: 	}
+000113: 
+000114: 	private Vector2 FFT(Vector2 w, Vector2 input1, Vector2 input2)
+000115: 	{
+000116: 		input1.x += w.x * input2.x - w.y * input2.y;
+000117: 		input1.y += w.y * input2.x + w.x * input2.y;
+000118: 		return input1;
+000119: 	}
+000120: 
+000121: 	public int PeformFFT_SinglePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+000122: 	{
+000123: 		int num = 0;
+000124: 		int num2 = startIdx;
+000125: 		int num3 = 0;
+000126: 		while (num3 < m_passes)
+000127: 		{
+000128: 			num = num2 % 2;
+000129: 			int index = (num2 + 1) % 2;
+000130: 			Vector4[] array = data0[num];
+000131: 			Vector4[] array2 = data0[index];
+000132: 			int num4 = num3 * m_size;
+000133: 			for (int i = 0; i < m_size; i++)
+000134: 			{
+000135: 				int num5 = i + num4;
+000136: 				int j = m_butterflyLookupTable[num5].j1;
+000137: 				int j2 = m_butterflyLookupTable[num5].j2;
+000138: 				float wr = m_butterflyLookupTable[num5].wr;
+000139: 				float wi = m_butterflyLookupTable[num5].wi;
+000140: 				for (int k = 0; k < m_size; k++)
+000141: 				{
+000142: 					if (token.Cancelled)
+000143: 					{
+000144: 						return -1;
+000145: 					}
+000146: 					int num6 = k * m_size;
+000147: 					int num7 = i + num6;
+000148: 					int num8 = j + num6;
+000149: 					int num9 = j2 + num6;
+000150: 					array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+000151: 					array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+000152: 				}
+000153: 			}
+000154: 			num3++;
+000155: 			num2++;
+000156: 		}
+000157: 		num3 = 0;
+000158: 		while (num3 < m_passes)
+000159: 		{
+000160: 			num = num2 % 2;
+000161: 			int index = (num2 + 1) % 2;
+000162: 			Vector4[] array3 = data0[num];
+000163: 			Vector4[] array4 = data0[index];
+000164: 			int num4 = num3 * m_size;
+000165: 			for (int k = 0; k < m_size; k++)
+000166: 			{
+000167: 				int num5 = k + num4;
+000168: 				int j = m_butterflyLookupTable[num5].j1 * m_size;
+000169: 				int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+000170: 				float wr = m_butterflyLookupTable[num5].wr;
+000171: 				float wi = m_butterflyLookupTable[num5].wi;
+000172: 				for (int i = 0; i < m_size; i++)
+000173: 				{
+000174: 					if (token.Cancelled)
+000175: 					{
+000176: 						return -1;
+000177: 					}
+000178: 					int num7 = i + k * m_size;
+000179: 					int num8 = i + j;
+000180: 					int num9 = i + j2;
+000181: 					array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+000182: 					array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+000183: 				}
+000184: 			}
+000185: 			num3++;
+000186: 			num2++;
+000187: 		}
+000188: 		return num;
+000189: 	}
+000190: 
+000191: 	public int PeformFFT_DoublePacked(int startIdx, IList<Vector4[]> data0, ICancelToken token)
+000192: 	{
+000193: 		int num = 0;
+000194: 		int num2 = startIdx;
+000195: 		int num3 = 0;
+000196: 		while (num3 < m_passes)
+000197: 		{
+000198: 			num = num2 % 2;
+000199: 			int index = (num2 + 1) % 2;
+000200: 			Vector4[] array = data0[num];
+000201: 			Vector4[] array2 = data0[index];
+000202: 			int num4 = num3 * m_size;
+000203: 			for (int i = 0; i < m_size; i++)
+000204: 			{
+000205: 				int num5 = i + num4;
+000206: 				int j = m_butterflyLookupTable[num5].j1;
+000207: 				int j2 = m_butterflyLookupTable[num5].j2;
+000208: 				float wr = m_butterflyLookupTable[num5].wr;
+000209: 				float wi = m_butterflyLookupTable[num5].wi;
+000210: 				for (int k = 0; k < m_size; k++)
+000211: 				{
+000212: 					if (token.Cancelled)
+000213: 					{
+000214: 						return -1;
+000215: 					}
+000216: 					int num6 = k * m_size;
+000217: 					int num7 = i + num6;
+000218: 					int num8 = j + num6;
+000219: 					int num9 = j2 + num6;
+000220: 					array[num7].x = array2[num8].x + wr * array2[num9].x - wi * array2[num9].y;
+000221: 					array[num7].y = array2[num8].y + wi * array2[num9].x + wr * array2[num9].y;
+000222: 					array[num7].z = array2[num8].z + wr * array2[num9].z - wi * array2[num9].w;
+000223: 					array[num7].w = array2[num8].w + wi * array2[num9].z + wr * array2[num9].w;
+000224: 				}
+000225: 			}
+000226: 			num3++;
+000227: 			num2++;
+000228: 		}
+000229: 		num3 = 0;
+000230: 		while (num3 < m_passes)
+000231: 		{
+000232: 			num = num2 % 2;
+000233: 			int index = (num2 + 1) % 2;
+000234: 			Vector4[] array3 = data0[num];
+000235: 			Vector4[] array4 = data0[index];
+000236: 			int num4 = num3 * m_size;
+000237: 			for (int k = 0; k < m_size; k++)
+000238: 			{
+000239: 				int num5 = k + num4;
+000240: 				int j = m_butterflyLookupTable[num5].j1 * m_size;
+000241: 				int j2 = m_butterflyLookupTable[num5].j2 * m_size;
+000242: 				float wr = m_butterflyLookupTable[num5].wr;
+000243: 				float wi = m_butterflyLookupTable[num5].wi;
+000244: 				for (int i = 0; i < m_size; i++)
+000245: 				{
+000246: 					if (token.Cancelled)
+000247: 					{
+000248: 						return -1;
+000249: 					}
+000250: 					int num7 = i + k * m_size;
+000251: 					int num8 = i + j;
+000252: 					int num9 = i + j2;
+000253: 					array3[num7].x = array4[num8].x + wr * array4[num9].x - wi * array4[num9].y;
+000254: 					array3[num7].y = array4[num8].y + wi * array4[num9].x + wr * array4[num9].y;
+000255: 					array3[num7].z = array4[num8].z + wr * array4[num9].z - wi * array4[num9].w;
+000256: 					array3[num7].w = array4[num8].w + wi * array4[num9].z + wr * array4[num9].w;
+000257: 				}
+000258: 			}
+000259: 			num3++;
+000260: 			num2++;
+000261: 		}
+000262: 		return num;
+000263: 	}
+000264: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/FourierGPU.cs
+LINES: 7-133
+000007: public class FourierGPU
+000008: {
+000009: 	private const int PASS_X_1 = 0;
+000010: 
+000011: 	private const int PASS_Y_1 = 1;
+000012: 
+000013: 	private const int PASS_X_2 = 2;
+000014: 
+000015: 	private const int PASS_Y_2 = 3;
+000016: 
+000017: 	private const int PASS_X_3 = 4;
+000018: 
+000019: 	private const int PASS_Y_3 = 5;
+000020: 
+000021: 	private const int PASS_X_4 = 6;
+000022: 
+000023: 	private const int PASS_Y_4 = 7;
+000024: 
+000025: 	private int m_size;
+000026: 
+000027: 	private float m_fsize;
+000028: 
+000029: 	private int m_passes;
+000030: 
+000031: 	private Texture2D[] m_butterflyLookupTable;
+000032: 
+000033: 	private Material m_fourier;
+000034: 
+000035: 	private RenderBuffer[] m_pass0RT2;
+000036: 
+000037: 	private RenderBuffer[] m_pass1RT2;
+000038: 
+000039: 	private RenderBuffer[] m_pass0RT3;
+000040: 
+000041: 	private RenderBuffer[] m_pass1RT3;
+000042: 
+000043: 	private RenderBuffer[] m_pass0RT4;
+000044: 
+000045: 	private RenderBuffer[] m_pass1RT4;
+000046: 
+000047: 	public int size => m_size;
+000048: 
+000049: 	public int passes => m_passes;
+000050: 
+000051: 	public FourierGPU(int size, Shader sdr)
+000052: 	{
+000053: 		if (!Mathf.IsPowerOfTwo(size))
+000054: 		{
+000055: 			throw new ArgumentException("Fourier grid size must be pow2 number");
+000056: 		}
+000057: 		m_fourier = new Material(sdr);
+000058: 		m_size = size;
+000059: 		m_fsize = m_size;
+000060: 		m_passes = (int)(Mathf.Log(m_fsize) / Mathf.Log(2f));
+000061: 		m_butterflyLookupTable = new Texture2D[m_passes];
+000062: 		ComputeButterflyLookupTable();
+000063: 		m_fourier.SetFloat("Ceto_FourierSize", m_fsize);
+000064: 		m_pass0RT2 = new RenderBuffer[2];
+000065: 		m_pass1RT2 = new RenderBuffer[2];
+000066: 		m_pass0RT3 = new RenderBuffer[3];
+000067: 		m_pass1RT3 = new RenderBuffer[3];
+000068: 		m_pass0RT4 = new RenderBuffer[4];
+000069: 		m_pass1RT4 = new RenderBuffer[4];
+000070: 	}
+000071: 
+000072: 	public void Release()
+000073: 	{
+000074: 		int num = m_butterflyLookupTable.Length;
+000075: 		for (int i = 0; i < num; i++)
+000076: 		{
+000077: 			UnityEngine.Object.Destroy(m_butterflyLookupTable[i]);
+000078: 		}
+000079: 		m_butterflyLookupTable = null;
+000080: 	}
+000081: 
+000082: 	private int BitReverse(int i)
+000083: 	{
+000084: 		int num = i;
+000085: 		int num2 = 0;
+000086: 		int num3 = 1;
+000087: 		for (int num4 = m_size / 2; num4 != 0; num4 /= 2)
+000088: 		{
+000089: 			num = (((i & num4) > num4 - 1) ? 1 : 0);
+000090: 			num2 += num * num3;
+000091: 			num3 *= 2;
+000092: 		}
+000093: 		return num2;
+000094: 	}
+000095: 
+000096: 	private Texture2D Make1DTex(int i)
+000097: 	{
+000098: 		return new Texture2D(m_size, 1, TextureFormat.RGBAFloat, mipChain: false, linear: true)
+000099: 		{
+000100: 			filterMode = FilterMode.Point,
+000101: 			wrapMode = TextureWrapMode.Clamp,
+000102: 			hideFlags = HideFlags.HideAndDontSave,
+000103: 			name = "Ceto Fouier GPU Butterfly Lookup"
+000104: 		};
+000105: 	}
+000106: 
+000107: 	private void ComputeButterflyLookupTable()
+000108: 	{
+000109: 		float num = m_size;
+000110: 		float num2 = m_size - 1;
+000111: 		for (int i = 0; i < m_passes; i++)
+000112: 		{
+000113: 			int num3 = (int)Mathf.Pow(2f, m_passes - 1 - i);
+000114: 			int num4 = (int)Mathf.Pow(2f, i);
+000115: 			m_butterflyLookupTable[i] = Make1DTex(i);
+000116: 			for (int j = 0; j < num3; j++)
+000117: 			{
+000118: 				for (int k = 0; k < num4; k++)
+000119: 				{
+000120: 					int num5;
+000121: 					int num6;
+000122: 					int num7;
+000123: 					int num8;
+000124: 					if (i == 0)
+000125: 					{
+000126: 						num5 = j * num4 * 2 + k;
+000127: 						num6 = j * num4 * 2 + num4 + k;
+000128: 						num7 = BitReverse(num5);
+000129: 						num8 = BitReverse(num6);
+000130: 					}
+000131: 					else
+000132: 					{
+000133: 						num5 = j * num4 * 2 + k;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Ceto/ShoreMaskGenerator.cs
+LINES: 1-36
+000001: using Ceto.Common.Containers.Interpolation;
+000002: using UnityEngine;
+000003: 
+000004: namespace Ceto;
+000005: 
+000006: public static class ShoreMaskGenerator
+000007: {
+000008: 	public static float[] CreateHeightMap(Terrain terrain)
+000009: 	{
+000010: 		TerrainData terrainData = terrain.terrainData;
+000011: 		int heightmapResolution = terrainData.heightmapResolution;
+000012: 		Vector3 heightmapScale = terrainData.heightmapScale;
+000013: 		float[,] heights = terrainData.GetHeights(0, 0, heightmapResolution, heightmapResolution);
+000014: 		float[] array = new float[heightmapResolution * heightmapResolution];
+000015: 		for (int i = 0; i < heightmapResolution; i++)
+000016: 		{
+000017: 			for (int j = 0; j < heightmapResolution; j++)
+000018: 			{
+000019: 				array[j + i * heightmapResolution] = heights[i, j] * heightmapScale.y + terrain.transform.position.y;
+000020: 			}
+000021: 		}
+000022: 		return array;
+000023: 	}
+000024: 
+000025: 	public static Texture2D CreateMask(float[] heightMap, int size, float shoreLevel, float spread, TextureFormat format)
+000026: 	{
+000027: 		Texture2D texture2D = new Texture2D(size, size, format, mipChain: false, linear: true);
+000028: 		texture2D.filterMode = FilterMode.Bilinear;
+000029: 		int num = size * size;
+000030: 		Color[] array = new Color[num];
+000031: 		for (int i = 0; i < num; i++)
+000032: 		{
+000033: 			float num2 = Mathf.Clamp(shoreLevel - heightMap[i], 0f, spread);
+000034: 			num2 = 1f - num2 / spread;
+000035: 			array[i].r = num2;
+000036: 			array[i].g = num2;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/MultiplayerMng.cs
+LINES: 583-624
+000583: 			if (Game.State == GameState.LOAD_GAME || Game.State == GameState.NEW_GAME)
+000584: 			{
+000585: 				UpdateToken();
+000586: 			}
+000587: 			else
+000588: 			{
+000589: 				UpdateSessionToken_IsOccupied(isOccupied: false);
+000590: 			}
+000591: 		}
+000592: 	}
+000593: 
+000594: 	private void UpdateToken()
+000595: 	{
+000596: 		try
+000597: 		{
+000598: 			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+000599: 			token.IsOccupied = false;
+000600: 			Zone zone = StrandedWorld.GetZone(PlayerRegistry.LocalPlayer.transform.position);
+000601: 			if (zone.Biome == Zone.BiomeType.MISSION && !zone.Equals(Beam.Singleton<StrandedWorld>.Instance.FindEndGameZone()))
+000602: 			{
+000603: 				token.IsBusy = true;
+000604: 			}
+000605: 			else if (GetSessionToken().IsBusy)
+000606: 			{
+000607: 				token.IsBusy = false;
+000608: 			}
+000609: 			BoltMatchmaking.UpdateSession(token);
+000610: 		}
+000611: 		catch (Exception ex)
+000612: 		{
+000613: 			LogError("Error updating session token " + ex.Message);
+000614: 		}
+000615: 	}
+000616: 
+000617: 	public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)
+000618: 	{
+000619: 		Log($"BoltShutdownBegin {disconnectReason} isRunning {BoltNetwork.IsRunning}");
+000620: 		if (BoltNetwork.IsRunning)
+000621: 		{
+000622: 			Disconnected(null);
+000623: 		}
+000624: 	}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/Peer.cs
+LINES: 474-515
+000474: 		};
+000475: 	}
+000476: 
+000477: 	public override void Attached()
+000478: 	{
+000479: 		base.Attached();
+000480: 		_id = MultiplayerMng.GetEntityId(entity);
+000481: 		gameObject.name = $"Peer {_id}";
+000482: 		PlayerRegistry.Link(this);
+000483: 		StayAlive(_aliveId);
+000484: 		if (entity.IsOwner)
+000485: 		{
+000486: 			_gender = Options.CustomSettings.Gender;
+000487: 			_gender2 = Options.CustomSettings.Gender2;
+000488: 			_gameDifficulty = Options.CustomSettings.Difficulty;
+000489: 			_permadeath = Options.CustomSettings.Permadeath;
+000490: 			_wildlife = Options.CustomSettings.Wildlife;
+000491: 			_gameStartingCrate = Options.CustomSettings.StartingCrate;
+000492: 			_worldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+000493: 			_onlineName = GAccountService.Get().LocalUser.UserInfo.DisplayName;
+000494: 		}
+000495: 		else
+000496: 		{
+000497: 			ReplicateAllParams replicateAllParams = new ReplicateAllParams();
+000498: 			replicateAllParams.Peer = this;
+000499: 			replicateAllParams.Post();
+000500: 		}
+000501: 	}
+000502: 
+000503: 	public override void Detached()
+000504: 	{
+000505: 		base.Detached();
+000506: 		PlayerRegistry.Unlink(this);
+000507: 	}
+000508: 
+000509: 	private void OnDestroy()
+000510: 	{
+000511: 		PlayerRegistry.Unlink(this);
+000512: 	}
+000513: 
+000514: 	private void Update()
+000515: 	{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.Core/LE_TerrainManager.cs
+LINES: 1-47
+000001: using LE_LevelEditor.Events;
+000002: using UnityEngine;
+000003: 
+000004: namespace LE_LevelEditor.Core;
+000005: 
+000006: public class LE_TerrainManager
+000007: {
+000008: 	private TerrainData m_terrainData;
+000009: 
+000010: 	public TerrainData TerrainData => m_terrainData;
+000011: 
+000012: 	public LE_TerrainManager(TerrainData p_terrainData)
+000013: 	{
+000014: 		m_terrainData = p_terrainData;
+000015: 	}
+000016: 
+000017: 	public void SmoothHeight(float p_amount, int p_neighbourCount, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, bool p_isDirected, float p_angle)
+000018: 	{
+000019: 		float num = m_terrainData.heightmapResolution - 1;
+000020: 		float num2 = m_terrainData.heightmapResolution - 1;
+000021: 		float p_relativeBrushSize2 = Mathf.Clamp01(p_relativeBrushSize + (float)(p_neighbourCount - 1) / Mathf.Max(num, num2));
+000022: 		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize2, p_relativeLocalLocation, num, num2, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var _, out var _);
+000023: 		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, num, num2, out var o_minX2, out var o_maxX2, out var o_minY2, out var o_maxY2, out var o_relBrushMinX2, out var o_relBrushMinY2);
+000024: 		float[,] heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+000025: 		int num3 = o_minX2 - o_minX;
+000026: 		int num4 = o_minY2 - o_minY;
+000027: 		int num5 = heights.GetLength(0) - 1;
+000028: 		int num6 = heights.GetLength(1) - 1;
+000029: 		int num7 = Mathf.Min(num3 + o_maxX2 - o_minX2, num5);
+000030: 		int num8 = Mathf.Min(num4 + o_maxY2 - o_minY2, num6);
+000031: 		int num9 = (p_neighbourCount - 1) / 2;
+000032: 		for (int i = num4; i <= num8; i++)
+000033: 		{
+000034: 			int num10;
+000035: 			int num11;
+000036: 			if (i == 0)
+000037: 			{
+000038: 				num10 = num9 + 1;
+000039: 				num11 = 0;
+000040: 			}
+000041: 			else if (i == num6)
+000042: 			{
+000043: 				num10 = num9 + 1;
+000044: 				num11 = -num9;
+000045: 			}
+000046: 			else if (i - num9 < 0)
+000047: 			{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.Core/LE_TerrainManager.cs
+LINES: 122-235
+000122: 									continue;
+000123: 								}
+000124: 							}
+000125: 						}
+000126: 						float num23 = heights[j + l + num15, i + k + num11];
+000127: 						num18 += num23;
+000128: 						num19++;
+000129: 					}
+000130: 				}
+000131: 				float num24 = num18 / (float)num19;
+000132: 				float num25 = heights[j, i];
+000133: 				float v = ((float)(j + o_minX) / num - o_relBrushMinX2) / p_relativeBrushSize;
+000134: 				float u = ((float)(i + o_minY) / num2 - o_relBrushMinY2) / p_relativeBrushSize;
+000135: 				float num26 = p_amount * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+000136: 				heights[j, i] = num25 * (1f - num26) + num24 * num26;
+000137: 				heights[j, i] = ClampHeightBounds(heights[j, i], o_minX + j, o_minY + i);
+000138: 			}
+000139: 		}
+000140: 		m_terrainData.SetHeights(o_minY, o_minX, heights);
+000141: 		LE_EventInterface.LevelDataChanged(this);
+000142: 	}
+000143: 
+000144: 	public void ChangeHeight(float p_delta, float p_targetHeight, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+000145: 	{
+000146: 		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+000147: 		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+000148: 		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+000149: 		for (int i = 0; i <= num; i++)
+000150: 		{
+000151: 			for (int j = 0; j <= num2; j++)
+000152: 			{
+000153: 				float num3 = o_heights[i, j];
+000154: 				if (Mathf.Abs(num3 - p_targetHeight) > 0.0001f)
+000155: 				{
+000156: 					float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+000157: 					float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+000158: 					float num4 = p_delta * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+000159: 					float num5 = ((p_targetHeight - num3 > 0f) ? 1f : (-1f));
+000160: 					if (Mathf.Sign(p_targetHeight - num3) != Mathf.Sign(p_targetHeight - (num3 + num5 * num4)))
+000161: 					{
+000162: 						o_heights[i, j] = p_targetHeight;
+000163: 					}
+000164: 					else
+000165: 					{
+000166: 						o_heights[i, j] += num5 * num4;
+000167: 					}
+000168: 				}
+000169: 				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+000170: 			}
+000171: 		}
+000172: 		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+000173: 		LE_EventInterface.LevelDataChanged(this);
+000174: 	}
+000175: 
+000176: 	private float ClampHeightBounds(float heightToClamp, int x, int y)
+000177: 	{
+000178: 		float num = 20f;
+000179: 		float num2 = 257f;
+000180: 		if ((!((float)x > num) || !((float)x < num2 - num) || !((float)y > num) || !((float)y < num2 - num)) && heightToClamp > 0.65f)
+000181: 		{
+000182: 			heightToClamp = 0.65f;
+000183: 		}
+000184: 		return heightToClamp;
+000185: 	}
+000186: 
+000187: 	public void ChangeHeight(float p_delta, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+000188: 	{
+000189: 		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+000190: 		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+000191: 		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+000192: 		for (int i = 0; i <= num; i++)
+000193: 		{
+000194: 			for (int j = 0; j <= num2; j++)
+000195: 			{
+000196: 				float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+000197: 				float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+000198: 				float a = p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+000199: 				o_heights[i, j] += p_delta * a;
+000200: 				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+000201: 			}
+000202: 		}
+000203: 		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+000204: 		LE_EventInterface.LevelDataChanged(this);
+000205: 	}
+000206: 
+000207: 	private void ChangeHeightInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float[,] o_heights, out float o_relBrushMinX, out float o_relBrushMinY, out float o_heightmapMaxX, out float o_heightmapMaxY)
+000208: 	{
+000209: 		o_heightmapMaxX = m_terrainData.heightmapResolution - 1;
+000210: 		o_heightmapMaxY = m_terrainData.heightmapResolution - 1;
+000211: 		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, o_heightmapMaxX, o_heightmapMaxY, out o_minX, out o_maxX, out o_minY, out o_maxY, out o_relBrushMinX, out o_relBrushMinY);
+000212: 		o_heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+000213: 	}
+000214: 
+000215: 	private void GetAffectedAreaInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, float p_maxX, float p_maxY, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float o_relBrushMinX, out float o_relBrushMinY)
+000216: 	{
+000217: 		o_minX = 0;
+000218: 		o_maxX = 0;
+000219: 		o_minY = 0;
+000220: 		o_maxY = 0;
+000221: 		o_relBrushMinX = p_relativeLocalLocation.x - p_relativeBrushSize * 0.5f;
+000222: 		float num = p_relativeLocalLocation.x + p_relativeBrushSize * 0.5f;
+000223: 		o_relBrushMinY = p_relativeLocalLocation.y - p_relativeBrushSize * 0.5f;
+000224: 		float num2 = p_relativeLocalLocation.y + p_relativeBrushSize * 0.5f;
+000225: 		if (p_alphaBrushTexture == null)
+000226: 		{
+000227: 			Debug.LogError("LE_TerrainManager: Parameter 'p_alphaBrushTexture' is null!");
+000228: 			return;
+000229: 		}
+000230: 		if (p_relativeBrushSize != Mathf.Clamp01(p_relativeBrushSize))
+000231: 		{
+000232: 			Debug.LogError("LE_TerrainManager: Parameter 'p_relativeBrushSize' is out of bounds expected range [0,1], but was '" + p_relativeBrushSize + "'!");
+000233: 			return;
+000234: 		}
+000235: 		if (p_relativeLocalLocation.x != Mathf.Clamp01(p_relativeLocalLocation.x) || p_relativeLocalLocation.y != Mathf.Clamp01(p_relativeLocalLocation.y))
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+LINES: 1-78
+000001: using LE_LevelEditor.Core;
+000002: using LE_LevelEditor.Events;
+000003: using LE_LevelEditor.Logic;
+000004: using Rewired;
+000005: using UnityEngine;
+000006: 
+000007: namespace LE_LevelEditor.UI;
+000008: 
+000009: public class LE_GUI3dTerrain : LE_GUI3dBase
+000010: {
+000011: 	public int TERRAIN_LAYER = 14;
+000012: 
+000013: 	private Terrain m_terrain;
+000014: 
+000015: 	private LE_TerrainManager m_terrainMgr;
+000016: 
+000017: 	private TerrainData m_defaultTerrainDataPrefab;
+000018: 
+000019: 	private Projector m_brushProjector;
+000020: 
+000021: 	private Texture2D m_brushAlphaTexture;
+000022: 
+000023: 	private LE_LogicTerrain.Heightmap _heightmap;
+000024: 
+000025: 	private float m_amount = 0.1f;
+000026: 
+000027: 	private float m_size = 0.1f;
+000028: 
+000029: 	private float m_targetRelativeValue = 0.5f;
+000030: 
+000031: 	private bool m_isReadingTerrainSetHeight;
+000032: 
+000033: 	private int m_isTerrainSetHeightReadInFrame = -1;
+000034: 
+000035: 	private bool m_isDirectedSmooth;
+000036: 
+000037: 	private float m_directedSmoothAngle;
+000038: 
+000039: 	private LE_ETerrainEditMode m_editMode;
+000040: 
+000041: 	private Vector3 m_lastCursorActiveScreenCoords = -1f * Vector3.one;
+000042: 
+000043: 	public Terrain TerrainInstance => m_terrain;
+000044: 
+000045: 	public LE_TerrainManager TerrainManager => m_terrainMgr;
+000046: 
+000047: 	public TerrainData DefaultTerrainDataPrefab
+000048: 	{
+000049: 		get
+000050: 		{
+000051: 			return m_defaultTerrainDataPrefab;
+000052: 		}
+000053: 		set
+000054: 		{
+000055: 			m_defaultTerrainDataPrefab = value;
+000056: 		}
+000057: 	}
+000058: 
+000059: 	public Projector BrushProjector
+000060: 	{
+000061: 		get
+000062: 		{
+000063: 			return m_brushProjector;
+000064: 		}
+000065: 		set
+000066: 		{
+000067: 			m_brushProjector = value;
+000068: 			m_brushProjector.material = Object.Instantiate(m_brushProjector.material);
+000069: 		}
+000070: 	}
+000071: 
+000072: 	public Texture2D BrushAlphaTexture
+000073: 	{
+000074: 		get
+000075: 		{
+000076: 			return m_brushAlphaTexture;
+000077: 		}
+000078: 		set
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+LINES: 95-144
+000095: 	}
+000096: 
+000097: 	public float Amount
+000098: 	{
+000099: 		get
+000100: 		{
+000101: 			return m_amount;
+000102: 		}
+000103: 		set
+000104: 		{
+000105: 			m_amount = value;
+000106: 		}
+000107: 	}
+000108: 
+000109: 	public float Size
+000110: 	{
+000111: 		get
+000112: 		{
+000113: 			return m_size;
+000114: 		}
+000115: 		set
+000116: 		{
+000117: 			m_size = value;
+000118: 			if (m_terrainMgr != null)
+000119: 			{
+000120: 				float num = 1f / (float)Mathf.Min(m_terrainMgr.TerrainData.heightmapResolution - 1, m_terrainMgr.TerrainData.heightmapResolution - 1);
+000121: 				m_size = Mathf.Floor(m_size / num) * num;
+000122: 			}
+000123: 		}
+000124: 	}
+000125: 
+000126: 	public float TargetRelativeValue
+000127: 	{
+000128: 		get
+000129: 		{
+000130: 			return m_targetRelativeValue;
+000131: 		}
+000132: 		set
+000133: 		{
+000134: 			m_targetRelativeValue = value;
+000135: 		}
+000136: 	}
+000137: 
+000138: 	public bool IsReadingTerrainSetHeight
+000139: 	{
+000140: 		get
+000141: 		{
+000142: 			return m_isReadingTerrainSetHeight;
+000143: 		}
+000144: 		set
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+LINES: 187-228
+000187: 			m_editMode = value;
+000188: 			if (m_editMode != LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE)
+000189: 			{
+000190: 				m_isReadingTerrainSetHeight = false;
+000191: 				m_isTerrainSetHeightReadInFrame = -1;
+000192: 			}
+000193: 		}
+000194: 	}
+000195: 
+000196: 	public override LE_EEditMode ActiveEditMode => LE_EEditMode.TERRAIN;
+000197: 
+000198: 	public void SetTerrain(Terrain p_terrain)
+000199: 	{
+000200: 		if (m_terrainMgr != null)
+000201: 		{
+000202: 			Debug.LogError("LE_GUI3dTerrain: SetTerrain: a terrain manager was already set and will be overwritten! Use 'RemoveTerrainManager' to reset the instance.");
+000203: 		}
+000204: 		m_terrain = p_terrain;
+000205: 		m_terrainMgr = new LE_TerrainManager(p_terrain.terrainData);
+000206: 		LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+000207: 	}
+000208: 
+000209: 	public void RemoveTerrainManager()
+000210: 	{
+000211: 		if (m_terrain != null)
+000212: 		{
+000213: 			LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+000214: 		}
+000215: 		m_terrain = null;
+000216: 		m_terrainMgr = null;
+000217: 	}
+000218: 
+000219: 	public override void SetCursorPosition(Vector3 p_cursorScreenCoords)
+000220: 	{
+000221: 		m_cursorScreenCoords = p_cursorScreenCoords;
+000222: 		m_cursorRay = Camera.main.ScreenPointToRay(p_cursorScreenCoords);
+000223: 		if (m_terrain != null)
+000224: 		{
+000225: 			SetIsCursorOverSomething(m_terrain.GetComponent<Collider>().Raycast(m_cursorRay, out m_cursorHitInfo, float.MaxValue));
+000226: 		}
+000227: 		else
+000228: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+LINES: 233-274
+000233: 	public override void SetIsCursorAction(bool p_isCursorAction)
+000234: 	{
+000235: 		if (m_isTerrainSetHeightReadInFrame != -1 && !p_isCursorAction && m_isTerrainSetHeightReadInFrame + 1 < Time.frameCount)
+000236: 		{
+000237: 			m_isReadingTerrainSetHeight = false;
+000238: 			m_isTerrainSetHeightReadInFrame = -1;
+000239: 		}
+000240: 		if (((IsCursorOverSomething && IsInteractable) & p_isCursorAction) && m_lastCursorActiveScreenCoords != m_cursorScreenCoords)
+000241: 		{
+000242: 			m_lastCursorActiveScreenCoords = m_cursorScreenCoords;
+000243: 			if (!(m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>() != null))
+000244: 			{
+000245: 				return;
+000246: 			}
+000247: 			if (m_isReadingTerrainSetHeight)
+000248: 			{
+000249: 				Terrain component = m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>();
+000250: 				float num = component.SampleHeight(m_cursorHitInfo.point);
+000251: 				m_targetRelativeValue = Mathf.Clamp01(num / component.terrainData.size.y);
+000252: 				m_isTerrainSetHeightReadInFrame = Time.frameCount;
+000253: 				return;
+000254: 			}
+000255: 			switch (m_editMode)
+000256: 			{
+000257: 			case LE_ETerrainEditMode.CHANGE_HEIGHT:
+000258: 				m_terrainMgr.ChangeHeight(Mathf.Sign(Amount) * Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+000259: 				break;
+000260: 			case LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE:
+000261: 				m_terrainMgr.ChangeHeight(Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, TargetRelativeValue, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+000262: 				break;
+000263: 			case LE_ETerrainEditMode.SMOOTH_HEIGHT:
+000264: 			{
+000265: 				int p_neighbourCount = 3 + 2 * Mathf.RoundToInt(Mathf.Abs(Amount) * 3f);
+000266: 				m_terrainMgr.SmoothHeight(Time.deltaTime * 2f, p_neighbourCount, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo), m_isDirectedSmooth, m_directedSmoothAngle);
+000267: 				break;
+000268: 			}
+000269: 			default:
+000270: 				Debug.LogError("LE_GUI3dTerrain: unknown EditMode!");
+000271: 				break;
+000272: 			case LE_ETerrainEditMode.PROCEDURAL:
+000273: 				break;
+000274: 			}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+LINES: 318-370
+000318: 			Vector3 vector = new Vector3(m_brushProjector.orthographicSize, m_brushProjector.orthographicSize * 0.7f, m_brushProjector.orthographicSize);
+000319: 			Vector3 vector2 = Camera.main.transform.position - point;
+000320: 			float num = Mathf.Max(vector.x, vector.y, vector.z) * 3f;
+000321: 			Camera.main.transform.position = point + vector2.normalized * num;
+000322: 			if (Camera.main.transform.position.y < point.y)
+000323: 			{
+000324: 				Vector3 position = Camera.main.transform.position;
+000325: 				position.y = point.y;
+000326: 				Camera.main.transform.position = position;
+000327: 			}
+000328: 			Camera.main.transform.LookAt(point, Vector3.up);
+000329: 		}
+000330: 	}
+000331: 
+000332: 	private void UpdateBrushProjector(bool p_isHit, RaycastHit p_hitInfo)
+000333: 	{
+000334: 		if (p_isHit)
+000335: 		{
+000336: 			Vector3 size = m_terrainMgr.TerrainData.size;
+000337: 			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+000338: 			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+000339: 			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+000340: 			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+000341: 			if (BrushProjector.transform.childCount > 0)
+000342: 			{
+000343: 				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+000344: 			}
+000345: 		}
+000346: 		else
+000347: 		{
+000348: 			BrushProjector.orthographicSize = 0f;
+000349: 			if (BrushProjector.transform.childCount > 0)
+000350: 			{
+000351: 				BrushProjector.transform.GetChild(0).gameObject.SetActive(value: false);
+000352: 			}
+000353: 		}
+000354: 	}
+000355: 
+000356: 	private Vector2 GetRelativeLocalLocation(RaycastHit hit)
+000357: 	{
+000358: 		Terrain component = hit.transform.gameObject.GetComponent<Terrain>();
+000359: 		Vector3 size = component.terrainData.size;
+000360: 		Vector3 vector = hit.transform.InverseTransformPoint(hit.point);
+000361: 		Vector2 zero = Vector2.zero;
+000362: 		zero.x = vector.z / size.z;
+000363: 		zero.y = vector.x / size.x;
+000364: 		float num = 1f / (float)(component.terrainData.heightmapResolution - 1);
+000365: 		float num2 = 1f / (float)(component.terrainData.heightmapResolution - 1);
+000366: 		zero.x = Mathf.Round(zero.x / num) * num;
+000367: 		zero.y = Mathf.Round(zero.y / num2) * num2;
+000368: 		return zero;
+000369: 	}
+000370: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor.UI/LE_GUIInterface_uGUIimpl.cs
+LINES: 187-228
+000187: 	}
+000188: 
+000189: 	private Rewired.Player GetPlayerInput()
+000190: 	{
+000191: 		return ReInput.players.GetPlayer(0);
+000192: 	}
+000193: 
+000194: 	private void OnTerrainGenerateCustomHeightmap(object p_obj, EventArgs p_args)
+000195: 	{
+000196: 		if (Singleton<LE_LevelEditorMain>.Instance.GUI3dTerrain.Heightmap == null)
+000197: 		{
+000198: 			DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_NO_SELECTION_DESC", DialogueButton.Ok, DialogueIcon.Warning);
+000199: 			return;
+000200: 		}
+000201: 		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+000202: 		{
+000203: 			if ((bool)Singleton<LE_ZoneTileGenerator>.Instance)
+000204: 			{
+000205: 				Singleton<LE_ZoneTileGenerator>.Instance.terrain.terrainData.SetHeights(0, 0, Singleton<LE_LevelEditorMain>.Instance.GUI3dTerrain.Heightmap.Heights);
+000206: 			}
+000207: 		};
+000208: 	}
+000209: 
+000210: 	private void OnTerrainGeneratePerlin(object p_obj, EventArgs p_args)
+000211: 	{
+000212: 		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+000213: 		{
+000214: 			DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATING_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATING_HEIGHTMAP_DESC", DialogueButton.None, DialogueIcon.Information);
+000215: 			BeamTeam.InvokeDelayed(0.5f, () =>
+000216: 			{
+000217: 				TerrainGeneratePerlin();
+000218: 				dialogue.Destroy();
+000219: 			});
+000220: 		};
+000221: 	}
+000222: 
+000223: 	private void TerrainGeneratePerlin()
+000224: 	{
+000225: 		if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+000226: 		{
+000227: 			Singleton<LE_ZoneTileGenerator>.Instance.GenerateAdvancedPerlin((int)TERRAIN_GENERATE_PERLIN_FREQ.value, TERRAIN_GENERATE_PERLIN_AMPLITUDE.value, (int)TERRAIN_GENERATE_PERLIN_OCTAVES.value, TERRAIN_GENERATE_PERLIN_BLEND.value);
+000228: 		}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor/LE_LevelEditorMain.cs
+LINES: 301-342
+000301: 		{
+000302: 			Debug.LogError("LE_LevelEditorMain: Start: could not find main camera!");
+000303: 		}
+000304: 		if (IS_OBJECT_EDITOR)
+000305: 		{
+000306: 			m_GUI3dObject = gameObject.AddComponent<LE_GUI3dObject>();
+000307: 			m_GUI3dObject.TERRAIN_LAYER = 14;
+000308: 			LE_GUI3dObject gUI3dObject = m_GUI3dObject;
+000309: 			gUI3dObject.OnFocused = (Action<Vector3, float>)Delegate.Combine(gUI3dObject.OnFocused, new Action<Vector3, float>(OnGUI3dObjectFocused));
+000310: 			m_GUI3dObject.IsKeyComboFocus = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.FOCUS) != 0;
+000311: 			m_GUI3dObject.IsKeyComboDuplicate = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.DUPLICATE) != 0;
+000312: 			m_GUI3d.Add(m_GUI3dObject);
+000313: 		}
+000314: 		m_input = new LE_Input(this);
+000315: 		m_camPivot = cam.transform.position + cam.transform.forward * 100f;
+000316: 		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Combine(LE_EventInterface.OnChangeLevelData, new EventHandler(OnChangeLevelData));
+000317: 		LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+000318: 		events.OnEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>)Delegate.Combine(events.OnEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>(OnEditModeBtn));
+000319: 		MAP_EDITOR_SEED = StrandedWorld.GetRandowWorldSeed();
+000320: 	}
+000321: 
+000322: 	private void Initialize_InFirstUpdate()
+000323: 	{
+000324: 		Camera cam = Cam;
+000325: 		LE_ConfigTerrain componentInChildren = GetComponentInChildren<LE_ConfigTerrain>();
+000326: 		if (LE_GUIInterface.Instance.delegates.IsCursorOverUI == null)
+000327: 		{
+000328: 			Debug.LogError("LE_LevelEditorMain: you have not setup LE_GUIInterface.delegates.IsCursorOverUI. Terrain might be edited behind UI while the user interacts with the UI, same is true for object placement!");
+000329: 		}
+000330: 		if (IS_TERRAIN_EDITOR)
+000331: 		{
+000332: 			m_GUI3dTerrain = gameObject.AddComponent<LE_GUI3dTerrain>();
+000333: 			m_GUI3d.Add(m_GUI3dTerrain);
+000334: 			InitializeDefaultTerrain(componentInChildren);
+000335: 			m_logicTerrain = new LE_LogicTerrain(componentInChildren, m_GUI3dTerrain);
+000336: 			m_logic.Add(m_logicTerrain);
+000337: 		}
+000338: 		else if (componentInChildren.CustomDefaultTerrain != null)
+000339: 		{
+000340: 			Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a value for LE_ConfigTerrain.CustomDefaultTerrain! The value will be ignored!");
+000341: 		}
+000342: 		m_logicLevel = new LE_LogicLevel(m_GUI3dTerrain, m_GUI3dObject, IS_OBLIQUE_FOCUS_CENTERING);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor/LE_LevelEditorMain.cs
+LINES: 461-502
+000461: 	private void Validate_References()
+000462: 	{
+000463: 	}
+000464: 
+000465: 	private void Initialize_InSecondUpdate()
+000466: 	{
+000467: 		if (IS_OBLIQUE_FOCUS_CENTERING)
+000468: 		{
+000469: 			Camera cam = Cam;
+000470: 			if (cam != null)
+000471: 			{
+000472: 				SetObliqueFocusProjectionMatrix(!cam.orthographic);
+000473: 			}
+000474: 		}
+000475: 	}
+000476: 
+000477: 	private void InitializeDefaultTerrain(LE_ConfigTerrain p_LEConfTerrain)
+000478: 	{
+000479: 		if (p_LEConfTerrain.CustomDefaultTerrain != null && p_LEConfTerrain.CustomDefaultTerrain.terrainData != null)
+000480: 		{
+000481: 			m_GUI3dTerrain.SetTerrain(p_LEConfTerrain.CustomDefaultTerrain);
+000482: 			LE_EventInterface.LevelDataChanged(p_LEConfTerrain.CustomDefaultTerrain.gameObject);
+000483: 			if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+000484: 			{
+000485: 				LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.EDIT);
+000486: 			}
+000487: 			else
+000488: 			{
+000489: 				Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to disable the create UI if the default Unity terrain is set!");
+000490: 			}
+000491: 		}
+000492: 		else if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+000493: 		{
+000494: 			LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.CREATE);
+000495: 		}
+000496: 		else
+000497: 		{
+000498: 			Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to show the create UI if there is no default Unity terrain set!");
+000499: 		}
+000500: 	}
+000501: 
+000502: 	private void Update()
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor/LE_ZoneTileGenerator.cs
+LINES: 4-101
+000004: using LE_LevelEditor.UI;
+000005: using UnityEngine;
+000006: 
+000007: namespace LE_LevelEditor;
+000008: 
+000009: public class LE_ZoneTileGenerator : Singleton<LE_ZoneTileGenerator>
+000010: {
+000011: 	public Terrain terrain;
+000012: 
+000013: 	private AddWaveOverlay _waveOverlay;
+000014: 
+000015: 	private void Start()
+000016: 	{
+000017: 		InvokeRepeating("GenerateShoreMap", 0f, 10f);
+000018: 	}
+000019: 
+000020: 	public void GenerateHeightmapFromTexture(Texture2D heightmap)
+000021: 	{
+000022: 		terrain.terrainData.SetHeights(0, 0, MapTools.GetHeightsFromTexture(heightmap));
+000023: 	}
+000024: 
+000025: 	public void GenerateShoreMap()
+000026: 	{
+000027: 		if (Singleton<LE_LevelEditorMain>.Instance.EditMode == LE_EEditMode.TERRAIN)
+000028: 		{
+000029: 			Texture2D height = WorldTools.CreateHeightMapTexture(terrain.terrainData);
+000030: 			Texture2D shore = WorldTools.CreateShoreMaskTexture(terrain.terrainData);
+000031: 			AddWaveOverlay(terrain.gameObject, height, shore);
+000032: 		}
+000033: 	}
+000034: 
+000035: 	public void GenerateRandomIsland()
+000036: 	{
+000037: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000038: 		int randowWorldSeed = StrandedWorld.GetRandowWorldSeed();
+000039: 		terrain.terrainData.SetHeights(0, 0, WorldTools.GenerateZoneHeightmap(Zone.BiomeType.ISLAND, randowWorldSeed));
+000040: 	}
+000041: 
+000042: 	public void GenerateAdvancedPerlin(int freq, float amplitude, int octaves, float blend)
+000043: 	{
+000044: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000045: 		terrain.terrainData.SetHeights(0, 0, WorldTools.PerlinGenerator(terrain.terrainData.GetHeights(0, 0, 257, 257), Random.Range(1, 99999999), freq, amplitude, octaves, blend));
+000046: 	}
+000047: 
+000048: 	public void GenerateAdvancedNormalise(float min, float max, float blend)
+000049: 	{
+000050: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000051: 		terrain.terrainData.SetHeights(0, 0, WorldTools.NormalizeHeightmap(terrain.terrainData.GetHeights(0, 0, 257, 257), min, max, blend));
+000052: 	}
+000053: 
+000054: 	public void GenerateSmooth()
+000055: 	{
+000056: 		terrain.terrainData.SetHeights(0, 0, WorldTools.SmoothTerrain(terrain.terrainData.GetHeights(0, 0, 257, 257), 2, 0.25f, Zone.BiomeType.ISLAND));
+000057: 	}
+000058: 
+000059: 	private Texture2D CreateHeightMapTexture(TerrainData terrain)
+000060: 	{
+000061: 		int heightmapResolution = terrain.heightmapResolution;
+000062: 		int heightmapResolution2 = terrain.heightmapResolution;
+000063: 		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+000064: 		for (int i = 0; i < heightmapResolution; i++)
+000065: 		{
+000066: 			for (int j = 0; j < heightmapResolution2; j++)
+000067: 			{
+000068: 				float num = terrain.GetHeight(i, j) + -100f;
+000069: 				Color color = Color.Lerp(Color.black, Color.white, Mathf.Clamp01((num + 10f) / 10f));
+000070: 				Color color2 = ((num > 0f) ? Color.white : color);
+000071: 				texture2D.SetPixel(i, j, color2);
+000072: 			}
+000073: 		}
+000074: 		texture2D.Apply();
+000075: 		return texture2D;
+000076: 	}
+000077: 
+000078: 	private Texture2D CreateShoreMaskTexture(TerrainData terrain)
+000079: 	{
+000080: 		int heightmapResolution = terrain.heightmapResolution;
+000081: 		int heightmapResolution2 = terrain.heightmapResolution;
+000082: 		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+000083: 		int num = -100;
+000084: 		for (int i = 0; i < heightmapResolution; i++)
+000085: 		{
+000086: 			for (int j = 0; j < heightmapResolution2; j++)
+000087: 			{
+000088: 				Color color = ((terrain.GetHeight(i, j) + (float)num >= 0f) ? Color.white : Color.black);
+000089: 				texture2D.SetPixel(i, j, color);
+000090: 			}
+000091: 		}
+000092: 		texture2D.Apply();
+000093: 		return texture2D;
+000094: 	}
+000095: 
+000096: 	private void AddWaveOverlay(GameObject zone, Texture2D height, Texture2D shore)
+000097: 	{
+000098: 		if ((bool)_waveOverlay)
+000099: 		{
+000100: 			Object.Destroy(_waveOverlay.heightTexture.tex);
+000101: 			Object.Destroy(_waveOverlay.heightTexture.mask);
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LE_LevelEditor/LE_ZoneTileGenerator.cs
+LINES: 117-137
+000117: 		_waveOverlay.heightTexture.alpha = 0f;
+000118: 		_waveOverlay.heightTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000119: 		_waveOverlay.normalTexture = new OverlayNormalTexture();
+000120: 		_waveOverlay.normalTexture.tex = shore;
+000121: 		_waveOverlay.normalTexture.mask = height;
+000122: 		_waveOverlay.normalTexture.alpha = 0f;
+000123: 		_waveOverlay.normalTexture.maskAlpha = 0.4f;
+000124: 		_waveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000125: 		_waveOverlay.foamTexture = new OverlayFoamTexture();
+000126: 		_waveOverlay.foamTexture.tex = shore;
+000127: 		_waveOverlay.foamTexture.mask = height;
+000128: 		_waveOverlay.foamTexture.alpha = 0.4f;
+000129: 		_waveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000130: 	}
+000131: 
+000132: 	public void LoadMap(Map map)
+000133: 	{
+000134: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000135: 		terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+000136: 	}
+000137: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/LevelLoader.cs
+LINES: 474-515
+000474: 	private CoroutineHandle SyncWorld_Async(bool serverLoadWorld = true)
+000475: 	{
+000476: 		return _syncWorldCoroutine = Timing.RunCoroutine(SyncWorld_Sequence(serverLoadWorld));
+000477: 	}
+000478: 
+000479: 	private IEnumerator<float> SyncWorld_Sequence(bool serverLoadWorld = true)
+000480: 	{
+000481: 		if (Game.Mode.IsServer() & serverLoadWorld)
+000482: 		{
+000483: 			LoadingResult loadingResult = World.LoadWorld();
+000484: 			if (loadingResult.Succeeded)
+000485: 			{
+000486: 				Singleton<StrandedWorld>.Instance.ApplyWorldToZones();
+000487: 			}
+000488: 			else
+000489: 			{
+000490: 				Debug.LogError("StrandedWorld:: Error loading world: " + loadingResult.Message);
+000491: 			}
+000492: 			PlayerRegistry.ServerPeer.WorldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+000493: 		}
+000494: 		if (Game.Mode.IsServer() && PlayerRegistry.IsClientPeerValid)
+000495: 		{
+000496: 			yield return MultiplayerWorldSync.Instance.SendWorld_Async(World.CurrentWorld, (CoroutineHandle coroutine) =>
+000497: 			{
+000498: 				_syncWorldCoroutineSend = coroutine;
+000499: 			}, (float ratio) =>
+000500: 			{
+000501: 				EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_WORLD", (int)((double)ratio * 100.0))));
+000502: 			}, () =>
+000503: 			{
+000504: 			}, ShutdownToMainMenu);
+000505: 		}
+000506: 		if (Game.Mode.IsClient())
+000507: 		{
+000508: 			yield return MultiplayerWorldSync.Instance.ReceiveWorld_Async((CoroutineHandle coroutine) =>
+000509: 			{
+000510: 				_syncWorldCoroutineRecv = coroutine;
+000511: 			}, (float ratio) =>
+000512: 			{
+000513: 				EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_WORLD", (int)((double)ratio * 100.0))));
+000514: 			}, (World.Bundle world) =>
+000515: 			{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/MapNameGenerator.cs
+LINES: 1-16
+000001: using System;
+000002: 
+000003: public static class MapNameGenerator
+000004: {
+000005: 	private static readonly string[] Prefixes = new string[8] { "MAP_NAME_PREFIX_1", "MAP_NAME_PREFIX_2", "MAP_NAME_PREFIX_3", "MAP_NAME_PREFIX_4", "MAP_NAME_PREFIX_5", "MAP_NAME_PREFIX_6", "MAP_NAME_PREFIX_7", "MAP_NAME_PREFIX_8" };
+000006: 
+000007: 	private static readonly string[] Stems = new string[10] { "MAP_NAME_STEM_1", "MAP_NAME_STEM_2", "MAP_NAME_STEM_3", "MAP_NAME_STEM_4", "MAP_NAME_STEM_5", "MAP_NAME_STEM_6", "MAP_NAME_STEM_7", "MAP_NAME_STEM_8", "MAP_NAME_STEM_9", "MAP_NAME_STEM_10" };
+000008: 
+000009: 	private static readonly string[] Suffixes = new string[6] { "MAP_NAME_SUFFIX_1", "MAP_NAME_SUFFIX_2", "MAP_NAME_SUFFIX_3", "MAP_NAME_SUFFIX_4", "MAP_NAME_SUFFIX_5", "MAP_NAME_SUFFIX_6" };
+000010: 
+000011: 	public static string GenerateRandomMapName(int seedEffect)
+000012: 	{
+000013: 		Random random = new Random(StrandedWorld.WORLD_SEED + seedEffect);
+000014: 		return string.Join(" ", Prefixes[random.Next(0, Prefixes.Length)], Stems[random.Next(0, Stems.Length)], Suffixes[random.Next(0, Suffixes.Length)]);
+000015: 	}
+000016: }
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/SaveManager.cs
+LINES: 66-107
+000066: 	public static Beam.Serialization.Json.JObject GetPersistentData(Beam.Serialization.Json.JObject root)
+000067: 	{
+000068: 		if (root == null || root.IsNull())
+000069: 		{
+000070: 			Debug.LogError("SaveManager::LoadSaveFile:: Root was null or empty.");
+000071: 			return null;
+000072: 		}
+000073: 		Beam.Serialization.Json.JObject field = root.GetField("Persistent");
+000074: 		if (field != null && !field.IsNull())
+000075: 		{
+000076: 			return field;
+000077: 		}
+000078: 		Debug.LogError("SaveManager::LoadSaveFile:: [Persistent] node is null, empty or missing.");
+000079: 		return null;
+000080: 	}
+000081: 
+000082: 	public static string GetSaveFolderPath()
+000083: 	{
+000084: 		return PathTools.Combine(FilePath.SAVE_FOLDER, FilePath.GetSlotFolderName(Options.GeneralSettings.LastSaveSlotUsed));
+000085: 	}
+000086: 
+000087: 	public static string GetSaveFilePath(GameMode mode)
+000088: 	{
+000089: 		return PathTools.Combine(GetSaveFolderPath(), "data" + FilePath.GetSaveFileExtension(mode));
+000090: 	}
+000091: 
+000092: 	public static bool TryGetSaveFilePath(GameMode mode, out string saveFilePath)
+000093: 	{
+000094: 		saveFilePath = string.Empty;
+000095: 		if (!GAccountService.Get().Initialized)
+000096: 		{
+000097: 			Debug.LogError("SaveManager::CheckSaveFileExists:: DRM not initialized.");
+000098: 			return false;
+000099: 		}
+000100: 		string saveFolderPath = GetSaveFolderPath();
+000101: 		if (string.IsNullOrEmpty(saveFolderPath) || !Directory.Exists(saveFolderPath))
+000102: 		{
+000103: 			return false;
+000104: 		}
+000105: 		string saveFilePath2 = GetSaveFilePath(mode);
+000106: 		if (string.IsNullOrEmpty(saveFilePath2))
+000107: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/SaveManager.cs
+LINES: 539-581
+000539: 		catch (Exception ex)
+000540: 		{
+000541: 			Debug.Log("SaveManager:: Error saving progress:\n\n" + ex);
+000542: 		}
+000543: 		return false;
+000544: 	}
+000545: 
+000546: 	public static void Save(GameMode mode, Beam.Serialization.Json.JObject save)
+000547: 	{
+000548: 		SaveToFile(GetSaveFilePath(mode), save);
+000549: 	}
+000550: 
+000551: 	public static bool ChangeCurrentSlot(int slotID)
+000552: 	{
+000553: 		Debug.Log("SaveManager:: Selecting slot " + slotID);
+000554: 		int lastSaveSlotUsed = Options.GeneralSettings.LastSaveSlotUsed;
+000555: 		Options.GeneralSettings.LastSaveSlotUsed = slotID;
+000556: 		string slotFolderName = FilePath.GetSlotFolderName(slotID);
+000557: 		FilePath.WORLD_FOLDER = PathTools.Combine(FilePath.SAVE_FOLDER, slotFolderName, "World");
+000558: 		FilePath.HEIGHTMAPS_FOLDER = PathTools.Combine(FilePath.SAVE_FOLDER, slotFolderName, "Heightmaps");
+000559: 		return lastSaveSlotUsed != slotID;
+000560: 	}
+000561: 
+000562: 	private static void ReplicateSaveErrorDialogue(IPlayer invokingPlayer, int resultCode)
+000563: 	{
+000564: 		if (invokingPlayer.Id == PlayerRegistry.LocalPlayer.Id)
+000565: 		{
+000566: 			UpdateSavingSpinner(active: false);
+000567: 			int pId = invokingPlayer.Id;
+000568: 			int prevMap = invokingPlayer.Input.GetCurrentMapId();
+000569: 			invokingPlayer.Input.GetOtherPlayers().DisableMaps();
+000570: 			invokingPlayer.Input.SetAndCacheMapsEnabled(state: false, prevMap);
+000571: 			invokingPlayer.Input.SetAndCacheMapsEnabled(state: true, 16);
+000572: 			invokingPlayer.Input.SetCursorEnabled(enabled: true);
+000573: 			string prettyResultMsg = resultCode.GetPrettyResultMsg("SAVE_DB_ERROR_SAVING_DESC");
+000574: 			DialogueBox.Show(PlayerRegistry.LocalPlayer.Input, "SAVE_DB_ERROR_TITLE", prettyResultMsg, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+000575: 			{
+000576: 				IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(pId);
+000577: 				playerFromId.Input.GetOtherPlayers().RestoreMapsEnabled();
+000578: 				playerFromId.Input.SetAndCacheMapsEnabled(state: false, 16);
+000579: 				playerFromId.Input.SetAndCacheMapsEnabled(state: true, prevMap);
+000580: 				playerFromId.Input.SetCursorEnabled(enabled: false);
+000581: 			};
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/SetupAdvancedFoliageShader.cs
+LINES: 342-383
+000342: 		Shader.SetGlobalVector("_AfsWaveAndDistance", new Vector4(GrassWindSpeed, WaveSizeForGrassshader, TempWind.w, DetailDistanceForGrassShader * DetailDistanceForGrassShader));
+000343: 		Shader.SetGlobalVector("_AFSWindMuliplier", WindMuliplierForTreeShader);
+000344: 	}
+000345: 
+000346: 	private void afsUpdateRain()
+000347: 	{
+000348: 	}
+000349: 
+000350: 	private void afsAutoSyncToTerrain()
+000351: 	{
+000352: 		if (AutoSyncToTerrain && SyncedTerrain != null)
+000353: 		{
+000354: 			DetailDistanceForGrassShader = SyncedTerrain.detailObjectDistance;
+000355: 			BillboardStart = SyncedTerrain.treeBillboardDistance;
+000356: 			if (Application.isPlaying && !TreeBillboardShadows)
+000357: 			{
+000358: 				BillboardFadeLenght = SyncedTerrain.treeCrossFadeLength;
+000359: 			}
+000360: 			GrassWavingTint = SyncedTerrain.terrainData.wavingGrassTint;
+000361: 		}
+000362: 	}
+000363: 
+000364: 	private void afsUpdateGrassTreesBillboards()
+000365: 	{
+000366: 		Shader.SetGlobalColor("_AfsWavingTint", GrassWavingTint);
+000367: 		Shader.SetGlobalColor("_AfsTreeColor", AFSTreeColor);
+000368: 		Shader.SetGlobalVector("_AfsTerrainTrees", new Vector4(BillboardStart, BillboardFadeLenght, BillboardFadeOutLength, 0f));
+000369: 		if (BillboardAdjustToCamera)
+000370: 		{
+000371: 			if ((bool)Camera.main)
+000372: 			{
+000373: 				MainCam = Camera.main;
+000374: 				CameraForward = MainCam.transform.forward;
+000375: 				ShadowCameraForward = CameraForward;
+000376: 				rollingX = MainCam.transform.eulerAngles.x;
+000377: 				if (rollingX >= 270f)
+000378: 				{
+000379: 					rollingX -= 270f;
+000380: 					rollingX = 90f - rollingX;
+000381: 					rollingXShadow = rollingX;
+000382: 				}
+000383: 				else
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 22-121
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;
+000081: 
+000082: 	private Dictionary<string, JObject> _zoneSavedObjectsLookup = new Dictionary<string, JObject>();
+000083: 
+000084: 	private Vector3 _playerPosition;
+000085: 
+000086: 	[SerializeField]
+000087: 	private Zone _zonePrefab;
+000088: 
+000089: 	[SerializeField]
+000090: 	private Transform _zoneContainer;
+000091: 
+000092: 	public static int WORLD_SEED
+000093: 	{
+000094: 		get
+000095: 		{
+000096: 			if (!Game.Mode.IsMultiplayer())
+000097: 			{
+000098: 				return LOCAL_WORLD_SEED;
+000099: 			}
+000100: 			return PlayerRegistry.ServerPeer.WorldSeed;
+000101: 		}
+000102: 	}
+000103: 
+000104: 	public Zone[] Zones => _zones;
+000105: 
+000106: 	public Zone NmlZone => _nmlZone;
+000107: 
+000108: 	public ZoneLoader ZoneLoader => _zoneLoader;
+000109: 
+000110: 	public int ShelterCount { get; private set; }
+000111: 
+000112: 	public event EmptyEventHandler WorldGenerated;
+000113: 
+000114: 	public event Action<Zone> ZoneEntered;
+000115: 
+000116: 	public Transform GetParent()
+000117: 	{
+000118: 		GameState state = Game.State;
+000119: 		if ((uint)(state - 2) <= 1u)
+000120: 		{
+000121: 			return _nmlZone.SaveContainer;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 146-187
+000146: 		Zone zone = GetZone(worldPosition);
+000147: 		if (zone?.Terrain == null)
+000148: 		{
+000149: 			result.y = -100f;
+000150: 			return result;
+000151: 		}
+000152: 		result.y = zone.Terrain.SampleHeight(worldPosition) + -100f;
+000153: 		return result;
+000154: 	}
+000155: 
+000156: 	public Vector3 GetNormal(Vector3 worldPosition)
+000157: 	{
+000158: 		Zone zone = GetZone(worldPosition);
+000159: 		if (zone?.Terrain == null)
+000160: 		{
+000161: 			return Vector3.up;
+000162: 		}
+000163: 		Vector3 vector = worldPosition - zone.Terrain.transform.position;
+000164: 		return zone.Terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.z, vector.z));
+000165: 	}
+000166: 
+000167: 	public bool InBounds(Vector3 worldPosition)
+000168: 	{
+000169: 		Zone zone = GetZone(worldPosition);
+000170: 		if (zone == null)
+000171: 		{
+000172: 			return false;
+000173: 		}
+000174: 		return zone.InSaveBounds(worldPosition);
+000175: 	}
+000176: 
+000177: 	public static Zone GetZone(Vector3 worldPosition, bool fallbackToNml = false)
+000178: 	{
+000179: 		Zone zone = Singleton<StrandedWorld>.Instance?.GetZone_(worldPosition);
+000180: 		if (!fallbackToNml)
+000181: 		{
+000182: 			return zone;
+000183: 		}
+000184: 		Zone zone2 = zone;
+000185: 		if ((object)zone2 == null)
+000186: 		{
+000187: 			StrandedWorld instance = Singleton<StrandedWorld>.Instance;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 235-285
+000235: 
+000236: 	protected void OnWorldGenerated()
+000237: 	{
+000238: 		WorldGenerated?.Invoke();
+000239: 	}
+000240: 
+000241: 	protected void OnZoneEntered(Zone zone)
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log("StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{
+000285: 			EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_WORLD"));
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 397-447
+000397: 		LoadingResult loadingResult = World.LoadWorld();
+000398: 		if (loadingResult.Succeeded)
+000399: 		{
+000400: 			ApplyWorldToZones();
+000401: 		}
+000402: 		else
+000403: 		{
+000404: 			Debug.LogError("StrandedWorld:: Error loading world: " + loadingResult.Message);
+000405: 		}
+000406: 	}
+000407: 
+000408: 	public void ApplyWorldToZones()
+000409: 	{
+000410: 		LoadZonePositions();
+000411: 		for (int i = 0; i < 49; i++)
+000412: 		{
+000413: 			Zone zone = Zones[i];
+000414: 			Map map = World.MapList[i];
+000415: 			zone.Terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+000416: 			zone.ZoneName = map.EditorData.Name;
+000417: 			zone.Id = map.EditorData.Id;
+000418: 			zone.Version = map.EditorData.VersionNumber;
+000419: 			zone.Biome = map.EditorData.Biome;
+000420: 			zone.IsMapEditor = map.IsCustomMap();
+000421: 			zone.IsUserMap = map.IsUserMap();
+000422: 			zone.Seed = i;
+000423: 			Texture2D height = WorldTools.CreateHeightMapTexture(zone.Terrain.terrainData);
+000424: 			Texture2D shore = WorldTools.CreateShoreMaskTexture(zone.Terrain.terrainData);
+000425: 			if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL || zone.Biome == Zone.BiomeType.ISLAND_ROCK || zone.Biome == Zone.BiomeType.CARRIER)
+000426: 			{
+000427: 				zone.WaveOverlay = AddWaveOverlay(zone.gameObject, height, shore);
+000428: 			}
+000429: 			zone.SaveContainer.transform.SetAsLastSibling();
+000430: 		}
+000431: 	}
+000432: 
+000433: 	private void LoadObjects(JObject rootData = null)
+000434: 	{
+000435: 		_zoneSavedObjectsLookup.Clear();
+000436: 		if (Game.State == GameState.LOAD_GAME)
+000437: 		{
+000438: 			rootData = rootData ?? SaveManager.LoadSaveFile(Game.Mode);
+000439: 			JObject persistentData = SaveManager.GetPersistentData(rootData);
+000440: 			if (persistentData == null || persistentData.IsNull())
+000441: 			{
+000442: 				return;
+000443: 			}
+000444: 			JObject field = persistentData.GetField("StrandedWorld");
+000445: 			if (field == null || field.IsNull())
+000446: 			{
+000447: 				Debug.LogError("StrandedWorld data is null or empty.");
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 793-834
+000793: 		JObject jObject = _zoneSavedObjectsLookup[zone.gameObject.name];
+000794: 		JObject field = jObject.GetField("Objects");
+000795: 		if (field != null && !field.IsNull())
+000796: 		{
+000797: 			_zoneLoader.LoadZone(zone, jObject);
+000798: 		}
+000799: 		else
+000800: 		{
+000801: 			_zoneLoader.CreateZone(zone);
+000802: 		}
+000803: 	}
+000804: 
+000805: 	private void Initialize_shelterTypes()
+000806: 	{
+000807: 		for (int i = 0; i < _shelters.Length; i++)
+000808: 		{
+000809: 			_shelters[i] = -1;
+000810: 		}
+000811: 		System.Random random = new System.Random(WORLD_SEED);
+000812: 		int num = 0;
+000813: 		for (int j = 0; j < _shelters.Length; j++)
+000814: 		{
+000815: 			int num2;
+000816: 			do
+000817: 			{
+000818: 				num2 = random.Next(0, 8);
+000819: 				for (int k = 0; k < _shelters.Length; k++)
+000820: 				{
+000821: 					if (num2 == _shelters[k])
+000822: 					{
+000823: 						num2 = -1;
+000824: 						break;
+000825: 					}
+000826: 				}
+000827: 			}
+000828: 			while (num2 == -1);
+000829: 			_shelters[num] = num2;
+000830: 			num++;
+000831: 		}
+000832: 	}
+000833: 
+000834: 	private void SetShelterOnZones()
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 949-994
+000949: 				index = i;
+000950: 			}
+000951: 		}
+000952: 		return result;
+000953: 	}
+000954: 
+000955: 	public Zone FindZone(string name)
+000956: 	{
+000957: 		for (int i = 0; i < Zones.Length; i++)
+000958: 		{
+000959: 			if (Zones[i].Id.Equals(name))
+000960: 			{
+000961: 				return Zones[i];
+000962: 			}
+000963: 		}
+000964: 		return null;
+000965: 	}
+000966: 
+000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals("INTERNAL_MISSION_3"))
+000972: 			{
+000973: 				return Zones[i];
+000974: 			}
+000975: 		}
+000976: 		return null;
+000977: 	}
+000978: 
+000979: 	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+000980: 	{
+000981: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+000982: 	}
+000983: 
+000984: 	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+000985: 	{
+000986: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+000987: 	}
+000988: 
+000989: 	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+000990: 	{
+000991: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+000992: 	}
+000993: 
+000994: 	private bool InImpostorViewRange(IPlayer player, Zone zone)
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINES: 1030-1135
+001030: 		addWaveOverlay.heightTexture.maskAlpha = 0.9f;
+001031: 		addWaveOverlay.normalTexture = new OverlayNormalTexture();
+001032: 		addWaveOverlay.normalTexture.tex = shore;
+001033: 		addWaveOverlay.normalTexture.mask = height;
+001034: 		addWaveOverlay.normalTexture.alpha = 0f;
+001035: 		addWaveOverlay.normalTexture.maskAlpha = 0.4f;
+001036: 		addWaveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+001037: 		addWaveOverlay.foamTexture = new OverlayFoamTexture();
+001038: 		addWaveOverlay.foamTexture.tex = shore;
+001039: 		addWaveOverlay.foamTexture.mask = height;
+001040: 		addWaveOverlay.foamTexture.alpha = 0.4f;
+001041: 		addWaveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+001042: 		addWaveOverlay.clipTexture = new OverlayClipTexture();
+001043: 		addWaveOverlay.clipTexture.tex = shore;
+001044: 		addWaveOverlay.clipTexture.ignoreQuerys = true;
+001045: 		return addWaveOverlay;
+001046: 	}
+001047: 
+001048: 	public static int GetRandowWorldSeed()
+001049: 	{
+001050: 		string text = (Environment.TickCount & 0x7FFFFFFF).ToString();
+001051: 		return int.Parse(text.Substring(0, Mathf.Min(text.Length, 8)));
+001052: 	}
+001053: 
+001054: 	public static void SetRandomWorldSeed()
+001055: 	{
+001056: 		SetWorldSeed(0);
+001057: 	}
+001058: 
+001059: 	public static void SetWorldSeed(int seed)
+001060: 	{
+001061: 		if (seed == 0)
+001062: 		{
+001063: 			LOCAL_WORLD_SEED = GetRandowWorldSeed();
+001064: 			Debug.Log("StrandedWorld::SetWorldSeed:: Random [" + LOCAL_WORLD_SEED + "]");
+001065: 		}
+001066: 		else
+001067: 		{
+001068: 			LOCAL_WORLD_SEED = seed;
+001069: 			Debug.Log("StrandedWorld::SetWorldSeed:: Custom [" + LOCAL_WORLD_SEED + "]");
+001070: 		}
+001071: 	}
+001072: 
+001073: 	public static void SetWorldSeed(string seedValue)
+001074: 	{
+001075: 		if (string.IsNullOrEmpty(seedValue))
+001076: 		{
+001077: 			SetWorldSeed(0);
+001078: 			return;
+001079: 		}
+001080: 		string s = seedValue.Substring(0, Mathf.Min(seedValue.Length, 8));
+001081: 		int result = 0;
+001082: 		if (!int.TryParse(s, out result))
+001083: 		{
+001084: 			Debug.LogWarning("StrandedWorld::SetWorldSeed:: Could not parse seed value. Seed likely contains invalid characters.");
+001085: 		}
+001086: 		SetWorldSeed(result);
+001087: 	}
+001088: 
+001089: 	public static GameObject AddDebugAxis(Vector3 position, Quaternion rotation)
+001090: 	{
+001091: 		return null;
+001092: 	}
+001093: 
+001094: 	public static GameObject AddDebugAxis(Vector3 position, Quaternion rotation, string text)
+001095: 	{
+001096: 		return null;
+001097: 	}
+001098: 
+001099: 	public System.Random GenerateLocalSeed(Vector3 objectPosition, int addedValue = 0)
+001100: 	{
+001101: 		Vector3 zero = Vector3.zero;
+001102: 		Vector3 b = new Vector3(objectPosition.x, 0f, objectPosition.z);
+001103: 		float num = Mathf.Atan2(b.z - zero.z, b.x - zero.x) * 180f / MathF.PI;
+001104: 		int num2 = (int)Vector3.Distance(zero, b);
+001105: 		addedValue++;
+001106: 		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+001107: 	}
+001108: 
+001109: 	public JObject Save()
+001110: 	{
+001111: 		JObject jObject = new JObject();
+001112: 		jObject.AddField("WorldSeed", JSerializer.Serialize(WORLD_SEED));
+001113: 		JObject jObject2 = new JObject();
+001114: 		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+001115: 		{
+001116: 			IPlayer player = PlayerRegistry.AllPlayers[i];
+001117: 			JObject jObject3 = new JObject();
+001118: 			jObject3.AddField("Position", JSerializer.Serialize(player.transform.position));
+001119: 			jObject3.AddField("ZoneId", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+001120: 			jObject2.Add(jObject3);
+001121: 		}
+001122: 		jObject.AddField("PlayersData", jObject2);
+001123: 		Zone[] zones = Zones;
+001124: 		foreach (Zone zone in zones)
+001125: 		{
+001126: 			if (zone.Loaded)
+001127: 			{
+001128: 				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+001129: 			}
+001130: 		}
+001131: 		SaveZone(_nmlZone, destroy: false, hardSave: true);
+001132: 		HandleOutOfGameBounds_NoMansLand();
+001133: 		JObject jObject4 = new JObject();
+001134: 		for (int k = 0; k < 49; k++)
+001135: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/WorldTools.cs
+LINES: 223-283
+000223: 	private static float[,] StitchTerrainEdges(float[,] heightmap)
+000224: 	{
+000225: 		int num = 257;
+000226: 		Color[] pixels = (Resources.Load("Terrain/Mask_Island_Stitch") as Texture2D).GetPixels();
+000227: 		for (int i = 0; i < num; i++)
+000228: 		{
+000229: 			for (int j = 0; j < num; j++)
+000230: 			{
+000231: 				if (heightmap[i, j] <= 0.66f)
+000232: 				{
+000233: 					float r = pixels[i * num + j].r;
+000234: 					heightmap[i, j] -= 1f * r;
+000235: 				}
+000236: 			}
+000237: 		}
+000238: 		return heightmap;
+000239: 	}
+000240: 
+000241: 	public static Texture2D CreateHeightMapTexture(TerrainData terrain)
+000242: 	{
+000243: 		int heightmapResolution = terrain.heightmapResolution;
+000244: 		int heightmapResolution2 = terrain.heightmapResolution;
+000245: 		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.ARGB32, mipChain: false, linear: false);
+000246: 		for (int i = 0; i < heightmapResolution; i++)
+000247: 		{
+000248: 			for (int j = 0; j < heightmapResolution2; j++)
+000249: 			{
+000250: 				float num = terrain.GetHeight(i, j) + -100f;
+000251: 				float num2 = Mathf.Lerp(0f, 1f, Mathf.Clamp01((num + 6f) / 5f));
+000252: 				Color color = ((num > 0f) ? new Color(1f, 1f, 1f, 1f) : new Color(num2, num2, num2, num2));
+000253: 				texture2D.SetPixel(i, j, color);
+000254: 			}
+000255: 		}
+000256: 		texture2D.Apply();
+000257: 		return texture2D;
+000258: 	}
+000259: 
+000260: 	public static Texture2D CreateShoreMaskTexture(TerrainData terrain)
+000261: 	{
+000262: 		int heightmapResolution = terrain.heightmapResolution;
+000263: 		int heightmapResolution2 = terrain.heightmapResolution;
+000264: 		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.ARGB32, mipChain: false, linear: false);
+000265: 		int num = -100;
+000266: 		for (int i = 0; i < heightmapResolution; i++)
+000267: 		{
+000268: 			for (int j = 0; j < heightmapResolution2; j++)
+000269: 			{
+000270: 				Color color = ((terrain.GetHeight(i, j) + (float)num > 0.3f) ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 0f));
+000271: 				texture2D.SetPixel(i, j, color);
+000272: 			}
+000273: 		}
+000274: 		texture2D.Apply();
+000275: 		return texture2D;
+000276: 	}
+000277: 
+000278: 	private static float[,] GenerateTerrain(float[,] heightmap, Zone.BiomeType biome = Zone.BiomeType.RANDOM)
+000279: 	{
+000280: 		int num = 257;
+000281: 		int num2 = num;
+000282: 		float[,] array = (float[,])heightmap.Clone();
+000283: 		float[,] array2 = (float[,])heightmap.Clone();
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZonePositionGenerator.cs
+LINES: 1-38
+000001: using System;
+000002: using System.Collections.Generic;
+000003: using SharpNeatLib.Maths;
+000004: using UnityEngine;
+000005: 
+000006: public static class ZonePositionGenerator
+000007: {
+000008: 	public static Vector2[] GeneratePoints(int WORLD_SEED, float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
+000009: 	{
+000010: 		float num = radius / Mathf.Sqrt(2f);
+000011: 		int[,] array = new int[Mathf.CeilToInt(sampleRegionSize.x / num), Mathf.CeilToInt(sampleRegionSize.y / num)];
+000012: 		List<Vector2> list = new List<Vector2>();
+000013: 		List<Vector2> list2 = new List<Vector2>();
+000014: 		list2.Add(sampleRegionSize / 2f);
+000015: 		FastRandom fastRandom = new FastRandom(WORLD_SEED);
+000016: 		while (list2.Count > 0)
+000017: 		{
+000018: 			int index = fastRandom.Next(0, list2.Count);
+000019: 			Vector2 vector = list2[index];
+000020: 			bool flag = false;
+000021: 			for (int i = 0; i < numSamplesBeforeRejection; i++)
+000022: 			{
+000023: 				float f = (float)fastRandom.NextDouble() * MathF.PI * 2f;
+000024: 				Vector2 vector2 = new Vector2(Mathf.Sin(f), Mathf.Cos(f));
+000025: 				Vector2 vector3 = vector + vector2 * (fastRandom.Next((int)(radius * 100f), (int)(1.25f * radius * 100f)) / 100);
+000026: 				if (i == 0)
+000027: 				{
+000028: 					vector3 = vector;
+000029: 				}
+000030: 				if (IsValid(vector3, sampleRegionSize, num, radius, list, array))
+000031: 				{
+000032: 					list.Add(vector3);
+000033: 					list2.Add(vector3);
+000034: 					array[(int)(vector3.x / num), (int)(vector3.y / num)] = list.Count;
+000035: 					flag = true;
+000036: 					break;
+000037: 				}
+000038: 			}
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZoneTerrainPointSampler.cs
+LINES: 10-31
+000010: 	}
+000011: 
+000012: 	public bool TryGetSample(Vector3 worldPosition, out Sample sample)
+000013: 	{
+000014: 		sample = Sample.Empty;
+000015: 		if (_zone == null)
+000016: 		{
+000017: 			return false;
+000018: 		}
+000019: 		Terrain terrain = _zone.Terrain;
+000020: 		if (terrain == null)
+000021: 		{
+000022: 			return false;
+000023: 		}
+000024: 		sample = default;
+000025: 		sample.Point = worldPosition;
+000026: 		sample.Point.y = terrain.SampleHeight(worldPosition) + -100f;
+000027: 		Vector3 vector = worldPosition - terrain.transform.position;
+000028: 		sample.Normal = terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, terrain.terrainData.size.z, vector.z));
+000029: 		return true;
+000030: 	}
+000031: }

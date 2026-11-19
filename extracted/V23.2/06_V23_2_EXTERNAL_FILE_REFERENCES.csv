@@ -1,0 +1,20 @@
+container,serialized_file,file_id,path,name,guid,type
+mission_eel.unity3d,CAB-c9c1a1d56e45b4f40aec8ac42a562959,1,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+mission_eel.unity3d,CAB-c9c1a1d56e45b4f40aec8ac42a562959,2,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+mission_shark.unity3d,CAB-ac412b350193a8eaca3ef4dd28dabf2b,1,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+mission_squid.unity3d,CAB-274bf3f3846c5c146a254ee198cd5955,1,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+mission_squid.unity3d,CAB-274bf3f3846c5c146a254ee198cd5955,2,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+introscene.unity3d,CAB-b713c4afcf1a2c7197e96acf299a9e17,1,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+introscene.unity3d,CAB-b713c4afcf1a2c7197e96acf299a9e17,2,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+introscene.unity3d,CAB-b713c4afcf1a2c7197e96acf299a9e17,3,archive:/CAB-72b1dc76f835e51f508afbd70a61a829/CAB-72b1dc76f835e51f508afbd70a61a829,CAB-72b1dc76f835e51f508afbd70a61a829,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+beepi.unity3d,CAB-72b1dc76f835e51f508afbd70a61a829,1,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+beepi.unity3d,CAB-72b1dc76f835e51f508afbd70a61a829,2,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+getbit.unity3d,CAB-cd860b2f1d94c5a518bcad0a3e5ca7e8,1,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,1,globalgamemanagers.assets,globalgamemanagers.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,2,Resources/unity_builtin_extra,unity_builtin_extra,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,3,Library/unity default resources,unity default resources,b'\x00\x00\x00\x00\x00\x00\x00\x00\x0e\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,4,resources.assets,resources.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,5,sharedassets0.assets,sharedassets0.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,6,sharedassets3.assets,sharedassets3.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,7,sharedassets4.assets,sharedassets4.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0
+globalgamemanagers,globalgamemanagers,8,sharedassets1.assets,sharedassets1.assets,b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',0

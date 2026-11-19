@@ -1,0 +1,33 @@
+CASTAWAY-DEPTHS V23.2
+UNITYPY SERIALIZED ASSET PARSING + TERRAIN REFERENCE RECOVERY
+================================================================
+Created UTC: 2026-11-19T21:42:38.167641+00:00
+Game root: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+V23.1 input: /storage/emulated/0/Map Check/reports/V23_1_ASSET_SEED_RECOVERY
+Output: /storage/emulated/0/Map Check/reports/V23_2_UNITYPY_TERRAIN_RECOVERY
+
+UnityPy: AVAILABLE 1.25.4
+Asset candidates: 20
+Containers loaded: 19
+Unity object index records: 51404
+Target objects parsed: 21106
+Terrain/Transform full-object previews: 21100
+Pointer reference records: 63510
+Save/Seed candidates: 4
+Source file index records: 34
+Parse errors: 0
+Warnings: 0
+
+SAFETY / SCOPE:
+- STRICT: all input and output paths must resolve inside /storage/emulated/0/Map Check.
+- Android/data and Android/media are not scanned.
+- Read-only: no game assets, save files, or source files are modified.
+- BinaryFormatter save files are not deserialized or executed.
+- Local PPtr links are marked resolved only when pathID matches the same serialized file.
+- External PPtr links remain candidates unless the correct external mapping is proven.
+- UnityPy parse errors and skipped large files must be reviewed before claiming completeness.
+- TerrainData dimensions/size are accepted only from parsed TerrainData object fields.
+- Mission 3 world coordinates are not guessed from asset names or seed candidates.
+- No Godot project changes and no APK build/export.
+
+V23.2 FINISHED
