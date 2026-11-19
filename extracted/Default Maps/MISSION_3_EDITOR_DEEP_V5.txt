@@ -1,0 +1,847 @@
+MISSION 3 EDITOR DEEP CHECK V5
+============================================================================
+ROOT: /storage/emulated/0/Map Check
+MODE: READ ONLY
+DLL SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+
+============================================================================
+EDITOR FILE
+SIZE: 681
+SHA256: cc1f2a7e8602158991d1ed725d21d33f52d7ddd345dc702cc0597679041bc7ab
+FIRST 64 BYTES: 00 01 00 00 00 ff ff ff ff 01 00 00 00 00 00 00 00 0c 02 00 00 00 46 41 73 73 65 6d 62 6c 79 2d 43 53 68 61 72 70 2c 20 56 65 72 73 69 6f 6e 3d 30 2e 30 2e 30 2e 30 2c 20 43 75 6c 74 75 72 65
+LAST 32 BYTES: 2e 06 0b 00 00 00 0a 30 33 2f 31 30 2f 32 30 32 30 06 0c 00 00 00 02 2d 2d 09 0c 00 00 00 0a 0b
+
+============================================================================
+HEIGHT FILE
+SIZE: 132098
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+FIRST 64 BYTES: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+LAST 32 BYTES: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+============================================================================
+OBJECT FILE
+SIZE: 31135
+SHA256: 0e88b74bf9030fdfe375f63cb1e5b71b1dc520e50e14af4eed2d2afdbd4bbabe
+FIRST 64 BYTES: 5b 0d 0a 09 7b 0d 0a 09 09 22 70 72 65 66 61 62 22 3a 20 22 33 33 34 37 31 62 37 30 2d 62 37 62 37 2d 34 61 38 64 2d 38 66 63 34 2d 62 61 32 35 39 66 37 39 36 31 34 32 22 2c 0d 0a 09 09 22 54
+LAST 32 BYTES: 31 2c 0d 0a 09 09 09 09 22 7a 22 3a 20 31 0d 0a 09 09 09 7d 0d 0a 09 09 7d 0d 0a 09 7d 0d 0a 5d
+
+============================================================================
+EDITOR BYTE ANALYSIS
+Length: 681
+Null bytes: 92
+Printable ASCII: 490
+Distinct byte values: 81
+Byte histogram:
+  0x00 (  0) : 92
+  0x01 (  1) : 15
+  0x02 (  2) : 11
+  0x03 (  3) : 2
+  0x04 (  4) : 5
+  0x05 (  5) : 6
+  0x06 (  6) : 9
+  0x07 (  7) : 5
+  0x08 (  8) : 6
+  0x09 (  9) : 4
+  0x0A ( 10) : 4
+  0x0B ( 11) : 4
+  0x0C ( 12) : 3
+  0x0D ( 13) : 2
+  0x0E ( 14) : 2
+  0x11 ( 17) : 1
+  0x12 ( 18) : 1
+  0x16 ( 22) : 1
+  0x18 ( 24) : 1
+  0x1A ( 26) : 1
+  0x20 ( 32) : 6
+  0x24 ( 36) : 2
+  0x25 ( 37) : 2
+  0x2B ( 43) : 6
+  0x2C ( 44) : 3
+  0x2D ( 45) : 3
+  0x2E ( 46) : 18
+  0x2F ( 47) : 2
+  0x30 ( 48) : 10
+  0x31 ( 49) : 2
+  0x32 ( 50) : 2
+  0x33 ( 51) : 2
+  0x36 ( 54) : 1
+  0x38 ( 56) : 1
+  0x3D ( 61) : 3
+  0x3F ( 63) : 3
+  0x41 ( 65) : 5
+  0x42 ( 66) : 10
+  0x43 ( 67) : 3
+  0x44 ( 68) : 9
+  0x45 ( 69) : 11
+  0x46 ( 70) : 1
+  0x47 ( 71) : 1
+  0x49 ( 73) : 5
+  0x4B ( 75) : 1
+  0x4C ( 76) : 2
+  0x4D ( 77) : 10
+  0x4E ( 78) : 6
+  0x4F ( 79) : 1
+  0x50 ( 80) : 2
+  0x52 ( 82) : 1
+  0x53 ( 83) : 9
+  0x54 ( 84) : 10
+  0x56 ( 86) : 3
+  0x5A ( 90) : 2
+  0x5F ( 95) : 8
+  0x61 ( 97) : 48
+  0x62 ( 98) : 4
+  0x63 ( 99) : 6
+  0x64 (100) : 12
+  0x65 (101) : 54
+  0x67 (103) : 2
+  0x68 (104) : 2
+  0x69 (105) : 23
+  0x6B (107) : 1
+  0x6C (108) : 10
+  0x6D (109) : 17
+  0x6E (110) : 15
+  0x6F (111) : 22
+  0x70 (112) : 13
+  0x72 (114) : 32
+  0x73 (115) : 9
+  0x74 (116) : 28
+  0x75 (117) : 15
+  0x76 (118) : 4
+  0x77 (119) : 1
+  0x79 (121) : 6
+  0xF9 (249) : 1
+  0xFA (250) : 1
+  0xFB (251) : 1
+  0xFF (255) : 13
+
+EDITOR STRING SCAN
+  offset=0x0016 text=FAssembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  offset=0x0063 text=Beam.Terrain.MapEditorData
+  offset=0x0085 text=VersionNumber
+  offset=0x0093 text=GameVersionNumber
+  offset=0x00A5 text=Source
+  offset=0x00AC text=State
+  offset=0x00B2 text=Biome
+  offset=0x00B8 text=Name
+  offset=0x00BD text=Author
+  offset=0x00C4 text=Description
+  offset=0x00D0 text=DateCreated
+  offset=0x00DC text=DateEdited
+  offset=0x00E7 text=DateAdded
+  offset=0x00F1 text=LargePreviewImageBytes
+  offset=0x0115 text=%Beam.Terrain.MapEditorData+EMapSource
+  offset=0x013F text=$Beam.Terrain.MapEditorData+EMapState
+  offset=0x0169 text=Zone+BiomeType
+  offset=0x0186 text=INTERNAL_MISSION_3
+  offset=0x01A2 text=0.68.01
+  offset=0x01AE text=%Beam.Terrain.MapEditorData+EMapSource
+  offset=0x01D9 text=value__
+  offset=0x01EF text=$Beam.Terrain.MapEditorData+EMapState
+  offset=0x0219 text=value__
+  offset=0x0230 text=Zone+BiomeType
+  offset=0x0243 text=value__
+  offset=0x025A text=???
+  offset=0x0263 text=Beam Team
+  offset=0x0272 text=A mysterious location...
+  offset=0x0290 text=03/10/2020
+
+NUMERIC CANDIDATE SCAN
+Offset | uint8 | int8 | uint16LE | int16LE | uint32LE | float32LE
+0x0000 | 0 | 0 | 256 | 256 | 256 | non-finite/extreme
+0x0004 | 0 | 0 | 65280 | -256 | 4294967040 | non-finite/extreme
+0x0008 | 255 | -1 | 511 | 511 | 511 | non-finite/extreme
+0x000C | 0 | 0 | 0 | 0 | 0 | 0
+0x0010 | 0 | 0 | 3072 | 3072 | 134144 | non-finite/extreme
+0x0014 | 0 | 0 | 0 | 0 | 1095106560 | 12.375
+0x0018 | 115 | 115 | 29555 | 29555 | 1835365235 | non-finite/extreme
+0x001C | 98 | 98 | 27746 | 27746 | 762932322 | 1.417808e-11
+0x0020 | 67 | 67 | 21315 | 21315 | 1634227011 | non-finite/extreme
+0x0024 | 114 | 114 | 28786 | 28786 | 539783282 | 1.460617e-19
+0x0028 | 86 | 86 | 25942 | 25942 | 1936876886 | non-finite/extreme
+0x002C | 105 | 105 | 28521 | 28521 | 1030647657 | 0.05821172
+0x0030 | 48 | 48 | 11824 | 11824 | 774909488 | 4.005879e-11
+0x0034 | 48 | 48 | 11824 | 11824 | 741355056 | 2.503674e-12
+0x0038 | 32 | 32 | 17184 | 17184 | 1819624224 | non-finite/extreme
+0x003C | 116 | 116 | 30068 | 30068 | 1701999988 | non-finite/extreme
+0x0040 | 61 | 61 | 28221 | 28221 | 1969581629 | non-finite/extreme
+0x0044 | 116 | 116 | 29300 | 29300 | 1818325620 | non-finite/extreme
+0x0048 | 44 | 44 | 8236 | 8236 | 1968185388 | non-finite/extreme
+0x004C | 98 | 98 | 27746 | 27746 | 1667853410 | non-finite/extreme
+0x0050 | 75 | 75 | 25931 | 25931 | 1417241931 | non-finite/extreme
+0x0054 | 111 | 111 | 27503 | 27503 | 1852140399 | non-finite/extreme
+0x0058 | 61 | 61 | 28221 | 28221 | 1819635261 | non-finite/extreme
+0x005C | 108 | 108 | 1388 | 1388 | 66924 | non-finite/extreme
+0x0060 | 0 | 0 | 0 | 0 | 1109000192 | 38.5
+0x0064 | 101 | 101 | 24933 | 24933 | 778920293 | 5.397406e-11
+0x0068 | 84 | 84 | 25940 | 25940 | 1920099668 | non-finite/extreme
+0x006C | 97 | 97 | 26977 | 26977 | 778987873 | 5.420853e-11
+0x0070 | 77 | 77 | 24909 | 24909 | 1164992845 | 3846.081
+0x0074 | 100 | 100 | 26980 | 26980 | 1869900132 | non-finite/extreme
+0x0078 | 114 | 114 | 17522 | 17522 | 1952531570 | non-finite/extreme
+0x007C | 97 | 97 | 3425 | 3425 | 3425 | non-finite/extreme
+0x0080 | 0 | 0 | 512 | 512 | 1682506240 | non-finite/extreme
+0x0084 | 13 | 13 | 22029 | 22029 | 1919243789 | non-finite/extreme
+0x0088 | 115 | 115 | 26995 | 26995 | 1852795251 | non-finite/extreme
+0x008C | 78 | 78 | 30030 | 30030 | 1651340622 | non-finite/extreme
+0x0090 | 101 | 101 | 29285 | 29285 | 1192325733 | 37234.39
+0x0094 | 97 | 97 | 28001 | 28001 | 1449487713 | non-finite/extreme
+0x0098 | 101 | 101 | 29285 | 29285 | 1769173605 | non-finite/extreme
+0x009C | 111 | 111 | 28271 | 28271 | 1968074351 | non-finite/extreme
+0x00A0 | 109 | 109 | 25197 | 25197 | 1919246957 | non-finite/extreme
+0x00A4 | 6 | 6 | 21254 | 21254 | 1970230022 | non-finite/extreme
+0x00A8 | 114 | 114 | 25458 | 25458 | 90530674 | non-finite/extreme
+0x00AC | 83 | 83 | 29779 | 29779 | 1952543827 | non-finite/extreme
+0x00B0 | 101 | 101 | 1381 | 1381 | 1765934437 | non-finite/extreme
+0x00B4 | 111 | 111 | 28015 | 28015 | 73756015 | non-finite/extreme
+0x00B8 | 78 | 78 | 24910 | 24910 | 1701667150 | non-finite/extreme
+0x00BC | 6 | 6 | 16646 | 16646 | 1953841414 | non-finite/extreme
+0x00C0 | 104 | 104 | 28520 | 28520 | 192049000 | non-finite/extreme
+0x00C4 | 68 | 68 | 25924 | 25924 | 1668506948 | non-finite/extreme
+0x00C8 | 114 | 114 | 26994 | 26994 | 1953524082 | non-finite/extreme
+0x00CC | 105 | 105 | 28521 | 28521 | 191786857 | non-finite/extreme
+0x00D0 | 68 | 68 | 24900 | 24900 | 1702125892 | non-finite/extreme
+0x00D4 | 67 | 67 | 29251 | 29251 | 1634038339 | non-finite/extreme
+0x00D8 | 116 | 116 | 25972 | 25972 | 174351732 | non-finite/extreme
+0x00DC | 68 | 68 | 24900 | 24900 | 1702125892 | non-finite/extreme
+0x00E0 | 69 | 69 | 25669 | 25669 | 1953064005 | non-finite/extreme
+0x00E4 | 101 | 101 | 25701 | 25701 | 1141466213 | 549.5687
+0x00E8 | 97 | 97 | 29793 | 29793 | 1097167969 | 14.34091
+0x00EC | 100 | 100 | 25700 | 25700 | 1684366436 | non-finite/extreme
+0x00F0 | 22 | 22 | 19478 | 19478 | 1918979094 | non-finite/extreme
+0x00F4 | 103 | 103 | 25959 | 25959 | 1917871463 | non-finite/extreme
+0x00F8 | 101 | 101 | 30309 | 30309 | 1701410405 | non-finite/extreme
+0x00FC | 119 | 119 | 18807 | 18807 | 1634552183 | non-finite/extreme
+0x0100 | 103 | 103 | 25959 | 25959 | 2034394471 | non-finite/extreme
+0x0104 | 116 | 116 | 25972 | 25972 | 24339828 | non-finite/extreme
+0x0108 | 0 | 0 | 256 | 256 | 67371264 | non-finite/extreme
+0x010C | 4 | 4 | 260 | 260 | 16843012 | non-finite/extreme
+0x0110 | 1 | 1 | 257 | 257 | 117506305 | non-finite/extreme
+0x0114 | 8 | 8 | 9480 | 9480 | 1698833672 | non-finite/extreme
+0x0118 | 97 | 97 | 28001 | 28001 | 1412328801 | non-finite/extreme
+0x011C | 101 | 101 | 29285 | 29285 | 1634890341 | non-finite/extreme
+0x0120 | 105 | 105 | 28265 | 28265 | 1294888553 | non-finite/extreme
+0x0124 | 97 | 97 | 28769 | 28769 | 1682272353 | non-finite/extreme
+0x0128 | 105 | 105 | 29801 | 29801 | 1919906921 | non-finite/extreme
+0x012C | 68 | 68 | 24900 | 24900 | 1635017028 | non-finite/extreme
+0x0130 | 43 | 43 | 17707 | 17707 | 1632453931 | non-finite/extreme
+0x0134 | 112 | 112 | 21360 | 21360 | 1970230128 | non-finite/extreme
+0x0138 | 114 | 114 | 25458 | 25458 | 40199026 | non-finite/extreme
+0x013C | 0 | 0 | 0 | 0 | 603979776 | 2.775558e-17
+0x0140 | 66 | 66 | 25922 | 25922 | 1835099458 | non-finite/extreme
+0x0144 | 46 | 46 | 21550 | 21550 | 1919243310 | non-finite/extreme
+0x0148 | 114 | 114 | 24946 | 24946 | 1852399986 | non-finite/extreme
+0x014C | 46 | 46 | 19758 | 19758 | 1885424942 | non-finite/extreme
+0x0150 | 69 | 69 | 25669 | 25669 | 1953064005 | non-finite/extreme
+0x0154 | 111 | 111 | 29295 | 29295 | 1631875695 | non-finite/extreme
+0x0158 | 116 | 116 | 24948 | 24948 | 1160470900 | 2742.091
+0x015C | 77 | 77 | 24909 | 24909 | 1399873869 | non-finite/extreme
+0x0160 | 116 | 116 | 24948 | 24948 | 1702125940 | non-finite/extreme
+0x0164 | 2 | 2 | 2 | 2 | 2 | non-finite/extreme
+0x0168 | 14 | 14 | 23054 | 23054 | 1852791310 | non-finite/extreme
+0x016C | 101 | 101 | 11109 | 11109 | 1765944165 | non-finite/extreme
+0x0170 | 111 | 111 | 28015 | 28015 | 1415933295 | non-finite/extreme
+0x0174 | 121 | 121 | 28793 | 28793 | 40202361 | non-finite/extreme
+0x0178 | 0 | 0 | 0 | 0 | 33554432 | non-finite/extreme
+0x017C | 2 | 2 | 2 | 2 | 2 | non-finite/extreme
+0x0180 | 6 | 6 | 774 | 774 | 774 | non-finite/extreme
+0x0184 | 0 | 0 | 4608 | 4608 | 1313411584 | non-finite/extreme
+0x0188 | 84 | 84 | 17748 | 17748 | 1314014548 | non-finite/extreme
+0x018C | 65 | 65 | 19521 | 19521 | 1298091073 | non-finite/extreme
+0x0190 | 73 | 73 | 21321 | 21321 | 1230197577 | 865588.6
+0x0194 | 79 | 79 | 20047 | 20047 | 861883983 | 5.199245e-08
+0x0198 | 1 | 1 | 1 | 1 | 1 | non-finite/extreme
+0x019C | 6 | 6 | 1030 | 1030 | 1030 | non-finite/extreme
+0x01A0 | 0 | 0 | 1792 | 1792 | 774899456 | 4.002398e-11
+0x01A4 | 54 | 54 | 14390 | 14390 | 808335414 | 6.338071e-10
+0x01A8 | 49 | 49 | 1329 | 1329 | 4294640945 | non-finite/extreme
+0x01AC | 255 | -1 | 65535 | -1 | 1109786623 | 41.5
+0x01B0 | 101 | 101 | 24933 | 24933 | 778920293 | 5.397406e-11
+0x01B4 | 84 | 84 | 25940 | 25940 | 1920099668 | non-finite/extreme
+0x01B8 | 97 | 97 | 26977 | 26977 | 778987873 | 5.420853e-11
+0x01BC | 77 | 77 | 24909 | 24909 | 1164992845 | 3846.081
+0x01C0 | 100 | 100 | 26980 | 26980 | 1869900132 | non-finite/extreme
+0x01C4 | 114 | 114 | 17522 | 17522 | 1952531570 | non-finite/extreme
+0x01C8 | 97 | 97 | 11105 | 11105 | 1296378721 | non-finite/extreme
+0x01CC | 97 | 97 | 28769 | 28769 | 1867739233 | non-finite/extreme
+0x01D0 | 117 | 117 | 29301 | 29301 | 1701016181 | non-finite/extreme
+0x01D4 | 1 | 1 | 1 | 1 | 1 | non-finite/extreme
+0x01D8 | 7 | 7 | 30215 | 30215 | 1818326535 | non-finite/extreme
+0x01DC | 117 | 117 | 25973 | 25973 | 1600087413 | non-finite/extreme
+0x01E0 | 0 | 0 | 2048 | 2048 | 133120 | non-finite/extreme
+0x01E4 | 0 | 0 | 0 | 0 | 0 | 0
+0x01E8 | 0 | 0 | 0 | 0 | 4194631680 | non-finite/extreme
+0x01EC | 255 | -1 | 65535 | -1 | 620756991 | 1.110223e-16
+0x01F0 | 66 | 66 | 25922 | 25922 | 1835099458 | non-finite/extreme
+0x01F4 | 46 | 46 | 21550 | 21550 | 1919243310 | non-finite/extreme
+0x01F8 | 114 | 114 | 24946 | 24946 | 1852399986 | non-finite/extreme
+0x01FC | 46 | 46 | 19758 | 19758 | 1885424942 | non-finite/extreme
+0x0200 | 69 | 69 | 25669 | 25669 | 1953064005 | non-finite/extreme
+0x0204 | 111 | 111 | 29295 | 29295 | 1631875695 | non-finite/extreme
+0x0208 | 116 | 116 | 24948 | 24948 | 1160470900 | 2742.091
+0x020C | 77 | 77 | 24909 | 24909 | 1399873869 | non-finite/extreme
+0x0210 | 116 | 116 | 24948 | 24948 | 1702125940 | non-finite/extreme
+0x0214 | 1 | 1 | 1 | 1 | 1 | non-finite/extreme
+0x0218 | 7 | 7 | 30215 | 30215 | 1818326535 | non-finite/extreme
+0x021C | 117 | 117 | 25973 | 25973 | 1600087413 | non-finite/extreme
+0x0220 | 0 | 0 | 2048 | 2048 | 133120 | non-finite/extreme
+0x0224 | 0 | 0 | 0 | 0 | 0 | 0
+0x0228 | 0 | 0 | 0 | 0 | 4177854464 | non-finite/extreme
+0x022C | 255 | -1 | 65535 | -1 | 251658239 | non-finite/extreme
+0x0230 | 90 | 90 | 28506 | 28506 | 1701736282 | non-finite/extreme
+0x0234 | 43 | 43 | 16939 | 16939 | 1869169195 | non-finite/extreme
+0x0238 | 109 | 109 | 25965 | 25965 | 2035574125 | non-finite/extreme
+0x023C | 112 | 112 | 25968 | 25968 | 91504 | non-finite/extreme
+0x0240 | 0 | 0 | 0 | 0 | 1980170240 | non-finite/extreme
+0x0244 | 97 | 97 | 27745 | 27745 | 1702194273 | non-finite/extreme
+0x0248 | 95 | 95 | 24415 | 24415 | 134242143 | non-finite/extreme
+0x024C | 2 | 2 | 2 | 2 | 2 | non-finite/extreme
+0x0250 | 8 | 8 | 8 | 8 | 8 | non-finite/extreme
+0x0254 | 6 | 6 | 2054 | 2054 | 2054 | non-finite/extreme
+0x0258 | 0 | 0 | 768 | 768 | 1061094144 | 0.7461395
+0x025C | 63 | 63 | 1599 | 1599 | 591423 | non-finite/extreme
+0x0260 | 0 | 0 | 0 | 0 | 1107886080 | 34.25
+0x0264 | 101 | 101 | 24933 | 24933 | 544039269 | 2.010691e-19
+0x0268 | 84 | 84 | 25940 | 25940 | 1835099476 | non-finite/extreme
+0x026C | 6 | 6 | 2566 | 2566 | 2566 | non-finite/extreme
+0x0270 | 0 | 0 | 6144 | 6144 | 541136896 | 1.635568e-19
+0x0274 | 109 | 109 | 31085 | 31085 | 1953724781 | non-finite/extreme
+0x0278 | 101 | 101 | 29285 | 29285 | 1869181541 | non-finite/extreme
+0x027C | 117 | 117 | 29557 | 29557 | 1814066037 | non-finite/extreme
+0x0280 | 111 | 111 | 25455 | 25455 | 1952539503 | non-finite/extreme
+0x0284 | 105 | 105 | 28521 | 28521 | 778989417 | 5.421389e-11
+0x0288 | 46 | 46 | 11822 | 11822 | 184954414 | non-finite/extreme
+0x028C | 0 | 0 | 0 | 0 | 167772160 | non-finite/extreme
+0x0290 | 48 | 48 | 13104 | 13104 | 825176880 | 2.549495e-09
+0x0294 | 48 | 48 | 12080 | 12080 | 808595248 | 6.482308e-10
+0x0298 | 50 | 50 | 12338 | 12338 | 201732146 | non-finite/extreme
+0x029C | 0 | 0 | 0 | 0 | 33554432 | non-finite/extreme
+0x02A0 | 45 | 45 | 11565 | 11565 | 201927981 | non-finite/extreme
+0x02A4 | 0 | 0 | 0 | 0 | 167772160 | non-finite/extreme
+
+CROSS-FILE LENGTH CHECK
+EDITOR: 681
+HEIGHT: 132098 expected 132098 = 132098
+OBJECT: 31135
+HEIGHT SIZE MATCH: True
+
+DLL MISSION / EDITOR STRING HITS
+MISSION_3 count= 0 offsets= 
+Mission3 count= 0 offsets= 
+Mission_3 count= 0 offsets= 
+Editor count= 88 offsets= 0x273d52, 0x27aa69, 0x27b41c, 0x27b6b0, 0x27bb38, 0x27bb6d, 0x27c5fc, 0x27d9d5, 0x2837c8, 0x283815, 0x284f7c, 0x288d72, 0x2918e1, 0x2918f3, 0x291b27, 0x2925b6, 0x294068, 0x295215, 0x297ddf, 0x298287, 0x29845e, 0x298577, 0x298e63, 0x2a802f, 0x2a8e13, 0x2ab53b, 0x2ac1ad, 0x2acbdb, 0x2b23d2, 0x2b23dd, 0x2b240a, 0x2b2415, 0x2b6a89, 0x2b7933, 0x2b7acc, 0x2b86b7, 0x2b88e1, 0x2b88ff, 0x2b8a61, 0x2bae0a
+Heightmap count= 24 offsets= 0x2602f3, 0x260eed, 0x262a9d, 0x264f23, 0x266cec, 0x26811b, 0x26907c, 0x27c556, 0x280e8f, 0x291807, 0x295a41, 0x295adb, 0x2b1218, 0x2b1226, 0x2b123c, 0x2b124f, 0x2b1261, 0x2b1282, 0x2b8e93, 0x2bd91f, 0x2c2e7c, 0x2c2e8b, 0x2c2e9d, 0x2d3762
+Island count= 31 offsets= 0x260105, 0x260383, 0x260d1f, 0x26a3b7, 0x282daa, 0x283260, 0x283c02, 0x284cfd, 0x2875c4, 0x28a88c, 0x28a899, 0x28a8b1, 0x28a8c7, 0x28a8d8, 0x28a8ed, 0x28a8fa, 0x28a90f, 0x28a935, 0x28a940, 0x28a94a, 0x2942fd, 0x29430c, 0x29592b, 0x29fc51, 0x2a849e, 0x2ad8ee, 0x2ad902, 0x2bd6f0, 0x2c9e08, 0x2cb028, 0x33ccf3
+Terrain count= 107 offsets= 0x260266, 0x2602de, 0x26051d, 0x260ab8, 0x260d10, 0x2610c2, 0x261735, 0x262f52, 0x262f99, 0x27c404, 0x27cdf6, 0x27ce31, 0x27ce4e, 0x27ce69, 0x280334, 0x28034a, 0x280d88, 0x280e88, 0x281064, 0x281089, 0x2810a7, 0x2810bd, 0x281390, 0x28158d, 0x283ba7, 0x28a8a2, 0x28c45d, 0x28df6f, 0x28df80, 0x28df91, 0x28e6a8, 0x28e723, 0x291d3d, 0x291dee, 0x292c05, 0x293353, 0x293c02, 0x296cd1, 0x29979e, 0x29a34b
+WorldTools count= 1 offsets= 0x2bf94d
+Seed count= 20 offsets= 0x2803b0, 0x2803b9, 0x2803c7, 0x2803d5, 0x2803e3, 0x2803f1, 0x280404, 0x280411, 0x280424, 0x28042f, 0x28043a, 0x28044c, 0x280458, 0x280463, 0x28046b, 0x280472, 0x286647, 0x2a59ea, 0x2a59fa, 0x2c6505
+
+DLL ASCII STRING CONTEXT
+0x002600FE: <CreateIsland>b__82_0
+0x00260261: <InitTerrainValues>b__23_0
+0x002602DB: <OnTerrainGenerateCustomHeightmap>b__33_0
+0x0026037E: <EditIsland>b__83_0
+0x0026051A: <OnTerrainGeneratePerlin>b__34_0
+0x002606BB: <LoadCompletedMissionGyroPieces>b__4_0
+0x00260AB5: <OnTerrainGenerateNormalise>b__36_0
+0x00260D0D: <OnTerrainGenerateIsland>b__37_0
+0x00260EE4: <FillCellHeightmap>b__28_0
+0x002610BF: <OnTerrainSmooth>b__39_0
+0x00261731: <AddTerrainSnapping>b__0
+0x002628EB: <LoadCompletedMissionGyroPieces>b__4_1
+0x00262A94: <FillCellHeightmap>b__28_1
+0x00262F4E: <AddTerrainSnapping>b__1
+0x00262F96: <OnTerrainGeneratePerlin>b__1
+0x00264E54: <LoadCompletedMissionGyroPieces>b__4_2
+0x00264F1A: <FillCellHeightmap>b__28_2
+0x00266C6A: <LoadCompletedMissionGyroPieces>b__4_3
+0x00266CE3: <FillCellHeightmap>b__28_3
+0x00266F03: <island>5__3
+0x00267074: <checkFilePermissions>5__3
+0x002680E1: <LoadCompletedMissionGyroPieces>b__4_4
+0x00268112: <FillCellHeightmap>b__28_4
+0x00269042: <LoadCompletedMissionGyroPieces>b__4_5
+0x00269073: <FillCellHeightmap>b__28_5
+0x00269C12: <LoadCompletedMissionGyroPieces>b__4_6
+0x0026A397: <RecreatePhysicsSetupForPalmLogsIsland>d__27
+0x0026A67F: <LoadCompletedMissionGyroPieces>b__4_7
+0x0026B096: <LoadCompletedMissionGyroPieces>b__4_8
+0x0026C092: MAP_EDITOR_BUTTON_CAMERA
+0x0026C89E: MISSIONS_MISSION_GREAT_ABAIA_DESC
+0x0026C97B: CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_SEED_DESC
+0x0026CA01: MISSIONS_MISSION_FAILED_DESC
+0x0026CABA: MAP_EDITOR_SAVE_MENU_DB_SAVE_RESERVED_DESC
+0x0026CAE5: MISSION_TROPHY_SQUID_DESC
+0x0026CD12: MAP_EDITOR_SAVE_MENU_DB_ERROR_SAVING_MAP_STORAGE_DESC
+0x0026CE82: MAP_EDITOR_SAVE_MENU_DB_SAVE_NAME_DESC
+0x0026D509: MAP_EDITOR_SAVE_MENU_DB_SAVE_EXISTING_DESC
+0x0026D7D6: MISSION_TROPHY_SHARK_DESC
+0x0026D89C: MISSION_TROPHY_EEL_DESC
+0x0026DBC3: MAP_EDITOR_DB_SMOOTH_TERRAIN_DESC
+0x0026DC1C: MISSIONS_MISSION_MEGALODON_DESC
+0x0026DC3C: MAP_EDITOR_DB_NO_SELECTION_DESC
+0x0026DC5C: MAP_EDITOR_SAVE_MENU_DB_SAVE_DESCRIPTION_DESC
+0x0026DDCA: MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC
+0x0026DDF0: MAP_EDITOR_DB_GENERATING_HEIGHTMAP_DESC
+0x0026DE96: MAP_EDITOR_SAVE_MENU_DB_ERROR_SAVING_MAP_DESC
+0x0026DEC4: MAP_EDITOR_MENU_DB_SAVE_EMPTY_MAP_DESC
+0x0026E3BD: MAIN_MENU_DB_FILE_PERMISSIONS_DESC
+0x0026E4FE: MISSIONS_MISSION_LUSCA_GREAT_DESC
+0x0026E520: MAP_EDITOR_DB_DELETE_OBJECT_DESC
+0x0026E5E8: MAP_EDITOR_MENU_DB_QUIT_DESC
+0x0026E9AA: MAP_EDITOR_OBJECTS_CATEGORY_MISC
+0x0026EC3B: WORLD_MSG_ERROR_LOADING_WORLD_SEED
+0x0026EC5E: WORLD_MSG_ERROR_SAVING_WORLD_SEED
+0x0026EC80: LOCAL_WORLD_SEED
+0x0026EC91: get_WORLD_SEED
+0x0026ECA0: MAP_EDITOR_SEED
+0x0026ED94: MISSIONS_MISSION_ASSET_LOADER_FAILED
+0x0026EEB6: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_HOPPED
+0x0026EF9A: STATS_ISLANDS_EXPLORED
+0x0026EFB1: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_EXPLORED
+0x0026F1DD: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_CREATED
+0x0026F237: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_TOGGLE_IS_DIRECTED
+0x0026F30C: ISLANDS_INSERTED
+0x0026F568: MAP_MISSION_ID
+0x0026F813: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_ISLAND
+0x0026F853: CARTOGRAPHER_MENU_BUTTON_CREATE_AN_ISLAND
+0x0026F8D5: TERRAIN_GENERATE_NORMALISE_BLEND
+0x0026F8F6: TERRAIN_GENERATE_PERLIN_BLEND
+0x0026FBC4: INPUT_ACTION_EDITOR_MOVE_BACKWARD
+0x0026FC00: INPUT_ACTION_EDITOR_MOVE_FORWARD
+0x0026FE80: TERRAIN_DETAIL_DISTANCE
+0x00270211: TERRAIN_GENERATE_PERLIN_AMPLITUDE
+0x00270400: MISSIONSHIP_STORAGE
+0x0027053A: PERMISSION_PROMPT_MESSAGE
+0x00270C3C: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_ANGLE
+0x00270EE9: MAP_EDITOR_DB_GENERATE_ISLAND_TITLE
+0x00270FEA: MAP_EDITOR_SAVE_MENU_DB_SAVE_TITLE
+0x002712D0: MAP_EDITOR_DB_SMOOTH_TERRAIN_TITLE
+0x00271317: MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE
+0x0027133E: MAP_EDITOR_DB_GENERATING_HEIGHTMAP_TITLE
+0x00271367: MAP_EDITOR_SAVE_MENU_SAVE_MAP_TITLE
+0x0027138B: MAP_EDITOR_NEW_MAP_TITLE
+0x0027140E: MAP_EDITOR_SAVE_MENU_DB_ERROR_TITLE
+0x002714BB: MAP_EDITOR_DB_DELETE_OBJECT_TITLE
+0x0027153C: MAP_EDITOR_MENU_DB_QUIT_TITLE
+0x00271583: PERMISSION_PROMPT_TITLE
+0x002715FB: MAP_EDITOR_SAVE_MENU_DB_SORRY_TITLE
+0x00271711: WORLD_SEED_FILENAME
+0x0027175F: MISSIONS_MISSION_GREAT_ABAIA_NAME
+0x00271887: MISSIONS_MISSION_MEGALODON_NAME
+0x002718BB: MISSIONS_MISSION_LUSCA_GREAT_NAME
+0x00271B29: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL_TIME
+0x00271D1E: MAP_EDITOR_MENU_BUTTON_RESUME
+0x00271F19: INPUT_ACTION_EDITOR_CLONE
+0x0027226B: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_RAISE
+0x002722C0: TERRAIN_GENERATE_NORMALISE
+0x00272429: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_GENERATE
+0x00272507: INPUT_ACTION_EDITOR_ROTATE
+0x00272598: INPUT_ACTION_EDITOR_DELETE
+0x002726A3: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_TARGET_VALUE
+0x0027278F: MAP_EDITOR_SAVE_MENU_BUTTON_SAVE
+0x002727C6: MAP_EDITOR_MENU_BUTTON_SAVE
+0x00272970: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BUTTON_NORMALIZE
+0x00272A14: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_SIZE
+0x00272A40: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_SIZE
+0x00272A71: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_SIZE
+0x00272A9A: ZONE_TERRAIN_SIZE
+0x00272AAC: ZONE_HEIGHTMAP_SIZE
+0x00272D27: ZONE_TERRAIN_SIZE_HALF
+0x00272E0E: MISSIONS_MISSION_CRAFTING_COMBINATION_UNLOCK_NTF
+0x002732B8: WORLD_MSG_SEED_FILE_MISSING
+0x00273C65: TERRAIN_SMOOTH
+0x00273D4A: LE_LevelEditor.UI
+0x00273FDD: MAP_EDITOR_SAVE_MENU_BUTTON_BACK
+0x0027415C: ISLAND_ROCK
+0x002745F8: ISLAND_HOPPER_GOAL
+0x00274647: ISLAND_HERMIT_GOAL
+0x00274797: MISSIONS_MISSION_FAILED_LABEL
+0x002747B5: MISSIONS_MISSION_COMPLETED_LABEL
+0x002747D6: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BLEND_LABEL
+0x0027480F: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BLEND_LABEL
+0x00274874: MISSIONS_MISSION_REWARD_TITLE_LABEL
+0x00274898: MAP_EDITOR_SAVE_MENU_MAP_NAME_LABEL
+0x002748DB: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_VALUE_LABEL
+0x00274975: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_LABEL
+0x002749A8: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_LABEL
+0x002749E2: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MIN_LABEL
+0x00274A20: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL
+0x00274A4F: MAP_EDITOR_SAVE_MENU_MAP_DESCRIPTION_LABEL
+0x00274A7A: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_FREQ_LABEL
+0x00274AD2: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_OCTAVES_LABEL
+0x00274B30: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_CUSTOM_HEIGHTMAPS_LABEL
+0x00274BA5: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL
+0x00274BCC: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL
+0x00274BF8: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL
+0x00274C1C: MAP_EDITOR_SAVE_MENU_MAP_NAME_INPUT_LABEL
+0x00274C46: MAP_EDITOR_SAVE_MENU_MAP_DESCRIPTION_INPUT_LABEL
+0x00274C77: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MAX_LABEL
+0x00274CD3: MISSIONS_MISSION_REWARD_QUANTITY_LABEL
+0x00274F70: ISLAND_SMALL
+0x002754F8: TERRAIN_MENU_FADE_IN_ANIM
+0x002758A8: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_TOGGLE_OCEAN
+0x00275A68: SNAP_TO_2D_GRID_AND_TERRAIN
+0x00275A84: MAP_EDITOR_BUTTON_TERRAIN
+0x00275A9E: SNAP_TO_TERRAIN
+0x00275B1D: TERRAIN_GENERATE_PERLIN
+0x00275B35: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BUTTON_GEN_PERLIN
+0x00275B74: TERRAIN_GENERATE_NORMALISE_MIN
+0x00275D34: MAP_DESC_MISSION
+0x0027607C: INPUT_ACTION_EDITOR_POSITION
+0x00276099: TERRAIN_Y_POSITION
+0x002761A9: TERRAIN_RESOLUTION
+0x00276444: TERRAIN_READ_SET_HEIGHT_BTN
+0x002764B6: INPUT_ACTION_EDITOR_MOVE_DOWN
+0x0027671E: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_SHOREMAP
+0x00276760: GENERATE_ISLAND_HEIGHTMAP
+0x0027677A: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_SMOOTH_HEIGHTMAP
+0x00276947: MAP_EDITOR_OBJECTS_LABEL_DRAG_AND_DROP
+0x00276A3A: INPUT_ACTION_EDITOR_MOVE_UP
+0x00276AF4: TERRAIN_GENERATE_PERLIN_FREQ
+0x00276D83: TERRAIN_EDIT_BRUSH_SIZE_SLIDER
+0x00276DA2: TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER
+0x00276E5D: HEIGHTMAPS_FOLDER
+0x00276F96: Interactive_MISSION_TRIGGER
+0x002770F5: TERRAIN_BRUSH_PICKER
+0x0027710A: TERRAIN_HEIGHTMAP_PICKER
+0x0027730D: ACHIEVEMENT_ISLAND_HOPPER
+0x00277586: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_LOWER
+0x0027763E: TERRAIN_LAYER
+0x002779E4: IS_TERRAIN_EDITOR
+0x002779F6: INPUT_ACTION_CATEGORY_MAP_EDITOR
+0x00277A17: IS_OBJECT_EDITOR
+0x00277AA0: ZONE_TERRAIN_SIZE_HALF_SQR
+0x00277D33: MAP_EDITOR_OBJECTS_CATEGORY_TREES
+0x00277FA3: MAP_EDITOR_OBJECTS_CATEGORY_STRUCTURES
+0x0027803D: TERRAIN_GENERATE_PERLIN_OCTAVES
+0x0027821C: INPUT_ACTION_EDITOR_MOVE_X_AXIS
+0x0027823C: INPUT_ACTION_EDITOR_MOVE_Y_AXIS
+0x0027825C: INPUT_ACTION_EDITOR_MOVE_Z_AXIS
+0x00278294: MAP_EDITOR_OBJECTS_CATEGORY_ROCKS
+0x002782CE: MAP_EDITOR_OBJECTS_CATEGORY_ANIMALS
+0x00278306: TERRAIN_DETAILS
+0x002783C0: MAP_EDITOR_OBJECTS_CATEGORY_ITEMS
+0x00278444: NUM_MISSIONS
+0x00278512: MAP_MSG_ERROR_LOADING_MISSION_MAPS
+0x00278B9A: MAP_EDITOR_MAX_NUM_OBJECTS
+0x00278BB5: TERRAIN_OBJECTS
+0x00278BC5: MAP_EDITOR_BUTTON_OBJECTS
+0x00278D50: INPUT_ACTION_EDITOR_FOCUS
+0x00279206: INPUT_ACTION_EDITOR_MOVE_LEFT
+0x00279308: MAP_EDITOR_TERRAIN_BUTTON_CLICK_TO_READ_TERRAIN_HEIGHT
+0x00279356: ZONE_HEIGHTMAP_HEIGHT
+0x0027936C: TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT
+0x0027939A: MAP_EDITOR_TERRAIN_BUTTON_READ_TERRAIN_PAINT_HEIGHT
+0x002794F9: INPUT_ACTION_EDITOR_MOVE_RIGHT
+0x00279583: TERRAIN_UI_MODE_EDIT
+0x002797BC: MAP_EDITOR_MENU_BUTTON_QUIT
+0x00279C44: INPUT_ACTION_EDITOR_SPRINT
+0x00279CD1: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_AMOUNT
+0x00279CFF: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_AMOUNT
+0x00279D32: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_AMOUNT
+0x0027A3DB: TERRAIN_MENU
+0x0027A930: TERRAIN_GENERATE_NORMALISE_MAX
+0x0027A9DB: MAP_EDITOR_SUFFIX
+0x0027AA69: Editor_Move_X
+0x0027AC95: o_heightmapMaxX
+0x0027B41C: Editor_Move_Y
+0x0027B652: o_heightmapMaxY
+0x0027B6B0: Editor_Move_Z
+0x0027BB30: LE_LevelEditor.LEInput.LE_IInputHandler.RotateCamera
+0x0027BB65: LE_LevelEditor.LEInput.LE_IInputHandler.MoveCamera
+0x0027C400: get_TerrainData
+0x0027C410: m_terrainData
+0x0027C41E: p_terrainData
+0x0027C42C: get_terrainData
+0x0027C43C: IMissionData
+0x0027C449: get_MissionData
+0x0027C459: _missionData
+0x0027C556: HeightmapData
+0x0027C5F9: MapEditorData
+0x0027CDEB: m_doRebuildTerrainTab
+0x0027CE26: get_DefaultTerrainDataPrefab
+0x0027CE43: set_DefaultTerrainDataPrefab
+0x0027CE60: m_defaultTerrainDataPrefab
+0x0027CE99: _seedPrefab
+0x0027D06A: MissionSaveablePrefab
+0x0027D13E: _missionBedSavePrefab
+0x0027D9CD: LE_LevelEditor.Logic
+0x00280218: add_MissionEnded
+0x00280229: remove_MissionEnded
+0x0028023D: MissionListener_MissionEnded
+0x0028025A: MissionEventBroadcaster_MissionEnded
+0x0028027F: get_MissionEnded
+0x00280290: OnMissionEnded
+0x0028029F: _missionEnded
+0x0028032E: get_IsTerrainGrounded
+0x00280344: set_IsTerrainGrounded
+0x0028035A: terrainGrounded
+0x002803AC: get_Seed
+0x002803B5: set_Seed
+0x002803BE: get_WorldSeed
+0x002803CC: set_WorldSeed
+0x002803DA: LoadWorldSeed
+0x002803E8: SaveWorldSeed
+0x002803F6: SetRandomWorldSeed
+0x00280409: SetWorldSeed
+0x00280416: GetRandowWorldSeed
+0x00280429: _worldSeed
+0x00280434: CreateSeed
+0x0028043F: GenerateLocalSeed
+0x00280451: _randomSeed
+0x0028045D: perlinSeed
+0x00280468: GetSeed
+0x00280470: _wSeed
+0x002808E1: _seed
+0x00280D86: OnTerrainChangeHeightModeChanged
+0x00280E86: OnTerrainHeightmapTextureChanged
+0x00281062: OnTerrainEditBrushTargetValueChanged
+0x00281087: OnTerrainEditBrushSizeChanged
+0x002810A5: OnTerrainBrushChanged
+0x002810BB: OnTerrainIsDirectedSmoothChanged
+0x0028138E: OnTerrainEditDirectionChanged
+0x0028158B: OnTerrainEditBrushAmountChanged
+0x0028229E: MissionAssetLoader_LoadFailed
+0x0028239D: add_MissionFailed
+0x002823AF: remove_MissionFailed
+0x002823C4: MissionEventBroadcaster_MissionFailed
+0x002823EA: get_MissionFailed
+0x002823FC: ReplicateMissionFailed
+0x00282413: ReplicatedComputeMissionFailed
+0x00282432: OnMissionFailed
+0x00282442: _missionFailed
+0x00282DAA: IslandsHopped
+0x00283260: IslandsExplored
+0x002837C2: get_isEditorPaused
+0x00283813: IsEditorSceneViewFocused
+0x00283BA5: OnTerrainCreated
+0x00283C02: IslandsCreated
+0x00283E13: _missionActivated
+0x0028436C: ReplicateMissionGoal_Completed
+0x002843D5: add_MissionCompleted
+0x002843EA: remove_MissionCompleted
+0x00284402: MissionEventBroadcaster_MissionCompleted
+0x0028442B: get_MissionCompleted
+0x00284440: OnMissionCompleted
+0x00284453: _missionCompleted
+0x002845B4: CheckMissionTrophiesCrafted
+0x00284B3F: add_MissionStarted
+0x00284B52: remove_MissionStarted
+0x00284B68: MissionListener_MissionStarted
+0x00284B87: MissionEventBroadcaster_MissionStarted
+0x00284BAE: get_MissionStarted
+0x00284BC1: ReplicateMissionStarted
+0x00284BD9: ReplicatedComputeMissionStarted
+0x00284BF9: OnMissionStarted
+0x00284C0A: _missionStarted
+0x00284CFD: IslandsInserted
+0x00284F79: MapEditorSaveMenuPresenter_Saved
+0x00286628: <MissionEnded>k__BackingField
+0x00286646: <Seed>k__BackingField
+0x00286741: <MissionFailed>k__BackingField
+0x0028695B: <MissionCompleted>k__BackingField
+0x002869B6: <MissionStarted>k__BackingField
+0x002875C3: <IslandType>k__BackingField
+0x00287FE6: <MissionGoal>k__BackingField
+0x00288003: <CurrentMissionGoal>k__BackingField
+0x002880B2: <PermissionLevel>k__BackingField
+0x00288D6C: <IsMapEditor>k__BackingField
+0x0028A11E: <EnteredMissionProximity>k__BackingField
+0x0028A147: <LeftMissionProximity>k__BackingField
+0x0028A886: InsideIsland
+0x0028A893: CreateIsland
+0x0028A8A0: OnTerrainGenerateIsland
+0x0028A8B8: spawnOnStartingIsland
+0x0028A8CE: IsStartingIsland
+0x0028A8DF: GenerateRandomIsland
+0x0028A8F4: cornerIsland
+0x0028A901: GatherPalmLogsIsland
+0x0028A916: RecreatePhysicsSetupForPalmLogsIsland
+0x0028A93C: EditIsland
+0x0028A947: NewIsland
+0x0028A951: island
+0x0028B0D9: IMissionReward
+0x0028B0E8: PrefabMissionReward
+0x0028B0FC: ItemMissionReward
+0x0028B10E: CraftingCombinationMissionReward
+0x0028B12F: StoryMissionReward
+0x0028B142: missionReward
+0x0028BE66: _terrainObjectCullingDistance
+0x0028C459: get_TerrainInstance
+0x0028DF6E: ETerrainUIMode
+0x0028DF7D: GetTerrainUIMode
+0x0028DF8E: SetTerrainUIMode
+0x0028E6A7: ETerrainChangeHeightMode
+0x0028E71F: LE_ETerrainEditMode
+0x0028F1DB: editorLoadedMessage
+0x0028FD93: get_heightmapScale
+0x002917D7: LoadMapHeightMapFile
+0x002917EC: SaveMapHeightMapFile
+0x00291801: ImportHeightmapFromRawFile
+0x002918DC: CheckEditorRecompile
+0x002918F1: OnEditorRecompile
+0x00291B1D: GetFocusedEditorWindowTitle
+0x00291D31: UnityEngine.TerrainModule
+0x00291D6D: EmissionModule
+0x00291DE2: UnityEngine.TerrainPhysicsModule
+0x002921B9: get_MissionAssetBundleName
+0x002921D4: _missionAssetBundleName
+0x002925B6: EditorObjectName
+0x00292C01: m_isTerrainSetHeightReadInFrame
+0x0029334D: _underTerrainTime
+0x00293BFA: afsSetupTerrainEngine
+0x00294068: Editor_Clone
+0x002942F9: get_IslandType
+0x00294308: set_IslandType
+0x00294317: islandType
+0x00294886: MissionType
+0x00294892: missionType
+0x0029520D: LE_LevelEditor.Core
+0x00295293: ReplicatedMissionGoal_CompletedCore
+0x0029592B: IslandDebugTexture
+0x00295A39: GenerateHeightmapFromTexture
+0x00295ABE: CreateHeightMapTexture
+0x00295AD5: CreateHeightmapTexture
+0x00295E2A: MissionRewardBase
+0x00295EBE: MissionGoalBase
+0x00295FD6: MissionControllerBase
+0x0029602C: MissionCompletedViewAdapterBase
+0x002960AB: ActiveMissionHudViewAdapterBase
+0x002960E8: DisplayMissionNameViewAdapterBase
+0x00296231: MissionRewardElementViewAdapterBase
+0x002963BF: MissionInitializerBase
+0x00296CCF: OnTerrainGenerateNormalise
+0x00297DDF: EditorBrowsableState
+0x00298287: EditorState
+0x0029845E: Editor_Rotate
+0x00298577: Editor_Delete
+0x00298E63: EditorBrowsableAttribute
+0x002994EB: seedValue
+0x0029979B: SetTerrainEditBrushTargetValue
+0x00299AAF: _missionLeave
+0x0029A348: SetTerrainEditBrushSize
+0x0029BEDB: AddTerrainSnapping
+0x0029E059: _missionBattleIntroTrackLength
+0x0029E447: OnTerrainSmooth
+0x0029F6AA: _missionBattleIntroTrack
+0x0029F6DD: _missionBattleLoopTrack
+0x0029FC4B: CreateIslandButton_Click
+0x002A40E1: SessionModificationSetPermissionLevelOptionsInternal
+0x002A4116: LobbyModificationSetPermissionLevelOptionsInternal
+0x002A5700: MissionAssetLoader_LoadedGoal
+0x002A5761: IMissionGoal
+0x002A576E: get_MissionGoal
+0x002A577E: set_MissionGoal
+0x002A578E: InteractiveMissionGoal
+0x002A57A5: get_CurrentMissionGoal
+0x002A57BC: set_CurrentMissionGoal
+0x002A59E1: get_WorldSeedLabel
+0x002A59F4: _worldSeedLabel
+0x002A5B37: get_MissionNameLabel
+0x002A5B4C: _missionNameLabel
+0x002A682F: m_PermissionLevel
+0x002A6841: get_PermissionLevel
+0x002A6855: set_PermissionLevel
+0x002A6869: OnlineSessionPermissionLevel
+0x002A6886: EOS_SessionModification_SetPermissionLevel
+0x002A68B1: EOS_LobbyModification_SetPermissionLevel
+0x002A68DA: LobbyPermissionLevel
+0x002A7449: editorStream
+0x002A74AB: useEdgeFoam
+0x002A802F: EditorPlatform
+0x002A803E: editorPlatform
+0x002A83D1: PrefabSizeFitsBetweenTerrainAndOcean
+0x002A849E: IslandGen
+0x002A8E0B: LE_LevelEditorMain
+0x002A8E74: Beam.Terrain
+0x002A8E81: Footstep_Terrain
+0x002A8E92: get_Terrain
+0x002A8E9E: LE_LogicTerrain
+0x002A8EAE: m_logicTerrain
+0x002A8EBD: LE_GUI3dTerrain
+0x002A8ECD: m_GUI3dTerrain
+0x002A8EDC: p_GUI3dTerrain
+0x002A8EEB: get_GUI3dTerrain
+0x002A8EFC: SyncedTerrain
+0x002A8F0A: CheckInsideTerrain
+0x002A8F1D: GenerateTerrain
+0x002A8F2D: get_activeTerrain
+0x002A8F3F: p_LEConfTerrain
+0x002A8F4F: p_confTerrain
+0x002A8F5D: LE_ConfigTerrain
+0x002A8F6E: SmoothTerrain
+0x002A8F7C: CheckTerrain
+0x002A8F89: afsAutoSyncToTerrain
+0x002A8F9E: PlacementModifier_SnapToTerrain
+0x002A8FBE: SnapHeightToTerrain
+0x002A8FD2: PlacementModifier_LimitHeightToTerrain
+0x002A8FF9: SetTerrain
+0x002A9004: InitializeDefaultTerrain
+0x002A901D: get_CustomDefaultTerrain
+0x002A9036: m_customDefaultTerrain
+0x002A904D: m_terrain
+0x002A9057: p_terrain
+0x002A9235: OnTerrainGeneratePerlin
+0x002A9AD0: get_Mission
+0x002A9ADC: ReplicateEnteredMission
+0x002A9AF4: ReplicatedComputeEnteredMission
+0x002A9B14: WireMission
+0x002A9B20: UnwireMission
+0x002A9B2E: GetPlayerDistanceFromMission
+0x002A9B4B: OnePlayerLeavesMission
+0x002A9B62: onePlayerLeavesMission
+0x002A9B79: ReplicateLeftMission
+0x002A9B8E: ReplicatedComputeLeftMission
+0x002A9BAB: ReplicatedOnePlayerLeftMission
+0x002A9BCA: ReplicateOnePlayerLeftMission
+0x002A9BE8: ComputeOnePlayerLeftMission
+0x002A9C1A: get_OriginalEmission
+0x002A9C2F: set_OriginalEmission
+0x002A9C44: _originalEmission
+0x002A9C56: SetEmission
+0x002A9C62: _mission
+0x002A9C6B: get_emission
+0x002A9C78: SessionsNoPermission
+0x002A9C8D: LobbyNoPermission
+0x002A9C9F: EmissionOcclusion
+0x002AB533: LE_LevelEditor.LEInput.LE_IInputHandler.SetIsCursorAction
+0x002ABF1A: MissionGoal_UpdatedCompletion
+0x002AC1AD: Editor_Position
+0x002AC289: _seedPosition
+0x002AC583: _missionBedSavePosition
+0x002ACBD3: LE_LevelEditor.LEInput.LE_IInputHandler.SetCursorPosition
+0x002AD5B5: get_heightmapResolution
+0x002AD8E4: get_CreateIslandButton
+0x002AD8FB: _createIslandButton
+0x002AEC26: OnTerrainEditModeBtn
+0x002AECC0: OnTerrainReadSetHeightBtn
+0x002B062B: MissionAudio
+0x002B0DC0: TerrainFoliageNrmSpecMap
+0x002B1083: editorMap
+0x002B10B4: CreateHeightMap
+0x002B10C4: heightMap
+0x002B11EA: OnTerrainGenerateShoremap
+0x002B1214: get_Heightmap
+0x002B1222: set_Heightmap
+0x002B1230: GenerateZoneHeightmap
+0x002B1246: NormalizeHeightmap
+0x002B1259: FillCellHeightmap
+0x002B126B: OnTerrainGenerateCustomHeightmap
+0x002B128C: _heightmap
+0x002B1303: terrainSnap
+0x002B210D: get_MissionNameGroup
+0x002B2122: _missionNameGroup
+0x002B23C7: Beam.UI.MapEditor.IMapEditorMenuViewAdapter.CanvasGroup
+0x002B23FF: Beam.UI.MapEditor.IMapEditorMenuViewAdapter.get_CanvasGroup
+0x002B3136: MissionLoader
+0x002B314E: MissionAssetLoader
+0x002B3161: _missionAssetLoader
+STRING OUTPUT LIMIT REACHED
+
+============================================================================
+LIMITATIONS
+- This is structural reconnaissance, not a complete binary schema.
+- Float candidates are not proof of field meaning.
+- DLL string hits do not prove Mission 3 call paths.
+- No source files or Godot project files were modified.
+============================================================================
