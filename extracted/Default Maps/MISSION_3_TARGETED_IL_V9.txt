@@ -1,0 +1,1993 @@
+MISSION 3 TARGETED IL V9
+MODE: READ ONLY DLL ANALYSIS
+ROOT: /storage/emulated/0/Map Check
+DLL: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+DLL_SIZE: 3432448
+DLL_SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+
+TYPEDEF_ROWS: 3859
+METHOD_ROWS: 26143
+FIELD_ROWS: 16992
+OWNER_MAPPED_METHODS: 26143
+OWNER_MAPPED_FIELDS: 16992
+SELECTED_METHODS: 21
+OWNER_MAPPING_WARNINGS: 0
+
+
+============================================================================
+METHOD: <?>::TryGetSample
+METHOD_TOKEN: 0x06000000 | RID 1663 = 0x0600067F
+RVA: 0x0
+BODY: NO BODY
+
+============================================================================
+METHOD: <?>::TryGetSample
+METHOD_TOKEN: 0x06000000 | RID 1665 = 0x06000681
+RVA: 0x1E854
+INSTRUCTIONS: 23
+IL_000C ldarg.2 
+IL_000D ldsfld  => FIELD <?>::Empty
+IL_0012 stobj  => TYPEDEF <?>
+IL_0017 call  => MEMBERREF TypeRef:<?>::get_activeTerrain
+IL_001C ldnull 
+IL_001D call  => MEMBERREF TypeRef:<?>::op_Inequality
+IL_0022 brfalse.s  79
+IL_0024 ldarg.2 
+IL_0025 initobj  => TYPEDEF <?>
+IL_002B ldarg.2 
+IL_002C call  => MEMBERREF TypeSpec:<?>::get_Instance
+IL_0031 ldarg.1 
+IL_0032 callvirt  => METHOD <?>::GetPoint
+IL_0037 stfld  => FIELD <?>::Point
+IL_003C ldarg.2 
+IL_003D call  => MEMBERREF TypeSpec:<?>::get_Instance
+IL_0042 ldarg.1 
+IL_0043 callvirt  => METHOD <?>::GetNormal
+IL_0048 stfld  => FIELD <?>::Normal
+IL_004D ldc.i4.1 
+IL_004E ret 
+IL_004F ldc.i4.0 
+IL_0050 ret 
+
+============================================================================
+METHOD: <?>::TryGetSample
+METHOD_TOKEN: 0x06000000 | RID 1668 = 0x06000684
+RVA: 0x1E8BC
+INSTRUCTIONS: 62
+IL_000C ldarg.2 
+IL_000D ldsfld  => FIELD <?>::Empty
+IL_0012 stobj  => TYPEDEF <?>
+IL_0017 ldarg.0 
+IL_0018 ldfld  => FIELD <?>::_zone
+IL_001D ldnull 
+IL_001E call  => MEMBERREF TypeRef:<?>::op_Equality
+IL_0023 brfalse.s  39
+IL_0025 ldc.i4.0 
+IL_0026 ret 
+IL_0027 ldarg.0 
+IL_0028 ldfld  => FIELD <?>::_zone
+IL_002D callvirt  => METHOD <?>::get_Terrain
+IL_0032 stloc.0 
+IL_0033 ldloc.0 
+IL_0034 ldnull 
+IL_0035 call  => MEMBERREF TypeRef:<?>::op_Equality
+IL_003A brfalse.s  62
+IL_003C ldc.i4.0 
+IL_003D ret 
+IL_003E ldarg.2 
+IL_003F initobj  => TYPEDEF <?>
+IL_0045 ldarg.2 
+IL_0046 ldarg.1 
+IL_0047 stfld  => FIELD <?>::Point
+IL_004C ldarg.2 
+IL_004D ldflda  => FIELD <?>::Point
+IL_0052 ldloc.0 
+IL_0053 ldarg.1 
+IL_0054 callvirt  => MEMBERREF TypeRef:<?>::SampleHeight
+IL_0059 ldc.r4  -100.0
+IL_005E add 
+IL_005F stfld  => MEMBERREF TypeRef:<?>::y
+IL_0064 ldarg.1 
+IL_0065 ldloc.0 
+IL_0066 callvirt  => MEMBERREF TypeRef:<?>::get_transform
+IL_006B callvirt  => MEMBERREF TypeRef:<?>::get_position
+IL_0070 call  => MEMBERREF TypeRef:<?>::op_Subtraction
+IL_0075 stloc.1 
+IL_0076 ldarg.2 
+IL_0077 ldloc.0 
+IL_0078 callvirt  => MEMBERREF TypeRef:<?>::get_terrainData
+IL_007D ldc.r4  0.0
+IL_0082 ldloc.0 
+IL_0083 callvirt  => MEMBERREF TypeRef:<?>::get_terrainData
+IL_0088 callvirt  => MEMBERREF TypeRef:<?>::get_size
+IL_008D ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0092 ldloc.1 
+IL_0093 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0098 call  => MEMBERREF TypeRef:<?>::InverseLerp
+IL_009D ldc.r4  0.0
+IL_00A2 ldloc.0 
+IL_00A3 callvirt  => MEMBERREF TypeRef:<?>::get_terrainData
+IL_00A8 callvirt  => MEMBERREF TypeRef:<?>::get_size
+IL_00AD ldfld  => MEMBERREF TypeRef:<?>::z
+IL_00B2 ldloc.1 
+IL_00B3 ldfld  => MEMBERREF TypeRef:<?>::z
+IL_00B8 call  => MEMBERREF TypeRef:<?>::InverseLerp
+IL_00BD callvirt  => MEMBERREF TypeRef:<?>::GetInterpolatedNormal
+IL_00C2 stfld  => FIELD <?>::Normal
+IL_00C7 ldc.i4.1 
+IL_00C8 ret 
+
+============================================================================
+METHOD: <?>::TryGetSample
+METHOD_TOKEN: 0x06000000 | RID 1672 = 0x06000688
+RVA: 0x1E9AC
+INSTRUCTIONS: 21
+IL_000C ldarg.2 
+IL_000D ldsfld  => FIELD <?>::Empty
+IL_0012 stobj  => TYPEDEF <?>
+IL_0017 ldarg.1 
+IL_0018 ldarg.0 
+IL_0019 ldfld  => FIELD <?>::_direction
+IL_001E ldloca.s  local(0x0000)
+IL_0020 ldarg.0 
+IL_0021 ldfld  => FIELD <?>::_length
+IL_0026 ldarg.0 
+IL_0027 ldfld  => FIELD <?>::_mask
+IL_002C call  => MEMBERREF TypeRef:<?>::Raycast
+IL_0031 brfalse.s  65
+IL_0033 ldarg.2 
+IL_0034 ldloc.0 
+IL_0035 newobj  => METHOD <?>::.ctor
+IL_003A stobj  => TYPEDEF <?>
+IL_003F ldc.i4.1 
+IL_0040 ret 
+IL_0041 ldc.i4.0 
+IL_0042 ret 
+
+============================================================================
+METHOD: <?>::GenerateLocalSeed
+METHOD_TOKEN: 0x06000000 | RID 1855 = 0x0600073F
+RVA: 0x21BD0
+INSTRUCTIONS: 44
+IL_000C call  => MEMBERREF TypeRef:<?>::get_zero
+IL_0011 stloc.0 
+IL_0012 ldloca.s  local(0x0001)
+IL_0014 ldarg.1 
+IL_0015 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_001A ldc.r4  0.0
+IL_001F ldarg.1 
+IL_0020 ldfld  => MEMBERREF TypeRef:<?>::z
+IL_0025 call  => MEMBERREF TypeRef:<?>::.ctor
+IL_002A ldloc.1 
+IL_002B ldfld  => MEMBERREF TypeRef:<?>::z
+IL_0030 ldloc.0 
+IL_0031 ldfld  => MEMBERREF TypeRef:<?>::z
+IL_0036 sub 
+IL_0037 ldloc.1 
+IL_0038 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_003D ldloc.0 
+IL_003E ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0043 sub 
+IL_0044 call  => MEMBERREF TypeRef:<?>::Atan2
+IL_0049 ldc.r4  180.0
+IL_004E mul 
+IL_004F ldc.r4  3.1415927410125732
+IL_0054 div 
+IL_0055 stloc.2 
+IL_0056 ldloc.0 
+IL_0057 ldloc.1 
+IL_0058 call  => MEMBERREF TypeRef:<?>::Distance
+IL_005D conv.i4 
+IL_005E stloc.3 
+IL_005F ldarg.2 
+IL_0060 ldc.i4.1 
+IL_0061 add 
+IL_0062 starg.s  argument(0x0002)
+IL_0064 call  => METHOD <?>::get_WORLD_SEED
+IL_0069 ldloc.2 
+IL_006A conv.i4 
+IL_006B ldloc.3 
+IL_006C add 
+IL_006D ldarg.2 
+IL_006E mul 
+IL_006F add 
+IL_0070 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0075 ret 
+
+============================================================================
+METHOD: <?>::LoadStartingZone
+METHOD_TOKEN: 0x06000000 | RID 1861 = 0x06000745
+RVA: 0x21EA0
+INSTRUCTIONS: 8
+IL_000C ldarg.1 
+IL_000D ldarg.2 
+IL_000E call  => METHOD <?>::GetZone
+IL_0013 stloc.0 
+IL_0014 ldarg.0 
+IL_0015 ldloc.0 
+IL_0016 call  => METHOD <?>::LoadStartingZone
+IL_001B ret 
+
+============================================================================
+METHOD: <?>::LoadStartingZone
+METHOD_TOKEN: 0x06000000 | RID 1862 = 0x06000746
+RVA: 0x21EBC
+INSTRUCTIONS: 17
+IL_0001 ldarg.1 
+IL_0002 ldnull 
+IL_0003 call  => MEMBERREF TypeRef:<?>::op_Inequality
+IL_0008 brfalse.s  36
+IL_000A ldarg.1 
+IL_000B callvirt  => METHOD <?>::get_Loaded
+IL_0010 brtrue.s  46
+IL_0012 ldarg.0 
+IL_0013 ldarg.1 
+IL_0014 call  => METHOD <?>::LoadStartingZone_Sequence
+IL_0019 call  => MEMBERREF TypeRef:<?>::RunCoroutine
+IL_001E call  => MEMBERREF TypeRef:<?>::WaitUntilDone
+IL_0023 ret 
+IL_0024 ldstr  => UNRESOLVED table=0x70 rid=23851
+IL_0029 call  => MEMBERREF TypeRef:<?>::LogError
+IL_002E ldc.r4  0.0
+IL_0033 ret 
+
+============================================================================
+METHOD: <?>::GenerateZoneBiome
+METHOD_TOKEN: 0x06000000 | RID 1882 = 0x0600075A
+RVA: 0x2292C
+INSTRUCTIONS: 24
+IL_000C ldarg.1 
+IL_000D newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0012 ldc.i4.0 
+IL_0013 ldc.i4.s  100
+IL_0015 callvirt  => MEMBERREF TypeRef:<?>::Next
+IL_001A stloc.0 
+IL_001B ldarg.0 
+IL_001C stloc.1 
+IL_001D ldarg.0 
+IL_001E brtrue.s  43
+IL_0020 ldloc.0 
+IL_0021 ldc.i4.s  50
+IL_0023 blt.s  41
+IL_0025 ldc.i4.5 
+IL_0026 stloc.1 
+IL_0027 br.s  43
+IL_0029 ldc.i4.4 
+IL_002A stloc.1 
+IL_002B ldloc.1 
+IL_002C brtrue.s  56
+IL_002E ldstr  => UNRESOLVED table=0x70 rid=24218
+IL_0033 call  => MEMBERREF TypeRef:<?>::LogError
+IL_0038 ldloc.1 
+IL_0039 ret 
+
+============================================================================
+METHOD: <?>::GenerateZoneHeightmap
+METHOD_TOKEN: 0x06000000 | RID 1883 = 0x0600075B
+RVA: 0x22968
+INSTRUCTIONS: 76
+IL_000C ldc.i4  257
+IL_0011 ldc.i4  257
+IL_0016 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_001B stloc.0 
+IL_001C ldarg.0 
+IL_001D ldc.i4.1 
+IL_001E sub 
+IL_001F switch  [198, 152, 107, 65, 79, 93]
+IL_003C br  241
+IL_0041 ldarg.1 
+IL_0042 ldarg.0 
+IL_0043 ldc.i4.0 
+IL_0044 call  => METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+IL_0049 stloc.0 
+IL_004A br  241
+IL_004F ldarg.1 
+IL_0050 ldarg.0 
+IL_0051 ldc.i4.0 
+IL_0052 call  => METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+IL_0057 stloc.0 
+IL_0058 br  241
+IL_005D ldarg.1 
+IL_005E ldarg.0 
+IL_005F ldc.i4.0 
+IL_0060 call  => METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+IL_0065 stloc.0 
+IL_0066 br  241
+IL_006B ldloc.0 
+IL_006C ldarg.1 
+IL_006D ldc.i4.6 
+IL_006E ldc.r4  0.5
+IL_0073 ldc.i4.6 
+IL_0074 ldc.r4  1.0
+IL_0079 call  => METHOD <?>::PerlinGenerator
+IL_007E stloc.0 
+IL_007F ldloc.0 
+IL_0080 ldc.r4  0.4399999976158142
+IL_0085 ldc.r4  0.550000011920929
+IL_008A ldc.r4  1.0
+IL_008F ldarg.0 
+IL_0090 call  => METHOD <?>::NormalizeHeightmap
+IL_0095 stloc.0 
+IL_0096 br.s  241
+IL_0098 ldloc.0 
+IL_0099 ldarg.1 
+IL_009A ldc.i4.s  12
+IL_009C ldc.r4  0.5
+IL_00A1 ldc.i4.6 
+IL_00A2 ldc.r4  1.0
+IL_00A7 call  => METHOD <?>::PerlinGenerator
+IL_00AC stloc.0 
+IL_00AD ldloc.0 
+IL_00AE ldc.r4  0.30000001192092896
+IL_00B3 ldc.r4  0.44999998807907104
+IL_00B8 ldc.r4  1.0
+IL_00BD ldarg.0 
+IL_00BE call  => METHOD <?>::NormalizeHeightmap
+IL_00C3 stloc.0 
+IL_00C4 br.s  241
+IL_00C6 ldloc.0 
+IL_00C7 ldarg.1 
+IL_00C8 ldc.i4.4 
+IL_00C9 ldc.r4  0.8999999761581421
+IL_00CE ldc.i4.4 
+IL_00CF ldc.r4  1.0
+IL_00D4 call  => METHOD <?>::PerlinGenerator
+IL_00D9 stloc.0 
+IL_00DA ldloc.0 
+IL_00DB ldc.r4  0.10000000149011612
+IL_00E0 ldc.r4  0.20000000298023224
+IL_00E5 ldc.r4  1.0
+IL_00EA ldarg.0 
+IL_00EB call  => METHOD <?>::NormalizeHeightmap
+IL_00F0 stloc.0 
+IL_00F1 ldloc.0 
+IL_00F2 ret 
+
+============================================================================
+METHOD: <?>::GENERATE_ISLAND_HEIGHTMAP
+METHOD_TOKEN: 0x06000000 | RID 1884 = 0x0600075C
+RVA: 0x22A5C
+INSTRUCTIONS: 348
+IL_000C ldarg.0 
+IL_000D newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0012 stloc.0 
+IL_0013 ldc.i4  140
+IL_0018 stloc.1 
+IL_0019 ldc.i4  200
+IL_001E stloc.2 
+IL_001F ldloc.2 
+IL_0020 stloc.3 
+IL_0021 ldarg.1 
+IL_0022 ldc.i4.5 
+IL_0023 bne.un.s  51
+IL_0025 ldloc.0 
+IL_0026 ldloc.1 
+IL_0027 ldloc.1 
+IL_0028 ldc.i4.s  20
+IL_002A add 
+IL_002B callvirt  => MEMBERREF TypeRef:<?>::Next
+IL_0030 stloc.3 
+IL_0031 br.s  67
+IL_0033 ldarg.1 
+IL_0034 ldc.i4.4 
+IL_0035 bne.un.s  67
+IL_0037 ldloc.0 
+IL_0038 ldloc.2 
+IL_0039 ldc.i4.s  20
+IL_003B sub 
+IL_003C ldloc.2 
+IL_003D callvirt  => MEMBERREF TypeRef:<?>::Next
+IL_0042 stloc.3 
+IL_0043 ldc.r4  0.6850000023841858
+IL_0048 stloc.s  local(0x0004)
+IL_004A ldc.r4  0.7049999833106995
+IL_004F stloc.s  local(0x0005)
+IL_0051 ldloc.3 
+IL_0052 ldloc.1 
+IL_0053 sub 
+IL_0054 conv.r4 
+IL_0055 ldloc.2 
+IL_0056 ldloc.1 
+IL_0057 sub 
+IL_0058 conv.r4 
+IL_0059 div 
+IL_005A stloc.s  local(0x0006)
+IL_005C ldloc.s  local(0x0004)
+IL_005E ldloc.s  local(0x0005)
+IL_0060 ldloc.s  local(0x0004)
+IL_0062 sub 
+IL_0063 ldloc.s  local(0x0006)
+IL_0065 mul 
+IL_0066 add 
+IL_0067 stloc.s  local(0x0007)
+IL_0069 ldloc.3 
+IL_006A stloc.s  local(0x0008)
+IL_006C ldloc.3 
+IL_006D conv.r4 
+IL_006E newobj  => METHOD <?>::.ctor
+IL_0073 stloc.s  local(0x0009)
+IL_0075 ldloc.s  local(0x0009)
+IL_0077 ldc.i4.0 
+IL_0078 ldc.i4.0 
+IL_0079 ldloc.s  local(0x0008)
+IL_007B ldarg.0 
+IL_007C ldloc.3 
+IL_007D conv.r4 
+IL_007E callvirt  => METHOD <?>::NewIsland
+IL_0083 ldc.i4  257
+IL_0088 stloc.s  local(0x000A)
+IL_008A ldc.i4  250
+IL_008F ldloc.3 
+IL_0090 sub 
+IL_0091 conv.r4 
+IL_0092 ldc.r4  0.5
+IL_0097 mul 
+IL_0098 conv.i4 
+IL_0099 conv.r4 
+IL_009A stloc.s  local(0x000B)
+IL_009C ldloc.s  local(0x000A)
+IL_009E ldloc.s  local(0x000A)
+IL_00A0 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_00A5 stloc.s  local(0x000C)
+IL_00A7 ldarg.2 
+IL_00A8 brtrue.s  220
+IL_00AA ldc.i4.0 
+IL_00AB stloc.s  local(0x000D)
+IL_00AD br.s  214
+IL_00AF ldc.i4.0 
+IL_00B0 stloc.s  local(0x000E)
+IL_00B2 br.s  202
+IL_00B4 ldloc.s  local(0x000C)
+IL_00B6 ldloc.s  local(0x000D)
+IL_00B8 ldloc.s  local(0x000E)
+IL_00BA ldc.r4  0.6600000262260437
+IL_00BF call  => MEMBERREF TypeSpec:<?>::Set
+IL_00C4 ldloc.s  local(0x000E)
+IL_00C6 ldc.i4.1 
+IL_00C7 add 
+IL_00C8 stloc.s  local(0x000E)
+IL_00CA ldloc.s  local(0x000E)
+IL_00CC ldloc.s  local(0x000A)
+IL_00CE blt.s  180
+IL_00D0 ldloc.s  local(0x000D)
+IL_00D2 ldc.i4.1 
+IL_00D3 add 
+IL_00D4 stloc.s  local(0x000D)
+IL_00D6 ldloc.s  local(0x000D)
+IL_00D8 ldloc.s  local(0x000A)
+IL_00DA blt.s  175
+IL_00DC ldloc.s  local(0x0009)
+IL_00DE callvirt  => METHOD <?>::get_Centers
+IL_00E3 callvirt  => MEMBERREF TypeSpec:<?>::GetEnumerator
+IL_00E8 stloc.s  local(0x000F)
+IL_00EA br  595
+IL_00EF ldloca.s  local(0x000F)
+IL_00F1 call  => MEMBERREF TypeSpec:<?>::get_Current
+IL_00F6 stloc.s  local(0x0010)
+IL_00F8 ldloc.s  local(0x0010)
+IL_00FA ldfld  => FIELD <?>::Biome
+IL_00FF brfalse  595
+IL_0104 ldloc.s  local(0x0010)
+IL_0106 ldfld  => FIELD <?>::Neighbors
+IL_010B callvirt  => MEMBERREF TypeSpec:<?>::GetEnumerator
+IL_0110 stloc.s  local(0x0011)
+IL_0112 br  567
+IL_0117 ldloca.s  local(0x0011)
+IL_0119 call  => MEMBERREF TypeSpec:<?>::get_Current
+IL_011E stloc.s  local(0x0012)
+IL_0120 ldloc.s  local(0x0012)
+IL_0122 ldfld  => FIELD <?>::Biome
+IL_0127 ldc.i4.1 
+IL_0128 bne.un.s  308
+IL_012A ldloc.s  local(0x0010)
+IL_012C ldfld  => FIELD <?>::Biome
+IL_0131 ldc.i4.1 
+IL_0132 pop 
+IL_0133 pop 
+IL_0134 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_0139 stloc.s  local(0x0013)
+IL_013B ldloc.s  local(0x0009)
+IL_013D ldloc.s  local(0x0010)
+IL_013F ldloc.s  local(0x0012)
+IL_0141 callvirt  => METHOD <?>::LookUpEdgeFromCenter
+IL_0146 stloc.s  local(0x0014)
+IL_0148 ldloc.s  local(0x0014)
+IL_014A brfalse  567
+IL_014F ldloc.s  local(0x0014)
+IL_0151 ldfld  => FIELD <?>::V0
+IL_0156 brfalse  567
+IL_015B ldloc.s  local(0x0014)
+IL_015D ldfld  => FIELD <?>::V1
+IL_0162 brfalse  567
+IL_0167 ldloc.s  local(0x0014)
+IL_0169 ldfld  => FIELD <?>::V0
+IL_016E stloc.s  local(0x0015)
+IL_0170 ldloc.s  local(0x0014)
+IL_0172 ldfld  => FIELD <?>::V1
+IL_0177 stloc.s  local(0x0016)
+IL_0179 ldloc.s  local(0x0013)
+IL_017B ldloc.s  local(0x0015)
+IL_017D ldflda  => FIELD <?>::Point
+IL_0182 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0187 ldloc.s  local(0x0015)
+IL_0189 ldfld  => FIELD <?>::Elevation
+IL_018E ldloc.s  local(0x0015)
+IL_0190 ldflda  => FIELD <?>::Point
+IL_0195 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_019A newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_019F callvirt  => MEMBERREF TypeSpec:<?>::Add
+IL_01A4 ldloc.s  local(0x0013)
+IL_01A6 ldloc.s  local(0x0016)
+IL_01A8 ldflda  => FIELD <?>::Point
+IL_01AD ldfld  => MEMBERREF TypeRef:<?>::x
+IL_01B2 ldloc.s  local(0x0016)
+IL_01B4 ldfld  => FIELD <?>::Elevation
+IL_01B9 ldloc.s  local(0x0016)
+IL_01BB ldflda  => FIELD <?>::Point
+IL_01C0 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_01C5 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_01CA callvirt  => MEMBERREF TypeSpec:<?>::Add
+IL_01CF ldloc.s  local(0x0013)
+IL_01D1 ldloc.s  local(0x0010)
+IL_01D3 ldflda  => FIELD <?>::Point
+IL_01D8 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_01DD ldloc.s  local(0x0010)
+IL_01DF ldfld  => FIELD <?>::Elevation
+IL_01E4 ldloc.s  local(0x0010)
+IL_01E6 ldflda  => FIELD <?>::Point
+IL_01EB ldfld  => MEMBERREF TypeRef:<?>::y
+IL_01F0 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_01F5 callvirt  => MEMBERREF TypeSpec:<?>::Add
+IL_01FA ldarg.2 
+IL_01FB brfalse.s  539
+IL_01FD ldloc.s  local(0x000C)
+IL_01FF ldloc.s  local(0x0013)
+IL_0201 callvirt  => MEMBERREF TypeSpec:<?>::ToArray
+IL_0206 ldloc.s  local(0x000B)
+IL_0208 conv.i4 
+IL_0209 ldc.i4.0 
+IL_020A ldc.r4  0.0
+IL_020F ldc.r4  1.0
+IL_0214 call  => METHOD <?>::FillCellHeightmap
+IL_0219 br.s  564
+IL_021B ldloc.s  local(0x000C)
+IL_021D ldloc.s  local(0x0013)
+IL_021F callvirt  => MEMBERREF TypeSpec:<?>::ToArray
+IL_0224 ldloc.s  local(0x000B)
+IL_0226 conv.i4 
+IL_0227 ldc.i4.0 
+IL_0228 ldc.r4  0.6600000262260437
+IL_022D ldloc.s  local(0x0007)
+IL_022F call  => METHOD <?>::FillCellHeightmap
+IL_0234 ldnull 
+IL_0235 stloc.s  local(0x0013)
+IL_0237 ldloca.s  local(0x0011)
+IL_0239 call  => MEMBERREF TypeSpec:<?>::MoveNext
+IL_023E brtrue  279
+IL_0243 leave.s  595
+IL_0245 ldloca.s  local(0x0011)
+IL_0247 constrained.  => TYPESPEC RID=357
+IL_024D callvirt  => MEMBERREF TypeRef:<?>::Dispose
+IL_0252 endfinally 
+IL_0253 ldloca.s  local(0x000F)
+IL_0255 call  => MEMBERREF TypeSpec:<?>::MoveNext
+IL_025A brtrue  239
+IL_025F leave.s  623
+IL_0261 ldloca.s  local(0x000F)
+IL_0263 constrained.  => TYPESPEC RID=357
+IL_0269 callvirt  => MEMBERREF TypeRef:<?>::Dispose
+IL_026E endfinally 
+IL_026F ldarg.2 
+IL_0270 brtrue  984
+IL_0275 ldloc.s  local(0x000C)
+IL_0277 call  => METHOD <?>::StitchTerrainEdges
+IL_027C stloc.s  local(0x000C)
+IL_027E ldloc.s  local(0x000C)
+IL_0280 ldarg.0 
+IL_0281 ldc.i4.s  24
+IL_0283 ldc.r4  1.0
+IL_0288 ldc.i4.6 
+IL_0289 ldc.r4  0.019999999552965164
+IL_028E call  => METHOD <?>::PerlinGenerator
+IL_0293 stloc.s  local(0x000C)
+IL_0295 ldloc.s  local(0x0009)
+IL_0297 callvirt  => METHOD <?>::get_Edges
+IL_029C callvirt  => MEMBERREF TypeSpec:<?>::GetEnumerator
+IL_02A1 stloc.s  local(0x0017)
+IL_02A3 br  940
+IL_02A8 ldloca.s  local(0x0017)
+IL_02AA call  => MEMBERREF TypeSpec:<?>::get_Current
+IL_02AF stloc.s  local(0x0018)
+IL_02B1 ldloc.s  local(0x0018)
+IL_02B3 brfalse  940
+IL_02B8 ldloc.s  local(0x0018)
+IL_02BA ldfld  => FIELD <?>::V0
+IL_02BF brfalse  940
+IL_02C4 ldloc.s  local(0x0018)
+IL_02C6 ldfld  => FIELD <?>::V1
+IL_02CB brfalse  940
+IL_02D0 ldloc.s  local(0x0018)
+IL_02D2 ldfld  => FIELD <?>::V0
+IL_02D7 stloc.s  local(0x0019)
+IL_02D9 ldloc.s  local(0x0018)
+IL_02DB ldfld  => FIELD <?>::V1
+IL_02E0 stloc.s  local(0x001A)
+IL_02E2 ldloc.s  local(0x0018)
+IL_02E4 ldfld  => FIELD <?>::River
+IL_02E9 ldc.i4.0 
+IL_02EA ble  940
+IL_02EF ldloc.s  local(0x000C)
+IL_02F1 ldloc.s  local(0x0019)
+IL_02F3 ldflda  => FIELD <?>::Point
+IL_02F8 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_02FD conv.i4 
+IL_02FE ldloc.s  local(0x0019)
+IL_0300 ldflda  => FIELD <?>::Point
+IL_0305 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_030A conv.i4 
+IL_030B ldloc.s  local(0x001A)
+IL_030D ldflda  => FIELD <?>::Point
+IL_0312 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0317 conv.i4 
+IL_0318 ldloc.s  local(0x001A)
+IL_031A ldflda  => FIELD <?>::Point
+IL_031F ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0324 conv.i4 
+IL_0325 call  => METHOD <?>::HeightmapRiver
+IL_032A ldloc.s  local(0x000C)
+IL_032C ldloc.s  local(0x0019)
+IL_032E ldflda  => FIELD <?>::Point
+IL_0333 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0338 conv.i4 
+IL_0339 ldc.i4.1 
+IL_033A add 
+IL_033B ldloc.s  local(0x0019)
+IL_033D ldflda  => FIELD <?>::Point
+IL_0342 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0347 conv.i4 
+IL_0348 ldloc.s  local(0x001A)
+IL_034A ldflda  => FIELD <?>::Point
+IL_034F ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0354 conv.i4 
+IL_0355 ldc.i4.1 
+IL_0356 add 
+IL_0357 ldloc.s  local(0x001A)
+IL_0359 ldflda  => FIELD <?>::Point
+IL_035E ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0363 conv.i4 
+IL_0364 call  => METHOD <?>::HeightmapRiver
+IL_0369 ldloc.s  local(0x000C)
+IL_036B ldloc.s  local(0x0019)
+IL_036D ldflda  => FIELD <?>::Point
+IL_0372 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0377 conv.i4 
+IL_0378 ldloc.s  local(0x0019)
+IL_037A ldflda  => FIELD <?>::Point
+IL_037F ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0384 conv.i4 
+IL_0385 ldc.i4.1 
+IL_0386 add 
+IL_0387 ldloc.s  local(0x001A)
+IL_0389 ldflda  => FIELD <?>::Point
+IL_038E ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0393 conv.i4 
+IL_0394 ldloc.s  local(0x001A)
+IL_0396 ldflda  => FIELD <?>::Point
+IL_039B ldfld  => MEMBERREF TypeRef:<?>::y
+IL_03A0 ldc.r4  1.0
+IL_03A5 add 
+IL_03A6 conv.i4 
+IL_03A7 call  => METHOD <?>::HeightmapRiver
+IL_03AC ldloca.s  local(0x0017)
+IL_03AE call  => MEMBERREF TypeSpec:<?>::MoveNext
+IL_03B3 brtrue  680
+IL_03B8 leave.s  968
+IL_03BA ldloca.s  local(0x0017)
+IL_03BC constrained.  => TYPESPEC RID=365
+IL_03C2 callvirt  => MEMBERREF TypeRef:<?>::Dispose
+IL_03C7 endfinally 
+IL_03C8 ldloc.s  local(0x000C)
+IL_03CA ldc.i4.2 
+IL_03CB ldc.r4  0.699999988079071
+IL_03D0 ldarg.1 
+IL_03D1 call  => METHOD <?>::SmoothTerrain
+IL_03D6 stloc.s  local(0x000C)
+IL_03D8 ldnull 
+IL_03D9 stloc.s  local(0x0009)
+IL_03DB ldloc.s  local(0x000C)
+IL_03DD ret 
+
+============================================================================
+METHOD: <?>::StitchTerrainEdges
+METHOD_TOKEN: 0x06000000 | RID 1885 = 0x0600075D
+RVA: 0x22E88
+INSTRUCTIONS: 55
+IL_000C ldc.i4  257
+IL_0011 stloc.0 
+IL_0012 ldstr  => UNRESOLVED table=0x70 rid=24280
+IL_0017 call  => MEMBERREF TypeRef:<?>::Load
+IL_001C isinst  => TYPEREF UnityEngine.<?>
+IL_0021 callvirt  => MEMBERREF TypeRef:<?>::GetPixels
+IL_0026 stloc.1 
+IL_0027 ldc.i4.0 
+IL_0028 stloc.2 
+IL_0029 br.s  112
+IL_002B ldc.i4.0 
+IL_002C stloc.3 
+IL_002D br.s  104
+IL_002F ldarg.0 
+IL_0030 ldloc.2 
+IL_0031 ldloc.3 
+IL_0032 call  => MEMBERREF TypeSpec:<?>::Get
+IL_0037 ldc.r4  0.6600000262260437
+IL_003C bgt.un.s  100
+IL_003E ldloc.1 
+IL_003F ldloc.2 
+IL_0040 ldloc.0 
+IL_0041 mul 
+IL_0042 ldloc.3 
+IL_0043 add 
+IL_0044 ldelema  => TYPEREF UnityEngine.<?>
+IL_0049 ldfld  => MEMBERREF TypeRef:<?>::r
+IL_004E stloc.s  local(0x0004)
+IL_0050 ldarg.0 
+IL_0051 ldloc.2 
+IL_0052 ldloc.3 
+IL_0053 call  => MEMBERREF TypeSpec:<?>::Address
+IL_0058 dup 
+IL_0059 ldind.r4 
+IL_005A ldc.r4  1.0
+IL_005F ldloc.s  local(0x0004)
+IL_0061 mul 
+IL_0062 sub 
+IL_0063 stind.r4 
+IL_0064 ldloc.3 
+IL_0065 ldc.i4.1 
+IL_0066 add 
+IL_0067 stloc.3 
+IL_0068 ldloc.3 
+IL_0069 ldloc.0 
+IL_006A blt.s  47
+IL_006C ldloc.2 
+IL_006D ldc.i4.1 
+IL_006E add 
+IL_006F stloc.2 
+IL_0070 ldloc.2 
+IL_0071 ldloc.0 
+IL_0072 blt.s  43
+IL_0074 ldarg.0 
+IL_0075 ret 
+
+============================================================================
+METHOD: <?>::GenerateTerrain
+METHOD_TOKEN: 0x06000000 | RID 1888 = 0x06000760
+RVA: 0x2306C
+INSTRUCTIONS: 179
+IL_000C ldc.i4  257
+IL_0011 stloc.0 
+IL_0012 ldloc.0 
+IL_0013 stloc.1 
+IL_0014 ldarg.0 
+IL_0015 callvirt  => MEMBERREF TypeRef:<?>::Clone
+IL_001A castclass  => TYPESPEC RID=363
+IL_001F stloc.2 
+IL_0020 ldarg.0 
+IL_0021 callvirt  => MEMBERREF TypeRef:<?>::Clone
+IL_0026 castclass  => TYPESPEC RID=363
+IL_002B stloc.3 
+IL_002C ldsfld  => FIELD <?>::generatorType
+IL_0031 stloc.s  local(0x0004)
+IL_0033 ldloc.s  local(0x0004)
+IL_0035 switch  [79, 189, 403, 296]
+IL_004A br  403
+IL_004F ldloc.3 
+IL_0050 ldloc.0 
+IL_0051 conv.r4 
+IL_0052 ldloc.1 
+IL_0053 conv.r4 
+IL_0054 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0059 call  => METHOD <?>::GeneratePerlin
+IL_005E stloc.3 
+IL_005F ldc.i4.0 
+IL_0060 stloc.s  local(0x0005)
+IL_0062 br.s  179
+IL_0064 ldc.i4.0 
+IL_0065 stloc.s  local(0x0006)
+IL_0067 br.s  168
+IL_0069 ldloc.2 
+IL_006A ldloc.s  local(0x0006)
+IL_006C ldloc.s  local(0x0005)
+IL_006E call  => MEMBERREF TypeSpec:<?>::Get
+IL_0073 stloc.s  local(0x0007)
+IL_0075 ldloc.3 
+IL_0076 ldloc.s  local(0x0006)
+IL_0078 ldloc.s  local(0x0005)
+IL_007A call  => MEMBERREF TypeSpec:<?>::Get
+IL_007F ldsfld  => FIELD <?>::perlinBlend
+IL_0084 mul 
+IL_0085 ldloc.s  local(0x0007)
+IL_0087 ldc.r4  1.0
+IL_008C ldsfld  => FIELD <?>::perlinBlend
+IL_0091 sub 
+IL_0092 mul 
+IL_0093 add 
+IL_0094 stloc.s  local(0x0008)
+IL_0096 ldloc.2 
+IL_0097 ldloc.s  local(0x0006)
+IL_0099 ldloc.s  local(0x0005)
+IL_009B ldloc.s  local(0x0008)
+IL_009D call  => MEMBERREF TypeSpec:<?>::Set
+IL_00A2 ldloc.s  local(0x0006)
+IL_00A4 ldc.i4.1 
+IL_00A5 add 
+IL_00A6 stloc.s  local(0x0006)
+IL_00A8 ldloc.s  local(0x0006)
+IL_00AA ldloc.0 
+IL_00AB blt.s  105
+IL_00AD ldloc.s  local(0x0005)
+IL_00AF ldc.i4.1 
+IL_00B0 add 
+IL_00B1 stloc.s  local(0x0005)
+IL_00B3 ldloc.s  local(0x0005)
+IL_00B5 ldloc.1 
+IL_00B6 blt.s  100
+IL_00B8 br  405
+IL_00BD ldloc.3 
+IL_00BE ldloc.0 
+IL_00BF conv.r4 
+IL_00C0 ldloc.1 
+IL_00C1 conv.r4 
+IL_00C2 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_00C7 call  => METHOD <?>::Normalise
+IL_00CC stloc.3 
+IL_00CD ldc.i4.0 
+IL_00CE stloc.s  local(0x0009)
+IL_00D0 br.s  289
+IL_00D2 ldc.i4.0 
+IL_00D3 stloc.s  local(0x000A)
+IL_00D5 br.s  278
+IL_00D7 ldloc.2 
+IL_00D8 ldloc.s  local(0x000A)
+IL_00DA ldloc.s  local(0x0009)
+IL_00DC call  => MEMBERREF TypeSpec:<?>::Get
+IL_00E1 stloc.s  local(0x000B)
+IL_00E3 ldloc.3 
+IL_00E4 ldloc.s  local(0x000A)
+IL_00E6 ldloc.s  local(0x0009)
+IL_00E8 call  => MEMBERREF TypeSpec:<?>::Get
+IL_00ED ldsfld  => FIELD <?>::normaliseBlend
+IL_00F2 mul 
+IL_00F3 ldloc.s  local(0x000B)
+IL_00F5 ldc.r4  1.0
+IL_00FA ldsfld  => FIELD <?>::normaliseBlend
+IL_00FF sub 
+IL_0100 mul 
+IL_0101 add 
+IL_0102 stloc.s  local(0x000C)
+IL_0104 ldloc.2 
+IL_0105 ldloc.s  local(0x000A)
+IL_0107 ldloc.s  local(0x0009)
+IL_0109 ldloc.s  local(0x000C)
+IL_010B call  => MEMBERREF TypeSpec:<?>::Set
+IL_0110 ldloc.s  local(0x000A)
+IL_0112 ldc.i4.1 
+IL_0113 add 
+IL_0114 stloc.s  local(0x000A)
+IL_0116 ldloc.s  local(0x000A)
+IL_0118 ldloc.0 
+IL_0119 blt.s  215
+IL_011B ldloc.s  local(0x0009)
+IL_011D ldc.i4.1 
+IL_011E add 
+IL_011F stloc.s  local(0x0009)
+IL_0121 ldloc.s  local(0x0009)
+IL_0123 ldloc.1 
+IL_0124 blt.s  210
+IL_0126 br.s  405
+IL_0128 ldloc.3 
+IL_0129 ldloc.0 
+IL_012A conv.r4 
+IL_012B ldloc.1 
+IL_012C conv.r4 
+IL_012D newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0132 call  => METHOD <?>::smooth
+IL_0137 stloc.3 
+IL_0138 ldc.i4.0 
+IL_0139 stloc.s  local(0x000D)
+IL_013B br.s  396
+IL_013D ldc.i4.0 
+IL_013E stloc.s  local(0x000E)
+IL_0140 br.s  385
+IL_0142 ldloc.2 
+IL_0143 ldloc.s  local(0x000E)
+IL_0145 ldloc.s  local(0x000D)
+IL_0147 call  => MEMBERREF TypeSpec:<?>::Get
+IL_014C stloc.s  local(0x000F)
+IL_014E ldloc.3 
+IL_014F ldloc.s  local(0x000E)
+IL_0151 ldloc.s  local(0x000D)
+IL_0153 call  => MEMBERREF TypeSpec:<?>::Get
+IL_0158 ldsfld  => FIELD <?>::smoothBlend
+IL_015D mul 
+IL_015E ldloc.s  local(0x000F)
+IL_0160 ldc.r4  1.0
+IL_0165 ldsfld  => FIELD <?>::smoothBlend
+IL_016A sub 
+IL_016B mul 
+IL_016C add 
+IL_016D stloc.s  local(0x0010)
+IL_016F ldloc.2 
+IL_0170 ldloc.s  local(0x000E)
+IL_0172 ldloc.s  local(0x000D)
+IL_0174 ldloc.s  local(0x0010)
+IL_0176 call  => MEMBERREF TypeSpec:<?>::Set
+IL_017B ldloc.s  local(0x000E)
+IL_017D ldc.i4.1 
+IL_017E add 
+IL_017F stloc.s  local(0x000E)
+IL_0181 ldloc.s  local(0x000E)
+IL_0183 ldloc.0 
+IL_0184 blt.s  322
+IL_0186 ldloc.s  local(0x000D)
+IL_0188 ldc.i4.1 
+IL_0189 add 
+IL_018A stloc.s  local(0x000D)
+IL_018C ldloc.s  local(0x000D)
+IL_018E ldloc.1 
+IL_018F blt.s  317
+IL_0191 br.s  405
+IL_0193 ldnull 
+IL_0194 ret 
+IL_0195 ldnull 
+IL_0196 stloc.3 
+IL_0197 ldloc.2 
+IL_0198 ret 
+
+============================================================================
+METHOD: <?>::NormalizeHeightmap
+METHOD_TOKEN: 0x06000000 | RID 1892 = 0x06000764
+RVA: 0x2350A
+INSTRUCTIONS: 12
+IL_0001 ldc.i4.1 
+IL_0002 stsfld  => FIELD <?>::generatorType
+IL_0007 ldarg.1 
+IL_0008 stsfld  => FIELD <?>::normaliseMin
+IL_000D ldarg.2 
+IL_000E stsfld  => FIELD <?>::normaliseMax
+IL_0013 ldarg.3 
+IL_0014 stsfld  => FIELD <?>::normaliseBlend
+IL_0019 ldarg.0 
+IL_001A ldarg.s  argument(0x0004)
+IL_001C call  => METHOD <?>::GenerateTerrain
+IL_0021 ret 
+
+============================================================================
+METHOD: <?>::SmoothTerrain
+METHOD_TOKEN: 0x06000000 | RID 1893 = 0x06000765
+RVA: 0x2352C
+INSTRUCTIONS: 10
+IL_0001 ldc.i4.3 
+IL_0002 stsfld  => FIELD <?>::generatorType
+IL_0007 ldarg.1 
+IL_0008 stsfld  => FIELD <?>::smoothIterations
+IL_000D ldarg.2 
+IL_000E stsfld  => FIELD <?>::smoothBlend
+IL_0013 ldarg.0 
+IL_0014 ldarg.3 
+IL_0015 call  => METHOD <?>::GenerateTerrain
+IL_001A ret 
+
+============================================================================
+METHOD: <?>::FillCellHeightmap
+METHOD_TOKEN: 0x06000000 | RID 1895 = 0x06000767
+RVA: 0x23678
+INSTRUCTIONS: 316
+IL_000C ldarg.1 
+IL_000D ldsfld  => FIELD <?>::<>9__28_0
+IL_0012 dup 
+IL_0013 brtrue.s  44
+IL_0015 pop 
+IL_0016 ldsfld  => FIELD <?>::<>9
+IL_001B ldftn  => METHOD <?>::<FillCellHeightmap>b__28_0
+IL_0021 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_0026 dup 
+IL_0027 stsfld  => FIELD <?>::<>9__28_0
+IL_002C call  => METHODSPEC MemberRef:Max
+IL_0031 conv.i4 
+IL_0032 stloc.0 
+IL_0033 ldarg.1 
+IL_0034 ldsfld  => FIELD <?>::<>9__28_1
+IL_0039 dup 
+IL_003A brtrue.s  83
+IL_003C pop 
+IL_003D ldsfld  => FIELD <?>::<>9
+IL_0042 ldftn  => METHOD <?>::<FillCellHeightmap>b__28_1
+IL_0048 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_004D dup 
+IL_004E stsfld  => FIELD <?>::<>9__28_1
+IL_0053 call  => METHODSPEC MemberRef:Min
+IL_0058 conv.i4 
+IL_0059 ldarg.1 
+IL_005A ldsfld  => FIELD <?>::<>9__28_2
+IL_005F dup 
+IL_0060 brtrue.s  121
+IL_0062 pop 
+IL_0063 ldsfld  => FIELD <?>::<>9
+IL_0068 ldftn  => METHOD <?>::<FillCellHeightmap>b__28_2
+IL_006E newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_0073 dup 
+IL_0074 stsfld  => FIELD <?>::<>9__28_2
+IL_0079 call  => METHODSPEC MemberRef:Min
+IL_007E conv.i4 
+IL_007F stloc.1 
+IL_0080 ldarg.1 
+IL_0081 ldsfld  => FIELD <?>::<>9__28_3
+IL_0086 dup 
+IL_0087 brtrue.s  160
+IL_0089 pop 
+IL_008A ldsfld  => FIELD <?>::<>9
+IL_008F ldftn  => METHOD <?>::<FillCellHeightmap>b__28_3
+IL_0095 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_009A dup 
+IL_009B stsfld  => FIELD <?>::<>9__28_3
+IL_00A0 call  => METHODSPEC MemberRef:Max
+IL_00A5 conv.i4 
+IL_00A6 stloc.2 
+IL_00A7 ldarg.1 
+IL_00A8 call  => METHODSPEC MemberRef:Count
+IL_00AD dup 
+IL_00AE stloc.3 
+IL_00AF ldarg.1 
+IL_00B0 ldsfld  => FIELD <?>::<>9__28_4
+IL_00B5 dup 
+IL_00B6 brtrue.s  207
+IL_00B8 pop 
+IL_00B9 ldsfld  => FIELD <?>::<>9
+IL_00BE ldftn  => METHOD <?>::<FillCellHeightmap>b__28_4
+IL_00C4 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_00C9 dup 
+IL_00CA stsfld  => FIELD <?>::<>9__28_4
+IL_00CF call  => METHODSPEC MemberRef:Select
+IL_00D4 call  => METHODSPEC MemberRef:ToArray
+IL_00D9 stloc.s  local(0x0004)
+IL_00DB ldarg.1 
+IL_00DC ldsfld  => FIELD <?>::<>9__28_5
+IL_00E1 dup 
+IL_00E2 brtrue.s  251
+IL_00E4 pop 
+IL_00E5 ldsfld  => FIELD <?>::<>9
+IL_00EA ldftn  => METHOD <?>::<FillCellHeightmap>b__28_5
+IL_00F0 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_00F5 dup 
+IL_00F6 stsfld  => FIELD <?>::<>9__28_5
+IL_00FB call  => METHODSPEC MemberRef:Select
+IL_0100 call  => METHODSPEC MemberRef:ToArray
+IL_0105 stloc.s  local(0x0005)
+IL_0107 newarr  => TYPEREF System.<?>
+IL_010C stloc.s  local(0x0006)
+IL_010E stloc.s  local(0x000B)
+IL_0110 br  669
+IL_0115 ldc.i4.0 
+IL_0116 stloc.s  local(0x0007)
+IL_0118 ldloc.3 
+IL_0119 ldc.i4.1 
+IL_011A sub 
+IL_011B stloc.s  local(0x0009)
+IL_011D ldc.i4.0 
+IL_011E stloc.s  local(0x0008)
+IL_0120 br.s  390
+IL_0122 ldloc.s  local(0x0004)
+IL_0124 ldloc.s  local(0x0008)
+IL_0126 ldelem.r4 
+IL_0127 ldloc.s  local(0x000B)
+IL_0129 conv.r4 
+IL_012A bge.un.s  310
+IL_012C ldloc.s  local(0x0004)
+IL_012E ldloc.s  local(0x0009)
+IL_0130 ldelem.r4 
+IL_0131 ldloc.s  local(0x000B)
+IL_0133 conv.r4 
+IL_0134 bge.s  330
+IL_0136 ldloc.s  local(0x0004)
+IL_0138 ldloc.s  local(0x0009)
+IL_013A ldelem.r4 
+IL_013B ldloc.s  local(0x000B)
+IL_013D conv.r4 
+IL_013E bge.un.s  380
+IL_0140 ldloc.s  local(0x0004)
+IL_0142 ldloc.s  local(0x0008)
+IL_0144 ldelem.r4 
+IL_0145 ldloc.s  local(0x000B)
+IL_0147 conv.r4 
+IL_0148 blt.un.s  380
+IL_014A ldloc.s  local(0x0006)
+IL_014C ldloc.s  local(0x0007)
+IL_014E dup 
+IL_014F ldc.i4.1 
+IL_0150 add 
+IL_0151 stloc.s  local(0x0007)
+IL_0153 ldloc.s  local(0x0005)
+IL_0155 ldloc.s  local(0x0008)
+IL_0157 ldelem.r4 
+IL_0158 ldloc.s  local(0x000B)
+IL_015A conv.r4 
+IL_015B ldloc.s  local(0x0004)
+IL_015D ldloc.s  local(0x0008)
+IL_015F ldelem.r4 
+IL_0160 sub 
+IL_0161 ldloc.s  local(0x0004)
+IL_0163 ldloc.s  local(0x0009)
+IL_0165 ldelem.r4 
+IL_0166 ldloc.s  local(0x0004)
+IL_0168 ldloc.s  local(0x0008)
+IL_016A ldelem.r4 
+IL_016B sub 
+IL_016C div 
+IL_016D ldloc.s  local(0x0005)
+IL_016F ldloc.s  local(0x0009)
+IL_0171 ldelem.r4 
+IL_0172 ldloc.s  local(0x0005)
+IL_0174 ldloc.s  local(0x0008)
+IL_0176 ldelem.r4 
+IL_0177 sub 
+IL_0178 mul 
+IL_0179 add 
+IL_017A conv.i4 
+IL_017B stelem.i4 
+IL_017C ldloc.s  local(0x0008)
+IL_017E stloc.s  local(0x0009)
+IL_0180 ldloc.s  local(0x0008)
+IL_0182 ldc.i4.1 
+IL_0183 add 
+IL_0184 stloc.s  local(0x0008)
+IL_0186 ldloc.s  local(0x0008)
+IL_0188 ldloc.3 
+IL_0189 blt.s  290
+IL_018B ldc.i4.0 
+IL_018C stloc.s  local(0x0008)
+IL_018E br.s  460
+IL_0190 ldloc.s  local(0x0006)
+IL_0192 ldloc.s  local(0x0008)
+IL_0194 ldelem.i4 
+IL_0195 ldloc.s  local(0x0006)
+IL_0197 ldloc.s  local(0x0008)
+IL_0199 ldc.i4.1 
+IL_019A add 
+IL_019B ldelem.i4 
+IL_019C ble.s  454
+IL_019E ldloc.s  local(0x0006)
+IL_01A0 ldloc.s  local(0x0008)
+IL_01A2 ldelem.i4 
+IL_01A3 stloc.s  local(0x000A)
+IL_01A5 ldloc.s  local(0x0006)
+IL_01A7 ldloc.s  local(0x0008)
+IL_01A9 ldloc.s  local(0x0006)
+IL_01AB ldloc.s  local(0x0008)
+IL_01AD ldc.i4.1 
+IL_01AE add 
+IL_01AF ldelem.i4 
+IL_01B0 stelem.i4 
+IL_01B1 ldloc.s  local(0x0006)
+IL_01B3 ldloc.s  local(0x0008)
+IL_01B5 ldc.i4.1 
+IL_01B6 add 
+IL_01B7 ldloc.s  local(0x000A)
+IL_01B9 stelem.i4 
+IL_01BA ldloc.s  local(0x0008)
+IL_01BC brfalse.s  460
+IL_01BE ldloc.s  local(0x0008)
+IL_01C0 ldc.i4.1 
+IL_01C1 sub 
+IL_01C2 stloc.s  local(0x0008)
+IL_01C4 br.s  460
+IL_01C6 ldloc.s  local(0x0008)
+IL_01C8 ldc.i4.1 
+IL_01C9 add 
+IL_01CA stloc.s  local(0x0008)
+IL_01CC ldloc.s  local(0x0008)
+IL_01CE ldloc.s  local(0x0007)
+IL_01D0 ldc.i4.1 
+IL_01D1 sub 
+IL_01D2 blt.s  400
+IL_01D4 ldc.i4.0 
+IL_01D5 stloc.s  local(0x0008)
+IL_01D7 br  654
+IL_01DC ldloc.s  local(0x0006)
+IL_01DE ldloc.s  local(0x0008)
+IL_01E0 ldelem.i4 
+IL_01E1 ldloc.2 
+IL_01E2 bge  663
+IL_01E7 ldloc.s  local(0x0006)
+IL_01E9 ldloc.s  local(0x0008)
+IL_01EB ldc.i4.1 
+IL_01EC add 
+IL_01ED ldelem.i4 
+IL_01EE ldloc.1 
+IL_01EF ble  648
+IL_01F4 ldloc.s  local(0x0006)
+IL_01F6 ldloc.s  local(0x0008)
+IL_01F8 ldelem.i4 
+IL_01F9 ldloc.1 
+IL_01FA bge.s  514
+IL_01FC ldloc.s  local(0x0006)
+IL_01FE ldloc.s  local(0x0008)
+IL_0200 ldloc.1 
+IL_0201 stelem.i4 
+IL_0202 ldloc.s  local(0x0006)
+IL_0204 ldloc.s  local(0x0008)
+IL_0206 ldc.i4.1 
+IL_0207 add 
+IL_0208 ldelem.i4 
+IL_0209 ldloc.2 
+IL_020A ble.s  532
+IL_020C ldloc.s  local(0x0006)
+IL_020E ldloc.s  local(0x0008)
+IL_0210 ldc.i4.1 
+IL_0211 add 
+IL_0212 ldloc.2 
+IL_0213 stelem.i4 
+IL_0214 ldloc.s  local(0x0006)
+IL_0216 ldloc.s  local(0x0008)
+IL_0218 ldelem.i4 
+IL_0219 stloc.s  local(0x0009)
+IL_021B br.s  637
+IL_021D ldarg.1 
+IL_021E ldc.i4.0 
+IL_021F ldelem  => TYPEREF UnityEngine.<?>
+IL_0224 stloc.s  local(0x000C)
+IL_0226 ldarg.1 
+IL_0227 ldc.i4.1 
+IL_0228 ldelem  => TYPEREF UnityEngine.<?>
+IL_022D stloc.s  local(0x000D)
+IL_022F ldarg.1 
+IL_0230 ldc.i4.2 
+IL_0231 ldelem  => TYPEREF UnityEngine.<?>
+IL_0236 stloc.s  local(0x000E)
+IL_0238 ldloc.s  local(0x0009)
+IL_023A conv.r4 
+IL_023B ldc.r4  0.0
+IL_0240 ldloc.s  local(0x000B)
+IL_0242 conv.r4 
+IL_0243 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0248 ldloc.s  local(0x000C)
+IL_024A ldloc.s  local(0x000D)
+IL_024C ldloc.s  local(0x000E)
+IL_024E newobj  => METHOD <?>::.ctor
+IL_0253 call  => METHOD <?>::GetHeightAtPoint
+IL_0258 stloc.s  local(0x000F)
+IL_025A ldarg.s  argument(0x0004)
+IL_025C ldarg.s  argument(0x0005)
+IL_025E ldarg.s  argument(0x0004)
+IL_0260 sub 
+IL_0261 ldloc.s  local(0x000F)
+IL_0263 mul 
+IL_0264 add 
+IL_0265 stloc.s  local(0x0010)
+IL_0267 ldarg.0 
+IL_0268 ldloc.s  local(0x0009)
+IL_026A ldarg.2 
+IL_026B add 
+IL_026C ldloc.s  local(0x000B)
+IL_026E ldarg.2 
+IL_026F add 
+IL_0270 ldloc.s  local(0x0010)
+IL_0272 call  => MEMBERREF TypeSpec:<?>::Set
+IL_0277 ldloc.s  local(0x0009)
+IL_0279 ldc.i4.1 
+IL_027A add 
+IL_027B stloc.s  local(0x0009)
+IL_027D ldloc.s  local(0x0009)
+IL_027F ldloc.s  local(0x0006)
+IL_0281 ldloc.s  local(0x0008)
+IL_0283 ldc.i4.1 
+IL_0284 add 
+IL_0285 ldelem.i4 
+IL_0286 blt.s  541
+IL_0288 ldloc.s  local(0x0008)
+IL_028A ldc.i4.2 
+IL_028B add 
+IL_028C stloc.s  local(0x0008)
+IL_028E ldloc.s  local(0x0008)
+IL_0290 ldloc.s  local(0x0007)
+IL_0292 blt  476
+IL_0297 ldloc.s  local(0x000B)
+IL_0299 ldc.i4.1 
+IL_029A add 
+IL_029B stloc.s  local(0x000B)
+IL_029D ldloc.s  local(0x000B)
+IL_029F ldloc.0 
+IL_02A0 ble  277
+IL_02A5 ret 
+
+============================================================================
+METHOD: <?>::HeightmapRiver
+METHOD_TOKEN: 0x06000000 | RID 1896 = 0x06000768
+RVA: 0x23920
+INSTRUCTIONS: 164
+IL_000C ldarg.s  argument(0x0004)
+IL_000E ldarg.2 
+IL_000F sub 
+IL_0010 stloc.0 
+IL_0011 ldarg.3 
+IL_0012 ldarg.1 
+IL_0013 sub 
+IL_0014 stloc.1 
+IL_0015 ldloc.0 
+IL_0016 ldc.i4.0 
+IL_0017 bge.s  32
+IL_0019 ldloc.0 
+IL_001A neg 
+IL_001B stloc.0 
+IL_001C ldc.i4.m1 
+IL_001D stloc.3 
+IL_001E br.s  34
+IL_0020 ldc.i4.1 
+IL_0021 stloc.3 
+IL_0022 ldloc.1 
+IL_0023 ldc.i4.0 
+IL_0024 bge.s  45
+IL_0026 ldloc.1 
+IL_0027 neg 
+IL_0028 stloc.1 
+IL_0029 ldc.i4.m1 
+IL_002A stloc.2 
+IL_002B br.s  47
+IL_002D ldc.i4.1 
+IL_002E stloc.2 
+IL_002F ldloc.0 
+IL_0030 ldc.i4.1 
+IL_0031 shl 
+IL_0032 stloc.0 
+IL_0033 ldloc.1 
+IL_0034 ldc.i4.1 
+IL_0035 shl 
+IL_0036 stloc.1 
+IL_0037 ldc.r4  0.0
+IL_003C stloc.s  local(0x0004)
+IL_003E ldc.r4  0.006500000134110451
+IL_0043 stloc.s  local(0x0005)
+IL_0045 ldc.r4  0.675000011920929
+IL_004A stloc.s  local(0x0006)
+IL_004C ldarg.0 
+IL_004D ldarg.1 
+IL_004E ldarg.2 
+IL_004F call  => MEMBERREF TypeSpec:<?>::Get
+IL_0054 ldloc.s  local(0x0006)
+IL_0056 ble.un.s  102
+IL_0058 ldarg.0 
+IL_0059 ldarg.1 
+IL_005A ldarg.2 
+IL_005B call  => MEMBERREF TypeSpec:<?>::Address
+IL_0060 dup 
+IL_0061 ldind.r4 
+IL_0062 ldloc.s  local(0x0005)
+IL_0064 sub 
+IL_0065 stind.r4 
+IL_0066 ldloc.1 
+IL_0067 ldloc.0 
+IL_0068 ble.s  187
+IL_006A ldloc.0 
+IL_006B ldloc.1 
+IL_006C ldc.i4.1 
+IL_006D shr 
+IL_006E sub 
+IL_006F conv.r4 
+IL_0070 stloc.s  local(0x0004)
+IL_0072 br.s  175
+IL_0074 ldloc.s  local(0x0004)
+IL_0076 ldc.r4  0.0
+IL_007B blt.un.s  137
+IL_007D ldarg.2 
+IL_007E ldloc.3 
+IL_007F add 
+IL_0080 starg.s  argument(0x0002)
+IL_0082 ldloc.s  local(0x0004)
+IL_0084 ldloc.1 
+IL_0085 conv.r4 
+IL_0086 sub 
+IL_0087 stloc.s  local(0x0004)
+IL_0089 ldarg.1 
+IL_008A ldloc.2 
+IL_008B add 
+IL_008C starg.s  argument(0x0001)
+IL_008E ldloc.s  local(0x0004)
+IL_0090 ldloc.0 
+IL_0091 conv.r4 
+IL_0092 add 
+IL_0093 stloc.s  local(0x0004)
+IL_0095 ldarg.0 
+IL_0096 ldarg.1 
+IL_0097 ldarg.2 
+IL_0098 call  => MEMBERREF TypeSpec:<?>::Get
+IL_009D ldloc.s  local(0x0006)
+IL_009F ble.un.s  175
+IL_00A1 ldarg.0 
+IL_00A2 ldarg.1 
+IL_00A3 ldarg.2 
+IL_00A4 call  => MEMBERREF TypeSpec:<?>::Address
+IL_00A9 dup 
+IL_00AA ldind.r4 
+IL_00AB ldloc.s  local(0x0005)
+IL_00AD sub 
+IL_00AE stind.r4 
+IL_00AF ldarg.1 
+IL_00B0 ldarg.3 
+IL_00B1 sub 
+IL_00B2 call  => MEMBERREF TypeRef:<?>::Abs
+IL_00B7 ldc.i4.1 
+IL_00B8 bgt.s  116
+IL_00BA ret 
+IL_00BB ldloc.1 
+IL_00BC ldloc.0 
+IL_00BD ldc.i4.1 
+IL_00BE shr 
+IL_00BF sub 
+IL_00C0 conv.r4 
+IL_00C1 stloc.s  local(0x0004)
+IL_00C3 br.s  256
+IL_00C5 ldloc.s  local(0x0004)
+IL_00C7 ldc.r4  0.0
+IL_00CC blt.un.s  218
+IL_00CE ldarg.1 
+IL_00CF ldloc.2 
+IL_00D0 add 
+IL_00D1 starg.s  argument(0x0001)
+IL_00D3 ldloc.s  local(0x0004)
+IL_00D5 ldloc.0 
+IL_00D6 conv.r4 
+IL_00D7 sub 
+IL_00D8 stloc.s  local(0x0004)
+IL_00DA ldarg.2 
+IL_00DB ldloc.3 
+IL_00DC add 
+IL_00DD starg.s  argument(0x0002)
+IL_00DF ldloc.s  local(0x0004)
+IL_00E1 ldloc.1 
+IL_00E2 conv.r4 
+IL_00E3 add 
+IL_00E4 stloc.s  local(0x0004)
+IL_00E6 ldarg.0 
+IL_00E7 ldarg.1 
+IL_00E8 ldarg.2 
+IL_00E9 call  => MEMBERREF TypeSpec:<?>::Get
+IL_00EE ldloc.s  local(0x0006)
+IL_00F0 ble.un.s  256
+IL_00F2 ldarg.0 
+IL_00F3 ldarg.1 
+IL_00F4 ldarg.2 
+IL_00F5 call  => MEMBERREF TypeSpec:<?>::Address
+IL_00FA dup 
+IL_00FB ldind.r4 
+IL_00FC ldloc.s  local(0x0005)
+IL_00FE sub 
+IL_00FF stind.r4 
+IL_0100 ldarg.2 
+IL_0101 ldarg.s  argument(0x0004)
+IL_0103 sub 
+IL_0104 call  => MEMBERREF TypeRef:<?>::Abs
+IL_0109 ldc.i4.1 
+IL_010A bgt.s  197
+IL_010C ret 
+
+============================================================================
+METHOD: <?>::GenerateGridData
+METHOD_TOKEN: 0x06000000 | RID 1938 = 0x06000792
+RVA: 0x23E4F
+INSTRUCTIONS: 7
+IL_0001 ldarg.0 
+IL_0002 ldarg.0 
+IL_0003 ldarg.0 
+IL_0004 call  => METHOD <?>::get_Seed
+IL_0009 call  => METHOD <?>::GenerateGridData
+IL_000E stfld  => FIELD <?>::_generationPoints
+IL_0013 ret 
+
+============================================================================
+METHOD: <?>::GetHeightAtPoint
+METHOD_TOKEN: 0x06000000 | RID 16519 = 0x06004087
+RVA: 0xB5E30
+INSTRUCTIONS: 25
+IL_000C ldarg.0 
+IL_000D ldarg.1 
+IL_000E call  => METHOD <?>::GetBarycentricCoordsAtPoint
+IL_0013 stloc.0 
+IL_0014 ldloc.0 
+IL_0015 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_001A ldarg.1 
+IL_001B ldfld  => FIELD <?>::P0
+IL_0020 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0025 mul 
+IL_0026 ldloc.0 
+IL_0027 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_002C ldarg.1 
+IL_002D ldfld  => FIELD <?>::P1
+IL_0032 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_0037 mul 
+IL_0038 add 
+IL_0039 ldloc.0 
+IL_003A ldfld  => MEMBERREF TypeRef:<?>::z
+IL_003F ldarg.1 
+IL_0040 ldfld  => FIELD <?>::P2
+IL_0045 ldfld  => MEMBERREF TypeRef:<?>::y
+IL_004A mul 
+IL_004B add 
+IL_004C ret 
+
+============================================================================
+METHOD: <?>::ImportHeightmapFromRawFile
+METHOD_TOKEN: 0x06000000 | RID 16707 = 0x06004143
+RVA: 0xB9A7C
+INSTRUCTIONS: 102
+IL_000C ldc.i4  257
+IL_0011 ldc.i4  257
+IL_0016 newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_001B stloc.0 
+IL_001C ldc.i4  66049
+IL_0021 stloc.1 
+IL_0022 ldloc.1 
+IL_0023 ldc.i4.2 
+IL_0024 mul 
+IL_0025 stloc.1 
+IL_0026 ldloc.1 
+IL_0027 newarr  => TYPEREF System.<?>
+IL_002C stloc.2 
+IL_002D ldarg.0 
+IL_002E ldc.i4.3 
+IL_002F ldc.i4.1 
+IL_0030 newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_0035 stloc.s  local(0x0004)
+IL_0037 ldloc.s  local(0x0004)
+IL_0039 ldloc.2 
+IL_003A ldc.i4.0 
+IL_003B ldloc.1 
+IL_003C callvirt  => MEMBERREF TypeRef:<?>::Read
+IL_0041 pop 
+IL_0042 leave.s  80
+IL_0044 pop 
+IL_0045 ldstr  => UNRESOLVED table=0x70 rid=118592
+IL_004A newobj  => MEMBERREF TypeRef:<?>::.ctor
+IL_004F throw 
+IL_0050 leave.s  94
+IL_0052 ldloc.s  local(0x0004)
+IL_0054 brfalse.s  93
+IL_0056 ldloc.s  local(0x0004)
+IL_0058 callvirt  => MEMBERREF TypeRef:<?>::Dispose
+IL_005D endfinally 
+IL_005E leave.s  125
+IL_0060 stloc.s  local(0x0005)
+IL_0062 ldstr  => UNRESOLVED table=0x70 rid=118648
+IL_0067 ldloc.s  local(0x0005)
+IL_0069 callvirt  => MEMBERREF TypeRef:<?>::get_Message
+IL_006E call  => MEMBERREF TypeRef:<?>::Concat
+IL_0073 call  => MEMBERREF TypeRef:<?>::LogError
+IL_0078 ldloc.0 
+IL_0079 stloc.s  local(0x0006)
+IL_007B leave.s  220
+IL_007D ldc.i4.0 
+IL_007E stloc.3 
+IL_007F ldc.i4.0 
+IL_0080 stloc.s  local(0x0007)
+IL_0082 br.s  209
+IL_0084 ldc.i4.0 
+IL_0085 stloc.s  local(0x0008)
+IL_0087 br.s  194
+IL_0089 ldloc.2 
+IL_008A ldloc.3 
+IL_008B dup 
+IL_008C ldc.i4.1 
+IL_008D add 
+IL_008E stloc.3 
+IL_008F ldelem.u1 
+IL_0090 conv.r4 
+IL_0091 ldloc.2 
+IL_0092 ldloc.3 
+IL_0093 dup 
+IL_0094 ldc.i4.1 
+IL_0095 add 
+IL_0096 stloc.3 
+IL_0097 ldelem.u1 
+IL_0098 conv.r4 
+IL_0099 ldc.r4  256.0
+IL_009E mul 
+IL_009F add 
+IL_00A0 stloc.s  local(0x0009)
+IL_00A2 ldloc.0 
+IL_00A3 ldc.i4  257
+IL_00A8 ldloc.s  local(0x0007)
+IL_00AA sub 
+IL_00AB ldc.i4.1 
+IL_00AC sub 
+IL_00AD ldloc.s  local(0x0008)
+IL_00AF ldloc.s  local(0x0009)
+IL_00B1 ldc.r4  65535.0
+IL_00B6 div 
+IL_00B7 call  => MEMBERREF TypeSpec:<?>::Set
+IL_00BC ldloc.s  local(0x0008)
+IL_00BE ldc.i4.1 
+IL_00BF add 
+IL_00C0 stloc.s  local(0x0008)
+IL_00C2 ldloc.s  local(0x0008)
+IL_00C4 ldc.i4  257
+IL_00C9 blt.s  137
+IL_00CB ldloc.s  local(0x0007)
+IL_00CD ldc.i4.1 
+IL_00CE add 
+IL_00CF stloc.s  local(0x0007)
+IL_00D1 ldloc.s  local(0x0007)
+IL_00D3 ldc.i4  257
+IL_00D8 blt.s  132
+IL_00DA ldloc.0 
+IL_00DB ret 
+IL_00DC ldloc.s  local(0x0006)
+IL_00DE ret 
+
+============================================================================
+METHOD: <?>::GenerateZone
+METHOD_TOKEN: 0x06000000 | RID 16742 = 0x06004166
+RVA: 0xBA107
+INSTRUCTIONS: 13
+IL_0001 ldarg.0 
+IL_0002 ldfld  => FIELD <?>::_isGenerating
+IL_0007 brfalse.s  11
+IL_0009 ldc.i4.0 
+IL_000A ret 
+IL_000B ldarg.0 
+IL_000C ldarg.1 
+IL_000D ldarg.0 
+IL_000E ldftn  => METHOD <?>::GenerateObject
+IL_0014 newobj  => METHOD <?>::.ctor
+IL_0019 call  => METHOD <?>::GenerateObjects
+IL_001E ldc.i4.1 
+IL_001F ret 
+
+============================================================================
+METHOD: <?>::GenerateGridData
+METHOD_TOKEN: 0x06000000 | RID 16764 = 0x0600417C
+RVA: 0xBB1E4
+INSTRUCTIONS: 129
+IL_000C ldc.r4  0.9765625
+IL_0011 stloc.0 
+IL_0012 ldc.i4  256
+IL_0017 ldc.i4  256
+IL_001C newobj  => MEMBERREF TypeSpec:<?>::.ctor
+IL_0021 stloc.1 
+IL_0022 ldarg.0 
+IL_0023 callvirt  => METHOD <?>::get_Terrain
+IL_0028 stloc.2 
+IL_0029 ldarg.0 
+IL_002A callvirt  => METHOD <?>::get_Terrain
+IL_002F callvirt  => MEMBERREF TypeRef:<?>::get_terrainData
+IL_0034 stloc.3 
+IL_0035 ldloc.3 
+IL_0036 ldc.i4.0 
+IL_0037 ldc.i4.0 
+IL_0038 ldc.i4  257
+IL_003D ldc.i4  257
+IL_0042 callvirt  => MEMBERREF TypeRef:<?>::GetHeights
+IL_0047 stloc.s  local(0x0004)
+IL_0049 call  => METHOD <?>::get_WORLD_SEED
+IL_004E ldarg.1 
+IL_004F sub 
+IL_0050 ldarg.0 
+IL_0051 callvirt  => METHOD <?>::get_Biome
+IL_0056 ldc.i4.1 
+IL_0057 call  => METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+IL_005C stloc.s  local(0x0005)
+IL_005E ldc.i4.0 
+IL_005F stloc.s  local(0x0006)
+IL_0061 br  343
+IL_0066 ldc.i4.0 
+IL_0067 stloc.s  local(0x0007)
+IL_0069 br  325
+IL_006E ldc.r4  150.0
+IL_0073 ldloc.s  local(0x0004)
+IL_0075 ldloc.s  local(0x0006)
+IL_0077 ldloc.s  local(0x0007)
+IL_0079 call  => MEMBERREF TypeSpec:<?>::Get
+IL_007E mul 
+IL_007F ldc.r4  -100.0
+IL_0084 add 
+IL_0085 stloc.s  local(0x0008)
+IL_0087 ldloca.s  local(0x0009)
+IL_0089 ldloc.2 
+IL_008A callvirt  => MEMBERREF TypeRef:<?>::get_transform
+IL_008F callvirt  => MEMBERREF TypeRef:<?>::get_position
+IL_0094 ldfld  => MEMBERREF TypeRef:<?>::x
+IL_0099 ldloc.0 
+IL_009A ldloc.s  local(0x0007)
+IL_009C conv.r4 
+IL_009D mul 
+IL_009E add 
+IL_009F ldloc.s  local(0x0008)
+IL_00A1 ldloc.2 
+IL_00A2 callvirt  => MEMBERREF TypeRef:<?>::get_transform
+IL_00A7 callvirt  => MEMBERREF TypeRef:<?>::get_position
+IL_00AC ldfld  => MEMBERREF TypeRef:<?>::z
+IL_00B1 ldloc.0 
+IL_00B2 ldloc.s  local(0x0006)
+IL_00B4 conv.r4 
+IL_00B5 mul 
+IL_00B6 add 
+IL_00B7 call  => MEMBERREF TypeRef:<?>::.ctor
+IL_00BC ldloc.s  local(0x0009)
+IL_00BE ldfld  => MEMBERREF TypeRef:<?>::x
+IL_00C3 ldloc.2 
+IL_00C4 callvirt  => MEMBERREF TypeRef:<?>::get_transform
+IL_00C9 callvirt  => MEMBERREF TypeRef:<?>::get_position
+IL_00CE ldfld  => MEMBERREF TypeRef:<?>::x
+IL_00D3 sub 
+IL_00D4 ldc.r4  250.0
+IL_00D9 div 
+IL_00DA stloc.s  local(0x000A)
+IL_00DC ldloc.s  local(0x0009)
+IL_00DE ldfld  => MEMBERREF TypeRef:<?>::z
+IL_00E3 ldloc.2 
+IL_00E4 callvirt  => MEMBERREF TypeRef:<?>::get_transform
+IL_00E9 callvirt  => MEMBERREF TypeRef:<?>::get_position
+IL_00EE ldfld  => MEMBERREF TypeRef:<?>::z
+IL_00F3 sub 
+IL_00F4 ldc.r4  250.0
+IL_00F9 div 
+IL_00FA stloc.s  local(0x000B)
+IL_00FC call  => MEMBERREF TypeRef:<?>::get_forward
+IL_0101 ldloc.3 
+IL_0102 ldloc.s  local(0x000A)
+IL_0104 ldloc.s  local(0x000B)
+IL_0106 callvirt  => MEMBERREF TypeRef:<?>::GetInterpolatedNormal
+IL_010B call  => MEMBERREF TypeRef:<?>::LookRotation
+IL_0110 stloc.s  local(0x000C)
+IL_0112 ldloc.3 
+IL_0113 ldloc.s  local(0x000A)
+IL_0115 ldloc.s  local(0x000B)
+IL_0117 callvirt  => MEMBERREF TypeRef:<?>::GetSteepness
+IL_011C stloc.s  local(0x000D)
+IL_011E ldloc.1 
+IL_011F ldloc.s  local(0x0006)
+IL_0121 ldloc.s  local(0x0007)
+IL_0123 ldloc.s  local(0x0009)
+IL_0125 ldloc.s  local(0x000C)
+IL_0127 ldc.i4.0 
+IL_0128 ldloc.s  local(0x000D)
+IL_012A ldloc.s  local(0x0005)
+IL_012C ldloc.s  local(0x0006)
+IL_012E ldloc.s  local(0x0007)
+IL_0130 call  => MEMBERREF TypeSpec:<?>::Get
+IL_0135 newobj  => METHOD <?>::.ctor
+IL_013A call  => MEMBERREF TypeSpec:<?>::Set
+IL_013F ldloc.s  local(0x0007)
+IL_0141 ldc.i4.1 
+IL_0142 add 
+IL_0143 stloc.s  local(0x0007)
+IL_0145 ldloc.s  local(0x0007)
+IL_0147 ldc.i4  256
+IL_014C blt  110
+IL_0151 ldloc.s  local(0x0006)
+IL_0153 ldc.i4.1 
+IL_0154 add 
+IL_0155 stloc.s  local(0x0006)
+IL_0157 ldloc.s  local(0x0006)
+IL_0159 ldc.i4  256
+IL_015E blt  102
+IL_0163 ldnull 
+IL_0164 stloc.s  local(0x0005)
+IL_0166 ldnull 
+IL_0167 stloc.s  local(0x0004)
+IL_0169 ldloc.1 
+IL_016A ret 
+
+============================================================================
+SELECTED METHOD CALL REFERENCES
+<?>::TryGetSample
+  IL_0017 call -> MEMBERREF TypeRef:<?>::get_activeTerrain
+  IL_001D call -> MEMBERREF TypeRef:<?>::op_Inequality
+  IL_002C call -> MEMBERREF TypeSpec:<?>::get_Instance
+  IL_0032 callvirt -> METHOD <?>::GetPoint
+  IL_003D call -> MEMBERREF TypeSpec:<?>::get_Instance
+  IL_0043 callvirt -> METHOD <?>::GetNormal
+<?>::TryGetSample
+  IL_001E call -> MEMBERREF TypeRef:<?>::op_Equality
+  IL_002D callvirt -> METHOD <?>::get_Terrain
+  IL_0035 call -> MEMBERREF TypeRef:<?>::op_Equality
+  IL_0054 callvirt -> MEMBERREF TypeRef:<?>::SampleHeight
+  IL_0066 callvirt -> MEMBERREF TypeRef:<?>::get_transform
+  IL_006B callvirt -> MEMBERREF TypeRef:<?>::get_position
+  IL_0070 call -> MEMBERREF TypeRef:<?>::op_Subtraction
+  IL_0078 callvirt -> MEMBERREF TypeRef:<?>::get_terrainData
+  IL_0083 callvirt -> MEMBERREF TypeRef:<?>::get_terrainData
+  IL_0088 callvirt -> MEMBERREF TypeRef:<?>::get_size
+  IL_0098 call -> MEMBERREF TypeRef:<?>::InverseLerp
+  IL_00A3 callvirt -> MEMBERREF TypeRef:<?>::get_terrainData
+  IL_00A8 callvirt -> MEMBERREF TypeRef:<?>::get_size
+  IL_00B8 call -> MEMBERREF TypeRef:<?>::InverseLerp
+  IL_00BD callvirt -> MEMBERREF TypeRef:<?>::GetInterpolatedNormal
+<?>::TryGetSample
+  IL_002C call -> MEMBERREF TypeRef:<?>::Raycast
+  IL_0035 newobj -> METHOD <?>::.ctor
+<?>::GenerateLocalSeed
+  IL_000C call -> MEMBERREF TypeRef:<?>::get_zero
+  IL_0025 call -> MEMBERREF TypeRef:<?>::.ctor
+  IL_0044 call -> MEMBERREF TypeRef:<?>::Atan2
+  IL_0058 call -> MEMBERREF TypeRef:<?>::Distance
+  IL_0064 call -> METHOD <?>::get_WORLD_SEED
+  IL_0070 newobj -> MEMBERREF TypeRef:<?>::.ctor
+<?>::LoadStartingZone
+  IL_000E call -> METHOD <?>::GetZone
+  IL_0016 call -> METHOD <?>::LoadStartingZone
+<?>::LoadStartingZone
+  IL_0003 call -> MEMBERREF TypeRef:<?>::op_Inequality
+  IL_000B callvirt -> METHOD <?>::get_Loaded
+  IL_0014 call -> METHOD <?>::LoadStartingZone_Sequence
+  IL_0019 call -> MEMBERREF TypeRef:<?>::RunCoroutine
+  IL_001E call -> MEMBERREF TypeRef:<?>::WaitUntilDone
+  IL_0029 call -> MEMBERREF TypeRef:<?>::LogError
+<?>::GenerateZoneBiome
+  IL_000D newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_0015 callvirt -> MEMBERREF TypeRef:<?>::Next
+  IL_0033 call -> MEMBERREF TypeRef:<?>::LogError
+<?>::GenerateZoneHeightmap
+  IL_0016 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0044 call -> METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+  IL_0052 call -> METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+  IL_0060 call -> METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+  IL_0079 call -> METHOD <?>::PerlinGenerator
+  IL_0090 call -> METHOD <?>::NormalizeHeightmap
+  IL_00A7 call -> METHOD <?>::PerlinGenerator
+  IL_00BE call -> METHOD <?>::NormalizeHeightmap
+  IL_00D4 call -> METHOD <?>::PerlinGenerator
+  IL_00EB call -> METHOD <?>::NormalizeHeightmap
+<?>::GENERATE_ISLAND_HEIGHTMAP
+  IL_000D newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_002B callvirt -> MEMBERREF TypeRef:<?>::Next
+  IL_003D callvirt -> MEMBERREF TypeRef:<?>::Next
+  IL_006E newobj -> METHOD <?>::.ctor
+  IL_007E callvirt -> METHOD <?>::NewIsland
+  IL_00A0 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_00BF call -> MEMBERREF TypeSpec:<?>::Set
+  IL_00DE callvirt -> METHOD <?>::get_Centers
+  IL_00E3 callvirt -> MEMBERREF TypeSpec:<?>::GetEnumerator
+  IL_00F1 call -> MEMBERREF TypeSpec:<?>::get_Current
+  IL_010B callvirt -> MEMBERREF TypeSpec:<?>::GetEnumerator
+  IL_0119 call -> MEMBERREF TypeSpec:<?>::get_Current
+  IL_0134 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0141 callvirt -> METHOD <?>::LookUpEdgeFromCenter
+  IL_019A newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_019F callvirt -> MEMBERREF TypeSpec:<?>::Add
+  IL_01C5 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_01CA callvirt -> MEMBERREF TypeSpec:<?>::Add
+  IL_01F0 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_01F5 callvirt -> MEMBERREF TypeSpec:<?>::Add
+  IL_0201 callvirt -> MEMBERREF TypeSpec:<?>::ToArray
+  IL_0214 call -> METHOD <?>::FillCellHeightmap
+  IL_021F callvirt -> MEMBERREF TypeSpec:<?>::ToArray
+  IL_022F call -> METHOD <?>::FillCellHeightmap
+  IL_0239 call -> MEMBERREF TypeSpec:<?>::MoveNext
+  IL_024D callvirt -> MEMBERREF TypeRef:<?>::Dispose
+  IL_0255 call -> MEMBERREF TypeSpec:<?>::MoveNext
+  IL_0269 callvirt -> MEMBERREF TypeRef:<?>::Dispose
+  IL_0277 call -> METHOD <?>::StitchTerrainEdges
+  IL_028E call -> METHOD <?>::PerlinGenerator
+  IL_0297 callvirt -> METHOD <?>::get_Edges
+  IL_029C callvirt -> MEMBERREF TypeSpec:<?>::GetEnumerator
+  IL_02AA call -> MEMBERREF TypeSpec:<?>::get_Current
+  IL_0325 call -> METHOD <?>::HeightmapRiver
+  IL_0364 call -> METHOD <?>::HeightmapRiver
+  IL_03A7 call -> METHOD <?>::HeightmapRiver
+  IL_03AE call -> MEMBERREF TypeSpec:<?>::MoveNext
+  IL_03C2 callvirt -> MEMBERREF TypeRef:<?>::Dispose
+  IL_03D1 call -> METHOD <?>::SmoothTerrain
+<?>::StitchTerrainEdges
+  IL_0017 call -> MEMBERREF TypeRef:<?>::Load
+  IL_0021 callvirt -> MEMBERREF TypeRef:<?>::GetPixels
+  IL_0032 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_0053 call -> MEMBERREF TypeSpec:<?>::Address
+<?>::GenerateTerrain
+  IL_0015 callvirt -> MEMBERREF TypeRef:<?>::Clone
+  IL_0021 callvirt -> MEMBERREF TypeRef:<?>::Clone
+  IL_0054 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_0059 call -> METHOD <?>::GeneratePerlin
+  IL_006E call -> MEMBERREF TypeSpec:<?>::Get
+  IL_007A call -> MEMBERREF TypeSpec:<?>::Get
+  IL_009D call -> MEMBERREF TypeSpec:<?>::Set
+  IL_00C2 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_00C7 call -> METHOD <?>::Normalise
+  IL_00DC call -> MEMBERREF TypeSpec:<?>::Get
+  IL_00E8 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_010B call -> MEMBERREF TypeSpec:<?>::Set
+  IL_012D newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_0132 call -> METHOD <?>::smooth
+  IL_0147 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_0153 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_0176 call -> MEMBERREF TypeSpec:<?>::Set
+<?>::NormalizeHeightmap
+  IL_001C call -> METHOD <?>::GenerateTerrain
+<?>::SmoothTerrain
+  IL_0015 call -> METHOD <?>::GenerateTerrain
+<?>::FillCellHeightmap
+  IL_001B ldftn -> METHOD <?>::<FillCellHeightmap>b__28_0
+  IL_0021 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_002C call -> METHODSPEC MemberRef:Max
+  IL_0042 ldftn -> METHOD <?>::<FillCellHeightmap>b__28_1
+  IL_0048 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0053 call -> METHODSPEC MemberRef:Min
+  IL_0068 ldftn -> METHOD <?>::<FillCellHeightmap>b__28_2
+  IL_006E newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0079 call -> METHODSPEC MemberRef:Min
+  IL_008F ldftn -> METHOD <?>::<FillCellHeightmap>b__28_3
+  IL_0095 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_00A0 call -> METHODSPEC MemberRef:Max
+  IL_00A8 call -> METHODSPEC MemberRef:Count
+  IL_00BE ldftn -> METHOD <?>::<FillCellHeightmap>b__28_4
+  IL_00C4 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_00CF call -> METHODSPEC MemberRef:Select
+  IL_00D4 call -> METHODSPEC MemberRef:ToArray
+  IL_00EA ldftn -> METHOD <?>::<FillCellHeightmap>b__28_5
+  IL_00F0 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_00FB call -> METHODSPEC MemberRef:Select
+  IL_0100 call -> METHODSPEC MemberRef:ToArray
+  IL_0243 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_024E newobj -> METHOD <?>::.ctor
+  IL_0253 call -> METHOD <?>::GetHeightAtPoint
+  IL_0272 call -> MEMBERREF TypeSpec:<?>::Set
+<?>::HeightmapRiver
+  IL_004F call -> MEMBERREF TypeSpec:<?>::Get
+  IL_005B call -> MEMBERREF TypeSpec:<?>::Address
+  IL_0098 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_00A4 call -> MEMBERREF TypeSpec:<?>::Address
+  IL_00B2 call -> MEMBERREF TypeRef:<?>::Abs
+  IL_00E9 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_00F5 call -> MEMBERREF TypeSpec:<?>::Address
+  IL_0104 call -> MEMBERREF TypeRef:<?>::Abs
+<?>::GenerateGridData
+  IL_0004 call -> METHOD <?>::get_Seed
+  IL_0009 call -> METHOD <?>::GenerateGridData
+<?>::GetHeightAtPoint
+  IL_000E call -> METHOD <?>::GetBarycentricCoordsAtPoint
+<?>::ImportHeightmapFromRawFile
+  IL_0016 newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0030 newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_003C callvirt -> MEMBERREF TypeRef:<?>::Read
+  IL_004A newobj -> MEMBERREF TypeRef:<?>::.ctor
+  IL_0058 callvirt -> MEMBERREF TypeRef:<?>::Dispose
+  IL_0069 callvirt -> MEMBERREF TypeRef:<?>::get_Message
+  IL_006E call -> MEMBERREF TypeRef:<?>::Concat
+  IL_0073 call -> MEMBERREF TypeRef:<?>::LogError
+  IL_00B7 call -> MEMBERREF TypeSpec:<?>::Set
+<?>::GenerateZone
+  IL_000E ldftn -> METHOD <?>::GenerateObject
+  IL_0014 newobj -> METHOD <?>::.ctor
+  IL_0019 call -> METHOD <?>::GenerateObjects
+<?>::GenerateGridData
+  IL_001C newobj -> MEMBERREF TypeSpec:<?>::.ctor
+  IL_0023 callvirt -> METHOD <?>::get_Terrain
+  IL_002A callvirt -> METHOD <?>::get_Terrain
+  IL_002F callvirt -> MEMBERREF TypeRef:<?>::get_terrainData
+  IL_0042 callvirt -> MEMBERREF TypeRef:<?>::GetHeights
+  IL_0049 call -> METHOD <?>::get_WORLD_SEED
+  IL_0051 callvirt -> METHOD <?>::get_Biome
+  IL_0057 call -> METHOD <?>::GENERATE_ISLAND_HEIGHTMAP
+  IL_0079 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_008A callvirt -> MEMBERREF TypeRef:<?>::get_transform
+  IL_008F callvirt -> MEMBERREF TypeRef:<?>::get_position
+  IL_00A2 callvirt -> MEMBERREF TypeRef:<?>::get_transform
+  IL_00A7 callvirt -> MEMBERREF TypeRef:<?>::get_position
+  IL_00B7 call -> MEMBERREF TypeRef:<?>::.ctor
+  IL_00C4 callvirt -> MEMBERREF TypeRef:<?>::get_transform
+  IL_00C9 callvirt -> MEMBERREF TypeRef:<?>::get_position
+  IL_00E4 callvirt -> MEMBERREF TypeRef:<?>::get_transform
+  IL_00E9 callvirt -> MEMBERREF TypeRef:<?>::get_position
+  IL_00FC call -> MEMBERREF TypeRef:<?>::get_forward
+  IL_0106 callvirt -> MEMBERREF TypeRef:<?>::GetInterpolatedNormal
+  IL_010B call -> MEMBERREF TypeRef:<?>::LookRotation
+  IL_0117 callvirt -> MEMBERREF TypeRef:<?>::GetSteepness
+  IL_0130 call -> MEMBERREF TypeSpec:<?>::Get
+  IL_0135 newobj -> METHOD <?>::.ctor
+  IL_013A call -> MEMBERREF TypeSpec:<?>::Set
+
+===== SUMMARY =====
+SELECTED: 21
+DECODE_ERRORS: see BODY_DECODE_ERROR lines
+OWNER_MAP_METHODS: 26143
+OWNER_MAP_FIELDS: 16992
+NOTE: Method owner mapping depends on dnfile metadata row references.
+NOTE: MemberRef parent names may not expose full signatures.
+NOTE: This report does not prove which Mission 3 generation branch executed.
