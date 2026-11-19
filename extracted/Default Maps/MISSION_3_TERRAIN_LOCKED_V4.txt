@@ -1,0 +1,4060 @@
+========================================================================
+MISSION 3 TERRAIN - LOCKED V4
+SECURITY ROOT: /storage/emulated/0/Map Check
+DLL: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+OUTPUT: /storage/emulated/0/Map Check/reports/MISSION_3_TERRAIN_LOCKED_V4.txt
+MODE: READ ONLY SOURCE INSPECTION
+========================================================================
+DLL SIZE: 3432448
+DLL SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+TOTAL METHODS: 26143
+SELECTED METHODS: 64
+
+------------------------------------------------------------------------
+METHOD: StrandedWorld::GetBiome
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x0600070A
+RVA: 0x2050d
+STATUS: DECODED
+INSTRUCTION COUNT: 9
+IL_0001: call token(0x0A0000E6) => MemberRef::get_Instance
+IL_0006: dup
+IL_0007: brtrue.s 12
+IL_0009: pop
+IL_000A: ldc.i4.0
+IL_000B: ret
+IL_000C: ldarg.0
+IL_000D: call token(0x0600070B) => MethodDef::GetBiome_
+IL_0012: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::GenerateZoneBiome
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x0600075A
+RVA: 0x2292c
+STATUS: DECODED
+INSTRUCTION COUNT: 24
+IL_000C: ldarg.1
+IL_000D: newobj token(0x0A000492) => MemberRef::.ctor
+IL_0012: ldc.i4.0
+IL_0013: ldc.i4.s 100
+IL_0015: callvirt token(0x0A000366) => MemberRef::Next
+IL_001A: stloc.0
+IL_001B: ldarg.0
+IL_001C: stloc.1
+IL_001D: ldarg.0
+IL_001E: brtrue.s 43
+IL_0020: ldloc.0
+IL_0021: ldc.i4.s 50
+IL_0023: blt.s 41
+IL_0025: ldc.i4.5
+IL_0026: stloc.1
+IL_0027: br.s 43
+IL_0029: ldc.i4.4
+IL_002A: stloc.1
+IL_002B: ldloc.1
+IL_002C: brtrue.s 56
+IL_002E: ldstr string token(0x70005E9A) => TOKEN_0x70005e9a
+IL_0033: call token(0x0A0000A5) => MemberRef::LogError
+IL_0038: ldloc.1
+IL_0039: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::GenerateZoneHeightmap
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x0600075B
+RVA: 0x22968
+STATUS: DECODED
+INSTRUCTION COUNT: 76
+IL_000C: ldc.i4 257
+IL_0011: ldc.i4 257
+IL_0016: newobj token(0x0A0004E5) => MemberRef::.ctor
+IL_001B: stloc.0
+IL_001C: ldarg.0
+IL_001D: ldc.i4.1
+IL_001E: sub
+IL_001F: switch [198, 152, 107, 65, 79, 93]
+IL_003C: br 241
+IL_0041: ldarg.1
+IL_0042: ldarg.0
+IL_0043: ldc.i4.0
+IL_0044: call token(0x0600075C) => MethodDef::GENERATE_ISLAND_HEIGHTMAP
+IL_0049: stloc.0
+IL_004A: br 241
+IL_004F: ldarg.1
+IL_0050: ldarg.0
+IL_0051: ldc.i4.0
+IL_0052: call token(0x0600075C) => MethodDef::GENERATE_ISLAND_HEIGHTMAP
+IL_0057: stloc.0
+IL_0058: br 241
+IL_005D: ldarg.1
+IL_005E: ldarg.0
+IL_005F: ldc.i4.0
+IL_0060: call token(0x0600075C) => MethodDef::GENERATE_ISLAND_HEIGHTMAP
+IL_0065: stloc.0
+IL_0066: br 241
+IL_006B: ldloc.0
+IL_006C: ldarg.1
+IL_006D: ldc.i4.6
+IL_006E: ldc.r4 0.5
+IL_0073: ldc.i4.6
+IL_0074: ldc.r4 1.0
+IL_0079: call token(0x06000762) => MethodDef::PerlinGenerator
+IL_007E: stloc.0
+IL_007F: ldloc.0
+IL_0080: ldc.r4 0.4399999976158142
+IL_0085: ldc.r4 0.550000011920929
+IL_008A: ldc.r4 1.0
+IL_008F: ldarg.0
+IL_0090: call token(0x06000764) => MethodDef::NormalizeHeightmap
+IL_0095: stloc.0
+IL_0096: br.s 241
+IL_0098: ldloc.0
+IL_0099: ldarg.1
+IL_009A: ldc.i4.s 12
+IL_009C: ldc.r4 0.5
+IL_00A1: ldc.i4.6
+IL_00A2: ldc.r4 1.0
+IL_00A7: call token(0x06000762) => MethodDef::PerlinGenerator
+IL_00AC: stloc.0
+IL_00AD: ldloc.0
+IL_00AE: ldc.r4 0.30000001192092896
+IL_00B3: ldc.r4 0.44999998807907104
+IL_00B8: ldc.r4 1.0
+IL_00BD: ldarg.0
+IL_00BE: call token(0x06000764) => MethodDef::NormalizeHeightmap
+IL_00C3: stloc.0
+IL_00C4: br.s 241
+IL_00C6: ldloc.0
+IL_00C7: ldarg.1
+IL_00C8: ldc.i4.4
+IL_00C9: ldc.r4 0.8999999761581421
+IL_00CE: ldc.i4.4
+IL_00CF: ldc.r4 1.0
+IL_00D4: call token(0x06000762) => MethodDef::PerlinGenerator
+IL_00D9: stloc.0
+IL_00DA: ldloc.0
+IL_00DB: ldc.r4 0.10000000149011612
+IL_00E0: ldc.r4 0.20000000298023224
+IL_00E5: ldc.r4 1.0
+IL_00EA: ldarg.0
+IL_00EB: call token(0x06000764) => MethodDef::NormalizeHeightmap
+IL_00F0: stloc.0
+IL_00F1: ldloc.0
+IL_00F2: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::GENERATE_ISLAND_HEIGHTMAP
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x0600075C
+RVA: 0x22a5c
+STATUS: DECODED
+INSTRUCTION COUNT: 348
+IL_000C: ldarg.0
+IL_000D: newobj token(0x0A000492) => MemberRef::.ctor
+IL_0012: stloc.0
+IL_0013: ldc.i4 140
+IL_0018: stloc.1
+IL_0019: ldc.i4 200
+IL_001E: stloc.2
+IL_001F: ldloc.2
+IL_0020: stloc.3
+IL_0021: ldarg.1
+IL_0022: ldc.i4.5
+IL_0023: bne.un.s 51
+IL_0025: ldloc.0
+IL_0026: ldloc.1
+IL_0027: ldloc.1
+IL_0028: ldc.i4.s 20
+IL_002A: add
+IL_002B: callvirt token(0x0A000366) => MemberRef::Next
+IL_0030: stloc.3
+IL_0031: br.s 67
+IL_0033: ldarg.1
+IL_0034: ldc.i4.4
+IL_0035: bne.un.s 67
+IL_0037: ldloc.0
+IL_0038: ldloc.2
+IL_0039: ldc.i4.s 20
+IL_003B: sub
+IL_003C: ldloc.2
+IL_003D: callvirt token(0x0A000366) => MemberRef::Next
+IL_0042: stloc.3
+IL_0043: ldc.r4 0.6850000023841858
+IL_0048: stloc.s local(0x0004)
+IL_004A: ldc.r4 0.7049999833106995
+IL_004F: stloc.s local(0x0005)
+IL_0051: ldloc.3
+IL_0052: ldloc.1
+IL_0053: sub
+IL_0054: conv.r4
+IL_0055: ldloc.2
+IL_0056: ldloc.1
+IL_0057: sub
+IL_0058: conv.r4
+IL_0059: div
+IL_005A: stloc.s local(0x0006)
+IL_005C: ldloc.s local(0x0004)
+IL_005E: ldloc.s local(0x0005)
+IL_0060: ldloc.s local(0x0004)
+IL_0062: sub
+IL_0063: ldloc.s local(0x0006)
+IL_0065: mul
+IL_0066: add
+IL_0067: stloc.s local(0x0007)
+IL_0069: ldloc.3
+IL_006A: stloc.s local(0x0008)
+IL_006C: ldloc.3
+IL_006D: conv.r4
+IL_006E: newobj token(0x060023E9) => MethodDef::.ctor
+IL_0073: stloc.s local(0x0009)
+IL_0075: ldloc.s local(0x0009)
+IL_0077: ldc.i4.0
+IL_0078: ldc.i4.0
+IL_0079: ldloc.s local(0x0008)
+IL_007B: ldarg.0
+IL_007C: ldloc.3
+IL_007D: conv.r4
+IL_007E: callvirt token(0x060023EB) => MethodDef::NewIsland
+IL_0083: ldc.i4 257
+IL_0088: stloc.s local(0x000A)
+IL_008A: ldc.i4 250
+IL_008F: ldloc.3
+IL_0090: sub
+IL_0091: conv.r4
+IL_0092: ldc.r4 0.5
+IL_0097: mul
+IL_0098: conv.i4
+IL_0099: conv.r4
+IL_009A: stloc.s local(0x000B)
+IL_009C: ldloc.s local(0x000A)
+IL_009E: ldloc.s local(0x000A)
+IL_00A0: newobj token(0x0A0004E5) => MemberRef::.ctor
+IL_00A5: stloc.s local(0x000C)
+IL_00A7: ldarg.2
+IL_00A8: brtrue.s 220
+IL_00AA: ldc.i4.0
+IL_00AB: stloc.s local(0x000D)
+IL_00AD: br.s 214
+IL_00AF: ldc.i4.0
+IL_00B0: stloc.s local(0x000E)
+IL_00B2: br.s 202
+IL_00B4: ldloc.s local(0x000C)
+IL_00B6: ldloc.s local(0x000D)
+IL_00B8: ldloc.s local(0x000E)
+IL_00BA: ldc.r4 0.6600000262260437
+IL_00BF: call token(0x0A0004E6) => MemberRef::Set
+IL_00C4: ldloc.s local(0x000E)
+IL_00C6: ldc.i4.1
+IL_00C7: add
+IL_00C8: stloc.s local(0x000E)
+IL_00CA: ldloc.s local(0x000E)
+IL_00CC: ldloc.s local(0x000A)
+IL_00CE: blt.s 180
+IL_00D0: ldloc.s local(0x000D)
+IL_00D2: ldc.i4.1
+IL_00D3: add
+IL_00D4: stloc.s local(0x000D)
+IL_00D6: ldloc.s local(0x000D)
+IL_00D8: ldloc.s local(0x000A)
+IL_00DA: blt.s 175
+IL_00DC: ldloc.s local(0x0009)
+IL_00DE: callvirt token(0x060023DB) => MethodDef::get_Centers
+IL_00E3: callvirt token(0x0A0004CD) => MemberRef::GetEnumerator
+IL_00E8: stloc.s local(0x000F)
+IL_00EA: br 595
+IL_00EF: ldloca.s local(0x000F)
+IL_00F1: call token(0x0A0004CE) => MemberRef::get_Current
+IL_00F6: stloc.s local(0x0010)
+IL_00F8: ldloc.s local(0x0010)
+IL_00FA: ldfld token(0x0400138D) => Field::Biome
+IL_00FF: brfalse 595
+IL_0104: ldloc.s local(0x0010)
+IL_0106: ldfld token(0x04001390) => Field::Neighbors
+IL_010B: callvirt token(0x0A0004CD) => MemberRef::GetEnumerator
+IL_0110: stloc.s local(0x0011)
+IL_0112: br 567
+IL_0117: ldloca.s local(0x0011)
+IL_0119: call token(0x0A0004CE) => MemberRef::get_Current
+IL_011E: stloc.s local(0x0012)
+IL_0120: ldloc.s local(0x0012)
+IL_0122: ldfld token(0x0400138D) => Field::Biome
+IL_0127: ldc.i4.1
+IL_0128: bne.un.s 308
+IL_012A: ldloc.s local(0x0010)
+IL_012C: ldfld token(0x0400138D) => Field::Biome
+IL_0131: ldc.i4.1
+IL_0132: pop
+IL_0133: pop
+IL_0134: newobj token(0x0A0004D0) => MemberRef::.ctor
+IL_0139: stloc.s local(0x0013)
+IL_013B: ldloc.s local(0x0009)
+IL_013D: ldloc.s local(0x0010)
+IL_013F: ldloc.s local(0x0012)
+IL_0141: callvirt token(0x060023F9) => MethodDef::LookUpEdgeFromCenter
+IL_0146: stloc.s local(0x0014)
+IL_0148: ldloc.s local(0x0014)
+IL_014A: brfalse 567
+IL_014F: ldloc.s local(0x0014)
+IL_0151: ldfld token(0x040013A5) => Field::V0
+IL_0156: brfalse 567
+IL_015B: ldloc.s local(0x0014)
+IL_015D: ldfld token(0x040013A6) => Field::V1
+IL_0162: brfalse 567
+IL_0167: ldloc.s local(0x0014)
+IL_0169: ldfld token(0x040013A5) => Field::V0
+IL_016E: stloc.s local(0x0015)
+IL_0170: ldloc.s local(0x0014)
+IL_0172: ldfld token(0x040013A6) => Field::V1
+IL_0177: stloc.s local(0x0016)
+IL_0179: ldloc.s local(0x0013)
+IL_017B: ldloc.s local(0x0015)
+IL_017D: ldflda token(0x04001394) => Field::Point
+IL_0182: ldfld token(0x0A00012B) => MemberRef::x
+IL_0187: ldloc.s local(0x0015)
+IL_0189: ldfld token(0x04001399) => Field::Elevation
+IL_018E: ldloc.s local(0x0015)
+IL_0190: ldflda token(0x04001394) => Field::Point
+IL_0195: ldfld token(0x0A00012C) => MemberRef::y
+IL_019A: newobj token(0x0A000083) => MemberRef::.ctor
+IL_019F: callvirt token(0x0A0004D2) => MemberRef::Add
+IL_01A4: ldloc.s local(0x0013)
+IL_01A6: ldloc.s local(0x0016)
+IL_01A8: ldflda token(0x04001394) => Field::Point
+IL_01AD: ldfld token(0x0A00012B) => MemberRef::x
+IL_01B2: ldloc.s local(0x0016)
+IL_01B4: ldfld token(0x04001399) => Field::Elevation
+IL_01B9: ldloc.s local(0x0016)
+IL_01BB: ldflda token(0x04001394) => Field::Point
+IL_01C0: ldfld token(0x0A00012C) => MemberRef::y
+IL_01C5: newobj token(0x0A000083) => MemberRef::.ctor
+IL_01CA: callvirt token(0x0A0004D2) => MemberRef::Add
+IL_01CF: ldloc.s local(0x0013)
+IL_01D1: ldloc.s local(0x0010)
+IL_01D3: ldflda token(0x04001388) => Field::Point
+IL_01D8: ldfld token(0x0A00012B) => MemberRef::x
+IL_01DD: ldloc.s local(0x0010)
+IL_01DF: ldfld token(0x0400138E) => Field::Elevation
+IL_01E4: ldloc.s local(0x0010)
+IL_01E6: ldflda token(0x04001388) => Field::Point
+IL_01EB: ldfld token(0x0A00012C) => MemberRef::y
+IL_01F0: newobj token(0x0A000083) => MemberRef::.ctor
+IL_01F5: callvirt token(0x0A0004D2) => MemberRef::Add
+IL_01FA: ldarg.2
+IL_01FB: brfalse.s 539
+IL_01FD: ldloc.s local(0x000C)
+IL_01FF: ldloc.s local(0x0013)
+IL_0201: callvirt token(0x0A0004D5) => MemberRef::ToArray
+IL_0206: ldloc.s local(0x000B)
+IL_0208: conv.i4
+IL_0209: ldc.i4.0
+IL_020A: ldc.r4 0.0
+IL_020F: ldc.r4 1.0
+IL_0214: call token(0x06000767) => MethodDef::FillCellHeightmap
+IL_0219: br.s 564
+IL_021B: ldloc.s local(0x000C)
+IL_021D: ldloc.s local(0x0013)
+IL_021F: callvirt token(0x0A0004D5) => MemberRef::ToArray
+IL_0224: ldloc.s local(0x000B)
+IL_0226: conv.i4
+IL_0227: ldc.i4.0
+IL_0228: ldc.r4 0.6600000262260437
+IL_022D: ldloc.s local(0x0007)
+IL_022F: call token(0x06000767) => MethodDef::FillCellHeightmap
+IL_0234: ldnull
+IL_0235: stloc.s local(0x0013)
+IL_0237: ldloca.s local(0x0011)
+IL_0239: call token(0x0A0004D8) => MemberRef::MoveNext
+IL_023E: brtrue 279
+IL_0243: leave.s 595
+IL_0245: ldloca.s local(0x0011)
+IL_0247: constrained. token(0x1B000165) => TOKEN_0x1b000165
+IL_024D: callvirt token(0x0A00000A) => MemberRef::Dispose
+IL_0252: endfinally
+IL_0253: ldloca.s local(0x000F)
+IL_0255: call token(0x0A0004D8) => MemberRef::MoveNext
+IL_025A: brtrue 239
+IL_025F: leave.s 623
+IL_0261: ldloca.s local(0x000F)
+IL_0263: constrained. token(0x1B000165) => TOKEN_0x1b000165
+IL_0269: callvirt token(0x0A00000A) => MemberRef::Dispose
+IL_026E: endfinally
+IL_026F: ldarg.2
+IL_0270: brtrue 984
+IL_0275: ldloc.s local(0x000C)
+IL_0277: call token(0x0600075D) => MethodDef::StitchTerrainEdges
+IL_027C: stloc.s local(0x000C)
+IL_027E: ldloc.s local(0x000C)
+IL_0280: ldarg.0
+IL_0281: ldc.i4.s 24
+IL_0283: ldc.r4 1.0
+IL_0288: ldc.i4.6
+IL_0289: ldc.r4 0.019999999552965164
+IL_028E: call token(0x06000762) => MethodDef::PerlinGenerator
+IL_0293: stloc.s local(0x000C)
+IL_0295: ldloc.s local(0x0009)
+IL_0297: callvirt token(0x060023DF) => MethodDef::get_Edges
+IL_029C: callvirt token(0x0A0004E7) => MemberRef::GetEnumerator
+IL_02A1: stloc.s local(0x0017)
+IL_02A3: br 940
+IL_02A8: ldloca.s local(0x0017)
+IL_02AA: call token(0x0A0004E8) => MemberRef::get_Current
+IL_02AF: stloc.s local(0x0018)
+IL_02B1: ldloc.s local(0x0018)
+IL_02B3: brfalse 940
+IL_02B8: ldloc.s local(0x0018)
+IL_02BA: ldfld token(0x040013A5) => Field::V0
+IL_02BF: brfalse 940
+IL_02C4: ldloc.s local(0x0018)
+IL_02C6: ldfld token(0x040013A6) => Field::V1
+IL_02CB: brfalse 940
+IL_02D0: ldloc.s local(0x0018)
+IL_02D2: ldfld token(0x040013A5) => Field::V0
+IL_02D7: stloc.s local(0x0019)
+IL_02D9: ldloc.s local(0x0018)
+IL_02DB: ldfld token(0x040013A6) => Field::V1
+IL_02E0: stloc.s local(0x001A)
+IL_02E2: ldloc.s local(0x0018)
+IL_02E4: ldfld token(0x040013A8) => Field::River
+IL_02E9: ldc.i4.0
+IL_02EA: ble 940
+IL_02EF: ldloc.s local(0x000C)
+IL_02F1: ldloc.s local(0x0019)
+IL_02F3: ldflda token(0x04001394) => Field::Point
+IL_02F8: ldfld token(0x0A00012B) => MemberRef::x
+IL_02FD: conv.i4
+IL_02FE: ldloc.s local(0x0019)
+IL_0300: ldflda token(0x04001394) => Field::Point
+IL_0305: ldfld token(0x0A00012C) => MemberRef::y
+IL_030A: conv.i4
+IL_030B: ldloc.s local(0x001A)
+IL_030D: ldflda token(0x04001394) => Field::Point
+IL_0312: ldfld token(0x0A00012B) => MemberRef::x
+IL_0317: conv.i4
+IL_0318: ldloc.s local(0x001A)
+IL_031A: ldflda token(0x04001394) => Field::Point
+IL_031F: ldfld token(0x0A00012C) => MemberRef::y
+IL_0324: conv.i4
+IL_0325: call token(0x06000768) => MethodDef::HeightmapRiver
+IL_032A: ldloc.s local(0x000C)
+IL_032C: ldloc.s local(0x0019)
+IL_032E: ldflda token(0x04001394) => Field::Point
+IL_0333: ldfld token(0x0A00012B) => MemberRef::x
+IL_0338: conv.i4
+IL_0339: ldc.i4.1
+IL_033A: add
+IL_033B: ldloc.s local(0x0019)
+IL_033D: ldflda token(0x04001394) => Field::Point
+IL_0342: ldfld token(0x0A00012C) => MemberRef::y
+IL_0347: conv.i4
+IL_0348: ldloc.s local(0x001A)
+IL_034A: ldflda token(0x04001394) => Field::Point
+IL_034F: ldfld token(0x0A00012B) => MemberRef::x
+IL_0354: conv.i4
+IL_0355: ldc.i4.1
+IL_0356: add
+IL_0357: ldloc.s local(0x001A)
+IL_0359: ldflda token(0x04001394) => Field::Point
+IL_035E: ldfld token(0x0A00012C) => MemberRef::y
+IL_0363: conv.i4
+IL_0364: call token(0x06000768) => MethodDef::HeightmapRiver
+IL_0369: ldloc.s local(0x000C)
+IL_036B: ldloc.s local(0x0019)
+IL_036D: ldflda token(0x04001394) => Field::Point
+IL_0372: ldfld token(0x0A00012B) => MemberRef::x
+IL_0377: conv.i4
+IL_0378: ldloc.s local(0x0019)
+IL_037A: ldflda token(0x04001394) => Field::Point
+IL_037F: ldfld token(0x0A00012C) => MemberRef::y
+IL_0384: conv.i4
+IL_0385: ldc.i4.1
+IL_0386: add
+IL_0387: ldloc.s local(0x001A)
+IL_0389: ldflda token(0x04001394) => Field::Point
+IL_038E: ldfld token(0x0A00012B) => MemberRef::x
+IL_0393: conv.i4
+IL_0394: ldloc.s local(0x001A)
+IL_0396: ldflda token(0x04001394) => Field::Point
+IL_039B: ldfld token(0x0A00012C) => MemberRef::y
+IL_03A0: ldc.r4 1.0
+IL_03A5: add
+IL_03A6: conv.i4
+IL_03A7: call token(0x06000768) => MethodDef::HeightmapRiver
+IL_03AC: ldloca.s local(0x0017)
+IL_03AE: call token(0x0A0004E9) => MemberRef::MoveNext
+IL_03B3: brtrue 680
+IL_03B8: leave.s 968
+IL_03BA: ldloca.s local(0x0017)
+IL_03BC: constrained. token(0x1B00016D) => TOKEN_0x1b00016d
+IL_03C2: callvirt token(0x0A00000A) => MemberRef::Dispose
+IL_03C7: endfinally
+IL_03C8: ldloc.s local(0x000C)
+IL_03CA: ldc.i4.2
+IL_03CB: ldc.r4 0.699999988079071
+IL_03D0: ldarg.1
+IL_03D1: call token(0x06000765) => MethodDef::SmoothTerrain
+IL_03D6: stloc.s local(0x000C)
+IL_03D8: ldnull
+IL_03D9: stloc.s local(0x0009)
+IL_03DB: ldloc.s local(0x000C)
+IL_03DD: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::StitchTerrainEdges
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x0600075D
+RVA: 0x22e88
+STATUS: DECODED
+INSTRUCTION COUNT: 55
+IL_000C: ldc.i4 257
+IL_0011: stloc.0
+IL_0012: ldstr string token(0x70005ED8) => TOKEN_0x70005ed8
+IL_0017: call token(0x0A0004EA) => MemberRef::Load
+IL_001C: isinst token(0x0100003A) => TypeRef::?
+IL_0021: callvirt token(0x0A000163) => MemberRef::GetPixels
+IL_0026: stloc.1
+IL_0027: ldc.i4.0
+IL_0028: stloc.2
+IL_0029: br.s 112
+IL_002B: ldc.i4.0
+IL_002C: stloc.3
+IL_002D: br.s 104
+IL_002F: ldarg.0
+IL_0030: ldloc.2
+IL_0031: ldloc.3
+IL_0032: call token(0x0A0004E4) => MemberRef::Get
+IL_0037: ldc.r4 0.6600000262260437
+IL_003C: bgt.un.s 100
+IL_003E: ldloc.1
+IL_003F: ldloc.2
+IL_0040: ldloc.0
+IL_0041: mul
+IL_0042: ldloc.3
+IL_0043: add
+IL_0044: ldelema token(0x0100003D) => TypeRef::?
+IL_0049: ldfld token(0x0A000217) => MemberRef::r
+IL_004E: stloc.s local(0x0004)
+IL_0050: ldarg.0
+IL_0051: ldloc.2
+IL_0052: ldloc.3
+IL_0053: call token(0x0A0004EB) => MemberRef::Address
+IL_0058: dup
+IL_0059: ldind.r4
+IL_005A: ldc.r4 1.0
+IL_005F: ldloc.s local(0x0004)
+IL_0061: mul
+IL_0062: sub
+IL_0063: stind.r4
+IL_0064: ldloc.3
+IL_0065: ldc.i4.1
+IL_0066: add
+IL_0067: stloc.3
+IL_0068: ldloc.3
+IL_0069: ldloc.0
+IL_006A: blt.s 47
+IL_006C: ldloc.2
+IL_006D: ldc.i4.1
+IL_006E: add
+IL_006F: stloc.2
+IL_0070: ldloc.2
+IL_0071: ldloc.0
+IL_0072: blt.s 43
+IL_0074: ldarg.0
+IL_0075: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::GenerateTerrain
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000760
+RVA: 0x2306c
+STATUS: DECODED
+INSTRUCTION COUNT: 179
+IL_000C: ldc.i4 257
+IL_0011: stloc.0
+IL_0012: ldloc.0
+IL_0013: stloc.1
+IL_0014: ldarg.0
+IL_0015: callvirt token(0x0A0004EF) => MemberRef::Clone
+IL_001A: castclass token(0x1B00016B) => TOKEN_0x1b00016b
+IL_001F: stloc.2
+IL_0020: ldarg.0
+IL_0021: callvirt token(0x0A0004EF) => MemberRef::Clone
+IL_0026: castclass token(0x1B00016B) => TOKEN_0x1b00016b
+IL_002B: stloc.3
+IL_002C: ldsfld token(0x04000582) => Field::generatorType
+IL_0031: stloc.s local(0x0004)
+IL_0033: ldloc.s local(0x0004)
+IL_0035: switch [79, 189, 403, 296]
+IL_004A: br 403
+IL_004F: ldloc.3
+IL_0050: ldloc.0
+IL_0051: conv.r4
+IL_0052: ldloc.1
+IL_0053: conv.r4
+IL_0054: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_0059: call token(0x06000761) => MethodDef::GeneratePerlin
+IL_005E: stloc.3
+IL_005F: ldc.i4.0
+IL_0060: stloc.s local(0x0005)
+IL_0062: br.s 179
+IL_0064: ldc.i4.0
+IL_0065: stloc.s local(0x0006)
+IL_0067: br.s 168
+IL_0069: ldloc.2
+IL_006A: ldloc.s local(0x0006)
+IL_006C: ldloc.s local(0x0005)
+IL_006E: call token(0x0A0004E4) => MemberRef::Get
+IL_0073: stloc.s local(0x0007)
+IL_0075: ldloc.3
+IL_0076: ldloc.s local(0x0006)
+IL_0078: ldloc.s local(0x0005)
+IL_007A: call token(0x0A0004E4) => MemberRef::Get
+IL_007F: ldsfld token(0x04000587) => Field::perlinBlend
+IL_0084: mul
+IL_0085: ldloc.s local(0x0007)
+IL_0087: ldc.r4 1.0
+IL_008C: ldsfld token(0x04000587) => Field::perlinBlend
+IL_0091: sub
+IL_0092: mul
+IL_0093: add
+IL_0094: stloc.s local(0x0008)
+IL_0096: ldloc.2
+IL_0097: ldloc.s local(0x0006)
+IL_0099: ldloc.s local(0x0005)
+IL_009B: ldloc.s local(0x0008)
+IL_009D: call token(0x0A0004E6) => MemberRef::Set
+IL_00A2: ldloc.s local(0x0006)
+IL_00A4: ldc.i4.1
+IL_00A5: add
+IL_00A6: stloc.s local(0x0006)
+IL_00A8: ldloc.s local(0x0006)
+IL_00AA: ldloc.0
+IL_00AB: blt.s 105
+IL_00AD: ldloc.s local(0x0005)
+IL_00AF: ldc.i4.1
+IL_00B0: add
+IL_00B1: stloc.s local(0x0005)
+IL_00B3: ldloc.s local(0x0005)
+IL_00B5: ldloc.1
+IL_00B6: blt.s 100
+IL_00B8: br 405
+IL_00BD: ldloc.3
+IL_00BE: ldloc.0
+IL_00BF: conv.r4
+IL_00C0: ldloc.1
+IL_00C1: conv.r4
+IL_00C2: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_00C7: call token(0x06000763) => MethodDef::Normalise
+IL_00CC: stloc.3
+IL_00CD: ldc.i4.0
+IL_00CE: stloc.s local(0x0009)
+IL_00D0: br.s 289
+IL_00D2: ldc.i4.0
+IL_00D3: stloc.s local(0x000A)
+IL_00D5: br.s 278
+IL_00D7: ldloc.2
+IL_00D8: ldloc.s local(0x000A)
+IL_00DA: ldloc.s local(0x0009)
+IL_00DC: call token(0x0A0004E4) => MemberRef::Get
+IL_00E1: stloc.s local(0x000B)
+IL_00E3: ldloc.3
+IL_00E4: ldloc.s local(0x000A)
+IL_00E6: ldloc.s local(0x0009)
+IL_00E8: call token(0x0A0004E4) => MemberRef::Get
+IL_00ED: ldsfld token(0x0400058A) => Field::normaliseBlend
+IL_00F2: mul
+IL_00F3: ldloc.s local(0x000B)
+IL_00F5: ldc.r4 1.0
+IL_00FA: ldsfld token(0x0400058A) => Field::normaliseBlend
+IL_00FF: sub
+IL_0100: mul
+IL_0101: add
+IL_0102: stloc.s local(0x000C)
+IL_0104: ldloc.2
+IL_0105: ldloc.s local(0x000A)
+IL_0107: ldloc.s local(0x0009)
+IL_0109: ldloc.s local(0x000C)
+IL_010B: call token(0x0A0004E6) => MemberRef::Set
+IL_0110: ldloc.s local(0x000A)
+IL_0112: ldc.i4.1
+IL_0113: add
+IL_0114: stloc.s local(0x000A)
+IL_0116: ldloc.s local(0x000A)
+IL_0118: ldloc.0
+IL_0119: blt.s 215
+IL_011B: ldloc.s local(0x0009)
+IL_011D: ldc.i4.1
+IL_011E: add
+IL_011F: stloc.s local(0x0009)
+IL_0121: ldloc.s local(0x0009)
+IL_0123: ldloc.1
+IL_0124: blt.s 210
+IL_0126: br.s 405
+IL_0128: ldloc.3
+IL_0129: ldloc.0
+IL_012A: conv.r4
+IL_012B: ldloc.1
+IL_012C: conv.r4
+IL_012D: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_0132: call token(0x06000766) => MethodDef::smooth
+IL_0137: stloc.3
+IL_0138: ldc.i4.0
+IL_0139: stloc.s local(0x000D)
+IL_013B: br.s 396
+IL_013D: ldc.i4.0
+IL_013E: stloc.s local(0x000E)
+IL_0140: br.s 385
+IL_0142: ldloc.2
+IL_0143: ldloc.s local(0x000E)
+IL_0145: ldloc.s local(0x000D)
+IL_0147: call token(0x0A0004E4) => MemberRef::Get
+IL_014C: stloc.s local(0x000F)
+IL_014E: ldloc.3
+IL_014F: ldloc.s local(0x000E)
+IL_0151: ldloc.s local(0x000D)
+IL_0153: call token(0x0A0004E4) => MemberRef::Get
+IL_0158: ldsfld token(0x0400058B) => Field::smoothBlend
+IL_015D: mul
+IL_015E: ldloc.s local(0x000F)
+IL_0160: ldc.r4 1.0
+IL_0165: ldsfld token(0x0400058B) => Field::smoothBlend
+IL_016A: sub
+IL_016B: mul
+IL_016C: add
+IL_016D: stloc.s local(0x0010)
+IL_016F: ldloc.2
+IL_0170: ldloc.s local(0x000E)
+IL_0172: ldloc.s local(0x000D)
+IL_0174: ldloc.s local(0x0010)
+IL_0176: call token(0x0A0004E6) => MemberRef::Set
+IL_017B: ldloc.s local(0x000E)
+IL_017D: ldc.i4.1
+IL_017E: add
+IL_017F: stloc.s local(0x000E)
+IL_0181: ldloc.s local(0x000E)
+IL_0183: ldloc.0
+IL_0184: blt.s 322
+IL_0186: ldloc.s local(0x000D)
+IL_0188: ldc.i4.1
+IL_0189: add
+IL_018A: stloc.s local(0x000D)
+IL_018C: ldloc.s local(0x000D)
+IL_018E: ldloc.1
+IL_018F: blt.s 317
+IL_0191: br.s 405
+IL_0193: ldnull
+IL_0194: ret
+IL_0195: ldnull
+IL_0196: stloc.3
+IL_0197: ldloc.2
+IL_0198: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::GeneratePerlin
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000761
+RVA: 0x23208
+STATUS: DECODED
+INSTRUCTION COUNT: 222
+IL_000C: ldarg.1
+IL_000D: ldfld token(0x0A00012B) => MemberRef::x
+IL_0012: conv.i4
+IL_0013: stloc.0
+IL_0014: ldarg.1
+IL_0015: ldfld token(0x0A00012C) => MemberRef::y
+IL_001A: conv.i4
+IL_001B: stloc.1
+IL_001C: ldsfld token(0x04000583) => Field::perlinSeed
+IL_0021: newobj token(0x0A000492) => MemberRef::.ctor
+IL_0026: stloc.2
+IL_0027: ldarg.0
+IL_0028: stloc.3
+IL_0029: ldsfld token(0x04000586) => Field::perlinOctaves
+IL_002E: newarr token(0x02000C26) => TypeDef::?
+IL_0033: stloc.s local(0x0004)
+IL_0035: ldsfld token(0x04000584) => Field::perlinFrequency
+IL_003A: stloc.s local(0x0005)
+IL_003C: ldc.r4 1.0
+IL_0041: stloc.s local(0x0006)
+IL_0043: ldc.i4.0
+IL_0044: stloc.s local(0x0007)
+IL_0046: br.s 109
+IL_0048: ldloc.s local(0x0004)
+IL_004A: ldloc.s local(0x0007)
+IL_004C: ldloc.s local(0x0005)
+IL_004E: ldloc.s local(0x0006)
+IL_0050: ldloc.2
+IL_0051: newobj token(0x06005C35) => MethodDef::.ctor
+IL_0056: stelem.ref
+IL_0057: ldloc.s local(0x0005)
+IL_0059: ldc.i4.2
+IL_005A: mul
+IL_005B: stloc.s local(0x0005)
+IL_005D: ldloc.s local(0x0006)
+IL_005F: ldc.r4 2.0
+IL_0064: div
+IL_0065: stloc.s local(0x0006)
+IL_0067: ldloc.s local(0x0007)
+IL_0069: ldc.i4.1
+IL_006A: add
+IL_006B: stloc.s local(0x0007)
+IL_006D: ldloc.s local(0x0007)
+IL_006F: ldsfld token(0x04000586) => Field::perlinOctaves
+IL_0074: blt.s 72
+IL_0076: ldc.i4.0
+IL_0077: stloc.s local(0x0007)
+IL_0079: br 297
+IL_007E: ldloc.0
+IL_007F: conv.r4
+IL_0080: ldloc.s local(0x0004)
+IL_0082: ldloc.s local(0x0007)
+IL_0084: ldelem.ref
+IL_0085: callvirt token(0x06005C39) => MethodDef::get_Frequency
+IL_008A: conv.r4
+IL_008B: div
+IL_008C: conv.r8
+IL_008D: stloc.s local(0x000A)
+IL_008F: ldloc.1
+IL_0090: conv.r4
+IL_0091: ldloc.s local(0x0004)
+IL_0093: ldloc.s local(0x0007)
+IL_0095: ldelem.ref
+IL_0096: callvirt token(0x06005C39) => MethodDef::get_Frequency
+IL_009B: conv.r4
+IL_009C: div
+IL_009D: conv.r8
+IL_009E: stloc.s local(0x000B)
+IL_00A0: ldc.i4.0
+IL_00A1: stloc.s local(0x000C)
+IL_00A3: br.s 286
+IL_00A5: ldc.i4.0
+IL_00A6: stloc.s local(0x000D)
+IL_00A8: br.s 275
+IL_00AA: ldloc.s local(0x000C)
+IL_00AC: conv.r8
+IL_00AD: ldloc.s local(0x000A)
+IL_00AF: div
+IL_00B0: conv.i4
+IL_00B1: stloc.s local(0x000E)
+IL_00B3: ldloc.s local(0x000E)
+IL_00B5: ldc.i4.1
+IL_00B6: add
+IL_00B7: stloc.s local(0x000F)
+IL_00B9: ldloc.s local(0x000D)
+IL_00BB: conv.r8
+IL_00BC: ldloc.s local(0x000B)
+IL_00BE: div
+IL_00BF: conv.i4
+IL_00C0: stloc.s local(0x0010)
+IL_00C2: ldloc.s local(0x0010)
+IL_00C4: ldc.i4.1
+IL_00C5: add
+IL_00C6: stloc.s local(0x0011)
+IL_00C8: ldloc.s local(0x0004)
+IL_00CA: ldloc.s local(0x0007)
+IL_00CC: ldelem.ref
+IL_00CD: ldloc.s local(0x000E)
+IL_00CF: ldloc.s local(0x000F)
+IL_00D1: ldloc.s local(0x0010)
+IL_00D3: ldloc.s local(0x0011)
+IL_00D5: ldloc.s local(0x000C)
+IL_00D7: conv.r8
+IL_00D8: ldloc.s local(0x000A)
+IL_00DA: div
+IL_00DB: ldloc.s local(0x000E)
+IL_00DD: conv.r8
+IL_00DE: sub
+IL_00DF: ldloc.s local(0x000D)
+IL_00E1: conv.r8
+IL_00E2: ldloc.s local(0x000B)
+IL_00E4: div
+IL_00E5: ldloc.s local(0x0010)
+IL_00E7: conv.r8
+IL_00E8: sub
+IL_00E9: callvirt token(0x06005C36) => MethodDef::getInterpolatedPoint
+IL_00EE: stloc.s local(0x0012)
+IL_00F0: ldloc.3
+IL_00F1: ldloc.s local(0x000C)
+IL_00F3: ldloc.s local(0x000D)
+IL_00F5: call token(0x0A0004EB) => MemberRef::Address
+IL_00FA: dup
+IL_00FB: ldind.r4
+IL_00FC: ldloc.s local(0x0012)
+IL_00FE: ldloc.s local(0x0004)
+IL_0100: ldloc.s local(0x0007)
+IL_0102: ldelem.ref
+IL_0103: callvirt token(0x06005C38) => MethodDef::get_Amplitude
+IL_0108: conv.r8
+IL_0109: mul
+IL_010A: conv.r4
+IL_010B: add
+IL_010C: stind.r4
+IL_010D: ldloc.s local(0x000D)
+IL_010F: ldc.i4.1
+IL_0110: add
+IL_0111: stloc.s local(0x000D)
+IL_0113: ldloc.s local(0x000D)
+IL_0115: ldloc.1
+IL_0116: blt.s 170
+IL_0118: ldloc.s local(0x000C)
+IL_011A: ldc.i4.1
+IL_011B: add
+IL_011C: stloc.s local(0x000C)
+IL_011E: ldloc.s local(0x000C)
+IL_0120: ldloc.0
+IL_0121: blt.s 165
+IL_0123: ldloc.s local(0x0007)
+IL_0125: ldc.i4.1
+IL_0126: add
+IL_0127: stloc.s local(0x0007)
+IL_0129: ldloc.s local(0x0007)
+IL_012B: ldsfld token(0x04000586) => Field::perlinOctaves
+IL_0130: blt 126
+IL_0135: ldsfld token(0x04000588) => Field::normaliseMin
+IL_013A: ldsfld token(0x04000589) => Field::normaliseMax
+IL_013F: stloc.s local(0x0008)
+IL_0141: ldsfld token(0x0400058A) => Field::normaliseBlend
+IL_0146: stloc.s local(0x0009)
+IL_0148: ldc.r4 0.0
+IL_014D: stsfld token(0x04000588) => Field::normaliseMin
+IL_0152: ldc.r4 1.0
+IL_0157: stsfld token(0x04000589) => Field::normaliseMax
+IL_015C: ldc.r4 1.0
+IL_0161: stsfld token(0x0400058A) => Field::normaliseBlend
+IL_0166: ldloc.3
+IL_0167: ldarg.1
+IL_0168: call token(0x06000763) => MethodDef::Normalise
+IL_016D: pop
+IL_016E: stsfld token(0x04000588) => Field::normaliseMin
+IL_0173: ldloc.s local(0x0008)
+IL_0175: stsfld token(0x04000589) => Field::normaliseMax
+IL_017A: ldloc.s local(0x0009)
+IL_017C: stsfld token(0x0400058A) => Field::normaliseBlend
+IL_0181: ldc.i4.0
+IL_0182: stloc.s local(0x0013)
+IL_0184: br.s 438
+IL_0186: ldc.i4.0
+IL_0187: stloc.s local(0x0014)
+IL_0189: br.s 427
+IL_018B: ldloc.3
+IL_018C: ldloc.s local(0x0013)
+IL_018E: ldloc.s local(0x0014)
+IL_0190: ldloc.3
+IL_0191: ldloc.s local(0x0013)
+IL_0193: ldloc.s local(0x0014)
+IL_0195: call token(0x0A0004E4) => MemberRef::Get
+IL_019A: ldsfld token(0x04000585) => Field::perlinAmplitude
+IL_019F: mul
+IL_01A0: call token(0x0A0004E6) => MemberRef::Set
+IL_01A5: ldloc.s local(0x0014)
+IL_01A7: ldc.i4.1
+IL_01A8: add
+IL_01A9: stloc.s local(0x0014)
+IL_01AB: ldloc.s local(0x0014)
+IL_01AD: ldloc.1
+IL_01AE: blt.s 395
+IL_01B0: ldloc.s local(0x0013)
+IL_01B2: ldc.i4.1
+IL_01B3: add
+IL_01B4: stloc.s local(0x0013)
+IL_01B6: ldloc.s local(0x0013)
+IL_01B8: ldloc.0
+IL_01B9: blt.s 390
+IL_01BB: ldc.i4.0
+IL_01BC: stloc.s local(0x0007)
+IL_01BE: br.s 460
+IL_01C0: ldloc.s local(0x0004)
+IL_01C2: ldloc.s local(0x0007)
+IL_01C4: ldnull
+IL_01C5: stelem.ref
+IL_01C6: ldloc.s local(0x0007)
+IL_01C8: ldc.i4.1
+IL_01C9: add
+IL_01CA: stloc.s local(0x0007)
+IL_01CC: ldloc.s local(0x0007)
+IL_01CE: ldsfld token(0x04000586) => Field::perlinOctaves
+IL_01D3: blt.s 448
+IL_01D5: ldnull
+IL_01D6: stloc.s local(0x0004)
+IL_01D8: ldloc.3
+IL_01D9: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::PerlinGenerator
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000762
+RVA: 0x233e2
+STATUS: DECODED
+INSTRUCTION COUNT: 16
+IL_0001: ldc.i4.0
+IL_0002: stsfld token(0x04000582) => Field::generatorType
+IL_0007: ldarg.2
+IL_0008: stsfld token(0x04000584) => Field::perlinFrequency
+IL_000D: ldarg.3
+IL_000E: stsfld token(0x04000585) => Field::perlinAmplitude
+IL_0013: ldarg.s argument(0x0004)
+IL_0015: stsfld token(0x04000586) => Field::perlinOctaves
+IL_001A: ldarg.s argument(0x0005)
+IL_001C: stsfld token(0x04000587) => Field::perlinBlend
+IL_0021: ldarg.1
+IL_0022: stsfld token(0x04000583) => Field::perlinSeed
+IL_0027: ldarg.0
+IL_0028: ldc.i4.0
+IL_0029: call token(0x06000760) => MethodDef::GenerateTerrain
+IL_002E: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::Normalise
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000763
+RVA: 0x23414
+STATUS: DECODED
+INSTRUCTION COUNT: 120
+IL_000C: ldarg.1
+IL_000D: ldfld token(0x0A00012B) => MemberRef::x
+IL_0012: conv.i4
+IL_0013: stloc.0
+IL_0014: ldarg.1
+IL_0015: ldfld token(0x0A00012C) => MemberRef::y
+IL_001A: conv.i4
+IL_001B: stloc.1
+IL_001C: ldc.r4 0.0
+IL_0021: stloc.s local(0x0004)
+IL_0023: ldc.r4 1.0
+IL_0028: stloc.s local(0x0005)
+IL_002A: ldarg.0
+IL_002B: stloc.s local(0x0006)
+IL_002D: ldc.i4.0
+IL_002E: stloc.3
+IL_002F: br.s 98
+IL_0031: ldc.i4.0
+IL_0032: stloc.2
+IL_0033: br.s 90
+IL_0035: ldloc.s local(0x0006)
+IL_0037: ldloc.2
+IL_0038: ldloc.3
+IL_0039: call token(0x0A0004E4) => MemberRef::Get
+IL_003E: stloc.s local(0x0009)
+IL_0040: ldloc.s local(0x0009)
+IL_0042: ldloc.s local(0x0005)
+IL_0044: bge.un.s 76
+IL_0046: ldloc.s local(0x0009)
+IL_0048: stloc.s local(0x0005)
+IL_004A: br.s 86
+IL_004C: ldloc.s local(0x0009)
+IL_004E: ldloc.s local(0x0004)
+IL_0050: ble.un.s 86
+IL_0052: ldloc.s local(0x0009)
+IL_0054: stloc.s local(0x0004)
+IL_0056: ldloc.2
+IL_0057: ldc.i4.1
+IL_0058: add
+IL_0059: stloc.2
+IL_005A: ldloc.2
+IL_005B: ldloc.0
+IL_005C: blt.s 53
+IL_005E: ldloc.3
+IL_005F: ldc.i4.1
+IL_0060: add
+IL_0061: stloc.3
+IL_0062: ldloc.3
+IL_0063: ldloc.1
+IL_0064: blt.s 49
+IL_0066: ldloc.s local(0x0004)
+IL_0068: ldloc.s local(0x0005)
+IL_006A: sub
+IL_006B: stloc.s local(0x0007)
+IL_006D: ldsfld token(0x04000589) => Field::normaliseMax
+IL_0072: ldsfld token(0x04000588) => Field::normaliseMin
+IL_0077: sub
+IL_0078: stloc.s local(0x0008)
+IL_007A: ldc.i4.0
+IL_007B: stloc.3
+IL_007C: br.s 239
+IL_007E: ldc.i4.0
+IL_007F: stloc.2
+IL_0080: br.s 231
+IL_0082: ldloc.s local(0x0006)
+IL_0084: ldloc.2
+IL_0085: ldloc.3
+IL_0086: call token(0x0A0004E4) => MemberRef::Get
+IL_008B: ldloc.s local(0x0005)
+IL_008D: sub
+IL_008E: ldloc.s local(0x0007)
+IL_0090: div
+IL_0091: ldloc.s local(0x0008)
+IL_0093: mul
+IL_0094: stloc.s local(0x000A)
+IL_0096: ldloc.s local(0x0006)
+IL_0098: ldloc.2
+IL_0099: ldloc.3
+IL_009A: ldsfld token(0x04000588) => Field::normaliseMin
+IL_009F: ldloc.s local(0x000A)
+IL_00A1: add
+IL_00A2: call token(0x0A0004E6) => MemberRef::Set
+IL_00A7: ldloc.s local(0x0006)
+IL_00A9: ldloc.2
+IL_00AA: ldloc.3
+IL_00AB: call token(0x0A0004E4) => MemberRef::Get
+IL_00B0: ldc.r4 1.0
+IL_00B5: ble.un.s 197
+IL_00B7: ldloc.s local(0x0006)
+IL_00B9: ldloc.2
+IL_00BA: ldloc.3
+IL_00BB: ldc.r4 1.0
+IL_00C0: call token(0x0A0004E6) => MemberRef::Set
+IL_00C5: ldloc.s local(0x0006)
+IL_00C7: ldloc.2
+IL_00C8: ldloc.3
+IL_00C9: call token(0x0A0004E4) => MemberRef::Get
+IL_00CE: ldc.r4 0.0
+IL_00D3: bge.un.s 227
+IL_00D5: ldloc.s local(0x0006)
+IL_00D7: ldloc.2
+IL_00D8: ldloc.3
+IL_00D9: ldc.r4 0.0
+IL_00DE: call token(0x0A0004E6) => MemberRef::Set
+IL_00E3: ldloc.2
+IL_00E4: ldc.i4.1
+IL_00E5: add
+IL_00E6: stloc.2
+IL_00E7: ldloc.2
+IL_00E8: ldloc.0
+IL_00E9: blt.s 130
+IL_00EB: ldloc.3
+IL_00EC: ldc.i4.1
+IL_00ED: add
+IL_00EE: stloc.3
+IL_00EF: ldloc.3
+IL_00F0: ldloc.1
+IL_00F1: blt.s 126
+IL_00F3: ldloc.s local(0x0006)
+IL_00F5: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::NormalizeHeightmap
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000764
+RVA: 0x2350a
+STATUS: DECODED
+INSTRUCTION COUNT: 12
+IL_0001: ldc.i4.1
+IL_0002: stsfld token(0x04000582) => Field::generatorType
+IL_0007: ldarg.1
+IL_0008: stsfld token(0x04000588) => Field::normaliseMin
+IL_000D: ldarg.2
+IL_000E: stsfld token(0x04000589) => Field::normaliseMax
+IL_0013: ldarg.3
+IL_0014: stsfld token(0x0400058A) => Field::normaliseBlend
+IL_0019: ldarg.0
+IL_001A: ldarg.s argument(0x0004)
+IL_001C: call token(0x06000760) => MethodDef::GenerateTerrain
+IL_0021: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::SmoothTerrain
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000765
+RVA: 0x2352c
+STATUS: DECODED
+INSTRUCTION COUNT: 10
+IL_0001: ldc.i4.3
+IL_0002: stsfld token(0x04000582) => Field::generatorType
+IL_0007: ldarg.1
+IL_0008: stsfld token(0x0400058C) => Field::smoothIterations
+IL_000D: ldarg.2
+IL_000E: stsfld token(0x0400058B) => Field::smoothBlend
+IL_0013: ldarg.0
+IL_0014: ldarg.3
+IL_0015: call token(0x06000760) => MethodDef::GenerateTerrain
+IL_001A: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::smooth
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000766
+RVA: 0x23548
+STATUS: DECODED
+INSTRUCTION COUNT: 163
+IL_000C: ldarg.1
+IL_000D: ldfld token(0x0A00012B) => MemberRef::x
+IL_0012: conv.i4
+IL_0013: stloc.0
+IL_0014: ldarg.1
+IL_0015: ldfld token(0x0A00012C) => MemberRef::y
+IL_001A: conv.i4
+IL_001B: stloc.1
+IL_001C: ldc.i4.0
+IL_001D: stloc.s local(0x000A)
+IL_001F: br 287
+IL_0024: ldc.i4.0
+IL_0025: stloc.s local(0x0009)
+IL_0027: br 273
+IL_002C: ldloc.s local(0x0009)
+IL_002E: brtrue.s 58
+IL_0030: ldc.i4.2
+IL_0031: stloc.3
+IL_0032: ldc.i4.0
+IL_0033: stloc.s local(0x0005)
+IL_0035: ldc.i4.0
+IL_0036: stloc.s local(0x0007)
+IL_0038: br.s 83
+IL_003A: ldloc.s local(0x0009)
+IL_003C: ldloc.1
+IL_003D: ldc.i4.1
+IL_003E: sub
+IL_003F: bne.un.s 75
+IL_0041: ldc.i4.2
+IL_0042: stloc.3
+IL_0043: ldc.i4.m1
+IL_0044: stloc.s local(0x0005)
+IL_0046: ldc.i4.1
+IL_0047: stloc.s local(0x0007)
+IL_0049: br.s 83
+IL_004B: ldc.i4.3
+IL_004C: stloc.3
+IL_004D: ldc.i4.m1
+IL_004E: stloc.s local(0x0005)
+IL_0050: ldc.i4.1
+IL_0051: stloc.s local(0x0007)
+IL_0053: ldc.i4.0
+IL_0054: stloc.s local(0x0008)
+IL_0056: br 259
+IL_005B: ldloc.s local(0x0008)
+IL_005D: brtrue.s 105
+IL_005F: ldc.i4.2
+IL_0060: stloc.2
+IL_0061: ldc.i4.0
+IL_0062: stloc.s local(0x0004)
+IL_0064: ldc.i4.0
+IL_0065: stloc.s local(0x0006)
+IL_0067: br.s 130
+IL_0069: ldloc.s local(0x0008)
+IL_006B: ldloc.0
+IL_006C: ldc.i4.1
+IL_006D: sub
+IL_006E: bne.un.s 122
+IL_0070: ldc.i4.2
+IL_0071: stloc.2
+IL_0072: ldc.i4.m1
+IL_0073: stloc.s local(0x0004)
+IL_0075: ldc.i4.1
+IL_0076: stloc.s local(0x0006)
+IL_0078: br.s 130
+IL_007A: ldc.i4.3
+IL_007B: stloc.2
+IL_007C: ldc.i4.m1
+IL_007D: stloc.s local(0x0004)
+IL_007F: ldc.i4.1
+IL_0080: stloc.s local(0x0006)
+IL_0082: ldc.r4 0.0
+IL_0087: stloc.s local(0x000D)
+IL_0089: ldc.i4.0
+IL_008A: stloc.s local(0x000E)
+IL_008C: ldc.i4.0
+IL_008D: stloc.s local(0x000B)
+IL_008F: br.s 216
+IL_0091: ldc.i4.0
+IL_0092: stloc.s local(0x000C)
+IL_0094: br.s 205
+IL_0096: ldloc.s local(0x000C)
+IL_0098: ldloc.s local(0x0006)
+IL_009A: beq.s 162
+IL_009C: ldloc.s local(0x000B)
+IL_009E: ldloc.s local(0x0007)
+IL_00A0: bne.un.s 199
+IL_00A2: ldarg.0
+IL_00A3: ldloc.s local(0x0008)
+IL_00A5: ldloc.s local(0x000C)
+IL_00A7: add
+IL_00A8: ldloc.s local(0x0004)
+IL_00AA: add
+IL_00AB: ldloc.s local(0x0009)
+IL_00AD: ldloc.s local(0x000B)
+IL_00AF: add
+IL_00B0: ldloc.s local(0x0005)
+IL_00B2: add
+IL_00B3: call token(0x0A0004E4) => MemberRef::Get
+IL_00B8: stloc.s local(0x0010)
+IL_00BA: ldloc.s local(0x000D)
+IL_00BC: ldloc.s local(0x0010)
+IL_00BE: add
+IL_00BF: stloc.s local(0x000D)
+IL_00C1: ldloc.s local(0x000E)
+IL_00C3: ldc.i4.1
+IL_00C4: add
+IL_00C5: stloc.s local(0x000E)
+IL_00C7: ldloc.s local(0x000C)
+IL_00C9: ldc.i4.1
+IL_00CA: add
+IL_00CB: stloc.s local(0x000C)
+IL_00CD: ldloc.s local(0x000C)
+IL_00CF: ldloc.2
+IL_00D0: blt.s 150
+IL_00D2: ldloc.s local(0x000B)
+IL_00D4: ldc.i4.1
+IL_00D5: add
+IL_00D6: stloc.s local(0x000B)
+IL_00D8: ldloc.s local(0x000B)
+IL_00DA: ldloc.3
+IL_00DB: blt.s 145
+IL_00DD: ldloc.s local(0x000D)
+IL_00DF: ldloc.s local(0x000E)
+IL_00E1: conv.r4
+IL_00E2: div
+IL_00E3: stloc.s local(0x000F)
+IL_00E5: ldarg.0
+IL_00E6: ldloc.s local(0x0008)
+IL_00E8: ldloc.s local(0x0006)
+IL_00EA: add
+IL_00EB: ldloc.s local(0x0004)
+IL_00ED: add
+IL_00EE: ldloc.s local(0x0009)
+IL_00F0: ldloc.s local(0x0007)
+IL_00F2: add
+IL_00F3: ldloc.s local(0x0005)
+IL_00F5: add
+IL_00F6: ldloc.s local(0x000F)
+IL_00F8: call token(0x0A0004E6) => MemberRef::Set
+IL_00FD: ldloc.s local(0x0008)
+IL_00FF: ldc.i4.1
+IL_0100: add
+IL_0101: stloc.s local(0x0008)
+IL_0103: ldloc.s local(0x0008)
+IL_0105: ldloc.0
+IL_0106: blt 91
+IL_010B: ldloc.s local(0x0009)
+IL_010D: ldc.i4.1
+IL_010E: add
+IL_010F: stloc.s local(0x0009)
+IL_0111: ldloc.s local(0x0009)
+IL_0113: ldloc.1
+IL_0114: blt 44
+IL_0119: ldloc.s local(0x000A)
+IL_011B: ldc.i4.1
+IL_011C: add
+IL_011D: stloc.s local(0x000A)
+IL_011F: ldloc.s local(0x000A)
+IL_0121: ldsfld token(0x0400058C) => Field::smoothIterations
+IL_0126: blt 36
+IL_012B: ldarg.0
+IL_012C: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::FillCellHeightmap
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000767
+RVA: 0x23678
+STATUS: DECODED
+INSTRUCTION COUNT: 316
+IL_000C: ldarg.1
+IL_000D: ldsfld token(0x040038ED) => Field::<>9__28_0
+IL_0012: dup
+IL_0013: brtrue.s 44
+IL_0015: pop
+IL_0016: ldsfld token(0x040038EC) => Field::<>9
+IL_001B: ldftn token(0x06005C3C) => MethodDef::<FillCellHeightmap>b__28_0
+IL_0021: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_0026: dup
+IL_0027: stsfld token(0x040038ED) => Field::<>9__28_0
+IL_002C: call token(0x2B0000C2) => MethodSpec::?
+IL_0031: conv.i4
+IL_0032: stloc.0
+IL_0033: ldarg.1
+IL_0034: ldsfld token(0x040038EE) => Field::<>9__28_1
+IL_0039: dup
+IL_003A: brtrue.s 83
+IL_003C: pop
+IL_003D: ldsfld token(0x040038EC) => Field::<>9
+IL_0042: ldftn token(0x06005C3D) => MethodDef::<FillCellHeightmap>b__28_1
+IL_0048: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_004D: dup
+IL_004E: stsfld token(0x040038EE) => Field::<>9__28_1
+IL_0053: call token(0x2B0000C3) => MethodSpec::?
+IL_0058: conv.i4
+IL_0059: ldarg.1
+IL_005A: ldsfld token(0x040038EF) => Field::<>9__28_2
+IL_005F: dup
+IL_0060: brtrue.s 121
+IL_0062: pop
+IL_0063: ldsfld token(0x040038EC) => Field::<>9
+IL_0068: ldftn token(0x06005C3E) => MethodDef::<FillCellHeightmap>b__28_2
+IL_006E: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_0073: dup
+IL_0074: stsfld token(0x040038EF) => Field::<>9__28_2
+IL_0079: call token(0x2B0000C3) => MethodSpec::?
+IL_007E: conv.i4
+IL_007F: stloc.1
+IL_0080: ldarg.1
+IL_0081: ldsfld token(0x040038F0) => Field::<>9__28_3
+IL_0086: dup
+IL_0087: brtrue.s 160
+IL_0089: pop
+IL_008A: ldsfld token(0x040038EC) => Field::<>9
+IL_008F: ldftn token(0x06005C3F) => MethodDef::<FillCellHeightmap>b__28_3
+IL_0095: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_009A: dup
+IL_009B: stsfld token(0x040038F0) => Field::<>9__28_3
+IL_00A0: call token(0x2B0000C2) => MethodSpec::?
+IL_00A5: conv.i4
+IL_00A6: stloc.2
+IL_00A7: ldarg.1
+IL_00A8: call token(0x2B0000C4) => MethodSpec::?
+IL_00AD: dup
+IL_00AE: stloc.3
+IL_00AF: ldarg.1
+IL_00B0: ldsfld token(0x040038F1) => Field::<>9__28_4
+IL_00B5: dup
+IL_00B6: brtrue.s 207
+IL_00B8: pop
+IL_00B9: ldsfld token(0x040038EC) => Field::<>9
+IL_00BE: ldftn token(0x06005C40) => MethodDef::<FillCellHeightmap>b__28_4
+IL_00C4: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_00C9: dup
+IL_00CA: stsfld token(0x040038F1) => Field::<>9__28_4
+IL_00CF: call token(0x2B0000C5) => MethodSpec::?
+IL_00D4: call token(0x2B0000C6) => MethodSpec::?
+IL_00D9: stloc.s local(0x0004)
+IL_00DB: ldarg.1
+IL_00DC: ldsfld token(0x040038F2) => Field::<>9__28_5
+IL_00E1: dup
+IL_00E2: brtrue.s 251
+IL_00E4: pop
+IL_00E5: ldsfld token(0x040038EC) => Field::<>9
+IL_00EA: ldftn token(0x06005C41) => MethodDef::<FillCellHeightmap>b__28_5
+IL_00F0: newobj token(0x0A0004DF) => MemberRef::.ctor
+IL_00F5: dup
+IL_00F6: stsfld token(0x040038F2) => Field::<>9__28_5
+IL_00FB: call token(0x2B0000C5) => MethodSpec::?
+IL_0100: call token(0x2B0000C6) => MethodSpec::?
+IL_0105: stloc.s local(0x0005)
+IL_0107: newarr token(0x010001E2) => TypeRef::?
+IL_010C: stloc.s local(0x0006)
+IL_010E: stloc.s local(0x000B)
+IL_0110: br 669
+IL_0115: ldc.i4.0
+IL_0116: stloc.s local(0x0007)
+IL_0118: ldloc.3
+IL_0119: ldc.i4.1
+IL_011A: sub
+IL_011B: stloc.s local(0x0009)
+IL_011D: ldc.i4.0
+IL_011E: stloc.s local(0x0008)
+IL_0120: br.s 390
+IL_0122: ldloc.s local(0x0004)
+IL_0124: ldloc.s local(0x0008)
+IL_0126: ldelem.r4
+IL_0127: ldloc.s local(0x000B)
+IL_0129: conv.r4
+IL_012A: bge.un.s 310
+IL_012C: ldloc.s local(0x0004)
+IL_012E: ldloc.s local(0x0009)
+IL_0130: ldelem.r4
+IL_0131: ldloc.s local(0x000B)
+IL_0133: conv.r4
+IL_0134: bge.s 330
+IL_0136: ldloc.s local(0x0004)
+IL_0138: ldloc.s local(0x0009)
+IL_013A: ldelem.r4
+IL_013B: ldloc.s local(0x000B)
+IL_013D: conv.r4
+IL_013E: bge.un.s 380
+IL_0140: ldloc.s local(0x0004)
+IL_0142: ldloc.s local(0x0008)
+IL_0144: ldelem.r4
+IL_0145: ldloc.s local(0x000B)
+IL_0147: conv.r4
+IL_0148: blt.un.s 380
+IL_014A: ldloc.s local(0x0006)
+IL_014C: ldloc.s local(0x0007)
+IL_014E: dup
+IL_014F: ldc.i4.1
+IL_0150: add
+IL_0151: stloc.s local(0x0007)
+IL_0153: ldloc.s local(0x0005)
+IL_0155: ldloc.s local(0x0008)
+IL_0157: ldelem.r4
+IL_0158: ldloc.s local(0x000B)
+IL_015A: conv.r4
+IL_015B: ldloc.s local(0x0004)
+IL_015D: ldloc.s local(0x0008)
+IL_015F: ldelem.r4
+IL_0160: sub
+IL_0161: ldloc.s local(0x0004)
+IL_0163: ldloc.s local(0x0009)
+IL_0165: ldelem.r4
+IL_0166: ldloc.s local(0x0004)
+IL_0168: ldloc.s local(0x0008)
+IL_016A: ldelem.r4
+IL_016B: sub
+IL_016C: div
+IL_016D: ldloc.s local(0x0005)
+IL_016F: ldloc.s local(0x0009)
+IL_0171: ldelem.r4
+IL_0172: ldloc.s local(0x0005)
+IL_0174: ldloc.s local(0x0008)
+IL_0176: ldelem.r4
+IL_0177: sub
+IL_0178: mul
+IL_0179: add
+IL_017A: conv.i4
+IL_017B: stelem.i4
+IL_017C: ldloc.s local(0x0008)
+IL_017E: stloc.s local(0x0009)
+IL_0180: ldloc.s local(0x0008)
+IL_0182: ldc.i4.1
+IL_0183: add
+IL_0184: stloc.s local(0x0008)
+IL_0186: ldloc.s local(0x0008)
+IL_0188: ldloc.3
+IL_0189: blt.s 290
+IL_018B: ldc.i4.0
+IL_018C: stloc.s local(0x0008)
+IL_018E: br.s 460
+IL_0190: ldloc.s local(0x0006)
+IL_0192: ldloc.s local(0x0008)
+IL_0194: ldelem.i4
+IL_0195: ldloc.s local(0x0006)
+IL_0197: ldloc.s local(0x0008)
+IL_0199: ldc.i4.1
+IL_019A: add
+IL_019B: ldelem.i4
+IL_019C: ble.s 454
+IL_019E: ldloc.s local(0x0006)
+IL_01A0: ldloc.s local(0x0008)
+IL_01A2: ldelem.i4
+IL_01A3: stloc.s local(0x000A)
+IL_01A5: ldloc.s local(0x0006)
+IL_01A7: ldloc.s local(0x0008)
+IL_01A9: ldloc.s local(0x0006)
+IL_01AB: ldloc.s local(0x0008)
+IL_01AD: ldc.i4.1
+IL_01AE: add
+IL_01AF: ldelem.i4
+IL_01B0: stelem.i4
+IL_01B1: ldloc.s local(0x0006)
+IL_01B3: ldloc.s local(0x0008)
+IL_01B5: ldc.i4.1
+IL_01B6: add
+IL_01B7: ldloc.s local(0x000A)
+IL_01B9: stelem.i4
+IL_01BA: ldloc.s local(0x0008)
+IL_01BC: brfalse.s 460
+IL_01BE: ldloc.s local(0x0008)
+IL_01C0: ldc.i4.1
+IL_01C1: sub
+IL_01C2: stloc.s local(0x0008)
+IL_01C4: br.s 460
+IL_01C6: ldloc.s local(0x0008)
+IL_01C8: ldc.i4.1
+IL_01C9: add
+IL_01CA: stloc.s local(0x0008)
+IL_01CC: ldloc.s local(0x0008)
+IL_01CE: ldloc.s local(0x0007)
+IL_01D0: ldc.i4.1
+IL_01D1: sub
+IL_01D2: blt.s 400
+IL_01D4: ldc.i4.0
+IL_01D5: stloc.s local(0x0008)
+IL_01D7: br 654
+IL_01DC: ldloc.s local(0x0006)
+IL_01DE: ldloc.s local(0x0008)
+IL_01E0: ldelem.i4
+IL_01E1: ldloc.2
+IL_01E2: bge 663
+IL_01E7: ldloc.s local(0x0006)
+IL_01E9: ldloc.s local(0x0008)
+IL_01EB: ldc.i4.1
+IL_01EC: add
+IL_01ED: ldelem.i4
+IL_01EE: ldloc.1
+IL_01EF: ble 648
+IL_01F4: ldloc.s local(0x0006)
+IL_01F6: ldloc.s local(0x0008)
+IL_01F8: ldelem.i4
+IL_01F9: ldloc.1
+IL_01FA: bge.s 514
+IL_01FC: ldloc.s local(0x0006)
+IL_01FE: ldloc.s local(0x0008)
+IL_0200: ldloc.1
+IL_0201: stelem.i4
+IL_0202: ldloc.s local(0x0006)
+IL_0204: ldloc.s local(0x0008)
+IL_0206: ldc.i4.1
+IL_0207: add
+IL_0208: ldelem.i4
+IL_0209: ldloc.2
+IL_020A: ble.s 532
+IL_020C: ldloc.s local(0x0006)
+IL_020E: ldloc.s local(0x0008)
+IL_0210: ldc.i4.1
+IL_0211: add
+IL_0212: ldloc.2
+IL_0213: stelem.i4
+IL_0214: ldloc.s local(0x0006)
+IL_0216: ldloc.s local(0x0008)
+IL_0218: ldelem.i4
+IL_0219: stloc.s local(0x0009)
+IL_021B: br.s 637
+IL_021D: ldarg.1
+IL_021E: ldc.i4.0
+IL_021F: ldelem token(0x0100000E) => TypeRef::?
+IL_0224: stloc.s local(0x000C)
+IL_0226: ldarg.1
+IL_0227: ldc.i4.1
+IL_0228: ldelem token(0x0100000E) => TypeRef::?
+IL_022D: stloc.s local(0x000D)
+IL_022F: ldarg.1
+IL_0230: ldc.i4.2
+IL_0231: ldelem token(0x0100000E) => TypeRef::?
+IL_0236: stloc.s local(0x000E)
+IL_0238: ldloc.s local(0x0009)
+IL_023A: conv.r4
+IL_023B: ldc.r4 0.0
+IL_0240: ldloc.s local(0x000B)
+IL_0242: conv.r4
+IL_0243: newobj token(0x0A000083) => MemberRef::.ctor
+IL_0248: ldloc.s local(0x000C)
+IL_024A: ldloc.s local(0x000D)
+IL_024C: ldloc.s local(0x000E)
+IL_024E: newobj token(0x06004085) => MethodDef::.ctor
+IL_0253: call token(0x06004087) => MethodDef::GetHeightAtPoint
+IL_0258: stloc.s local(0x000F)
+IL_025A: ldarg.s argument(0x0004)
+IL_025C: ldarg.s argument(0x0005)
+IL_025E: ldarg.s argument(0x0004)
+IL_0260: sub
+IL_0261: ldloc.s local(0x000F)
+IL_0263: mul
+IL_0264: add
+IL_0265: stloc.s local(0x0010)
+IL_0267: ldarg.0
+IL_0268: ldloc.s local(0x0009)
+IL_026A: ldarg.2
+IL_026B: add
+IL_026C: ldloc.s local(0x000B)
+IL_026E: ldarg.2
+IL_026F: add
+IL_0270: ldloc.s local(0x0010)
+IL_0272: call token(0x0A0004E6) => MemberRef::Set
+IL_0277: ldloc.s local(0x0009)
+IL_0279: ldc.i4.1
+IL_027A: add
+IL_027B: stloc.s local(0x0009)
+IL_027D: ldloc.s local(0x0009)
+IL_027F: ldloc.s local(0x0006)
+IL_0281: ldloc.s local(0x0008)
+IL_0283: ldc.i4.1
+IL_0284: add
+IL_0285: ldelem.i4
+IL_0286: blt.s 541
+IL_0288: ldloc.s local(0x0008)
+IL_028A: ldc.i4.2
+IL_028B: add
+IL_028C: stloc.s local(0x0008)
+IL_028E: ldloc.s local(0x0008)
+IL_0290: ldloc.s local(0x0007)
+IL_0292: blt 476
+IL_0297: ldloc.s local(0x000B)
+IL_0299: ldc.i4.1
+IL_029A: add
+IL_029B: stloc.s local(0x000B)
+IL_029D: ldloc.s local(0x000B)
+IL_029F: ldloc.0
+IL_02A0: ble 277
+IL_02A5: ret
+
+------------------------------------------------------------------------
+METHOD: WorldTools::HeightmapRiver
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06000768
+RVA: 0x23920
+STATUS: DECODED
+INSTRUCTION COUNT: 164
+IL_000C: ldarg.s argument(0x0004)
+IL_000E: ldarg.2
+IL_000F: sub
+IL_0010: stloc.0
+IL_0011: ldarg.3
+IL_0012: ldarg.1
+IL_0013: sub
+IL_0014: stloc.1
+IL_0015: ldloc.0
+IL_0016: ldc.i4.0
+IL_0017: bge.s 32
+IL_0019: ldloc.0
+IL_001A: neg
+IL_001B: stloc.0
+IL_001C: ldc.i4.m1
+IL_001D: stloc.3
+IL_001E: br.s 34
+IL_0020: ldc.i4.1
+IL_0021: stloc.3
+IL_0022: ldloc.1
+IL_0023: ldc.i4.0
+IL_0024: bge.s 45
+IL_0026: ldloc.1
+IL_0027: neg
+IL_0028: stloc.1
+IL_0029: ldc.i4.m1
+IL_002A: stloc.2
+IL_002B: br.s 47
+IL_002D: ldc.i4.1
+IL_002E: stloc.2
+IL_002F: ldloc.0
+IL_0030: ldc.i4.1
+IL_0031: shl
+IL_0032: stloc.0
+IL_0033: ldloc.1
+IL_0034: ldc.i4.1
+IL_0035: shl
+IL_0036: stloc.1
+IL_0037: ldc.r4 0.0
+IL_003C: stloc.s local(0x0004)
+IL_003E: ldc.r4 0.006500000134110451
+IL_0043: stloc.s local(0x0005)
+IL_0045: ldc.r4 0.675000011920929
+IL_004A: stloc.s local(0x0006)
+IL_004C: ldarg.0
+IL_004D: ldarg.1
+IL_004E: ldarg.2
+IL_004F: call token(0x0A0004E4) => MemberRef::Get
+IL_0054: ldloc.s local(0x0006)
+IL_0056: ble.un.s 102
+IL_0058: ldarg.0
+IL_0059: ldarg.1
+IL_005A: ldarg.2
+IL_005B: call token(0x0A0004EB) => MemberRef::Address
+IL_0060: dup
+IL_0061: ldind.r4
+IL_0062: ldloc.s local(0x0005)
+IL_0064: sub
+IL_0065: stind.r4
+IL_0066: ldloc.1
+IL_0067: ldloc.0
+IL_0068: ble.s 187
+IL_006A: ldloc.0
+IL_006B: ldloc.1
+IL_006C: ldc.i4.1
+IL_006D: shr
+IL_006E: sub
+IL_006F: conv.r4
+IL_0070: stloc.s local(0x0004)
+IL_0072: br.s 175
+IL_0074: ldloc.s local(0x0004)
+IL_0076: ldc.r4 0.0
+IL_007B: blt.un.s 137
+IL_007D: ldarg.2
+IL_007E: ldloc.3
+IL_007F: add
+IL_0080: starg.s argument(0x0002)
+IL_0082: ldloc.s local(0x0004)
+IL_0084: ldloc.1
+IL_0085: conv.r4
+IL_0086: sub
+IL_0087: stloc.s local(0x0004)
+IL_0089: ldarg.1
+IL_008A: ldloc.2
+IL_008B: add
+IL_008C: starg.s argument(0x0001)
+IL_008E: ldloc.s local(0x0004)
+IL_0090: ldloc.0
+IL_0091: conv.r4
+IL_0092: add
+IL_0093: stloc.s local(0x0004)
+IL_0095: ldarg.0
+IL_0096: ldarg.1
+IL_0097: ldarg.2
+IL_0098: call token(0x0A0004E4) => MemberRef::Get
+IL_009D: ldloc.s local(0x0006)
+IL_009F: ble.un.s 175
+IL_00A1: ldarg.0
+IL_00A2: ldarg.1
+IL_00A3: ldarg.2
+IL_00A4: call token(0x0A0004EB) => MemberRef::Address
+IL_00A9: dup
+IL_00AA: ldind.r4
+IL_00AB: ldloc.s local(0x0005)
+IL_00AD: sub
+IL_00AE: stind.r4
+IL_00AF: ldarg.1
+IL_00B0: ldarg.3
+IL_00B1: sub
+IL_00B2: call token(0x0A0004DE) => MemberRef::Abs
+IL_00B7: ldc.i4.1
+IL_00B8: bgt.s 116
+IL_00BA: ret
+IL_00BB: ldloc.1
+IL_00BC: ldloc.0
+IL_00BD: ldc.i4.1
+IL_00BE: shr
+IL_00BF: sub
+IL_00C0: conv.r4
+IL_00C1: stloc.s local(0x0004)
+IL_00C3: br.s 256
+IL_00C5: ldloc.s local(0x0004)
+IL_00C7: ldc.r4 0.0
+IL_00CC: blt.un.s 218
+IL_00CE: ldarg.1
+IL_00CF: ldloc.2
+IL_00D0: add
+IL_00D1: starg.s argument(0x0001)
+IL_00D3: ldloc.s local(0x0004)
+IL_00D5: ldloc.0
+IL_00D6: conv.r4
+IL_00D7: sub
+IL_00D8: stloc.s local(0x0004)
+IL_00DA: ldarg.2
+IL_00DB: ldloc.3
+IL_00DC: add
+IL_00DD: starg.s argument(0x0002)
+IL_00DF: ldloc.s local(0x0004)
+IL_00E1: ldloc.1
+IL_00E2: conv.r4
+IL_00E3: add
+IL_00E4: stloc.s local(0x0004)
+IL_00E6: ldarg.0
+IL_00E7: ldarg.1
+IL_00E8: ldarg.2
+IL_00E9: call token(0x0A0004E4) => MemberRef::Get
+IL_00EE: ldloc.s local(0x0006)
+IL_00F0: ble.un.s 256
+IL_00F2: ldarg.0
+IL_00F3: ldarg.1
+IL_00F4: ldarg.2
+IL_00F5: call token(0x0A0004EB) => MemberRef::Address
+IL_00FA: dup
+IL_00FB: ldind.r4
+IL_00FC: ldloc.s local(0x0005)
+IL_00FE: sub
+IL_00FF: stind.r4
+IL_0100: ldarg.2
+IL_0101: ldarg.s argument(0x0004)
+IL_0103: sub
+IL_0104: call token(0x0A0004DE) => MemberRef::Abs
+IL_0109: ldc.i4.1
+IL_010A: bgt.s 197
+IL_010C: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::get_IslandType
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060023E5
+RVA: 0x49349
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001385) => Field::<IslandType>k__BackingField
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::set_IslandType
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060023E6
+RVA: 0x49351
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x04001385) => Field::<IslandType>k__BackingField
+IL_0008: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::NewIsland
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060023EB
+RVA: 0x495f0
+STATUS: DECODED
+INSTRUCTION COUNT: 116
+IL_000C: ldarg.0
+IL_000D: call token(0x060023EA) => MethodDef::Reset
+IL_0012: call token(0x0A00065C) => MemberRef::get_state
+IL_0017: stloc.0
+IL_0018: ldarg.s argument(0x0004)
+IL_001A: call token(0x0A00065D) => MemberRef::InitState
+IL_001F: ldarg.0
+IL_0020: ldarg.s argument(0x0005)
+IL_0022: call token(0x060023E2) => MethodDef::set_Size
+IL_0027: ldarg.0
+IL_0028: ldarg.1
+IL_0029: call token(0x060023E6) => MethodDef::set_IslandType
+IL_002E: ldarg.0
+IL_002F: ldarg.2
+IL_0030: call token(0x060023E8) => MethodDef::set_PointType
+IL_0035: ldarg.0
+IL_0036: ldarg.3
+IL_0037: call token(0x060023E4) => MethodDef::set_NumPoints
+IL_003C: ldarg.0
+IL_003D: call token(0x060023E7) => MethodDef::get_PointType
+IL_0042: stloc.2
+IL_0043: ldloc.2
+IL_0044: brfalse.s 95
+IL_0046: ldloc.2
+IL_0047: ldc.i4.1
+IL_0048: bne.un.s 114
+IL_004A: ldarg.0
+IL_004B: ldarg.0
+IL_004C: call token(0x060023E1) => MethodDef::get_Size
+IL_0051: conv.i4
+IL_0052: ldarg.3
+IL_0053: call token(0x06002401) => MethodDef::GenerateRelaxed
+IL_0058: call token(0x060023DA) => MethodDef::set_Points
+IL_005D: br.s 114
+IL_005F: ldarg.0
+IL_0060: ldarg.0
+IL_0061: call token(0x060023E1) => MethodDef::get_Size
+IL_0066: conv.i4
+IL_0067: ldarg.3
+IL_0068: call token(0x06002400) => MethodDef::GenerateRandom
+IL_006D: call token(0x060023DA) => MethodDef::set_Points
+IL_0072: ldarg.0
+IL_0073: call token(0x060023D9) => MethodDef::get_Points
+IL_0078: ldnull
+IL_0079: ldc.r4 0.0
+IL_007E: ldc.r4 0.0
+IL_0083: ldarg.0
+IL_0084: call token(0x060023E1) => MethodDef::get_Size
+IL_0089: ldarg.0
+IL_008A: call token(0x060023E1) => MethodDef::get_Size
+IL_008F: newobj token(0x0A0002DB) => MemberRef::.ctor
+IL_0094: newobj token(0x0600247B) => MethodDef::.ctor
+IL_0099: stloc.1
+IL_009A: ldarg.0
+IL_009B: ldarg.0
+IL_009C: call token(0x060023D9) => MethodDef::get_Points
+IL_00A1: ldloc.1
+IL_00A2: call token(0x060023ED) => MethodDef::BuildGraph
+IL_00A7: ldarg.0
+IL_00A8: call token(0x060023EC) => MethodDef::ImproveCorners
+IL_00AD: ldloc.1
+IL_00AE: callvirt token(0x0600247A) => MethodDef::Dispose
+IL_00B3: ldnull
+IL_00B4: stloc.1
+IL_00B5: ldarg.0
+IL_00B6: ldnull
+IL_00B7: call token(0x060023DA) => MethodDef::set_Points
+IL_00BC: ldarg.0
+IL_00BD: call token(0x060023EF) => MethodDef::AssignCornerElevations
+IL_00C2: ldarg.0
+IL_00C3: call token(0x060023F1) => MethodDef::AssignOceanCoastAndLand
+IL_00C8: ldarg.0
+IL_00C9: ldarg.0
+IL_00CA: ldarg.0
+IL_00CB: call token(0x060023DD) => MethodDef::get_Corners
+IL_00D0: call token(0x060023EE) => MethodDef::LandCorners
+IL_00D5: call token(0x060023F0) => MethodDef::RedistributeElevations
+IL_00DA: ldc.i4.0
+IL_00DB: stloc.3
+IL_00DC: br.s 270
+IL_00DE: ldarg.0
+IL_00DF: call token(0x060023DD) => MethodDef::get_Corners
+IL_00E4: ldloc.3
+IL_00E5: callvirt token(0x0A00065E) => MemberRef::get_Item
+IL_00EA: stloc.s local(0x0004)
+IL_00EC: ldloc.s local(0x0004)
+IL_00EE: ldfld token(0x04001395) => Field::Ocean
+IL_00F3: brtrue.s 254
+IL_00F5: ldloc.s local(0x0004)
+IL_00F7: ldfld token(0x04001397) => Field::Coast
+IL_00FC: brfalse.s 266
+IL_00FE: ldloc.s local(0x0004)
+IL_0100: ldc.r4 0.0
+IL_0105: stfld token(0x04001399) => Field::Elevation
+IL_010A: ldloc.3
+IL_010B: ldc.i4.1
+IL_010C: add
+IL_010D: stloc.3
+IL_010E: ldloc.3
+IL_010F: ldarg.0
+IL_0110: call token(0x060023DD) => MethodDef::get_Corners
+IL_0115: callvirt token(0x0A00065F) => MemberRef::get_Count
+IL_011A: blt.s 222
+IL_011C: ldarg.0
+IL_011D: call token(0x060023F2) => MethodDef::AssignPolygonElevations
+IL_0122: ldarg.0
+IL_0123: call token(0x060023F3) => MethodDef::CalculateDownslopes
+IL_0128: ldarg.0
+IL_0129: call token(0x060023F4) => MethodDef::CalculateWatersheds
+IL_012E: ldarg.0
+IL_012F: call token(0x060023F5) => MethodDef::CreateRivers
+IL_0134: ldarg.0
+IL_0135: call token(0x060023F7) => MethodDef::AssignBiomes
+IL_013A: ldloc.0
+IL_013B: call token(0x0A000660) => MemberRef::set_state
+IL_0140: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::CreateRivers
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060023F5
+RVA: 0x4a5cc
+STATUS: DECODED
+INSTRUCTION COUNT: 64
+IL_000C: ldc.i4.0
+IL_000D: stloc.0
+IL_000E: br 156
+IL_0013: ldarg.0
+IL_0014: call token(0x060023DD) => MethodDef::get_Corners
+IL_0019: ldc.i4.0
+IL_001A: ldarg.0
+IL_001B: call token(0x060023DD) => MethodDef::get_Corners
+IL_0020: callvirt token(0x0A00065F) => MemberRef::get_Count
+IL_0025: call token(0x0A0000F7) => MemberRef::Range
+IL_002A: callvirt token(0x0A00065E) => MemberRef::get_Item
+IL_002F: stloc.1
+IL_0030: ldloc.1
+IL_0031: ldfld token(0x04001395) => Field::Ocean
+IL_0036: brtrue.s 152
+IL_0038: ldloc.1
+IL_0039: ldfld token(0x04001399) => Field::Elevation
+IL_003E: ldc.r4 0.30000001192092896
+IL_0043: blt.s 152
+IL_0045: ldloc.1
+IL_0046: ldfld token(0x04001399) => Field::Elevation
+IL_004B: ldc.r4 0.8999999761581421
+IL_0050: ble.un.s 144
+IL_0052: br.s 152
+IL_0054: ldloc.1
+IL_0055: ldloc.1
+IL_0056: ldfld token(0x0400139F) => Field::Downslope
+IL_005B: beq.s 152
+IL_005D: ldarg.0
+IL_005E: ldloc.1
+IL_005F: ldloc.1
+IL_0060: ldfld token(0x0400139F) => Field::Downslope
+IL_0065: call token(0x060023F8) => MethodDef::LookUpEdgeFromCorner
+IL_006A: dup
+IL_006B: ldfld token(0x040013A8) => Field::River
+IL_0070: ldc.i4.1
+IL_0071: add
+IL_0072: stfld token(0x040013A8) => Field::River
+IL_0077: ldloc.1
+IL_0078: ldloc.1
+IL_0079: ldfld token(0x0400139E) => Field::River
+IL_007E: brtrue.s 131
+IL_0080: ldc.i4.1
+IL_0081: br.s 132
+IL_0083: ldc.i4.2
+IL_0084: stfld token(0x0400139E) => Field::River
+IL_0089: ldloc.1
+IL_008A: ldfld token(0x0400139F) => Field::Downslope
+IL_008F: stloc.1
+IL_0090: ldloc.1
+IL_0091: ldfld token(0x04001397) => Field::Coast
+IL_0096: brfalse.s 84
+IL_0098: ldloc.0
+IL_0099: ldc.i4.1
+IL_009A: add
+IL_009B: stloc.0
+IL_009C: ldloc.0
+IL_009D: conv.r4
+IL_009E: ldarg.0
+IL_009F: call token(0x060023E1) => MethodDef::get_Size
+IL_00A4: ldc.r4 2.0
+IL_00A9: div
+IL_00AA: blt 19
+IL_00AF: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::GetBiome
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x060023F6
+RVA: 0x4a67c
+STATUS: DECODED
+INSTRUCTION COUNT: 17
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400138A) => Field::Ocean
+IL_0007: brfalse.s 11
+IL_0009: ldc.i4.0
+IL_000A: ret
+IL_000B: ldarg.0
+IL_000C: ldfld token(0x04001389) => Field::Water
+IL_0011: brfalse.s 21
+IL_0013: ldc.i4.1
+IL_0014: ret
+IL_0015: ldarg.0
+IL_0016: ldfld token(0x0400138B) => Field::Coast
+IL_001B: brfalse.s 31
+IL_001D: ldc.i4.2
+IL_001E: ret
+IL_001F: ldc.i4.3
+IL_0020: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::AssignBiomes
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x060023F7
+RVA: 0x4a6a0
+STATUS: DECODED
+INSTRUCTION COUNT: 19
+IL_000C: ldarg.0
+IL_000D: call token(0x060023DB) => MethodDef::get_Centers
+IL_0012: callvirt token(0x0A0004CD) => MemberRef::GetEnumerator
+IL_0017: stloc.0
+IL_0018: br.s 44
+IL_001A: ldloca.s local(0x0000)
+IL_001C: call token(0x0A0004CE) => MemberRef::get_Current
+IL_0021: dup
+IL_0022: call token(0x060023F6) => MethodDef::GetBiome
+IL_0027: stfld token(0x0400138D) => Field::Biome
+IL_002C: ldloca.s local(0x0000)
+IL_002E: call token(0x0A0004D8) => MemberRef::MoveNext
+IL_0033: brtrue.s 26
+IL_0035: leave.s 69
+IL_0037: ldloca.s local(0x0000)
+IL_0039: constrained. token(0x1B000165) => TOKEN_0x1b000165
+IL_003F: callvirt token(0x0A00000A) => MemberRef::Dispose
+IL_0044: endfinally
+IL_0045: ret
+
+------------------------------------------------------------------------
+METHOD: IslandGen.Island::InsideIsland
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x060023FB
+RVA: 0x4a808
+STATUS: DECODED
+INSTRUCTION COUNT: 58
+IL_000C: ldarg.1
+IL_000D: ldfld token(0x0A00012B) => MemberRef::x
+IL_0012: ldc.r4 0.20000000298023224
+IL_0017: sub
+IL_0018: ldarg.1
+IL_0019: ldfld token(0x0A00012C) => MemberRef::y
+IL_001E: ldc.r4 2.0
+IL_0023: div
+IL_0024: ldc.r4 0.20000000298023224
+IL_0029: add
+IL_002A: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_002F: stloc.2
+IL_0030: ldloca.s local(0x0002)
+IL_0032: call token(0x0A00013E) => MemberRef::get_magnitude
+IL_0037: ldc.r4 0.05000000074505806
+IL_003C: clt
+IL_003E: stloc.0
+IL_003F: ldarg.1
+IL_0040: ldfld token(0x0A00012B) => MemberRef::x
+IL_0045: ldc.r4 0.20000000298023224
+IL_004A: add
+IL_004B: ldarg.1
+IL_004C: ldfld token(0x0A00012C) => MemberRef::y
+IL_0051: ldc.r4 2.0
+IL_0056: div
+IL_0057: ldc.r4 0.20000000298023224
+IL_005C: add
+IL_005D: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_0062: stloc.2
+IL_0063: ldloca.s local(0x0002)
+IL_0065: call token(0x0A00013E) => MemberRef::get_magnitude
+IL_006A: ldc.r4 0.05000000074505806
+IL_006F: clt
+IL_0071: stloc.1
+IL_0072: ldarga.s argument(0x0001)
+IL_0074: call token(0x0A00013E) => MemberRef::get_magnitude
+IL_0079: ldc.r4 0.800000011920929
+IL_007E: ldc.r4 0.18000000715255737
+IL_0083: ldc.r4 5.0
+IL_0088: ldarg.1
+IL_0089: ldfld token(0x0A00012C) => MemberRef::y
+IL_008E: ldarg.1
+IL_008F: ldfld token(0x0A00012B) => MemberRef::x
+IL_0094: call token(0x0A00010A) => MemberRef::Atan2
+IL_0099: mul
+IL_009A: call token(0x0A000174) => MemberRef::Sin
+IL_009F: mul
+IL_00A0: sub
+IL_00A1: clt
+IL_00A3: brfalse.s 173
+IL_00A5: ldloc.0
+IL_00A6: brtrue.s 173
+IL_00A8: ldloc.1
+IL_00A9: ldc.i4.0
+IL_00AA: ceq
+IL_00AC: ret
+IL_00AD: ldc.i4.0
+IL_00AE: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.LE_ConfigTerrain::get_Heightmaps
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002621
+RVA: 0x5300a
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400150E) => Field::_heightmaps
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.LE_ConfigTerrain::set_Heightmaps
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002622
+RVA: 0x53012
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x0400150E) => Field::_heightmaps
+IL_0008: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.LE_ConfigTerrain::get_CustomDefaultTerrain
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002623
+RVA: 0x5301b
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400150F) => Field::m_customDefaultTerrain
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.LE_ConfigTerrain::get_TerrainLayer
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002624
+RVA: 0x53023
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001510) => Field::m_terrainLayer
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_TerrainInstance
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002699
+RVA: 0x56956
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001554) => Field::m_terrain
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_TerrainManager
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600269A
+RVA: 0x5695e
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001555) => Field::m_terrainMgr
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::SetTerrain
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600269B
+RVA: 0x56966
+STATUS: DECODED
+INSTRUCTION COUNT: 18
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001555) => Field::m_terrainMgr
+IL_0007: brfalse.s 19
+IL_0009: ldstr string token(0x7000C070) => TOKEN_0x7000c070
+IL_000E: call token(0x0A0000A5) => MemberRef::LogError
+IL_0013: ldarg.0
+IL_0014: ldarg.1
+IL_0015: stfld token(0x04001554) => Field::m_terrain
+IL_001A: ldarg.0
+IL_001B: ldarg.1
+IL_001C: callvirt token(0x0A0002AD) => MemberRef::get_terrainData
+IL_0021: newobj token(0x060027BC) => MethodDef::.ctor
+IL_0026: stfld token(0x04001555) => Field::m_terrainMgr
+IL_002B: ldarg.0
+IL_002C: ldfld token(0x04001554) => Field::m_terrain
+IL_0031: callvirt token(0x0A0000D1) => MemberRef::get_gameObject
+IL_0036: call token(0x06002752) => MethodDef::LevelDataChanged
+IL_003B: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::RemoveTerrainManager
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600269C
+RVA: 0x569a2
+STATUS: DECODED
+INSTRUCTION COUNT: 16
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001554) => Field::m_terrain
+IL_0007: ldnull
+IL_0008: call token(0x0A00008C) => MemberRef::op_Inequality
+IL_000D: brfalse.s 31
+IL_000F: ldarg.0
+IL_0010: ldfld token(0x04001554) => Field::m_terrain
+IL_0015: callvirt token(0x0A0000D1) => MemberRef::get_gameObject
+IL_001A: call token(0x06002752) => MethodDef::LevelDataChanged
+IL_001F: ldarg.0
+IL_0020: ldnull
+IL_0021: stfld token(0x04001554) => Field::m_terrain
+IL_0026: ldarg.0
+IL_0027: ldnull
+IL_0028: stfld token(0x04001555) => Field::m_terrainMgr
+IL_002D: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_DefaultTerrainDataPrefab
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600269D
+RVA: 0x569d0
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001556) => Field::m_defaultTerrainDataPrefab
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::set_DefaultTerrainDataPrefab
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600269E
+RVA: 0x569d8
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x04001556) => Field::m_defaultTerrainDataPrefab
+IL_0008: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_Heightmap
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026A3
+RVA: 0x56a34
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001559) => Field::_heightmap
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::set_Heightmap
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026A4
+RVA: 0x56a3c
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x04001559) => Field::_heightmap
+IL_0008: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_IsReadingTerrainSetHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026AB
+RVA: 0x56ad3
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400155D) => Field::m_isReadingTerrainSetHeight
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::set_IsReadingTerrainSetHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026AC
+RVA: 0x56adb
+STATUS: DECODED
+INSTRUCTION COUNT: 7
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x0400155D) => Field::m_isReadingTerrainSetHeight
+IL_0008: ldarg.0
+IL_0009: ldc.i4.m1
+IL_000A: stfld token(0x0400155E) => Field::m_isTerrainSetHeightReadInFrame
+IL_000F: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_IsDirectedSmooth
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026AD
+RVA: 0x56aeb
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400155F) => Field::m_isDirectedSmooth
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::set_IsDirectedSmooth
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026AE
+RVA: 0x56af3
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldarg.0
+IL_0002: ldarg.1
+IL_0003: stfld token(0x0400155F) => Field::m_isDirectedSmooth
+IL_0008: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::get_DirectedSmoothAngle
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026AF
+RVA: 0x56afc
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x04001560) => Field::m_directedSmoothAngle
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.UI.LE_GUI3dTerrain::set_DirectedSmoothAngle
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060026B0
+RVA: 0x56b04
+STATUS: DECODED
+INSTRUCTION COUNT: 22
+IL_000C: ldarg.0
+IL_000D: ldarg.1
+IL_000E: stfld token(0x04001560) => Field::m_directedSmoothAngle
+IL_0013: ldarg.0
+IL_0014: ldfld token(0x04001557) => Field::m_brushProjector
+IL_0019: callvirt token(0x0A000073) => MemberRef::get_transform
+IL_001E: callvirt token(0x0A0001A1) => MemberRef::get_childCount
+IL_0023: ldc.i4.0
+IL_0024: ble.s 86
+IL_0026: ldarg.0
+IL_0027: ldfld token(0x04001557) => Field::m_brushProjector
+IL_002C: callvirt token(0x0A000073) => MemberRef::get_transform
+IL_0031: ldc.i4.0
+IL_0032: callvirt token(0x0A0001A2) => MemberRef::GetChild
+IL_0037: callvirt token(0x0A000073) => MemberRef::get_transform
+IL_003C: call token(0x0A0007D6) => MemberRef::get_back
+IL_0041: ldarg.0
+IL_0042: ldfld token(0x04001560) => Field::m_directedSmoothAngle
+IL_0047: call token(0x0A00007A) => MemberRef::op_Multiply
+IL_004C: call token(0x0A0000CC) => MemberRef::Euler
+IL_0051: callvirt token(0x0A000076) => MemberRef::set_localRotation
+IL_0056: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::LoadRawHeightmaps
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600272A
+RVA: 0x5923c
+STATUS: DECODED
+INSTRUCTION COUNT: 50
+IL_000C: ldsfld token(0x0A0003DB) => MemberRef::HEIGHTMAPS_FOLDER
+IL_0011: stloc.0
+IL_0012: ldloc.0
+IL_0013: call token(0x0A0003C0) => MemberRef::Exists
+IL_0018: brtrue.s 33
+IL_001A: ldloc.0
+IL_001B: call token(0x0A00041A) => MemberRef::CreateDirectory
+IL_0020: pop
+IL_0021: newobj token(0x0A000805) => MemberRef::.ctor
+IL_0026: stloc.1
+IL_0027: ldloc.0
+IL_0028: ldstr string token(0x7000F0C0) => TOKEN_0x7000f0c0
+IL_002D: call token(0x0A000806) => MemberRef::GetFiles
+IL_0032: stloc.2
+IL_0033: ldc.i4.0
+IL_0034: stloc.3
+IL_0035: br.s 111
+IL_0037: ldloc.2
+IL_0038: ldloc.3
+IL_0039: ldelem.ref
+IL_003A: newobj token(0x06005CD4) => MethodDef::.ctor
+IL_003F: stloc.s local(0x0004)
+IL_0041: call token(0x06004143) => MethodDef::ImportHeightmapFromRawFile
+IL_0046: stloc.s local(0x0005)
+IL_0048: ldloc.s local(0x0005)
+IL_004A: call token(0x06004073) => MethodDef::CreateHeightmapTexture
+IL_004F: stloc.s local(0x0006)
+IL_0051: ldloc.s local(0x0004)
+IL_0053: ldloc.s local(0x0005)
+IL_0055: stfld token(0x040039F1) => Field::Heights
+IL_005A: ldloc.s local(0x0004)
+IL_005C: ldloc.s local(0x0006)
+IL_005E: stfld token(0x040039F0) => Field::Preview
+IL_0063: ldloc.1
+IL_0064: ldloc.s local(0x0004)
+IL_0066: callvirt token(0x0A000807) => MemberRef::Add
+IL_006B: ldloc.3
+IL_006C: ldc.i4.1
+IL_006D: add
+IL_006E: stloc.3
+IL_006F: ldloc.3
+IL_0070: ldloc.2
+IL_0071: ldlen
+IL_0072: conv.i4
+IL_0073: blt.s 55
+IL_0075: ldarg.1
+IL_0076: ldloc.1
+IL_0077: callvirt token(0x0A000808) => MemberRef::ToArray
+IL_007C: callvirt token(0x06002622) => MethodDef::set_Heightmaps
+IL_0081: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainBrushChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600272F
+RVA: 0x597b4
+STATUS: DECODED
+INSTRUCTION COUNT: 27
+IL_000C: ldarg.0
+IL_000D: ldarg.2
+IL_000E: ldfld token(0x04004222) => Field::Value
+IL_0013: stfld token(0x040015B0) => Field::m_selectedBrushIndex
+IL_0018: ldarg.0
+IL_0019: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_001E: ldarg.0
+IL_001F: ldfld token(0x040015AD) => Field::m_confT
+IL_0024: callvirt token(0x06002620) => MethodDef::get_Brushes
+IL_0029: ldarg.0
+IL_002A: ldfld token(0x040015B0) => Field::m_selectedBrushIndex
+IL_002F: ldelem.ref
+IL_0030: callvirt token(0x060026A2) => MethodDef::set_BrushAlphaTexture
+IL_0035: ldarg.0
+IL_0036: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_003B: call token(0x0A0000B6) => MemberRef::get_width
+IL_0040: ldc.i4.2
+IL_0041: div
+IL_0042: conv.r4
+IL_0043: call token(0x0A0000B8) => MemberRef::get_height
+IL_0048: ldc.i4.2
+IL_0049: div
+IL_004A: conv.r4
+IL_004B: ldc.r4 0.0
+IL_0050: newobj token(0x0A000083) => MemberRef::.ctor
+IL_0055: callvirt token(0x06002663) => MethodDef::SetCursorPosition
+IL_005A: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainHeightmapTextureChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002730
+RVA: 0x59810
+STATUS: DECODED
+INSTRUCTION COUNT: 27
+IL_000C: ldarg.0
+IL_000D: ldarg.2
+IL_000E: ldfld token(0x04004222) => Field::Value
+IL_0013: stfld token(0x040015B1) => Field::m_selectedHeightmapIndex
+IL_0018: ldarg.0
+IL_0019: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_001E: ldarg.0
+IL_001F: ldfld token(0x040015AD) => Field::m_confT
+IL_0024: callvirt token(0x06002621) => MethodDef::get_Heightmaps
+IL_0029: ldarg.0
+IL_002A: ldfld token(0x040015B1) => Field::m_selectedHeightmapIndex
+IL_002F: ldelem.ref
+IL_0030: callvirt token(0x060026A4) => MethodDef::set_Heightmap
+IL_0035: ldarg.0
+IL_0036: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_003B: call token(0x0A0000B6) => MemberRef::get_width
+IL_0040: ldc.i4.2
+IL_0041: div
+IL_0042: conv.r4
+IL_0043: call token(0x0A0000B8) => MemberRef::get_height
+IL_0048: ldc.i4.2
+IL_0049: div
+IL_004A: conv.r4
+IL_004B: ldc.r4 0.0
+IL_0050: newobj token(0x0A000083) => MemberRef::.ctor
+IL_0055: callvirt token(0x06002663) => MethodDef::SetCursorPosition
+IL_005A: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainEditBrushSizeChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002731
+RVA: 0x5986c
+STATUS: DECODED
+INSTRUCTION COUNT: 29
+IL_000C: ldarg.2
+IL_000D: ldfld token(0x04004223) => Field::Value
+IL_0012: stloc.0
+IL_0013: ldloc.0
+IL_0014: ldloc.0
+IL_0015: mul
+IL_0016: stloc.0
+IL_0017: ldc.r4 0.0020000000949949026
+IL_001C: ldloc.0
+IL_001D: call token(0x0A0001D8) => MemberRef::Max
+IL_0022: stloc.0
+IL_0023: ldarg.0
+IL_0024: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0029: ldloc.0
+IL_002A: callvirt token(0x060026A8) => MethodDef::set_Size
+IL_002F: ldarg.0
+IL_0030: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0035: call token(0x0A0000B6) => MemberRef::get_width
+IL_003A: ldc.i4.2
+IL_003B: div
+IL_003C: conv.r4
+IL_003D: call token(0x0A0000B8) => MemberRef::get_height
+IL_0042: ldc.i4.2
+IL_0043: div
+IL_0044: conv.r4
+IL_0045: ldc.r4 0.0
+IL_004A: newobj token(0x0A000083) => MemberRef::.ctor
+IL_004F: callvirt token(0x06002663) => MethodDef::SetCursorPosition
+IL_0054: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainEditBrushAmountChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002732
+RVA: 0x598c4
+STATUS: DECODED
+INSTRUCTION COUNT: 18
+IL_000C: ldarg.2
+IL_000D: ldfld token(0x04004223) => Field::Value
+IL_0012: stloc.0
+IL_0013: ldc.r4 0.0020000000949949026
+IL_0018: ldloc.0
+IL_0019: call token(0x0A0001D8) => MemberRef::Max
+IL_001E: stloc.0
+IL_001F: ldarg.0
+IL_0020: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0025: ldarg.0
+IL_0026: ldfld token(0x040015B2) => Field::m_isHeightRaise
+IL_002B: brtrue.s 49
+IL_002D: ldloc.0
+IL_002E: neg
+IL_002F: br.s 50
+IL_0031: ldloc.0
+IL_0032: callvirt token(0x060026A6) => MethodDef::set_Amount
+IL_0037: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainEditBrushTargetValueChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002733
+RVA: 0x598fc
+STATUS: DECODED
+INSTRUCTION COUNT: 6
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0007: ldarg.2
+IL_0008: ldfld token(0x04004223) => Field::Value
+IL_000D: callvirt token(0x060026AA) => MethodDef::set_TargetRelativeValue
+IL_0012: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainEditDirectionChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002734
+RVA: 0x59910
+STATUS: DECODED
+INSTRUCTION COUNT: 26
+IL_000C: ldarg.0
+IL_000D: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0012: ldarg.2
+IL_0013: ldfld token(0x04004223) => Field::Value
+IL_0018: ldc.r4 360.0
+IL_001D: mul
+IL_001E: ldc.r4 22.5
+IL_0023: div
+IL_0024: call token(0x0A00047D) => MemberRef::Round
+IL_0029: ldc.r4 22.5
+IL_002E: mul
+IL_002F: callvirt token(0x060026B0) => MethodDef::set_DirectedSmoothAngle
+IL_0034: ldarg.0
+IL_0035: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_003A: call token(0x0A0000B6) => MemberRef::get_width
+IL_003F: ldc.i4.2
+IL_0040: div
+IL_0041: conv.r4
+IL_0042: call token(0x0A0000B8) => MemberRef::get_height
+IL_0047: ldc.i4.2
+IL_0048: div
+IL_0049: conv.r4
+IL_004A: ldc.r4 0.0
+IL_004F: newobj token(0x0A000083) => MemberRef::.ctor
+IL_0054: callvirt token(0x06002663) => MethodDef::SetCursorPosition
+IL_0059: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainChangeHeightModeChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002735
+RVA: 0x5996c
+STATUS: DECODED
+INSTRUCTION COUNT: 26
+IL_000C: ldarg.2
+IL_000D: ldfld token(0x04004229) => Field::ChangeHeightMode
+IL_0012: brtrue.s 55
+IL_0014: ldarg.0
+IL_0015: ldc.i4.1
+IL_0016: stfld token(0x040015B2) => Field::m_isHeightRaise
+IL_001B: ldarg.0
+IL_001C: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0021: ldarg.0
+IL_0022: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0027: callvirt token(0x060026A5) => MethodDef::get_Amount
+IL_002C: call token(0x0A000103) => MemberRef::Abs
+IL_0031: callvirt token(0x060026A6) => MethodDef::set_Amount
+IL_0036: ret
+IL_0037: ldarg.0
+IL_0038: ldc.i4.0
+IL_0039: stfld token(0x040015B2) => Field::m_isHeightRaise
+IL_003E: ldarg.0
+IL_003F: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0044: ldarg.0
+IL_0045: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_004A: callvirt token(0x060026A5) => MethodDef::get_Amount
+IL_004F: call token(0x0A000103) => MemberRef::Abs
+IL_0054: neg
+IL_0055: callvirt token(0x060026A6) => MethodDef::set_Amount
+IL_005A: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainIsDirectedSmoothChanged
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002736
+RVA: 0x599c7
+STATUS: DECODED
+INSTRUCTION COUNT: 19
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0007: ldarg.2
+IL_0008: ldfld token(0x04004221) => Field::Value
+IL_000D: callvirt token(0x060026AE) => MethodDef::set_IsDirectedSmooth
+IL_0012: ldarg.0
+IL_0013: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0018: call token(0x0A0000B6) => MemberRef::get_width
+IL_001D: ldc.i4.2
+IL_001E: div
+IL_001F: conv.r4
+IL_0020: call token(0x0A0000B8) => MemberRef::get_height
+IL_0025: ldc.i4.2
+IL_0026: div
+IL_0027: conv.r4
+IL_0028: ldc.r4 0.0
+IL_002D: newobj token(0x0A000083) => MemberRef::.ctor
+IL_0032: callvirt token(0x06002663) => MethodDef::SetCursorPosition
+IL_0037: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainEditModeBtn
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002737
+RVA: 0x599ff
+STATUS: DECODED
+INSTRUCTION COUNT: 6
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0007: ldarg.2
+IL_0008: ldfld token(0x04004228) => Field::EditMode
+IL_000D: callvirt token(0x060026B2) => MethodDef::set_EditMode
+IL_0012: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::OnTerrainReadSetHeightBtn
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06002738
+RVA: 0x59a14
+STATUS: DECODED
+INSTRUCTION COUNT: 23
+IL_000C: call token(0x060026C7) => MethodDef::get_Instance
+IL_0011: ldfld token(0x04001579) => Field::delegates
+IL_0016: ldfld token(0x040039BE) => Field::SetTerrainIsReadingSetHeight
+IL_001B: brfalse.s 52
+IL_001D: call token(0x060026C7) => MethodDef::get_Instance
+IL_0022: ldfld token(0x04001579) => Field::delegates
+IL_0027: ldfld token(0x040039BE) => Field::SetTerrainIsReadingSetHeight
+IL_002C: ldc.i4.1
+IL_002D: callvirt token(0x0A000803) => MemberRef::Invoke
+IL_0032: br.s 62
+IL_0034: ldstr string token(0x7000F506) => TOKEN_0x7000f506
+IL_0039: call token(0x0A000162) => MemberRef::LogWarning
+IL_003E: ldarg.0
+IL_003F: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0044: ldc.i4.1
+IL_0045: callvirt token(0x060026AC) => MethodDef::set_IsReadingTerrainSetHeight
+IL_004A: ldarg.0
+IL_004B: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0050: ldarg.0
+IL_0051: call token(0x0600273C) => MethodDef::ReadSetHeightRoutine
+IL_0056: callvirt token(0x0A0000A7) => MemberRef::StartCoroutine
+IL_005B: pop
+IL_005C: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::InitTerrainValues
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600273A
+RVA: 0x59b30
+STATUS: DECODED
+INSTRUCTION COUNT: 120
+IL_000C: ldarg.0
+IL_000D: ldc.i4.0
+IL_000E: stfld token(0x040015B0) => Field::m_selectedBrushIndex
+IL_0013: ldarg.0
+IL_0014: ldfld token(0x040015AD) => Field::m_confT
+IL_0019: callvirt token(0x06002620) => MethodDef::get_Brushes
+IL_001E: ldlen
+IL_001F: brfalse.s 57
+IL_0021: ldarg.0
+IL_0022: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0027: ldarg.0
+IL_0028: ldfld token(0x040015AD) => Field::m_confT
+IL_002D: callvirt token(0x06002620) => MethodDef::get_Brushes
+IL_0032: ldc.i4.0
+IL_0033: ldelem.ref
+IL_0034: callvirt token(0x060026A2) => MethodDef::set_BrushAlphaTexture
+IL_0039: call token(0x060026C7) => MethodDef::get_Instance
+IL_003E: ldfld token(0x04001579) => Field::delegates
+IL_0043: ldfld token(0x040039BA) => Field::SetTerrainBrushes
+IL_0048: brfalse.s 113
+IL_004A: call token(0x060026C7) => MethodDef::get_Instance
+IL_004F: ldfld token(0x04001579) => Field::delegates
+IL_0054: ldfld token(0x040039BA) => Field::SetTerrainBrushes
+IL_0059: ldarg.0
+IL_005A: ldfld token(0x040015AD) => Field::m_confT
+IL_005F: callvirt token(0x06002620) => MethodDef::get_Brushes
+IL_0064: ldarg.0
+IL_0065: ldfld token(0x040015B0) => Field::m_selectedBrushIndex
+IL_006A: callvirt token(0x0A00080D) => MemberRef::Invoke
+IL_006F: br.s 123
+IL_0071: ldstr string token(0x7000FC60) => TOKEN_0x7000fc60
+IL_0076: call token(0x0A0000A5) => MemberRef::LogError
+IL_007B: ldarg.0
+IL_007C: ldc.i4.0
+IL_007D: stfld token(0x040015B1) => Field::m_selectedHeightmapIndex
+IL_0082: ldarg.0
+IL_0083: ldfld token(0x040015AD) => Field::m_confT
+IL_0088: callvirt token(0x06002621) => MethodDef::get_Heightmaps
+IL_008D: ldlen
+IL_008E: brfalse.s 168
+IL_0090: ldarg.0
+IL_0091: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0096: ldarg.0
+IL_0097: ldfld token(0x040015AD) => Field::m_confT
+IL_009C: callvirt token(0x06002621) => MethodDef::get_Heightmaps
+IL_00A1: ldc.i4.0
+IL_00A2: ldelem.ref
+IL_00A3: callvirt token(0x060026A4) => MethodDef::set_Heightmap
+IL_00A8: call token(0x060026C7) => MethodDef::get_Instance
+IL_00AD: ldfld token(0x04001579) => Field::delegates
+IL_00B2: ldfld token(0x040039B9) => Field::SetTerrainHeightmapTextures
+IL_00B7: brfalse.s 265
+IL_00B9: call token(0x060026C7) => MethodDef::get_Instance
+IL_00BE: ldfld token(0x04001579) => Field::delegates
+IL_00C3: ldfld token(0x040039B9) => Field::SetTerrainHeightmapTextures
+IL_00C8: ldarg.0
+IL_00C9: ldfld token(0x040015AD) => Field::m_confT
+IL_00CE: callvirt token(0x06002621) => MethodDef::get_Heightmaps
+IL_00D3: ldsfld token(0x040039F3) => Field::<>9__23_0
+IL_00D8: dup
+IL_00D9: brtrue.s 242
+IL_00DB: pop
+IL_00DC: ldsfld token(0x040039F2) => Field::<>9
+IL_00E1: ldftn token(0x06005CD7) => MethodDef::<InitTerrainValues>b__23_0
+IL_00E7: newobj token(0x0A00080E) => MemberRef::.ctor
+IL_00EC: dup
+IL_00ED: stsfld token(0x040039F3) => Field::<>9__23_0
+IL_00F2: call token(0x2B0004FF) => MethodSpec::?
+IL_00F7: call token(0x2B000500) => MethodSpec::?
+IL_00FC: ldarg.0
+IL_00FD: ldfld token(0x040015B1) => Field::m_selectedHeightmapIndex
+IL_0102: callvirt token(0x0A00080D) => MemberRef::Invoke
+IL_0107: br.s 275
+IL_0109: ldstr string token(0x7000FDFB) => TOKEN_0x7000fdfb
+IL_010E: call token(0x0A0000A5) => MemberRef::LogError
+IL_0113: call token(0x060026C7) => MethodDef::get_Instance
+IL_0118: ldfld token(0x04001579) => Field::delegates
+IL_011D: ldfld token(0x040039BB) => Field::SetTerrainEditBrushSize
+IL_0122: brfalse.s 330
+IL_0124: call token(0x060026C7) => MethodDef::get_Instance
+IL_0129: ldfld token(0x04001579) => Field::delegates
+IL_012E: ldfld token(0x040039BB) => Field::SetTerrainEditBrushSize
+IL_0133: ldarg.0
+IL_0134: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0139: callvirt token(0x060026A7) => MethodDef::get_Size
+IL_013E: call token(0x0A000160) => MemberRef::Sqrt
+IL_0143: callvirt token(0x0A00080F) => MemberRef::Invoke
+IL_0148: br.s 340
+IL_014A: ldstr string token(0x7000FFAA) => TOKEN_0x7000ffaa
+IL_014F: call token(0x0A000162) => MemberRef::LogWarning
+IL_0154: call token(0x060026C7) => MethodDef::get_Instance
+IL_0159: ldfld token(0x04001579) => Field::delegates
+IL_015E: ldfld token(0x040039BC) => Field::SetTerrainEditBrushAmount
+IL_0163: brfalse.s 395
+IL_0165: call token(0x060026C7) => MethodDef::get_Instance
+IL_016A: ldfld token(0x04001579) => Field::delegates
+IL_016F: ldfld token(0x040039BC) => Field::SetTerrainEditBrushAmount
+IL_0174: ldarg.0
+IL_0175: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_017A: callvirt token(0x060026A5) => MethodDef::get_Amount
+IL_017F: call token(0x0A000103) => MemberRef::Abs
+IL_0184: callvirt token(0x0A00080F) => MemberRef::Invoke
+IL_0189: br.s 405
+IL_018B: ldstr string token(0x700100A5) => TOKEN_0x700100a5
+IL_0190: call token(0x0A000162) => MemberRef::LogWarning
+IL_0195: call token(0x060026C7) => MethodDef::get_Instance
+IL_019A: ldfld token(0x04001579) => Field::delegates
+IL_019F: ldfld token(0x040039BD) => Field::SetTerrainEditBrushTargetValue
+IL_01A4: brfalse.s 454
+IL_01A6: call token(0x060026C7) => MethodDef::get_Instance
+IL_01AB: ldfld token(0x04001579) => Field::delegates
+IL_01B0: ldfld token(0x040039BD) => Field::SetTerrainEditBrushTargetValue
+IL_01B5: ldarg.0
+IL_01B6: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_01BB: callvirt token(0x060026A9) => MethodDef::get_TargetRelativeValue
+IL_01C0: callvirt token(0x0A00080F) => MemberRef::Invoke
+IL_01C5: ret
+IL_01C6: ldstr string token(0x70010280) => TOKEN_0x70010280
+IL_01CB: call token(0x0A000162) => MemberRef::LogWarning
+IL_01D0: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::GetTerrainUIMode
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600273B
+RVA: 0x59d01
+STATUS: DECODED
+INSTRUCTION COUNT: 8
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x040015AE) => Field::m_GUI3dTerrain
+IL_0007: callvirt token(0x0600269A) => MethodDef::get_TerrainManager
+IL_000C: brfalse.s 16
+IL_000E: ldc.i4.1
+IL_000F: ret
+IL_0010: ldc.i4.0
+IL_0011: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Logic.LE_LogicTerrain::ReadSetHeightRoutine
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600273C
+RVA: 0x59d13
+STATUS: DECODED
+INSTRUCTION COUNT: 6
+IL_0001: ldc.i4.0
+IL_0002: newobj token(0x06005CD8) => MethodDef::.ctor
+IL_0007: dup
+IL_0008: ldarg.0
+IL_0009: stfld token(0x040039F6) => Field::<>4__this
+IL_000E: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Events.LE_TerrainCreatedEvent::get_TerrainGameObject
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x0600275B
+RVA: 0x5a1d0
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x040015C8) => Field::m_terrainGameObject
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::get_TerrainData
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027BB
+RVA: 0x5b626
+STATUS: DECODED
+INSTRUCTION COUNT: 3
+IL_0001: ldarg.0
+IL_0002: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0007: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::SmoothHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027BD
+RVA: 0x5b640
+STATUS: DECODED
+INSTRUCTION COUNT: 443
+IL_000C: ldarg.0
+IL_000D: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0012: callvirt token(0x0A0004EC) => MemberRef::get_heightmapResolution
+IL_0017: ldc.i4.1
+IL_0018: sub
+IL_0019: conv.r4
+IL_001A: stloc.s local(0x0007)
+IL_001C: ldarg.0
+IL_001D: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0022: callvirt token(0x0A0004EC) => MemberRef::get_heightmapResolution
+IL_0027: ldc.i4.1
+IL_0028: sub
+IL_0029: conv.r4
+IL_002A: stloc.s local(0x0008)
+IL_002C: ldarg.s argument(0x0004)
+IL_002E: ldarg.2
+IL_002F: ldc.i4.1
+IL_0030: sub
+IL_0031: conv.r4
+IL_0032: ldloc.s local(0x0007)
+IL_0034: ldloc.s local(0x0008)
+IL_0036: call token(0x0A0001D8) => MemberRef::Max
+IL_003B: div
+IL_003C: add
+IL_003D: call token(0x0A000093) => MemberRef::Clamp01
+IL_0042: stloc.s local(0x0009)
+IL_0044: ldarg.0
+IL_0045: ldarg.3
+IL_0046: ldloc.s local(0x0009)
+IL_0048: ldarg.s argument(0x0005)
+IL_004A: ldloc.s local(0x0007)
+IL_004C: ldloc.s local(0x0008)
+IL_004E: ldloca.s local(0x0001)
+IL_0050: ldloca.s local(0x0002)
+IL_0052: ldloca.s local(0x0003)
+IL_0054: ldloca.s local(0x0004)
+IL_0056: ldloca.s local(0x0005)
+IL_0058: ldloca.s local(0x0006)
+IL_005A: call token(0x060027C2) => MethodDef::GetAffectedAreaInternal
+IL_005F: ldarg.0
+IL_0060: ldarg.3
+IL_0061: ldarg.s argument(0x0004)
+IL_0063: ldarg.s argument(0x0005)
+IL_0065: ldloc.s local(0x0007)
+IL_0067: ldloc.s local(0x0008)
+IL_0069: ldloca.s local(0x000A)
+IL_006B: ldloca.s local(0x000B)
+IL_006D: ldloca.s local(0x000C)
+IL_006F: ldloca.s local(0x000D)
+IL_0071: ldloca.s local(0x000E)
+IL_0073: ldloca.s local(0x000F)
+IL_0075: call token(0x060027C2) => MethodDef::GetAffectedAreaInternal
+IL_007A: ldarg.0
+IL_007B: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0080: ldloc.3
+IL_0081: ldloc.1
+IL_0082: ldloc.s local(0x0004)
+IL_0084: ldloc.3
+IL_0085: sub
+IL_0086: ldc.i4.1
+IL_0087: add
+IL_0088: ldloc.2
+IL_0089: ldloc.1
+IL_008A: sub
+IL_008B: ldc.i4.1
+IL_008C: add
+IL_008D: callvirt token(0x0A0007A5) => MemberRef::GetHeights
+IL_0092: stloc.0
+IL_0093: ldloc.s local(0x000A)
+IL_0095: ldloc.1
+IL_0096: sub
+IL_0097: stloc.s local(0x0010)
+IL_0099: ldloc.s local(0x000C)
+IL_009B: ldloc.3
+IL_009C: sub
+IL_009D: stloc.s local(0x0011)
+IL_009F: ldloc.0
+IL_00A0: ldc.i4.0
+IL_00A1: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_00A6: ldc.i4.1
+IL_00A7: sub
+IL_00A8: stloc.s local(0x0012)
+IL_00AA: ldloc.0
+IL_00AB: ldc.i4.1
+IL_00AC: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_00B1: ldc.i4.1
+IL_00B2: sub
+IL_00B3: stloc.s local(0x0013)
+IL_00B5: ldloc.s local(0x0010)
+IL_00B7: ldloc.s local(0x000B)
+IL_00B9: add
+IL_00BA: ldloc.s local(0x000A)
+IL_00BC: sub
+IL_00BD: ldloc.s local(0x0012)
+IL_00BF: call token(0x0A000347) => MemberRef::Min
+IL_00C4: stloc.s local(0x0014)
+IL_00C6: ldloc.s local(0x0011)
+IL_00C8: ldloc.s local(0x000D)
+IL_00CA: add
+IL_00CB: ldloc.s local(0x000C)
+IL_00CD: sub
+IL_00CE: ldloc.s local(0x0013)
+IL_00D0: call token(0x0A000347) => MemberRef::Min
+IL_00D5: stloc.s local(0x0015)
+IL_00D7: ldarg.2
+IL_00D8: ldc.i4.1
+IL_00D9: sub
+IL_00DA: ldc.i4.2
+IL_00DB: div
+IL_00DC: stloc.s local(0x0016)
+IL_00DE: ldloc.s local(0x0011)
+IL_00E0: stloc.s local(0x001C)
+IL_00E2: br 884
+IL_00E7: ldloc.s local(0x001C)
+IL_00E9: brtrue.s 246
+IL_00EB: ldloc.s local(0x0016)
+IL_00ED: ldc.i4.1
+IL_00EE: add
+IL_00EF: stloc.s local(0x0018)
+IL_00F1: ldc.i4.0
+IL_00F2: stloc.s local(0x001A)
+IL_00F4: br.s 336
+IL_00F6: ldloc.s local(0x001C)
+IL_00F8: ldloc.s local(0x0013)
+IL_00FA: bne.un.s 265
+IL_00FC: ldloc.s local(0x0016)
+IL_00FE: ldc.i4.1
+IL_00FF: add
+IL_0100: stloc.s local(0x0018)
+IL_0102: ldloc.s local(0x0016)
+IL_0104: neg
+IL_0105: stloc.s local(0x001A)
+IL_0107: br.s 336
+IL_0109: ldloc.s local(0x001C)
+IL_010B: ldloc.s local(0x0016)
+IL_010D: sub
+IL_010E: ldc.i4.0
+IL_010F: bge.s 296
+IL_0111: ldloc.s local(0x0016)
+IL_0113: ldloc.s local(0x001C)
+IL_0115: sub
+IL_0116: stloc.s local(0x0021)
+IL_0118: ldarg.2
+IL_0119: ldloc.s local(0x0021)
+IL_011B: sub
+IL_011C: stloc.s local(0x0018)
+IL_011E: ldloc.s local(0x0016)
+IL_0120: neg
+IL_0121: ldloc.s local(0x0021)
+IL_0123: add
+IL_0124: stloc.s local(0x001A)
+IL_0126: br.s 336
+IL_0128: ldloc.s local(0x001C)
+IL_012A: ldloc.s local(0x0016)
+IL_012C: add
+IL_012D: ldloc.s local(0x0013)
+IL_012F: blt.s 328
+IL_0131: ldloc.s local(0x0016)
+IL_0133: ldloc.s local(0x001C)
+IL_0135: add
+IL_0136: ldloc.s local(0x0013)
+IL_0138: sub
+IL_0139: stloc.s local(0x0022)
+IL_013B: ldarg.2
+IL_013C: ldloc.s local(0x0022)
+IL_013E: sub
+IL_013F: stloc.s local(0x0018)
+IL_0141: ldloc.s local(0x0016)
+IL_0143: neg
+IL_0144: stloc.s local(0x001A)
+IL_0146: br.s 336
+IL_0148: ldarg.2
+IL_0149: stloc.s local(0x0018)
+IL_014B: ldloc.s local(0x0016)
+IL_014D: neg
+IL_014E: stloc.s local(0x001A)
+IL_0150: ldloc.s local(0x0010)
+IL_0152: stloc.s local(0x001B)
+IL_0154: br 869
+IL_0159: ldloc.s local(0x001B)
+IL_015B: brtrue.s 360
+IL_015D: ldloc.s local(0x0016)
+IL_015F: ldc.i4.1
+IL_0160: add
+IL_0161: stloc.s local(0x0017)
+IL_0163: ldc.i4.0
+IL_0164: stloc.s local(0x0019)
+IL_0166: br.s 450
+IL_0168: ldloc.s local(0x001B)
+IL_016A: ldloc.s local(0x0012)
+IL_016C: bne.un.s 379
+IL_016E: ldloc.s local(0x0016)
+IL_0170: ldc.i4.1
+IL_0171: add
+IL_0172: stloc.s local(0x0017)
+IL_0174: ldloc.s local(0x0016)
+IL_0176: neg
+IL_0177: stloc.s local(0x0019)
+IL_0179: br.s 450
+IL_017B: ldloc.s local(0x001B)
+IL_017D: ldloc.s local(0x0016)
+IL_017F: sub
+IL_0180: ldc.i4.0
+IL_0181: bge.s 410
+IL_0183: ldloc.s local(0x0016)
+IL_0185: ldloc.s local(0x001B)
+IL_0187: sub
+IL_0188: stloc.s local(0x0028)
+IL_018A: ldarg.2
+IL_018B: ldloc.s local(0x0028)
+IL_018D: sub
+IL_018E: stloc.s local(0x0017)
+IL_0190: ldloc.s local(0x0016)
+IL_0192: neg
+IL_0193: ldloc.s local(0x0028)
+IL_0195: add
+IL_0196: stloc.s local(0x0019)
+IL_0198: br.s 450
+IL_019A: ldloc.s local(0x001B)
+IL_019C: ldloc.s local(0x0016)
+IL_019E: add
+IL_019F: ldloc.s local(0x0012)
+IL_01A1: blt.s 442
+IL_01A3: ldloc.s local(0x0016)
+IL_01A5: ldloc.s local(0x001B)
+IL_01A7: add
+IL_01A8: ldloc.s local(0x0012)
+IL_01AA: sub
+IL_01AB: stloc.s local(0x0029)
+IL_01AD: ldarg.2
+IL_01AE: ldloc.s local(0x0029)
+IL_01B0: sub
+IL_01B1: stloc.s local(0x0017)
+IL_01B3: ldloc.s local(0x0016)
+IL_01B5: neg
+IL_01B6: stloc.s local(0x0019)
+IL_01B8: br.s 450
+IL_01BA: ldarg.2
+IL_01BB: stloc.s local(0x0017)
+IL_01BD: ldloc.s local(0x0016)
+IL_01BF: neg
+IL_01C0: stloc.s local(0x0019)
+IL_01C2: ldc.r4 0.0
+IL_01C7: stloc.s local(0x0025)
+IL_01C9: ldc.i4.0
+IL_01CA: stloc.s local(0x0026)
+IL_01CC: ldc.i4.0
+IL_01CD: stloc.s local(0x0023)
+IL_01CF: br 722
+IL_01D4: ldc.i4.0
+IL_01D5: stloc.s local(0x0024)
+IL_01D7: br 707
+IL_01DC: ldarg.s argument(0x0006)
+IL_01DE: brfalse 664
+IL_01E3: ldloc.s local(0x0024)
+IL_01E5: ldloc.s local(0x0019)
+IL_01E7: add
+IL_01E8: stloc.s local(0x002B)
+IL_01EA: ldloc.s local(0x0023)
+IL_01EC: ldloc.s local(0x001A)
+IL_01EE: add
+IL_01EF: stloc.s local(0x002C)
+IL_01F1: ldloc.s local(0x002B)
+IL_01F3: brtrue.s 508
+IL_01F5: ldloc.s local(0x002C)
+IL_01F7: brfalse 664
+IL_01FC: ldloc.s local(0x002B)
+IL_01FE: conv.r4
+IL_01FF: ldloc.s local(0x002C)
+IL_0201: conv.r4
+IL_0202: newobj token(0x0A00012A) => MemberRef::.ctor
+IL_0207: stloc.s local(0x002F)
+IL_0209: ldloca.s local(0x002F)
+IL_020B: call token(0x0A000819) => MemberRef::get_normalized
+IL_0210: stloc.s local(0x002D)
+IL_0212: ldloc.s local(0x002D)
+IL_0214: ldfld token(0x0A00012C) => MemberRef::y
+IL_0219: ldc.r4 0.0
+IL_021E: blt.un.s 566
+IL_0220: ldc.r4 57.295780181884766
+IL_0225: ldloc.s local(0x002D)
+IL_0227: ldfld token(0x0A00012B) => MemberRef::x
+IL_022C: call token(0x0A00081A) => MemberRef::Acos
+IL_0231: mul
+IL_0232: stloc.s local(0x002E)
+IL_0234: br.s 616
+IL_0236: ldc.r4 57.295780181884766
+IL_023B: ldloc.s local(0x002D)
+IL_023D: ldfld token(0x0A00012C) => MemberRef::y
+IL_0242: call token(0x0A000176) => MemberRef::Asin
+IL_0247: mul
+IL_0248: stloc.s local(0x002E)
+IL_024A: ldloc.s local(0x002D)
+IL_024C: ldfld token(0x0A00012B) => MemberRef::x
+IL_0251: ldc.r4 0.0
+IL_0256: bge.un.s 616
+IL_0258: ldc.r4 -90.0
+IL_025D: ldc.r4 90.0
+IL_0262: ldloc.s local(0x002E)
+IL_0264: add
+IL_0265: sub
+IL_0266: stloc.s local(0x002E)
+IL_0268: ldarg.s argument(0x0007)
+IL_026A: ldloc.s local(0x002E)
+IL_026C: call token(0x0A00081B) => MemberRef::DeltaAngle
+IL_0271: call token(0x0A000103) => MemberRef::Abs
+IL_0276: ldc.r4 5.0
+IL_027B: ble.un.s 664
+IL_027D: ldarg.s argument(0x0007)
+IL_027F: ldloc.s local(0x002E)
+IL_0281: ldc.r4 180.0
+IL_0286: add
+IL_0287: call token(0x0A00081B) => MemberRef::DeltaAngle
+IL_028C: call token(0x0A000103) => MemberRef::Abs
+IL_0291: ldc.r4 5.0
+IL_0296: bgt.s 701
+IL_0298: ldloc.0
+IL_0299: ldloc.s local(0x001B)
+IL_029B: ldloc.s local(0x0024)
+IL_029D: add
+IL_029E: ldloc.s local(0x0019)
+IL_02A0: add
+IL_02A1: ldloc.s local(0x001C)
+IL_02A3: ldloc.s local(0x0023)
+IL_02A5: add
+IL_02A6: ldloc.s local(0x001A)
+IL_02A8: add
+IL_02A9: call token(0x0A0004E4) => MemberRef::Get
+IL_02AE: stloc.s local(0x002A)
+IL_02B0: ldloc.s local(0x0025)
+IL_02B2: ldloc.s local(0x002A)
+IL_02B4: add
+IL_02B5: stloc.s local(0x0025)
+IL_02B7: ldloc.s local(0x0026)
+IL_02B9: ldc.i4.1
+IL_02BA: add
+IL_02BB: stloc.s local(0x0026)
+IL_02BD: ldloc.s local(0x0024)
+IL_02BF: ldc.i4.1
+IL_02C0: add
+IL_02C1: stloc.s local(0x0024)
+IL_02C3: ldloc.s local(0x0024)
+IL_02C5: ldloc.s local(0x0017)
+IL_02C7: blt 476
+IL_02CC: ldloc.s local(0x0023)
+IL_02CE: ldc.i4.1
+IL_02CF: add
+IL_02D0: stloc.s local(0x0023)
+IL_02D2: ldloc.s local(0x0023)
+IL_02D4: ldloc.s local(0x0018)
+IL_02D6: blt 468
+IL_02DB: ldloc.s local(0x0025)
+IL_02DD: ldloc.s local(0x0026)
+IL_02DF: conv.r4
+IL_02E0: div
+IL_02E1: stloc.s local(0x0027)
+IL_02E3: ldloc.0
+IL_02E4: ldloc.s local(0x001B)
+IL_02E6: ldloc.s local(0x001C)
+IL_02E8: call token(0x0A0004E4) => MemberRef::Get
+IL_02ED: stloc.s local(0x0020)
+IL_02EF: ldloc.s local(0x001B)
+IL_02F1: ldloc.1
+IL_02F2: add
+IL_02F3: conv.r4
+IL_02F4: ldloc.s local(0x0007)
+IL_02F6: div
+IL_02F7: ldloc.s local(0x000E)
+IL_02F9: sub
+IL_02FA: ldarg.s argument(0x0004)
+IL_02FC: div
+IL_02FD: stloc.s local(0x001E)
+IL_02FF: ldloc.s local(0x001C)
+IL_0301: ldloc.3
+IL_0302: add
+IL_0303: conv.r4
+IL_0304: ldloc.s local(0x0008)
+IL_0306: div
+IL_0307: ldloc.s local(0x000F)
+IL_0309: sub
+IL_030A: ldarg.s argument(0x0004)
+IL_030C: div
+IL_030D: stloc.s local(0x001D)
+IL_030F: ldarg.1
+IL_0310: ldarg.3
+IL_0311: ldloc.s local(0x001D)
+IL_0313: ldloc.s local(0x001E)
+IL_0315: callvirt token(0x0A00081C) => MemberRef::GetPixelBilinear
+IL_031A: ldfld token(0x0A0005AE) => MemberRef::a
+IL_031F: mul
+IL_0320: stloc.s local(0x001F)
+IL_0322: ldloc.0
+IL_0323: ldloc.s local(0x001B)
+IL_0325: ldloc.s local(0x001C)
+IL_0327: ldloc.s local(0x0020)
+IL_0329: ldc.r4 1.0
+IL_032E: ldloc.s local(0x001F)
+IL_0330: sub
+IL_0331: mul
+IL_0332: ldloc.s local(0x0027)
+IL_0334: ldloc.s local(0x001F)
+IL_0336: mul
+IL_0337: add
+IL_0338: call token(0x0A0004E6) => MemberRef::Set
+IL_033D: ldloc.0
+IL_033E: ldloc.s local(0x001B)
+IL_0340: ldloc.s local(0x001C)
+IL_0342: ldarg.0
+IL_0343: ldloc.0
+IL_0344: ldloc.s local(0x001B)
+IL_0346: ldloc.s local(0x001C)
+IL_0348: call token(0x0A0004E4) => MemberRef::Get
+IL_034D: ldloc.1
+IL_034E: ldloc.s local(0x001B)
+IL_0350: add
+IL_0351: ldloc.3
+IL_0352: ldloc.s local(0x001C)
+IL_0354: add
+IL_0355: call token(0x060027BF) => MethodDef::ClampHeightBounds
+IL_035A: call token(0x0A0004E6) => MemberRef::Set
+IL_035F: ldloc.s local(0x001B)
+IL_0361: ldc.i4.1
+IL_0362: add
+IL_0363: stloc.s local(0x001B)
+IL_0365: ldloc.s local(0x001B)
+IL_0367: ldloc.s local(0x0014)
+IL_0369: ble 345
+IL_036E: ldloc.s local(0x001C)
+IL_0370: ldc.i4.1
+IL_0371: add
+IL_0372: stloc.s local(0x001C)
+IL_0374: ldloc.s local(0x001C)
+IL_0376: ldloc.s local(0x0015)
+IL_0378: ble 231
+IL_037D: ldarg.0
+IL_037E: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0383: ldloc.3
+IL_0384: ldloc.1
+IL_0385: ldloc.0
+IL_0386: callvirt token(0x0A0004AF) => MemberRef::SetHeights
+IL_038B: ldarg.0
+IL_038C: call token(0x06002752) => MethodDef::LevelDataChanged
+IL_0391: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::ChangeHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027BE
+RVA: 0x5b9d4
+STATUS: DECODED
+INSTRUCTION COUNT: 159
+IL_000C: ldarg.0
+IL_000D: ldarg.3
+IL_000E: ldarg.s argument(0x0004)
+IL_0010: ldarg.s argument(0x0005)
+IL_0012: ldloca.s local(0x0001)
+IL_0014: ldloca.s local(0x0002)
+IL_0016: ldloca.s local(0x0003)
+IL_0018: ldloca.s local(0x0004)
+IL_001A: ldloca.s local(0x0000)
+IL_001C: ldloca.s local(0x0005)
+IL_001E: ldloca.s local(0x0006)
+IL_0020: ldloca.s local(0x0007)
+IL_0022: ldloca.s local(0x0008)
+IL_0024: call token(0x060027C1) => MethodDef::ChangeHeightInternal
+IL_0029: ldloc.2
+IL_002A: ldloc.1
+IL_002B: sub
+IL_002C: ldloc.0
+IL_002D: ldc.i4.0
+IL_002E: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_0033: ldc.i4.1
+IL_0034: sub
+IL_0035: call token(0x0A000347) => MemberRef::Min
+IL_003A: stloc.s local(0x0009)
+IL_003C: ldloc.s local(0x0004)
+IL_003E: ldloc.3
+IL_003F: sub
+IL_0040: ldloc.0
+IL_0041: ldc.i4.1
+IL_0042: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_0047: ldc.i4.1
+IL_0048: sub
+IL_0049: call token(0x0A000347) => MemberRef::Min
+IL_004E: stloc.s local(0x000A)
+IL_0050: ldc.i4.0
+IL_0051: stloc.s local(0x000B)
+IL_0053: br 316
+IL_0058: ldc.i4.0
+IL_0059: stloc.s local(0x000C)
+IL_005B: br 301
+IL_0060: ldloc.0
+IL_0061: ldloc.s local(0x000B)
+IL_0063: ldloc.s local(0x000C)
+IL_0065: call token(0x0A0004E4) => MemberRef::Get
+IL_006A: stloc.s local(0x000D)
+IL_006C: ldloc.s local(0x000D)
+IL_006E: ldarg.2
+IL_006F: sub
+IL_0070: call token(0x0A000103) => MemberRef::Abs
+IL_0075: ldc.r4 9.999999747378752e-05
+IL_007A: ble.un 261
+IL_007F: ldloc.s local(0x000B)
+IL_0081: ldloc.1
+IL_0082: add
+IL_0083: conv.r4
+IL_0084: ldloc.s local(0x0007)
+IL_0086: div
+IL_0087: ldloc.s local(0x0005)
+IL_0089: sub
+IL_008A: ldarg.s argument(0x0004)
+IL_008C: div
+IL_008D: stloc.s local(0x000E)
+IL_008F: ldloc.s local(0x000C)
+IL_0091: ldloc.3
+IL_0092: add
+IL_0093: conv.r4
+IL_0094: ldloc.s local(0x0008)
+IL_0096: div
+IL_0097: ldloc.s local(0x0006)
+IL_0099: sub
+IL_009A: ldarg.s argument(0x0004)
+IL_009C: div
+IL_009D: stloc.s local(0x000F)
+IL_009F: ldarg.1
+IL_00A0: ldarg.3
+IL_00A1: ldloc.s local(0x000F)
+IL_00A3: ldloc.s local(0x000E)
+IL_00A5: callvirt token(0x0A00081C) => MemberRef::GetPixelBilinear
+IL_00AA: ldfld token(0x0A0005AE) => MemberRef::a
+IL_00AF: mul
+IL_00B0: stloc.s local(0x0010)
+IL_00B2: ldarg.2
+IL_00B3: ldloc.s local(0x000D)
+IL_00B5: sub
+IL_00B6: ldc.r4 0.0
+IL_00BB: bgt.s 196
+IL_00BD: ldc.r4 -1.0
+IL_00C2: br.s 201
+IL_00C4: ldc.r4 1.0
+IL_00C9: stloc.s local(0x0011)
+IL_00CB: ldarg.2
+IL_00CC: ldloc.s local(0x000D)
+IL_00CE: sub
+IL_00CF: call token(0x0A000374) => MemberRef::Sign
+IL_00D4: ldarg.2
+IL_00D5: ldloc.s local(0x000D)
+IL_00D7: ldloc.s local(0x0011)
+IL_00D9: ldloc.s local(0x0010)
+IL_00DB: mul
+IL_00DC: add
+IL_00DD: sub
+IL_00DE: call token(0x0A000374) => MemberRef::Sign
+IL_00E3: beq.s 242
+IL_00E5: ldloc.0
+IL_00E6: ldloc.s local(0x000B)
+IL_00E8: ldloc.s local(0x000C)
+IL_00EA: ldarg.2
+IL_00EB: call token(0x0A0004E6) => MemberRef::Set
+IL_00F0: br.s 261
+IL_00F2: ldloc.0
+IL_00F3: ldloc.s local(0x000B)
+IL_00F5: ldloc.s local(0x000C)
+IL_00F7: call token(0x0A0004EB) => MemberRef::Address
+IL_00FC: dup
+IL_00FD: ldind.r4
+IL_00FE: ldloc.s local(0x0011)
+IL_0100: ldloc.s local(0x0010)
+IL_0102: mul
+IL_0103: add
+IL_0104: stind.r4
+IL_0105: ldloc.0
+IL_0106: ldloc.s local(0x000B)
+IL_0108: ldloc.s local(0x000C)
+IL_010A: ldarg.0
+IL_010B: ldloc.0
+IL_010C: ldloc.s local(0x000B)
+IL_010E: ldloc.s local(0x000C)
+IL_0110: call token(0x0A0004E4) => MemberRef::Get
+IL_0115: ldloc.1
+IL_0116: ldloc.s local(0x000B)
+IL_0118: add
+IL_0119: ldloc.3
+IL_011A: ldloc.s local(0x000C)
+IL_011C: add
+IL_011D: call token(0x060027BF) => MethodDef::ClampHeightBounds
+IL_0122: call token(0x0A0004E6) => MemberRef::Set
+IL_0127: ldloc.s local(0x000C)
+IL_0129: ldc.i4.1
+IL_012A: add
+IL_012B: stloc.s local(0x000C)
+IL_012D: ldloc.s local(0x000C)
+IL_012F: ldloc.s local(0x000A)
+IL_0131: ble 96
+IL_0136: ldloc.s local(0x000B)
+IL_0138: ldc.i4.1
+IL_0139: add
+IL_013A: stloc.s local(0x000B)
+IL_013C: ldloc.s local(0x000B)
+IL_013E: ldloc.s local(0x0009)
+IL_0140: ble 88
+IL_0145: ldarg.0
+IL_0146: ldfld token(0x0400160C) => Field::m_terrainData
+IL_014B: ldloc.3
+IL_014C: ldloc.1
+IL_014D: ldloc.0
+IL_014E: callvirt token(0x0A0004AF) => MemberRef::SetHeights
+IL_0153: ldarg.0
+IL_0154: call token(0x06002752) => MethodDef::LevelDataChanged
+IL_0159: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::ClampHeightBounds
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027BF
+RVA: 0x5bb30
+STATUS: DECODED
+INSTRUCTION COUNT: 31
+IL_000C: ldc.r4 20.0
+IL_0011: stloc.0
+IL_0012: ldc.r4 257.0
+IL_0017: stloc.1
+IL_0018: ldarg.2
+IL_0019: conv.r4
+IL_001A: ldloc.0
+IL_001B: ble.un.s 48
+IL_001D: ldarg.2
+IL_001E: conv.r4
+IL_001F: ldloc.1
+IL_0020: ldloc.0
+IL_0021: sub
+IL_0022: bge.un.s 48
+IL_0024: ldarg.3
+IL_0025: conv.r4
+IL_0026: ldloc.0
+IL_0027: ble.un.s 48
+IL_0029: ldarg.3
+IL_002A: conv.r4
+IL_002B: ldloc.1
+IL_002C: ldloc.0
+IL_002D: sub
+IL_002E: blt.s 63
+IL_0030: ldarg.1
+IL_0031: ldc.r4 0.6499999761581421
+IL_0036: ble.un.s 63
+IL_0038: ldc.r4 0.6499999761581421
+IL_003D: starg.s argument(0x0001)
+IL_003F: ldarg.1
+IL_0040: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::ChangeHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027C0
+RVA: 0x5bb74
+STATUS: DECODED
+INSTRUCTION COUNT: 118
+IL_000C: ldarg.0
+IL_000D: ldarg.2
+IL_000E: ldarg.3
+IL_000F: ldarg.s argument(0x0004)
+IL_0011: ldloca.s local(0x0001)
+IL_0013: ldloca.s local(0x0002)
+IL_0015: ldloca.s local(0x0003)
+IL_0017: ldloca.s local(0x0004)
+IL_0019: ldloca.s local(0x0000)
+IL_001B: ldloca.s local(0x0005)
+IL_001D: ldloca.s local(0x0006)
+IL_001F: ldloca.s local(0x0007)
+IL_0021: ldloca.s local(0x0008)
+IL_0023: call token(0x060027C1) => MethodDef::ChangeHeightInternal
+IL_0028: ldloc.2
+IL_0029: ldloc.1
+IL_002A: sub
+IL_002B: ldloc.0
+IL_002C: ldc.i4.0
+IL_002D: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_0032: ldc.i4.1
+IL_0033: sub
+IL_0034: call token(0x0A000347) => MemberRef::Min
+IL_0039: stloc.s local(0x0009)
+IL_003B: ldloc.s local(0x0004)
+IL_003D: ldloc.3
+IL_003E: sub
+IL_003F: ldloc.0
+IL_0040: ldc.i4.1
+IL_0041: callvirt token(0x0A00050F) => MemberRef::GetLength
+IL_0046: ldc.i4.1
+IL_0047: sub
+IL_0048: call token(0x0A000347) => MemberRef::Min
+IL_004D: stloc.s local(0x000A)
+IL_004F: ldc.i4.0
+IL_0050: stloc.s local(0x000B)
+IL_0052: br.s 206
+IL_0054: ldc.i4.0
+IL_0055: stloc.s local(0x000C)
+IL_0057: br.s 194
+IL_0059: ldloc.s local(0x000B)
+IL_005B: ldloc.1
+IL_005C: add
+IL_005D: conv.r4
+IL_005E: ldloc.s local(0x0007)
+IL_0060: div
+IL_0061: ldloc.s local(0x0005)
+IL_0063: sub
+IL_0064: ldarg.3
+IL_0065: div
+IL_0066: stloc.s local(0x000D)
+IL_0068: ldloc.s local(0x000C)
+IL_006A: ldloc.3
+IL_006B: add
+IL_006C: conv.r4
+IL_006D: ldloc.s local(0x0008)
+IL_006F: div
+IL_0070: ldloc.s local(0x0006)
+IL_0072: sub
+IL_0073: ldarg.3
+IL_0074: div
+IL_0075: stloc.s local(0x000E)
+IL_0077: ldarg.2
+IL_0078: ldloc.s local(0x000E)
+IL_007A: ldloc.s local(0x000D)
+IL_007C: callvirt token(0x0A00081C) => MemberRef::GetPixelBilinear
+IL_0081: ldfld token(0x0A0005AE) => MemberRef::a
+IL_0086: stloc.s local(0x000F)
+IL_0088: ldloc.0
+IL_0089: ldloc.s local(0x000B)
+IL_008B: ldloc.s local(0x000C)
+IL_008D: call token(0x0A0004EB) => MemberRef::Address
+IL_0092: dup
+IL_0093: ldind.r4
+IL_0094: ldarg.1
+IL_0095: ldloc.s local(0x000F)
+IL_0097: mul
+IL_0098: add
+IL_0099: stind.r4
+IL_009A: ldloc.0
+IL_009B: ldloc.s local(0x000B)
+IL_009D: ldloc.s local(0x000C)
+IL_009F: ldarg.0
+IL_00A0: ldloc.0
+IL_00A1: ldloc.s local(0x000B)
+IL_00A3: ldloc.s local(0x000C)
+IL_00A5: call token(0x0A0004E4) => MemberRef::Get
+IL_00AA: ldloc.1
+IL_00AB: ldloc.s local(0x000B)
+IL_00AD: add
+IL_00AE: ldloc.3
+IL_00AF: ldloc.s local(0x000C)
+IL_00B1: add
+IL_00B2: call token(0x060027BF) => MethodDef::ClampHeightBounds
+IL_00B7: call token(0x0A0004E6) => MemberRef::Set
+IL_00BC: ldloc.s local(0x000C)
+IL_00BE: ldc.i4.1
+IL_00BF: add
+IL_00C0: stloc.s local(0x000C)
+IL_00C2: ldloc.s local(0x000C)
+IL_00C4: ldloc.s local(0x000A)
+IL_00C6: ble.s 89
+IL_00C8: ldloc.s local(0x000B)
+IL_00CA: ldc.i4.1
+IL_00CB: add
+IL_00CC: stloc.s local(0x000B)
+IL_00CE: ldloc.s local(0x000B)
+IL_00D0: ldloc.s local(0x0009)
+IL_00D2: ble.s 84
+IL_00D4: ldarg.0
+IL_00D5: ldfld token(0x0400160C) => Field::m_terrainData
+IL_00DA: ldloc.3
+IL_00DB: ldloc.1
+IL_00DC: ldloc.0
+IL_00DD: callvirt token(0x0A0004AF) => MemberRef::SetHeights
+IL_00E2: ldarg.0
+IL_00E3: call token(0x06002752) => MethodDef::LevelDataChanged
+IL_00E8: ret
+
+------------------------------------------------------------------------
+METHOD: LE_LevelEditor.Core.LE_TerrainManager::ChangeHeightInternal
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x060027C1
+RVA: 0x5bc60
+STATUS: DECODED
+INSTRUCTION COUNT: 55
+IL_000C: ldarg.s argument(0x000B)
+IL_000E: ldarg.0
+IL_000F: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0014: callvirt token(0x0A0004EC) => MemberRef::get_heightmapResolution
+IL_0019: ldc.i4.1
+IL_001A: sub
+IL_001B: conv.r4
+IL_001C: stind.r4
+IL_001D: ldarg.s argument(0x000C)
+IL_001F: ldarg.0
+IL_0020: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0025: callvirt token(0x0A0004EC) => MemberRef::get_heightmapResolution
+IL_002A: ldc.i4.1
+IL_002B: sub
+IL_002C: conv.r4
+IL_002D: stind.r4
+IL_002E: ldarg.0
+IL_002F: ldarg.1
+IL_0030: ldarg.2
+IL_0031: ldarg.3
+IL_0032: ldarg.s argument(0x000B)
+IL_0034: ldind.r4
+IL_0035: ldarg.s argument(0x000C)
+IL_0037: ldind.r4
+IL_0038: ldarg.s argument(0x0004)
+IL_003A: ldarg.s argument(0x0005)
+IL_003C: ldarg.s argument(0x0006)
+IL_003E: ldarg.s argument(0x0007)
+IL_0040: ldarg.s argument(0x0009)
+IL_0042: ldarg.s argument(0x000A)
+IL_0044: call token(0x060027C2) => MethodDef::GetAffectedAreaInternal
+IL_0049: ldarg.s argument(0x0008)
+IL_004B: ldarg.0
+IL_004C: ldfld token(0x0400160C) => Field::m_terrainData
+IL_0051: ldarg.s argument(0x0006)
+IL_0053: ldind.i4
+IL_0054: ldarg.s argument(0x0004)
+IL_0056: ldind.i4
+IL_0057: ldarg.s argument(0x0007)
+IL_0059: ldind.i4
+IL_005A: ldarg.s argument(0x0006)
+IL_005C: ldind.i4
+IL_005D: sub
+IL_005E: ldc.i4.1
+IL_005F: add
+IL_0060: ldarg.s argument(0x0005)
+IL_0062: ldind.i4
+IL_0063: ldarg.s argument(0x0004)
+IL_0065: ldind.i4
+IL_0066: sub
+IL_0067: ldc.i4.1
+IL_0068: add
+IL_0069: callvirt token(0x0A0007A5) => MemberRef::GetHeights
+IL_006E: stind.ref
+IL_006F: ret
+
+------------------------------------------------------------------------
+METHOD: Beam.ITerrainProvider::GetHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06004080
+RVA: 0x0
+STATUS: NO BODY
+------------------------------------------------------------------------
+METHOD: Beam.NullTerrainProvider::GetHeight
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06004082
+RVA: 0xb5d48
+STATUS: DECODED
+INSTRUCTION COUNT: 4
+IL_0001: ldstr string token(0x7001C100) => TOKEN_0x7001c100
+IL_0006: call token(0x0A0000A5) => MemberRef::LogError
+IL_000B: ldc.r4 0.0
+IL_0010: ret
+
+------------------------------------------------------------------------
+METHOD: Beam.Triangulation::GetHeightAtPoint
+CLASSIFICATION: EXACT_TARGET
+TOKEN: 0x06004087
+RVA: 0xb5e30
+STATUS: DECODED
+INSTRUCTION COUNT: 25
+IL_000C: ldarg.0
+IL_000D: ldarg.1
+IL_000E: call token(0x06004086) => MethodDef::GetBarycentricCoordsAtPoint
+IL_0013: stloc.0
+IL_0014: ldloc.0
+IL_0015: ldfld token(0x0A000088) => MemberRef::x
+IL_001A: ldarg.1
+IL_001B: ldfld token(0x040025D5) => Field::P0
+IL_0020: ldfld token(0x0A000092) => MemberRef::y
+IL_0025: mul
+IL_0026: ldloc.0
+IL_0027: ldfld token(0x0A000092) => MemberRef::y
+IL_002C: ldarg.1
+IL_002D: ldfld token(0x040025D6) => Field::P1
+IL_0032: ldfld token(0x0A000092) => MemberRef::y
+IL_0037: mul
+IL_0038: add
+IL_0039: ldloc.0
+IL_003A: ldfld token(0x0A000089) => MemberRef::z
+IL_003F: ldarg.1
+IL_0040: ldfld token(0x040025D7) => Field::P2
+IL_0045: ldfld token(0x0A000092) => MemberRef::y
+IL_004A: mul
+IL_004B: add
+IL_004C: ret
+
+------------------------------------------------------------------------
+METHOD: Beam.Terrain.World::ImportHeightmapFromRawFile
+CLASSIFICATION: RELATED_METHOD
+TOKEN: 0x06004143
+RVA: 0xb9a7c
+STATUS: DECODED
+INSTRUCTION COUNT: 102
+IL_000C: ldc.i4 257
+IL_0011: ldc.i4 257
+IL_0016: newobj token(0x0A0004E5) => MemberRef::.ctor
+IL_001B: stloc.0
+IL_001C: ldc.i4 66049
+IL_0021: stloc.1
+IL_0022: ldloc.1
+IL_0023: ldc.i4.2
+IL_0024: mul
+IL_0025: stloc.1
+IL_0026: ldloc.1
+IL_0027: newarr token(0x01000248) => TypeRef::?
+IL_002C: stloc.2
+IL_002D: ldarg.0
+IL_002E: ldc.i4.3
+IL_002F: ldc.i4.1
+IL_0030: newobj token(0x0A0003C4) => MemberRef::.ctor
+IL_0035: stloc.s local(0x0004)
+IL_0037: ldloc.s local(0x0004)
+IL_0039: ldloc.2
+IL_003A: ldc.i4.0
+IL_003B: ldloc.1
+IL_003C: callvirt token(0x0A00083E) => MemberRef::Read
+IL_0041: pop
+IL_0042: leave.s 80
+IL_0044: pop
+IL_0045: ldstr string token(0x7001CF40) => TOKEN_0x7001cf40
+IL_004A: newobj token(0x0A0001A5) => MemberRef::.ctor
+IL_004F: throw
+IL_0050: leave.s 94
+IL_0052: ldloc.s local(0x0004)
+IL_0054: brfalse.s 93
+IL_0056: ldloc.s local(0x0004)
+IL_0058: callvirt token(0x0A00000A) => MemberRef::Dispose
+IL_005D: endfinally
+IL_005E: leave.s 125
+IL_0060: stloc.s local(0x0005)
+IL_0062: ldstr string token(0x7001CF78) => TOKEN_0x7001cf78
+IL_0067: ldloc.s local(0x0005)
+IL_0069: callvirt token(0x0A0003B7) => MemberRef::get_Message
+IL_006E: call token(0x0A0000EC) => MemberRef::Concat
+IL_0073: call token(0x0A0000A5) => MemberRef::LogError
+IL_0078: ldloc.0
+IL_0079: stloc.s local(0x0006)
+IL_007B: leave.s 220
+IL_007D: ldc.i4.0
+IL_007E: stloc.3
+IL_007F: ldc.i4.0
+IL_0080: stloc.s local(0x0007)
+IL_0082: br.s 209
+IL_0084: ldc.i4.0
+IL_0085: stloc.s local(0x0008)
+IL_0087: br.s 194
+IL_0089: ldloc.2
+IL_008A: ldloc.3
+IL_008B: dup
+IL_008C: ldc.i4.1
+IL_008D: add
+IL_008E: stloc.3
+IL_008F: ldelem.u1
+IL_0090: conv.r4
+IL_0091: ldloc.2
+IL_0092: ldloc.3
+IL_0093: dup
+IL_0094: ldc.i4.1
+IL_0095: add
+IL_0096: stloc.3
+IL_0097: ldelem.u1
+IL_0098: conv.r4
+IL_0099: ldc.r4 256.0
+IL_009E: mul
+IL_009F: add
+IL_00A0: stloc.s local(0x0009)
+IL_00A2: ldloc.0
+IL_00A3: ldc.i4 257
+IL_00A8: ldloc.s local(0x0007)
+IL_00AA: sub
+IL_00AB: ldc.i4.1
+IL_00AC: sub
+IL_00AD: ldloc.s local(0x0008)
+IL_00AF: ldloc.s local(0x0009)
+IL_00B1: ldc.r4 65535.0
+IL_00B6: div
+IL_00B7: call token(0x0A0004E6) => MemberRef::Set
+IL_00BC: ldloc.s local(0x0008)
+IL_00BE: ldc.i4.1
+IL_00BF: add
+IL_00C0: stloc.s local(0x0008)
+IL_00C2: ldloc.s local(0x0008)
+IL_00C4: ldc.i4 257
+IL_00C9: blt.s 137
+IL_00CB: ldloc.s local(0x0007)
+IL_00CD: ldc.i4.1
+IL_00CE: add
+IL_00CF: stloc.s local(0x0007)
+IL_00D1: ldloc.s local(0x0007)
+IL_00D3: ldc.i4 257
+IL_00D8: blt.s 132
+IL_00DA: ldloc.0
+IL_00DB: ret
+IL_00DC: ldloc.s local(0x0006)
+IL_00DE: ret
+
+========================================================================
+METHOD CALL REFERENCES
+========================================================================
+0x600070b StrandedWorld::GetBiome_
+0x600075c WorldTools::GENERATE_ISLAND_HEIGHTMAP
+0x600075d WorldTools::StitchTerrainEdges
+0x6000760 WorldTools::GenerateTerrain
+0x6000761 WorldTools::GeneratePerlin
+0x6000762 WorldTools::PerlinGenerator
+0x6000763 WorldTools::Normalise
+0x6000764 WorldTools::NormalizeHeightmap
+0x6000765 WorldTools::SmoothTerrain
+0x6000766 WorldTools::smooth
+0x6000767 WorldTools::FillCellHeightmap
+0x6000768 WorldTools::HeightmapRiver
+0x60023d9 IslandGen.Island::get_Points
+0x60023da IslandGen.Island::set_Points
+0x60023db IslandGen.Island::get_Centers
+0x60023dd IslandGen.Island::get_Corners
+0x60023df IslandGen.Island::get_Edges
+0x60023e1 IslandGen.Island::get_Size
+0x60023e2 IslandGen.Island::set_Size
+0x60023e4 IslandGen.Island::set_NumPoints
+0x60023e6 IslandGen.Island::set_IslandType
+0x60023e7 IslandGen.Island::get_PointType
+0x60023e8 IslandGen.Island::set_PointType
+0x60023e9 IslandGen.Island::.ctor
+0x60023ea IslandGen.Island::Reset
+0x60023eb IslandGen.Island::NewIsland
+0x60023ec IslandGen.Island::ImproveCorners
+0x60023ed IslandGen.Island::BuildGraph
+0x60023ee IslandGen.Island::LandCorners
+0x60023ef IslandGen.Island::AssignCornerElevations
+0x60023f0 IslandGen.Island::RedistributeElevations
+0x60023f1 IslandGen.Island::AssignOceanCoastAndLand
+0x60023f2 IslandGen.Island::AssignPolygonElevations
+0x60023f3 IslandGen.Island::CalculateDownslopes
+0x60023f4 IslandGen.Island::CalculateWatersheds
+0x60023f5 IslandGen.Island::CreateRivers
+0x60023f6 IslandGen.Island::GetBiome
+0x60023f7 IslandGen.Island::AssignBiomes
+0x60023f8 IslandGen.Island::LookUpEdgeFromCorner
+0x60023f9 IslandGen.Island::LookUpEdgeFromCenter
+0x6002400 IslandGen.PointSelector::GenerateRandom
+0x6002401 IslandGen.PointSelector::GenerateRelaxed
+0x600247a Delaunay.Voronoi::Dispose
+0x600247b Delaunay.Voronoi::.ctor
+0x6002620 LE_LevelEditor.LE_ConfigTerrain::get_Brushes
+0x6002621 LE_LevelEditor.LE_ConfigTerrain::get_Heightmaps
+0x6002622 LE_LevelEditor.LE_ConfigTerrain::set_Heightmaps
+0x6002663 LE_LevelEditor.UI.LE_GUI3dBase::SetCursorPosition
+0x600269a LE_LevelEditor.UI.LE_GUI3dTerrain::get_TerrainManager
+0x60026a2 LE_LevelEditor.UI.LE_GUI3dTerrain::set_BrushAlphaTexture
+0x60026a4 LE_LevelEditor.UI.LE_GUI3dTerrain::set_Heightmap
+0x60026a5 LE_LevelEditor.UI.LE_GUI3dTerrain::get_Amount
+0x60026a6 LE_LevelEditor.UI.LE_GUI3dTerrain::set_Amount
+0x60026a7 LE_LevelEditor.UI.LE_GUI3dTerrain::get_Size
+0x60026a8 LE_LevelEditor.UI.LE_GUI3dTerrain::set_Size
+0x60026a9 LE_LevelEditor.UI.LE_GUI3dTerrain::get_TargetRelativeValue
+0x60026aa LE_LevelEditor.UI.LE_GUI3dTerrain::set_TargetRelativeValue
+0x60026ac LE_LevelEditor.UI.LE_GUI3dTerrain::set_IsReadingTerrainSetHeight
+0x60026ae LE_LevelEditor.UI.LE_GUI3dTerrain::set_IsDirectedSmooth
+0x60026b0 LE_LevelEditor.UI.LE_GUI3dTerrain::set_DirectedSmoothAngle
+0x60026b2 LE_LevelEditor.UI.LE_GUI3dTerrain::set_EditMode
+0x60026c7 LE_LevelEditor.UI.LE_GUIInterface::get_Instance
+0x600273c LE_LevelEditor.Logic.LE_LogicTerrain::ReadSetHeightRoutine
+0x6002752 LE_LevelEditor.Events.LE_EventInterface::LevelDataChanged
+0x60027bc LE_LevelEditor.Core.LE_TerrainManager::.ctor
+0x60027bf LE_LevelEditor.Core.LE_TerrainManager::ClampHeightBounds
+0x60027c1 LE_LevelEditor.Core.LE_TerrainManager::ChangeHeightInternal
+0x60027c2 LE_LevelEditor.Core.LE_TerrainManager::GetAffectedAreaInternal
+0x6004073 Beam.MapTools::CreateHeightmapTexture
+0x6004085 Beam.Triangle::.ctor
+0x6004086 Beam.Triangulation::GetBarycentricCoordsAtPoint
+0x6004087 Beam.Triangulation::GetHeightAtPoint
+0x6004143 Beam.Terrain.World::ImportHeightmapFromRawFile
+0x6005c35 PerlinNoise2D::.ctor
+0x6005c36 PerlinNoise2D::getInterpolatedPoint
+0x6005c38 PerlinNoise2D::get_Amplitude
+0x6005c39 PerlinNoise2D::get_Frequency
+0x6005c3c <>c::<FillCellHeightmap>b__28_0
+0x6005c3d <>c::<FillCellHeightmap>b__28_1
+0x6005c3e <>c::<FillCellHeightmap>b__28_2
+0x6005c3f <>c::<FillCellHeightmap>b__28_3
+0x6005c40 <>c::<FillCellHeightmap>b__28_4
+0x6005c41 <>c::<FillCellHeightmap>b__28_5
+0x6005cd4 Heightmap::.ctor
+0x6005cd7 <>c::<InitTerrainValues>b__23_0
+0x6005cd8 <ReadSetHeightRoutine>d__25::.ctor
+
+========================================================================
+FINAL SUMMARY
+DECODED: 63
+FAILED: 0
+NO BODY: 1
+CALL REFERENCES: 86
+BOUNDARY: Map Check only
+ORIGINAL DLL MODIFIED: NO
+GODOT PROJECT MODIFIED: NO
+========================================================================
