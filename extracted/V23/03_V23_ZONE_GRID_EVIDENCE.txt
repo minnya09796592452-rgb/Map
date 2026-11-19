@@ -1,0 +1,187 @@
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINE: 256
+TERM: CreateZones
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log("StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINE: 48
+TERM: WORLD_ZONES
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINE: 50
+TERM: WORLD_ZONES
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+
+FILE: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs
+LINE: 52
+TERM: WORLD_ZONES
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;

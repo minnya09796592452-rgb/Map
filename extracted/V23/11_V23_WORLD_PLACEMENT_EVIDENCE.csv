@@ -1,0 +1,4152 @@
+file,line,term,context
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Atmosphere.cs,300,WORLD_SEED,"000286: 			}
+000287: 			Texture3D texture3D = new Texture3D(num, height, num2, TextureFormat.ARGB32, mipChain: false);
+000288: 			texture3D.wrapMode = TextureWrapMode.Clamp;
+000289: 			texture3D.filterMode = FilterMode.Bilinear;
+000290: 			texture3D.SetPixels(array);
+000291: 			texture3D.Apply();
+000292: 			return texture3D;
+000293: 		}
+000294: 		Debug.LogError(""Atmosphere::ConvertLookUpTable(): Couldn't load 3D LUT texture. Texture3D will be disabled."");
+000295: 		return null;
+000296: 	}
+000297: 
+000298: 	private void SetStaticShaderUniforms()
+000299: 	{
+000300: 		float value = (float)(new FastRandom(StrandedWorld.WORLD_SEED).NextDouble() * 1000.0);
+000301: 		Shader.SetGlobalFloat(""_RandomSeed"", value);
+000302: 		Shader.SetGlobalFloat(""_SkyFade"", 0f);
+000303: 		Shader.SetGlobalFloat(""_StormFade"", 0f);
+000304: 	}
+000305: 
+000306: 	private void SetDynamicShaderUniforms()
+000307: 	{
+000308: 		Shader.SetGlobalColor(""_SunColor"", _sunIlluminary.Light.color.linear);
+000309: 		Shader.SetGlobalFloat(""_SunIntensity"", _sunIlluminary.Light.intensity);
+000310: 		Shader.SetGlobalVector(""_SunPosition"", _sunIlluminary.Transform.position);
+000311: 		Shader.SetGlobalVector(""_SunDirection"", _sunIlluminary.Transform.forward * -1f);
+000312: 		Shader.SetGlobalVector(""_MoonDirection"", _moonIlluminary.Transform.forward * -1f);
+000313: 	}
+000314: 
+000315: 	public void SetMaterialUniforms(Material material)
+000316: 	{
+000317: 		if (!(material == null))
+000318: 		{
+000319: 			material.SetTexture(""_Transmittance"", _transmittance);
+000320: 			material.SetTexture(""_Inscatter"", _inscatterEncoded);
+000321: 			material.SetTexture(""_Irradiance"", _irradiance);
+000322: 			material.SetFloat(""_MieG"", _mieG);
+000323: 			material.SetFloat(""Rg"", 6360000f);
+000324: 			material.SetFloat(""Rt"", 6420000f);
+000325: 			material.SetFloat(""Rl"", 6421000f);
+000326: 			material.SetFloat(""RES_R"", 16f);
+000327: 			material.SetFloat(""RES_MU"", 16f);
+000328: 			material.SetFloat(""RES_MU_S"", 16f);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Atmosphere.cs,310,transform.position,"000296: 	}
+000297: 
+000298: 	private void SetStaticShaderUniforms()
+000299: 	{
+000300: 		float value = (float)(new FastRandom(StrandedWorld.WORLD_SEED).NextDouble() * 1000.0);
+000301: 		Shader.SetGlobalFloat(""_RandomSeed"", value);
+000302: 		Shader.SetGlobalFloat(""_SkyFade"", 0f);
+000303: 		Shader.SetGlobalFloat(""_StormFade"", 0f);
+000304: 	}
+000305: 
+000306: 	private void SetDynamicShaderUniforms()
+000307: 	{
+000308: 		Shader.SetGlobalColor(""_SunColor"", _sunIlluminary.Light.color.linear);
+000309: 		Shader.SetGlobalFloat(""_SunIntensity"", _sunIlluminary.Light.intensity);
+000310: 		Shader.SetGlobalVector(""_SunPosition"", _sunIlluminary.Transform.position);
+000311: 		Shader.SetGlobalVector(""_SunDirection"", _sunIlluminary.Transform.forward * -1f);
+000312: 		Shader.SetGlobalVector(""_MoonDirection"", _moonIlluminary.Transform.forward * -1f);
+000313: 	}
+000314: 
+000315: 	public void SetMaterialUniforms(Material material)
+000316: 	{
+000317: 		if (!(material == null))
+000318: 		{
+000319: 			material.SetTexture(""_Transmittance"", _transmittance);
+000320: 			material.SetTexture(""_Inscatter"", _inscatterEncoded);
+000321: 			material.SetTexture(""_Irradiance"", _irradiance);
+000322: 			material.SetFloat(""_MieG"", _mieG);
+000323: 			material.SetFloat(""Rg"", 6360000f);
+000324: 			material.SetFloat(""Rt"", 6420000f);
+000325: 			material.SetFloat(""Rl"", 6421000f);
+000326: 			material.SetFloat(""RES_R"", 16f);
+000327: 			material.SetFloat(""RES_MU"", 16f);
+000328: 			material.SetFloat(""RES_MU_S"", 16f);
+000329: 			material.SetFloat(""RES_NU"", 1f);
+000330: 		}
+000331: 	}
+000332: 
+000333: 	private void ClampSkyPosition(Vector3 position)
+000334: 	{
+000335: 		Vector3 position2 = position;
+000336: 		position2.y = 0f;
+000337: 		transform.position = position2;
+000338: 	}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/AtmosphereStorm.cs,86,WORLD_SEED,"000072: 
+000073: 	private void Start()
+000074: 	{
+000075: 		Shader.SetGlobalFloat(""_SheetLightning"", 0f);
+000076: 		Singleton<GameTime>.Instance.NewDayTick += GameTime_NewDayTick;
+000077: 		Singleton<GameTime>.Instance.HourChanged += GameTime_HourChanged;
+000078: 		for (int i = 0; i < _weatherEvents.Count; i++)
+000079: 		{
+000080: 			_weatherEvents[i].Started += WeatherEvent_Started;
+000081: 			_weatherEvents[i].Stopped += WeatherEvent_Stopped;
+000082: 		}
+000083: 		EventManager.AddListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000084: 		if (Game.Mode.IsMaster())
+000085: 		{
+000086: 			SetState(StrandedWorld.WORLD_SEED, 0);
+000087: 		}
+000088: 	}
+000089: 
+000090: 	protected override void OnDestroy()
+000091: 	{
+000092: 		if ((bool)Singleton<GameTime>.Instance)
+000093: 		{
+000094: 			Singleton<GameTime>.Instance.NewDayTick -= GameTime_NewDayTick;
+000095: 			Singleton<GameTime>.Instance.HourChanged -= GameTime_HourChanged;
+000096: 		}
+000097: 		for (int i = 0; i < _weatherEvents.Count; i++)
+000098: 		{
+000099: 			_weatherEvents[i].Started -= WeatherEvent_Started;
+000100: 			_weatherEvents[i].Stopped -= WeatherEvent_Stopped;
+000101: 		}
+000102: 		EventManager.RemoveListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000103: 		WeatherStarted = null;
+000104: 		WeatherStopped = null;
+000105: 		base.OnDestroy();
+000106: 	}
+000107: 
+000108: 	private void SetState(int seed, int iter)
+000109: 	{
+000110: 		_random.RestoreState(seed, iter);
+000111: 	}
+000112: 
+000113: 	private void EventManager_EndGameSequenceEvent(EndGameSequenceEvent ev)
+000114: 	{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/FlockController.cs,122,FindEndGameZone,"000108: 		if (!Game.Mode.IsMaster())
+000109: 		{
+000110: 			yield break;
+000111: 		}
+000112: 		while (LevelLoader.IsLoadingScene())
+000113: 		{
+000114: 			yield return null;
+000115: 		}
+000116: 		_flockData = _flockProvider.GetFlocks();
+000117: 		CreateFlocks();
+000118: 		EventManager.AddListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000119: 		if ((bool)Singleton<StrandedWorld>.Instance)
+000120: 		{
+000121: 			_nmlZoneName = Singleton<StrandedWorld>.Instance.NmlZone.name;
+000122: 			Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000123: 			if ((bool)zone)
+000124: 			{
+000125: 				_endGameZoneName = zone.name;
+000126: 			}
+000127: 		}
+000128: 		InvokeRepeating(""PollZone"", 1f, 1f);
+000129: 		InvokeRepeating(""PollFlockEvents"", 1f, 1f);
+000130: 	}
+000131: 
+000132: 	private void OnDestroy()
+000133: 	{
+000134: 		if (!(_Instance != this))
+000135: 		{
+000136: 			_Instance = null;
+000137: 			if (Game.Mode.IsMaster())
+000138: 			{
+000139: 				EventManager.RemoveListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+000140: 			}
+000141: 		}
+000142: 	}
+000143: 
+000144: 	private void EventManager_EndGameSequenceEvent(EndGameSequenceEvent e)
+000145: 	{
+000146: 		StopAllFlockAudio();
+000147: 	}
+000148: 
+000149: 	private void PollZone()
+000150: 	{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam/GameCalendar.cs,197,WORLD_SEED,"000183: 		}
+000184: 	}
+000185: 
+000186: 	public int DaysElapsed => _daysElapsed;
+000187: 
+000188: 	public int DaysAlive => DaysElapsed + 1;
+000189: 
+000190: 	public DayTickEvent NewDayTick => _newDayTick;
+000191: 
+000192: 	public MonthData CurrentMonthData => MonthsData[Month];
+000193: 
+000194: 	private void Awake()
+000195: 	{
+000196: 		_year = 2022;
+000197: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000198: 		Month = fastRandom.Next(0, 12);
+000199: 		Day = fastRandom.Next(0, DateTime.DaysInMonth(_year, Month + 1));
+000200: 		Singleton<GameTime>.Instance.DayTick += GameTime_DayTick;
+000201: 		Singleton<GameTime>.Instance.NewDayTick += GameTime_NewDayTick;
+000202: 	}
+000203: 
+000204: 	protected override void OnDestroy()
+000205: 	{
+000206: 		if (Singleton<GameTime>.Instance != null)
+000207: 		{
+000208: 			Singleton<GameTime>.Instance.DayTick -= GameTime_DayTick;
+000209: 			Singleton<GameTime>.Instance.NewDayTick -= GameTime_NewDayTick;
+000210: 		}
+000211: 		base.OnDestroy();
+000212: 	}
+000213: 
+000214: 	private void GameTime_DayTick()
+000215: 	{
+000216: 		Day++;
+000217: 		_daysElapsed++;
+000218: 	}
+000219: 
+000220: 	private void GameTime_NewDayTick()
+000221: 	{
+000222: 		NewDayTick?.Invoke(_daysElapsed);
+000223: 		GAccountService.Get().LocalUser.UserStats.SessionStats.DaysSurvived = DaysElapsed;
+000224: 	}
+000225: "
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,362,FindEndGameZone,"000348: 	private void CheckShelter()
+000349: 	{
+000350: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000351: 		{
+000352: 			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
+000353: 			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
+000354: 			{
+000355: 				playerEffect.Protected = true;
+000356: 			}
+000357: 		}
+000358: 	}
+000359: 
+000360: 	private bool AllPlayersOverLand()
+000361: 	{
+000362: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000363: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000364: 		{
+000365: 			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+000366: 			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+000367: 			{
+000368: 				return false;
+000369: 			}
+000370: 			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+000371: 			{
+000372: 				return false;
+000373: 			}
+000374: 			if (hitInfo.point.y < -5f)
+000375: 			{
+000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,400,FindEndGameZone,"000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()
+000399: 	{
+000400: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000401: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000402: 		{
+000403: 			if (!allPlayer.IsNullOrDestroyed())
+000404: 			{
+000405: 				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+000406: 				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+000407: 				{
+000408: 					return true;
+000409: 				}
+000410: 			}
+000411: 		}
+000412: 		return false;
+000413: 	}
+000414: 
+000415: 	private bool AnyPlayerKnockedOut()
+000416: 	{
+000417: 		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+000418: 		{
+000419: 			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
+000420: 			{
+000421: 				return true;
+000422: 			}
+000423: 		}
+000424: 		return false;
+000425: 	}
+000426: 
+000427: 	private bool AnyPlayerIsBusy()
+000428: 	{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,370,Terrain,"000356: 			}
+000357: 		}
+000358: 	}
+000359: 
+000360: 	private bool AllPlayersOverLand()
+000361: 	{
+000362: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000363: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000364: 		{
+000365: 			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+000366: 			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+000367: 			{
+000368: 				return false;
+000369: 			}
+000370: 			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+000371: 			{
+000372: 				return false;
+000373: 			}
+000374: 			if (hitInfo.point.y < -5f)
+000375: 			{
+000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,365,transform.position,"000351: 		{
+000352: 			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
+000353: 			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
+000354: 			{
+000355: 				playerEffect.Protected = true;
+000356: 			}
+000357: 		}
+000358: 	}
+000359: 
+000360: 	private bool AllPlayersOverLand()
+000361: 	{
+000362: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000363: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000364: 		{
+000365: 			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+000366: 			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+000367: 			{
+000368: 				return false;
+000369: 			}
+000370: 			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+000371: 			{
+000372: 				return false;
+000373: 			}
+000374: 			if (hitInfo.point.y < -5f)
+000375: 			{
+000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,370,transform.position,"000356: 			}
+000357: 		}
+000358: 	}
+000359: 
+000360: 	private bool AllPlayersOverLand()
+000361: 	{
+000362: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000363: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000364: 		{
+000365: 			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+000366: 			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+000367: 			{
+000368: 				return false;
+000369: 			}
+000370: 			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+000371: 			{
+000372: 				return false;
+000373: 			}
+000374: 			if (hitInfo.point.y < -5f)
+000375: 			{
+000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,390,transform.position,"000376: 				return false;
+000377: 			}
+000378: 		}
+000379: 		return true;
+000380: 	}
+000381: 
+000382: 	private bool AllPlayersInProximity(IPlayer player)
+000383: 	{
+000384: 		if (Game.Mode == GameMode.SinglePlayer)
+000385: 		{
+000386: 			return true;
+000387: 		}
+000388: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000389: 		{
+000390: 			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()
+000399: 	{
+000400: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000401: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000402: 		{
+000403: 			if (!allPlayer.IsNullOrDestroyed())
+000404: 			{
+000405: 				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+000406: 				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+000407: 				{
+000408: 					return true;
+000409: 				}
+000410: 			}
+000411: 		}
+000412: 		return false;
+000413: 	}
+000414: 
+000415: 	private bool AnyPlayerKnockedOut()
+000416: 	{
+000417: 		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+000418: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs,405,transform.position,"000391: 			{
+000392: 				return false;
+000393: 			}
+000394: 		}
+000395: 		return true;
+000396: 	}
+000397: 
+000398: 	private bool IsFightingBoss()
+000399: 	{
+000400: 		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+000401: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000402: 		{
+000403: 			if (!allPlayer.IsNullOrDestroyed())
+000404: 			{
+000405: 				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+000406: 				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+000407: 				{
+000408: 					return true;
+000409: 				}
+000410: 			}
+000411: 		}
+000412: 		return false;
+000413: 	}
+000414: 
+000415: 	private bool AnyPlayerKnockedOut()
+000416: 	{
+000417: 		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+000418: 		{
+000419: 			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
+000420: 			{
+000421: 				return true;
+000422: 			}
+000423: 		}
+000424: 		return false;
+000425: 	}
+000426: 
+000427: 	private bool AnyPlayerIsBusy()
+000428: 	{
+000429: 		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+000430: 		{
+000431: 			if (allPlayer.Crafter.IsPlacing)
+000432: 			{
+000433: 				return true;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,428,CreateWorld,"000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,430,CreateWorld,"000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,640,CreateWorld,"000626: 	}
+000627: 
+000628: 	private static LoadingResult LoadWorld_(bool legacy = false)
+000629: 	{
+000630: 		LoadingResult loadingResult = ValidateWorldFolders(legacy);
+000631: 		if (loadingResult.Succeeded)
+000632: 		{
+000633: 			LoadingResult loadingResult2 = LoadWorldSeed();
+000634: 			if (!loadingResult2.Succeeded)
+000635: 			{
+000636: 				return loadingResult2;
+000637: 			}
+000638: 			if (!legacy)
+000639: 			{
+000640: 				CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000641: 			}
+000642: 			loadingResult2 = LoadWorldMaps(legacy);
+000643: 			if (!loadingResult2.Succeeded)
+000644: 			{
+000645: 				return loadingResult2;
+000646: 			}
+000647: 			return new LoadingResult
+000648: 			{
+000649: 				Succeeded = true
+000650: 			};
+000651: 		}
+000652: 		LoadingResult result = new LoadingResult
+000653: 		{
+000654: 			Message = ""WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE "" + loadingResult.Message,
+000655: 			Succeeded = false
+000656: 		};
+000657: 		Debug.LogError(""World::LoadWorld:: "" + loadingResult.Message);
+000658: 		return result;
+000659: 	}
+000660: 
+000661: 	public static bool CheckWorldSeedFileExists()
+000662: 	{
+000663: 		return File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, ""Seed.sdd""));
+000664: 	}
+000665: 
+000666: 	private static LoadingResult LoadWorldSeed()
+000667: 	{
+000668: 		try"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,409,CreateMissionTiles,"000395: 	}
+000396: 
+000397: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+000398: 	{
+000399: 		for (int i = 0; i < 49; i++)
+000400: 		{
+000401: 			if (_mapList[i] == mapToReplace)
+000402: 			{
+000403: 				_mapList[i] = replacingMap;
+000404: 				break;
+000405: 			}
+000406: 		}
+000407: 	}
+000408: 
+000409: 	private static int[] CreateMissionTiles()
+000410: 	{
+000411: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000412: 		int upperBound = 48;
+000413: 		List<int> list = new List<int>();
+000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,442,CreateMissionTiles,"000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}
+000459: 			}
+000460: 			if (flag && num < Maps.DefaultMapList.Count)
+000461: 			{
+000462: 				Map map2 = Maps.DefaultMapList[num];
+000463: 				_mapList[j] = map2;
+000464: 				if (map2.EditorData.Biome == Zone.BiomeType.CARRIER)
+000465: 				{
+000466: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Carrier"") as Texture2D;
+000467: 				}
+000468: 				else if (map2.EditorData.Biome == Zone.BiomeType.MISSION)
+000469: 				{
+000470: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Mission"") as Texture2D;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,358,WORLD_SEED,"000344: 			{
+000345: 				Message = ex2.Message,
+000346: 				Succeeded = false
+000347: 			};
+000348: 		}
+000349: 		return new LoadingResult
+000350: 		{
+000351: 			Succeeded = true
+000352: 		};
+000353: 	}
+000354: 
+000355: 	private static Map CreateProceduralMap(int index, int seed)
+000356: 	{
+000357: 		Map map = new Map();
+000358: 		Zone.BiomeType biomeType = WorldTools.GenerateZoneBiome(Zone.BiomeType.RANDOM, StrandedWorld.WORLD_SEED - seed);
+000359: 		if (index == 0)
+000360: 		{
+000361: 			biomeType = Zone.BiomeType.ISLAND_SMALL;
+000362: 		}
+000363: 		float[,] heightmapData = WorldTools.GenerateZoneHeightmap(biomeType, StrandedWorld.WORLD_SEED - seed);
+000364: 		map.EditorData = new MapEditorData
+000365: 		{
+000366: 			Name = MapNameGenerator.GenerateRandomMapName(seed),
+000367: 			Id = string.Format(""{0}_{1}"", ""INTERNAL_PROCEDURAL"", index),
+000368: 			VersionNumber = 0,
+000369: 			Biome = biomeType,
+000370: 			Author = ""Beam Team"",
+000371: 			Description = ""MAP_DESC_PROCEDURAL""
+000372: 		};
+000373: 		map.ObjectData = new JObject();
+000374: 		map.HeightmapData = heightmapData;
+000375: 		map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+000376: 		return map;
+000377: 	}
+000378: 
+000379: 	public static bool ReplaceMapWithProceduralMap(Map replaceMap, out Map proceduralMap)
+000380: 	{
+000381: 		proceduralMap = null;
+000382: 		int num = 0;
+000383: 		for (int i = 0; i < 49; i++)
+000384: 		{
+000385: 			if (_mapList[i] == replaceMap)
+000386: 			{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,363,WORLD_SEED,"000349: 		return new LoadingResult
+000350: 		{
+000351: 			Succeeded = true
+000352: 		};
+000353: 	}
+000354: 
+000355: 	private static Map CreateProceduralMap(int index, int seed)
+000356: 	{
+000357: 		Map map = new Map();
+000358: 		Zone.BiomeType biomeType = WorldTools.GenerateZoneBiome(Zone.BiomeType.RANDOM, StrandedWorld.WORLD_SEED - seed);
+000359: 		if (index == 0)
+000360: 		{
+000361: 			biomeType = Zone.BiomeType.ISLAND_SMALL;
+000362: 		}
+000363: 		float[,] heightmapData = WorldTools.GenerateZoneHeightmap(biomeType, StrandedWorld.WORLD_SEED - seed);
+000364: 		map.EditorData = new MapEditorData
+000365: 		{
+000366: 			Name = MapNameGenerator.GenerateRandomMapName(seed),
+000367: 			Id = string.Format(""{0}_{1}"", ""INTERNAL_PROCEDURAL"", index),
+000368: 			VersionNumber = 0,
+000369: 			Biome = biomeType,
+000370: 			Author = ""Beam Team"",
+000371: 			Description = ""MAP_DESC_PROCEDURAL""
+000372: 		};
+000373: 		map.ObjectData = new JObject();
+000374: 		map.HeightmapData = heightmapData;
+000375: 		map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+000376: 		return map;
+000377: 	}
+000378: 
+000379: 	public static bool ReplaceMapWithProceduralMap(Map replaceMap, out Map proceduralMap)
+000380: 	{
+000381: 		proceduralMap = null;
+000382: 		int num = 0;
+000383: 		for (int i = 0; i < 49; i++)
+000384: 		{
+000385: 			if (_mapList[i] == replaceMap)
+000386: 			{
+000387: 				Map map = CreateProceduralMap(i, num);
+000388: 				_mapList[i] = map;
+000389: 				proceduralMap = map;
+000390: 				return true;
+000391: 			}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,411,WORLD_SEED,"000397: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+000398: 	{
+000399: 		for (int i = 0; i < 49; i++)
+000400: 		{
+000401: 			if (_mapList[i] == mapToReplace)
+000402: 			{
+000403: 				_mapList[i] = replacingMap;
+000404: 				break;
+000405: 			}
+000406: 		}
+000407: 	}
+000408: 
+000409: 	private static int[] CreateMissionTiles()
+000410: 	{
+000411: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000412: 		int upperBound = 48;
+000413: 		List<int> list = new List<int>();
+000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,430,WORLD_SEED,"000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,640,WORLD_SEED,"000626: 	}
+000627: 
+000628: 	private static LoadingResult LoadWorld_(bool legacy = false)
+000629: 	{
+000630: 		LoadingResult loadingResult = ValidateWorldFolders(legacy);
+000631: 		if (loadingResult.Succeeded)
+000632: 		{
+000633: 			LoadingResult loadingResult2 = LoadWorldSeed();
+000634: 			if (!loadingResult2.Succeeded)
+000635: 			{
+000636: 				return loadingResult2;
+000637: 			}
+000638: 			if (!legacy)
+000639: 			{
+000640: 				CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000641: 			}
+000642: 			loadingResult2 = LoadWorldMaps(legacy);
+000643: 			if (!loadingResult2.Succeeded)
+000644: 			{
+000645: 				return loadingResult2;
+000646: 			}
+000647: 			return new LoadingResult
+000648: 			{
+000649: 				Succeeded = true
+000650: 			};
+000651: 		}
+000652: 		LoadingResult result = new LoadingResult
+000653: 		{
+000654: 			Message = ""WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE "" + loadingResult.Message,
+000655: 			Succeeded = false
+000656: 		};
+000657: 		Debug.LogError(""World::LoadWorld:: "" + loadingResult.Message);
+000658: 		return result;
+000659: 	}
+000660: 
+000661: 	public static bool CheckWorldSeedFileExists()
+000662: 	{
+000663: 		return File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, ""Seed.sdd""));
+000664: 	}
+000665: 
+000666: 	private static LoadingResult LoadWorldSeed()
+000667: 	{
+000668: 		try"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,432,GenerationZonePositons,"000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}
+000459: 			}
+000460: 			if (flag && num < Maps.DefaultMapList.Count)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,409,MissionTiles,"000395: 	}
+000396: 
+000397: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+000398: 	{
+000399: 		for (int i = 0; i < 49; i++)
+000400: 		{
+000401: 			if (_mapList[i] == mapToReplace)
+000402: 			{
+000403: 				_mapList[i] = replacingMap;
+000404: 				break;
+000405: 			}
+000406: 		}
+000407: 	}
+000408: 
+000409: 	private static int[] CreateMissionTiles()
+000410: 	{
+000411: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000412: 		int upperBound = 48;
+000413: 		List<int> list = new List<int>();
+000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,442,MissionTiles,"000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}
+000459: 			}
+000460: 			if (flag && num < Maps.DefaultMapList.Count)
+000461: 			{
+000462: 				Map map2 = Maps.DefaultMapList[num];
+000463: 				_mapList[j] = map2;
+000464: 				if (map2.EditorData.Biome == Zone.BiomeType.CARRIER)
+000465: 				{
+000466: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Carrier"") as Texture2D;
+000467: 				}
+000468: 				else if (map2.EditorData.Biome == Zone.BiomeType.MISSION)
+000469: 				{
+000470: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Mission"") as Texture2D;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,409,MissionTile,"000395: 	}
+000396: 
+000397: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+000398: 	{
+000399: 		for (int i = 0; i < 49; i++)
+000400: 		{
+000401: 			if (_mapList[i] == mapToReplace)
+000402: 			{
+000403: 				_mapList[i] = replacingMap;
+000404: 				break;
+000405: 			}
+000406: 		}
+000407: 	}
+000408: 
+000409: 	private static int[] CreateMissionTiles()
+000410: 	{
+000411: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+000412: 		int upperBound = 48;
+000413: 		List<int> list = new List<int>();
+000414: 		int[] array = new int[4];
+000415: 		for (int i = 0; i < 4; i++)
+000416: 		{
+000417: 			int num = fastRandom.Next(1, upperBound);
+000418: 			while (list.Contains(num))
+000419: 			{
+000420: 				num = fastRandom.Next(1, upperBound);
+000421: 			}
+000422: 			list.Add(num);
+000423: 			array[i] = num;
+000424: 		}
+000425: 		return array;
+000426: 	}
+000427: 
+000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/World.cs,442,MissionTile,"000428: 	public static void CreateWorld(bool legacy = false)
+000429: 	{
+000430: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+000431: 		_mapList = new Map[49];
+000432: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+000433: 		{
+000434: 			int seed = i;
+000435: 			Map map = CreateProceduralMap(i, seed);
+000436: 			_mapList[i] = map;
+000437: 		}
+000438: 		if (legacy)
+000439: 		{
+000440: 			return;
+000441: 		}
+000442: 		int[] array = CreateMissionTiles();
+000443: 		int num = 0;
+000444: 		if (Maps.DefaultMapList.Count == 0)
+000445: 		{
+000446: 			Maps.LoadDefaultMaps(out var result);
+000447: 			_ = result.Succeeded;
+000448: 		}
+000449: 		for (int j = 0; j < 49; j++)
+000450: 		{
+000451: 			bool flag = false;
+000452: 			for (int k = 0; k < 4; k++)
+000453: 			{
+000454: 				if (j == array[k])
+000455: 				{
+000456: 					flag = true;
+000457: 					break;
+000458: 				}
+000459: 			}
+000460: 			if (flag && num < Maps.DefaultMapList.Count)
+000461: 			{
+000462: 				Map map2 = Maps.DefaultMapList[num];
+000463: 				_mapList[j] = map2;
+000464: 				if (map2.EditorData.Biome == Zone.BiomeType.CARRIER)
+000465: 				{
+000466: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Carrier"") as Texture2D;
+000467: 				}
+000468: 				else if (map2.EditorData.Biome == Zone.BiomeType.MISSION)
+000469: 				{
+000470: 					map2.EditorData.SmallPreviewImage = Resources.Load(""Icons/WorldMap_Icon_Mission"") as Texture2D;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs,269,WORLD_SEED,"000255: 
+000256: 	public bool GenerateZone(Zone zone)
+000257: 	{
+000258: 		if (_isGenerating)
+000259: 		{
+000260: 			return false;
+000261: 		}
+000262: 		GenerateObjects(zone, GenerateObject);
+000263: 		return true;
+000264: 	}
+000265: 
+000266: 	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
+000267: 	{
+000268: 		_isGenerating = true;
+000269: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000270: 		zone.GenerateGridData();
+000271: 		zone.GeneratedObjects.Clear();
+000272: 		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
+000273: 		if (zone.HasShelter)
+000274: 		{
+000275: 			GenerateShelter(sheltersGeneration, zone, generationCallback);
+000276: 		}
+000277: 		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
+000278: 		{
+000279: 			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
+000280: 			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
+000281: 			{
+000282: 				continue;
+000283: 			}
+000284: 			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
+000285: 			{
+000286: 				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
+000287: 				switch (zoneObjects.generationType)
+000288: 				{
+000289: 				case ZoneGenerationType.Position:
+000290: 					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
+000291: 					break;
+000292: 				case ZoneGenerationType.Procedural:
+000293: 					GenerateProceduralObjectsProcedural(zoneObjects, zone, generationCallback);
+000294: 					break;
+000295: 				}
+000296: 			}
+000297: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs,329,WORLD_SEED,"000315: 				}
+000316: 			}
+000317: 		}
+000318: 		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+000319: 		_isGenerating = false;
+000320: 	}
+000321: 
+000322: 	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000323: 	{
+000324: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000325: 		{
+000326: 			UnityEngine.Debug.LogError(""ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty."");
+000327: 			return;
+000328: 		}
+000329: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000330: 		float num = 0f;
+000331: 		if (zoneObjects.Objects.Length != 0)
+000332: 		{
+000333: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000334: 			{
+000335: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000336: 				num += zoneObject.Rarity;
+000337: 			}
+000338: 		}
+000339: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000340: 		{
+000341: 			return;
+000342: 		}
+000343: 		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+000344: 		{
+000345: 			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+000346: 			{
+000347: 				continue;
+000348: 			}
+000349: 			int num2 = 0;
+000350: 			if (zoneObjects.Objects.Length != 0)
+000351: 			{
+000352: 				float num3 = (float)_random.NextDouble() * num;
+000353: 				for (int k = 0; k < zoneObjects.Objects.Length; k++)
+000354: 				{
+000355: 					if (num3 < zoneObjects.Objects[k].Rarity)
+000356: 					{
+000357: 						num2 = k;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs,377,WORLD_SEED,"000363: 			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+000364: 			Quaternion identity = Quaternion.identity;
+000365: 			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+000366: 			generationCallback(obj, position, identity, zone);
+000367: 		}
+000368: 	}
+000369: 
+000370: 	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000371: 	{
+000372: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000373: 		{
+000374: 			UnityEngine.Debug.LogError(""ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty."");
+000375: 			return;
+000376: 		}
+000377: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000378: 		float num = 0f;
+000379: 		if (zoneObjects.Objects.Length != 0)
+000380: 		{
+000381: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000382: 			{
+000383: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000384: 				num += zoneObject.Rarity;
+000385: 			}
+000386: 		}
+000387: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000388: 		{
+000389: 			return;
+000390: 		}
+000391: 		int detailAmountFactor = zoneObjects.detailAmountFactor;
+000392: 		int num2 = 0;
+000393: 		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
+000394: 		{
+000395: 			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
+000396: 			{
+000397: 				if (num2 >= zoneObjects.maxObjectCount)
+000398: 				{
+000399: 					return;
+000400: 				}
+000401: 				GenerationPoints generationPoints = zone.GenerationPoints[j, k];
+000402: 				if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f) || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+000403: 				{
+000404: 					continue;
+000405: 				}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs,318,transform.position,"000304: 				{
+000305: 					ZoneObjects zoneObjects2 = objectCategory.ProceduralObjects[l];
+000306: 					switch (zoneObjects2.generationType)
+000307: 					{
+000308: 					case ZoneGenerationType.Position:
+000309: 						GenerateProceduralObjectsPosition(zoneObjects2, zone, generationCallback);
+000310: 						break;
+000311: 					case ZoneGenerationType.Procedural:
+000312: 						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
+000313: 						break;
+000314: 					}
+000315: 				}
+000316: 			}
+000317: 		}
+000318: 		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+000319: 		_isGenerating = false;
+000320: 	}
+000321: 
+000322: 	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000323: 	{
+000324: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000325: 		{
+000326: 			UnityEngine.Debug.LogError(""ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty."");
+000327: 			return;
+000328: 		}
+000329: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000330: 		float num = 0f;
+000331: 		if (zoneObjects.Objects.Length != 0)
+000332: 		{
+000333: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000334: 			{
+000335: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000336: 				num += zoneObject.Rarity;
+000337: 			}
+000338: 		}
+000339: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000340: 		{
+000341: 			return;
+000342: 		}
+000343: 		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+000344: 		{
+000345: 			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+000346: 			{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneLoader.cs,363,transform.position,"000349: 			int num2 = 0;
+000350: 			if (zoneObjects.Objects.Length != 0)
+000351: 			{
+000352: 				float num3 = (float)_random.NextDouble() * num;
+000353: 				for (int k = 0; k < zoneObjects.Objects.Length; k++)
+000354: 				{
+000355: 					if (num3 < zoneObjects.Objects[k].Rarity)
+000356: 					{
+000357: 						num2 = k;
+000358: 						break;
+000359: 					}
+000360: 					num3 -= zoneObjects.Objects[k].Rarity;
+000361: 				}
+000362: 			}
+000363: 			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+000364: 			Quaternion identity = Quaternion.identity;
+000365: 			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+000366: 			generationCallback(obj, position, identity, zone);
+000367: 		}
+000368: 	}
+000369: 
+000370: 	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+000371: 	{
+000372: 		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+000373: 		{
+000374: 			UnityEngine.Debug.LogError(""ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty."");
+000375: 			return;
+000376: 		}
+000377: 		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+000378: 		float num = 0f;
+000379: 		if (zoneObjects.Objects.Length != 0)
+000380: 		{
+000381: 			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+000382: 			{
+000383: 				ZoneObject zoneObject = zoneObjects.Objects[i];
+000384: 				num += zoneObject.Rarity;
+000385: 			}
+000386: 		}
+000387: 		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+000388: 		{
+000389: 			return;
+000390: 		}
+000391: 		int detailAmountFactor = zoneObjects.detailAmountFactor;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,16,WORLD_SEED,"000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,14,TerrainData,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,15,TerrainData,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,25,TerrainData,"000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,26,TerrainData,"000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,3,Terrain,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,13,Terrain,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,14,Terrain,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,15,Terrain,"000001: using UnityEngine;
+000002: 
+000003: namespace Beam.Terrain;
+000004: 
+000005: public static class ZoneObjectGenerator
+000006: {
+000007: 	private const int INDEX_SIZE = 256;
+000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,22,Terrain,"000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,23,Terrain,"000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,24,Terrain,"000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,25,Terrain,"000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,26,Terrain,"000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,22,transform.position,"000008: 
+000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,23,transform.position,"000009: 	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs,24,transform.position,"000010: 	{
+000011: 		float num = 125f / 128f;
+000012: 		GenerationPoints[,] array = new GenerationPoints[256, 256];
+000013: 		UnityEngine.Terrain terrain = zone.Terrain;
+000014: 		TerrainData terrainData = zone.Terrain.terrainData;
+000015: 		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+000016: 		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+000017: 		for (int i = 0; i < 256; i++)
+000018: 		{
+000019: 			for (int j = 0; j < 256; j++)
+000020: 			{
+000021: 				float y = 150f * heights[i, j] + -100f;
+000022: 				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+000023: 				float x = (pos.x - terrain.transform.position.x) / 250f;
+000024: 				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+000025: 				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+000026: 				float steepness = terrainData.GetSteepness(x, y2);
+000027: 				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+000028: 			}
+000029: 		}
+000030: 		array2 = null;
+000031: 		heights = null;
+000032: 		return array;
+000033: 	}
+000034: 
+000035: 	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+000036: 	{
+000037: 		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+000038: 		gameObject.gameObject.name = ""Debug_SoilMap"";
+000039: 		gameObject.transform.parent = zone.transform;
+000040: 		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+000041: 		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+000042: 		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+000043: 		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+000044: 		texture2D.wrapMode = TextureWrapMode.Clamp;
+000045: 		texture2D.Apply();
+000046: 		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+000047: 	}
+000048: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs,582,CreateWorld,"000568: 			ResetWorldView();
+000569: 		}
+000570: 	}
+000571: 
+000572: 	private void CreateWorld(string seedValue)
+000573: 	{
+000574: 		StrandedWorld.SetWorldSeed(seedValue);
+000575: 		World.CreateWorld();
+000576: 		SaveWorld();
+000577: 		OnCreatedNewWorld();
+000578: 	}
+000579: 
+000580: 	public void CreateRandomWorld()
+000581: 	{
+000582: 		CreateWorld(string.Empty);
+000583: 	}
+000584: 
+000585: 	private void SaveWorld(Action onSuccess = null)
+000586: 	{
+000587: 		World.SaveWorld((LoadingResult result) =>
+000588: 		{
+000589: 			if (result.Succeeded)
+000590: 			{
+000591: 				UpdateMapsStatus();
+000592: 				onSuccess?.Invoke();
+000593: 				_mapsInserted = 0;
+000594: 				ResetDirty();
+000595: 			}
+000596: 			else
+000597: 			{
+000598: 				string message = Localization.GetLanguageHandler().Localize(""CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC"", result.Message.Truncate());
+000599: 				DialogueBox.Show(GetPlayerInput(), ""CARTOGRAPHER_MENU_DB_ERROR_TITLE"", message, DialogueButton.Ok, DialogueIcon.Warning);
+000600: 			}
+000601: 		});
+000602: 	}
+000603: 
+000604: 	private void ResetWorldView()
+000605: 	{
+000606: 		_view.InfoLabel.Text = ""CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC"";
+000607: 		_view.WorldSeedLabel.Text = ""#"" + StrandedWorld.WORLD_SEED;
+000608: 		LoadPlayerMaps();
+000609: 		UpdateMapsStatus();
+000610: 		CreateWorldMapSlots();"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs,610,CreateWorld,"000596: 			else
+000597: 			{
+000598: 				string message = Localization.GetLanguageHandler().Localize(""CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC"", result.Message.Truncate());
+000599: 				DialogueBox.Show(GetPlayerInput(), ""CARTOGRAPHER_MENU_DB_ERROR_TITLE"", message, DialogueButton.Ok, DialogueIcon.Warning);
+000600: 			}
+000601: 		});
+000602: 	}
+000603: 
+000604: 	private void ResetWorldView()
+000605: 	{
+000606: 		_view.InfoLabel.Text = ""CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC"";
+000607: 		_view.WorldSeedLabel.Text = ""#"" + StrandedWorld.WORLD_SEED;
+000608: 		LoadPlayerMaps();
+000609: 		UpdateMapsStatus();
+000610: 		CreateWorldMapSlots();
+000611: 		_view.LocalMapsButton.PerformClick();
+000612: 		_view.SelectFirstButton();
+000613: 	}
+000614: 
+000615: 	private void LocalMapsButton_Click(object sender)
+000616: 	{
+000617: 		_view.LocalMapListContainer.gameObject.SetActive(value: true);
+000618: 		_view.RemoteMapListContainer.gameObject.SetActive(value: false);
+000619: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: false);
+000620: 		_view.NoMapsLabel.transform.gameObject.SetActive(value: false);
+000621: 		CreateMapListElements(Maps.UserMapList, _view.LocalMapListContainer.transform);
+000622: 	}
+000623: 
+000624: 	private void RemoteMapsButton_Click(object sender)
+000625: 	{
+000626: 		_view.LocalMapListContainer.gameObject.SetActive(value: false);
+000627: 		_view.RemoteMapListContainer.gameObject.SetActive(value: true);
+000628: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: true);
+000629: 		ShowRemoteMaps();
+000630: 	}
+000631: 
+000632: 	private void UserContentProvider_LoadedUserContent(LoadedContentArgs args)
+000633: 	{
+000634: 		if (_retrievedUGC)
+000635: 		{
+000636: 			return;
+000637: 		}
+000638: 		_remoteMapPaths = args.LoadedContent.Where((LoadedContent c) => c.Tags.Any_NonAlloc((string tag) => tag.Equals(UgcTags.MAPS))).SelectMany((LoadedContent c) => Directory.GetDirectories(c.Path));"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs,607,WORLD_SEED,"000593: 				_mapsInserted = 0;
+000594: 				ResetDirty();
+000595: 			}
+000596: 			else
+000597: 			{
+000598: 				string message = Localization.GetLanguageHandler().Localize(""CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC"", result.Message.Truncate());
+000599: 				DialogueBox.Show(GetPlayerInput(), ""CARTOGRAPHER_MENU_DB_ERROR_TITLE"", message, DialogueButton.Ok, DialogueIcon.Warning);
+000600: 			}
+000601: 		});
+000602: 	}
+000603: 
+000604: 	private void ResetWorldView()
+000605: 	{
+000606: 		_view.InfoLabel.Text = ""CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC"";
+000607: 		_view.WorldSeedLabel.Text = ""#"" + StrandedWorld.WORLD_SEED;
+000608: 		LoadPlayerMaps();
+000609: 		UpdateMapsStatus();
+000610: 		CreateWorldMapSlots();
+000611: 		_view.LocalMapsButton.PerformClick();
+000612: 		_view.SelectFirstButton();
+000613: 	}
+000614: 
+000615: 	private void LocalMapsButton_Click(object sender)
+000616: 	{
+000617: 		_view.LocalMapListContainer.gameObject.SetActive(value: true);
+000618: 		_view.RemoteMapListContainer.gameObject.SetActive(value: false);
+000619: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: false);
+000620: 		_view.NoMapsLabel.transform.gameObject.SetActive(value: false);
+000621: 		CreateMapListElements(Maps.UserMapList, _view.LocalMapListContainer.transform);
+000622: 	}
+000623: 
+000624: 	private void RemoteMapsButton_Click(object sender)
+000625: 	{
+000626: 		_view.LocalMapListContainer.gameObject.SetActive(value: false);
+000627: 		_view.RemoteMapListContainer.gameObject.SetActive(value: true);
+000628: 		_view.RetrievingLabel.transform.gameObject.SetActive(value: true);
+000629: 		ShowRemoteMaps();
+000630: 	}
+000631: 
+000632: 	private void UserContentProvider_LoadedUserContent(LoadedContentArgs args)
+000633: 	{
+000634: 		if (_retrievedUGC)
+000635: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/MultiplayerMng.cs,601,FindEndGameZone,"000587: 			else
+000588: 			{
+000589: 				UpdateSessionToken_IsOccupied(isOccupied: false);
+000590: 			}
+000591: 		}
+000592: 	}
+000593: 
+000594: 	private void UpdateToken()
+000595: 	{
+000596: 		try
+000597: 		{
+000598: 			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+000599: 			token.IsOccupied = false;
+000600: 			Zone zone = StrandedWorld.GetZone(PlayerRegistry.LocalPlayer.transform.position);
+000601: 			if (zone.Biome == Zone.BiomeType.MISSION && !zone.Equals(Beam.Singleton<StrandedWorld>.Instance.FindEndGameZone()))
+000602: 			{
+000603: 				token.IsBusy = true;
+000604: 			}
+000605: 			else if (GetSessionToken().IsBusy)
+000606: 			{
+000607: 				token.IsBusy = false;
+000608: 			}
+000609: 			BoltMatchmaking.UpdateSession(token);
+000610: 		}
+000611: 		catch (Exception ex)
+000612: 		{
+000613: 			LogError(""Error updating session token "" + ex.Message);
+000614: 		}
+000615: 	}
+000616: 
+000617: 	public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)
+000618: 	{
+000619: 		Log($""BoltShutdownBegin {disconnectReason} isRunning {BoltNetwork.IsRunning}"");
+000620: 		if (BoltNetwork.IsRunning)
+000621: 		{
+000622: 			Disconnected(null);
+000623: 		}
+000624: 	}
+000625: 
+000626: 	public static void Shutdown()
+000627: 	{
+000628: 		if (BoltNetwork.IsRunning && !_shuttingDown)
+000629: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/MultiplayerMng.cs,600,transform.position,"000586: 			}
+000587: 			else
+000588: 			{
+000589: 				UpdateSessionToken_IsOccupied(isOccupied: false);
+000590: 			}
+000591: 		}
+000592: 	}
+000593: 
+000594: 	private void UpdateToken()
+000595: 	{
+000596: 		try
+000597: 		{
+000598: 			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+000599: 			token.IsOccupied = false;
+000600: 			Zone zone = StrandedWorld.GetZone(PlayerRegistry.LocalPlayer.transform.position);
+000601: 			if (zone.Biome == Zone.BiomeType.MISSION && !zone.Equals(Beam.Singleton<StrandedWorld>.Instance.FindEndGameZone()))
+000602: 			{
+000603: 				token.IsBusy = true;
+000604: 			}
+000605: 			else if (GetSessionToken().IsBusy)
+000606: 			{
+000607: 				token.IsBusy = false;
+000608: 			}
+000609: 			BoltMatchmaking.UpdateSession(token);
+000610: 		}
+000611: 		catch (Exception ex)
+000612: 		{
+000613: 			LogError(""Error updating session token "" + ex.Message);
+000614: 		}
+000615: 	}
+000616: 
+000617: 	public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)
+000618: 	{
+000619: 		Log($""BoltShutdownBegin {disconnectReason} isRunning {BoltNetwork.IsRunning}"");
+000620: 		if (BoltNetwork.IsRunning)
+000621: 		{
+000622: 			Disconnected(null);
+000623: 		}
+000624: 	}
+000625: 
+000626: 	public static void Shutdown()
+000627: 	{
+000628: 		if (BoltNetwork.IsRunning && !_shuttingDown)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/MapNameGenerator.cs,13,WORLD_SEED,"000001: using System;
+000002: 
+000003: public static class MapNameGenerator
+000004: {
+000005: 	private static readonly string[] Prefixes = new string[8] { ""MAP_NAME_PREFIX_1"", ""MAP_NAME_PREFIX_2"", ""MAP_NAME_PREFIX_3"", ""MAP_NAME_PREFIX_4"", ""MAP_NAME_PREFIX_5"", ""MAP_NAME_PREFIX_6"", ""MAP_NAME_PREFIX_7"", ""MAP_NAME_PREFIX_8"" };
+000006: 
+000007: 	private static readonly string[] Stems = new string[10] { ""MAP_NAME_STEM_1"", ""MAP_NAME_STEM_2"", ""MAP_NAME_STEM_3"", ""MAP_NAME_STEM_4"", ""MAP_NAME_STEM_5"", ""MAP_NAME_STEM_6"", ""MAP_NAME_STEM_7"", ""MAP_NAME_STEM_8"", ""MAP_NAME_STEM_9"", ""MAP_NAME_STEM_10"" };
+000008: 
+000009: 	private static readonly string[] Suffixes = new string[6] { ""MAP_NAME_SUFFIX_1"", ""MAP_NAME_SUFFIX_2"", ""MAP_NAME_SUFFIX_3"", ""MAP_NAME_SUFFIX_4"", ""MAP_NAME_SUFFIX_5"", ""MAP_NAME_SUFFIX_6"" };
+000010: 
+000011: 	public static string GenerateRandomMapName(int seedEffect)
+000012: 	{
+000013: 		Random random = new Random(StrandedWorld.WORLD_SEED + seedEffect);
+000014: 		return string.Join("" "", Prefixes[random.Next(0, Prefixes.Length)], Stems[random.Next(0, Stems.Length)], Suffixes[random.Next(0, Suffixes.Length)]);
+000015: 	}
+000016: }"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,255,CreateWorld,"000241: 	protected void OnZoneEntered(Zone zone)
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,256,CreateZones,"000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,967,FindEndGameZone,"000953: 	}
+000954: 
+000955: 	public Zone FindZone(string name)
+000956: 	{
+000957: 		for (int i = 0; i < Zones.Length; i++)
+000958: 		{
+000959: 			if (Zones[i].Id.Equals(name))
+000960: 			{
+000961: 				return Zones[i];
+000962: 			}
+000963: 		}
+000964: 		return null;
+000965: 	}
+000966: 
+000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals(""INTERNAL_MISSION_3""))
+000972: 			{
+000973: 				return Zones[i];
+000974: 			}
+000975: 		}
+000976: 		return null;
+000977: 	}
+000978: 
+000979: 	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+000980: 	{
+000981: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+000982: 	}
+000983: 
+000984: 	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+000985: 	{
+000986: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+000987: 	}
+000988: 
+000989: 	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+000990: 	{
+000991: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+000992: 	}
+000993: 
+000994: 	private bool InImpostorViewRange(IPlayer player, Zone zone)
+000995: 	{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,40,WORLD_SEED,"000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: "
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,92,WORLD_SEED,"000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;
+000081: 
+000082: 	private Dictionary<string, JObject> _zoneSavedObjectsLookup = new Dictionary<string, JObject>();
+000083: 
+000084: 	private Vector3 _playerPosition;
+000085: 
+000086: 	[SerializeField]
+000087: 	private Zone _zonePrefab;
+000088: 
+000089: 	[SerializeField]
+000090: 	private Transform _zoneContainer;
+000091: 
+000092: 	public static int WORLD_SEED
+000093: 	{
+000094: 		get
+000095: 		{
+000096: 			if (!Game.Mode.IsMultiplayer())
+000097: 			{
+000098: 				return LOCAL_WORLD_SEED;
+000099: 			}
+000100: 			return PlayerRegistry.ServerPeer.WorldSeed;
+000101: 		}
+000102: 	}
+000103: 
+000104: 	public Zone[] Zones => _zones;
+000105: 
+000106: 	public Zone NmlZone => _nmlZone;
+000107: 
+000108: 	public ZoneLoader ZoneLoader => _zoneLoader;
+000109: 
+000110: 	public int ShelterCount { get; private set; }
+000111: 
+000112: 	public event EmptyEventHandler WorldGenerated;
+000113: 
+000114: 	public event Action<Zone> ZoneEntered;
+000115: 
+000116: 	public Transform GetParent()
+000117: 	{
+000118: 		GameState state = Game.State;
+000119: 		if ((uint)(state - 2) <= 1u)
+000120: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,98,WORLD_SEED,"000084: 	private Vector3 _playerPosition;
+000085: 
+000086: 	[SerializeField]
+000087: 	private Zone _zonePrefab;
+000088: 
+000089: 	[SerializeField]
+000090: 	private Transform _zoneContainer;
+000091: 
+000092: 	public static int WORLD_SEED
+000093: 	{
+000094: 		get
+000095: 		{
+000096: 			if (!Game.Mode.IsMultiplayer())
+000097: 			{
+000098: 				return LOCAL_WORLD_SEED;
+000099: 			}
+000100: 			return PlayerRegistry.ServerPeer.WorldSeed;
+000101: 		}
+000102: 	}
+000103: 
+000104: 	public Zone[] Zones => _zones;
+000105: 
+000106: 	public Zone NmlZone => _nmlZone;
+000107: 
+000108: 	public ZoneLoader ZoneLoader => _zoneLoader;
+000109: 
+000110: 	public int ShelterCount { get; private set; }
+000111: 
+000112: 	public event EmptyEventHandler WorldGenerated;
+000113: 
+000114: 	public event Action<Zone> ZoneEntered;
+000115: 
+000116: 	public Transform GetParent()
+000117: 	{
+000118: 		GameState state = Game.State;
+000119: 		if ((uint)(state - 2) <= 1u)
+000120: 		{
+000121: 			return _nmlZone.SaveContainer;
+000122: 		}
+000123: 		return null;
+000124: 	}
+000125: 
+000126: 	public JObject GetZoneData(Zone zone)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,255,WORLD_SEED,"000241: 	protected void OnZoneEntered(Zone zone)
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,811,WORLD_SEED,"000797: 			_zoneLoader.LoadZone(zone, jObject);
+000798: 		}
+000799: 		else
+000800: 		{
+000801: 			_zoneLoader.CreateZone(zone);
+000802: 		}
+000803: 	}
+000804: 
+000805: 	private void Initialize_shelterTypes()
+000806: 	{
+000807: 		for (int i = 0; i < _shelters.Length; i++)
+000808: 		{
+000809: 			_shelters[i] = -1;
+000810: 		}
+000811: 		System.Random random = new System.Random(WORLD_SEED);
+000812: 		int num = 0;
+000813: 		for (int j = 0; j < _shelters.Length; j++)
+000814: 		{
+000815: 			int num2;
+000816: 			do
+000817: 			{
+000818: 				num2 = random.Next(0, 8);
+000819: 				for (int k = 0; k < _shelters.Length; k++)
+000820: 				{
+000821: 					if (num2 == _shelters[k])
+000822: 					{
+000823: 						num2 = -1;
+000824: 						break;
+000825: 					}
+000826: 				}
+000827: 			}
+000828: 			while (num2 == -1);
+000829: 			_shelters[num] = num2;
+000830: 			num++;
+000831: 		}
+000832: 	}
+000833: 
+000834: 	private void SetShelterOnZones()
+000835: 	{
+000836: 		for (int i = 0; i < Zones.Length; i++)
+000837: 		{
+000838: 			Zones[i].HasShelter = false;
+000839: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,1106,WORLD_SEED,"001092: 	}
+001093: 
+001094: 	public static GameObject AddDebugAxis(Vector3 position, Quaternion rotation, string text)
+001095: 	{
+001096: 		return null;
+001097: 	}
+001098: 
+001099: 	public System.Random GenerateLocalSeed(Vector3 objectPosition, int addedValue = 0)
+001100: 	{
+001101: 		Vector3 zero = Vector3.zero;
+001102: 		Vector3 b = new Vector3(objectPosition.x, 0f, objectPosition.z);
+001103: 		float num = Mathf.Atan2(b.z - zero.z, b.x - zero.x) * 180f / MathF.PI;
+001104: 		int num2 = (int)Vector3.Distance(zero, b);
+001105: 		addedValue++;
+001106: 		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+001107: 	}
+001108: 
+001109: 	public JObject Save()
+001110: 	{
+001111: 		JObject jObject = new JObject();
+001112: 		jObject.AddField(""WorldSeed"", JSerializer.Serialize(WORLD_SEED));
+001113: 		JObject jObject2 = new JObject();
+001114: 		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+001115: 		{
+001116: 			IPlayer player = PlayerRegistry.AllPlayers[i];
+001117: 			JObject jObject3 = new JObject();
+001118: 			jObject3.AddField(""Position"", JSerializer.Serialize(player.transform.position));
+001119: 			jObject3.AddField(""ZoneId"", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+001120: 			jObject2.Add(jObject3);
+001121: 		}
+001122: 		jObject.AddField(""PlayersData"", jObject2);
+001123: 		Zone[] zones = Zones;
+001124: 		foreach (Zone zone in zones)
+001125: 		{
+001126: 			if (zone.Loaded)
+001127: 			{
+001128: 				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+001129: 			}
+001130: 		}
+001131: 		SaveZone(_nmlZone, destroy: false, hardSave: true);
+001132: 		HandleOutOfGameBounds_NoMansLand();
+001133: 		JObject jObject4 = new JObject();
+001134: 		for (int k = 0; k < 49; k++)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,1112,WORLD_SEED,"001098: 
+001099: 	public System.Random GenerateLocalSeed(Vector3 objectPosition, int addedValue = 0)
+001100: 	{
+001101: 		Vector3 zero = Vector3.zero;
+001102: 		Vector3 b = new Vector3(objectPosition.x, 0f, objectPosition.z);
+001103: 		float num = Mathf.Atan2(b.z - zero.z, b.x - zero.x) * 180f / MathF.PI;
+001104: 		int num2 = (int)Vector3.Distance(zero, b);
+001105: 		addedValue++;
+001106: 		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+001107: 	}
+001108: 
+001109: 	public JObject Save()
+001110: 	{
+001111: 		JObject jObject = new JObject();
+001112: 		jObject.AddField(""WorldSeed"", JSerializer.Serialize(WORLD_SEED));
+001113: 		JObject jObject2 = new JObject();
+001114: 		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+001115: 		{
+001116: 			IPlayer player = PlayerRegistry.AllPlayers[i];
+001117: 			JObject jObject3 = new JObject();
+001118: 			jObject3.AddField(""Position"", JSerializer.Serialize(player.transform.position));
+001119: 			jObject3.AddField(""ZoneId"", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+001120: 			jObject2.Add(jObject3);
+001121: 		}
+001122: 		jObject.AddField(""PlayersData"", jObject2);
+001123: 		Zone[] zones = Zones;
+001124: 		foreach (Zone zone in zones)
+001125: 		{
+001126: 			if (zone.Loaded)
+001127: 			{
+001128: 				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+001129: 			}
+001130: 		}
+001131: 		SaveZone(_nmlZone, destroy: false, hardSave: true);
+001132: 		HandleOutOfGameBounds_NoMansLand();
+001133: 		JObject jObject4 = new JObject();
+001134: 		for (int k = 0; k < 49; k++)
+001135: 		{
+001136: 			JObject zoneData = GetZoneData(Zones[k]);
+001137: 			jObject4.Add(zoneData);
+001138: 		}
+001139: 		JObject zoneData2 = GetZoneData(_nmlZone);
+001140: 		jObject4.Add(zoneData2);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,48,WORLD_ZONES,"000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,50,WORLD_ZONES,"000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,52,WORLD_ZONES,"000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,253,GenerationZonePositons,"000239: 	}
+000240: 
+000241: 	protected void OnZoneEntered(Zone zone)
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,261,GenerationZonePositons,"000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{
+000285: 			EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_WORLD""));
+000286: 			yield return 0f;
+000287: 			LoadWorld();
+000288: 		}
+000289: 		EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_OBJECTS""));"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,262,GenerationZonePositons,"000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{
+000285: 			EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_WORLD""));
+000286: 			yield return 0f;
+000287: 			LoadWorld();
+000288: 		}
+000289: 		EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_OBJECTS""));
+000290: 		yield return 0f;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,971,INTERNAL_MISSION_3,"000957: 		for (int i = 0; i < Zones.Length; i++)
+000958: 		{
+000959: 			if (Zones[i].Id.Equals(name))
+000960: 			{
+000961: 				return Zones[i];
+000962: 			}
+000963: 		}
+000964: 		return null;
+000965: 	}
+000966: 
+000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals(""INTERNAL_MISSION_3""))
+000972: 			{
+000973: 				return Zones[i];
+000974: 			}
+000975: 		}
+000976: 		return null;
+000977: 	}
+000978: 
+000979: 	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+000980: 	{
+000981: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+000982: 	}
+000983: 
+000984: 	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+000985: 	{
+000986: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+000987: 	}
+000988: 
+000989: 	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+000990: 	{
+000991: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+000992: 	}
+000993: 
+000994: 	private bool InImpostorViewRange(IPlayer player, Zone zone)
+000995: 	{
+000996: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1001600f;
+000997: 	}
+000998: 
+000999: 	private void ParentObjectToTransform(SaveablePrefab sp, Transform parent)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,971,MISSION_3,"000957: 		for (int i = 0; i < Zones.Length; i++)
+000958: 		{
+000959: 			if (Zones[i].Id.Equals(name))
+000960: 			{
+000961: 				return Zones[i];
+000962: 			}
+000963: 		}
+000964: 		return null;
+000965: 	}
+000966: 
+000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals(""INTERNAL_MISSION_3""))
+000972: 			{
+000973: 				return Zones[i];
+000974: 			}
+000975: 		}
+000976: 		return null;
+000977: 	}
+000978: 
+000979: 	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+000980: 	{
+000981: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+000982: 	}
+000983: 
+000984: 	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+000985: 	{
+000986: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+000987: 	}
+000988: 
+000989: 	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+000990: 	{
+000991: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+000992: 	}
+000993: 
+000994: 	private bool InImpostorViewRange(IPlayer player, Zone zone)
+000995: 	{
+000996: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1001600f;
+000997: 	}
+000998: 
+000999: 	private void ParentObjectToTransform(SaveablePrefab sp, Transform parent)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,72,TerrainData,"000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;
+000081: 
+000082: 	private Dictionary<string, JObject> _zoneSavedObjectsLookup = new Dictionary<string, JObject>();
+000083: 
+000084: 	private Vector3 _playerPosition;
+000085: 
+000086: 	[SerializeField]
+000087: 	private Zone _zonePrefab;
+000088: 
+000089: 	[SerializeField]
+000090: 	private Transform _zoneContainer;
+000091: 
+000092: 	public static int WORLD_SEED
+000093: 	{
+000094: 		get
+000095: 		{
+000096: 			if (!Game.Mode.IsMultiplayer())
+000097: 			{
+000098: 				return LOCAL_WORLD_SEED;
+000099: 			}
+000100: 			return PlayerRegistry.ServerPeer.WorldSeed;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,8,Terrain,"000001: using System;
+000002: using System.Collections.Generic;
+000003: using Beam;
+000004: using Beam.Events;
+000005: using Beam.Obfuscated.Users;
+000006: using Beam.Serialization;
+000007: using Beam.Serialization.Json;
+000008: using Beam.Terrain;
+000009: using Beam.Utilities;
+000010: using Ceto;
+000011: using Funlabs;
+000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,16,Terrain,"000002: using System.Collections.Generic;
+000003: using Beam;
+000004: using Beam.Events;
+000005: using Beam.Obfuscated.Users;
+000006: using Beam.Serialization;
+000007: using Beam.Serialization.Json;
+000008: using Beam.Terrain;
+000009: using Beam.Utilities;
+000010: using Ceto;
+000011: using Funlabs;
+000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,24,Terrain,"000010: using Ceto;
+000011: using Funlabs;
+000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,26,Terrain,"000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,28,Terrain,"000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,42,Terrain,"000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,44,Terrain,"000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,46,Terrain,"000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,72,Terrain,"000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;
+000071: 
+000072: 	private TerrainData[] _terrainDatas;
+000073: 
+000074: 	public ZoneEvents ZoneEvents;
+000075: 
+000076: 	public ProceduralObjectManager ProceduralObjectsManager;
+000077: 
+000078: 	private ZoneLoader _zoneLoader = new ZoneLoader();
+000079: 
+000080: 	private Vector3 _lastSavePosition;
+000081: 
+000082: 	private Dictionary<string, JObject> _zoneSavedObjectsLookup = new Dictionary<string, JObject>();
+000083: 
+000084: 	private Vector3 _playerPosition;
+000085: 
+000086: 	[SerializeField]
+000087: 	private Zone _zonePrefab;
+000088: 
+000089: 	[SerializeField]
+000090: 	private Transform _zoneContainer;
+000091: 
+000092: 	public static int WORLD_SEED
+000093: 	{
+000094: 		get
+000095: 		{
+000096: 			if (!Game.Mode.IsMultiplayer())
+000097: 			{
+000098: 				return LOCAL_WORLD_SEED;
+000099: 			}
+000100: 			return PlayerRegistry.ServerPeer.WorldSeed;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,263,transform.position,"000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}
+000280: 
+000281: 	private IEnumerator<float> CreateWorld_Sequence()
+000282: 	{
+000283: 		if (!Game.Mode.IsMultiplayer())
+000284: 		{
+000285: 			EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_WORLD""));
+000286: 			yield return 0f;
+000287: 			LoadWorld();
+000288: 		}
+000289: 		EventManager.RaiseEvent(new LoadingProgressChangedEvent(""LOADING_PROGRESS_TEXT_LOADING_OBJECTS""));
+000290: 		yield return 0f;
+000291: 		LoadObjects();"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,783,transform.position,"000769: 			if (!_zoneSavedObjectsLookup.ContainsKey(zone.gameObject.name))
+000770: 			{
+000771: 				_zoneSavedObjectsLookup.Add(zone.gameObject.name, null);
+000772: 			}
+000773: 			_zoneSavedObjectsLookup[zone.gameObject.name] = jObject;
+000774: 		}
+000775: 		if (!hardSave)
+000776: 		{
+000777: 			zone.Exit();
+000778: 			zone.HasObjectsForBillboard = true;
+000779: 			zone.Loaded = false;
+000780: 		}
+000781: 		Time.fixedDeltaTime = fixedDeltaTime;
+000782: 		Time.timeScale = timeScale;
+000783: 		_lastSavePosition = zone.transform.position;
+000784: 	}
+000785: 
+000786: 	private void OnZoneDownloaded(ZoneDownloadedEvent @event)
+000787: 	{
+000788: 		_zoneSavedObjectsLookup[Zones[@event.ZoneId].gameObject.name] = @event.Zone;
+000789: 	}
+000790: 
+000791: 	private void LoadZone(Zone zone)
+000792: 	{
+000793: 		JObject jObject = _zoneSavedObjectsLookup[zone.gameObject.name];
+000794: 		JObject field = jObject.GetField(""Objects"");
+000795: 		if (field != null && !field.IsNull())
+000796: 		{
+000797: 			_zoneLoader.LoadZone(zone, jObject);
+000798: 		}
+000799: 		else
+000800: 		{
+000801: 			_zoneLoader.CreateZone(zone);
+000802: 		}
+000803: 	}
+000804: 
+000805: 	private void Initialize_shelterTypes()
+000806: 	{
+000807: 		for (int i = 0; i < _shelters.Length; i++)
+000808: 		{
+000809: 			_shelters[i] = -1;
+000810: 		}
+000811: 		System.Random random = new System.Random(WORLD_SEED);"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,944,transform.position,"000930: 
+000931: 	private Zone FindClosestZone(Vector3 position)
+000932: 	{
+000933: 		int index = 0;
+000934: 		return FindClosestZone(position, out index);
+000935: 	}
+000936: 
+000937: 	private Zone FindClosestZone(Vector3 position, out int index)
+000938: 	{
+000939: 		index = -1;
+000940: 		Zone result = null;
+000941: 		float num = float.PositiveInfinity;
+000942: 		for (int i = 0; i < Zones.Length; i++)
+000943: 		{
+000944: 			float num2 = Vector3.Distance(position, Zones[i].transform.position);
+000945: 			if (num2 < num)
+000946: 			{
+000947: 				num = num2;
+000948: 				result = Zones[i];
+000949: 				index = i;
+000950: 			}
+000951: 		}
+000952: 		return result;
+000953: 	}
+000954: 
+000955: 	public Zone FindZone(string name)
+000956: 	{
+000957: 		for (int i = 0; i < Zones.Length; i++)
+000958: 		{
+000959: 			if (Zones[i].Id.Equals(name))
+000960: 			{
+000961: 				return Zones[i];
+000962: 			}
+000963: 		}
+000964: 		return null;
+000965: 	}
+000966: 
+000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals(""INTERNAL_MISSION_3""))
+000972: 			{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,981,transform.position,"000967: 	public Zone FindEndGameZone()
+000968: 	{
+000969: 		for (int i = 0; i < Zones.Length; i++)
+000970: 		{
+000971: 			if (Zones[i].Id.Equals(""INTERNAL_MISSION_3""))
+000972: 			{
+000973: 				return Zones[i];
+000974: 			}
+000975: 		}
+000976: 		return null;
+000977: 	}
+000978: 
+000979: 	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+000980: 	{
+000981: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+000982: 	}
+000983: 
+000984: 	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+000985: 	{
+000986: 		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+000987: 	}
+000988: 
+000989: 	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+000990: 	{
+000991: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+000992: 	}
+000993: 
+000994: 	private bool InImpostorViewRange(IPlayer player, Zone zone)
+000995: 	{
+000996: 		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1001600f;
+000997: 	}
+000998: 
+000999: 	private void ParentObjectToTransform(SaveablePrefab sp, Transform parent)
+001000: 	{
+001001: 		BaseObject baseObject = sp as BaseObject;
+001002: 		if (baseObject != null)
+001003: 		{
+001004: 			if (baseObject.CanParent)
+001005: 			{
+001006: 				baseObject.transform.parent = null;
+001007: 				baseObject.TransformParent = parent;
+001008: 				baseObject.Parent();
+001009: 			}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,1118,transform.position,"001104: 		int num2 = (int)Vector3.Distance(zero, b);
+001105: 		addedValue++;
+001106: 		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+001107: 	}
+001108: 
+001109: 	public JObject Save()
+001110: 	{
+001111: 		JObject jObject = new JObject();
+001112: 		jObject.AddField(""WorldSeed"", JSerializer.Serialize(WORLD_SEED));
+001113: 		JObject jObject2 = new JObject();
+001114: 		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+001115: 		{
+001116: 			IPlayer player = PlayerRegistry.AllPlayers[i];
+001117: 			JObject jObject3 = new JObject();
+001118: 			jObject3.AddField(""Position"", JSerializer.Serialize(player.transform.position));
+001119: 			jObject3.AddField(""ZoneId"", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+001120: 			jObject2.Add(jObject3);
+001121: 		}
+001122: 		jObject.AddField(""PlayersData"", jObject2);
+001123: 		Zone[] zones = Zones;
+001124: 		foreach (Zone zone in zones)
+001125: 		{
+001126: 			if (zone.Loaded)
+001127: 			{
+001128: 				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+001129: 			}
+001130: 		}
+001131: 		SaveZone(_nmlZone, destroy: false, hardSave: true);
+001132: 		HandleOutOfGameBounds_NoMansLand();
+001133: 		JObject jObject4 = new JObject();
+001134: 		for (int k = 0; k < 49; k++)
+001135: 		{
+001136: 			JObject zoneData = GetZoneData(Zones[k]);
+001137: 			jObject4.Add(zoneData);
+001138: 		}
+001139: 		JObject zoneData2 = GetZoneData(_nmlZone);
+001140: 		jObject4.Add(zoneData2);
+001141: 		jObject.AddField(""Zones"", jObject4);
+001142: 		jObject.AddField(""ShelterCount"", JSerializer.Serialize(ShelterCount));
+001143: 		JObject jObject5 = new JObject();
+001144: 		int num = 1;
+001145: 		int instance = -1;
+001146: 		for (int l = 0; l < Zones.Length; l++)"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,1119,transform.position,"001105: 		addedValue++;
+001106: 		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+001107: 	}
+001108: 
+001109: 	public JObject Save()
+001110: 	{
+001111: 		JObject jObject = new JObject();
+001112: 		jObject.AddField(""WorldSeed"", JSerializer.Serialize(WORLD_SEED));
+001113: 		JObject jObject2 = new JObject();
+001114: 		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+001115: 		{
+001116: 			IPlayer player = PlayerRegistry.AllPlayers[i];
+001117: 			JObject jObject3 = new JObject();
+001118: 			jObject3.AddField(""Position"", JSerializer.Serialize(player.transform.position));
+001119: 			jObject3.AddField(""ZoneId"", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+001120: 			jObject2.Add(jObject3);
+001121: 		}
+001122: 		jObject.AddField(""PlayersData"", jObject2);
+001123: 		Zone[] zones = Zones;
+001124: 		foreach (Zone zone in zones)
+001125: 		{
+001126: 			if (zone.Loaded)
+001127: 			{
+001128: 				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+001129: 			}
+001130: 		}
+001131: 		SaveZone(_nmlZone, destroy: false, hardSave: true);
+001132: 		HandleOutOfGameBounds_NoMansLand();
+001133: 		JObject jObject4 = new JObject();
+001134: 		for (int k = 0; k < 49; k++)
+001135: 		{
+001136: 			JObject zoneData = GetZoneData(Zones[k]);
+001137: 			jObject4.Add(zoneData);
+001138: 		}
+001139: 		JObject zoneData2 = GetZoneData(_nmlZone);
+001140: 		jObject4.Add(zoneData2);
+001141: 		jObject.AddField(""Zones"", jObject4);
+001142: 		jObject.AddField(""ShelterCount"", JSerializer.Serialize(ShelterCount));
+001143: 		JObject jObject5 = new JObject();
+001144: 		int num = 1;
+001145: 		int instance = -1;
+001146: 		for (int l = 0; l < Zones.Length; l++)
+001147: 		{"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,24,ZONE_TERRAIN_SIZE,"000010: using Ceto;
+000011: using Funlabs;
+000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,26,ZONE_TERRAIN_SIZE,"000012: using MEC;
+000013: using Photon.Bolt;
+000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,28,ZONE_TERRAIN_SIZE,"000014: using UnityEngine;
+000015: 
+000016: public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+000017: {
+000018: 	public const float ZONE_SPACING = 1.25f;
+000019: 
+000020: 	public const float ZONE_SIZE = 500f;
+000021: 
+000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,36,ZONE_HEIGHTMAP_SIZE,"000022: 	public const float ZONE_SIZE_HALF = 250f;
+000023: 
+000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,38,ZONE_HEIGHTMAP_HEIGHT,"000024: 	public const float ZONE_TERRAIN_SIZE = 250f;
+000025: 
+000026: 	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+000027: 
+000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,42,TERRAIN_Y_POSITION,"000028: 	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+000029: 
+000030: 	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+000031: 
+000032: 	public const float ZONE_LOAD_DISTANCE = 240f;
+000033: 
+000034: 	public const float ZONE_UNLOAD_DISTANCE = 250f;
+000035: 
+000036: 	public const int ZONE_HEIGHTMAP_SIZE = 257;
+000037: 
+000038: 	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+000039: 
+000040: 	public static int LOCAL_WORLD_SEED;
+000041: 
+000042: 	public const int TERRAIN_Y_POSITION = -100;
+000043: 
+000044: 	public const int TERRAIN_RESOLUTION = 45;
+000045: 
+000046: 	public const int TERRAIN_DETAIL_DISTANCE = 70;
+000047: 
+000048: 	public const int WORLD_ZONES = 7;
+000049: 
+000050: 	public const int WORLD_ZONES_SQUARED = 49;
+000051: 
+000052: 	public const int LEGACY_WORLD_ZONES = 5;
+000053: 
+000054: 	public const float LEGACY_ZONE_SIZE = 630f;
+000055: 
+000056: 	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+000057: 
+000058: 	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+000059: 
+000060: 	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+000061: 
+000062: 	private const float SQR_LOADING_BUFFER = 1600f;
+000063: 
+000064: 	private static int[] _shelters = new int[3] { -1, -1, -1 };
+000065: 
+000066: 	[SerializeField]
+000067: 	private Zone[] _zones;
+000068: 
+000069: 	[SerializeField]
+000070: 	private Zone _nmlZone;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/StrandedWorld.cs,251,ZonePosition,"000237: 	{
+000238: 		WorldGenerated?.Invoke();
+000239: 	}
+000240: 
+000241: 	protected void OnZoneEntered(Zone zone)
+000242: 	{
+000243: 		ZoneEntered?.Invoke(zone);
+000244: 	}
+000245: 
+000246: 	private void Awake()
+000247: 	{
+000248: 		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+000249: 	}
+000250: 
+000251: 	private void LoadZonePositions()
+000252: 	{
+000253: 		if (World.GenerationZonePositons == null)
+000254: 		{
+000255: 			World.CreateWorldZonePoints(WORLD_SEED);
+000256: 			Debug.Log(""StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions"");
+000257: 		}
+000258: 		for (int i = 0; i < 49; i++)
+000259: 		{
+000260: 			Vector3 zero = Vector3.zero;
+000261: 			zero.x = World.GenerationZonePositons[i].x;
+000262: 			zero.z = World.GenerationZonePositons[i].y;
+000263: 			_zones[i].transform.position = zero;
+000264: 			if (i == 0)
+000265: 			{
+000266: 				_zones[i].IsStartingIsland = true;
+000267: 			}
+000268: 		}
+000269: 	}
+000270: 
+000271: 	public float CreateWorld_Async()
+000272: 	{
+000273: 		return Timing.WaitUntilDone(CreateWorld());
+000274: 	}
+000275: 
+000276: 	public CoroutineHandle CreateWorld()
+000277: 	{
+000278: 		return Timing.RunCoroutine(CreateWorld_Sequence());
+000279: 	}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZonePositionGenerator.cs,8,WORLD_SEED,"000001: using System;
+000002: using System.Collections.Generic;
+000003: using SharpNeatLib.Maths;
+000004: using UnityEngine;
+000005: 
+000006: public static class ZonePositionGenerator
+000007: {
+000008: 	public static Vector2[] GeneratePoints(int WORLD_SEED, float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
+000009: 	{
+000010: 		float num = radius / Mathf.Sqrt(2f);
+000011: 		int[,] array = new int[Mathf.CeilToInt(sampleRegionSize.x / num), Mathf.CeilToInt(sampleRegionSize.y / num)];
+000012: 		List<Vector2> list = new List<Vector2>();
+000013: 		List<Vector2> list2 = new List<Vector2>();
+000014: 		list2.Add(sampleRegionSize / 2f);
+000015: 		FastRandom fastRandom = new FastRandom(WORLD_SEED);
+000016: 		while (list2.Count > 0)
+000017: 		{
+000018: 			int index = fastRandom.Next(0, list2.Count);
+000019: 			Vector2 vector = list2[index];
+000020: 			bool flag = false;
+000021: 			for (int i = 0; i < numSamplesBeforeRejection; i++)
+000022: 			{
+000023: 				float f = (float)fastRandom.NextDouble() * MathF.PI * 2f;
+000024: 				Vector2 vector2 = new Vector2(Mathf.Sin(f), Mathf.Cos(f));
+000025: 				Vector2 vector3 = vector + vector2 * (fastRandom.Next((int)(radius * 100f), (int)(1.25f * radius * 100f)) / 100);
+000026: 				if (i == 0)
+000027: 				{
+000028: 					vector3 = vector;
+000029: 				}
+000030: 				if (IsValid(vector3, sampleRegionSize, num, radius, list, array))
+000031: 				{
+000032: 					list.Add(vector3);
+000033: 					list2.Add(vector3);
+000034: 					array[(int)(vector3.x / num), (int)(vector3.y / num)] = list.Count;
+000035: 					flag = true;
+000036: 					break;"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZonePositionGenerator.cs,15,WORLD_SEED,"000001: using System;
+000002: using System.Collections.Generic;
+000003: using SharpNeatLib.Maths;
+000004: using UnityEngine;
+000005: 
+000006: public static class ZonePositionGenerator
+000007: {
+000008: 	public static Vector2[] GeneratePoints(int WORLD_SEED, float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
+000009: 	{
+000010: 		float num = radius / Mathf.Sqrt(2f);
+000011: 		int[,] array = new int[Mathf.CeilToInt(sampleRegionSize.x / num), Mathf.CeilToInt(sampleRegionSize.y / num)];
+000012: 		List<Vector2> list = new List<Vector2>();
+000013: 		List<Vector2> list2 = new List<Vector2>();
+000014: 		list2.Add(sampleRegionSize / 2f);
+000015: 		FastRandom fastRandom = new FastRandom(WORLD_SEED);
+000016: 		while (list2.Count > 0)
+000017: 		{
+000018: 			int index = fastRandom.Next(0, list2.Count);
+000019: 			Vector2 vector = list2[index];
+000020: 			bool flag = false;
+000021: 			for (int i = 0; i < numSamplesBeforeRejection; i++)
+000022: 			{
+000023: 				float f = (float)fastRandom.NextDouble() * MathF.PI * 2f;
+000024: 				Vector2 vector2 = new Vector2(Mathf.Sin(f), Mathf.Cos(f));
+000025: 				Vector2 vector3 = vector + vector2 * (fastRandom.Next((int)(radius * 100f), (int)(1.25f * radius * 100f)) / 100);
+000026: 				if (i == 0)
+000027: 				{
+000028: 					vector3 = vector;
+000029: 				}
+000030: 				if (IsValid(vector3, sampleRegionSize, num, radius, list, array))
+000031: 				{
+000032: 					list.Add(vector3);
+000033: 					list2.Add(vector3);
+000034: 					array[(int)(vector3.x / num), (int)(vector3.y / num)] = list.Count;
+000035: 					flag = true;
+000036: 					break;
+000037: 				}
+000038: 			}
+000039: 			if (!flag)
+000040: 			{
+000041: 				list2.RemoveAt(index);
+000042: 			}
+000043: 		}"
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/ZonePositionGenerator.cs,6,ZonePosition,"000001: using System;
+000002: using System.Collections.Generic;
+000003: using SharpNeatLib.Maths;
+000004: using UnityEngine;
+000005: 
+000006: public static class ZonePositionGenerator
+000007: {
+000008: 	public static Vector2[] GeneratePoints(int WORLD_SEED, float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30)
+000009: 	{
+000010: 		float num = radius / Mathf.Sqrt(2f);
+000011: 		int[,] array = new int[Mathf.CeilToInt(sampleRegionSize.x / num), Mathf.CeilToInt(sampleRegionSize.y / num)];
+000012: 		List<Vector2> list = new List<Vector2>();
+000013: 		List<Vector2> list2 = new List<Vector2>();
+000014: 		list2.Add(sampleRegionSize / 2f);
+000015: 		FastRandom fastRandom = new FastRandom(WORLD_SEED);
+000016: 		while (list2.Count > 0)
+000017: 		{
+000018: 			int index = fastRandom.Next(0, list2.Count);
+000019: 			Vector2 vector = list2[index];
+000020: 			bool flag = false;
+000021: 			for (int i = 0; i < numSamplesBeforeRejection; i++)
+000022: 			{
+000023: 				float f = (float)fastRandom.NextDouble() * MathF.PI * 2f;
+000024: 				Vector2 vector2 = new Vector2(Mathf.Sin(f), Mathf.Cos(f));
+000025: 				Vector2 vector3 = vector + vector2 * (fastRandom.Next((int)(radius * 100f), (int)(1.25f * radius * 100f)) / 100);
+000026: 				if (i == 0)
+000027: 				{
+000028: 					vector3 = vector;
+000029: 				}
+000030: 				if (IsValid(vector3, sampleRegionSize, num, radius, list, array))
+000031: 				{
+000032: 					list.Add(vector3);
+000033: 					list2.Add(vector3);
+000034: 					array[(int)(vector3.x / num), (int)(vector3.y / num)] = list.Count;"

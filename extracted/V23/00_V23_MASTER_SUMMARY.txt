@@ -1,0 +1,73 @@
+
+CASTAWAY-DEPTHS V23 MASTER SUMMARY
+============================================================
+
+Created UTC:
+2026-11-19T20:57:38.420859+00:00
+
+STATUS:
+AUDIT COMPLETED - EVIDENCE REQUIRES REVIEW
+
+SOURCE ROOTS:
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED
+/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH
+
+GAME ROOT:
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+
+SOURCE FILES:
+3182
+
+SOURCE EVIDENCE RECORDS:
+2795
+
+ASSET CANDIDATES:
+58
+
+ASSET KIND COUNTS:
+{'GAME_MAP_DATA': 15, 'OTHER_TEXT_OR_DATA': 16, 'MANIFEST': 8, 'UNITY_BUNDLE_CANDIDATE': 7, 'UNITY_RESOURCE_CANDIDATE': 12}
+
+FILE MAGIC COUNTS:
+{'UNKNOWN_OR_RAW': 51, 'UnityFS': 7}
+
+GUID RECORDS:
+0
+
+BINARY STRING HITS:
+43
+
+MISSION 3 ASSET CANDIDATES:
+13
+
+WORLD PLACEMENT SOURCE ROWS:
+99
+
+V22 PROVENANCE:
+00_V22_MASTER_SUMMARY.txt: EXISTS; 1096 bytes; SHA256=726913a8974dc6144ce2ef8297ae887f3a0ba54b40673880e3dbfc0dd9a994f5
+04_V22_HEIGHT_NORMALIZATION.txt: EXISTS; 679 bytes; SHA256=7ab640f3295a8d70f9b158bdb77d4bb7a4a589297630d3578279f72dd636779b
+05_V22_COORDINATE_MAPPING.txt: EXISTS; 1096 bytes; SHA256=a38b68ddc1302f04493a337a282961ecd53bb977e80cd582ed9e4ba0cd0591ce
+09_V22_SHA256_MANIFEST.csv: EXISTS; 66399 bytes; SHA256=bf929fc2acec8ce82c7a890c5919f0d86e090b7cec3cc8c5058851830d9ab679
+
+ERROR COUNT:
+0
+
+WARNING COUNT:
+0
+
+IMPORTANT LIMITATIONS:
+- This script inventories Unity asset candidates.
+- It does not fully deserialize Unity TerrainData.
+- A UnityFS header identifies a bundle format, not its contents.
+- GUIDs from .meta files do not prove runtime assignment.
+- Source search hits do not prove execution order.
+- Global coordinates must be derived from complete methods,
+  seed data and actual zone assignment evidence.
+- Missing values remain UNKNOWN.
+
+NO MODIFICATIONS:
+- Original game files
+- Existing Godot project
+- GLB extraction pipeline
+- APK build/export workflow
+
+V23 AUDIT FINISHED
