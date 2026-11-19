@@ -1,0 +1,55 @@
+
+CASTAWAY-DEPTHS V23.1
+UNITY ASSET DEEP SCAN & WORLD SEED RECOVERY
+============================================================
+
+Created UTC:
+2026-11-19T21:12:09.074128+00:00
+
+GAME ROOT:
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+
+V23 INPUT:
+/storage/emulated/0/Map Check/reports/V23_GLOBAL_WORLD_RECOVERY
+
+ASSET INVENTORY COUNT:
+55
+
+ASSET MAGIC COUNTS:
+{'UNKNOWN_OR_RAW': 30, 'UNKNOWN_ZERO_PREFIX': 18, 'UnityFS': 7}
+
+ASSET EXTENSION COUNTS:
+{'.map': 15, '': 6, '.assets': 7, '.ress': 6, '.resource': 6, '.manifest': 8, '.unity3d': 7}
+
+SEED FILE CANDIDATES:
+0
+
+SOURCE EVIDENCE RECORDS:
+240
+
+UNITY OBJECT RECORDS:
+0
+
+TERRAIN / TRANSFORM FIELD RECORDS:
+0
+
+UNITYPY:
+UnityPy: NOT AVAILABLE; no serialized parsing performed
+
+ERROR COUNT:
+0
+
+WARNING COUNT:
+1
+
+IMPORTANT:
+- Seed.sdd candidates are not automatically confirmed seeds.
+- BinaryFormatter headers are not decoded seed values.
+- Unity object names are candidates until references are resolved.
+- TerrainData values are accepted only from parsed serialized objects.
+- FileID/PathID links must be resolved before declaring references.
+- Unknown data remains UNKNOWN.
+- This audit does not modify game/save files.
+- No Godot project or APK changes are made.
+
+V23.1 FINISHED
