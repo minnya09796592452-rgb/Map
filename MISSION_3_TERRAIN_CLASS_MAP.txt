@@ -1,0 +1,2764 @@
+CASTAWAY-DEPTHS TERRAIN CLASS MAP
+Assembly: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+
+======================================================================
+TYPE: <>f__AnonymousType0`2
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <Height>i__Field
+-- MATCHING METHODS --
+METHOD: get_Height
+SIGNATURE HEX: 20001301
+
+======================================================================
+TYPE: PiscusManager
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CheckInsideTerrain
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Piscus_Creature
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _biomePosition
+FIELD: _biomeSize
+FIELD: _underTerrainTime
+-- MATCHING METHODS --
+METHOD: get_BiomePosition
+SIGNATURE HEX: 20001139
+METHOD: set_BiomePosition
+SIGNATURE HEX: 2001011139
+METHOD: get_BiomeSize
+SIGNATURE HEX: 20000c
+METHOD: set_BiomeSize
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: FogVolume
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: mesh
+-- MATCHING METHODS --
+METHOD: UpdateBoxMesh
+SIGNATURE HEX: 200001
+METHOD: CreateBoxMesh
+SIGNATURE HEX: 2001011139
+
+======================================================================
+TYPE: IntroAtmo
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _normalizedTime
+
+======================================================================
+TYPE: WeatherEvent
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _normalizedBuildTime
+FIELD: _normalizedDissipateTime
+-- MATCHING METHODS --
+METHOD: get_NormalizedFadeValue
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: CullingSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _terrainObjectCullingDistance
+
+======================================================================
+TYPE: MouseLook
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _clampedSmoothing
+FIELD: _smoothing
+
+======================================================================
+TYPE: BaseObjectProxy
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MeshFilter
+FIELD: MeshRenderer
+
+======================================================================
+TYPE: SetupAdvancedFoliageShader
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: TerrainFoliageNrmSpecMap
+FIELD: AutoSyncToTerrain
+FIELD: SyncedTerrain
+FIELD: allTerrains
+-- MATCHING METHODS --
+METHOD: afsSetupTerrainEngine
+SIGNATURE HEX: 200001
+METHOD: afsAutoSyncToTerrain
+SIGNATURE HEX: 200001
+METHOD: CubicSmooth
+SIGNATURE HEX: 20010c0c
+METHOD: SmoothTriangleWave
+SIGNATURE HEX: 20010c0c
+METHOD: CubicSmooth
+SIGNATURE HEX: 20011181cd1181cd
+METHOD: SmoothTriangleWave
+SIGNATURE HEX: 20011181cd1181cd
+
+======================================================================
+TYPE: Tide
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _lowTideHeight
+FIELD: _highTideHeight
+
+======================================================================
+TYPE: EDeltaTimeType
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Smoothed
+
+======================================================================
+TYPE: LE_ObjectReference
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SnapGridCellSize
+
+======================================================================
+TYPE: ShippingContainerSpawner
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateShippingContainer
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Achievements
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ISLAND_HERMIT_GOAL
+FIELD: ISLAND_HOPPER_GOAL
+-- MATCHING METHODS --
+METHOD: ZoneEvents_CampFirePlaced
+SIGNATURE HEX: 200101128484
+METHOD: ZoneEvents_CropPlanted
+SIGNATURE HEX: 200201128484119e44
+
+======================================================================
+TYPE: SaveManager
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateSave_Sequence
+SIGNATURE HEX: 0002151259010c12a2cc12a2cc
+
+======================================================================
+TYPE: GraphicsSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Resolution
+
+======================================================================
+TYPE: InputSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MouseSmoothness
+
+======================================================================
+TYPE: LootContainerSpawner
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _containersGenerated
+
+======================================================================
+TYPE: CreditsAsset
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: ConvertMarkdownToTextMeshProTags
+SIGNATURE HEX: 00010e0e
+
+======================================================================
+TYPE: TerrainPointSampler
+TOKEN: ?
+
+======================================================================
+TYPE: ZoneTerrainPointSampler
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _zone
+
+======================================================================
+TYPE: LevelLoader
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _loadingZones
+-- MATCHING METHODS --
+METHOD: get_LoadingZones
+SIGNATURE HEX: 2000151282e901128484
+
+======================================================================
+TYPE: MapNameGenerator
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateRandomMapName
+SIGNATURE HEX: 00010e08
+
+======================================================================
+TYPE: PlayerDetailSpawnerManager
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: StrandedWorld_WorldGenerated
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: StrandedWorld
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ZONE_SPACING
+FIELD: ZONE_SIZE
+FIELD: ZONE_SIZE_HALF
+FIELD: ZONE_TERRAIN_SIZE
+FIELD: ZONE_TERRAIN_SIZE_HALF
+FIELD: ZONE_TERRAIN_SIZE_HALF_SQR
+FIELD: ZONE_LOAD_UNLOAD_BUFFER
+FIELD: ZONE_LOAD_DISTANCE
+FIELD: ZONE_UNLOAD_DISTANCE
+FIELD: ZONE_HEIGHTMAP_SIZE
+FIELD: ZONE_HEIGHTMAP_HEIGHT
+FIELD: TERRAIN_Y_POSITION
+FIELD: TERRAIN_RESOLUTION
+FIELD: TERRAIN_DETAIL_DISTANCE
+FIELD: WORLD_ZONES
+FIELD: WORLD_ZONES_SQUARED
+FIELD: LEGACY_WORLD_ZONES
+FIELD: LEGACY_ZONE_SIZE
+FIELD: LEGACY_ZONE_SIZE_HALF
+FIELD: _zones
+FIELD: _nmlZone
+FIELD: _terrainDatas
+FIELD: ZoneEvents
+FIELD: _zoneLoader
+FIELD: _zoneSavedObjectsLookup
+FIELD: WorldGenerated
+FIELD: ZoneEntered
+FIELD: _zonePrefab
+FIELD: _zoneContainer
+-- MATCHING METHODS --
+METHOD: GetZoneData
+SIGNATURE HEX: 200112a2cc128484
+METHOD: GetHeight
+SIGNATURE HEX: 20010c1139
+METHOD: get_Zones
+SIGNATURE HEX: 20001d128484
+METHOD: get_NmlZone
+SIGNATURE HEX: 2000128484
+METHOD: get_ZoneLoader
+SIGNATURE HEX: 200012a288
+METHOD: GetZone
+SIGNATURE HEX: 0002128484113902
+METHOD: GetZoneId
+SIGNATURE HEX: 200108128484
+METHOD: GetZone_
+SIGNATURE HEX: 20011284841139
+METHOD: GetBiome
+SIGNATURE HEX: 000111b0a01139
+METHOD: GetBiome_
+SIGNATURE HEX: 200111b0a01139
+METHOD: add_WorldGenerated
+SIGNATURE HEX: 200101129cdc
+METHOD: remove_WorldGenerated
+SIGNATURE HEX: 200101129cdc
+METHOD: OnWorldGenerated
+SIGNATURE HEX: 200001
+METHOD: add_ZoneEntered
+SIGNATURE HEX: 2001011512823501128484
+METHOD: remove_ZoneEntered
+SIGNATURE HEX: 2001011512823501128484
+METHOD: OnZoneEntered
+SIGNATURE HEX: 200101128484
+METHOD: LoadZonePositions
+SIGNATURE HEX: 200001
+METHOD: SubscribeToZoneLoaderEvents
+SIGNATURE HEX: 200001
+METHOD: UnsubscribeFromZoneLoaderEvents
+SIGNATURE HEX: 200001
+METHOD: ZoneLoader_LoadedZone
+SIGNATURE HEX: 200101128484
+METHOD: InitializeZones
+SIGNATURE HEX: 200001
+METHOD: ApplyWorldToZones
+SIGNATURE HEX: 200001
+METHOD: PollZones
+SIGNATURE HEX: 200001
+METHOD: PollZone
+SIGNATURE HEX: 200101128484
+METHOD: SaveZone
+SIGNATURE HEX: 200401128484020202
+METHOD: OnZoneDownloaded
+SIGNATURE HEX: 200101129890
+METHOD: LoadZone
+SIGNATURE HEX: 200101128484
+METHOD: SetShelterOnZones
+SIGNATURE HEX: 200001
+METHOD: SetSheltersOnWorldZones
+SIGNATURE HEX: 200001
+METHOD: SetWollieOnShelterZone
+SIGNATURE HEX: 2001011512650108
+METHOD: FindClosestZone
+SIGNATURE HEX: 20011284841139
+METHOD: FindClosestZone
+SIGNATURE HEX: 200212848411391008
+METHOD: FindZone
+SIGNATURE HEX: 20011284840e
+METHOD: FindEndGameZone
+SIGNATURE HEX: 2000128484
+METHOD: InZoneUnLoadingBounds
+SIGNATURE HEX: 20020212a06c128484
+METHOD: InZoneLoadingBounds
+SIGNATURE HEX: 20020212a06c128484
+METHOD: GenerateLocalSeed
+SIGNATURE HEX: 200212816d113908
+METHOD: LoadStartingZone
+SIGNATURE HEX: 20020c113902
+METHOD: LoadStartingZone
+SIGNATURE HEX: 20010c128484
+METHOD: LoadStartingZone_Sequence
+SIGNATURE HEX: 2001151259010c128484
+
+======================================================================
+TYPE: IslandDebugTexture
+TOKEN: ?
+
+======================================================================
+TYPE: WorldTools
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: heightmapRes
+FIELD: perlinSeed
+FIELD: perlinFrequency
+FIELD: perlinAmplitude
+FIELD: perlinOctaves
+FIELD: perlinBlend
+FIELD: normaliseMin
+FIELD: normaliseMax
+FIELD: normaliseBlend
+FIELD: smoothBlend
+FIELD: smoothIterations
+FIELD: Island_Base_Height
+-- MATCHING METHODS --
+METHOD: GenerateZoneBiome
+SIGNATURE HEX: 000211b0a011b0a008
+METHOD: GenerateZoneHeightmap
+SIGNATURE HEX: 0002140c020002000011b0a008
+METHOD: GENERATE_ISLAND_HEIGHTMAP
+SIGNATURE HEX: 0003140c02000200000811b0a002
+METHOD: StitchTerrainEdges
+SIGNATURE HEX: 0001140c0200020000140c0200020000
+METHOD: CreateHeightMapTexture
+SIGNATURE HEX: 00011280e91282f5
+METHOD: GenerateTerrain
+SIGNATURE HEX: 0002140c0200020000140c020002000011b0a0
+METHOD: GeneratePerlin
+SIGNATURE HEX: 0002140c0200020000140c02000200001180cd
+METHOD: PerlinGenerator
+SIGNATURE HEX: 0006140c0200020000140c020002000008080c080c
+METHOD: Normalise
+SIGNATURE HEX: 0002140c0200020000140c02000200001180cd
+METHOD: NormalizeHeightmap
+SIGNATURE HEX: 0005140c0200020000140c02000200000c0c0c11b0a0
+METHOD: SmoothTerrain
+SIGNATURE HEX: 0004140c0200020000140c0200020000080c11b0a0
+METHOD: smooth
+SIGNATURE HEX: 0002140c0200020000140c02000200001180cd
+METHOD: FillCellHeightmap
+SIGNATURE HEX: 000601140c02000200001d113908020c0c
+METHOD: HeightmapRiver
+SIGNATURE HEX: 000501140c020002000008080808
+
+======================================================================
+TYPE: Zone
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SAVE_BOUNDS_MAX_HEIGHT
+FIELD: SAVE_BOUNDS_MIN_HEIGHT
+FIELD: _terrain
+FIELD: _biome
+FIELD: ZoneName
+FIELD: IsStartingIsland
+FIELD: _generatedObjects
+-- MATCHING METHODS --
+METHOD: InSaveBoundsHeight
+SIGNATURE HEX: 2001021139
+METHOD: get_Terrain
+SIGNATURE HEX: 20001281d5
+METHOD: get_Biome
+SIGNATURE HEX: 200011b0a0
+METHOD: set_Biome
+SIGNATURE HEX: 20010111b0a0
+METHOD: get_GeneratedObjects
+SIGNATURE HEX: 20001512810d0112a284
+METHOD: GenerateGridData
+SIGNATURE HEX: 200001
+METHOD: OnObjectGenerated
+SIGNATURE HEX: 20010112a284
+
+======================================================================
+TYPE: ZoneObjects
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: spawnOnStartingIsland
+FIELD: minHeight
+FIELD: maxHeight
+FIELD: terrainSnap
+FIELD: TerrainSnapBias
+
+======================================================================
+TYPE: ZonePositionGenerator
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GeneratePoints
+SIGNATURE HEX: 00041d1180cd080c1180cd08
+
+======================================================================
+TYPE: DynamicBoneCollider
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_Height
+
+======================================================================
+TYPE: DeluxeEyeAdaptation
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_LowResolution
+
+======================================================================
+TYPE: DeluxeEyeAdaptationLogic
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_Meshes
+FIELD: m_CurrentHeight
+FIELD: m_Height
+-- MATCHING METHODS --
+METHOD: RebuildMeshIfNeeded
+SIGNATURE HEX: 2002010808
+METHOD: BuildMeshes
+SIGNATURE HEX: 2002010808
+METHOD: ClearMeshes
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: kode80.Utils.GFXDebug
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetEndOfFrameShim
+SIGNATURE HEX: 20001284f0
+
+======================================================================
+TYPE: kode80.Clouds.FullScreenQuad
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _mesh
+
+======================================================================
+TYPE: kode80.Clouds.kode80Clouds
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: fixedHeight
+FIELD: atmosphereStartHeight
+FIELD: atmosphereEndHeight
+FIELD: _perlin3D
+-- MATCHING METHODS --
+METHOD: CloudHeightGradient
+SIGNATURE HEX: 20011181cd1280e5
+
+======================================================================
+TYPE: kode80.Clouds.SharedProperties
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _atmosphereStartHeight
+FIELD: _atmosphereEndHeight
+FIELD: _subFrameHeight
+FIELD: _frameHeight
+FIELD: fixedHeight
+-- MATCHING METHODS --
+METHOD: get_atmosphereStartHeight
+SIGNATURE HEX: 20000c
+METHOD: set_atmosphereStartHeight
+SIGNATURE HEX: 2001010c
+METHOD: get_atmosphereEndHeight
+SIGNATURE HEX: 20000c
+METHOD: set_atmosphereEndHeight
+SIGNATURE HEX: 2001010c
+METHOD: get_subFrameHeight
+SIGNATURE HEX: 200008
+METHOD: get_frameHeight
+SIGNATURE HEX: 200008
+METHOD: NormalizedPointToAtmosphere
+SIGNATURE HEX: 200211391180cd128085
+
+======================================================================
+TYPE: HighlightingSystem.HighlightingBase
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: cachedHeight
+
+======================================================================
+TYPE: Epic.OnlineServices.Ecom.KeyImageInfo
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <Height>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_Height
+SIGNATURE HEX: 200009
+METHOD: set_Height
+SIGNATURE HEX: 20010109
+
+======================================================================
+TYPE: Epic.OnlineServices.Ecom.KeyImageInfoInternal
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_Height
+-- MATCHING METHODS --
+METHOD: get_Height
+SIGNATURE HEX: 200009
+METHOD: set_Height
+SIGNATURE HEX: 20010109
+
+======================================================================
+TYPE: IslandGen.Island
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <IslandType>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_IslandType
+SIGNATURE HEX: 200011b110
+METHOD: set_IslandType
+SIGNATURE HEX: 20010111b110
+METHOD: NewIsland
+SIGNATURE HEX: 20050111b11011b11408080c
+METHOD: GetBiome
+SIGNATURE HEX: 000111b11c129628
+METHOD: AssignBiomes
+SIGNATURE HEX: 200001
+METHOD: InsideIsland
+SIGNATURE HEX: 2001021180cd
+
+======================================================================
+TYPE: IslandGen.Center
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Biome
+
+======================================================================
+TYPE: IslandGen.Corner
+TOKEN: ?
+
+======================================================================
+TYPE: IslandGen.Edge
+TOKEN: ?
+
+======================================================================
+TYPE: IslandGen.PointSelector
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateRandom
+SIGNATURE HEX: 0002151265011180cd0808
+METHOD: GenerateRelaxed
+SIGNATURE HEX: 0002151265011180cd0808
+
+======================================================================
+TYPE: UnityEngine.UI.LetterSpacing
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: ModifyMesh
+SIGNATURE HEX: 200101128389
+
+======================================================================
+TYPE: S_SnapTools.S_SnapToGrid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_gridCellSize
+-- MATCHING METHODS --
+METHOD: get_GridCellSize
+SIGNATURE HEX: 20001139
+METHOD: set_GridCellSize
+SIGNATURE HEX: 2001011139
+
+======================================================================
+TYPE: S_SnapTools.S_SnapToObjectPreview
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_uiMesh
+FIELD: m_isUiMeshIndicesSet
+
+======================================================================
+TYPE: LE_LevelEditor.LE_ConfigTerrain
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _heightmaps
+FIELD: m_customDefaultTerrain
+FIELD: m_terrainLayer
+-- MATCHING METHODS --
+METHOD: get_Heightmaps
+SIGNATURE HEX: 20001d12b1b0
+METHOD: set_Heightmaps
+SIGNATURE HEX: 2001011d12b1b0
+METHOD: get_CustomDefaultTerrain
+SIGNATURE HEX: 20001281d5
+METHOD: get_TerrainLayer
+SIGNATURE HEX: 200008
+
+======================================================================
+TYPE: LE_LevelEditor.LE_DensityBounds
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zoneSize
+
+======================================================================
+TYPE: LE_LevelEditor.LE_LevelEditorMain
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: IS_TERRAIN_EDITOR
+FIELD: m_GUI3dTerrain
+FIELD: m_logicTerrain
+-- MATCHING METHODS --
+METHOD: get_GUI3dTerrain
+SIGNATURE HEX: 2000129764
+METHOD: InitializeDefaultTerrain
+SIGNATURE HEX: 200101129748
+
+======================================================================
+TYPE: LE_LevelEditor.LE_SaveLoad
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SaveMapHeightMapFile
+SIGNATURE HEX: 000201140c02000200000e
+METHOD: LoadMapHeightMapFile
+SIGNATURE HEX: 0001140c02000200000e
+
+======================================================================
+TYPE: LE_LevelEditor.LE_ZoneTileGenerator
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: terrain
+-- MATCHING METHODS --
+METHOD: GenerateHeightmapFromTexture
+SIGNATURE HEX: 2001011280e9
+METHOD: GenerateShoreMap
+SIGNATURE HEX: 200001
+METHOD: GenerateRandomIsland
+SIGNATURE HEX: 200001
+METHOD: GenerateAdvancedPerlin
+SIGNATURE HEX: 200401080c080c
+METHOD: GenerateAdvancedNormalise
+SIGNATURE HEX: 2003010c0c0c
+METHOD: GenerateSmooth
+SIGNATURE HEX: 200001
+METHOD: CreateHeightMapTexture
+SIGNATURE HEX: 20011280e91282f5
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_GUI3dObject
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: TERRAIN_LAYER
+-- MATCHING METHODS --
+METHOD: AddTerrainSnapping
+SIGNATURE HEX: 2001011297dc
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_GUI3dTerrain
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: TERRAIN_LAYER
+FIELD: m_terrain
+FIELD: m_terrainMgr
+FIELD: m_defaultTerrainDataPrefab
+FIELD: _heightmap
+FIELD: m_isReadingTerrainSetHeight
+FIELD: m_isTerrainSetHeightReadInFrame
+FIELD: m_isDirectedSmooth
+FIELD: m_directedSmoothAngle
+-- MATCHING METHODS --
+METHOD: get_TerrainInstance
+SIGNATURE HEX: 20001281d5
+METHOD: get_TerrainManager
+SIGNATURE HEX: 20001297f0
+METHOD: SetTerrain
+SIGNATURE HEX: 2001011281d5
+METHOD: RemoveTerrainManager
+SIGNATURE HEX: 200001
+METHOD: get_DefaultTerrainDataPrefab
+SIGNATURE HEX: 20001282f5
+METHOD: set_DefaultTerrainDataPrefab
+SIGNATURE HEX: 2001011282f5
+METHOD: get_Heightmap
+SIGNATURE HEX: 200012b1b0
+METHOD: set_Heightmap
+SIGNATURE HEX: 20010112b1b0
+METHOD: get_IsReadingTerrainSetHeight
+SIGNATURE HEX: 200002
+METHOD: set_IsReadingTerrainSetHeight
+SIGNATURE HEX: 20010102
+METHOD: get_IsDirectedSmooth
+SIGNATURE HEX: 200002
+METHOD: set_IsDirectedSmooth
+SIGNATURE HEX: 20010102
+METHOD: get_DirectedSmoothAngle
+SIGNATURE HEX: 20000c
+METHOD: set_DirectedSmoothAngle
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_EEditMode
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: TERRAIN
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_ETerrainEditMode
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: CHANGE_HEIGHT
+FIELD: CHANGE_HEIGHT_TO_TARGET_VALUE
+FIELD: SMOOTH_HEIGHT
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_GUIInterface
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: OnTerrainHeightmapTextureChanged
+SIGNATURE HEX: 20010108
+METHOD: OnTerrainBrushChanged
+SIGNATURE HEX: 20010108
+METHOD: OnTerrainEditBrushSizeChanged
+SIGNATURE HEX: 2001010c
+METHOD: OnTerrainEditBrushAmountChanged
+SIGNATURE HEX: 2001010c
+METHOD: OnTerrainEditBrushTargetValueChanged
+SIGNATURE HEX: 2001010c
+METHOD: OnTerrainEditDirectionChanged
+SIGNATURE HEX: 2001010c
+METHOD: OnTerrainChangeHeightModeChanged
+SIGNATURE HEX: 20010102
+METHOD: OnTerrainIsDirectedSmoothChanged
+SIGNATURE HEX: 20010102
+METHOD: OnTerrainEditModeBtn
+SIGNATURE HEX: 20010108
+METHOD: OnTerrainReadSetHeightBtn
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGenerateShoremap
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGenerateCustomHeightmap
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGeneratePerlin
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGenerateNormalise
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGenerateIsland
+SIGNATURE HEX: 200001
+METHOD: OnTerrainSmooth
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_GUIInterface_uGUIimpl
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_GUI3dTerrain
+FIELD: TERRAIN_BRUSH_PICKER
+FIELD: TERRAIN_HEIGHTMAP_PICKER
+FIELD: TERRAIN_EDIT_BRUSH_SIZE_SLIDER
+FIELD: TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER
+FIELD: TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT
+FIELD: TERRAIN_READ_SET_HEIGHT_BTN
+FIELD: TERRAIN_MENU
+FIELD: TERRAIN_MENU_FADE_IN_ANIM
+FIELD: TERRAIN_UI_MODE_EDIT
+FIELD: TERRAIN_GENERATE_PERLIN
+FIELD: TERRAIN_GENERATE_PERLIN_FREQ
+FIELD: TERRAIN_GENERATE_PERLIN_AMPLITUDE
+FIELD: TERRAIN_GENERATE_PERLIN_OCTAVES
+FIELD: TERRAIN_GENERATE_PERLIN_BLEND
+FIELD: TERRAIN_GENERATE_NORMALISE
+FIELD: TERRAIN_GENERATE_NORMALISE_MIN
+FIELD: TERRAIN_GENERATE_NORMALISE_MAX
+FIELD: TERRAIN_GENERATE_NORMALISE_BLEND
+FIELD: TERRAIN_SMOOTH
+-- MATCHING METHODS --
+METHOD: OnTerrainGenerateCustomHeightmap
+SIGNATURE HEX: 2002011c1283a9
+METHOD: OnTerrainGeneratePerlin
+SIGNATURE HEX: 2002011c1283a9
+METHOD: TerrainGeneratePerlin
+SIGNATURE HEX: 200001
+METHOD: OnTerrainGenerateNormalise
+SIGNATURE HEX: 2002011c1283a9
+METHOD: OnTerrainGenerateIsland
+SIGNATURE HEX: 2002011c1283a9
+METHOD: OnTerrainGenerateShoremap
+SIGNATURE HEX: 2002011c1283a9
+METHOD: OnTerrainSmooth
+SIGNATURE HEX: 2002011c1283a9
+METHOD: SetTerrainUIMode
+SIGNATURE HEX: 20010111bbdc
+METHOD: SetTerrainEditBrushSize
+SIGNATURE HEX: 2001010c
+METHOD: SetTerrainEditBrushAmount
+SIGNATURE HEX: 2001010c
+METHOD: SetTerrainEditBrushTargetValue
+SIGNATURE HEX: 2001010c
+METHOD: SetTerrainIsReadingSetHeight
+SIGNATURE HEX: 20010102
+METHOD: AddButtonClickSoundsToGeneratedUI
+SIGNATURE HEX: 200101128125
+METHOD: <OnTerrainGeneratePerlin>b__34_0
+SIGNATURE HEX: 200001
+METHOD: <OnTerrainGenerateNormalise>b__36_0
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: LE_LevelEditor.UI.LE_ObjectDragDrop
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_selectedObjectTransformHeight
+
+======================================================================
+TYPE: LE_LevelEditor.Logic.LE_LogicLevel
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_GUI3dTerrain
+
+======================================================================
+TYPE: LE_LevelEditor.Logic.LE_LogicTerrain
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_GUI3dTerrain
+FIELD: m_doRebuildTerrainTab
+FIELD: m_selectedHeightmapIndex
+FIELD: m_isHeightRaise
+-- MATCHING METHODS --
+METHOD: LoadRawHeightmaps
+SIGNATURE HEX: 200101129748
+METHOD: OnTerrainBrushChanged
+SIGNATURE HEX: 2002011c12bbf4
+METHOD: OnTerrainHeightmapTextureChanged
+SIGNATURE HEX: 2002011c12bbf4
+METHOD: OnTerrainEditBrushSizeChanged
+SIGNATURE HEX: 2002011c12bbf8
+METHOD: OnTerrainEditBrushAmountChanged
+SIGNATURE HEX: 2002011c12bbf8
+METHOD: OnTerrainEditBrushTargetValueChanged
+SIGNATURE HEX: 2002011c12bbf8
+METHOD: OnTerrainEditDirectionChanged
+SIGNATURE HEX: 2002011c12bbf8
+METHOD: OnTerrainChangeHeightModeChanged
+SIGNATURE HEX: 2002011c12bc10
+METHOD: OnTerrainIsDirectedSmoothChanged
+SIGNATURE HEX: 2002011c12bbf0
+METHOD: OnTerrainEditModeBtn
+SIGNATURE HEX: 2002011c12bc0c
+METHOD: OnTerrainReadSetHeightBtn
+SIGNATURE HEX: 2002011c1283a9
+METHOD: InitTerrainValues
+SIGNATURE HEX: 200001
+METHOD: GetTerrainUIMode
+SIGNATURE HEX: 200011bbdc
+METHOD: ReadSetHeightRoutine
+SIGNATURE HEX: 20001251
+
+======================================================================
+TYPE: LE_LevelEditor.Events.LE_EventInterface
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: OnTerrainCreated
+
+======================================================================
+TYPE: LE_LevelEditor.Events.LE_TerrainCreatedEvent
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_terrainGameObject
+-- MATCHING METHODS --
+METHOD: get_TerrainGameObject
+SIGNATURE HEX: 20001235
+
+======================================================================
+TYPE: LE_LevelEditor.Core.LE_Object
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_snapGridCellSize
+-- MATCHING METHODS --
+METHOD: get_SnapGridCellSize
+SIGNATURE HEX: 20001139
+METHOD: set_SnapGridCellSize
+SIGNATURE HEX: 2001011139
+
+======================================================================
+TYPE: LE_LevelEditor.Core.LE_TerrainManager
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_terrainData
+-- MATCHING METHODS --
+METHOD: get_TerrainData
+SIGNATURE HEX: 20001282f5
+METHOD: SmoothHeight
+SIGNATURE HEX: 2007010c081280e90c1180cd020c
+METHOD: ChangeHeight
+SIGNATURE HEX: 2005010c0c1280e90c1180cd
+METHOD: ClampHeightBounds
+SIGNATURE HEX: 20030c0c0808
+METHOD: ChangeHeight
+SIGNATURE HEX: 2004010c1280e90c1180cd
+METHOD: ChangeHeightInternal
+SIGNATURE HEX: 200c011280e90c1180cd100810081008100810140c0200020000100c100c100c100c
+
+======================================================================
+TYPE: Funlabs.TransformId
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Zones
+
+======================================================================
+TYPE: Funlabs.MPExtensions
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetZoneData
+SIGNATURE HEX: 000212a2cc12a2cc0e
+
+======================================================================
+TYPE: Funlabs.MultiplayerMng
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _zoneStreamChannel
+-- MATCHING METHODS --
+METHOD: get_ZoneStreamChannel
+SIGNATURE HEX: 000011841d
+
+======================================================================
+TYPE: Funlabs.ZoneDownloadedEvent
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ZoneId
+FIELD: Zone
+
+======================================================================
+TYPE: Funlabs.MultiplayerZoneSync
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _zoneUploadIndex
+FIELD: _zoneDownloadState
+FIELD: _zoneDownloadStartTime
+FIELD: _zoneDownloadElapsed
+FIELD: _zoneDownloadRatio
+FIELD: _zoneDownloadIndex
+-- MATCHING METHODS --
+METHOD: get_ZoneDowloadIndex
+SIGNATURE HEX: 200008
+METHOD: SendZone
+SIGNATURE HEX: 2002010512a2cc
+METHOD: SendZone_Sequence
+SIGNATURE HEX: 2002151259010c0512a2cc
+METHOD: PostZone
+SIGNATURE HEX: 2001011d05
+METHOD: PostZone_Sequence
+SIGNATURE HEX: 2001151259010c1d05
+
+======================================================================
+TYPE: Rewired.Demos.ControlRemappingDemo1
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: defaultModalHeight
+
+======================================================================
+TYPE: Rewired.Demos.TouchJoystickExample
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: origScreenResolution
+
+======================================================================
+TYPE: Rewired.Demos.FallbackJoystickIdentificationDemo
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: windowHeight
+
+======================================================================
+TYPE: Ceto.ProjectedGrid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MAX_SCREEN_HEIGHT
+FIELD: resolution
+-- MATCHING METHODS --
+METHOD: ScreenHeight
+SIGNATURE HEX: 200008
+METHOD: ResolutionToNumber
+SIGNATURE HEX: 200108119990
+
+======================================================================
+TYPE: Ceto.Buoyancy
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <WaterHeight>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_WaterHeight
+SIGNATURE HEX: 20000c
+METHOD: set_WaterHeight
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Ceto.Ocean
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MAX_SPECTRUM_WAVE_HEIGHT
+FIELD: MAX_OVERLAY_WAVE_HEIGHT
+FIELD: heightOverlaySize
+FIELD: heightBlendMode
+-- MATCHING METHODS --
+METHOD: get_MAX_WAVE_HEIGHT
+SIGNATURE HEX: 00000c
+
+======================================================================
+TYPE: Ceto.OceanCameraSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: heightOverlaySize
+FIELD: reflectionResolution
+
+======================================================================
+TYPE: Ceto.OVERLAY_PASS
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: HEIGHT_ADD
+FIELD: HEIGHT_MAX
+
+======================================================================
+TYPE: Ceto.OceanUtility
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CreateQuadMesh
+SIGNATURE HEX: 0000128139
+
+======================================================================
+TYPE: Ceto.AddAutoShoreMask
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: heightSpread
+FIELD: resolution
+FIELD: useHeightMask
+FIELD: heightAlpha
+FIELD: m_height
+FIELD: m_heightMask
+FIELD: m_heightSpread
+FIELD: m_resolution
+
+======================================================================
+TYPE: Ceto.AddShoreMask
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: heightMask
+FIELD: heightAlpha
+FIELD: height
+
+======================================================================
+TYPE: Ceto.AddWaveOverlay
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: heightTexture
+FIELD: height
+
+======================================================================
+TYPE: Ceto.OverlayManager
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <HasHeightOverlay>k__BackingField
+FIELD: <HeightOverlayBlendMode>k__BackingField
+FIELD: m_heightOverlays
+-- MATCHING METHODS --
+METHOD: get_HasHeightOverlay
+SIGNATURE HEX: 200002
+METHOD: set_HasHeightOverlay
+SIGNATURE HEX: 20010102
+METHOD: get_HeightOverlayBlendMode
+SIGNATURE HEX: 20001199bc
+METHOD: set_HeightOverlayBlendMode
+SIGNATURE HEX: 2001011199bc
+METHOD: RenderHeightOverlays
+SIGNATURE HEX: 200101128081
+
+======================================================================
+TYPE: Ceto.WaveOverlay
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <HeightTex>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_NormalizedAge
+SIGNATURE HEX: 20000c
+METHOD: get_HeightTex
+SIGNATURE HEX: 2000129a1c
+METHOD: set_HeightTex
+SIGNATURE HEX: 200101129a1c
+
+======================================================================
+TYPE: Ceto.WaveOverlayData
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: height
+
+======================================================================
+TYPE: Ceto.Projection3d
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: Normalize3
+SIGNATURE HEX: 2001011d0d
+
+======================================================================
+TYPE: Ceto.PlanarReflection
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: reflectionResolution
+-- MATCHING METHODS --
+METHOD: GetReflectionResolution
+SIGNATURE HEX: 2001119998129988
+METHOD: ResolutionToNumber
+SIGNATURE HEX: 200108119998
+
+======================================================================
+TYPE: Ceto.QueryDisplacements
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SampleHeightOnly
+SIGNATURE HEX: 0006011d11391512810d01129b4c1d020c0c1299e0
+
+======================================================================
+TYPE: Ceto.SpectrumTask
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateWavesSpectrum
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Ceto.WaveSpectrum
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MAX_WAVE_SMOOTHING
+FIELD: MIN_WAVE_SMOOTHING
+FIELD: MAX_SLOPE_SMOOTHING
+FIELD: MIN_SLOPE_SMOOTHING
+FIELD: MAX_FOAM_SMOOTHING
+FIELD: MIN_FOAM_SMOOTHING
+FIELD: waveSmoothing
+FIELD: slopeSmoothing
+FIELD: foamSmoothing
+-- MATCHING METHODS --
+METHOD: GenerateSlopes
+SIGNATURE HEX: 2001010c
+METHOD: GenerateDisplacement
+SIGNATURE HEX: 2001010c
+METHOD: GenerateFoam
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Ceto.UnderWater
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: NumMeshSegmentsX
+FIELD: NumMeshSegmentsY
+-- MATCHING METHODS --
+METHOD: CreateBottomMesh
+SIGNATURE HEX: 20021281390808
+
+======================================================================
+TYPE: Ceto.ShipCamera
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: shipSmoothness
+FIELD: camSmoothness
+
+======================================================================
+TYPE: Ceto.ShoreMaskGenerator
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CreateHeightMap
+SIGNATURE HEX: 00011d0c1281d5
+
+======================================================================
+TYPE: Ceto.Common.Unity.Utility.RTSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: height
+
+======================================================================
+TYPE: Ceto.Common.Threading.Tasks.ICancelToken
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_Cancelled
+SIGNATURE HEX: 200002
+
+======================================================================
+TYPE: Ceto.Common.Threading.Tasks.IThreadedTask
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_Cancelled
+SIGNATURE HEX: 200002
+
+======================================================================
+TYPE: Ceto.Common.Threading.Tasks.ThreadedTask
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: m_cancelled
+-- MATCHING METHODS --
+METHOD: get_Cancelled
+SIGNATURE HEX: 200002
+
+======================================================================
+TYPE: Beam.CharacterRenderer
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _aimTargetSmooth
+FIELD: armCameraFollowSmoothness
+
+======================================================================
+TYPE: Beam.BiomeFlockProvider
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _biomeFlocks
+FIELD: _previousZoneName
+-- MATCHING METHODS --
+METHOD: StrandedWorld_ZoneEntered
+SIGNATURE HEX: 200101128484
+
+======================================================================
+TYPE: Beam.FlockController
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _waypointHeightBias
+FIELD: _currentZoneName
+FIELD: _nmlZoneName
+FIELD: _endGameZoneName
+-- MATCHING METHODS --
+METHOD: PollZone
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.Renderable
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Mesh
+
+======================================================================
+TYPE: Beam.FishBase
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _cell
+-- MATCHING METHODS --
+METHOD: get_Cell
+SIGNATURE HEX: 2000129f38
+METHOD: Beam.ICellObject.Subscribe
+SIGNATURE HEX: 200101129f38
+METHOD: Beam.ICellObject.Unsubscribe
+SIGNATURE HEX: 200101129f38
+METHOD: Beam.ICellObject.Destroy
+SIGNATURE HEX: 200001
+METHOD: Cell_LodChanged
+SIGNATURE HEX: 20010108
+
+======================================================================
+TYPE: Beam.FishMovement
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _minWorldHeight
+FIELD: _maxWorldHeight
+FIELD: _positionSmoothing
+FIELD: _rotationSmoothing
+-- MATCHING METHODS --
+METHOD: GenerateWaypoint
+SIGNATURE HEX: 20010108
+METHOD: ClampHeightToRange
+SIGNATURE HEX: 200101101139
+
+======================================================================
+TYPE: Beam.SingleFishRenderer
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _meshProvider
+FIELD: _meshRenderer
+-- MATCHING METHODS --
+METHOD: SetMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.FishRendererBase
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SetMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.LandAnimal
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: minExploreHeight
+FIELD: maxExploreHeight
+
+======================================================================
+TYPE: Beam.FogWeatherEventEffect
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _fogHeight
+
+======================================================================
+TYPE: Beam.GameTime
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _normalizedTime
+-- MATCHING METHODS --
+METHOD: get_NormalizedTime
+SIGNATURE HEX: 20000c
+METHOD: get_NormalizedPingPongTime
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.LegacyUtilities
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: LoadStrandedWorldPlayerZoneId_PreCoop
+SIGNATURE HEX: 00020212824d100e
+
+======================================================================
+TYPE: Beam.PlayerCamera
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _camSmooth
+FIELD: _camSmoothTimer
+-- MATCHING METHODS --
+METHOD: CheckCameraHeight
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.ICraftable
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_GhostMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.InteractiveObject_PALM
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateTreeSegments
+SIGNATURE HEX: 200015126501129e90
+METHOD: GenerateFruit
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.Decal
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _terrain
+-- MATCHING METHODS --
+METHOD: GenerateDecalMesh
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.ICreateCellObjects`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CreateCellObject
+SIGNATURE HEX: 200113001300
+
+======================================================================
+TYPE: Beam.IFreeCellObjects`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: FreeCellObject
+SIGNATURE HEX: 2001011300
+
+======================================================================
+TYPE: Beam.SimpleCreateCellObjects`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CreateCellObject
+SIGNATURE HEX: 200113001300
+
+======================================================================
+TYPE: Beam.SimpleFreeCellObjects`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: FreeCellObject
+SIGNATURE HEX: 2001011300
+
+======================================================================
+TYPE: Beam.CellObjectPool`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: Beam.ICreateCellObjects<TCellObject>.CreateCellObject
+SIGNATURE HEX: 200113001300
+METHOD: Beam.IFreeCellObjects<TCellObject>.FreeCellObject
+SIGNATURE HEX: 2001011300
+METHOD: PopCellObject
+SIGNATURE HEX: 200113001300
+METHOD: PoolCellObject
+SIGNATURE HEX: 2001011300
+
+======================================================================
+TYPE: Beam.ICell
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Cell`1
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <Generated>k__BackingField
+FIELD: CellObjectFreed
+FIELD: CellObjectDestroyed
+-- MATCHING METHODS --
+METHOD: get_Generated
+SIGNATURE HEX: 200002
+METHOD: set_Generated
+SIGNATURE HEX: 20010102
+METHOD: add_CellObjectFreed
+SIGNATURE HEX: 20010115128235011300
+METHOD: remove_CellObjectFreed
+SIGNATURE HEX: 20010115128235011300
+METHOD: add_CellObjectDestroyed
+SIGNATURE HEX: 20010115128235011300
+METHOD: remove_CellObjectDestroyed
+SIGNATURE HEX: 20010115128235011300
+METHOD: AddCellObject
+SIGNATURE HEX: 2001011300
+METHOD: RemoveCellObject
+SIGNATURE HEX: 2001011300
+METHOD: CellObject_Freed
+SIGNATURE HEX: 200101129f40
+METHOD: CellObject_Destroyed
+SIGNATURE HEX: 200101129f40
+
+======================================================================
+TYPE: Beam.ICellObject
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.IPlacementSettings
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_MinimumWorldHeight
+SIGNATURE HEX: 20000c
+METHOD: get_MaximumWorldHeight
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.CellObjectSettings`1
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _minimumWorldHeight
+FIELD: _maximumWorldHeight
+-- MATCHING METHODS --
+METHOD: get_MinimumWorldHeight
+SIGNATURE HEX: 20000c
+METHOD: get_MaximumWorldHeight
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.CellObjectSpawner
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.CellObjectSpawner`1
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: CELLS
+FIELD: CELL_RESOLUTION
+FIELD: _cellWidth
+FIELD: _cellObjectCreator
+FIELD: _cellObjectDestroyer
+FIELD: _cellObjectsSettings
+FIELD: _cellObjectsDataCache
+FIELD: _cellsBuffers
+-- MATCHING METHODS --
+METHOD: get_CellObjectsSettings
+SIGNATURE HEX: 20001512810d0115129f4c011300
+METHOD: get_HalfCellWidth
+SIGNATURE HEX: 20000c
+METHOD: get__cells
+SIGNATURE HEX: 20001d15129f3c011300
+METHOD: set__cells
+SIGNATURE HEX: 2001011d15129f3c011300
+METHOD: CreateCells
+SIGNATURE HEX: 200001
+METHOD: UpdateCenterCell
+SIGNATURE HEX: 200001
+METHOD: UpdateCellPositions
+SIGNATURE HEX: 200001
+METHOD: UpdateCellObjects
+SIGNATURE HEX: 200001
+METHOD: UpdateCellObjects
+SIGNATURE HEX: 20010115129f3c011300
+METHOD: UpdateCellLodLevel
+SIGNATURE HEX: 20010108
+METHOD: FreeCellObject
+SIGNATURE HEX: 2001011300
+METHOD: ClearCellObjects
+SIGNATURE HEX: 20010115129f3c011300
+METHOD: CreateCellObjects
+SIGNATURE HEX: 20010115129f3c011300
+METHOD: SaveCellObjects
+SIGNATURE HEX: 20010115129f3c011300
+METHOD: LoadCellObjects
+SIGNATURE HEX: 20020115129f3c0113001512810d0112a2cc
+METHOD: FindCellObjectPrefab
+SIGNATURE HEX: 2001130008
+
+======================================================================
+TYPE: Beam.SnapHeightToTerrain
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.PrefabSizeFitsBetweenTerrainAndOcean
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.TerrainIsBelowPlacement
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.TerrainIsIslandHeightAtPlacement
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.TerrainIsMinimumHeightAtPlacement
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Buoyancy
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _voxelHalfHeight
+
+======================================================================
+TYPE: Beam.BuoyancyManager
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CheckInRangeOfActiveZone
+SIGNATURE HEX: 2001021139
+
+======================================================================
+TYPE: Beam.CameraMovement
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _rotationSmoothness
+
+======================================================================
+TYPE: Beam.Footstep
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: Footstep_Terrain
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.Movement
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _playerControllerHeight
+FIELD: _crouchControllerHeight
+FIELD: _swimHeight
+FIELD: _jumpHeight
+FIELD: _oceanHeight
+FIELD: terrainGrounded
+-- MATCHING METHODS --
+METHOD: GetNormalizedInputAxis
+SIGNATURE HEX: 20020c0c0c
+METHOD: CheckControllerHeight
+SIGNATURE HEX: 200001
+METHOD: CheckOceanHeight
+SIGNATURE HEX: 200001
+METHOD: SetControllerHeight
+SIGNATURE HEX: 2001010c
+METHOD: GetCharacterHeight
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.PlayerSkills
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetNormalizedValueInTiers
+SIGNATURE HEX: 20020c0c1d0c
+
+======================================================================
+TYPE: Beam.Session_Filter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MOST_ISLANDS_HOPPED
+FIELD: MOST_ISLANDS_EXPLORED
+
+======================================================================
+TYPE: Beam.HelicopterVehicleMovement
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ANGULAR_SMOOTHING_FACTOR
+
+======================================================================
+TYPE: Beam.IMapEditorObject
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.MapTools
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CreateHeightmapTexture
+SIGNATURE HEX: 00011280e9140c0200020000
+METHOD: GetHeightsFromTexture
+SIGNATURE HEX: 0001140c02000200001280e9
+
+======================================================================
+TYPE: Beam.BiomeCategory
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Biome
+
+======================================================================
+TYPE: Beam.ProceduralObjectManager
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _biomeGeneration
+-- MATCHING METHODS --
+METHOD: get_BiomeGeneration
+SIGNATURE HEX: 20001512810d0112a1f8
+
+======================================================================
+TYPE: Beam.IZoneDataProvider
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetZoneData
+SIGNATURE HEX: 200112a2cc128484
+
+======================================================================
+TYPE: Beam.ITerrainProvider
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetHeight
+SIGNATURE HEX: 20010c1139
+
+======================================================================
+TYPE: Beam.NullTerrainProvider
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetHeight
+SIGNATURE HEX: 20010c1139
+
+======================================================================
+TYPE: Beam.Triangulation
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetHeightAtPoint
+SIGNATURE HEX: 00020c113911a218
+
+======================================================================
+TYPE: Beam.FlockSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SimulationCells
+
+======================================================================
+TYPE: Beam.BoidFlock
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _cellCount
+FIELD: _cellWidth
+FIELD: _cells
+FIELD: _tempCellBoids
+-- MATCHING METHODS --
+METHOD: FindCellContaining
+SIGNATURE HEX: 20021512810d0112a2300c0c
+METHOD: FindNeighbourCells
+SIGNATURE HEX: 20021512810d0112a2300c0c
+
+======================================================================
+TYPE: Beam.FlockFishRenderer
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _mesh
+-- MATCHING METHODS --
+METHOD: SetMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.Terrain.Map
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: HeightmapData
+
+======================================================================
+TYPE: Beam.Terrain.MapEditorData
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Biome
+
+======================================================================
+TYPE: Beam.Terrain.Maps
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MAP_HEIGHT_SUFFIX
+
+======================================================================
+TYPE: Beam.Terrain.LoadingResult
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Terrain.World
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get__generationZonePositons
+SIGNATURE HEX: 00001d1180cd
+METHOD: set__generationZonePositons
+SIGNATURE HEX: 0001011d1180cd
+METHOD: get_GenerationZonePositons
+SIGNATURE HEX: 00001d1180cd
+METHOD: get__generatedZonePoints
+SIGNATURE HEX: 00001d1180cd
+METHOD: set__generatedZonePoints
+SIGNATURE HEX: 0001011d1180cd
+METHOD: get_GeneratedZonePoints
+SIGNATURE HEX: 00001d1180cd
+METHOD: CreateWorldZonePoints
+SIGNATURE HEX: 00010108
+METHOD: ImportHeightmapFromRawFile
+SIGNATURE HEX: 0001140c02000200000e
+
+======================================================================
+TYPE: Beam.Terrain.ZoneEvents
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Terrain.GeneratedObject
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Terrain.ZoneLoader
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: CreatedZone
+FIELD: LoadedZone
+-- MATCHING METHODS --
+METHOD: add_CreatedZone
+SIGNATURE HEX: 2001011512823501128484
+METHOD: remove_CreatedZone
+SIGNATURE HEX: 2001011512823501128484
+METHOD: add_LoadedZone
+SIGNATURE HEX: 2001011512823501128484
+METHOD: remove_LoadedZone
+SIGNATURE HEX: 2001011512823501128484
+METHOD: LoadZone_Async
+SIGNATURE HEX: 20020c12848412a2cc
+METHOD: LoadZone
+SIGNATURE HEX: 20021180a112848412a2cc
+METHOD: LoadZone_Sequence
+SIGNATURE HEX: 2002151259010c12848412a2cc
+METHOD: AbortLoadingZone
+SIGNATURE HEX: 200101128484
+METHOD: CreateZone
+SIGNATURE HEX: 200102128484
+METHOD: CreateZoneObjects_Async
+SIGNATURE HEX: 20020c12848408
+METHOD: CreateZoneObjects
+SIGNATURE HEX: 20011180a1128484
+METHOD: CreateZoneObjects_Sequence
+SIGNATURE HEX: 2001151259010c128484
+METHOD: GenerateZone
+SIGNATURE HEX: 200102128484
+METHOD: GenerateObjects
+SIGNATURE HEX: 20020112848412b710
+METHOD: GenerateProceduralObjectsPosition
+SIGNATURE HEX: 20030112849412848412b710
+METHOD: GenerateProceduralObjectsProcedural
+SIGNATURE HEX: 20030112849412848412b710
+METHOD: GenerateShelter
+SIGNATURE HEX: 20030112849412848412b710
+METHOD: GenerateObject
+SIGNATURE HEX: 20040112844c11391131128484
+METHOD: CreateGeneratedPrefab
+SIGNATURE HEX: 20020112a284128484
+
+======================================================================
+TYPE: Beam.Terrain.GenerationPoints
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Terrain.ZoneObjectGenerator
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateGridData
+SIGNATURE HEX: 00021412a28c020002000012848408
+
+======================================================================
+TYPE: Beam.PostEffects.AtmosphericFogController
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _originalHeight
+FIELD: _height
+-- MATCHING METHODS --
+METHOD: get_OriginalHeight
+SIGNATURE HEX: 20000c
+METHOD: set_Height
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.PostEffects.AtmosphericFogSettings
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Height
+
+======================================================================
+TYPE: Beam.Obfuscated.Users.EStat
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ISLANDS_HOPPED
+FIELD: ISLANDS_EXPLORED
+FIELD: ISLANDS_INSERTED
+FIELD: ISLANDS_CREATED
+
+======================================================================
+TYPE: Beam.Obfuscated.Users.Stats
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: IslandsHopped
+FIELD: IslandsExplored
+FIELD: IslandsInserted
+FIELD: IslandsCreated
+
+======================================================================
+TYPE: Beam.Ocean.StructureBuoyancy
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _voxelHalfHeight
+
+======================================================================
+TYPE: Beam.AccountServices.EAchievement
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ISLAND_HOPPER
+
+======================================================================
+TYPE: Beam.AccountServices.LeaderboardNames
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MOST_ISLANDS_HOPPED
+FIELD: MOST_ISLANDS_EXPLORED
+FIELD: MOST_ISLANDS_CREATED
+
+======================================================================
+TYPE: Beam.Language.LocalizationTerms
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: LOADING_PROGRESS_TEXT_LOADING_STARTING_ZONE
+FIELD: LOADING_PROGRESS_TEXT_LOADING_CURRENT_ZONE
+FIELD: OPTIONS_GRAPHICS_MENU_BUTTON_RESOLUTION
+FIELD: OPTIONS_INPUT_MENU_BUTTON_SMOOTHNESS
+FIELD: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_CREATED
+FIELD: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_EXPLORED
+FIELD: LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_HOPPED
+FIELD: CARTOGRAPHER_MENU_BUTTON_CREATE_AN_ISLAND
+FIELD: CARTOGRAPHER_MENU_DB_UPDATE_ZONE_DESC
+FIELD: MAP_EDITOR_BUTTON_TERRAIN
+FIELD: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL
+FIELD: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_SIZE
+FIELD: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_AMOUNT
+FIELD: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_RAISE
+FIELD: MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_LOWER
+FIELD: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL
+FIELD: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_SIZE
+FIELD: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_AMOUNT
+FIELD: MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_TARGET_VALUE
+FIELD: MAP_EDITOR_TERRAIN_BUTTON_READ_TERRAIN_PAINT_HEIGHT
+FIELD: MAP_EDITOR_TERRAIN_BUTTON_CLICK_TO_READ_TERRAIN_HEIGHT
+FIELD: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL
+FIELD: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_SIZE
+FIELD: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_AMOUNT
+FIELD: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_TOGGLE_IS_DIRECTED
+FIELD: MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_ANGLE
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_SHOREMAP
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_ISLAND
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL_TIME
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_TOGGLE_OCEAN
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_FREQ_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_VALUE_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_OCTAVES_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BLEND_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BUTTON_GEN_PERLIN
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MIN_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MAX_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BLEND_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BUTTON_NORMALIZE
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_CUSTOM_HEIGHTMAPS_LABEL
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_GENERATE
+FIELD: MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_SMOOTH_HEIGHTMAP
+FIELD: MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE
+FIELD: MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC
+FIELD: MAP_EDITOR_DB_GENERATING_HEIGHTMAP_TITLE
+FIELD: MAP_EDITOR_DB_GENERATING_HEIGHTMAP_DESC
+FIELD: MAP_EDITOR_DB_GENERATE_ISLAND_TITLE
+FIELD: MAP_EDITOR_DB_SMOOTH_TERRAIN_TITLE
+FIELD: MAP_EDITOR_DB_SMOOTH_TERRAIN_DESC
+FIELD: STATS_ISLANDS_EXPLORED
+FIELD: ACHIEVEMENT_ISLAND_HOPPER
+
+======================================================================
+TYPE: Beam.Intro.AircraftProximity
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: PROXIMITY_HEIGHT
+
+======================================================================
+TYPE: Beam.UI.InventoryData
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetHealthNormalized
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.UI.CartographerMenuPresenter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _reservedZoneIds
+-- MATCHING METHODS --
+METHOD: CreateIslandButton_Click
+SIGNATURE HEX: 2001011c
+METHOD: CreateIsland
+SIGNATURE HEX: 200001
+METHOD: EditIsland
+SIGNATURE HEX: 20010112a26c
+METHOD: <CreateIsland>b__82_0
+SIGNATURE HEX: 200001
+METHOD: <EditIsland>b__83_0
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.UI.MenuBackgroundScaler
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _height
+
+======================================================================
+TYPE: Beam.UI.CartographerMenuViewAdapterBase
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_CreateIslandButton
+SIGNATURE HEX: 200012a918
+
+======================================================================
+TYPE: Beam.UI.UCartographerMenuViewAdapter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _createIslandButton
+-- MATCHING METHODS --
+METHOD: get_CreateIslandButton
+SIGNATURE HEX: 200012a918
+
+======================================================================
+TYPE: Beam.UI.GraphicsMenuPresenter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SetResolutionControlSelection
+SIGNATURE HEX: 200001
+METHOD: ResolutionButton_Changed
+SIGNATURE HEX: 20010112a9f4
+METHOD: TryParseResolution
+SIGNATURE HEX: 2003020e10081008
+METHOD: SetResolution
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Beam.UI.InputMenuPresenter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _smoothnessSlider
+-- MATCHING METHODS --
+METHOD: InputMapper_Cancelled
+SIGNATURE HEX: 2001011286f5
+
+======================================================================
+TYPE: Beam.UI.IGraphicsMenuViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_ResolutionButton
+SIGNATURE HEX: 200012a9f8
+
+======================================================================
+TYPE: Beam.UI.UGraphicsMenuViewAdapter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _resolutionButton
+-- MATCHING METHODS --
+METHOD: get_ResolutionButton
+SIGNATURE HEX: 200012a9f8
+
+======================================================================
+TYPE: Beam.UI.WatchScreenViewAdapterBase
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SetWatchMesh
+SIGNATURE HEX: 20010108
+
+======================================================================
+TYPE: Beam.UI.WatchScreenViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SetWatchMesh
+SIGNATURE HEX: 20010108
+
+======================================================================
+TYPE: Beam.UI.NullWatchScreenViewAdapterBase
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SetWatchMesh
+SIGNATURE HEX: 20010108
+
+======================================================================
+TYPE: Beam.UI.IScrollviewViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedHorizontalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedHorizontalPosition
+SIGNATURE HEX: 2001010c
+METHOD: get_NormalizedVerticalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedVerticalPosition
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.ScrollviewViewAdapterBase`1
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedHorizontalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedHorizontalPosition
+SIGNATURE HEX: 2001010c
+METHOD: get_NormalizedVerticalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedVerticalPosition
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.NullScrollviewViewAdapter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <NormalizedHorizontalPosition>k__BackingField
+FIELD: <NormalizedVerticalPosition>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_NormalizedHorizontalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedHorizontalPosition
+SIGNATURE HEX: 2001010c
+METHOD: get_NormalizedVerticalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedVerticalPosition
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.SliderViewAdapterBase`2
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedValue
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedValue
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.TMPSliderViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedValue
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedValue
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.ExtensionMethods
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: SmoothFill
+SIGNATURE HEX: 00030112aa0c0c0c
+
+======================================================================
+TYPE: Beam.UI.UScrollviewViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedHorizontalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedHorizontalPosition
+SIGNATURE HEX: 2001010c
+METHOD: get_NormalizedVerticalPosition
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedVerticalPosition
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.USliderViewAdapter
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_NormalizedValue
+SIGNATURE HEX: 20000c
+METHOD: set_NormalizedValue
+SIGNATURE HEX: 2001010c
+
+======================================================================
+TYPE: Beam.UI.MapEditor.MapEditorMenuPresenter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.MapEditorSaveMenuPresenter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.IMapEditorSaveMenuViewAdapter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.UMapEditorSaveMenuViewAdapter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.IMapEditorMenuViewAdapter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.UMapEditorViewAdapter
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.IMapHandle
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.UMapHandle
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.MapListElementHandler
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.IMapListElement
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.UMapListElement
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.MapSlotHandler
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.IWorldMapSlot
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.UI.MapEditor.UWorldMapSlot
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Crafting.ConnectorCheck_CheckDistanceFromZone
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MAX_DISTANCE_FROM_ZONE
+
+======================================================================
+TYPE: Beam.Crafting.Constructing
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _ghostMesh
+-- MATCHING METHODS --
+METHOD: get_GhostMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Crafting.ConstructionObject_WATERBOTTLE
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _ghostMesh
+-- MATCHING METHODS --
+METHOD: get_GhostMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Crafting.ConstructionObject
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _ghostMesh
+-- MATCHING METHODS --
+METHOD: get_GhostMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Crafting.PlacementModifier_LimitHeightToTerrain
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Crafting.PlacementModifier_SnapToTerrain
+TOKEN: ?
+
+======================================================================
+TYPE: Beam.Crafting.QuickAccessSlotUnlocker
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <GhostMesh>k__BackingField
+-- MATCHING METHODS --
+METHOD: get_GhostMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Crafting.Plot
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetNormalizedWater
+SIGNATURE HEX: 20000c
+
+======================================================================
+TYPE: Beam.Crafting.Crafter
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _buildCancellationSound
+
+======================================================================
+TYPE: Beam.Crafting.Dragger
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GatherPalmLogsIsland
+SIGNATURE HEX: 200201151281b501129e90129e90
+METHOD: RecreatePhysicsSetupForPalmLogsIsland
+SIGNATURE HEX: 20011251151281b501129e90
+
+======================================================================
+TYPE: Beam.Rendering.MeshFilterMeshProvider
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _meshFilter
+-- MATCHING METHODS --
+METHOD: get_MeshFilter
+SIGNATURE HEX: 2000128135
+METHOD: get_SharedMesh
+SIGNATURE HEX: 2000128139
+METHOD: set_SharedMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.Rendering.MeshProviderBase
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: get_SharedMesh
+SIGNATURE HEX: 2000128139
+METHOD: set_SharedMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.Rendering.SkinnedMeshProvider
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _skinnedMeshRenderer
+-- MATCHING METHODS --
+METHOD: get_SkinnedMeshRenderer
+SIGNATURE HEX: 200012822d
+METHOD: get_SharedMesh
+SIGNATURE HEX: 2000128139
+METHOD: set_SharedMesh
+SIGNATURE HEX: 200101128139
+
+======================================================================
+TYPE: Beam.Rendering.ImposterScope
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Terrain
+
+======================================================================
+TYPE: Beam.Rendering.LodController
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: CheckTerrain
+SIGNATURE HEX: 200002
+
+======================================================================
+TYPE: Beam.Rendering.RenderableProxy
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _meshFilter
+-- MATCHING METHODS --
+METHOD: get_MeshFilter
+SIGNATURE HEX: 2000128135
+
+======================================================================
+TYPE: Beam.Rendering.IInstancedMeshData
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GetMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Rendering.InstancedMeshData
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _mesh
+-- MATCHING METHODS --
+METHOD: GetMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Rendering.SerializedInstancedMeshData
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: _mesh
+-- MATCHING METHODS --
+METHOD: GetMesh
+SIGNATURE HEX: 2000128139
+
+======================================================================
+TYPE: Beam.Utilities.BeamMath
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: Normalize
+SIGNATURE HEX: 00030c0c0c0c
+
+======================================================================
+TYPE: AmplifyImpostors.AmplifyImpostor
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: MinAlphaResolution
+-- MATCHING METHODS --
+METHOD: GenerateTextures
+SIGNATURE HEX: 2002011512650112ade402
+METHOD: GenerateAlphaTextures
+SIGNATURE HEX: 2001011512650112ade4
+METHOD: GenerateAutomaticMesh
+SIGNATURE HEX: 20010112adcc
+METHOD: GenerateMesh
+SIGNATURE HEX: 20051281391d1180cd11390c0c02
+
+======================================================================
+TYPE: AmplifyImpostors.DeferredBuffers
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SpecularSmoothness
+
+======================================================================
+TYPE: AmplifyImpostors.AmplifyImpostorAsset
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Mesh
+
+======================================================================
+TYPE: AmplifyImpostors.AmplifyImpostorBakePreset
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: RuntimeShader
+
+======================================================================
+TYPE: AmplifyImpostors.SpriteUtilityEx
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: GenerateOutline
+SIGNATURE HEX: 0006011280e91181290c0502101d1d1180cd
+
+======================================================================
+TYPE: SpawnGrid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: CanGenerate
+FIELD: Generated
+
+======================================================================
+TYPE: <Play_Sequence>d__13
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: normalizedTime
+
+======================================================================
+TYPE: <>c
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <ZoneEvents_CampFirePlaced>b__39_0
+SIGNATURE HEX: 200108128484
+METHOD: <ZoneEvents_CropPlanted>b__40_0
+SIGNATURE HEX: 2001021511822502119e4408
+
+======================================================================
+TYPE: <>c__DisplayClass36_0
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <GenerateSave_Sequence>b__2
+SIGNATURE HEX: 2001011282b4
+
+======================================================================
+TYPE: <>c
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <GenerateSave_Sequence>b__36_0
+SIGNATURE HEX: 200102122d
+METHOD: <GenerateSave_Sequence>b__36_1
+SIGNATURE HEX: 200102122d
+
+======================================================================
+TYPE: SpawnGrid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: CanGenerate
+
+======================================================================
+TYPE: BiomeGrid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: allBiomes
+FIELD: _biome
+FIELD: biomeParameters
+
+======================================================================
+TYPE: GridObject
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: minHeight
+FIELD: maxHeight
+
+======================================================================
+TYPE: <CreateGridObjects_Sequence>d__29
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <currentBiome>5__2
+FIELD: <biomeGrid>5__5
+
+======================================================================
+TYPE: <ServerJoinInProgress_LoadPlayerReplicant>d__67
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <numLoadedZones>5__3
+
+======================================================================
+TYPE: <CreateWorld_Sequence>d__70
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <zone>5__2
+
+======================================================================
+TYPE: <LoadStartingZone_Sequence>d__119
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: GeneratorType
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Perlin
+FIELD: Normalise
+FIELD: Smooth
+
+======================================================================
+TYPE: <>c
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <FillCellHeightmap>b__28_0
+SIGNATURE HEX: 20010c1139
+METHOD: <FillCellHeightmap>b__28_1
+SIGNATURE HEX: 20010c1139
+METHOD: <FillCellHeightmap>b__28_2
+SIGNATURE HEX: 20010c1139
+METHOD: <FillCellHeightmap>b__28_3
+SIGNATURE HEX: 20010c1139
+METHOD: <FillCellHeightmap>b__28_4
+SIGNATURE HEX: 20010c1139
+METHOD: <FillCellHeightmap>b__28_5
+SIGNATURE HEX: 20010c1139
+
+======================================================================
+TYPE: BiomeType
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ISLAND
+FIELD: ISLAND_SMALL
+FIELD: ISLAND_ROCK
+
+======================================================================
+TYPE: Data
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: submeshIndex
+
+======================================================================
+TYPE: IslandTypes
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Perlin
+
+======================================================================
+TYPE: BiomeProperties
+TOKEN: ?
+
+======================================================================
+TYPE: Biome
+TOKEN: ?
+
+======================================================================
+TYPE: <>c__DisplayClass41_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: cornerIsland
+
+======================================================================
+TYPE: <>c__DisplayClass55_0
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <AddTerrainSnapping>b__0
+SIGNATURE HEX: 2002011c1283a9
+METHOD: <AddTerrainSnapping>b__1
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Delegates
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SetTerrainHeightmapTextures
+FIELD: SetTerrainBrushes
+FIELD: SetTerrainEditBrushSize
+FIELD: SetTerrainEditBrushAmount
+FIELD: SetTerrainEditBrushTargetValue
+FIELD: SetTerrainIsReadingSetHeight
+FIELD: SetTerrainUIMode
+
+======================================================================
+TYPE: EventHandlers
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: OnTerrainHeightmapTextureChanged
+FIELD: OnTerrainBrushChanged
+FIELD: OnTerrainEditBrushSizeChanged
+FIELD: OnTerrainEditBrushAmountChanged
+FIELD: OnTerrainEditBrushTargetValueChanged
+FIELD: OnTerrainEditDirectionChanged
+FIELD: OnTerrainChangeHeightModeChanged
+FIELD: OnTerrainIsDirectedSmoothChanged
+FIELD: OnTerrainEditModeBtn
+FIELD: OnTerrainReadSetHeightBtn
+FIELD: OnTerrainGenerateShoremap
+FIELD: OnTerrainGenerateCustomHeightmap
+FIELD: OnTerrainGeneratePerlin
+FIELD: OnTerrainGenerateNormalise
+FIELD: OnTerrainGenerateIsland
+FIELD: OnTerrainSmooth
+
+======================================================================
+TYPE: <>c
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <OnTerrainGenerateCustomHeightmap>b__33_0
+SIGNATURE HEX: 200001
+METHOD: <OnTerrainGenerateIsland>b__37_0
+SIGNATURE HEX: 200001
+METHOD: <OnTerrainSmooth>b__39_0
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: <>c__DisplayClass34_0
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <OnTerrainGeneratePerlin>b__1
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: <DrawLevelPreview>d__7
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <imageHeight>5__3
+
+======================================================================
+TYPE: Heightmap
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Heights
+
+======================================================================
+TYPE: <>c
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <InitTerrainValues>b__23_0
+SIGNATURE HEX: 20011280e912b1b0
+
+======================================================================
+TYPE: ESnapType
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: SNAP_TO_TERRAIN
+FIELD: SNAP_TO_2D_GRID_AND_TERRAIN
+
+======================================================================
+TYPE: <>c__DisplayClass42_0
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <GetZoneData>b__0
+SIGNATURE HEX: 20020212a2cc08
+
+======================================================================
+TYPE: Session
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: IslandsHopped
+FIELD: IslandsExplored
+
+======================================================================
+TYPE: Usage
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ZoneGeneration
+FIELD: ZoneLoading
+
+======================================================================
+TYPE: Command
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: Zone
+
+======================================================================
+TYPE: <>c__DisplayClass28_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+-- MATCHING METHODS --
+METHOD: <SendZone_Sequence>b__0
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: <SendZone_Sequence>d__28
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: <>c__DisplayClass34_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+-- MATCHING METHODS --
+METHOD: <PostZone_Sequence>b__0
+SIGNATURE HEX: 200001
+
+======================================================================
+TYPE: Grid
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: screenHeight
+FIELD: resolution
+
+======================================================================
+TYPE: WaveQueryResult
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: height
+FIELD: overlayHeight
+
+======================================================================
+TYPE: DISPLAY
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: OVERLAY_HEIGHT
+
+======================================================================
+TYPE: <PlayUseAnimation_Sequence>d__93
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: normalizedTime
+
+======================================================================
+TYPE: <>c__DisplayClass12_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zoneId
+
+======================================================================
+TYPE: <>c__DisplayClass13_0
+TOKEN: ?
+-- MATCHING METHODS --
+METHOD: <GenerateFruit>b__0
+SIGNATURE HEX: 20010111b278
+
+======================================================================
+TYPE: Bundle
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: GenerationZonePositons
+FIELD: GeneratedZonePoints
+
+======================================================================
+TYPE: <LoadZone_Sequence>d__44
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: <CreateZoneObjects_Sequence>d__50
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: <>c__DisplayClass52_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+-- MATCHING METHODS --
+METHOD: <GenerateObjects>b__0
+SIGNATURE HEX: 20020812a28412a284
+
+======================================================================
+TYPE: <>c__DisplayClass59_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: <ProcessCollection_Sequence>d__66`1
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: zone
+
+======================================================================
+TYPE: <>c__DisplayClass13_0
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: resolution
+-- MATCHING METHODS --
+METHOD: <SetResolutionControlSelection>b__0
+SIGNATURE HEX: 20010212834c
+
+======================================================================
+TYPE: <WaitForScreenChange>d__37
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <height>5__3
+
+======================================================================
+TYPE: <SetLocalDrag>d__25
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: <island>5__3
+
+======================================================================
+TYPE: <RecreatePhysicsSetupForPalmLogsIsland>d__27
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: island
+
+======================================================================
+TYPE: ETerrainUIMode
+TOKEN: ?
+
+======================================================================
+TYPE: ETerrainChangeHeightMode
+TOKEN: ?
+
+======================================================================
+TYPE: TerrainEditModeEventArgs
+TOKEN: ?
+
+======================================================================
+TYPE: TerrainChangeHeightModeEventArgs
+TOKEN: ?
+-- MATCHING FIELDS --
+FIELD: ChangeHeightMode
+
+TOTAL MATCHING TYPES: 285
+
+END OF REPORT
