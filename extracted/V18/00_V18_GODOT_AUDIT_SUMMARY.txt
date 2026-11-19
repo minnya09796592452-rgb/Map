@@ -1,0 +1,25 @@
+CASTAWAY-DEPTHS V18 GODOT PROJECT AUDIT
+================================================
+Map Check root: /storage/emulated/0/Map Check
+Godot projects found: 1
+
+PROJECT 1: /storage/emulated/0/Map Check/godot-project
+------------------------------------------------
+Files: 16
+Total bytes: 180056
+Extensions: .cfg=1, .gd=1, .godot=1, .import=1, .map=3, .md=1, .svg=1, .tscn=2, .uid=1, [no extension]=4
+Godot feature tags: not found
+Main scene: res://scenes/terrain_preview.tscn
+Rendering method: mobile
+
+IMPORTANT FILES:
+  export_presets.cfg | 7486 bytes | 7315d09bd4e16f7f7cf427bab0efb98df98846381e040ca098fae4043575c7ef
+  node.tscn | 1731 bytes | 8ea3bb7174a107c33542681b484ac12fb32398e4d428611d82e58e60d7592ccb
+  project.godot | 646 bytes | 936582a47d09d2b5cfea67463086a6dd907603c3eb2dfc7df3ae799187c96906
+  scenes/terrain_preview.tscn | 180 bytes | 4d36d53ff9f40b1bd0b7681a95c7b37979cf69a8c067168e1e3aa9b09ad63d54
+  scripts/terrain_preview.gd | 2685 bytes | 78bf9f5ee1333fc18224ec08d7e3418b3b8b1dcd01b3d6a594863a9bbbbae242
+
+ANDROID EXPORT PRESET:
+  PRESENT
+  Android preset sections detected: 1
+

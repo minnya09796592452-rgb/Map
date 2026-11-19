@@ -1,0 +1,17 @@
+﻿project_root,relative_path,file_name,size_bytes,extension,sha256
+/storage/emulated/0/Map Check/godot-project,project.godot,project.godot,646,.godot,936582a47d09d2b5cfea67463086a6dd907603c3eb2dfc7df3ae799187c96906
+/storage/emulated/0/Map Check/godot-project,icon.svg,icon.svg,995,.svg,6c80384360a5b269d1054bfb27241258154e2cc8167c522016fdc1820e84e0f8
+/storage/emulated/0/Map Check/godot-project,.gitignore,.gitignore,46,[no extension],d6194b1a176268740a0b7f153bd4926908b4a0955a9a311181c0200b4329bc94
+/storage/emulated/0/Map Check/godot-project,.gitattributes,.gitattributes,80,[no extension],21b01a606c9f85f18bb9230245f00ab104df7409cbb2fe9423f6751ca72ba754
+/storage/emulated/0/Map Check/godot-project,.editorconfig,.editorconfig,33,[no extension],3b2c749c8a940905a08f727d8be9017c9568a12421c0aee7e37e9543b3751b1b
+/storage/emulated/0/Map Check/godot-project,.nomedia,.nomedia,43,[no extension],657deff46c5324e1249e936f8fb5824c228405a35cea255615a1314ef1e87aca
+/storage/emulated/0/Map Check/godot-project,node.tscn,node.tscn,1731,.tscn,8ea3bb7174a107c33542681b484ac12fb32398e4d428611d82e58e60d7592ccb
+/storage/emulated/0/Map Check/godot-project,icon.svg.import,icon.svg.import,1013,.import,9320db66ff69e56ecb22e0b77bbf913cd5dc9f7fd7da551cf0a0a725ee46b3c1
+/storage/emulated/0/Map Check/godot-project,export_presets.cfg,export_presets.cfg,7486,.cfg,7315d09bd4e16f7f7cf427bab0efb98df98846381e040ca098fae4043575c7ef
+/storage/emulated/0/Map Check/godot-project,PROJECT_NOTES.md,PROJECT_NOTES.md,1184,.md,a1a4dc63660f6640f473734d1ab410a549951247cce4165151d446b14bd00c16
+/storage/emulated/0/Map Check/godot-project,scenes/terrain_preview.tscn,terrain_preview.tscn,180,.tscn,4d36d53ff9f40b1bd0b7681a95c7b37979cf69a8c067168e1e3aa9b09ad63d54
+/storage/emulated/0/Map Check/godot-project,scripts/terrain_preview.gd,terrain_preview.gd,2685,.gd,78bf9f5ee1333fc18224ec08d7e3418b3b8b1dcd01b3d6a594863a9bbbbae242
+/storage/emulated/0/Map Check/godot-project,scripts/terrain_preview.gd.uid,terrain_preview.gd.uid,20,.uid,11f21d0a797f0e1f7dded6ceffe9da9f826447d48e153cd79d0e65f953c93294
+/storage/emulated/0/Map Check/godot-project,terrain/source/MAP_INTERNAL_MISSION_3_HEIGHT.map,MAP_INTERNAL_MISSION_3_HEIGHT.map,132098,.map,4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+/storage/emulated/0/Map Check/godot-project,terrain/source/MAP_INTERNAL_MISSION_3_EDITOR.map,MAP_INTERNAL_MISSION_3_EDITOR.map,681,.map,cc1f2a7e8602158991d1ed725d21d33f52d7ddd345dc702cc0597679041bc7ab
+/storage/emulated/0/Map Check/godot-project,terrain/source/MAP_INTERNAL_MISSION_3_OBJECT.map,MAP_INTERNAL_MISSION_3_OBJECT.map,31135,.map,0e88b74bf9030fdfe375f63cb1e5b71b1dc520e50e14af4eed2d2afdbd4bbabe
