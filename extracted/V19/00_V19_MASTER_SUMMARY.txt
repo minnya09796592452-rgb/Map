@@ -1,0 +1,43 @@
+CASTAWAY-DEPTHS V19
+TERRAIN FOUNDATION & BINARY FORMAT VERIFICATION
+=================================================================
+Started: 2026-11-20T02:33:57
+Game root: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+Output: /storage/emulated/0/Map Check/reports/V19_TERRAIN_FOUNDATION
+Mode: READ-ONLY
+
+
+TARGET: MAP_INTERNAL_MISSION_3_HEIGHT.map
+COPIES FOUND: 1
+Copy 1: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+Size: 132,098 bytes (129.00 KiB)
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+
+TARGET: MAP_INTERNAL_MISSION_3_EDITOR.map
+COPIES FOUND: 1
+Copy 1: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_EDITOR.map
+Size: 681 bytes (0.67 KiB)
+SHA256: cc1f2a7e8602158991d1ed725d21d33f52d7ddd345dc702cc0597679041bc7ab
+
+TARGET: MAP_INTERNAL_MISSION_3_OBJECT.map
+COPIES FOUND: 1
+Copy 1: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_OBJECT.map
+Size: 31,135 bytes (30.41 KiB)
+SHA256: 0e88b74bf9030fdfe375f63cb1e5b71b1dc520e50e14af4eed2d2afdbd4bbabe
+
+=================================================================
+SOURCE SCAN
+Source files scanned: 6
+Files with relevant matches: 5
+
+EXPECTED MAP FILE SIZES (REFERENCE ONLY)
+HEIGHT: 132098 bytes
+EDITOR: 681 bytes
+OBJECT: 31135 bytes
+
+IMPORTANT:
+These expected sizes are comparison references, not proof
+of internal binary structure.
+No decoder or file format has been declared verified.
+
+Errors: 0
