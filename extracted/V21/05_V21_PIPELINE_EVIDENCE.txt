@@ -1,0 +1,24 @@
+V21 MAP SAVE/LOAD PIPELINE CROSS-CHECK
+=================================================================
+Evidence source: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/01_BEAM_TERRAIN.txt
+
+
+SEARCH: MPExtensions.IsCompressStableValuesInitialized()
+LINE 318: if (!MPExtensions.IsCompressStableValuesInitialized())
+LINE 395: if (!MPExtensions.IsCompressStableValuesInitialized())
+
+SEARCH: MPExtensions.InitializeCompressStableValues();
+LINE 320: MPExtensions.InitializeCompressStableValues();
+LINE 397: MPExtensions.InitializeCompressStableValues();
+
+SEARCH: map.HeightmapData[i, j].Compress()
+LINE 348: binaryWriter.Write(map.HeightmapData[i, j].Compress());
+
+SEARCH: ReadUInt16().ToCompressStable()
+LINE 452: ushort value = binaryReader.ReadUInt16().ToCompressStable();
+
+SEARCH: value.Decompress()
+LINE 453: array[i, j] = value.Decompress();
+
+SEARCH: map.HeightmapData = array;
+LINE 456: map.HeightmapData = array;

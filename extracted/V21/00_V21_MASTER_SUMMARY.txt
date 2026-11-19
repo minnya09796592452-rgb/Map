@@ -1,0 +1,34 @@
+CASTAWAY DEPTHS - V21 MASTER SUMMARY
+=================================================================
+MISSION 3 HEIGHT COMPRESSION RECOVERY
+Created UTC: 2026-11-19T20:30:05.813754+00:00
+Output: /storage/emulated/0/Map Check/reports/V21_HEIGHT_COMPRESSION_RECOVERY
+
+SOURCE
+Path: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/MPExtensions.cs
+Bytes: 25790
+SHA256: c4426c95d1c4a0d47c88dfb88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf
+Expected SHA match: True
+
+HEIGHT
+Path: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+Bytes: 132098
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+Expected SHA match: True
+
+COMPRESSION
+Stable uint16 values: 65536
+Changed lookup entries: 0
+Initialization sentinel nonzero: True
+
+ERRORS
+0
+
+WARNINGS
+0
+NONE
+
+STATUS: VERIFIED SOURCE + BINARY DECODE
+
+No original source or game binary was modified.
+No Godot project files were modified.

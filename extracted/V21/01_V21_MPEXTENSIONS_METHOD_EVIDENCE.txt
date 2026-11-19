@@ -1,0 +1,91 @@
+V21 MPEXTENSIONS SOURCE METHOD EVIDENCE
+=================================================================
+Source: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp/Funlabs/MPExtensions.cs
+Size: 25790
+SHA256: c4426c95d1c4a0d47c88dfb88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf
+Source type: ILSpy-decompiled C#
+
+
+METHOD: public static ushort Compress(this float value)
+LINES: 814-825
+-------------------------------------------------------
+  814: public static ushort Compress(this float value)
+  815: 	{
+  816: 		if ((double)value > 1.0)
+  817: 		{
+  818: 			value = 1f;
+  819: 		}
+  820: 		if ((double)value < 0.0)
+  821: 		{
+  822: 			value = 0f;
+  823: 		}
+  824: 		return (ushort)(value * 65535f);
+  825: 	}
+
+METHOD: public static float Decompress(this ushort value)
+LINES: 827-830
+-------------------------------------------------------
+  827: public static float Decompress(this ushort value)
+  828: 	{
+  829: 		return (float)(int)value / 65535f;
+  830: 	}
+
+METHOD: public static bool IsCompressStable(this ushort value)
+LINES: 832-835
+-------------------------------------------------------
+  832: public static bool IsCompressStable(this ushort value)
+  833: 	{
+  834: 		return value == value.Decompress().Compress();
+  835: 	}
+
+METHOD: private static ushort GetCompressStable(this ushort value)
+LINES: 837-857
+-------------------------------------------------------
+  837: private static ushort GetCompressStable(this ushort value)
+  838: 	{
+  839: 		if (value.IsCompressStable())
+  840: 		{
+  841: 			return value;
+  842: 		}
+  843: 		int num = 1;
+  844: 		while (true)
+  845: 		{
+  846: 			if (value - num >= 0 && ((ushort)(value - num)).IsCompressStable())
+  847: 			{
+  848: 				return (ushort)(value - num);
+  849: 			}
+  850: 			if (value + num <= 65535 && ((ushort)(value + num)).IsCompressStable())
+  851: 			{
+  852: 				break;
+  853: 			}
+  854: 			num++;
+  855: 		}
+  856: 		return (ushort)(value + num);
+  857: 	}
+
+METHOD: public static ushort ToCompressStable(this ushort value)
+LINES: 859-862
+-------------------------------------------------------
+  859: public static ushort ToCompressStable(this ushort value)
+  860: 	{
+  861: 		return _toCompressStable[value];
+  862: 	}
+
+METHOD: public static void InitializeCompressStableValues()
+LINES: 864-870
+-------------------------------------------------------
+  864: public static void InitializeCompressStableValues()
+  865: 	{
+  866: 		for (int i = 0; i <= 65535; i++)
+  867: 		{
+  868: 			_toCompressStable[i] = ((ushort)i).GetCompressStable();
+  869: 		}
+  870: 	}
+
+METHOD: public static bool IsCompressStableValuesInitialized()
+LINES: 872-875
+-------------------------------------------------------
+  872: public static bool IsCompressStableValuesInitialized()
+  873: 	{
+  874: 		return _toCompressStable[32768] != 0;
+  875: 	}

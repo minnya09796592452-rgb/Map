@@ -1,0 +1,20 @@
+V21 STABLE COMPRESSION TABLE AUDIT
+=================================================================
+Total uint16 inputs: 65536
+Stable values: 65536
+Unstable values: 0
+Lookup entries changed: 0
+Maximum lookup adjustment: 0
+Stable identity check failures: 0
+Initialization sentinel [32768]: 32768
+Initialized condition after table build: True
+
+TEST VECTORS
+0 -> 0 -> 0 -> 0
+1 -> 1 -> 1.52590218931e-05 -> 1
+2 -> 2 -> 3.05180437863e-05 -> 2
+16384 -> 16384 -> 0.250003814697 -> 16384
+32768 -> 32768 -> 0.500007629395 -> 32768
+46128 -> 46128 -> 0.703868150711 -> 46128
+65534 -> 65534 -> 0.999984741211 -> 65534
+65535 -> 65535 -> 1 -> 65535

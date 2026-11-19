@@ -1,0 +1,43 @@
+V21 MISSION 3 HEIGHT DECODE PROFILE
+=================================================================
+Original path: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+Original size: 132098
+Original SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+Samples: 66049
+Grid: 257 x 257
+Binary format: little-endian uint16
+Read order: sequential, j changes fastest
+
+DECODE FORMULA
+stable = ToCompressStable(raw_uint16)
+height = float32(stable) / float32(65535)
+
+VALUE STATISTICS
+Raw minimum: 0
+Raw maximum: 46128
+Raw unique values: 15791
+Raw zero count: 8275
+Mapped changed samples: 0
+Decoded minimum: 0
+Decoded maximum: 0.703868150711
+Decoded mean: 0.465015180655
+Decoded median: 0.607568502426
+Decoded P01: 0
+Decoded P05: 0
+Decoded P25: 0.270908683538
+Decoded P50: 0.607568502426
+Decoded P75: 0.657740116119
+Decoded P95: 0.676890194416
+Decoded P99: 0.68998247385
+
+MIN LOCATION [i,j]: (0, 0)
+MAX LOCATION [i,j]: (119, 128)
+
+GRID ORIENTATION
+Map.Load loops i=0..256, then j=0..256.
+It stores array[i,j] directly.
+This internal MAP decoder does not reverse rows.
+
+IMPORTANT
+Decoded values are normalized Map.HeightmapData floats.
+They are NOT yet verified Unity world-space elevations.
