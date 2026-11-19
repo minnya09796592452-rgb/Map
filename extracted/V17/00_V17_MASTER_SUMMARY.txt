@@ -1,0 +1,25 @@
+CASTAWAY-DEPTHS — V17 SOURCE BATCH SUMMARY
+Created UTC: 2026-11-19T19:12:59.376813+00:00
+Source: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED/Assembly-CSharp
+Exported C# files: 33
+Exported source bytes: 239061
+Missing files: 0
+Errors: 0
+Source SHA256 changed: 0
+
+GROUP COUNTS
+01_BEAM_TERRAIN: 10
+02_ISLAND_GENERATION: 6
+03_WORLD_TERRAIN: 7
+04_LEVEL_EDITOR_TERRAIN: 10
+
+MISSING FILES
+None
+
+ERRORS
+None
+
+CHANGED SOURCE FILES
+None
+
+Important: these are ILSpy-reconstructed C# files, not original developer-authored source.

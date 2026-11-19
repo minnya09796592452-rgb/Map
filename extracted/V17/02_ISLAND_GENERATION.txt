@@ -1,0 +1,1048 @@
+CASTAWAY-DEPTHS V17 SOURCE BATCH
+GROUP: 02_ISLAND_GENERATION
+NOTE: ILSpy-decompiled C#; reconstructed output, not original authored source.
+====================================================================================================
+
+
+####################################################################################################
+FILE: IslandGen/Center.cs
+SIZE_BYTES: 401
+SHA256: 28af852d81c98a84dab32cf8417b2554fe54a1d03e221941fc74928ca5a6d813
+####################################################################################################
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace IslandGen;
+
+public class Center
+{
+	public int Index;
+
+	public Vector2 Point;
+
+	public bool Water;
+
+	public bool Ocean;
+
+	public bool Coast;
+
+	public bool Border;
+
+	public Island.Biome Biome;
+
+	public float Elevation;
+
+	public float Moisture;
+
+	public List<Center> Neighbors;
+
+	public List<Edge> Borders;
+
+	public List<Corner> Corners;
+}
+
+####################################################################################################
+FILE: IslandGen/Corner.cs
+SIZE_BYTES: 475
+SHA256: 66b4163c43e2b4540d83e3bfaa0a62ac944dd8db9b52e845773a5f33a4d2a106
+####################################################################################################
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace IslandGen;
+
+public class Corner
+{
+	public int Index;
+
+	public Vector2 Point;
+
+	public bool Ocean;
+
+	public bool Water;
+
+	public bool Coast;
+
+	public bool Border;
+
+	public float Elevation;
+
+	public float Moisture;
+
+	public List<Center> Touches;
+
+	public List<Edge> Protrudes;
+
+	public List<Corner> Adjacent;
+
+	public int River;
+
+	public Corner Downslope;
+
+	public Corner Watershed;
+
+	public int WatershedSize;
+}
+
+####################################################################################################
+FILE: IslandGen/Edge.cs
+SIZE_BYTES: 210
+SHA256: 98779e81b61b738891c34b05d00eea5bbd4b9ef9427ec44a82309027b33a78d3
+####################################################################################################
+
+using UnityEngine;
+
+namespace IslandGen;
+
+public class Edge
+{
+	public int Index;
+
+	public Center D0;
+
+	public Center D1;
+
+	public Corner V0;
+
+	public Corner V1;
+
+	public Vector2 Midpoint;
+
+	public int River;
+}
+
+####################################################################################################
+FILE: IslandGen/Island.cs
+SIZE_BYTES: 14137
+SHA256: abce67ca7e69a1cbeeb6c6b172fc4c9afd0709030ebe0e4fcc4c56b7fbe1374b
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Delaunay;
+using Delaunay.Geo;
+using UnityEngine;
+
+namespace IslandGen;
+
+public class Island
+{
+	public enum IslandTypes
+	{
+		Radial,
+		Perlin,
+		Blob
+	}
+
+	public enum PointTypes
+	{
+		Random,
+		Relaxed
+	}
+
+	public static class BiomeProperties
+	{
+		public static Dictionary<Biome, Color> Colors = new Dictionary<Biome, Color>
+		{
+			{
+				Biome.Ocean,
+				HexToColor("44447a")
+			},
+			{
+				Biome.Lake,
+				HexToColor("336699")
+			},
+			{
+				Biome.Beach,
+				HexToColor("605647")
+			},
+			{
+				Biome.Land,
+				HexToColor("a09077")
+			}
+		};
+
+		private static Color HexToColor(string hex)
+		{
+			byte r = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+			byte g = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+			byte b = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+			return new Color32(r, g, b, byte.MaxValue);
+		}
+	}
+
+	public enum Biome
+	{
+		Ocean,
+		Lake,
+		Beach,
+		Land
+	}
+
+	public static float LakeThreshold = 0.3f;
+
+	public List<Vector2> Points { get; private set; }
+
+	public List<Center> Centers { get; private set; }
+
+	public List<Corner> Corners { get; private set; }
+
+	public List<Edge> Edges { get; private set; }
+
+	public float Size { get; private set; }
+
+	public int NumPoints { get; private set; }
+
+	public IslandTypes IslandType { get; private set; }
+
+	public PointTypes PointType { get; private set; }
+
+	public Island(float size)
+	{
+		size = Size;
+		NumPoints = 1;
+		Points = new List<Vector2>();
+		Centers = new List<Center>();
+		Corners = new List<Corner>();
+		Edges = new List<Edge>();
+		Reset();
+	}
+
+	private void Reset()
+	{
+		Points.Clear();
+		Points.Capacity = 0;
+		if (Edges != null)
+		{
+			foreach (Edge edge in Edges)
+			{
+				edge.D0 = null;
+				edge.D1 = null;
+				edge.V0 = null;
+				edge.V1 = null;
+			}
+			Edges.Clear();
+			Edges.TrimExcess();
+		}
+		if (Centers != null)
+		{
+			foreach (Center center in Centers)
+			{
+				center.Neighbors.Clear();
+				center.Corners.Clear();
+				center.Borders.Clear();
+				center.Neighbors.TrimExcess();
+				center.Corners.TrimExcess();
+				center.Borders.TrimExcess();
+			}
+			Centers.Clear();
+			Centers.TrimExcess();
+		}
+		if (Corners != null)
+		{
+			foreach (Corner corner in Corners)
+			{
+				corner.Adjacent.Clear();
+				corner.Touches.Clear();
+				corner.Protrudes.Clear();
+				corner.Downslope = null;
+				corner.Watershed = null;
+				corner.Adjacent.TrimExcess();
+				corner.Touches.TrimExcess();
+				corner.Protrudes.TrimExcess();
+			}
+			Corners.Clear();
+			Corners.TrimExcess();
+		}
+		if (Points == null)
+		{
+			Points = new List<Vector2>();
+		}
+		if (Edges == null)
+		{
+			Edges = new List<Edge>();
+		}
+		if (Centers == null)
+		{
+			Centers = new List<Center>();
+		}
+		if (Corners == null)
+		{
+			Corners = new List<Corner>();
+		}
+	}
+
+	public void NewIsland(IslandTypes islandType, PointTypes pointType, int numPoints, int seed, float size)
+	{
+		Reset();
+		UnityEngine.Random.State state = UnityEngine.Random.state;
+		UnityEngine.Random.InitState(seed);
+		Size = size;
+		IslandType = islandType;
+		PointType = pointType;
+		NumPoints = numPoints;
+		switch (PointType)
+		{
+		case PointTypes.Relaxed:
+			Points = PointSelector.GenerateRelaxed((int)Size, numPoints);
+			break;
+		case PointTypes.Random:
+			Points = PointSelector.GenerateRandom((int)Size, numPoints);
+			break;
+		}
+		Voronoi voronoi = new Voronoi(Points, null, new Rect(0f, 0f, Size, Size));
+		BuildGraph(Points, voronoi);
+		ImproveCorners();
+		voronoi.Dispose();
+		voronoi = null;
+		Points = null;
+		AssignCornerElevations();
+		AssignOceanCoastAndLand();
+		RedistributeElevations(LandCorners(Corners));
+		for (int i = 0; i < Corners.Count; i++)
+		{
+			Corner corner = Corners[i];
+			if (corner.Ocean || corner.Coast)
+			{
+				corner.Elevation = 0f;
+			}
+		}
+		AssignPolygonElevations();
+		CalculateDownslopes();
+		CalculateWatersheds();
+		CreateRivers();
+		AssignBiomes();
+		UnityEngine.Random.state = state;
+	}
+
+	private void ImproveCorners()
+	{
+		List<Vector2> list = new List<Vector2>(Corners.Count);
+		while (list.Count < Corners.Count)
+		{
+			list.Add(default);
+		}
+		foreach (Corner corner in Corners)
+		{
+			if (corner.Border)
+			{
+				list[corner.Index] = corner.Point;
+				continue;
+			}
+			Vector2 value = default;
+			foreach (Center touch in corner.Touches)
+			{
+				value.x += touch.Point.x;
+				value.y += touch.Point.y;
+			}
+			value.x /= corner.Touches.Count;
+			value.y /= corner.Touches.Count;
+			list[corner.Index] = value;
+		}
+		for (int i = 0; i < Corners.Count; i++)
+		{
+			Corners[i].Point = list[i];
+		}
+		foreach (Edge edge in Edges)
+		{
+			if (edge.V0 != null && edge.V1 != null)
+			{
+				edge.Midpoint = Vector2.Lerp(edge.V0.Point, edge.V1.Point, 0.5f);
+			}
+		}
+	}
+
+	private void BuildGraph(List<Vector2> points, Voronoi voronoi)
+	{
+		Dictionary<Vector2, Center> dictionary = new Dictionary<Vector2, Center>();
+		foreach (Vector2 point in points)
+		{
+			Center center = new Center();
+			center.Index = Centers.Count;
+			center.Point = point;
+			center.Neighbors = new List<Center>();
+			center.Borders = new List<Edge>();
+			center.Corners = new List<Corner>();
+			Centers.Add(center);
+			dictionary.Add(point, center);
+		}
+		foreach (Center center2 in Centers)
+		{
+			voronoi.Region(center2.Point);
+		}
+		List<List<Corner>> cornerIsland = new List<List<Corner>>();
+		Func<Vector2?, Corner> func = (Vector2? point) =>
+		{
+			int num = 0;
+			if (!point.HasValue || !point.HasValue)
+			{
+				return (Corner)null;
+			}
+			Vector2 value = point.Value;
+			for (num = (int)value.x - 1; num <= (int)value.x + 1; num++)
+			{
+				if (num >= 0 && num < cornerIsland.Count)
+				{
+					foreach (Corner item in cornerIsland[num])
+					{
+						float num2 = value.x - item.Point.x;
+						float num3 = value.y - item.Point.y;
+						if (num2 * num2 + num3 * num3 < 1E-06f)
+						{
+							return item;
+						}
+					}
+				}
+			}
+			num = (int)value.x;
+			while (cornerIsland.Count <= num)
+			{
+				cornerIsland.Add(new List<Corner>());
+			}
+			Corner corner = new Corner
+			{
+				Index = Corners.Count
+			};
+			Corners.Add(corner);
+			corner.Point = value;
+			corner.Border = value.x == 0f || value.x == Size || value.y == 0f || value.y == Size;
+			corner.Touches = new List<Center>();
+			corner.Protrudes = new List<Edge>();
+			corner.Adjacent = new List<Corner>();
+			cornerIsland[num].Add(corner);
+			return corner;
+		};
+		Action<List<Corner>, Corner> action = (List<Corner> cornerList, Corner corner) =>
+		{
+			if (corner != null && cornerList.IndexOf(corner) < 0)
+			{
+				cornerList.Add(corner);
+			}
+		};
+		Action<List<Center>, Center> action2 = (List<Center> centerList, Center center2) =>
+		{
+			if (center2 != null && centerList.IndexOf(center2) < 0)
+			{
+				centerList.Add(center2);
+			}
+		};
+		foreach (Delaunay.Edge item2 in voronoi.Edges())
+		{
+			LineSegment lineSegment = item2.DelaunayLine();
+			LineSegment lineSegment2 = item2.VoronoiEdge();
+			Edge edge = new Edge();
+			edge.Index = Edges.Count;
+			edge.River = 0;
+			Edges.Add(edge);
+			if (lineSegment2.p0.HasValue && lineSegment2.p1.HasValue)
+			{
+				edge.Midpoint = Vector2.Lerp(lineSegment2.p0.Value, lineSegment2.p1.Value, 0.5f);
+			}
+			edge.V0 = func(lineSegment2.p0);
+			edge.V1 = func(lineSegment2.p1);
+			edge.D0 = dictionary[lineSegment.p0.Value];
+			edge.D1 = dictionary[lineSegment.p1.Value];
+			if (edge.D0 != null)
+			{
+				edge.D0.Borders.Add(edge);
+			}
+			if (edge.D1 != null)
+			{
+				edge.D1.Borders.Add(edge);
+			}
+			if (edge.V0 != null)
+			{
+				edge.V0.Protrudes.Add(edge);
+			}
+			if (edge.V1 != null)
+			{
+				edge.V1.Protrudes.Add(edge);
+			}
+			if (edge.D0 != null && edge.D1 != null)
+			{
+				action2(edge.D0.Neighbors, edge.D1);
+				action2(edge.D1.Neighbors, edge.D0);
+			}
+			if (edge.V0 != null && edge.V1 != null)
+			{
+				action(edge.V0.Adjacent, edge.V1);
+				action(edge.V1.Adjacent, edge.V0);
+			}
+			if (edge.D0 != null)
+			{
+				action(edge.D0.Corners, edge.V0);
+				action(edge.D0.Corners, edge.V1);
+			}
+			if (edge.D1 != null)
+			{
+				action(edge.D1.Corners, edge.V0);
+				action(edge.D1.Corners, edge.V1);
+			}
+			if (edge.V0 != null)
+			{
+				action2(edge.V0.Touches, edge.D0);
+				action2(edge.V0.Touches, edge.D1);
+			}
+			if (edge.V1 != null)
+			{
+				action2(edge.V1.Touches, edge.D0);
+				action2(edge.V1.Touches, edge.D1);
+			}
+		}
+	}
+
+	private List<Corner> LandCorners(List<Corner> corners)
+	{
+		List<Corner> list = new List<Corner>();
+		foreach (Corner corner in Corners)
+		{
+			if (!corner.Ocean && !corner.Coast)
+			{
+				list.Add(corner);
+			}
+		}
+		return list;
+	}
+
+	private void AssignCornerElevations()
+	{
+		Queue<Corner> queue = new Queue<Corner>();
+		foreach (Corner corner2 in Corners)
+		{
+			corner2.Water = !Inside(corner2.Point);
+		}
+		foreach (Corner corner3 in Corners)
+		{
+			if (corner3.Border)
+			{
+				corner3.Elevation = 0f;
+				queue.Enqueue(corner3);
+			}
+			else
+			{
+				corner3.Elevation = float.PositiveInfinity;
+			}
+		}
+		while (queue.Count > 0)
+		{
+			Corner corner = queue.Dequeue();
+			foreach (Corner item in corner.Adjacent)
+			{
+				float num = 0.01f + corner.Elevation;
+				if (!corner.Water && !item.Water)
+				{
+					num++;
+				}
+				if (num < item.Elevation)
+				{
+					item.Elevation = num;
+					queue.Enqueue(item);
+				}
+			}
+		}
+	}
+
+	private void RedistributeElevations(List<Corner> locations)
+	{
+		float num = 1.1f;
+		locations = locations.OrderBy((Corner o) => o.Elevation).ToList();
+		for (int num2 = 0; num2 < locations.Count; num2++)
+		{
+			float num3 = (float)num2 / (float)(locations.Count - 1);
+			float num4 = Mathf.Sqrt(num) - Mathf.Sqrt(num * (1f - num3));
+			if (num4 > 1f)
+			{
+				num4 = 1f;
+			}
+			locations[num2].Elevation = num4;
+		}
+	}
+
+	private void AssignOceanCoastAndLand()
+	{
+		Queue<Center> queue = new Queue<Center>();
+		foreach (Center center in Centers)
+		{
+			int num = 0;
+			foreach (Corner corner in center.Corners)
+			{
+				if (corner.Border)
+				{
+					center.Border = true;
+					center.Ocean = true;
+					corner.Water = true;
+					queue.Enqueue(center);
+				}
+				if (corner.Water)
+				{
+					num++;
+				}
+			}
+			center.Water = center.Ocean || (float)num >= (float)center.Corners.Count * LakeThreshold;
+		}
+		while (queue.Count > 0)
+		{
+			foreach (Center neighbor in queue.Dequeue().Neighbors)
+			{
+				if (neighbor.Water && !neighbor.Ocean)
+				{
+					neighbor.Ocean = true;
+					queue.Enqueue(neighbor);
+				}
+			}
+		}
+		foreach (Center center2 in Centers)
+		{
+			int num2 = 0;
+			int num3 = 0;
+			foreach (Center neighbor2 in center2.Neighbors)
+			{
+				if (neighbor2.Ocean)
+				{
+					num2++;
+				}
+				if (!neighbor2.Water)
+				{
+					num3++;
+				}
+			}
+			center2.Coast = num2 > 0 && num3 > 0;
+		}
+		foreach (Corner corner2 in Corners)
+		{
+			int num4 = 0;
+			int num5 = 0;
+			foreach (Center touch in corner2.Touches)
+			{
+				if (touch.Ocean)
+				{
+					num4++;
+				}
+				if (!touch.Water)
+				{
+					num5++;
+				}
+			}
+			corner2.Ocean = num4 == corner2.Touches.Count;
+			corner2.Coast = num4 > 0 && num5 > 0;
+			corner2.Water = corner2.Border || (num5 != corner2.Touches.Count && !corner2.Coast);
+		}
+	}
+
+	private void AssignPolygonElevations()
+	{
+		foreach (Center center in Centers)
+		{
+			float num = 0f;
+			foreach (Corner corner in center.Corners)
+			{
+				num += corner.Elevation;
+			}
+			center.Elevation = num / (float)center.Corners.Count;
+		}
+	}
+
+	private void CalculateDownslopes()
+	{
+		foreach (Corner corner2 in Corners)
+		{
+			Corner corner = corner2;
+			foreach (Corner item in corner2.Adjacent)
+			{
+				if (item.Elevation <= corner.Elevation)
+				{
+					corner = item;
+				}
+			}
+			corner2.Downslope = corner;
+		}
+	}
+
+	private void CalculateWatersheds()
+	{
+		foreach (Corner corner2 in Corners)
+		{
+			corner2.Watershed = corner2;
+			if (!corner2.Ocean && !corner2.Coast)
+			{
+				corner2.Watershed = corner2.Downslope;
+			}
+		}
+		Corner corner = null;
+		for (int i = 0; i < 100; i++)
+		{
+			bool flag = false;
+			foreach (Corner corner3 in Corners)
+			{
+				if (!corner3.Ocean && !corner3.Coast && !corner3.Watershed.Coast)
+				{
+					corner = corner3.Downslope.Watershed;
+					if (!corner.Ocean)
+					{
+						corner3.Watershed = corner;
+					}
+					flag = true;
+				}
+			}
+			if (!flag)
+			{
+				break;
+			}
+		}
+		foreach (Corner corner4 in Corners)
+		{
+			corner = corner4.Watershed;
+			corner.WatershedSize = ((corner.WatershedSize == 0) ? 1 : 2);
+		}
+	}
+
+	private void CreateRivers()
+	{
+		for (int i = 0; (float)i < Size / 2f; i++)
+		{
+			Corner corner = Corners[UnityEngine.Random.Range(0, Corners.Count)];
+			if (!corner.Ocean && !(corner.Elevation < 0.3f) && !(corner.Elevation > 0.9f))
+			{
+				while (!corner.Coast && corner != corner.Downslope)
+				{
+					LookUpEdgeFromCorner(corner, corner.Downslope).River++;
+					corner.River = ((corner.River == 0) ? 1 : 2);
+					corner = corner.Downslope;
+				}
+			}
+		}
+	}
+
+	private static Biome GetBiome(Center center)
+	{
+		if (center.Ocean)
+		{
+			return Biome.Ocean;
+		}
+		if (center.Water)
+		{
+			return Biome.Lake;
+		}
+		if (center.Coast)
+		{
+			return Biome.Beach;
+		}
+		return Biome.Land;
+	}
+
+	private void AssignBiomes()
+	{
+		foreach (Center center in Centers)
+		{
+			center.Biome = GetBiome(center);
+		}
+	}
+
+	public Edge LookUpEdgeFromCorner(Corner main, Corner secondary)
+	{
+		foreach (Edge protrude in main.Protrudes)
+		{
+			if (protrude.V0 == secondary || protrude.V1 == secondary)
+			{
+				return protrude;
+			}
+		}
+		return null;
+	}
+
+	public Edge LookUpEdgeFromCenter(Center main, Center secondary)
+	{
+		foreach (Edge border in main.Borders)
+		{
+			if (border.D0 == secondary || border.D1 == secondary)
+			{
+				return border;
+			}
+		}
+		return null;
+	}
+
+	private bool Inside(Vector2 position)
+	{
+		return InsideIsland(new Vector2(2f * (position.x / Size - 0.5f), 2f * (position.y / Size - 0.5f)));
+	}
+
+	private bool InsideIsland(Vector2 point)
+	{
+		bool flag = new Vector2(point.x - 0.2f, point.y / 2f + 0.2f).magnitude < 0.05f;
+		bool flag2 = new Vector2(point.x + 0.2f, point.y / 2f + 0.2f).magnitude < 0.05f;
+		if (point.magnitude < 0.8f - 0.18f * Mathf.Sin(5f * Mathf.Atan2(point.y, point.x)) && !flag)
+		{
+			return !flag2;
+		}
+		return false;
+	}
+}
+
+####################################################################################################
+FILE: IslandGen/PointSelector.cs
+SIZE_BYTES: 1089
+SHA256: 6e01c3be84ef0d622194e14e9f4d9080464e4857f333de06c52eac61ba69def5
+####################################################################################################
+
+using System.Collections.Generic;
+using Delaunay;
+using UnityEngine;
+
+namespace IslandGen;
+
+public class PointSelector
+{
+	public static int NumLloydRelaxations = 2;
+
+	public static List<Vector2> GenerateRandom(int size, int numPoints)
+	{
+		List<Vector2> list = new List<Vector2>(numPoints - 1);
+		for (int i = 0; i < numPoints; i++)
+		{
+			list.Add(new Vector2(Random.Range(10f, size - 10), Random.Range(10f, size - 10)));
+		}
+		list.TrimExcess();
+		return list;
+	}
+
+	public static List<Vector2> GenerateRelaxed(int size, int numPoints)
+	{
+		List<Vector2> list = GenerateRandom(size, numPoints);
+		List<Vector2> list2 = null;
+		for (int i = 0; i < NumLloydRelaxations; i++)
+		{
+			Voronoi voronoi = new Voronoi(list, null, new Rect(0f, 0f, size, size));
+			for (int j = 0; j < list.Count; j++)
+			{
+				Vector2 p = list[j];
+				list2 = voronoi.Region(p);
+				p.x = 0f;
+				p.y = 0f;
+				foreach (Vector2 item in list2)
+				{
+					p.x += item.x;
+					p.y += item.y;
+				}
+				p.x /= list2.Count;
+				p.y /= list2.Count;
+				list2.Clear();
+			}
+			voronoi.Dispose();
+		}
+		return list;
+	}
+}
+
+####################################################################################################
+FILE: IslandDebugTexture.cs
+SIZE_BYTES: 5074
+SHA256: 72ad1b8313a2be17918aed0154e84c78f24010430a644ff8712ed7525927206e
+####################################################################################################
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using IslandGen;
+using UnityEngine;
+
+public class IslandDebugTexture
+{
+	public void AttachTexture(Island island)
+	{
+		int num = 256;
+		int num2 = 256;
+		int num3 = (int)((250f - island.Size) * 0.5f);
+		Texture2D texture2D = new Texture2D(num, num2);
+		texture2D.SetPixels(Enumerable.Repeat(Color.magenta, num * num2).ToArray());
+		foreach (Center center in island.Centers)
+		{
+			List<Vector2> list = new List<Vector2>();
+			foreach (Center neighbor in center.Neighbors)
+			{
+				List<Vector3> list2 = new List<Vector3>();
+				Edge edge = island.LookUpEdgeFromCenter(center, neighbor);
+				if (edge == null || edge.D0 == null || edge.D1 == null)
+				{
+					continue;
+				}
+				Center d = edge.D0;
+				Center d2 = edge.D1;
+				list.Add(d.Point);
+				list.Add(d2.Point);
+				list.Add(center.Point);
+				if (edge != null && edge.V0 != null && edge.V1 != null)
+				{
+					list2.Add(new Vector3(center.Point.x, center.Elevation, center.Point.y));
+					list2.Add(new Vector3(edge.V0.Point.x, edge.V0.Elevation, edge.V0.Point.y));
+					list2.Add(new Vector3(edge.V1.Point.x, edge.V1.Elevation, edge.V1.Point.y));
+				}
+				foreach (Vector3 item in list2)
+				{
+					_ = item;
+					FillTexturePolygon(texture2D, list2.ToArray(), Island.BiomeProperties.Colors[center.Biome], num3);
+				}
+			}
+			texture2D.SetPixel((int)center.Point.x + num3, (int)center.Point.y + num3, Color.red);
+		}
+		texture2D.Apply();
+		GameObject gameObject = GameObject.Find("DebugVoronoi");
+		if ((bool)gameObject)
+		{
+			gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+		}
+	}
+
+	private void DrawLine(Texture2D texture, float x0, float y0, float x1, float y1, Color color)
+	{
+		DrawLines(texture, (int)x0, (int)y0, (int)x1, (int)y1, color);
+	}
+
+	private void DrawLines(Texture2D tex, int x0, int y0, int x1, int y1, Color col)
+	{
+		int num = y1 - y0;
+		int num2 = x1 - x0;
+		int num3;
+		if (num < 0)
+		{
+			num = -num;
+			num3 = -1;
+		}
+		else
+		{
+			num3 = 1;
+		}
+		int num4;
+		if (num2 < 0)
+		{
+			num2 = -num2;
+			num4 = -1;
+		}
+		else
+		{
+			num4 = 1;
+		}
+		num <<= 1;
+		num2 <<= 1;
+		float num5 = 0f;
+		tex.SetPixel(x0, y0, col);
+		if (num2 > num)
+		{
+			num5 = num - (num2 >> 1);
+			while (Mathf.Abs(x0 - x1) > 1)
+			{
+				if (num5 >= 0f)
+				{
+					y0 += num3;
+					num5 -= (float)num2;
+				}
+				x0 += num4;
+				num5 += (float)num;
+				tex.SetPixel(x0, y0, col);
+			}
+			return;
+		}
+		num5 = num2 - (num >> 1);
+		while (Mathf.Abs(y0 - y1) > 1)
+		{
+			if (num5 >= 0f)
+			{
+				x0 += num4;
+				num5 -= (float)num;
+			}
+			y0 += num3;
+			num5 += (float)num2;
+			tex.SetPixel(x0, y0, col);
+		}
+	}
+
+	private void FillTexturePolygon(Texture2D texture, Vector3[] points, Color color, int offset)
+	{
+		int num = (int)points.Max((Vector3 vector) => vector.z);
+		int num2 = (int)points.Min((Vector3 vector) => vector.z);
+		int num3 = (int)points.Min((Vector3 vector) => vector.x);
+		int num4 = (int)points.Max((Vector3 vector) => vector.x);
+		int num6;
+		int num5 = (num6 = points.Count());
+		float[] array = points.Select((Vector3 vector) => vector.z).ToArray();
+		float[] array2 = points.Select((Vector3 vector) => vector.x).ToArray();
+		int[] array3 = new int[num5];
+		for (int num7 = num2; num7 <= num; num7++)
+		{
+			int num8 = 0;
+			int num9 = num6 - 1;
+			int num10;
+			for (num10 = 0; num10 < num6; num10++)
+			{
+				if ((array[num10] < (float)num7 && array[num9] >= (float)num7) || (array[num9] < (float)num7 && array[num10] >= (float)num7))
+				{
+					array3[num8++] = (int)(array2[num10] + ((float)num7 - array[num10]) / (array[num9] - array[num10]) * (array2[num9] - array2[num10]));
+				}
+				num9 = num10;
+			}
+			num10 = 0;
+			while (num10 < num8 - 1)
+			{
+				if (array3[num10] > array3[num10 + 1])
+				{
+					int num11 = array3[num10];
+					array3[num10] = array3[num10 + 1];
+					array3[num10 + 1] = num11;
+					if (num10 != 0)
+					{
+						num10--;
+					}
+				}
+				else
+				{
+					num10++;
+				}
+			}
+			for (num10 = 0; num10 < num8 && array3[num10] < num4; num10 += 2)
+			{
+				if (array3[num10 + 1] > num3)
+				{
+					if (array3[num10] < num3)
+					{
+						array3[num10] = num3;
+					}
+					if (array3[num10 + 1] > num4)
+					{
+						array3[num10 + 1] = num4;
+					}
+					for (num9 = array3[num10]; num9 < array3[num10 + 1]; num9++)
+					{
+						Vector3 p = points[0];
+						Vector3 p2 = points[1];
+						Vector3 p3 = points[2];
+						Triangulation.GetHeightAtPoint(new Vector3(num9, 0f, num7), new Triangle(p, p2, p3));
+						texture.SetPixel(num9 + offset, num7 + offset, new Color(color.r, color.g, color.b, 1f));
+					}
+				}
+			}
+		}
+	}
+
+	public static Texture2D RenderSoilMapImageIcon(float[,] soilmap, int heightmapRes)
+	{
+		Texture2D texture2D = new Texture2D(256, 256);
+		for (int i = 0; i < heightmapRes - 1; i++)
+		{
+			for (int j = 0; j < heightmapRes - 1; j++)
+			{
+				float num = soilmap[j, i];
+				Color color = Color.Lerp(Color.yellow, Color.green, num);
+				if (num == 0f)
+				{
+					color = Color.black;
+				}
+				texture2D.SetPixel(j, i, color);
+			}
+		}
+		return texture2D;
+	}
+}

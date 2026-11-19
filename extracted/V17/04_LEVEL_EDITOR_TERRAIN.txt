@@ -1,0 +1,2486 @@
+CASTAWAY-DEPTHS V17 SOURCE BATCH
+GROUP: 04_LEVEL_EDITOR_TERRAIN
+NOTE: ILSpy-decompiled C#; reconstructed output, not original authored source.
+====================================================================================================
+
+
+####################################################################################################
+FILE: LE_LevelEditor/LE_ConfigTerrain.cs
+SIZE_BYTES: 1287
+SHA256: 424cdef895ead4a2dcbe178a02f7c0e93982c2f0948ecdf77d3682211a67a40f
+####################################################################################################
+
+using LE_LevelEditor.Logic;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_ConfigTerrain : MonoBehaviour
+{
+	[SerializeField]
+	[Tooltip("Scene object with a 'Projector' component that will be used to project the terrain edit brush. Can be 'null' if 'LE_LevelEditorMain.IS_TERRAIN_EDITOR' is 'false'.")]
+	private Projector m_brushProjector;
+
+	[SerializeField]
+	[Tooltip("Array with selectable brush textures.")]
+	private Texture2D[] m_brushes = new Texture2D[0];
+
+	[SerializeField]
+	[Tooltip("Array with selectable heightmap textures.")]
+	private LE_LogicTerrain.Heightmap[] _heightmaps = new LE_LogicTerrain.Heightmap[0];
+
+	[SerializeField]
+	[Tooltip("Set a predefined Unity terrain scene object.")]
+	private Terrain m_customDefaultTerrain;
+
+	[SerializeField]
+	[Tooltip("Created/loaded terrains will be moved to this layer. Raycast layer for terrain editing and terrain snapped object placement.")]
+	private int m_terrainLayer = 14;
+
+	public Projector BrushProjector => m_brushProjector;
+
+	public Texture2D[] Brushes => m_brushes;
+
+	public LE_LogicTerrain.Heightmap[] Heightmaps
+	{
+		get
+		{
+			return _heightmaps;
+		}
+		set
+		{
+			_heightmaps = value;
+		}
+	}
+
+	public Terrain CustomDefaultTerrain => m_customDefaultTerrain;
+
+	public int TerrainLayer => m_terrainLayer;
+}
+
+####################################################################################################
+FILE: LE_LevelEditor/LE_LevelEditorMain.cs
+SIZE_BYTES: 24682
+SHA256: 7aa156e431510e5853365f81e82e338349a49cb3815ef2269ed1fd79aebd3092
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using Beam.Utilities.Reflection;
+using CPG_CameraPerspective;
+using LE_LevelEditor.Core;
+using LE_LevelEditor.Events;
+using LE_LevelEditor.LEInput;
+using LE_LevelEditor.Logic;
+using LE_LevelEditor.UI;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_LevelEditorMain : Singleton<LE_LevelEditorMain>, LE_IInputHandler
+{
+	private enum EEstimateDistanceMode
+	{
+		AVERAGE,
+		NEAREST
+	}
+
+	public static int MAP_EDITOR_SEED;
+
+	[SerializeField]
+	private GameObject _screenShotCamera;
+
+	public List<Texture2D> MapScreenshots = new List<Texture2D>();
+
+	public List<LE_Object> MapObjectReferences = new List<LE_Object>();
+
+	public GameObject Boundary;
+
+	public Transform ObjectDumpContainer;
+
+	public Transform ObjectInstanceContainer;
+
+	[SerializeField]
+	[Tooltip("Show/hide camera perspective gizmo. Works like the built-in Unity Editor scene view handle: click on the axes to change camera's position and direction; click in the middle to toggle between perspective and orthographic camera view.")]
+	private bool IS_WITH_CAMERA_PERSPECTIVE_GIZMO = true;
+
+	[SerializeField]
+	[Tooltip("Camera perspective gizmo's render layer index. This layer should be excluded from the main camera.")]
+	private int CAMERA_PERSPECTIVE_GIZMO_LAYER = 14;
+
+	[SerializeField]
+	[Tooltip("Root object map shown in the object editor's tree browser.")]
+	private LE_ObjectMap ROOT_OBJECT_MAP;
+
+	[SerializeField]
+	[Tooltip("Enable to bring focused objects to the center of the visible screen (not hidden by right menu). On low resolution devices the right menu could use half of the screen. Without the oblique projection only the left half of a big object would be visible, because the right half would be behind the menu.")]
+	private bool IS_OBLIQUE_FOCUS_CENTERING = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the camera will be controlled by the level editor as described in the help popup.")]
+	private bool IS_CAMERA_MOVEMENT = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the terrain editor logic will be initialized and terrain related events handled.")]
+	private bool IS_TERRAIN_EDITOR = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the object editor logic will be initialized and object related events handled.")]
+	private bool IS_OBJECT_EDITOR = true;
+
+	[SerializeField]
+	[LE_EnumFlags("Flag enum containing activated key combinations. For example if DUPLICATE is picked then objects will be cloned when Ctrl+D is typed.")]
+	private LE_EKeyCombo ACTIVE_KEY_COMBOS = LE_EKeyCombo.FOCUS | LE_EKeyCombo.DUPLICATE;
+
+	private LE_EEditMode m_editMode;
+
+	private List<LE_GUI3dBase> m_GUI3d = new List<LE_GUI3dBase>();
+
+	private LE_GUI3dTerrain m_GUI3dTerrain;
+
+	private LE_GUI3dObject m_GUI3dObject;
+
+	private List<LE_LogicBase> m_logic = new List<LE_LogicBase>();
+
+	private LE_LogicTerrain m_logicTerrain;
+
+	private LE_LogicLevel m_logicLevel;
+
+	private LE_LogicObjects m_LogicObjects;
+
+	private LE_Input m_input;
+
+	private CPG_CameraPerspectiveGizmo m_cameraPerspectiveGizmo;
+
+	private Vector3 m_camPivot = Vector3.zero;
+
+	private Camera m_cam;
+
+	private Rect m_perspectiveGizmoRect;
+
+	private bool m_isFirstUpdateInitialized;
+
+	private bool m_isSecondUpdateInitialized;
+
+	private Action m_executeWhenReady;
+
+	private int m_lastChangeFrame = -1;
+
+	public LE_EEditMode EditMode => m_editMode;
+
+	public LE_GUI3dTerrain GUI3dTerrain => m_GUI3dTerrain;
+
+	public Vector3 CamPivot
+	{
+		get
+		{
+			return m_camPivot;
+		}
+		set
+		{
+			m_camPivot = value;
+		}
+	}
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	public bool IsReady => m_isFirstUpdateInitialized;
+
+	public int LastChangeFrame => m_lastChangeFrame;
+
+	public void ExecuteWhenReady(Action p_action)
+	{
+		m_executeWhenReady = (Action)Delegate.Combine(m_executeWhenReady, p_action);
+	}
+
+	public static bool SetObliqueFocusProjectionMatrix(bool p_isObliqueProjectionEnabled)
+	{
+		if (LE_GUIInterface.Instance.delegates.GetObliqueCameraPerspectiveRightPixelOffset != null)
+		{
+			if (p_isObliqueProjectionEnabled)
+			{
+				Camera.main.ResetProjectionMatrix();
+				Matrix4x4 projectionMatrix = Camera.main.projectionMatrix;
+				projectionMatrix[0, 2] = LE_GUIInterface.Instance.delegates.GetObliqueCameraPerspectiveRightPixelOffset() / (float)Screen.width;
+				Camera.main.projectionMatrix = projectionMatrix;
+			}
+			else
+			{
+				Camera.main.ResetProjectionMatrix();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	void LE_IInputHandler.SetCursorPosition(Vector3 p_cursorScreenCoords)
+	{
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i].ActiveEditMode == m_editMode && m_GUI3d[i].IsInteractable)
+			{
+				m_GUI3d[i].SetCursorPosition(p_cursorScreenCoords);
+			}
+		}
+	}
+
+	void LE_IInputHandler.SetIsCursorAction(bool p_isCursorAction)
+	{
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i].ActiveEditMode == m_editMode)
+			{
+				m_GUI3d[i].SetIsCursorAction(p_isCursorAction);
+			}
+		}
+	}
+
+	void LE_IInputHandler.MoveCamera(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords, bool scrolling = false)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if ((!scrolling || !IsMouseOverGUI()) && cam != null)
+		{
+			float num = EstimateDistanceToLevel(EEstimateDistanceMode.AVERAGE);
+			Vector3 direction = p_toScreenCoords - p_fromScreenCoords;
+			direction = cam.transform.TransformDirection(direction);
+			Vector3 vector;
+			if (cam.orthographic)
+			{
+				float num2 = Vector3.Dot(direction, cam.transform.forward);
+				direction -= cam.transform.forward * num2;
+				cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - num2 * (cam.orthographicSize / (float)Screen.width), 5f, 1000f);
+				vector = direction * (cam.orthographicSize / (float)Screen.width);
+			}
+			else
+			{
+				vector = direction * (num / (float)Screen.width);
+			}
+			cam.transform.position += vector;
+			cam.transform.position = new Vector3(Mathf.Clamp(cam.transform.position.x, -300f, 300f), Mathf.Clamp(cam.transform.position.y, -100f, 150f), Mathf.Clamp(cam.transform.position.z, -300f, 300f));
+		}
+	}
+
+	void LE_IInputHandler.RotateCamera(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Ray ray = cam.ScreenPointToRay(p_fromScreenCoords);
+			Ray ray2 = cam.ScreenPointToRay(p_toScreenCoords);
+			if (cam.orthographic)
+			{
+				ray.direction = (ray.origin + ray.direction * 100f - cam.transform.position).normalized;
+				ray2.direction = (ray2.origin + ray2.direction * 100f - cam.transform.position).normalized;
+			}
+			float num = Vector3.Angle(ray.direction, ray2.direction);
+			Vector3 normalized = Vector3.Cross(ray.direction, ray2.direction).normalized;
+			float num2 = Mathf.Abs(cam.transform.forward.y);
+			if (num2 > 0.9f)
+			{
+				num2 = (1f - num2) / 0.100000024f;
+				num2 *= num2;
+				float num3 = Vector3.Dot(normalized, cam.transform.right);
+				normalized -= (1f - num2) * (normalized - num3 * cam.transform.right);
+			}
+			cam.transform.Rotate(normalized, 0f - num, Space.World);
+			if (cam.transform.up.y > 0f)
+			{
+				cam.transform.LookAt(cam.transform.position + cam.transform.forward, Vector3.up);
+			}
+			else
+			{
+				cam.transform.LookAt(cam.transform.position + cam.transform.forward, Vector3.down);
+			}
+		}
+	}
+
+	void LE_IInputHandler.RotateCameraAroundPivot(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector2 vector = new Vector2(p_toScreenCoords.x, p_toScreenCoords.y) - new Vector2(p_fromScreenCoords.x, p_fromScreenCoords.y);
+			vector.x /= Screen.width;
+			vector.y /= Screen.height;
+			cam.transform.RotateAround(m_camPivot, cam.transform.right, vector.y * 300f);
+			cam.transform.RotateAround(m_camPivot, cam.transform.up, (0f - vector.x) * 300f);
+			if (cam.transform.up.y > 0f)
+			{
+				cam.transform.LookAt(m_camPivot, Vector3.up);
+			}
+			else
+			{
+				cam.transform.LookAt(m_camPivot, Vector3.down);
+			}
+		}
+	}
+
+	private void Start()
+	{
+		if (LE_GUIInterface.Instance == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: a LE_GUIInterface object must be added to the scene!");
+		}
+		LE_ConfigTerrain lE_ConfigTerrain = GetComponentInChildren<LE_ConfigTerrain>();
+		if (lE_ConfigTerrain == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: a LE_ConfigTerrain component must be added to the game object with the LE_LevelEditorMain script!");
+			lE_ConfigTerrain = gameObject.AddComponent<LE_ConfigTerrain>();
+		}
+		if (!IS_TERRAIN_EDITOR)
+		{
+			if (lE_ConfigTerrain.Brushes.Length != 0)
+			{
+				Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a non empty array for LE_ConfigTerrain.Brushes! This is performance waist and will increase loading time! Remove brushes or reenable terrain editing.");
+			}
+			if (lE_ConfigTerrain.BrushProjector != null)
+			{
+				Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a value for LE_ConfigTerrain.BrushProjector! This is performance waist and will increase loading time! Remove brush projector from scene or reenable terrain editing.");
+			}
+		}
+		Camera cam = Cam;
+		if (cam == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: Start: could not find main camera!");
+		}
+		if (IS_OBJECT_EDITOR)
+		{
+			m_GUI3dObject = gameObject.AddComponent<LE_GUI3dObject>();
+			m_GUI3dObject.TERRAIN_LAYER = 14;
+			LE_GUI3dObject gUI3dObject = m_GUI3dObject;
+			gUI3dObject.OnFocused = (Action<Vector3, float>)Delegate.Combine(gUI3dObject.OnFocused, new Action<Vector3, float>(OnGUI3dObjectFocused));
+			m_GUI3dObject.IsKeyComboFocus = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.FOCUS) != 0;
+			m_GUI3dObject.IsKeyComboDuplicate = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.DUPLICATE) != 0;
+			m_GUI3d.Add(m_GUI3dObject);
+		}
+		m_input = new LE_Input(this);
+		m_camPivot = cam.transform.position + cam.transform.forward * 100f;
+		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Combine(LE_EventInterface.OnChangeLevelData, new EventHandler(OnChangeLevelData));
+		LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+		events.OnEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>)Delegate.Combine(events.OnEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>(OnEditModeBtn));
+		MAP_EDITOR_SEED = StrandedWorld.GetRandowWorldSeed();
+	}
+
+	private void Initialize_InFirstUpdate()
+	{
+		Camera cam = Cam;
+		LE_ConfigTerrain componentInChildren = GetComponentInChildren<LE_ConfigTerrain>();
+		if (LE_GUIInterface.Instance.delegates.IsCursorOverUI == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: you have not setup LE_GUIInterface.delegates.IsCursorOverUI. Terrain might be edited behind UI while the user interacts with the UI, same is true for object placement!");
+		}
+		if (IS_TERRAIN_EDITOR)
+		{
+			m_GUI3dTerrain = gameObject.AddComponent<LE_GUI3dTerrain>();
+			m_GUI3d.Add(m_GUI3dTerrain);
+			InitializeDefaultTerrain(componentInChildren);
+			m_logicTerrain = new LE_LogicTerrain(componentInChildren, m_GUI3dTerrain);
+			m_logic.Add(m_logicTerrain);
+		}
+		else if (componentInChildren.CustomDefaultTerrain != null)
+		{
+			Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a value for LE_ConfigTerrain.CustomDefaultTerrain! The value will be ignored!");
+		}
+		m_logicLevel = new LE_LogicLevel(m_GUI3dTerrain, m_GUI3dObject, IS_OBLIQUE_FOCUS_CENTERING);
+		m_logic.Add(m_logicLevel);
+		if (IS_OBJECT_EDITOR)
+		{
+			if (ROOT_OBJECT_MAP == null)
+			{
+				InitializeObjects();
+			}
+			m_LogicObjects = new LE_LogicObjects(m_GUI3dObject, ROOT_OBJECT_MAP);
+			m_logic.Add(m_LogicObjects);
+		}
+		if (cam != null && IS_WITH_CAMERA_PERSPECTIVE_GIZMO)
+		{
+			if (LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset != null)
+			{
+				float num = 0.2f * (float)Screen.width / cam.aspect;
+				float height = 0.2f * (float)Screen.height;
+				m_perspectiveGizmoRect = new Rect((float)Screen.width - LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset() - num, 0f, num, height);
+				if (string.IsNullOrEmpty(LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER)))
+				{
+					Debug.LogWarning("LE_LevelEditorMain: Inspector property 'CAMERA_PERSPECTIVE_GIZMO_LAYER' is set to '" + CAMERA_PERSPECTIVE_GIZMO_LAYER + "', but this layer has no name in 'Tags & Layers' set. Please set the name of this layer to 'CameraPerspectiveGizmo' or change the value of the 'CAMERA_PERSPECTIVE_GIZMO_LAYER' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+				}
+				else if (LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER) != "CameraPerspectiveGizmo")
+				{
+					Debug.LogWarning("LE_LevelEditorMain: Inspector property 'CAMERA_PERSPECTIVE_GIZMO_LAYER' is set to '" + CAMERA_PERSPECTIVE_GIZMO_LAYER + "', but the name of this layer is '" + LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER) + "'. Is this intended? If not please set the name of this layer to 'CameraPerspectiveGizmo' or change the value of the 'CAMERA_PERSPECTIVE_GIZMO_LAYER' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+				}
+				m_cameraPerspectiveGizmo = CPG_CameraPerspectiveGizmo.Create(cam, CAMERA_PERSPECTIVE_GIZMO_LAYER);
+				if (m_cameraPerspectiveGizmo != null)
+				{
+					m_cameraPerspectiveGizmo.transform.position = Vector3.down * -10000f;
+					m_cameraPerspectiveGizmo.OrthoOffset = cam.farClipPlane * 0.2f;
+					cam.cullingMask &= ~(1 << CAMERA_PERSPECTIVE_GIZMO_LAYER);
+					m_cameraPerspectiveGizmo.RelativeScreenSize = 0.2f;
+					float num2 = LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset() / (float)Screen.width;
+					m_cameraPerspectiveGizmo.RelativeScreenPos = new Vector2(1f - 0.1f / cam.aspect - num2, 0.9f);
+					CPG_CameraPerspectiveGizmo cameraPerspectiveGizmo = m_cameraPerspectiveGizmo;
+					cameraPerspectiveGizmo.m_onBeforeSwitchToOrthographic = (EventHandler)Delegate.Combine(cameraPerspectiveGizmo.m_onBeforeSwitchToOrthographic, new EventHandler(OnCameraPerspectiveSwitchToOrthographic));
+					CPG_CameraPerspectiveGizmo cameraPerspectiveGizmo2 = m_cameraPerspectiveGizmo;
+					cameraPerspectiveGizmo2.m_onAfterSwitchToPerspective = (EventHandler)Delegate.Combine(cameraPerspectiveGizmo2.m_onAfterSwitchToPerspective, new EventHandler(OnCameraPerspectiveSwitchToPerspective));
+				}
+			}
+			else
+			{
+				Debug.LogError("LE_LevelEditorMain: LE_GUIInterface.delegates.GetCameraPerspectiveGizmoRightPixelOffset was not set from the UI scripts! The camera perspective gizmo cannot be placed to the right screen position! To set this delegate use 'LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset = ...' in one of the Start functions of your scripts!");
+			}
+		}
+		if (IS_OBLIQUE_FOCUS_CENTERING && !SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: true))
+		{
+			Debug.LogError("LE_LevelEditorMain: IS_OBLIQUE_FOCUS_CENTERING is true, but you have not provided the LE_GUIInterface.delegates.GetObliqueCameraPerspectiveRightPixelOffset delegate! Provide it to bring focused objects in the center of the visible (not covered by UI) screen area!");
+		}
+	}
+
+	public void OnObjectEditModeKey(LE_EObjectEditMode editMode)
+	{
+		m_GUI3dObject.ObjectEditMode = editMode;
+	}
+
+	public void OnSelectedObjectDeleteKey()
+	{
+		if (m_GUI3dObject.SelectedObject != null)
+		{
+			if (LE_GUIInterface.Instance.delegates.ShowPopupConfirmDeleteObject != null)
+			{
+				m_LogicObjects.ConfirmDelete();
+			}
+			else
+			{
+				Debug.LogError("LE_LogicObject: OnSelectedObjectDeleteBtn: you have triggered the delete button behaviour, but the LE_GUIInterface.delegates.ShowPopupConfirmDeleteObject delegate is not set! Set this delegate to make the delete button work!");
+			}
+		}
+	}
+
+	public void OnSelectedObjectDuplicateKey()
+	{
+		m_GUI3dObject.CloneObject();
+	}
+
+	public void InitializeObjects()
+	{
+		Debug.Log("LevelEditorMain:: Initializing Editor Objects");
+		List<LE_ObjectMap> list = new List<LE_ObjectMap>();
+		foreach (LE_Object.Categories value in Enum.GetValues(typeof(LE_Object.Categories)))
+		{
+			if (value != LE_Object.Categories.NONE)
+			{
+				LE_ObjectMap lE_ObjectMap = new LE_ObjectMap();
+				lE_ObjectMap.CategoryName = value.GetAttribute<DescriptionAttribute>().Text;
+				lE_ObjectMap.ObjectPrefabs = new List<LE_Object>();
+				list.Add(lE_ObjectMap);
+			}
+		}
+		ROOT_OBJECT_MAP = new LE_ObjectMap();
+		ROOT_OBJECT_MAP.ObjectPrefabs = new List<LE_Object>();
+		Shader.SetGlobalColor("_HighlightRimColor", Color.black);
+		Shader.SetGlobalFloat("_HighlightRimPower", 1f);
+		LE_Object[] componentsInChildren = ObjectInstanceContainer.GetComponentsInChildren<LE_Object>();
+		foreach (LE_Object item in componentsInChildren)
+		{
+			MapObjectReferences.Add(item);
+		}
+		ObjectInstanceContainer.gameObject.SetActive(value: false);
+		foreach (LE_Object mapObjectReference in MapObjectReferences)
+		{
+			if (mapObjectReference.Category == LE_Object.Categories.NONE)
+			{
+				ROOT_OBJECT_MAP.ObjectPrefabs.Add(mapObjectReference);
+			}
+			else
+			{
+				list[(int)(mapObjectReference.Category - 1)].ObjectPrefabs.Add(mapObjectReference);
+			}
+		}
+		foreach (LE_ObjectMap item2 in list)
+		{
+			item2.ObjectPrefabs = item2.ObjectPrefabs.OrderBy((LE_Object go) => go.gameObject.name).ToList();
+			ROOT_OBJECT_MAP.SubObjectMaps.Add(item2);
+		}
+	}
+
+	private void Validate_References()
+	{
+	}
+
+	private void Initialize_InSecondUpdate()
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			Camera cam = Cam;
+			if (cam != null)
+			{
+				SetObliqueFocusProjectionMatrix(!cam.orthographic);
+			}
+		}
+	}
+
+	private void InitializeDefaultTerrain(LE_ConfigTerrain p_LEConfTerrain)
+	{
+		if (p_LEConfTerrain.CustomDefaultTerrain != null && p_LEConfTerrain.CustomDefaultTerrain.terrainData != null)
+		{
+			m_GUI3dTerrain.SetTerrain(p_LEConfTerrain.CustomDefaultTerrain);
+			LE_EventInterface.LevelDataChanged(p_LEConfTerrain.CustomDefaultTerrain.gameObject);
+			if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+			{
+				LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.EDIT);
+			}
+			else
+			{
+				Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to disable the create UI if the default Unity terrain is set!");
+			}
+		}
+		else if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.CREATE);
+		}
+		else
+		{
+			Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to show the create UI if there is no default Unity terrain set!");
+		}
+	}
+
+	private void Update()
+	{
+		if (m_isFirstUpdateInitialized && !m_isSecondUpdateInitialized)
+		{
+			m_isSecondUpdateInitialized = true;
+			Initialize_InSecondUpdate();
+		}
+		if (!m_isFirstUpdateInitialized)
+		{
+			m_isFirstUpdateInitialized = true;
+			Initialize_InFirstUpdate();
+		}
+		bool flag = IsMouseOverGUI();
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			m_GUI3d[i].IsInteractable = !flag && m_GUI3d[i].ActiveEditMode == m_editMode;
+		}
+		for (int j = 0; j < m_logic.Count; j++)
+		{
+			m_logic[j].Update();
+		}
+		m_input.Update();
+		UpdateCameraPivotPoint();
+		if (m_cameraPerspectiveGizmo != null)
+		{
+			m_cameraPerspectiveGizmo.Pivot = m_camPivot;
+		}
+		if (m_executeWhenReady != null && IsReady)
+		{
+			m_executeWhenReady();
+			m_executeWhenReady = null;
+		}
+	}
+
+	public bool IsMouseOverGUI()
+	{
+		bool flag = LE_GUIInterface.Instance.delegates.IsCursorOverUI != null && LE_GUIInterface.Instance.delegates.IsCursorOverUI();
+		bool flag2 = false;
+		if (IS_WITH_CAMERA_PERSPECTIVE_GIZMO && !flag)
+		{
+			Vector3 mousePosition = Input.mousePosition;
+			mousePosition.y = Mathf.Clamp((float)Screen.height - mousePosition.y, 0f, Screen.height);
+			mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
+			flag2 = m_perspectiveGizmoRect.Contains(mousePosition);
+		}
+		return flag | flag2;
+	}
+
+	private void OnGUI3dObjectFocused(Vector3 p_focusOn, float p_distance)
+	{
+		m_camPivot = p_focusOn;
+		Camera cam = Cam;
+		if (cam != null && cam.orthographic && m_cameraPerspectiveGizmo != null)
+		{
+			cam.transform.position = m_camPivot - cam.transform.forward * Mathf.Abs(m_cameraPerspectiveGizmo.OrthoOffset + p_distance);
+			cam.orthographicSize = p_distance;
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Remove(LE_EventInterface.OnChangeLevelData, new EventHandler(OnChangeLevelData));
+		if (LE_GUIInterface.Instance != null)
+		{
+			LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+			events.OnEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>)Delegate.Remove(events.OnEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>(OnEditModeBtn));
+		}
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i] is LE_GUI3dObject)
+			{
+				((LE_GUI3dObject)m_GUI3d[i]).OnFocused = null;
+			}
+		}
+		m_executeWhenReady = null;
+		if (m_input != null)
+		{
+			m_input.Destroy();
+		}
+		for (int j = 0; j < m_logic.Count; j++)
+		{
+			m_logic[j].Destroy();
+		}
+		base.OnDestroy();
+	}
+
+	private void OnChangeLevelData(object p_sender, EventArgs p_args)
+	{
+		m_lastChangeFrame = Time.frameCount;
+	}
+
+	private void OnEditModeBtn(object p_sender, LE_GUIInterface.EventHandlers.EditModeEventArgs p_args)
+	{
+		m_editMode = p_args.EditMode;
+		if (m_editMode != LE_EEditMode.TERRAIN && m_GUI3dTerrain != null)
+		{
+			m_GUI3dTerrain.HideCursor();
+		}
+		if (m_editMode != LE_EEditMode.OBJECT && m_GUI3dObject != null)
+		{
+			m_GUI3dObject.RemoveSelection();
+		}
+		if (m_editMode != LE_EEditMode.NONE)
+		{
+			_screenShotCamera.SetActive(value: false);
+		}
+		else
+		{
+			_screenShotCamera.SetActive(value: true);
+		}
+	}
+
+	private void OnCameraPerspectiveSwitchToOrthographic(object p_sender, EventArgs p_args)
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: false);
+		}
+		if (m_cameraPerspectiveGizmo != null)
+		{
+			float value = EstimateDistanceToLevel(EEstimateDistanceMode.NEAREST);
+			Camera cam = Cam;
+			if (cam != null)
+			{
+				cam.orthographicSize = Mathf.Clamp(value, 5f, 60f);
+			}
+		}
+	}
+
+	private void OnCameraPerspectiveSwitchToPerspective(object p_sender, EventArgs p_args)
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: true);
+		}
+	}
+
+	private void UpdateCameraPivotPoint()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 rhs = m_camPivot - cam.transform.position;
+			float num = Vector3.Dot(cam.transform.forward, rhs);
+			if (num < 1f)
+			{
+				float num2 = num - 1.5f;
+				m_camPivot = cam.transform.position - cam.transform.forward * num2;
+				rhs = m_camPivot - cam.transform.position;
+				num = Vector3.Dot(cam.transform.forward, rhs);
+			}
+			if (Vector3.Cross(cam.transform.forward, rhs).magnitude > 1f)
+			{
+				m_camPivot = cam.transform.position + cam.transform.forward * num;
+			}
+		}
+	}
+
+	private float EstimateDistanceToLevel(EEstimateDistanceMode p_mode)
+	{
+		float result = 300f;
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			float num = 0f;
+			Vector3 vector = Vector3.zero;
+			float num2 = float.MaxValue;
+			for (float num3 = 0f; num3 < 2f; num3++)
+			{
+				for (float num4 = 0f; num4 < 2f; num4++)
+				{
+					if (!Physics.Raycast(cam.ScreenPointToRay(new Vector3(cam.rect.width * (float)Screen.width * (0.25f + 0.5f * num3), cam.rect.height * (float)Screen.height * (0.25f + 0.5f * num4), 0f)), out var hitInfo))
+					{
+						continue;
+					}
+					num++;
+					if (p_mode == EEstimateDistanceMode.AVERAGE)
+					{
+						vector += hitInfo.point;
+						continue;
+					}
+					float magnitude = (hitInfo.point - cam.transform.position).magnitude;
+					if (num2 > magnitude)
+					{
+						num2 = magnitude;
+						vector = hitInfo.point;
+					}
+				}
+			}
+			if (num > 0f)
+			{
+				if (p_mode == EEstimateDistanceMode.AVERAGE)
+				{
+					vector /= num;
+				}
+				result = (vector - cam.transform.position).magnitude;
+			}
+		}
+		return result;
+	}
+
+	public void ClearLevel()
+	{
+		foreach (Transform item in ObjectDumpContainer)
+		{
+			UnityEngine.Object.Destroy(item.gameObject);
+		}
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor/LE_SaveLoad.cs
+SIZE_BYTES: 1374
+SHA256: 83e87e55dface9899a22f99268e8b79199b25f98bd4a6a1b402def79f49db176
+####################################################################################################
+
+using System.IO;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public static class LE_SaveLoad
+{
+	private static string filePath = "/CustomMaps/Original/";
+
+	private static void SaveMapHeightMapFile(float[,] heightmap, string mapName)
+	{
+		FileStream fileStream = new FileStream(Application.dataPath + filePath + mapName + "_heightmap.map", FileMode.Create, FileAccess.ReadWrite);
+		BinaryWriter binaryWriter = new BinaryWriter(fileStream);
+		for (int i = 0; i < 257; i++)
+		{
+			for (int j = 0; j < 257; j++)
+			{
+				if (heightmap[i, j] > 1f)
+				{
+					heightmap[i, j] = 1f;
+				}
+				if (heightmap[i, j] < 0f)
+				{
+					heightmap[i, j] = 0f;
+				}
+				ushort value = (ushort)(heightmap[i, j] * 65535f);
+				binaryWriter.Write(value);
+			}
+		}
+		fileStream.Close();
+		binaryWriter.Close();
+	}
+
+	public static float[,] LoadMapHeightMapFile(string mapName)
+	{
+		float[,] array = new float[257, 257];
+		FileStream fileStream = new FileStream(Application.dataPath + filePath + mapName + "_heightmap.map", FileMode.Open, FileAccess.ReadWrite);
+		BinaryReader binaryReader = new BinaryReader(fileStream);
+		binaryReader.BaseStream.Seek(0L, SeekOrigin.Begin);
+		for (int i = 0; i < 257; i++)
+		{
+			for (int j = 0; j < 257; j++)
+			{
+				array[i, j] = (float)(int)binaryReader.ReadUInt16() / 65535f;
+			}
+		}
+		fileStream.Close();
+		binaryReader.Close();
+		return array;
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor/LE_ZoneTileGenerator.cs
+SIZE_BYTES: 4902
+SHA256: 621bbdfa03f6331ef1bfd1f3723d491f8933a337ce3221d52ddce3074a541013
+####################################################################################################
+
+using Beam;
+using Beam.Terrain;
+using Ceto;
+using LE_LevelEditor.UI;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_ZoneTileGenerator : Singleton<LE_ZoneTileGenerator>
+{
+	public Terrain terrain;
+
+	private AddWaveOverlay _waveOverlay;
+
+	private void Start()
+	{
+		InvokeRepeating("GenerateShoreMap", 0f, 10f);
+	}
+
+	public void GenerateHeightmapFromTexture(Texture2D heightmap)
+	{
+		terrain.terrainData.SetHeights(0, 0, MapTools.GetHeightsFromTexture(heightmap));
+	}
+
+	public void GenerateShoreMap()
+	{
+		if (Singleton<LE_LevelEditorMain>.Instance.EditMode == LE_EEditMode.TERRAIN)
+		{
+			Texture2D height = WorldTools.CreateHeightMapTexture(terrain.terrainData);
+			Texture2D shore = WorldTools.CreateShoreMaskTexture(terrain.terrainData);
+			AddWaveOverlay(terrain.gameObject, height, shore);
+		}
+	}
+
+	public void GenerateRandomIsland()
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		int randowWorldSeed = StrandedWorld.GetRandowWorldSeed();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.GenerateZoneHeightmap(Zone.BiomeType.ISLAND, randowWorldSeed));
+	}
+
+	public void GenerateAdvancedPerlin(int freq, float amplitude, int octaves, float blend)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.PerlinGenerator(terrain.terrainData.GetHeights(0, 0, 257, 257), Random.Range(1, 99999999), freq, amplitude, octaves, blend));
+	}
+
+	public void GenerateAdvancedNormalise(float min, float max, float blend)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.NormalizeHeightmap(terrain.terrainData.GetHeights(0, 0, 257, 257), min, max, blend));
+	}
+
+	public void GenerateSmooth()
+	{
+		terrain.terrainData.SetHeights(0, 0, WorldTools.SmoothTerrain(terrain.terrainData.GetHeights(0, 0, 257, 257), 2, 0.25f, Zone.BiomeType.ISLAND));
+	}
+
+	private Texture2D CreateHeightMapTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				float num = terrain.GetHeight(i, j) + -100f;
+				Color color = Color.Lerp(Color.black, Color.white, Mathf.Clamp01((num + 10f) / 10f));
+				Color color2 = ((num > 0f) ? Color.white : color);
+				texture2D.SetPixel(i, j, color2);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	private Texture2D CreateShoreMaskTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+		int num = -100;
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				Color color = ((terrain.GetHeight(i, j) + (float)num >= 0f) ? Color.white : Color.black);
+				texture2D.SetPixel(i, j, color);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	private void AddWaveOverlay(GameObject zone, Texture2D height, Texture2D shore)
+	{
+		if ((bool)_waveOverlay)
+		{
+			Object.Destroy(_waveOverlay.heightTexture.tex);
+			Object.Destroy(_waveOverlay.heightTexture.mask);
+			Object.Destroy(_waveOverlay.normalTexture.tex);
+			Object.Destroy(_waveOverlay.normalTexture.mask);
+			Object.Destroy(_waveOverlay.foamTexture.tex);
+			Object.Destroy(_waveOverlay.foamTexture.mask);
+			Object.Destroy(_waveOverlay.gameObject);
+		}
+		GameObject gameObject = new GameObject("WaveOverlay");
+		gameObject.transform.parent = zone.transform;
+		gameObject.transform.position = new Vector3(0f, 0f, 0f);
+		_waveOverlay = gameObject.AddComponent<AddWaveOverlay>();
+		_waveOverlay.width = 250f;
+		_waveOverlay.height = 250f;
+		_waveOverlay.heightTexture = new OverlayHeightTexture();
+		_waveOverlay.heightTexture.tex = shore;
+		_waveOverlay.heightTexture.mask = height;
+		_waveOverlay.heightTexture.alpha = 0f;
+		_waveOverlay.heightTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		_waveOverlay.normalTexture = new OverlayNormalTexture();
+		_waveOverlay.normalTexture.tex = shore;
+		_waveOverlay.normalTexture.mask = height;
+		_waveOverlay.normalTexture.alpha = 0f;
+		_waveOverlay.normalTexture.maskAlpha = 0.4f;
+		_waveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		_waveOverlay.foamTexture = new OverlayFoamTexture();
+		_waveOverlay.foamTexture.tex = shore;
+		_waveOverlay.foamTexture.mask = height;
+		_waveOverlay.foamTexture.alpha = 0.4f;
+		_waveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+	}
+
+	public void LoadMap(Map map)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.Core/LE_TerrainManager.cs
+SIZE_BYTES: 9425
+SHA256: 6a69458febae5f5a6807b81eada07df770fb7f0fea51274f8b766447b6b52b0e
+####################################################################################################
+
+using LE_LevelEditor.Events;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_TerrainManager
+{
+	private TerrainData m_terrainData;
+
+	public TerrainData TerrainData => m_terrainData;
+
+	public LE_TerrainManager(TerrainData p_terrainData)
+	{
+		m_terrainData = p_terrainData;
+	}
+
+	public void SmoothHeight(float p_amount, int p_neighbourCount, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, bool p_isDirected, float p_angle)
+	{
+		float num = m_terrainData.heightmapResolution - 1;
+		float num2 = m_terrainData.heightmapResolution - 1;
+		float p_relativeBrushSize2 = Mathf.Clamp01(p_relativeBrushSize + (float)(p_neighbourCount - 1) / Mathf.Max(num, num2));
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize2, p_relativeLocalLocation, num, num2, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var _, out var _);
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, num, num2, out var o_minX2, out var o_maxX2, out var o_minY2, out var o_maxY2, out var o_relBrushMinX2, out var o_relBrushMinY2);
+		float[,] heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+		int num3 = o_minX2 - o_minX;
+		int num4 = o_minY2 - o_minY;
+		int num5 = heights.GetLength(0) - 1;
+		int num6 = heights.GetLength(1) - 1;
+		int num7 = Mathf.Min(num3 + o_maxX2 - o_minX2, num5);
+		int num8 = Mathf.Min(num4 + o_maxY2 - o_minY2, num6);
+		int num9 = (p_neighbourCount - 1) / 2;
+		for (int i = num4; i <= num8; i++)
+		{
+			int num10;
+			int num11;
+			if (i == 0)
+			{
+				num10 = num9 + 1;
+				num11 = 0;
+			}
+			else if (i == num6)
+			{
+				num10 = num9 + 1;
+				num11 = -num9;
+			}
+			else if (i - num9 < 0)
+			{
+				int num12 = num9 - i;
+				num10 = p_neighbourCount - num12;
+				num11 = -num9 + num12;
+			}
+			else if (i + num9 >= num6)
+			{
+				int num13 = num9 + i - num6;
+				num10 = p_neighbourCount - num13;
+				num11 = -num9;
+			}
+			else
+			{
+				num10 = p_neighbourCount;
+				num11 = -num9;
+			}
+			for (int j = num3; j <= num7; j++)
+			{
+				int num14;
+				int num15;
+				if (j == 0)
+				{
+					num14 = num9 + 1;
+					num15 = 0;
+				}
+				else if (j == num5)
+				{
+					num14 = num9 + 1;
+					num15 = -num9;
+				}
+				else if (j - num9 < 0)
+				{
+					int num16 = num9 - j;
+					num14 = p_neighbourCount - num16;
+					num15 = -num9 + num16;
+				}
+				else if (j + num9 >= num5)
+				{
+					int num17 = num9 + j - num5;
+					num14 = p_neighbourCount - num17;
+					num15 = -num9;
+				}
+				else
+				{
+					num14 = p_neighbourCount;
+					num15 = -num9;
+				}
+				float num18 = 0f;
+				int num19 = 0;
+				for (int k = 0; k < num10; k++)
+				{
+					for (int l = 0; l < num14; l++)
+					{
+						if (p_isDirected)
+						{
+							int num20 = l + num15;
+							int num21 = k + num11;
+							if (num20 != 0 || num21 != 0)
+							{
+								Vector2 normalized = new Vector2(num20, num21).normalized;
+								float num22;
+								if (normalized.y >= 0f)
+								{
+									num22 = 57.29578f * Mathf.Acos(normalized.x);
+								}
+								else
+								{
+									num22 = 57.29578f * Mathf.Asin(normalized.y);
+									if (normalized.x < 0f)
+									{
+										num22 = -90f - (90f + num22);
+									}
+								}
+								if (Mathf.Abs(Mathf.DeltaAngle(p_angle, num22)) > 5f && Mathf.Abs(Mathf.DeltaAngle(p_angle, num22 + 180f)) > 5f)
+								{
+									continue;
+								}
+							}
+						}
+						float num23 = heights[j + l + num15, i + k + num11];
+						num18 += num23;
+						num19++;
+					}
+				}
+				float num24 = num18 / (float)num19;
+				float num25 = heights[j, i];
+				float v = ((float)(j + o_minX) / num - o_relBrushMinX2) / p_relativeBrushSize;
+				float u = ((float)(i + o_minY) / num2 - o_relBrushMinY2) / p_relativeBrushSize;
+				float num26 = p_amount * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+				heights[j, i] = num25 * (1f - num26) + num24 * num26;
+				heights[j, i] = ClampHeightBounds(heights[j, i], o_minX + j, o_minY + i);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	public void ChangeHeight(float p_delta, float p_targetHeight, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+	{
+		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+		for (int i = 0; i <= num; i++)
+		{
+			for (int j = 0; j <= num2; j++)
+			{
+				float num3 = o_heights[i, j];
+				if (Mathf.Abs(num3 - p_targetHeight) > 0.0001f)
+				{
+					float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+					float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+					float num4 = p_delta * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+					float num5 = ((p_targetHeight - num3 > 0f) ? 1f : (-1f));
+					if (Mathf.Sign(p_targetHeight - num3) != Mathf.Sign(p_targetHeight - (num3 + num5 * num4)))
+					{
+						o_heights[i, j] = p_targetHeight;
+					}
+					else
+					{
+						o_heights[i, j] += num5 * num4;
+					}
+				}
+				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	private float ClampHeightBounds(float heightToClamp, int x, int y)
+	{
+		float num = 20f;
+		float num2 = 257f;
+		if ((!((float)x > num) || !((float)x < num2 - num) || !((float)y > num) || !((float)y < num2 - num)) && heightToClamp > 0.65f)
+		{
+			heightToClamp = 0.65f;
+		}
+		return heightToClamp;
+	}
+
+	public void ChangeHeight(float p_delta, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+	{
+		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+		for (int i = 0; i <= num; i++)
+		{
+			for (int j = 0; j <= num2; j++)
+			{
+				float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+				float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+				float a = p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+				o_heights[i, j] += p_delta * a;
+				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	private void ChangeHeightInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float[,] o_heights, out float o_relBrushMinX, out float o_relBrushMinY, out float o_heightmapMaxX, out float o_heightmapMaxY)
+	{
+		o_heightmapMaxX = m_terrainData.heightmapResolution - 1;
+		o_heightmapMaxY = m_terrainData.heightmapResolution - 1;
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, o_heightmapMaxX, o_heightmapMaxY, out o_minX, out o_maxX, out o_minY, out o_maxY, out o_relBrushMinX, out o_relBrushMinY);
+		o_heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+	}
+
+	private void GetAffectedAreaInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, float p_maxX, float p_maxY, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float o_relBrushMinX, out float o_relBrushMinY)
+	{
+		o_minX = 0;
+		o_maxX = 0;
+		o_minY = 0;
+		o_maxY = 0;
+		o_relBrushMinX = p_relativeLocalLocation.x - p_relativeBrushSize * 0.5f;
+		float num = p_relativeLocalLocation.x + p_relativeBrushSize * 0.5f;
+		o_relBrushMinY = p_relativeLocalLocation.y - p_relativeBrushSize * 0.5f;
+		float num2 = p_relativeLocalLocation.y + p_relativeBrushSize * 0.5f;
+		if (p_alphaBrushTexture == null)
+		{
+			Debug.LogError("LE_TerrainManager: Parameter 'p_alphaBrushTexture' is null!");
+			return;
+		}
+		if (p_relativeBrushSize != Mathf.Clamp01(p_relativeBrushSize))
+		{
+			Debug.LogError("LE_TerrainManager: Parameter 'p_relativeBrushSize' is out of bounds expected range [0,1], but was '" + p_relativeBrushSize + "'!");
+			return;
+		}
+		if (p_relativeLocalLocation.x != Mathf.Clamp01(p_relativeLocalLocation.x) || p_relativeLocalLocation.y != Mathf.Clamp01(p_relativeLocalLocation.y))
+		{
+			Vector2 vector = p_relativeLocalLocation;
+			Debug.LogError("LE_TerrainManager: Parameter 'p_relativeLocalLocation' is out of bounds expected range ([0,1],[0,1]), but was '" + vector.ToString() + "'!");
+			return;
+		}
+		o_minX = Mathf.Clamp(Mathf.FloorToInt(p_maxX * o_relBrushMinX), 0, (int)p_maxX);
+		o_maxX = Mathf.Clamp(Mathf.CeilToInt(p_maxX * num), 0, (int)p_maxX);
+		o_minY = Mathf.Clamp(Mathf.FloorToInt(p_maxY * o_relBrushMinY), 0, (int)p_maxY);
+		o_maxY = Mathf.Clamp(Mathf.CeilToInt(p_maxY * num2), 0, (int)p_maxY);
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.Logic/LE_LogicTerrain.cs
+SIZE_BYTES: 18437
+SHA256: 9d4fa629405e4d9a7edb0c6a1e3ed5719a820ed414713fce5c118563971a5dd8
+####################################################################################################
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Beam;
+using Beam.Terrain;
+using LE_LevelEditor.Events;
+using LE_LevelEditor.UI;
+using UnityEngine;
+
+namespace LE_LevelEditor.Logic;
+
+public class LE_LogicTerrain : LE_LogicBase
+{
+	[Serializable]
+	public class Heightmap
+	{
+		public Texture2D Preview;
+
+		public float[,] Heights;
+	}
+
+	private LE_ConfigTerrain m_confT;
+
+	private LE_GUI3dTerrain m_GUI3dTerrain;
+
+	private bool m_doRebuildTerrainTab;
+
+	private int m_selectedBrushIndex;
+
+	private int m_selectedHeightmapIndex;
+
+	private bool m_isHeightRaise = true;
+
+	private void LoadRawHeightmaps(LE_ConfigTerrain confTerrain)
+	{
+		string hEIGHTMAPS_FOLDER = FilePath.HEIGHTMAPS_FOLDER;
+		if (!Directory.Exists(hEIGHTMAPS_FOLDER))
+		{
+			Directory.CreateDirectory(hEIGHTMAPS_FOLDER);
+		}
+		List<Heightmap> list = new List<Heightmap>();
+		string[] files = Directory.GetFiles(hEIGHTMAPS_FOLDER, "*.raw");
+		foreach (string path in files)
+		{
+			Heightmap heightmap = new Heightmap();
+			float[,] array = World.ImportHeightmapFromRawFile(path);
+			Texture2D preview = MapTools.CreateHeightmapTexture(array);
+			heightmap.Heights = array;
+			heightmap.Preview = preview;
+			list.Add(heightmap);
+		}
+		confTerrain.Heightmaps = list.ToArray();
+	}
+
+	public LE_LogicTerrain(LE_ConfigTerrain p_confTerrain, LE_GUI3dTerrain p_GUI3dTerrain)
+	{
+		m_confT = p_confTerrain;
+		m_GUI3dTerrain = p_GUI3dTerrain;
+		m_GUI3dTerrain.TERRAIN_LAYER = p_confTerrain.TerrainLayer;
+		if (p_confTerrain.BrushProjector != null)
+		{
+			m_GUI3dTerrain.BrushProjector = p_confTerrain.BrushProjector;
+		}
+		else
+		{
+			Debug.LogError("LE_GUILogicTerrain: LE_ConfigTerrain.BrushProjector was not initialized! You need to set it in the inspector.");
+		}
+		if (p_confTerrain.Brushes.Length != 0)
+		{
+			m_GUI3dTerrain.BrushAlphaTexture = p_confTerrain.Brushes[0];
+		}
+		else
+		{
+			Debug.LogError("LE_GUILogicTerrain: LE_ConfigTerrain.Brushes was not initialized! You need to set it in the inspector.");
+		}
+		LoadRawHeightmaps(p_confTerrain);
+		if (p_confTerrain.Heightmaps.Length != 0)
+		{
+			m_GUI3dTerrain.Heightmap = p_confTerrain.Heightmaps[0];
+		}
+		else
+		{
+			Debug.Log("LE_GUILogicTerrain: LE_ConfigTerrain.Heightmap was not initialized! You need to set it in the inspector.");
+		}
+		CheckParameters();
+		InitTerrainValues();
+		LE_EventInterface.OnLoadedLevelInEditor = (EventHandler)Delegate.Combine(LE_EventInterface.OnLoadedLevelInEditor, new EventHandler(OnLoadedLevelInEditor));
+		LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+		events.OnTerrainBrushChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Combine(events.OnTerrainBrushChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainBrushChanged));
+		LE_GUIInterface.EventHandlers events2 = LE_GUIInterface.Instance.events;
+		events2.OnTerrainHeightmapTextureChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Combine(events2.OnTerrainHeightmapTextureChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainHeightmapTextureChanged));
+		LE_GUIInterface.EventHandlers events3 = LE_GUIInterface.Instance.events;
+		events3.OnTerrainEditBrushSizeChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events3.OnTerrainEditBrushSizeChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushSizeChanged));
+		LE_GUIInterface.EventHandlers events4 = LE_GUIInterface.Instance.events;
+		events4.OnTerrainEditBrushAmountChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events4.OnTerrainEditBrushAmountChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushAmountChanged));
+		LE_GUIInterface.EventHandlers events5 = LE_GUIInterface.Instance.events;
+		events5.OnTerrainEditBrushTargetValueChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events5.OnTerrainEditBrushTargetValueChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushTargetValueChanged));
+		LE_GUIInterface.EventHandlers events6 = LE_GUIInterface.Instance.events;
+		events6.OnTerrainEditDirectionChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events6.OnTerrainEditDirectionChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditDirectionChanged));
+		LE_GUIInterface.EventHandlers events7 = LE_GUIInterface.Instance.events;
+		events7.OnTerrainChangeHeightModeChanged = (EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>)Delegate.Combine(events7.OnTerrainChangeHeightModeChanged, new EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>(OnTerrainChangeHeightModeChanged));
+		LE_GUIInterface.EventHandlers events8 = LE_GUIInterface.Instance.events;
+		events8.OnTerrainIsDirectedSmoothChanged = (EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>)Delegate.Combine(events8.OnTerrainIsDirectedSmoothChanged, new EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>(OnTerrainIsDirectedSmoothChanged));
+		LE_GUIInterface.EventHandlers events9 = LE_GUIInterface.Instance.events;
+		events9.OnTerrainEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>)Delegate.Combine(events9.OnTerrainEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>(OnTerrainEditModeBtn));
+		LE_GUIInterface.EventHandlers events10 = LE_GUIInterface.Instance.events;
+		events10.OnTerrainReadSetHeightBtn = (EventHandler)Delegate.Combine(events10.OnTerrainReadSetHeightBtn, new EventHandler(OnTerrainReadSetHeightBtn));
+	}
+
+	public override void Destroy()
+	{
+		LE_EventInterface.OnLoadedLevelInEditor = (EventHandler)Delegate.Remove(LE_EventInterface.OnLoadedLevelInEditor, new EventHandler(OnLoadedLevelInEditor));
+		if (LE_GUIInterface.Instance != null)
+		{
+			LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+			events.OnTerrainBrushChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Remove(events.OnTerrainBrushChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainBrushChanged));
+			LE_GUIInterface.EventHandlers events2 = LE_GUIInterface.Instance.events;
+			events2.OnTerrainHeightmapTextureChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Remove(events2.OnTerrainHeightmapTextureChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainHeightmapTextureChanged));
+			LE_GUIInterface.EventHandlers events3 = LE_GUIInterface.Instance.events;
+			events3.OnTerrainEditBrushSizeChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Remove(events3.OnTerrainEditBrushSizeChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushSizeChanged));
+			LE_GUIInterface.EventHandlers events4 = LE_GUIInterface.Instance.events;
+			events4.OnTerrainEditBrushAmountChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Remove(events4.OnTerrainEditBrushAmountChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushAmountChanged));
+			LE_GUIInterface.EventHandlers events5 = LE_GUIInterface.Instance.events;
+			events5.OnTerrainEditBrushTargetValueChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Remove(events5.OnTerrainEditBrushTargetValueChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushTargetValueChanged));
+			LE_GUIInterface.EventHandlers events6 = LE_GUIInterface.Instance.events;
+			events6.OnTerrainEditDirectionChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Remove(events6.OnTerrainEditDirectionChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditDirectionChanged));
+			LE_GUIInterface.EventHandlers events7 = LE_GUIInterface.Instance.events;
+			events7.OnTerrainChangeHeightModeChanged = (EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>)Delegate.Remove(events7.OnTerrainChangeHeightModeChanged, new EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>(OnTerrainChangeHeightModeChanged));
+			LE_GUIInterface.EventHandlers events8 = LE_GUIInterface.Instance.events;
+			events8.OnTerrainIsDirectedSmoothChanged = (EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>)Delegate.Remove(events8.OnTerrainIsDirectedSmoothChanged, new EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>(OnTerrainIsDirectedSmoothChanged));
+			LE_GUIInterface.EventHandlers events9 = LE_GUIInterface.Instance.events;
+			events9.OnTerrainEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>)Delegate.Remove(events9.OnTerrainEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>(OnTerrainEditModeBtn));
+			LE_GUIInterface.EventHandlers events10 = LE_GUIInterface.Instance.events;
+			events10.OnTerrainReadSetHeightBtn = (EventHandler)Delegate.Remove(events10.OnTerrainReadSetHeightBtn, new EventHandler(OnTerrainReadSetHeightBtn));
+		}
+	}
+
+	public override void Update()
+	{
+		if (m_doRebuildTerrainTab)
+		{
+			m_doRebuildTerrainTab = false;
+			InitTerrainValues();
+		}
+	}
+
+	private void OnLoadedLevelInEditor(object p_obj, EventArgs p_args)
+	{
+		LE_GUIInterface.Delegates.ETerrainUIMode terrainUIMode = GetTerrainUIMode();
+		if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainUIMode(terrainUIMode);
+		}
+		else
+		{
+			Debug.LogWarning("LE_LogicTerrain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. Set it to show the create UI if the loaded level has no terrain and the edit UI if the loaded level has a terrain!");
+		}
+		Debug.Log("Setup complete");
+		m_doRebuildTerrainTab = true;
+	}
+
+	private void OnTerrainBrushChanged(object p_obj, LE_GUIInterface.EventHandlers.IntEventArgs p_args)
+	{
+		m_selectedBrushIndex = p_args.Value;
+		m_GUI3dTerrain.BrushAlphaTexture = m_confT.Brushes[m_selectedBrushIndex];
+		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+	}
+
+	private void OnTerrainHeightmapTextureChanged(object p_obj, LE_GUIInterface.EventHandlers.IntEventArgs p_args)
+	{
+		m_selectedHeightmapIndex = p_args.Value;
+		m_GUI3dTerrain.Heightmap = m_confT.Heightmaps[m_selectedHeightmapIndex];
+		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+	}
+
+	private void OnTerrainEditBrushSizeChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+	{
+		float value = p_args.Value;
+		value *= value;
+		value = Mathf.Max(0.002f, value);
+		m_GUI3dTerrain.Size = value;
+		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+	}
+
+	private void OnTerrainEditBrushAmountChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+	{
+		float value = p_args.Value;
+		value = Mathf.Max(0.002f, value);
+		m_GUI3dTerrain.Amount = (m_isHeightRaise ? value : (0f - value));
+	}
+
+	private void OnTerrainEditBrushTargetValueChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+	{
+		m_GUI3dTerrain.TargetRelativeValue = p_args.Value;
+	}
+
+	private void OnTerrainEditDirectionChanged(object p_obj, LE_GUIInterface.EventHandlers.FloatEventArgs p_args)
+	{
+		m_GUI3dTerrain.DirectedSmoothAngle = Mathf.Round(p_args.Value * 360f / 22.5f) * 22.5f;
+		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+	}
+
+	private void OnTerrainChangeHeightModeChanged(object p_obj, LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs p_args)
+	{
+		if (p_args.ChangeHeightMode == LE_GUIInterface.EventHandlers.ETerrainChangeHeightMode.RAISE)
+		{
+			m_isHeightRaise = true;
+			m_GUI3dTerrain.Amount = Mathf.Abs(m_GUI3dTerrain.Amount);
+		}
+		else
+		{
+			m_isHeightRaise = false;
+			m_GUI3dTerrain.Amount = 0f - Mathf.Abs(m_GUI3dTerrain.Amount);
+		}
+	}
+
+	private void OnTerrainIsDirectedSmoothChanged(object p_obj, LE_GUIInterface.EventHandlers.BoolEventArgs p_args)
+	{
+		m_GUI3dTerrain.IsDirectedSmooth = p_args.Value;
+		m_GUI3dTerrain.SetCursorPosition(new Vector3(Screen.width / 2, Screen.height / 2, 0f));
+	}
+
+	private void OnTerrainEditModeBtn(object p_obj, LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs p_args)
+	{
+		m_GUI3dTerrain.EditMode = p_args.EditMode;
+	}
+
+	private void OnTerrainReadSetHeightBtn(object sender, EventArgs e)
+	{
+		if (LE_GUIInterface.Instance.delegates.SetTerrainIsReadingSetHeight != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainIsReadingSetHeight(obj: true);
+		}
+		else
+		{
+			Debug.LogWarning("LE_LogicTerrain: OnTerrainReadSetHeightBtn: you have not set the LE_GUIInterface.delegates.SetTerrainIsReadingSetHeight delegate. Set it if you want to give visual feedback to the user showing if the terrain set height is currently being read!");
+		}
+		m_GUI3dTerrain.IsReadingTerrainSetHeight = true;
+		m_GUI3dTerrain.StartCoroutine(ReadSetHeightRoutine());
+	}
+
+	private void CheckParameters()
+	{
+		if (string.IsNullOrEmpty(LayerMask.LayerToName(m_confT.TerrainLayer)))
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: Inspector property 'LE_ConfigTerrain.TerrainLayer' is set to '" + m_confT.TerrainLayer + "', but this layer has no name in 'Tags & Layers' set. Please set the name of this layer to 'Terrain' or change the value of the 'LE_ConfigTerrain.TerrainLayer' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+		}
+		else if (LayerMask.LayerToName(m_confT.TerrainLayer) != "Terrain")
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: Inspector property 'LE_ConfigTerrain.TerrainLayer' is set to '" + m_confT.TerrainLayer + "', but the name of this layer is '" + LayerMask.LayerToName(m_confT.TerrainLayer) + "'. Is this intended? If not please set the name of this layer to 'Terrain' or change the value of the 'LE_ConfigTerrain.TerrainLayer' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+		}
+	}
+
+	private void InitTerrainValues()
+	{
+		m_selectedBrushIndex = 0;
+		if (m_confT.Brushes.Length != 0)
+		{
+			m_GUI3dTerrain.BrushAlphaTexture = m_confT.Brushes[0];
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainBrushes != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainBrushes(m_confT.Brushes, m_selectedBrushIndex);
+		}
+		else
+		{
+			Debug.LogError("LE_GUILogicTerrain: InitTerrainValues: you have not provided the LE_GUIInterface.delegates.SetTerrainBrushes delegate. You must set this delegate to show and update the brush texture selection in your UI!");
+		}
+		m_selectedHeightmapIndex = 0;
+		if (m_confT.Heightmaps.Length != 0)
+		{
+			m_GUI3dTerrain.Heightmap = m_confT.Heightmaps[0];
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainHeightmapTextures != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainHeightmapTextures(m_confT.Heightmaps.Select((Heightmap h) => h.Preview).ToArray(), m_selectedHeightmapIndex);
+		}
+		else
+		{
+			Debug.LogError("LE_GUILogicTerrain: InitTerrainValues: you have not provided the LE_GUIInterface.delegates.SetTerrainHeightmapTextures delegate. You must set this delegate to show and update the brush texture selection in your UI!");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainEditBrushSize != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainEditBrushSize(Mathf.Sqrt(m_GUI3dTerrain.Size));
+		}
+		else
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: InitTerrainValues: you have not provided the LE_GUIInterface.delegates.SetTerrainEditHeightmap delegate.");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainEditBrushAmount != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainEditBrushAmount(Mathf.Abs(m_GUI3dTerrain.Amount));
+		}
+		else
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: InitTerrainValues: you have not provided the LE_GUIInterface.delegates.SetTerrainEditBrushAmount delegate. If you have a brush amount slider, then its value might be different from the value used by the level editor.");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue(m_GUI3dTerrain.TargetRelativeValue);
+		}
+		else
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: InitTerrainValues: you have not provided the LE_GUIInterface.delegates.SetTerrainEditBrushTargetValue delegate. If you have a brush target value slider, then its value might be different from the value used by the level editor.");
+		}
+	}
+
+	private LE_GUIInterface.Delegates.ETerrainUIMode GetTerrainUIMode()
+	{
+		if (m_GUI3dTerrain.TerrainManager != null)
+		{
+			return LE_GUIInterface.Delegates.ETerrainUIMode.EDIT;
+		}
+		return LE_GUIInterface.Delegates.ETerrainUIMode.CREATE;
+	}
+
+	private IEnumerator ReadSetHeightRoutine()
+	{
+		WaitForEndOfFrame wait = new WaitForEndOfFrame();
+		while (m_GUI3dTerrain.IsReadingTerrainSetHeight)
+		{
+			if (LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue != null)
+			{
+				LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue(m_GUI3dTerrain.TargetRelativeValue);
+			}
+			yield return wait;
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainIsReadingSetHeight != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainIsReadingSetHeight(obj: false);
+		}
+		else
+		{
+			Debug.LogWarning("LE_LogicTerrain: OnTerrainReadSetHeightBtn: you have not set the LE_GUIInterface.delegates.SetTerrainIsReadingSetHeight delegate. Set it if you want to give visual feedback to the user showing if the terrain set height is currently being read!");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainEditBrushTargetValue(m_GUI3dTerrain.TargetRelativeValue);
+		}
+		else
+		{
+			Debug.LogWarning("LE_GUILogicTerrain: ReadSetHeightRoutine: you have not provided the LE_GUIInterface.delegates.SetTerrainEditBrushTargetValue delegate. If you have a brush target value slider, then its value is now different from the value used by the level editor, because the terrain set height was read.");
+		}
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.Events/LE_TerrainCreatedEvent.cs
+SIZE_BYTES: 347
+SHA256: 16e37b990e1461407b7def696f98f7adbc947ff829136f2765102e1fbc42d588
+####################################################################################################
+
+using System;
+using UnityEngine;
+
+namespace LE_LevelEditor.Events;
+
+public class LE_TerrainCreatedEvent : EventArgs
+{
+	private readonly GameObject m_terrainGameObject;
+
+	public GameObject TerrainGameObject => m_terrainGameObject;
+
+	public LE_TerrainCreatedEvent(GameObject p_terrainGameObject)
+	{
+		m_terrainGameObject = p_terrainGameObject;
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.UI/LE_ETerrainEditMode.cs
+SIZE_BYTES: 142
+SHA256: 87a959b5369a2834f1d067221226281de2edb7bbdb00aaa2eb70f8a63f420ab6
+####################################################################################################
+
+namespace LE_LevelEditor.UI;
+
+public enum LE_ETerrainEditMode
+{
+	CHANGE_HEIGHT,
+	CHANGE_HEIGHT_TO_TARGET_VALUE,
+	SMOOTH_HEIGHT,
+	PROCEDURAL
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+SIZE_BYTES: 9096
+SHA256: 5a3ba1eee67652944b768fd1bebf671dbf840e4ea4a82a4c70b5c9cade30ae68
+####################################################################################################
+
+using LE_LevelEditor.Core;
+using LE_LevelEditor.Events;
+using LE_LevelEditor.Logic;
+using Rewired;
+using UnityEngine;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUI3dTerrain : LE_GUI3dBase
+{
+	public int TERRAIN_LAYER = 14;
+
+	private Terrain m_terrain;
+
+	private LE_TerrainManager m_terrainMgr;
+
+	private TerrainData m_defaultTerrainDataPrefab;
+
+	private Projector m_brushProjector;
+
+	private Texture2D m_brushAlphaTexture;
+
+	private LE_LogicTerrain.Heightmap _heightmap;
+
+	private float m_amount = 0.1f;
+
+	private float m_size = 0.1f;
+
+	private float m_targetRelativeValue = 0.5f;
+
+	private bool m_isReadingTerrainSetHeight;
+
+	private int m_isTerrainSetHeightReadInFrame = -1;
+
+	private bool m_isDirectedSmooth;
+
+	private float m_directedSmoothAngle;
+
+	private LE_ETerrainEditMode m_editMode;
+
+	private Vector3 m_lastCursorActiveScreenCoords = -1f * Vector3.one;
+
+	public Terrain TerrainInstance => m_terrain;
+
+	public LE_TerrainManager TerrainManager => m_terrainMgr;
+
+	public TerrainData DefaultTerrainDataPrefab
+	{
+		get
+		{
+			return m_defaultTerrainDataPrefab;
+		}
+		set
+		{
+			m_defaultTerrainDataPrefab = value;
+		}
+	}
+
+	public Projector BrushProjector
+	{
+		get
+		{
+			return m_brushProjector;
+		}
+		set
+		{
+			m_brushProjector = value;
+			m_brushProjector.material = Object.Instantiate(m_brushProjector.material);
+		}
+	}
+
+	public Texture2D BrushAlphaTexture
+	{
+		get
+		{
+			return m_brushAlphaTexture;
+		}
+		set
+		{
+			m_brushAlphaTexture = value;
+			m_brushProjector.material.mainTexture = m_brushAlphaTexture;
+		}
+	}
+
+	public LE_LogicTerrain.Heightmap Heightmap
+	{
+		get
+		{
+			return _heightmap;
+		}
+		set
+		{
+			_heightmap = value;
+		}
+	}
+
+	public float Amount
+	{
+		get
+		{
+			return m_amount;
+		}
+		set
+		{
+			m_amount = value;
+		}
+	}
+
+	public float Size
+	{
+		get
+		{
+			return m_size;
+		}
+		set
+		{
+			m_size = value;
+			if (m_terrainMgr != null)
+			{
+				float num = 1f / (float)Mathf.Min(m_terrainMgr.TerrainData.heightmapResolution - 1, m_terrainMgr.TerrainData.heightmapResolution - 1);
+				m_size = Mathf.Floor(m_size / num) * num;
+			}
+		}
+	}
+
+	public float TargetRelativeValue
+	{
+		get
+		{
+			return m_targetRelativeValue;
+		}
+		set
+		{
+			m_targetRelativeValue = value;
+		}
+	}
+
+	public bool IsReadingTerrainSetHeight
+	{
+		get
+		{
+			return m_isReadingTerrainSetHeight;
+		}
+		set
+		{
+			m_isReadingTerrainSetHeight = value;
+			m_isTerrainSetHeightReadInFrame = -1;
+		}
+	}
+
+	public bool IsDirectedSmooth
+	{
+		get
+		{
+			return m_isDirectedSmooth;
+		}
+		set
+		{
+			m_isDirectedSmooth = value;
+		}
+	}
+
+	public float DirectedSmoothAngle
+	{
+		get
+		{
+			return m_directedSmoothAngle;
+		}
+		set
+		{
+			m_directedSmoothAngle = value;
+			if (m_brushProjector.transform.childCount > 0)
+			{
+				m_brushProjector.transform.GetChild(0).transform.localRotation = Quaternion.Euler(Vector3.back * m_directedSmoothAngle);
+			}
+		}
+	}
+
+	public LE_ETerrainEditMode EditMode
+	{
+		get
+		{
+			return m_editMode;
+		}
+		set
+		{
+			m_editMode = value;
+			if (m_editMode != LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE)
+			{
+				m_isReadingTerrainSetHeight = false;
+				m_isTerrainSetHeightReadInFrame = -1;
+			}
+		}
+	}
+
+	public override LE_EEditMode ActiveEditMode => LE_EEditMode.TERRAIN;
+
+	public void SetTerrain(Terrain p_terrain)
+	{
+		if (m_terrainMgr != null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: SetTerrain: a terrain manager was already set and will be overwritten! Use 'RemoveTerrainManager' to reset the instance.");
+		}
+		m_terrain = p_terrain;
+		m_terrainMgr = new LE_TerrainManager(p_terrain.terrainData);
+		LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+	}
+
+	public void RemoveTerrainManager()
+	{
+		if (m_terrain != null)
+		{
+			LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+		}
+		m_terrain = null;
+		m_terrainMgr = null;
+	}
+
+	public override void SetCursorPosition(Vector3 p_cursorScreenCoords)
+	{
+		m_cursorScreenCoords = p_cursorScreenCoords;
+		m_cursorRay = Camera.main.ScreenPointToRay(p_cursorScreenCoords);
+		if (m_terrain != null)
+		{
+			SetIsCursorOverSomething(m_terrain.GetComponent<Collider>().Raycast(m_cursorRay, out m_cursorHitInfo, float.MaxValue));
+		}
+		else
+		{
+			SetIsCursorOverSomething(p_isHit: false);
+		}
+	}
+
+	public override void SetIsCursorAction(bool p_isCursorAction)
+	{
+		if (m_isTerrainSetHeightReadInFrame != -1 && !p_isCursorAction && m_isTerrainSetHeightReadInFrame + 1 < Time.frameCount)
+		{
+			m_isReadingTerrainSetHeight = false;
+			m_isTerrainSetHeightReadInFrame = -1;
+		}
+		if (((IsCursorOverSomething && IsInteractable) & p_isCursorAction) && m_lastCursorActiveScreenCoords != m_cursorScreenCoords)
+		{
+			m_lastCursorActiveScreenCoords = m_cursorScreenCoords;
+			if (!(m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>() != null))
+			{
+				return;
+			}
+			if (m_isReadingTerrainSetHeight)
+			{
+				Terrain component = m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>();
+				float num = component.SampleHeight(m_cursorHitInfo.point);
+				m_targetRelativeValue = Mathf.Clamp01(num / component.terrainData.size.y);
+				m_isTerrainSetHeightReadInFrame = Time.frameCount;
+				return;
+			}
+			switch (m_editMode)
+			{
+			case LE_ETerrainEditMode.CHANGE_HEIGHT:
+				m_terrainMgr.ChangeHeight(Mathf.Sign(Amount) * Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+				break;
+			case LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE:
+				m_terrainMgr.ChangeHeight(Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, TargetRelativeValue, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+				break;
+			case LE_ETerrainEditMode.SMOOTH_HEIGHT:
+			{
+				int p_neighbourCount = 3 + 2 * Mathf.RoundToInt(Mathf.Abs(Amount) * 3f);
+				m_terrainMgr.SmoothHeight(Time.deltaTime * 2f, p_neighbourCount, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo), m_isDirectedSmooth, m_directedSmoothAngle);
+				break;
+			}
+			default:
+				Debug.LogError("LE_GUI3dTerrain: unknown EditMode!");
+				break;
+			case LE_ETerrainEditMode.PROCEDURAL:
+				break;
+			}
+		}
+		else
+		{
+			m_lastCursorActiveScreenCoords = -1f * Vector3.one;
+		}
+	}
+
+	public void HideCursor()
+	{
+		BrushProjector.orthographicSize = 0f;
+		if (BrushProjector.transform.childCount > 0)
+		{
+			BrushProjector.transform.GetChild(0).gameObject.SetActive(value: false);
+		}
+		SetIsCursorOverSomething(p_isHit: false);
+	}
+
+	private void Start()
+	{
+		if (m_brushProjector == null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: m_brushProjector was not initialized!");
+		}
+		if (m_brushAlphaTexture == null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: m_brushAlphaTexture was not initialized!");
+		}
+	}
+
+	private void Update()
+	{
+		UpdateBrushProjector(IsCursorOverSomething, m_cursorHitInfo);
+		if (ReInput.players.GetPlayer(0).GetButtonDown(53))
+		{
+			Focus();
+		}
+	}
+
+	public void Focus()
+	{
+		if (IsCursorOverSomething)
+		{
+			Vector3 point = m_cursorHitInfo.point;
+			Vector3 vector = new Vector3(m_brushProjector.orthographicSize, m_brushProjector.orthographicSize * 0.7f, m_brushProjector.orthographicSize);
+			Vector3 vector2 = Camera.main.transform.position - point;
+			float num = Mathf.Max(vector.x, vector.y, vector.z) * 3f;
+			Camera.main.transform.position = point + vector2.normalized * num;
+			if (Camera.main.transform.position.y < point.y)
+			{
+				Vector3 position = Camera.main.transform.position;
+				position.y = point.y;
+				Camera.main.transform.position = position;
+			}
+			Camera.main.transform.LookAt(point, Vector3.up);
+		}
+	}
+
+	private void UpdateBrushProjector(bool p_isHit, RaycastHit p_hitInfo)
+	{
+		if (p_isHit)
+		{
+			Vector3 size = m_terrainMgr.TerrainData.size;
+			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+			if (BrushProjector.transform.childCount > 0)
+			{
+				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+			}
+		}
+		else
+		{
+			BrushProjector.orthographicSize = 0f;
+			if (BrushProjector.transform.childCount > 0)
+			{
+				BrushProjector.transform.GetChild(0).gameObject.SetActive(value: false);
+			}
+		}
+	}
+
+	private Vector2 GetRelativeLocalLocation(RaycastHit hit)
+	{
+		Terrain component = hit.transform.gameObject.GetComponent<Terrain>();
+		Vector3 size = component.terrainData.size;
+		Vector3 vector = hit.transform.InverseTransformPoint(hit.point);
+		Vector2 zero = Vector2.zero;
+		zero.x = vector.z / size.z;
+		zero.y = vector.x / size.x;
+		float num = 1f / (float)(component.terrainData.heightmapResolution - 1);
+		float num2 = 1f / (float)(component.terrainData.heightmapResolution - 1);
+		zero.x = Mathf.Round(zero.x / num) * num;
+		zero.y = Mathf.Round(zero.y / num2) * num2;
+		return zero;
+	}
+}
+
+####################################################################################################
+FILE: LE_LevelEditor.UI/LE_GUIInterface.cs
+SIZE_BYTES: 11518
+SHA256: 99bb1167b6e4589b93c9a816f768dff159ad0872c6a85551771e8ea232c5de76
+####################################################################################################
+
+using System;
+using LE_LevelEditor.Core;
+using UnityEngine;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUIInterface : MonoBehaviour
+{
+	public class Delegates
+	{
+		public enum ETerrainUIMode
+		{
+			CREATE,
+			EDIT
+		}
+
+		public enum EDraggedObjectState
+		{
+			NONE,
+			IN_3D_PREVIEW,
+			NOT_PLACEABLE
+		}
+
+		public delegate bool GetBoolFunction();
+
+		public delegate float GetFloatFunction();
+
+		public GetBoolFunction IsCursorOverUI;
+
+		public GetFloatFunction GetCameraPerspectiveGizmoRightPixelOffset;
+
+		public GetFloatFunction GetObliqueCameraPerspectiveRightPixelOffset;
+
+		public Action<Texture2D[], int> SetTerrainHeightmapTextures;
+
+		public Action<Texture2D[], int> SetTerrainBrushes;
+
+		public Action<float> SetTerrainEditBrushSize;
+
+		public Action<float> SetTerrainEditBrushAmount;
+
+		public Action<float> SetTerrainEditBrushTargetValue;
+
+		public Action<bool> SetTerrainIsReadingSetHeight;
+
+		public Action<ETerrainUIMode> SetTerrainUIMode;
+
+		public Action<LE_ObjectMap> SetObjects;
+
+		public GetBoolFunction IsObjectDragged;
+
+		public Action<string> SetDraggableObjectMessage;
+
+		public Action<EDraggedObjectState> SetDraggableObjectState;
+
+		public Action<bool> SetIsSelectedObjectFocusBtnInteractable;
+
+		public Action<bool> SetIsSelectedObjectDuplicateBtnInteractable;
+
+		public Action<bool> SetIsSelectedObjectDeleteBtnInteractable;
+
+		public Action<Action<bool>> ShowPopupConfirmDeleteObject;
+
+		public void OnDestroy()
+		{
+			IsCursorOverUI = null;
+			GetCameraPerspectiveGizmoRightPixelOffset = null;
+			GetObliqueCameraPerspectiveRightPixelOffset = null;
+			SetTerrainHeightmapTextures = null;
+			SetTerrainBrushes = null;
+			SetTerrainEditBrushSize = null;
+			SetTerrainEditBrushAmount = null;
+			SetTerrainEditBrushTargetValue = null;
+			SetTerrainIsReadingSetHeight = null;
+			SetTerrainUIMode = null;
+			IsObjectDragged = null;
+			SetObjects = null;
+			SetDraggableObjectMessage = null;
+			SetDraggableObjectState = null;
+			SetIsSelectedObjectFocusBtnInteractable = null;
+			SetIsSelectedObjectDuplicateBtnInteractable = null;
+			SetIsSelectedObjectDeleteBtnInteractable = null;
+			ShowPopupConfirmDeleteObject = null;
+		}
+	}
+
+	public class EventHandlers
+	{
+		public enum ETerrainChangeHeightMode
+		{
+			RAISE,
+			LOWER
+		}
+
+		public class BoolEventArgs : EventArgs
+		{
+			public readonly bool Value;
+
+			public BoolEventArgs(bool p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class IntEventArgs : EventArgs
+		{
+			public readonly int Value;
+
+			public IntEventArgs(int p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class FloatEventArgs : EventArgs
+		{
+			public readonly float Value;
+
+			public FloatEventArgs(float p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class StringEventArgs : EventArgs
+		{
+			public readonly string Value;
+
+			public StringEventArgs(string p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class ColorEventArgs : EventArgs
+		{
+			public readonly Color Value;
+
+			public ColorEventArgs(Color p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class TextureEventArgs : EventArgs
+		{
+			public readonly Texture2D Value;
+
+			public TextureEventArgs(Texture2D p_value)
+			{
+				Value = p_value;
+			}
+		}
+
+		public class EditModeEventArgs : EventArgs
+		{
+			public readonly LE_EEditMode EditMode;
+
+			public EditModeEventArgs(LE_EEditMode p_editMode)
+			{
+				EditMode = p_editMode;
+			}
+		}
+
+		public class TerrainEditModeEventArgs : EventArgs
+		{
+			public readonly LE_ETerrainEditMode EditMode;
+
+			public TerrainEditModeEventArgs(LE_ETerrainEditMode p_editMode)
+			{
+				EditMode = p_editMode;
+			}
+		}
+
+		public class TerrainChangeHeightModeEventArgs : EventArgs
+		{
+			public readonly ETerrainChangeHeightMode ChangeHeightMode;
+
+			public TerrainChangeHeightModeEventArgs(ETerrainChangeHeightMode p_changeHeightMode)
+			{
+				ChangeHeightMode = p_changeHeightMode;
+			}
+		}
+
+		public class ObjectEditModeEventArgs : EventArgs
+		{
+			public readonly LE_EObjectEditMode EditMode;
+
+			public ObjectEditModeEventArgs(LE_EObjectEditMode p_editMode)
+			{
+				EditMode = p_editMode;
+			}
+		}
+
+		public class ObjectSelectDraggableEventArgs : EventArgs
+		{
+			public readonly LE_Object ObjPrefab;
+
+			public ObjectSelectDraggableEventArgs(LE_Object p_objPrefab)
+			{
+				ObjPrefab = p_objPrefab;
+			}
+		}
+
+		public EventHandler<EditModeEventArgs> OnEditModeBtn;
+
+		public EventHandler<IntEventArgs> OnTerrainHeightmapTextureChanged;
+
+		public EventHandler<IntEventArgs> OnTerrainBrushChanged;
+
+		public EventHandler<FloatEventArgs> OnTerrainEditBrushSizeChanged;
+
+		public EventHandler<FloatEventArgs> OnTerrainEditBrushAmountChanged;
+
+		public EventHandler<FloatEventArgs> OnTerrainEditBrushTargetValueChanged;
+
+		public EventHandler<FloatEventArgs> OnTerrainEditDirectionChanged;
+
+		public EventHandler<TerrainChangeHeightModeEventArgs> OnTerrainChangeHeightModeChanged;
+
+		public EventHandler<BoolEventArgs> OnTerrainIsDirectedSmoothChanged;
+
+		public EventHandler<TerrainEditModeEventArgs> OnTerrainEditModeBtn;
+
+		public EventHandler OnTerrainReadSetHeightBtn;
+
+		public EventHandler<ObjectEditModeEventArgs> OnObjectEditModeBtn;
+
+		public EventHandler<ObjectSelectDraggableEventArgs> OnObjectSelectDraggable;
+
+		public EventHandler OnSelectedObjectFocusBtn;
+
+		public EventHandler OnSelectedObjectDuplicateBtn;
+
+		public EventHandler OnSelectedObjectDeleteBtn;
+
+		public EventHandler OnTerrainGenerateShoremap;
+
+		public EventHandler OnTerrainGenerateCustomHeightmap;
+
+		public EventHandler OnTerrainGeneratePerlin;
+
+		public EventHandler OnTerrainGenerateNormalise;
+
+		public EventHandler OnTerrainGenerateIsland;
+
+		public EventHandler OnTerrainSmooth;
+
+		public void OnDestroy()
+		{
+			OnEditModeBtn = null;
+			OnTerrainHeightmapTextureChanged = null;
+			OnTerrainBrushChanged = null;
+			OnTerrainEditBrushSizeChanged = null;
+			OnTerrainEditBrushAmountChanged = null;
+			OnTerrainEditBrushTargetValueChanged = null;
+			OnTerrainEditDirectionChanged = null;
+			OnTerrainChangeHeightModeChanged = null;
+			OnTerrainIsDirectedSmoothChanged = null;
+			OnTerrainEditModeBtn = null;
+			OnTerrainReadSetHeightBtn = null;
+			OnObjectEditModeBtn = null;
+			OnObjectSelectDraggable = null;
+			OnSelectedObjectFocusBtn = null;
+			OnSelectedObjectDuplicateBtn = null;
+			OnSelectedObjectDeleteBtn = null;
+			OnTerrainGenerateShoremap = null;
+			OnTerrainGenerateCustomHeightmap = null;
+			OnTerrainGeneratePerlin = null;
+			OnTerrainGenerateNormalise = null;
+			OnTerrainGenerateIsland = null;
+			OnTerrainSmooth = null;
+		}
+	}
+
+	private static LE_GUIInterface s_instance;
+
+	public readonly Delegates delegates = new Delegates();
+
+	public readonly EventHandlers events = new EventHandlers();
+
+	public static LE_GUIInterface Instance => s_instance;
+
+	private void Awake()
+	{
+		if (s_instance != null)
+		{
+			Debug.LogError("LE_GUIInterface: there is already an instance of LE_GUIInterface in this scene!");
+		}
+		s_instance = this;
+	}
+
+	private void OnDestroy()
+	{
+		if (s_instance == this)
+		{
+			s_instance = null;
+		}
+		events.OnDestroy();
+		delegates.OnDestroy();
+	}
+
+	public void OnEditModeBtn(int p_editMode)
+	{
+		if (events.OnEditModeBtn != null)
+		{
+			events.OnEditModeBtn(this, new EventHandlers.EditModeEventArgs((LE_EEditMode)p_editMode));
+		}
+	}
+
+	public void OnTerrainHeightmapTextureChanged(int p_heightmapTextureIndex)
+	{
+		if (events.OnTerrainHeightmapTextureChanged != null)
+		{
+			events.OnTerrainHeightmapTextureChanged(this, new EventHandlers.IntEventArgs(p_heightmapTextureIndex));
+		}
+	}
+
+	public void OnTerrainBrushChanged(int p_brushIndex)
+	{
+		if (events.OnTerrainBrushChanged != null)
+		{
+			events.OnTerrainBrushChanged(this, new EventHandlers.IntEventArgs(p_brushIndex));
+		}
+	}
+
+	public void OnTerrainEditBrushSizeChanged(float p_brushSize)
+	{
+		if (events.OnTerrainEditBrushSizeChanged != null)
+		{
+			events.OnTerrainEditBrushSizeChanged(this, new EventHandlers.FloatEventArgs(p_brushSize));
+		}
+	}
+
+	public void OnTerrainEditBrushAmountChanged(float p_brushAmount)
+	{
+		if (events.OnTerrainEditBrushAmountChanged != null)
+		{
+			events.OnTerrainEditBrushAmountChanged(this, new EventHandlers.FloatEventArgs(p_brushAmount));
+		}
+	}
+
+	public void OnTerrainEditBrushTargetValueChanged(float p_brushTargetValue)
+	{
+		if (events.OnTerrainEditBrushTargetValueChanged != null)
+		{
+			events.OnTerrainEditBrushTargetValueChanged(this, new EventHandlers.FloatEventArgs(p_brushTargetValue));
+		}
+	}
+
+	public void OnTerrainEditDirectionChanged(float p_direction)
+	{
+		if (events.OnTerrainEditDirectionChanged != null)
+		{
+			events.OnTerrainEditDirectionChanged(this, new EventHandlers.FloatEventArgs(p_direction));
+		}
+	}
+
+	public void OnTerrainChangeHeightModeChanged(bool p_isRaiseHeight)
+	{
+		if (events.OnTerrainChangeHeightModeChanged != null)
+		{
+			events.OnTerrainChangeHeightModeChanged(this, new EventHandlers.TerrainChangeHeightModeEventArgs((!p_isRaiseHeight) ? EventHandlers.ETerrainChangeHeightMode.LOWER : EventHandlers.ETerrainChangeHeightMode.RAISE));
+		}
+	}
+
+	public void OnTerrainIsDirectedSmoothChanged(bool p_isDirectedSmooth)
+	{
+		if (events.OnTerrainIsDirectedSmoothChanged != null)
+		{
+			events.OnTerrainIsDirectedSmoothChanged(this, new EventHandlers.BoolEventArgs(p_isDirectedSmooth));
+		}
+	}
+
+	public void OnTerrainEditModeBtn(int p_editMode)
+	{
+		if (events.OnTerrainEditModeBtn != null)
+		{
+			events.OnTerrainEditModeBtn(this, new EventHandlers.TerrainEditModeEventArgs((LE_ETerrainEditMode)p_editMode));
+		}
+	}
+
+	public void OnTerrainReadSetHeightBtn()
+	{
+		if (events.OnTerrainReadSetHeightBtn != null)
+		{
+			events.OnTerrainReadSetHeightBtn(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnObjectEditModeBtn(int p_editMode)
+	{
+		if (events.OnObjectEditModeBtn != null)
+		{
+			events.OnObjectEditModeBtn(this, new EventHandlers.ObjectEditModeEventArgs((LE_EObjectEditMode)p_editMode));
+		}
+	}
+
+	public void OnObjectSelectDraggable(LE_Object p_objPrefab)
+	{
+		if (events.OnObjectSelectDraggable != null)
+		{
+			events.OnObjectSelectDraggable(this, new EventHandlers.ObjectSelectDraggableEventArgs(p_objPrefab));
+		}
+	}
+
+	public void OnSelectedObjectFocusBtn()
+	{
+		if (events.OnSelectedObjectFocusBtn != null)
+		{
+			events.OnSelectedObjectFocusBtn(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnSelectedObjectDuplicateBtn()
+	{
+		if (events.OnSelectedObjectDuplicateBtn != null)
+		{
+			events.OnSelectedObjectDuplicateBtn(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnSelectedObjectDeleteBtn()
+	{
+		if (events.OnSelectedObjectDeleteBtn != null)
+		{
+			events.OnSelectedObjectDeleteBtn(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainGenerateShoremap()
+	{
+		if (events.OnTerrainGenerateShoremap != null)
+		{
+			events.OnTerrainGenerateShoremap(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainGenerateCustomHeightmap()
+	{
+		if (events.OnTerrainGenerateCustomHeightmap != null)
+		{
+			events.OnTerrainGenerateCustomHeightmap(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainGeneratePerlin()
+	{
+		if (events.OnTerrainGeneratePerlin != null)
+		{
+			events.OnTerrainGeneratePerlin(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainGenerateNormalise()
+	{
+		if (events.OnTerrainGenerateNormalise != null)
+		{
+			events.OnTerrainGenerateNormalise(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainGenerateIsland()
+	{
+		if (events.OnTerrainGenerateIsland != null)
+		{
+			events.OnTerrainGenerateIsland(this, EventArgs.Empty);
+		}
+	}
+
+	public void OnTerrainSmooth()
+	{
+		if (events.OnTerrainSmooth != null)
+		{
+			events.OnTerrainSmooth(this, EventArgs.Empty);
+		}
+	}
+}

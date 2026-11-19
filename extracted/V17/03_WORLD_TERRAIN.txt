@@ -1,0 +1,2951 @@
+CASTAWAY-DEPTHS V17 SOURCE BATCH
+GROUP: 03_WORLD_TERRAIN
+NOTE: ILSpy-decompiled C#; reconstructed output, not original authored source.
+====================================================================================================
+
+
+####################################################################################################
+FILE: StrandedWorld.cs
+SIZE_BYTES: 34639
+SHA256: d1d9d9d0f4d969cde2ce62b245f43625d685d19c154e572e805f8f87ac8d91c8
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Terrain;
+using Beam.Utilities;
+using Ceto;
+using Funlabs;
+using MEC;
+using Photon.Bolt;
+using UnityEngine;
+
+public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, IZoneDataProvider, ITerrainProvider, ICheckBounds, IPersistentSaveable, ISaveable
+{
+	public const float ZONE_SPACING = 1.25f;
+
+	public const float ZONE_SIZE = 500f;
+
+	public const float ZONE_SIZE_HALF = 250f;
+
+	public const float ZONE_TERRAIN_SIZE = 250f;
+
+	public const float ZONE_TERRAIN_SIZE_HALF = 125f;
+
+	public const float ZONE_TERRAIN_SIZE_HALF_SQR = 15625f;
+
+	private const float ZONE_LOAD_UNLOAD_BUFFER = 10f;
+
+	public const float ZONE_LOAD_DISTANCE = 240f;
+
+	public const float ZONE_UNLOAD_DISTANCE = 250f;
+
+	public const int ZONE_HEIGHTMAP_SIZE = 257;
+
+	public const int ZONE_HEIGHTMAP_HEIGHT = 150;
+
+	public static int LOCAL_WORLD_SEED;
+
+	public const int TERRAIN_Y_POSITION = -100;
+
+	public const int TERRAIN_RESOLUTION = 45;
+
+	public const int TERRAIN_DETAIL_DISTANCE = 70;
+
+	public const int WORLD_ZONES = 7;
+
+	public const int WORLD_ZONES_SQUARED = 49;
+
+	public const int LEGACY_WORLD_ZONES = 5;
+
+	public const float LEGACY_ZONE_SIZE = 630f;
+
+	public const float LEGACY_ZONE_SIZE_HALF = 315f;
+
+	public const float IMPOSTOR_VIEW_DISTANCE = 1000f;
+
+	private const float SQR_IMPOSTOR_VIEW_DISTANCE = 1000000f;
+
+	private const float SQR_LOADING_BUFFER = 1600f;
+
+	private static int[] _shelters = new int[3] { -1, -1, -1 };
+
+	[SerializeField]
+	private Zone[] _zones;
+
+	[SerializeField]
+	private Zone _nmlZone;
+
+	private TerrainData[] _terrainDatas;
+
+	public ZoneEvents ZoneEvents;
+
+	public ProceduralObjectManager ProceduralObjectsManager;
+
+	private ZoneLoader _zoneLoader = new ZoneLoader();
+
+	private Vector3 _lastSavePosition;
+
+	private Dictionary<string, JObject> _zoneSavedObjectsLookup = new Dictionary<string, JObject>();
+
+	private Vector3 _playerPosition;
+
+	[SerializeField]
+	private Zone _zonePrefab;
+
+	[SerializeField]
+	private Transform _zoneContainer;
+
+	public static int WORLD_SEED
+	{
+		get
+		{
+			if (!Game.Mode.IsMultiplayer())
+			{
+				return LOCAL_WORLD_SEED;
+			}
+			return PlayerRegistry.ServerPeer.WorldSeed;
+		}
+	}
+
+	public Zone[] Zones => _zones;
+
+	public Zone NmlZone => _nmlZone;
+
+	public ZoneLoader ZoneLoader => _zoneLoader;
+
+	public int ShelterCount { get; private set; }
+
+	public event EmptyEventHandler WorldGenerated;
+
+	public event Action<Zone> ZoneEntered;
+
+	public Transform GetParent()
+	{
+		GameState state = Game.State;
+		if ((uint)(state - 2) <= 1u)
+		{
+			return _nmlZone.SaveContainer;
+		}
+		return null;
+	}
+
+	public JObject GetZoneData(Zone zone)
+	{
+		JObject value = null;
+		_zoneSavedObjectsLookup.TryGetValue(zone.gameObject.name, out value);
+		return value;
+	}
+
+	public float GetHeight(Vector3 worldPosition)
+	{
+		Zone zone = GetZone(worldPosition);
+		if (zone?.Terrain == null)
+		{
+			return -100f;
+		}
+		return zone.Terrain.SampleHeight(worldPosition) + -100f;
+	}
+
+	public Vector3 GetPoint(Vector3 worldPosition)
+	{
+		Vector3 result = worldPosition;
+		Zone zone = GetZone(worldPosition);
+		if (zone?.Terrain == null)
+		{
+			result.y = -100f;
+			return result;
+		}
+		result.y = zone.Terrain.SampleHeight(worldPosition) + -100f;
+		return result;
+	}
+
+	public Vector3 GetNormal(Vector3 worldPosition)
+	{
+		Zone zone = GetZone(worldPosition);
+		if (zone?.Terrain == null)
+		{
+			return Vector3.up;
+		}
+		Vector3 vector = worldPosition - zone.Terrain.transform.position;
+		return zone.Terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, zone.Terrain.terrainData.size.z, vector.z));
+	}
+
+	public bool InBounds(Vector3 worldPosition)
+	{
+		Zone zone = GetZone(worldPosition);
+		if (zone == null)
+		{
+			return false;
+		}
+		return zone.InSaveBounds(worldPosition);
+	}
+
+	public static Zone GetZone(Vector3 worldPosition, bool fallbackToNml = false)
+	{
+		Zone zone = Singleton<StrandedWorld>.Instance?.GetZone_(worldPosition);
+		if (!fallbackToNml)
+		{
+			return zone;
+		}
+		Zone zone2 = zone;
+		if ((object)zone2 == null)
+		{
+			StrandedWorld instance = Singleton<StrandedWorld>.Instance;
+			if ((object)instance == null)
+			{
+				return null;
+			}
+			zone2 = instance._nmlZone;
+		}
+		return zone2;
+	}
+
+	public int GetZoneId(Zone zone)
+	{
+		if (null == zone)
+		{
+			return -1;
+		}
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			if (zone == Zones[i])
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private Zone GetZone_(Vector3 worldPosition)
+	{
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			Zone zone = Zones[i];
+			if (zone.InBounds(worldPosition))
+			{
+				return zone;
+			}
+		}
+		return null;
+	}
+
+	public static Zone.BiomeType GetBiome(Vector3 worldPosition)
+	{
+		return Singleton<StrandedWorld>.Instance?.GetBiome_(worldPosition) ?? Zone.BiomeType.RANDOM;
+	}
+
+	private Zone.BiomeType GetBiome_(Vector3 worldPosition)
+	{
+		return GetZone_(worldPosition)?.Biome ?? Zone.BiomeType.RANDOM;
+	}
+
+	protected void OnWorldGenerated()
+	{
+		WorldGenerated?.Invoke();
+	}
+
+	protected void OnZoneEntered(Zone zone)
+	{
+		ZoneEntered?.Invoke(zone);
+	}
+
+	private void Awake()
+	{
+		EventManager.AddListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+	}
+
+	private void LoadZonePositions()
+	{
+		if (World.GenerationZonePositons == null)
+		{
+			World.CreateWorldZonePoints(WORLD_SEED);
+			Debug.Log("StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions");
+		}
+		for (int i = 0; i < 49; i++)
+		{
+			Vector3 zero = Vector3.zero;
+			zero.x = World.GenerationZonePositons[i].x;
+			zero.z = World.GenerationZonePositons[i].y;
+			_zones[i].transform.position = zero;
+			if (i == 0)
+			{
+				_zones[i].IsStartingIsland = true;
+			}
+		}
+	}
+
+	public float CreateWorld_Async()
+	{
+		return Timing.WaitUntilDone(CreateWorld());
+	}
+
+	public CoroutineHandle CreateWorld()
+	{
+		return Timing.RunCoroutine(CreateWorld_Sequence());
+	}
+
+	private IEnumerator<float> CreateWorld_Sequence()
+	{
+		if (!Game.Mode.IsMultiplayer())
+		{
+			EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_WORLD"));
+			yield return 0f;
+			LoadWorld();
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_OBJECTS"));
+		yield return 0f;
+		LoadObjects();
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_STARTING_ZONE"));
+		yield return 0f;
+		InitializeZones();
+		int index = 0;
+		Zone zone = FindClosestZone(Vector3.zero, out index);
+		if (zone != null && index != -1)
+		{
+			JObject zoneData = GetZoneData(zone);
+			if (zoneData != null)
+			{
+				zone.Enter();
+				ZoneLoader.EObjectProcessingMode mode = _zoneLoader.ObjectProcessingMode;
+				_zoneLoader.ObjectProcessingMode = ZoneLoader.EObjectProcessingMode.Faster;
+				JObject field = zoneData.GetField("Objects");
+				if (field != null && !field.IsNull())
+				{
+					zone.LoadImpostors(field);
+					yield return _zoneLoader.LoadZone_Async(zone, zoneData);
+				}
+				else
+				{
+					_zoneLoader.GenerateZone(zone);
+					zone.CreateImpostors();
+					yield return _zoneLoader.CreateZoneObjects_Async(zone, index);
+				}
+				_zoneLoader.ObjectProcessingMode = mode;
+			}
+			else
+			{
+				Debug.LogError("StrandedWorld::LoadAsync:: Something went wrong. No starting zone data was found.");
+			}
+		}
+		else
+		{
+			Debug.LogError("StrandedWorld::LoadAsync:: Something went wrong. No starting zone was found.");
+		}
+		Initialize_shelterTypes();
+		SetShelterOnZones();
+		SetSheltersOnWorldZones();
+		OnWorldGenerated();
+		OnZoneEntered(zone);
+		EventManager.RaiseEvent(new AddStatsEvent(0, new Stats
+		{
+			IslandsExplored = 1
+		}));
+		SubscribeToZoneLoaderEvents();
+		InvokeRepeating("PollZones", 0f, 0.3f);
+	}
+
+	private void SubscribeToZoneLoaderEvents()
+	{
+		_zoneLoader.CreatedZone += ZoneLoader_LoadedZone;
+		_zoneLoader.LoadedZone += ZoneLoader_LoadedZone;
+	}
+
+	private void UnsubscribeFromZoneLoaderEvents()
+	{
+		if (_zoneLoader != null)
+		{
+			_zoneLoader.CreatedZone -= ZoneLoader_LoadedZone;
+			_zoneLoader.LoadedZone -= ZoneLoader_LoadedZone;
+		}
+	}
+
+	private void ZoneLoader_LoadedZone(Zone zone)
+	{
+		if (zone.Biome != Zone.BiomeType.MISSION)
+		{
+			EventManager.RaiseEvent(new AddStatsEvent(0, new Stats
+			{
+				IslandsHopped = 1
+			}));
+			if (!zone.HasVisited)
+			{
+				EventManager.RaiseEvent(new AddStatsEvent(0, new Stats
+				{
+					IslandsExplored = 1
+				}));
+			}
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		UnsubscribeFromZoneLoaderEvents();
+		WorldGenerated = null;
+		ZoneEntered = null;
+		EventManager.RemoveListener<ZoneDownloadedEvent>(OnZoneDownloaded);
+		base.OnDestroy();
+	}
+
+	private void InitializeZones()
+	{
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			Zone zone = Zones[i];
+			zone.gameObject.SetActive(value: true);
+			zone.Terrain.heightmapPixelError = 75f;
+			zone.Terrain.basemapDistance = 180f;
+			GetZoneData(zone)?.IsNull();
+		}
+	}
+
+	private void LoadWorld()
+	{
+		LoadingResult loadingResult = World.LoadWorld();
+		if (loadingResult.Succeeded)
+		{
+			ApplyWorldToZones();
+		}
+		else
+		{
+			Debug.LogError("StrandedWorld:: Error loading world: " + loadingResult.Message);
+		}
+	}
+
+	public void ApplyWorldToZones()
+	{
+		LoadZonePositions();
+		for (int i = 0; i < 49; i++)
+		{
+			Zone zone = Zones[i];
+			Map map = World.MapList[i];
+			zone.Terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+			zone.ZoneName = map.EditorData.Name;
+			zone.Id = map.EditorData.Id;
+			zone.Version = map.EditorData.VersionNumber;
+			zone.Biome = map.EditorData.Biome;
+			zone.IsMapEditor = map.IsCustomMap();
+			zone.IsUserMap = map.IsUserMap();
+			zone.Seed = i;
+			Texture2D height = WorldTools.CreateHeightMapTexture(zone.Terrain.terrainData);
+			Texture2D shore = WorldTools.CreateShoreMaskTexture(zone.Terrain.terrainData);
+			if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL || zone.Biome == Zone.BiomeType.ISLAND_ROCK || zone.Biome == Zone.BiomeType.CARRIER)
+			{
+				zone.WaveOverlay = AddWaveOverlay(zone.gameObject, height, shore);
+			}
+			zone.SaveContainer.transform.SetAsLastSibling();
+		}
+	}
+
+	private void LoadObjects(JObject rootData = null)
+	{
+		_zoneSavedObjectsLookup.Clear();
+		if (Game.State == GameState.LOAD_GAME)
+		{
+			rootData = rootData ?? SaveManager.LoadSaveFile(Game.Mode);
+			JObject persistentData = SaveManager.GetPersistentData(rootData);
+			if (persistentData == null || persistentData.IsNull())
+			{
+				return;
+			}
+			JObject field = persistentData.GetField("StrandedWorld");
+			if (field == null || field.IsNull())
+			{
+				Debug.LogError("StrandedWorld data is null or empty.");
+				return;
+			}
+			JObject field2 = field.GetField("Zones");
+			if (field2 == null || field2.IsNull())
+			{
+				Debug.LogError("Zones data is null or empty.");
+				return;
+			}
+			for (int i = 0; i < 49; i++)
+			{
+				Zone zone = Zones[i];
+				Map map = World.MapList[i];
+				JObject jObject = field2.Children[i];
+				string value = jObject.GetField("Id").GetValue<string>();
+				int value2 = jObject.GetField("Version").GetValue<int>();
+				if (map.EditorData.Id != value || map.EditorData.VersionNumber != value2)
+				{
+					JObject jObject2 = new JObject();
+					jObject2.AddField("Name", map.EditorData.Name);
+					jObject2.AddField("Id", map.EditorData.Id);
+					jObject2.AddField("Version", map.EditorData.VersionNumber);
+					if (map.IsCustomMap())
+					{
+						jObject2.AddField("Objects", map.ObjectData);
+					}
+					jObject = jObject2;
+				}
+				JObject field3 = jObject.GetField("Discovered");
+				if (field3 != null)
+				{
+					bool value3 = field3.GetValue<bool>();
+					zone.HasVisited = value3;
+				}
+				JObject field4 = jObject.GetField("Attributes");
+				if (field4 != null)
+				{
+					SavingUtilities.Load(zone.Attributes, field4);
+				}
+				JObject field5 = jObject.GetField("Objects");
+				if (field5 != null && !field5.IsNull())
+				{
+					zone.HasObjectsForBillboard = true;
+				}
+				_zoneSavedObjectsLookup.Add(zone.gameObject.name, jObject);
+			}
+			JObject jObject3 = field2.GetZoneData(_nmlZone.Id);
+			if (jObject3 == null || jObject3.IsNull())
+			{
+				Debug.Log("No NML data. Recreating...");
+				JObject jObject4 = new JObject();
+				jObject4.AddField("Name", _nmlZone.gameObject.name);
+				jObject4.AddField("Id", _nmlZone.Id);
+				jObject4.AddField("Version", _nmlZone.Version);
+				jObject4.AddField("Discovered", instance: false);
+				jObject4.AddField("Objects", (JObject)null);
+				jObject3 = jObject4;
+			}
+			_zoneSavedObjectsLookup.Add(_nmlZone.gameObject.name, jObject3);
+			LoadShelterData(field);
+		}
+		else
+		{
+			if (Game.State != GameState.NEW_GAME)
+			{
+				return;
+			}
+			for (int j = 0; j < 49; j++)
+			{
+				Zone zone2 = Zones[j];
+				Map map2 = World.MapList[j];
+				JObject jObject5 = new JObject();
+				jObject5.AddField("Name", map2.EditorData.Name);
+				jObject5.AddField("Id", map2.EditorData.Id);
+				jObject5.AddField("Version", map2.EditorData.VersionNumber);
+				if (map2.IsCustomMap())
+				{
+					jObject5.AddField("Objects", map2.ObjectData);
+					zone2.HasObjectsForBillboard = true;
+				}
+				_zoneSavedObjectsLookup.Add(zone2.gameObject.name, jObject5);
+			}
+		}
+	}
+
+	private void LoadShelterData(JObject strandedWorldData)
+	{
+		int[] array = new int[3] { -1, -1, -1 };
+		int[] array2 = new int[3] { -1, -1, -1 };
+		int num = -1;
+		JObject field = strandedWorldData.GetField("Shelters");
+		if (field != null)
+		{
+			JObject jObject = null;
+			for (int i = 1; i < 4; i++)
+			{
+				int num2 = -1;
+				int num3 = -1;
+				jObject = field.GetField("Shelter" + i);
+				if (jObject != null)
+				{
+					num2 = jObject.GetValue<int>();
+				}
+				jObject = field.GetField("Shelter" + i + "_zone");
+				if (jObject != null)
+				{
+					num3 = jObject.GetValue<int>();
+				}
+				if (num2 == -1 || num3 == -1)
+				{
+					Debug.LogError("Load: Shelter " + i + "Data Not Found. Possible Old Save.");
+					continue;
+				}
+				array[i - 1] = num2;
+				array2[i - 1] = num3;
+			}
+			jObject = field.GetField("Wollie");
+			if (jObject != null)
+			{
+				num = jObject.GetValue<int>();
+			}
+			if (num == -1)
+			{
+				Debug.LogError("Load: Wollie Data Not Found. Possible Old Save.");
+			}
+			for (int j = 0; j < _shelters.Length; j++)
+			{
+				int num4 = array2[j];
+				_shelters[j] = array[j];
+				if (_shelters[j] != -1)
+				{
+					Zones[num4].HasShelter = true;
+					Zones[num4].ShelterType = _shelters[j];
+				}
+			}
+			if (num != -1)
+			{
+				Zones[num].HasWollie = true;
+			}
+		}
+		else
+		{
+			Debug.LogError("StrandedWorld::Load: Old Save Detected. Shelter Data not found.");
+		}
+	}
+
+	private void PollZones()
+	{
+		if (PlayerRegistry.AllPeers.Count == 0 || LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			Zone zone = Zones[i];
+			bool active = PlayerRegistry.AllPlayers.Any_NonAlloc(InImpostorViewRange, zone);
+			zone.Terrain.gameObject.SetActive(active);
+			PollImposters(zone);
+			if (!PollUnload(zone))
+			{
+				PollLoad(zone);
+			}
+		}
+	}
+
+	private void PollImposters(Zone zone)
+	{
+		if (zone.Loading || zone.Loaded)
+		{
+			return;
+		}
+		if (!zone.Billboarding)
+		{
+			if (!PlayerRegistry.AllPlayers.Any_NonAlloc(InImpostorLoadingRange, zone))
+			{
+				return;
+			}
+			if (zone.HasObjectsForBillboard)
+			{
+				JObject field = GetZoneData(zone).GetField("Objects");
+				if (field != null && !field.IsNull())
+				{
+					zone.LoadImpostors(field);
+				}
+			}
+			else if (_zoneLoader.GenerateZone(zone))
+			{
+				zone.CreateImpostors();
+			}
+		}
+		else if (zone.Billboarding && !PlayerRegistry.AllPlayers.Any_NonAlloc(InImpostorViewRange, zone))
+		{
+			zone.ReleaseImpostors();
+		}
+	}
+
+	private void PollZone(Zone zone)
+	{
+		PollUnload(zone);
+	}
+
+	private bool PollUnload(Zone zone)
+	{
+		if ((zone.Loading || zone.Loaded) && !PlayerRegistry.AllPlayers.Any_NonAlloc(InZoneUnLoadingBounds, zone))
+		{
+			if (zone.Loading)
+			{
+				_zoneLoader.AbortLoadingZone(zone);
+			}
+			else
+			{
+				SaveZone(zone);
+				if (Game.Mode.IsServer())
+				{
+					MultiplayerZoneSync.Instance?.SendZone((byte)GetZoneId(zone), _zoneSavedObjectsLookup[zone.gameObject.name]);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private bool PollLoad(Zone zone)
+	{
+		if (!zone.Loading && !zone.Loaded && PlayerRegistry.AllPlayers.Any_NonAlloc(InZoneLoadingBounds, zone))
+		{
+			OnZoneEntered(zone);
+			LoadZone(zone);
+			return true;
+		}
+		return false;
+	}
+
+	private void SaveZone(Zone zone, bool destroy = true, bool hardSave = false, bool handleOufOfGameBounds4SaveDynamicContainer = true)
+	{
+		bool flag = zone.Id == _nmlZone.Id;
+		float timeScale = Time.timeScale;
+		float fixedDeltaTime = Time.fixedDeltaTime;
+		Time.fixedDeltaTime = 0f;
+		Time.timeScale = 0f;
+		JObject jObject = new JObject();
+		JObject jObject2 = new JObject();
+		SaveablePrefab[] componentsInChildren = zone.SaveContainer.GetComponentsInChildren<SaveablePrefab>(includeInactive: true);
+		OrderByFurthestFromPoint(componentsInChildren, zone.transform.position);
+		foreach (SaveablePrefab saveablePrefab in componentsInChildren)
+		{
+			if (!saveablePrefab.gameObject.activeInHierarchy || IsOutOfGameBounds(saveablePrefab.transform.position))
+			{
+				continue;
+			}
+			if (zone.InSaveBounds(saveablePrefab.transform.position))
+			{
+				if (Game.Mode.IsMaster())
+				{
+					ParentObjectToTransform(saveablePrefab, zone.SaveContainer);
+					JObject jObject3 = SavingUtilities.SavePrefabToJObject(saveablePrefab);
+					if (jObject3 != null)
+					{
+						jObject2.Add(jObject3);
+					}
+				}
+				if (destroy)
+				{
+					MultiplayerMng.Destroy(saveablePrefab, DestroyDelay.NOW);
+				}
+			}
+			else
+			{
+				ParentObjectToTransform(saveablePrefab, _nmlZone.SaveContainer);
+			}
+		}
+		SaveablePrefab[] array = null;
+		if (!flag)
+		{
+			array = _nmlZone.SaveContainer.GetComponentsInChildren<SaveablePrefab>(includeInactive: true);
+			foreach (SaveablePrefab saveablePrefab2 in array)
+			{
+				if (!saveablePrefab2.gameObject.activeInHierarchy || IsOutOfGameBounds(saveablePrefab2.transform.position) || !zone.InSaveBounds(saveablePrefab2.transform.position))
+				{
+					continue;
+				}
+				if (Game.Mode.IsMaster())
+				{
+					ParentObjectToTransform(saveablePrefab2, zone.SaveContainer);
+					JObject jObject4 = SavingUtilities.SavePrefabToJObject(saveablePrefab2);
+					if (jObject4 != null)
+					{
+						jObject2.Add(jObject4);
+					}
+				}
+				if (destroy)
+				{
+					MultiplayerMng.Destroy(saveablePrefab2, DestroyDelay.NOW);
+				}
+			}
+		}
+		if (Game.Mode.IsMaster())
+		{
+			try
+			{
+				Component[] objs = componentsInChildren;
+				HandleOutOfGameBounds(objs);
+				if (handleOufOfGameBounds4SaveDynamicContainer)
+				{
+					objs = array;
+					HandleOutOfGameBounds(objs);
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Error in SaveZone.HandleOutOfGameBounds: " + ex.Message + "\n" + ex.StackTrace);
+			}
+			jObject.AddField("Name", zone.gameObject.name);
+			jObject.AddField("Id", zone.Id);
+			jObject.AddField("Version", zone.Version);
+			jObject.AddField("Discovered", zone.HasVisited);
+			JObject jObject5 = SavingUtilities.Save(zone.Attributes);
+			if (jObject5 != null)
+			{
+				jObject.AddField("Attributes", jObject5);
+			}
+			jObject.AddField("Objects", jObject2);
+			if (!_zoneSavedObjectsLookup.ContainsKey(zone.gameObject.name))
+			{
+				_zoneSavedObjectsLookup.Add(zone.gameObject.name, null);
+			}
+			_zoneSavedObjectsLookup[zone.gameObject.name] = jObject;
+		}
+		if (!hardSave)
+		{
+			zone.Exit();
+			zone.HasObjectsForBillboard = true;
+			zone.Loaded = false;
+		}
+		Time.fixedDeltaTime = fixedDeltaTime;
+		Time.timeScale = timeScale;
+		_lastSavePosition = zone.transform.position;
+	}
+
+	private void OnZoneDownloaded(ZoneDownloadedEvent @event)
+	{
+		_zoneSavedObjectsLookup[Zones[@event.ZoneId].gameObject.name] = @event.Zone;
+	}
+
+	private void LoadZone(Zone zone)
+	{
+		JObject jObject = _zoneSavedObjectsLookup[zone.gameObject.name];
+		JObject field = jObject.GetField("Objects");
+		if (field != null && !field.IsNull())
+		{
+			_zoneLoader.LoadZone(zone, jObject);
+		}
+		else
+		{
+			_zoneLoader.CreateZone(zone);
+		}
+	}
+
+	private void Initialize_shelterTypes()
+	{
+		for (int i = 0; i < _shelters.Length; i++)
+		{
+			_shelters[i] = -1;
+		}
+		System.Random random = new System.Random(WORLD_SEED);
+		int num = 0;
+		for (int j = 0; j < _shelters.Length; j++)
+		{
+			int num2;
+			do
+			{
+				num2 = random.Next(0, 8);
+				for (int k = 0; k < _shelters.Length; k++)
+				{
+					if (num2 == _shelters[k])
+					{
+						num2 = -1;
+						break;
+					}
+				}
+			}
+			while (num2 == -1);
+			_shelters[num] = num2;
+			num++;
+		}
+	}
+
+	private void SetShelterOnZones()
+	{
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			Zones[i].HasShelter = false;
+		}
+		int num = CountViableMaps();
+		if (num == 0)
+		{
+			return;
+		}
+		List<int> list = new List<int>(num);
+		for (int j = 0; j < num; j++)
+		{
+			int num2;
+			do
+			{
+				num2 = _zoneLoader.Random.Next(0, Zones.Length);
+			}
+			while (list.Contains(num2) || !IsMapViable(num2));
+			list.Add(num2);
+		}
+		for (int k = 0; k < list.Count; k++)
+		{
+			Zones[list[k]].HasShelter = true;
+		}
+		SetWollieOnShelterZone(list);
+	}
+
+	private bool IsMapViable(int randIndex)
+	{
+		if (!Zones[randIndex].IsMapEditor && !Zones[randIndex].IsStartingIsland && !Zones[randIndex].HasShelter)
+		{
+			return !Zones[randIndex].Id.Contains("INTERNAL_MISSION");
+		}
+		return false;
+	}
+
+	private int CountViableMaps()
+	{
+		int num = 0;
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			if (IsMapViable(i))
+			{
+				num++;
+			}
+		}
+		return Math.Min(_shelters.Length, num);
+	}
+
+	private void SetSheltersOnWorldZones()
+	{
+		int num = 0;
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			if (Zones[i].HasShelter)
+			{
+				Zones[i].ShelterType = _shelters[num];
+				num++;
+				if (num >= _shelters.Length)
+				{
+					break;
+				}
+			}
+		}
+		ShelterCount = num;
+	}
+
+	private void SetWollieOnShelterZone(List<int> sheltersOnWorld)
+	{
+		int index = _zoneLoader.Random.Next(0, sheltersOnWorld.Count);
+		Zones[sheltersOnWorld[index]].HasWollie = true;
+	}
+
+	private static void OrderByFurthestFromPoint(SaveablePrefab[] arr, Vector3 point)
+	{
+		for (int i = 0; i < arr.Length - 1; i++)
+		{
+			for (int j = i + 1; j < arr.Length; j++)
+			{
+				SaveablePrefab saveablePrefab = arr[i];
+				SaveablePrefab saveablePrefab2 = arr[j];
+				if (saveablePrefab.CanReorder && saveablePrefab2.CanReorder)
+				{
+					float sqrMagnitude = (point - saveablePrefab.transform.position).sqrMagnitude;
+					float sqrMagnitude2 = (point - saveablePrefab2.transform.position).sqrMagnitude;
+					if (sqrMagnitude < sqrMagnitude2)
+					{
+						arr[i] = saveablePrefab2;
+						arr[j] = saveablePrefab;
+					}
+				}
+			}
+		}
+	}
+
+	private Zone FindClosestZone(Vector3 position)
+	{
+		int index = 0;
+		return FindClosestZone(position, out index);
+	}
+
+	private Zone FindClosestZone(Vector3 position, out int index)
+	{
+		index = -1;
+		Zone result = null;
+		float num = float.PositiveInfinity;
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			float num2 = Vector3.Distance(position, Zones[i].transform.position);
+			if (num2 < num)
+			{
+				num = num2;
+				result = Zones[i];
+				index = i;
+			}
+		}
+		return result;
+	}
+
+	public Zone FindZone(string name)
+	{
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			if (Zones[i].Id.Equals(name))
+			{
+				return Zones[i];
+			}
+		}
+		return null;
+	}
+
+	public Zone FindEndGameZone()
+	{
+		for (int i = 0; i < Zones.Length; i++)
+		{
+			if (Zones[i].Id.Equals("INTERNAL_MISSION_3"))
+			{
+				return Zones[i];
+			}
+		}
+		return null;
+	}
+
+	private bool InZoneUnLoadingBounds(IPlayer player, Zone zone)
+	{
+		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 250f;
+	}
+
+	private bool InZoneLoadingBounds(IPlayer player, Zone zone)
+	{
+		return Vector2.Distance(new Vector2(player.transform.position.x, player.transform.position.z), new Vector2(zone.transform.position.x, zone.transform.position.z)) < 240f;
+	}
+
+	private bool InImpostorLoadingRange(IPlayer player, Zone zone)
+	{
+		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1000000f;
+	}
+
+	private bool InImpostorViewRange(IPlayer player, Zone zone)
+	{
+		return Vector3Tools.SqrDistanceOnAxis(player.transform.position, zone.transform.position, Vector3Tools.xz) < 1001600f;
+	}
+
+	private void ParentObjectToTransform(SaveablePrefab sp, Transform parent)
+	{
+		BaseObject baseObject = sp as BaseObject;
+		if (baseObject != null)
+		{
+			if (baseObject.CanParent)
+			{
+				baseObject.transform.parent = null;
+				baseObject.TransformParent = parent;
+				baseObject.Parent();
+			}
+		}
+		else
+		{
+			sp.transform.parent = parent;
+		}
+	}
+
+	private AddWaveOverlay AddWaveOverlay(GameObject zone, Texture2D height, Texture2D shore)
+	{
+		GameObject gameObject = new GameObject("WaveOverlay");
+		gameObject.transform.parent = zone.transform;
+		gameObject.transform.localPosition = Vector3.zero;
+		AddWaveOverlay addWaveOverlay = gameObject.AddComponent<AddWaveOverlay>();
+		addWaveOverlay.width = 250f;
+		addWaveOverlay.height = 250f;
+		addWaveOverlay.heightTexture = new OverlayHeightTexture();
+		addWaveOverlay.heightTexture.tex = shore;
+		addWaveOverlay.heightTexture.mask = height;
+		addWaveOverlay.heightTexture.alpha = 0f;
+		addWaveOverlay.heightTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		addWaveOverlay.heightTexture.maskAlpha = 0.9f;
+		addWaveOverlay.normalTexture = new OverlayNormalTexture();
+		addWaveOverlay.normalTexture.tex = shore;
+		addWaveOverlay.normalTexture.mask = height;
+		addWaveOverlay.normalTexture.alpha = 0f;
+		addWaveOverlay.normalTexture.maskAlpha = 0.4f;
+		addWaveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		addWaveOverlay.foamTexture = new OverlayFoamTexture();
+		addWaveOverlay.foamTexture.tex = shore;
+		addWaveOverlay.foamTexture.mask = height;
+		addWaveOverlay.foamTexture.alpha = 0.4f;
+		addWaveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		addWaveOverlay.clipTexture = new OverlayClipTexture();
+		addWaveOverlay.clipTexture.tex = shore;
+		addWaveOverlay.clipTexture.ignoreQuerys = true;
+		return addWaveOverlay;
+	}
+
+	public static int GetRandowWorldSeed()
+	{
+		string text = (Environment.TickCount & 0x7FFFFFFF).ToString();
+		return int.Parse(text.Substring(0, Mathf.Min(text.Length, 8)));
+	}
+
+	public static void SetRandomWorldSeed()
+	{
+		SetWorldSeed(0);
+	}
+
+	public static void SetWorldSeed(int seed)
+	{
+		if (seed == 0)
+		{
+			LOCAL_WORLD_SEED = GetRandowWorldSeed();
+			Debug.Log("StrandedWorld::SetWorldSeed:: Random [" + LOCAL_WORLD_SEED + "]");
+		}
+		else
+		{
+			LOCAL_WORLD_SEED = seed;
+			Debug.Log("StrandedWorld::SetWorldSeed:: Custom [" + LOCAL_WORLD_SEED + "]");
+		}
+	}
+
+	public static void SetWorldSeed(string seedValue)
+	{
+		if (string.IsNullOrEmpty(seedValue))
+		{
+			SetWorldSeed(0);
+			return;
+		}
+		string s = seedValue.Substring(0, Mathf.Min(seedValue.Length, 8));
+		int result = 0;
+		if (!int.TryParse(s, out result))
+		{
+			Debug.LogWarning("StrandedWorld::SetWorldSeed:: Could not parse seed value. Seed likely contains invalid characters.");
+		}
+		SetWorldSeed(result);
+	}
+
+	public static GameObject AddDebugAxis(Vector3 position, Quaternion rotation)
+	{
+		return null;
+	}
+
+	public static GameObject AddDebugAxis(Vector3 position, Quaternion rotation, string text)
+	{
+		return null;
+	}
+
+	public System.Random GenerateLocalSeed(Vector3 objectPosition, int addedValue = 0)
+	{
+		Vector3 zero = Vector3.zero;
+		Vector3 b = new Vector3(objectPosition.x, 0f, objectPosition.z);
+		float num = Mathf.Atan2(b.z - zero.z, b.x - zero.x) * 180f / MathF.PI;
+		int num2 = (int)Vector3.Distance(zero, b);
+		addedValue++;
+		return new System.Random(WORLD_SEED + ((int)num + num2) * addedValue);
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("WorldSeed", JSerializer.Serialize(WORLD_SEED));
+		JObject jObject2 = new JObject();
+		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			IPlayer player = PlayerRegistry.AllPlayers[i];
+			JObject jObject3 = new JObject();
+			jObject3.AddField("Position", JSerializer.Serialize(player.transform.position));
+			jObject3.AddField("ZoneId", JSerializer.Serialize(GetZone(player.transform.position, fallbackToNml: true).Id));
+			jObject2.Add(jObject3);
+		}
+		jObject.AddField("PlayersData", jObject2);
+		Zone[] zones = Zones;
+		foreach (Zone zone in zones)
+		{
+			if (zone.Loaded)
+			{
+				SaveZone(zone, destroy: false, hardSave: true, handleOufOfGameBounds4SaveDynamicContainer: false);
+			}
+		}
+		SaveZone(_nmlZone, destroy: false, hardSave: true);
+		HandleOutOfGameBounds_NoMansLand();
+		JObject jObject4 = new JObject();
+		for (int k = 0; k < 49; k++)
+		{
+			JObject zoneData = GetZoneData(Zones[k]);
+			jObject4.Add(zoneData);
+		}
+		JObject zoneData2 = GetZoneData(_nmlZone);
+		jObject4.Add(zoneData2);
+		jObject.AddField("Zones", jObject4);
+		jObject.AddField("ShelterCount", JSerializer.Serialize(ShelterCount));
+		JObject jObject5 = new JObject();
+		int num = 1;
+		int instance = -1;
+		for (int l = 0; l < Zones.Length; l++)
+		{
+			Zone zone2 = Zones[l];
+			if (zone2.HasShelter)
+			{
+				jObject5.AddField("Shelter" + num, zone2.ShelterType);
+				jObject5.AddField("Shelter" + num + "_zone", l);
+				num++;
+			}
+			if (zone2.HasWollie)
+			{
+				instance = l;
+			}
+		}
+		jObject5.AddField("Wollie", instance);
+		jObject.AddField("Shelters", jObject5);
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+	}
+
+	public float LoadWorld_Async(JObject rootData, JObject data)
+	{
+		return Timing.WaitUntilDone(LoadWorld(rootData, data));
+	}
+
+	private CoroutineHandle LoadWorld(JObject rootData, JObject data)
+	{
+		return Timing.RunCoroutine(LoadWorld_Sequence(rootData, data));
+	}
+
+	public IEnumerator<float> LoadWorld_Sequence(JObject rootData, JObject data)
+	{
+		if (!Game.Mode.IsMultiplayer())
+		{
+			EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_WORLD"));
+			yield return 0f;
+			LoadWorld();
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_OBJECTS"));
+		yield return 0f;
+		LoadObjects(rootData);
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_CURRENT_ZONE"));
+		yield return 0f;
+		InitializeZones();
+		JObject field = data.GetField("ShelterCount");
+		if (field != null)
+		{
+			ShelterCount = field.GetValue<int>();
+		}
+		JObject playersData = data.GetField("PlayersData");
+		Vector3 position2;
+		if (playersData != null && !playersData.IsNull())
+		{
+			for (int i = 0; i < playersData.Children.Count; i++)
+			{
+				JObject field2 = playersData.Children[i].GetField("Position");
+				if (field2 != null)
+				{
+					Vector3 position = JSerializer.Deserialize<Vector3>(field2);
+					yield return LoadStartingZone(position, fallbackToNml: true);
+				}
+			}
+		}
+		else if (LegacyUtilities.LoadStrandedWorldPlayerPosition_PreCoop(data, out position2))
+		{
+			yield return LoadStartingZone(position2);
+		}
+		if (!_nmlZone.Loaded && GetZoneData(_nmlZone).IsValid())
+		{
+			yield return LoadStartingZone(_nmlZone);
+		}
+		OnWorldGenerated();
+		SubscribeToZoneLoaderEvents();
+		InvokeRepeating("PollZones", 0.3f, 0.3f);
+		Debug.Log("StrandedWorld::LoadWorld_Sequence:: Loaded world.");
+	}
+
+	private float LoadStartingZone(Vector3 position, bool fallbackToNml = false)
+	{
+		Zone zone = GetZone(position, fallbackToNml);
+		return LoadStartingZone(zone);
+	}
+
+	private float LoadStartingZone(Zone zone)
+	{
+		if (zone != null)
+		{
+			if (!zone.Loaded)
+			{
+				return Timing.WaitUntilDone(Timing.RunCoroutine(LoadStartingZone_Sequence(zone)));
+			}
+		}
+		else
+		{
+			Debug.LogError("StrandedWorld::LoadStartingZone:: Something went wrong. No zone was found.");
+		}
+		return 0f;
+	}
+
+	private IEnumerator<float> LoadStartingZone_Sequence(Zone zone)
+	{
+		JObject zoneData = GetZoneData(zone);
+		if (zoneData != null)
+		{
+			zone.Enter();
+			JObject field = zoneData.GetField("Objects");
+			if (field != null && !field.IsNull())
+			{
+				ZoneLoader.EObjectProcessingMode mode = _zoneLoader.ObjectProcessingMode;
+				_zoneLoader.ObjectProcessingMode = ZoneLoader.EObjectProcessingMode.Faster;
+				zone.LoadImpostors(field);
+				yield return _zoneLoader.LoadZone_Async(zone, zoneData);
+				OnZoneEntered(zone);
+				_zoneLoader.ObjectProcessingMode = mode;
+			}
+			else
+			{
+				Debug.LogError("StrandedWorld::LoadStartingZone_Sequence:: Zone [" + zone.ZoneName + "] [Objects] field is null or empty.");
+			}
+		}
+		else
+		{
+			Debug.LogError("StrandedWorld::LoadStartingZone_Sequence:: Something went wrong. Zone [" + zone.ZoneName + "] data is null or empty.");
+		}
+	}
+
+	private bool IsOutOfGameBounds(Vector3 position)
+	{
+		if (!(position.y > 300f) && !(position.y < -25f) && !(position.x > 2500f) && !(position.x < -2500f) && !(position.z > 2500f))
+		{
+			return position.z < -2500f;
+		}
+		return true;
+	}
+
+	private bool HandleOutOfGameBounds(Component obj)
+	{
+		if (IsOutOfGameBounds(obj.transform.position))
+		{
+			if (obj.gameObject.TryGetComponent<BoltEntity>(out var component))
+			{
+				if (component.IsOwner)
+				{
+					MultiplayerMng.DestroyMultiplayerEntity(component.gameObject, DestroyDelay.LATE);
+				}
+				else
+				{
+					component.gameObject.SetActive(value: false);
+				}
+			}
+			else
+			{
+				BeamTeam.Destroy(obj.gameObject);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void HandleOutOfGameBounds(Component[] objs)
+	{
+		if (objs.IsNullOrDestroyed())
+		{
+			return;
+		}
+		for (int i = 0; i < objs.Length; i++)
+		{
+			Component component = objs[i];
+			if (!component.IsNullOrDestroyed() && component.gameObject.activeInHierarchy)
+			{
+				HandleOutOfGameBounds(objs[i]);
+			}
+		}
+	}
+
+	public void HandleOutOfGameBounds_NoMansLand()
+	{
+		try
+		{
+			Rigidbody[] componentsInChildren = _nmlZone.SaveContainer.GetComponentsInChildren<Rigidbody>();
+			Component[] objs = componentsInChildren;
+			HandleOutOfGameBounds(objs);
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Error in HandleOutOfGameBounds_NoMansLand: " + ex.Message + "\n" + ex.StackTrace);
+		}
+	}
+
+	public void HandleOutOfGameBounds(Zone zone, bool handleNmlContainer = false)
+	{
+		if (!zone.IsNullOrDestroyed() && zone.Loaded)
+		{
+			try
+			{
+				Rigidbody[] componentsInChildren = zone.SaveContainer.GetComponentsInChildren<Rigidbody>();
+				Component[] objs = componentsInChildren;
+				HandleOutOfGameBounds(objs);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Error in HandleOutOfGameBounds: " + ex.Message + "\n" + ex.StackTrace);
+			}
+		}
+		if (handleNmlContainer && zone != _nmlZone)
+		{
+			HandleOutOfGameBounds_NoMansLand();
+		}
+	}
+}
+
+####################################################################################################
+FILE: WorldTools.cs
+SIZE_BYTES: 16833
+SHA256: 75d276343c8cc547f0de8f727a6ba1a3b8d875197460d5a4db5c279e53f1564d
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using IslandGen;
+using UnityEngine;
+
+public static class WorldTools
+{
+	private enum GeneratorType
+	{
+		Perlin,
+		Normalise,
+		Voronoi,
+		Smooth
+	}
+
+	public class PerlinNoise2D
+	{
+		private double[,] noiseValues;
+
+		private float amplitude = 1f;
+
+		private int frequency = 1;
+
+		public float Amplitude => amplitude;
+
+		public int Frequency => frequency;
+
+		public PerlinNoise2D(int freq, float _amp, System.Random _wSeed)
+		{
+			noiseValues = new double[freq, freq];
+			amplitude = _amp;
+			frequency = freq;
+			for (int i = 0; i < freq; i++)
+			{
+				for (int j = 0; j < freq; j++)
+				{
+					noiseValues[i, j] = _wSeed.NextDouble();
+				}
+			}
+		}
+
+		public double getInterpolatedPoint(int _xa, int _xb, int _ya, int _yb, double Px, double Py)
+		{
+			double pa = interpolate(noiseValues[_xa % Frequency, _ya % frequency], noiseValues[_xb % Frequency, _ya % frequency], Px);
+			double pb = interpolate(noiseValues[_xa % Frequency, _yb % frequency], noiseValues[_xb % Frequency, _yb % frequency], Px);
+			return interpolate(pa, pb, Py);
+		}
+
+		private double interpolate(double Pa, double Pb, double Px)
+		{
+			double num = Px * 3.1415927410125732;
+			double num2 = (double)(1f - Mathf.Cos((float)num)) * 0.5;
+			return Pa * (1.0 - num2) + Pb * num2;
+		}
+	}
+
+	private const int heightmapRes = 257;
+
+	private static GeneratorType generatorType = GeneratorType.Perlin;
+
+	private static int perlinSeed = 0;
+
+	private static int perlinFrequency = 4;
+
+	private static float perlinAmplitude = 1f;
+
+	private static int perlinOctaves = 8;
+
+	private static float perlinBlend = 1f;
+
+	private static float normaliseMin = 0f;
+
+	private static float normaliseMax = 1f;
+
+	private static float normaliseBlend = 1f;
+
+	public static float smoothBlend = 1f;
+
+	public static int smoothIterations;
+
+	private const float Island_Base_Height = 0.66f;
+
+	public static Zone.BiomeType GenerateZoneBiome(Zone.BiomeType biomeType, int seed)
+	{
+		int num = new System.Random(seed).Next(0, 100);
+		Zone.BiomeType biomeType2 = biomeType;
+		if (biomeType == Zone.BiomeType.RANDOM)
+		{
+			biomeType2 = ((num < 50) ? Zone.BiomeType.ISLAND : Zone.BiomeType.ISLAND_SMALL);
+		}
+		if (biomeType2 == Zone.BiomeType.RANDOM)
+		{
+			Debug.LogError("Biome Error :: Biome is Random");
+		}
+		return biomeType2;
+	}
+
+	public static float[,] GenerateZoneHeightmap(Zone.BiomeType biomeType, int randomSeed)
+	{
+		float[,] array = new float[257, 257];
+		switch (biomeType)
+		{
+		case Zone.BiomeType.ISLAND:
+			array = GENERATE_ISLAND_HEIGHTMAP(randomSeed, biomeType);
+			break;
+		case Zone.BiomeType.ISLAND_SMALL:
+			array = GENERATE_ISLAND_HEIGHTMAP(randomSeed, biomeType);
+			break;
+		case Zone.BiomeType.ISLAND_ROCK:
+			array = GENERATE_ISLAND_HEIGHTMAP(randomSeed, biomeType);
+			break;
+		case Zone.BiomeType.SHALLOW:
+			array = PerlinGenerator(array, randomSeed, 6, 0.5f, 6, 1f);
+			array = NormalizeHeightmap(array, 0.44f, 0.55f, 1f, biomeType);
+			break;
+		case Zone.BiomeType.MEDIUM:
+			array = PerlinGenerator(array, randomSeed, 12, 0.5f, 6, 1f);
+			array = NormalizeHeightmap(array, 0.3f, 0.45f, 1f, biomeType);
+			break;
+		case Zone.BiomeType.DEEP_SEA:
+			array = PerlinGenerator(array, randomSeed, 4, 0.9f, 4, 1f);
+			array = NormalizeHeightmap(array, 0.1f, 0.2f, 1f, biomeType);
+			break;
+		}
+		return array;
+	}
+
+	public static float[,] GENERATE_ISLAND_HEIGHTMAP(int seed, Zone.BiomeType biome, bool soilMapGeneration = false)
+	{
+		System.Random random = new System.Random(seed);
+		int num = 140;
+		int num2 = 200;
+		int num3 = num2;
+		switch (biome)
+		{
+		case Zone.BiomeType.ISLAND_SMALL:
+			num3 = random.Next(num, num + 20);
+			break;
+		case Zone.BiomeType.ISLAND:
+			num3 = random.Next(num2 - 20, num2);
+			break;
+		}
+		float num4 = 0.685f;
+		float num5 = 0.705f;
+		float num6 = (float)(num3 - num) / (float)(num2 - num);
+		float maxHeight = num4 + (num5 - num4) * num6;
+		int numPoints = num3;
+		Island island = new Island(num3);
+		island.NewIsland(Island.IslandTypes.Radial, Island.PointTypes.Random, numPoints, seed, num3);
+		int num7 = 257;
+		float num8 = (int)((float)(250 - num3) * 0.5f);
+		float[,] array = new float[num7, num7];
+		if (!soilMapGeneration)
+		{
+			for (int i = 0; i < num7; i++)
+			{
+				for (int j = 0; j < num7; j++)
+				{
+					array[i, j] = 0.66f;
+				}
+			}
+		}
+		foreach (Center center in island.Centers)
+		{
+			if (center.Biome == Island.Biome.Ocean)
+			{
+				continue;
+			}
+			foreach (Center neighbor in center.Neighbors)
+			{
+				if (neighbor.Biome == Island.Biome.Lake)
+				{
+					_ = center.Biome;
+					_ = 1;
+				}
+				List<Vector3> list = new List<Vector3>();
+				Edge edge = island.LookUpEdgeFromCenter(center, neighbor);
+				if (edge != null && edge.V0 != null && edge.V1 != null)
+				{
+					Corner v = edge.V0;
+					Corner v2 = edge.V1;
+					list.Add(new Vector3(v.Point.x, v.Elevation, v.Point.y));
+					list.Add(new Vector3(v2.Point.x, v2.Elevation, v2.Point.y));
+					list.Add(new Vector3(center.Point.x, center.Elevation, center.Point.y));
+					if (soilMapGeneration)
+					{
+						array.FillCellHeightmap(list.ToArray(), (int)num8);
+					}
+					else
+					{
+						array.FillCellHeightmap(list.ToArray(), (int)num8, lake: false, 0.66f, maxHeight);
+					}
+					list = null;
+				}
+			}
+		}
+		if (!soilMapGeneration)
+		{
+			array = StitchTerrainEdges(array);
+			array = PerlinGenerator(array, seed, 24, 1f, 6, 0.02f);
+			foreach (Edge edge2 in island.Edges)
+			{
+				if (edge2 != null && edge2.V0 != null && edge2.V1 != null)
+				{
+					Corner v3 = edge2.V0;
+					Corner v4 = edge2.V1;
+					if (edge2.River > 0)
+					{
+						array.HeightmapRiver((int)v3.Point.x, (int)v3.Point.y, (int)v4.Point.x, (int)v4.Point.y);
+						array.HeightmapRiver((int)v3.Point.x + 1, (int)v3.Point.y, (int)v4.Point.x + 1, (int)v4.Point.y);
+						array.HeightmapRiver((int)v3.Point.x, (int)v3.Point.y + 1, (int)v4.Point.x, (int)(v4.Point.y + 1f));
+					}
+				}
+			}
+			array = SmoothTerrain(array, 2, 0.7f, biome);
+		}
+		island = null;
+		return array;
+	}
+
+	private static float[,] StitchTerrainEdges(float[,] heightmap)
+	{
+		int num = 257;
+		Color[] pixels = (Resources.Load("Terrain/Mask_Island_Stitch") as Texture2D).GetPixels();
+		for (int i = 0; i < num; i++)
+		{
+			for (int j = 0; j < num; j++)
+			{
+				if (heightmap[i, j] <= 0.66f)
+				{
+					float r = pixels[i * num + j].r;
+					heightmap[i, j] -= 1f * r;
+				}
+			}
+		}
+		return heightmap;
+	}
+
+	public static Texture2D CreateHeightMapTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.ARGB32, mipChain: false, linear: false);
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				float num = terrain.GetHeight(i, j) + -100f;
+				float num2 = Mathf.Lerp(0f, 1f, Mathf.Clamp01((num + 6f) / 5f));
+				Color color = ((num > 0f) ? new Color(1f, 1f, 1f, 1f) : new Color(num2, num2, num2, num2));
+				texture2D.SetPixel(i, j, color);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	public static Texture2D CreateShoreMaskTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.ARGB32, mipChain: false, linear: false);
+		int num = -100;
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				Color color = ((terrain.GetHeight(i, j) + (float)num > 0.3f) ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 0f));
+				texture2D.SetPixel(i, j, color);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	private static float[,] GenerateTerrain(float[,] heightmap, Zone.BiomeType biome = Zone.BiomeType.RANDOM)
+	{
+		int num = 257;
+		int num2 = num;
+		float[,] array = (float[,])heightmap.Clone();
+		float[,] array2 = (float[,])heightmap.Clone();
+		switch (generatorType)
+		{
+		case GeneratorType.Perlin:
+		{
+			array2 = GeneratePerlin(array2, new Vector2(num, num2));
+			for (int k = 0; k < num2; k++)
+			{
+				for (int l = 0; l < num; l++)
+				{
+					float num5 = array[l, k];
+					float num6 = array2[l, k] * perlinBlend + num5 * (1f - perlinBlend);
+					array[l, k] = num6;
+				}
+			}
+			break;
+		}
+		case GeneratorType.Normalise:
+		{
+			array2 = Normalise(array2, new Vector2(num, num2));
+			for (int m = 0; m < num2; m++)
+			{
+				for (int n = 0; n < num; n++)
+				{
+					float num7 = array[n, m];
+					float num8 = array2[n, m] * normaliseBlend + num7 * (1f - normaliseBlend);
+					array[n, m] = num8;
+				}
+			}
+			break;
+		}
+		case GeneratorType.Smooth:
+		{
+			array2 = smooth(array2, new Vector2(num, num2));
+			for (int i = 0; i < num2; i++)
+			{
+				for (int j = 0; j < num; j++)
+				{
+					float num3 = array[j, i];
+					float num4 = array2[j, i] * smoothBlend + num3 * (1f - smoothBlend);
+					array[j, i] = num4;
+				}
+			}
+			break;
+		}
+		default:
+			return null;
+		}
+		array2 = null;
+		return array;
+	}
+
+	private static float[,] GeneratePerlin(float[,] heightmap, Vector2 arraySize)
+	{
+		int num = (int)arraySize.x;
+		int num2 = (int)arraySize.y;
+		System.Random wSeed = new System.Random(perlinSeed);
+		PerlinNoise2D[] array = new PerlinNoise2D[perlinOctaves];
+		int num3 = perlinFrequency;
+		float num4 = 1f;
+		for (int i = 0; i < perlinOctaves; i++)
+		{
+			array[i] = new PerlinNoise2D(num3, num4, wSeed);
+			num3 *= 2;
+			num4 /= 2f;
+		}
+		for (int i = 0; i < perlinOctaves; i++)
+		{
+			double num5 = (float)num / (float)array[i].Frequency;
+			double num6 = (float)num2 / (float)array[i].Frequency;
+			for (int j = 0; j < num; j++)
+			{
+				for (int k = 0; k < num2; k++)
+				{
+					int num7 = (int)((double)j / num5);
+					int xb = num7 + 1;
+					int num8 = (int)((double)k / num6);
+					int yb = num8 + 1;
+					double interpolatedPoint = array[i].getInterpolatedPoint(num7, xb, num8, yb, (double)j / num5 - (double)num7, (double)k / num6 - (double)num8);
+					heightmap[j, k] += (float)(interpolatedPoint * (double)array[i].Amplitude);
+				}
+			}
+		}
+		float num9 = normaliseMin;
+		float num10 = normaliseMax;
+		float num11 = normaliseBlend;
+		normaliseMin = 0f;
+		normaliseMax = 1f;
+		normaliseBlend = 1f;
+		Normalise(heightmap, arraySize);
+		normaliseMin = num9;
+		normaliseMax = num10;
+		normaliseBlend = num11;
+		for (int l = 0; l < num; l++)
+		{
+			for (int m = 0; m < num2; m++)
+			{
+				heightmap[l, m] *= perlinAmplitude;
+			}
+		}
+		for (int i = 0; i < perlinOctaves; i++)
+		{
+			array[i] = null;
+		}
+		array = null;
+		return heightmap;
+	}
+
+	public static float[,] PerlinGenerator(float[,] heightmap, int seed, int frequency, float amplitude, int octaves, float blend)
+	{
+		generatorType = GeneratorType.Perlin;
+		perlinFrequency = frequency;
+		perlinAmplitude = amplitude;
+		perlinOctaves = octaves;
+		perlinBlend = blend;
+		perlinSeed = seed;
+		return GenerateTerrain(heightmap);
+	}
+
+	private static float[,] Normalise(float[,] heightmap, Vector2 arraySize)
+	{
+		int num = (int)arraySize.x;
+		int num2 = (int)arraySize.y;
+		float num3 = 0f;
+		float num4 = 1f;
+		for (int i = 0; i < num2; i++)
+		{
+			for (int j = 0; j < num; j++)
+			{
+				float num5 = heightmap[j, i];
+				if (num5 < num4)
+				{
+					num4 = num5;
+				}
+				else if (num5 > num3)
+				{
+					num3 = num5;
+				}
+			}
+		}
+		float num6 = num3 - num4;
+		float num7 = normaliseMax - normaliseMin;
+		for (int i = 0; i < num2; i++)
+		{
+			for (int j = 0; j < num; j++)
+			{
+				float num8 = (heightmap[j, i] - num4) / num6 * num7;
+				heightmap[j, i] = normaliseMin + num8;
+				if (heightmap[j, i] > 1f)
+				{
+					heightmap[j, i] = 1f;
+				}
+				if (heightmap[j, i] < 0f)
+				{
+					heightmap[j, i] = 0f;
+				}
+			}
+		}
+		return heightmap;
+	}
+
+	public static float[,] NormalizeHeightmap(float[,] heightmap, float minHeight, float maxHeight, float blend, Zone.BiomeType biome = Zone.BiomeType.RANDOM)
+	{
+		generatorType = GeneratorType.Normalise;
+		normaliseMin = minHeight;
+		normaliseMax = maxHeight;
+		normaliseBlend = blend;
+		return GenerateTerrain(heightmap, biome);
+	}
+
+	public static float[,] SmoothTerrain(float[,] heightmap, int iterations, float blend, Zone.BiomeType biome = Zone.BiomeType.RANDOM)
+	{
+		generatorType = GeneratorType.Smooth;
+		smoothIterations = iterations;
+		smoothBlend = blend;
+		return GenerateTerrain(heightmap, biome);
+	}
+
+	private static float[,] smooth(float[,] heightMap, Vector2 arraySize)
+	{
+		int num = (int)arraySize.x;
+		int num2 = (int)arraySize.y;
+		for (int i = 0; i < smoothIterations; i++)
+		{
+			for (int j = 0; j < num2; j++)
+			{
+				int num3;
+				int num4;
+				int num5;
+				if (j == 0)
+				{
+					num3 = 2;
+					num4 = 0;
+					num5 = 0;
+				}
+				else if (j == num2 - 1)
+				{
+					num3 = 2;
+					num4 = -1;
+					num5 = 1;
+				}
+				else
+				{
+					num3 = 3;
+					num4 = -1;
+					num5 = 1;
+				}
+				for (int k = 0; k < num; k++)
+				{
+					int num6;
+					int num7;
+					int num8;
+					if (k == 0)
+					{
+						num6 = 2;
+						num7 = 0;
+						num8 = 0;
+					}
+					else if (k == num - 1)
+					{
+						num6 = 2;
+						num7 = -1;
+						num8 = 1;
+					}
+					else
+					{
+						num6 = 3;
+						num7 = -1;
+						num8 = 1;
+					}
+					float num9 = 0f;
+					int num10 = 0;
+					for (int l = 0; l < num3; l++)
+					{
+						for (int m = 0; m < num6; m++)
+						{
+							if (m == num8 || l == num5)
+							{
+								float num11 = heightMap[k + m + num7, j + l + num4];
+								num9 += num11;
+								num10++;
+							}
+						}
+					}
+					float num12 = num9 / (float)num10;
+					heightMap[k + num8 + num7, j + num5 + num4] = num12;
+				}
+			}
+		}
+		return heightMap;
+	}
+
+	public static void FillCellHeightmap(this float[,] heightmap, Vector3[] points, int offset, bool lake = false, float minHeight = 0f, float maxHeight = 1f)
+	{
+		int num = (int)points.Max((Vector3 vector) => vector.z);
+		int num2 = (int)points.Min((Vector3 vector) => vector.z);
+		int num3 = (int)points.Min((Vector3 vector) => vector.x);
+		int num4 = (int)points.Max((Vector3 vector) => vector.x);
+		int num6;
+		int num5 = (num6 = points.Count());
+		float[] array = points.Select((Vector3 vector) => vector.z).ToArray();
+		float[] array2 = points.Select((Vector3 vector) => vector.x).ToArray();
+		int[] array3 = new int[num5];
+		for (int num7 = num2; num7 <= num; num7++)
+		{
+			int num8 = 0;
+			int num9 = num6 - 1;
+			int num10;
+			for (num10 = 0; num10 < num6; num10++)
+			{
+				if ((array[num10] < (float)num7 && array[num9] >= (float)num7) || (array[num9] < (float)num7 && array[num10] >= (float)num7))
+				{
+					array3[num8++] = (int)(array2[num10] + ((float)num7 - array[num10]) / (array[num9] - array[num10]) * (array2[num9] - array2[num10]));
+				}
+				num9 = num10;
+			}
+			num10 = 0;
+			while (num10 < num8 - 1)
+			{
+				if (array3[num10] > array3[num10 + 1])
+				{
+					int num11 = array3[num10];
+					array3[num10] = array3[num10 + 1];
+					array3[num10 + 1] = num11;
+					if (num10 != 0)
+					{
+						num10--;
+					}
+				}
+				else
+				{
+					num10++;
+				}
+			}
+			for (num10 = 0; num10 < num8 && array3[num10] < num4; num10 += 2)
+			{
+				if (array3[num10 + 1] > num3)
+				{
+					if (array3[num10] < num3)
+					{
+						array3[num10] = num3;
+					}
+					if (array3[num10 + 1] > num4)
+					{
+						array3[num10 + 1] = num4;
+					}
+					for (num9 = array3[num10]; num9 < array3[num10 + 1]; num9++)
+					{
+						Vector3 p = points[0];
+						Vector3 p2 = points[1];
+						Vector3 p3 = points[2];
+						float heightAtPoint = Triangulation.GetHeightAtPoint(new Vector3(num9, 0f, num7), new Triangle(p, p2, p3));
+						float num12 = minHeight + (maxHeight - minHeight) * heightAtPoint;
+						heightmap[num9 + offset, num7 + offset] = num12;
+					}
+				}
+			}
+		}
+	}
+
+	public static void HeightmapRiver(this float[,] heightmap, int x0, int y0, int x1, int y1)
+	{
+		int num = y1 - y0;
+		int num2 = x1 - x0;
+		int num3;
+		if (num < 0)
+		{
+			num = -num;
+			num3 = -1;
+		}
+		else
+		{
+			num3 = 1;
+		}
+		int num4;
+		if (num2 < 0)
+		{
+			num2 = -num2;
+			num4 = -1;
+		}
+		else
+		{
+			num4 = 1;
+		}
+		num <<= 1;
+		num2 <<= 1;
+		float num5 = 0f;
+		float num6 = 0.0065f;
+		float num7 = 0.675f;
+		if (heightmap[x0, y0] > num7)
+		{
+			heightmap[x0, y0] -= num6;
+		}
+		if (num2 > num)
+		{
+			num5 = num - (num2 >> 1);
+			while (Mathf.Abs(x0 - x1) > 1)
+			{
+				if (num5 >= 0f)
+				{
+					y0 += num3;
+					num5 -= (float)num2;
+				}
+				x0 += num4;
+				num5 += (float)num;
+				if (heightmap[x0, y0] > num7)
+				{
+					heightmap[x0, y0] -= num6;
+				}
+			}
+			return;
+		}
+		num5 = num2 - (num >> 1);
+		while (Mathf.Abs(y0 - y1) > 1)
+		{
+			if (num5 >= 0f)
+			{
+				x0 += num4;
+				num5 -= (float)num;
+			}
+			y0 += num3;
+			num5 += (float)num2;
+			if (heightmap[x0, y0] > num7)
+			{
+				heightmap[x0, y0] -= num6;
+			}
+		}
+	}
+}
+
+####################################################################################################
+FILE: Zone.cs
+SIZE_BYTES: 7913
+SHA256: 3ef0e64eeece977d6256c9adafe9106a952432726ef46a8de73b032db66756cc
+####################################################################################################
+
+using System.Collections.Generic;
+using Beam;
+using Beam.Rendering;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Terrain;
+using Beam.Utilities;
+using Ceto;
+using UnityEngine;
+
+public class Zone : MonoBehaviour
+{
+	public enum BiomeType
+	{
+		RANDOM,
+		DEEP_SEA,
+		MEDIUM,
+		SHALLOW,
+		ISLAND,
+		ISLAND_SMALL,
+		ISLAND_ROCK,
+		MISSION,
+		CARRIER
+	}
+
+	public const float SAVE_BOUNDS_MAX_HEIGHT = 300f;
+
+	public const float SAVE_BOUNDS_MIN_HEIGHT = -25f;
+
+	private const float SAVE_BOUNDS_BUFFER = 30f;
+
+	public const float SAVE_BOUNDS_RADIUS = 155f;
+
+	public const float SQR_SAVE_BOUNDS_RADIUS = 24025f;
+
+	public ZoneAttributes Attributes = new ZoneAttributes();
+
+	[SerializeField]
+	private Terrain _terrain;
+
+	public Transform SaveContainer;
+
+	[SerializeField]
+	private BiomeType _biome;
+
+	public string ZoneName;
+
+	public string Id;
+
+	public int Version;
+
+	public bool IsStartingIsland;
+
+	private GenerationPoints[,] _generationPoints;
+
+	private readonly List<GeneratedObject> _generatedObjects = new List<GeneratedObject>();
+
+	private bool _billboarding;
+
+	private readonly List<ImpostorBase> _activeImposters = new List<ImpostorBase>();
+
+	public Terrain Terrain => _terrain;
+
+	public BiomeType Biome
+	{
+		get
+		{
+			return _biome;
+		}
+		set
+		{
+			_biome = value;
+		}
+	}
+
+	public int Seed { get; set; }
+
+	public bool Loading { get; set; }
+
+	public bool Loaded { get; set; }
+
+	public bool IsMapEditor { get; set; }
+
+	public bool IsUserMap { get; set; }
+
+	public bool HasObjectsForBillboard { get; set; }
+
+	public bool HasShelter { get; set; }
+
+	public int ShelterType { get; set; }
+
+	public bool HasWollie { get; set; }
+
+	public bool HasVisited { get; set; }
+
+	public GenerationPoints[,] GenerationPoints => _generationPoints;
+
+	public IList<GeneratedObject> GeneratedObjects => _generatedObjects;
+
+	public AddWaveOverlay WaveOverlay { get; set; }
+
+	public bool Billboarding => _billboarding;
+
+	public bool InBounds(Vector3 position)
+	{
+		return Vector3Tools.SqrDistanceOnAxis(transform.position, position, Vector3Tools.xz) < BeamMath.Sqr(250f);
+	}
+
+	public virtual bool InSaveBounds(Vector3 position)
+	{
+		if (InSaveBoundsRadius(position))
+		{
+			return InSaveBoundsHeight(position);
+		}
+		return false;
+	}
+
+	private bool InSaveBoundsRadius(Vector3 position)
+	{
+		return Vector3Tools.SqrDistanceOnAxis(transform.position, position, Vector3Tools.xz) < 24025f;
+	}
+
+	private bool InSaveBoundsHeight(Vector3 position)
+	{
+		if (position.y < 300f)
+		{
+			return position.y > -25f;
+		}
+		return false;
+	}
+
+	private void Awake()
+	{
+		_terrain.detailObjectDistance = 70f;
+		_terrain.heightmapPixelError = 45f;
+		gameObject.SetActive(value: false);
+	}
+
+	public void GenerateGridData()
+	{
+		_generationPoints = ZoneObjectGenerator.GenerateGridData(this, Seed);
+	}
+
+	public virtual void Enter()
+	{
+		Terrain.heightmapPixelError = 45f;
+		if (WaveOverlay != null)
+		{
+			WaveOverlay.enabled = true;
+		}
+	}
+
+	public void Exit()
+	{
+		Terrain.heightmapPixelError = 75f;
+		if (WaveOverlay != null)
+		{
+			WaveOverlay.enabled = false;
+		}
+	}
+
+	public void OnObjectGenerated(GeneratedObject objectData)
+	{
+		_generatedObjects.Add(objectData);
+	}
+
+	public void OnObjectCreated(GameObject instance)
+	{
+	}
+
+	public void OnObjectLoaded(GameObject instance)
+	{
+	}
+
+	public ImpostorBase FindImpostor(GameObject instance)
+	{
+		int parentInstanceId = instance.transform.position.Hash();
+		TryGetImpostor(parentInstanceId, out var impostor);
+		return impostor;
+	}
+
+	public void CreateImpostors()
+	{
+		if (_billboarding)
+		{
+			return;
+		}
+		for (int i = 0; i < _generatedObjects?.Count; i += ((i <= ImpostorManager.MIN_BILLBOARD_DENSITY) ? 1 : ImpostorManager.BILLBOARD_DENSITY_STEP))
+		{
+			GeneratedObject generatedObject = _generatedObjects[i];
+			IImpostorParent impostorParentPrefab = generatedObject.ImpostorParentPrefab;
+			if (!impostorParentPrefab.IsNullOrDestroyed() && impostorParentPrefab.Scope.HasFlag(ImposterScope.Terrain))
+			{
+				ImpostorBase impostorBase = CreateImpostor(impostorParentPrefab.Id, generatedObject.Position, generatedObject.Rotation);
+				if (impostorBase != null)
+				{
+					impostorBase.SetRenderables(impostorParentPrefab.Renderables);
+				}
+			}
+		}
+		_billboarding = true;
+	}
+
+	public void LoadImpostors(JObject zoneObjectData)
+	{
+		if (_billboarding)
+		{
+			return;
+		}
+		for (int i = 0; i < zoneObjectData.Children.Count; i += ((i <= ImpostorManager.MIN_BILLBOARD_DENSITY) ? 1 : ImpostorManager.BILLBOARD_DENSITY_STEP))
+		{
+			JObject jObject = zoneObjectData.Children[i];
+			JObject field = jObject.GetField("prefab");
+			if (field == null)
+			{
+				continue;
+			}
+			SaveablePrefab prefab = Prefabs.GetPrefab(field);
+			IImpostorParent impostorParent = (((object)prefab != null) ? prefab.GetInterface<IImpostorParent>() : null);
+			if (impostorParent.IsNullOrDestroyed() || !impostorParent.Scope.HasFlag(ImposterScope.Terrain))
+			{
+				continue;
+			}
+			ImpostorBase impostorBase = CreateImpostor(impostorParent.Id);
+			if (impostorBase != null)
+			{
+				JObject field2 = jObject.GetField("Transform");
+				Vector3 vector = JSerializer.Deserialize<Vector3>(field2.GetField("localPosition"));
+				Quaternion quaternion = JSerializer.Deserialize<Quaternion>(field2.GetField("localRotation"));
+				Vector3 value = JSerializer.Deserialize<Vector3>(field2.GetField("localScale"));
+				value = value.Truncate();
+				Vector3 vector2 = vector;
+				Quaternion rotation = quaternion;
+				Vector3 localScale = value;
+				JObject field3 = jObject.GetField("Parent");
+				if (field3 != null)
+				{
+					JObject field4 = field3.GetField("Transform");
+					Vector3 vector3 = JSerializer.Deserialize<Vector3>(field4.GetField("localPosition"));
+					Quaternion quaternion2 = JSerializer.Deserialize<Quaternion>(field4.GetField("localRotation"));
+					Vector3 value2 = JSerializer.Deserialize<Vector3>(field4.GetField("localScale"));
+					value2 = value2.Truncate();
+					vector2 = vector3 + quaternion2 * vector;
+					rotation = quaternion2 * quaternion;
+					localScale = new Vector3(value2.x / value.x, value2.y / value.y, value2.z / value.z);
+				}
+				impostorBase.transform.position = transform.position + vector2;
+				impostorBase.transform.rotation = rotation;
+				impostorBase.transform.localScale = localScale;
+				impostorBase.ParentInstanceId = impostorBase.transform.position.Hash();
+				impostorBase.SetRenderables(impostorParent.Renderables);
+			}
+		}
+		_billboarding = true;
+	}
+
+	public ImpostorBase CreateImpostor(int parentPrefabId, Vector3 position, Quaternion rotation)
+	{
+		ImpostorBase impostorBase = ImpostorManager.Create(parentPrefabId);
+		if (impostorBase == null)
+		{
+			Debug.LogError("CreateImposter:: " + parentPrefabId);
+			return null;
+		}
+		if (impostorBase == DummyImpostor.Instance)
+		{
+			return null;
+		}
+		impostorBase.transform.position = position;
+		impostorBase.transform.rotation = rotation;
+		impostorBase.ParentInstanceId = impostorBase.transform.position.Hash();
+		_activeImposters.Add(impostorBase);
+		return impostorBase;
+	}
+
+	private ImpostorBase CreateImpostor(int parentPrefabId)
+	{
+		ImpostorBase impostorBase = ImpostorManager.Create(parentPrefabId);
+		if (impostorBase == null)
+		{
+			Debug.LogError("CreateImposter:: " + parentPrefabId);
+			return null;
+		}
+		if (impostorBase == DummyImpostor.Instance)
+		{
+			return null;
+		}
+		_activeImposters.Add(impostorBase);
+		return impostorBase;
+	}
+
+	private bool TryGetImpostor(int parentInstanceId, out ImpostorBase impostor)
+	{
+		impostor = null;
+		for (int i = 0; i < _activeImposters.Count; i++)
+		{
+			ImpostorBase impostorBase = _activeImposters[i];
+			if (impostorBase.ParentInstanceId == parentInstanceId)
+			{
+				impostor = impostorBase;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void ReleaseImpostors()
+	{
+		for (int i = 0; i < _activeImposters.Count; i++)
+		{
+			ImpostorManager.Release(_activeImposters[i]);
+		}
+		_activeImposters.Clear();
+		_billboarding = false;
+	}
+}
+
+####################################################################################################
+FILE: ZoneObjects.cs
+SIZE_BYTES: 1650
+SHA256: fae00a2ff831260b3196d6585b68354f9018c6834e453a937f234d53a84c2951
+####################################################################################################
+
+using Beam.Editor;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
+public class ZoneObjects : SerializedMonoBehaviour
+{
+	[Space]
+	[Header("GENERATION TYPE")]
+	public ZoneGenerationType generationType;
+
+	public bool spawnOnStartingIsland = true;
+
+	[Space]
+	[Header("OBJECTS")]
+	[SerializeField]
+	private ZoneObject[] _objects;
+
+	[Space]
+	[Header("TOOLS")]
+	public bool occupyPoint;
+
+	public int maxObjectCount;
+
+	[Range(0f, 100f)]
+	public int spawnChance;
+
+	[Name("Density")]
+	[Range(0f, 64f)]
+	public int detailAmountFactor;
+
+	[Space]
+	[Header("SOILMAP / ELEVATION")]
+	[Name("Soilmap Min Strength")]
+	public float minStrength;
+
+	[Name("Soilmap Max Strength")]
+	public float maxStrength = 1f;
+
+	[Space]
+	[Header("HEIGHTS")]
+	[Name("World Min Height")]
+	[Range(-200f, 15f)]
+	public float minHeight;
+
+	[Name("World Max Height")]
+	[Range(-200f, 15f)]
+	public float maxHeight;
+
+	[Space]
+	[Header("SLOPE")]
+	[Range(1f, 90f)]
+	public float maxSteepness;
+
+	[Range(0f, 90f)]
+	public float minSteepness;
+
+	[Space]
+	[Header("PLACEMENT")]
+	[Name("Random Rotation")]
+	public bool randomFullRotation;
+
+	[Name("Random Y Rotation")]
+	public bool randomRotation;
+
+	[Name("Snap to Terrain")]
+	public bool terrainSnap;
+
+	[Range(0f, 1f)]
+	public float TerrainSnapBias = 1f;
+
+	public Vector3 manualPosition;
+
+	public Vector3 offsetPosition;
+
+	public Vector3 minPositionOffset;
+
+	public Vector3 maxPositionOffset;
+
+	public ZoneObject[] Objects => _objects;
+
+	private bool CheckGenerationIsProcedural()
+	{
+		return generationType == ZoneGenerationType.Procedural;
+	}
+
+	private bool CheckGenerationIsManual()
+	{
+		return generationType == ZoneGenerationType.Position;
+	}
+}
+
+####################################################################################################
+FILE: TerrainPointSampler.cs
+SIZE_BYTES: 486
+SHA256: d574094261ccd0b222f2dc93e65baa260e8a51a644858cd348c42d100106b55d
+####################################################################################################
+
+using Beam;
+using UnityEngine;
+
+public class TerrainPointSampler : IPointSampler
+{
+	public void Init(Vector3 worldPosition)
+	{
+	}
+
+	public bool TryGetSample(Vector3 worldPosition, out Sample sample)
+	{
+		sample = Sample.Empty;
+		if (Terrain.activeTerrain != null)
+		{
+			sample = default;
+			sample.Point = Singleton<StrandedWorld>.Instance.GetPoint(worldPosition);
+			sample.Normal = Singleton<StrandedWorld>.Instance.GetNormal(worldPosition);
+			return true;
+		}
+		return false;
+	}
+}
+
+####################################################################################################
+FILE: ZoneTerrainPointSampler.cs
+SIZE_BYTES: 800
+SHA256: 53ee2e8d81ff88081acd9b267d52d23944fa7f82b1920b9322e90ba09f89deee
+####################################################################################################
+
+using UnityEngine;
+
+public class ZoneTerrainPointSampler : IPointSampler
+{
+	private Zone _zone;
+
+	public void Init(Vector3 worldPosition)
+	{
+		_zone = StrandedWorld.GetZone(worldPosition);
+	}
+
+	public bool TryGetSample(Vector3 worldPosition, out Sample sample)
+	{
+		sample = Sample.Empty;
+		if (_zone == null)
+		{
+			return false;
+		}
+		Terrain terrain = _zone.Terrain;
+		if (terrain == null)
+		{
+			return false;
+		}
+		sample = default;
+		sample.Point = worldPosition;
+		sample.Point.y = terrain.SampleHeight(worldPosition) + -100f;
+		Vector3 vector = worldPosition - terrain.transform.position;
+		sample.Normal = terrain.terrainData.GetInterpolatedNormal(Mathf.InverseLerp(0f, terrain.terrainData.size.x, vector.x), Mathf.InverseLerp(0f, terrain.terrainData.size.z, vector.z));
+		return true;
+	}
+}
+
+####################################################################################################
+FILE: FollowSpawn.cs
+SIZE_BYTES: 12589
+SHA256: 14165e60d0f796b2050626d36161c3c7e75e22fa887449a1fea9296e61589d3d
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Events;
+using MEC;
+using SharpNeatLib.Maths;
+using UnityEngine;
+
+public class FollowSpawn : CellObjectSpawner, IHashCollection
+{
+	private class SpawnGrid
+	{
+		public Transform Transform;
+
+		public Transform Objects;
+
+		public bool CanGenerate = true;
+
+		public SpawnGrid(Transform transform)
+		{
+			Transform = transform;
+		}
+	}
+
+	[Serializable]
+	public class BiomeGrid
+	{
+		public string name;
+
+		public bool allBiomes;
+
+		public Zone.BiomeType _biome;
+
+		public GridObject[] biomeParameters;
+	}
+
+	[Serializable]
+	public class GridObject
+	{
+		public GameObject[] objectsToSpawn;
+
+		public LayerMask rayCastMasks;
+
+		public bool cycleGrid;
+
+		public int gridCheckDensity = 1;
+
+		public int maxObjects = 1;
+
+		public int rarity;
+
+		public float align = 0.5f;
+
+		public float minslope;
+
+		public float maxslope = 90f;
+
+		public float minHeight;
+
+		public float maxHeight = 50f;
+
+		public bool randomYRotation;
+
+		public bool grass;
+	}
+
+	public static int GRID_DIMENSION = 20;
+
+	private const int GRID_SIZE = 3;
+
+	private const int MAX_SAMPLES_PER_FRAME = 400;
+
+	private SpawnGrid[][,] _spawnGridsBuffers;
+
+	[SerializeField]
+	private BiomeGrid[] GridObjects2;
+
+	private IPointSampler _sampler;
+
+	private FastRandom _random = new FastRandom();
+
+	private CoroutineHandle _masterUpdateCoroutine;
+
+	private CoroutineHandle _gridUpdateCoroutine;
+
+	private int _samplesCounter;
+
+	private bool _grass = true;
+
+	private SpawnGrid[,] _spawnGrids
+	{
+		get
+		{
+			return _spawnGridsBuffers[0];
+		}
+		set
+		{
+			_spawnGridsBuffers[0] = value;
+		}
+	}
+
+	public bool IsGenerating
+	{
+		get
+		{
+			if (_masterUpdateCoroutine.IsValid)
+			{
+				return _masterUpdateCoroutine.IsRunning;
+			}
+			return false;
+		}
+	}
+
+	private void Awake()
+	{
+		_sampler = new ZoneTerrainPointSampler();
+		EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		LoadOptions();
+	}
+
+	public override void Initialize(Transform follow)
+	{
+		base.Initialize(follow);
+		CreateGrid();
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		HashCollectionCache.Remove(this);
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		Timing.KillCoroutines(_gridUpdateCoroutine);
+		Timing.KillCoroutines(_masterUpdateCoroutine);
+	}
+
+	private void EventManager_OptionsApplied(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	private void LoadOptions()
+	{
+		_grass = Options.GraphicsSettings.Grass == Quality_Grass.ON;
+	}
+
+	private void CreateGrid()
+	{
+		_spawnGridsBuffers = new SpawnGrid[2][,];
+		_spawnGridsBuffers[0] = new SpawnGrid[3, 3];
+		_spawnGridsBuffers[1] = new SpawnGrid[3, 3];
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Transform transform = new GameObject("Spawn_Grid_" + i + "_" + j).transform;
+				transform.gameObject.layer = gameObject.layer;
+				transform.transform.parent = base.transform;
+				_spawnGrids[i, j] = new SpawnGrid(transform);
+				new GameObject(transform.name + "_Combined").transform.parent = transform.transform;
+				Transform transform2 = new GameObject(transform.name + "_Objects").transform;
+				transform2.parent = transform.transform;
+				_spawnGrids[i, j].Objects = transform2;
+				_spawnGrids[i, j].CanGenerate = true;
+			}
+		}
+		Vector3 position = new Vector3(Mathf.RoundToInt(Following.position.x / (float)GRID_DIMENSION) * GRID_DIMENSION, 0f, Mathf.RoundToInt(Following.position.z / (float)GRID_DIMENSION) * GRID_DIMENSION);
+		_spawnGrids[1, 1].Transform.position = position;
+		UpdateGridPositions();
+		UpdateGridObjects();
+		InvokeRepeating("CheckFollowingPosition", 1f, 0.5f);
+		HashCollectionCache.Add(this);
+	}
+
+	private void CheckFollowingPosition()
+	{
+		if (IsGenerating || Following == null || LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		SpawnGrid spawnGrid = null;
+		int num = 0;
+		int num2 = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Vector3 position = _spawnGrids[i, j].Transform.position;
+				if (Following.position.x >= position.x - (float)(GRID_DIMENSION / 2) && Following.position.x <= position.x + (float)(GRID_DIMENSION / 2) && Following.position.z >= position.z - (float)(GRID_DIMENSION / 2) && Following.position.z <= position.z + (float)(GRID_DIMENSION / 2))
+				{
+					spawnGrid = _spawnGrids[i, j];
+					num = 1 - i;
+					num2 = 1 - j;
+					break;
+				}
+			}
+		}
+		if (spawnGrid != _spawnGrids[1, 1])
+		{
+			if (spawnGrid == null)
+			{
+				Vector3 position2 = new Vector3(Mathf.Round(Following.position.x / (float)GRID_DIMENSION) * (float)GRID_DIMENSION, 0f, Mathf.Round(Following.position.z / (float)GRID_DIMENSION) * (float)GRID_DIMENSION);
+				_spawnGrids[1, 1].Transform.position = position2;
+				num = 3;
+				num2 = 3;
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					int num3 = k + num;
+					int num4 = l + num2;
+					if (num3 < 0 || num3 > 2 || num4 < 0 || num4 > 2)
+					{
+						int childCount = _spawnGrids[k, l].Objects.childCount;
+						for (int m = 0; m < childCount; m++)
+						{
+							ObjectPoolManager.DestroyPooled(_spawnGrids[k, l].Objects.GetChild(0).gameObject);
+						}
+						_spawnGrids[k, l].CanGenerate = true;
+					}
+					num3 = (3 + num3) % 3;
+					num4 = (3 + num4) % 3;
+					_spawnGridsBuffers[1][num3, num4] = _spawnGrids[k, l];
+				}
+			}
+			SpawnGrid[,] array = _spawnGridsBuffers[0];
+			_spawnGridsBuffers[0] = _spawnGridsBuffers[1];
+			_spawnGridsBuffers[1] = array;
+			UpdateGridPositions();
+		}
+		UpdateGridObjects();
+	}
+
+	private void UpdateGridPositions()
+	{
+		_spawnGrids[0, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[0, 1].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z);
+		_spawnGrids[0, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+		_spawnGrids[1, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[1, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+		_spawnGrids[2, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[2, 1].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z);
+		_spawnGrids[2, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+	}
+
+	private void UpdateGridObjects()
+	{
+		_masterUpdateCoroutine = Timing.RunCoroutine(UpdateGridObjects_Sequence(distributed: true));
+	}
+
+	private IEnumerator<float> UpdateGridObjects_Sequence(bool distributed)
+	{
+		_samplesCounter = 0;
+		for (int x = 0; x < 3; x++)
+		{
+			for (int y = 0; y < 3; y++)
+			{
+				SpawnGrid spawnGrid = _spawnGrids[x, y];
+				if (spawnGrid.CanGenerate && !HashCollectionCache.HasHash(this, spawnGrid.Transform.position.Hash()))
+				{
+					_gridUpdateCoroutine = Timing.RunCoroutine(CreateGridObjects_Sequence(spawnGrid, 400));
+					yield return Timing.WaitUntilDone(_gridUpdateCoroutine);
+				}
+			}
+		}
+	}
+
+	private IEnumerator<float> CreateGridObjects_Sequence(SpawnGrid grid, int samplesPerStep)
+	{
+		if (Following == null)
+		{
+			yield break;
+		}
+		grid.CanGenerate = false;
+		_random.Reinitialise((int)(grid.Transform.position.x + grid.Transform.position.z));
+		Zone.BiomeType currentBiome = StrandedWorld.GetBiome(Following.position);
+		if (currentBiome == Zone.BiomeType.DEEP_SEA)
+		{
+			yield break;
+		}
+		_sampler.Init(grid.Transform.position);
+		BiomeGrid[] gridObjects = GridObjects2;
+		foreach (BiomeGrid biomeGrid in gridObjects)
+		{
+			GridObject[] biomeParameters = biomeGrid.biomeParameters;
+			foreach (GridObject gridObject in biomeParameters)
+			{
+				if ((!_grass && gridObject.grass) || (currentBiome == Zone.BiomeType.MISSION && biomeGrid._biome != Zone.BiomeType.MISSION))
+				{
+					continue;
+				}
+				if (gridObject.cycleGrid)
+				{
+					int curObjectCount = 0;
+					for (int x = 0; x < GRID_DIMENSION; x += gridObject.gridCheckDensity)
+					{
+						for (int y = 0; y < GRID_DIMENSION; y += gridObject.gridCheckDensity)
+						{
+							if (curObjectCount >= gridObject.maxObjects)
+							{
+								continue;
+							}
+							Vector3 pos = grid.Transform.position + new Vector3(x - GRID_DIMENSION / 2, 50f, y - GRID_DIMENSION / 2);
+							int randRot = _random.Next(360);
+							if (_random.Next(100) > gridObject.rarity)
+							{
+								continue;
+							}
+							_samplesCounter++;
+							if (_samplesCounter % samplesPerStep == 0)
+							{
+								yield return 0f;
+							}
+							if (!_sampler.TryGetSample(pos, out var sample))
+							{
+								continue;
+							}
+							float num = Mathf.Acos(Vector3.Dot(sample.Normal, Vector3.up)) * 57.29578f;
+							Vector3 point = sample.Point;
+							if (num >= gridObject.minslope && num <= gridObject.maxslope && point.y >= gridObject.minHeight && point.y <= gridObject.maxHeight)
+							{
+								point = transform.worldToLocalMatrix.MultiplyPoint3x4(point);
+								Vector3 b = transform.worldToLocalMatrix.MultiplyVector(sample.Normal);
+								Vector3 normalized = Vector3.Lerp(Vector3.up, b, gridObject.align).normalized;
+								Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normalized);
+								GameObject gameObject = ObjectPoolManager.CreatePooled(gridObject.objectsToSpawn[_random.Next(gridObject.objectsToSpawn.Length)], point, rotation);
+								if (gridObject.randomYRotation)
+								{
+									gameObject.transform.Rotate(Vector3.up * randRot);
+								}
+								gameObject.transform.parent = grid.Objects;
+								curObjectCount++;
+							}
+						}
+					}
+					continue;
+				}
+				for (int curObjectCount = 0; curObjectCount < gridObject.maxObjects; curObjectCount++)
+				{
+					Vector3 pos = grid.Transform.position + new Vector3(_random.Next(-GRID_DIMENSION / 2, GRID_DIMENSION / 2), 50f, _random.Next(-GRID_DIMENSION / 2, GRID_DIMENSION / 2));
+					int x = _random.Next(360);
+					if (_random.Next(100) > gridObject.rarity)
+					{
+						continue;
+					}
+					_samplesCounter++;
+					if (_samplesCounter % samplesPerStep == 0)
+					{
+						yield return 0f;
+					}
+					if (!_sampler.TryGetSample(pos, out var sample2))
+					{
+						continue;
+					}
+					float num2 = Mathf.Acos(Vector3.Dot(sample2.Normal, Vector3.up)) * 57.29578f;
+					Vector3 point2 = sample2.Point;
+					if (num2 >= gridObject.minslope && num2 <= gridObject.maxslope && point2.y >= gridObject.minHeight && point2.y <= gridObject.maxHeight)
+					{
+						point2 = transform.worldToLocalMatrix.MultiplyPoint3x4(point2);
+						Vector3 b2 = transform.worldToLocalMatrix.MultiplyVector(sample2.Normal);
+						Vector3 normalized2 = Vector3.Lerp(Vector3.up, b2, gridObject.align).normalized;
+						Quaternion rotation2 = Quaternion.FromToRotation(Vector3.up, normalized2);
+						GameObject gameObject2 = ObjectPoolManager.CreatePooled(gridObject.objectsToSpawn[_random.Next(gridObject.objectsToSpawn.Length)], point2, rotation2);
+						if (gridObject.randomYRotation)
+						{
+							gameObject2.transform.Rotate(Vector3.up * x);
+						}
+						gameObject2.transform.parent = grid.Objects;
+					}
+				}
+			}
+		}
+	}
+
+	public void ClearPatch(Vector3 position, float radius)
+	{
+		SpawnGrid[,] spawnGrids = _spawnGrids;
+		int upperBound = spawnGrids.GetUpperBound(0);
+		int upperBound2 = spawnGrids.GetUpperBound(1);
+		for (int i = spawnGrids.GetLowerBound(0); i <= upperBound; i++)
+		{
+			for (int j = spawnGrids.GetLowerBound(1); j <= upperBound2; j++)
+			{
+				foreach (Transform item in spawnGrids[i, j].Transform)
+				{
+					if (Vector3.Distance(item.position, position) <= radius)
+					{
+						ObjectPoolManager.DestroyPooled(item.gameObject);
+					}
+				}
+			}
+		}
+	}
+
+	bool IHashCollection.HasHash(int hash)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				if (_spawnGrids[i, j].Transform.position.Hash() == hash)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}

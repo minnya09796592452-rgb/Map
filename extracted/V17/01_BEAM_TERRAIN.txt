@@ -1,0 +1,2336 @@
+CASTAWAY-DEPTHS V17 SOURCE BATCH
+GROUP: 01_BEAM_TERRAIN
+NOTE: ILSpy-decompiled C#; reconstructed output, not original authored source.
+====================================================================================================
+
+
+####################################################################################################
+FILE: Beam.Terrain/GeneratedObject.cs
+SIZE_BYTES: 231
+SHA256: eec912b96dbd098b3e68278f5d03cbf8ce585375979d9cc47666295107c82992
+####################################################################################################
+
+using Beam.Rendering;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class GeneratedObject
+{
+	public GameObject Prefab;
+
+	public Vector3 Position;
+
+	public Quaternion Rotation;
+
+	public IImpostorParent ImpostorParentPrefab;
+}
+
+####################################################################################################
+FILE: Beam.Terrain/GenerationPoints.cs
+SIZE_BYTES: 422
+SHA256: f5b6d7ab94e5d5a59df6c252c36457054b4d29928631e216a319353191faae3f
+####################################################################################################
+
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class GenerationPoints
+{
+	public Vector3 Position;
+
+	public Quaternion Rotation;
+
+	public bool Occupied;
+
+	public float steepNess;
+
+	public float Soilmap;
+
+	public GenerationPoints(Vector3 pos, Quaternion rot, bool occupied, float steepness, float soilmap)
+	{
+		Position = pos;
+		Rotation = rot;
+		Occupied = occupied;
+		steepNess = steepness;
+		Soilmap = soilmap;
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/LoadingResult.cs
+SIZE_BYTES: 105
+SHA256: 594b921c28f3807c31437a70d0699907095aaaf283fb9f72db9e4adae0a3bfe3
+####################################################################################################
+
+namespace Beam.Terrain;
+
+public class LoadingResult
+{
+	public bool Succeeded;
+
+	public string Message;
+}
+
+####################################################################################################
+FILE: Beam.Terrain/Map.cs
+SIZE_BYTES: 762
+SHA256: 9911e28016cb4878c66393c4ab7ddef05a7c56e7caca158d6e4ad9f8be8e296d
+####################################################################################################
+
+using System;
+using Beam.Serialization.Json;
+
+namespace Beam.Terrain;
+
+[Serializable]
+public class Map
+{
+	public MapEditorData EditorData;
+
+	public JObject ObjectData;
+
+	public float[,] HeightmapData;
+
+	public Map()
+	{
+		EditorData = new MapEditorData();
+	}
+
+	public bool IsProceduralMap()
+	{
+		if (EditorData == null)
+		{
+			return false;
+		}
+		return EditorData.Id.Contains("INTERNAL_PROCEDURAL");
+	}
+
+	public bool IsCustomMap()
+	{
+		if (EditorData == null)
+		{
+			return false;
+		}
+		return !IsProceduralMap();
+	}
+
+	private bool IsInternalMap()
+	{
+		if (EditorData == null)
+		{
+			return false;
+		}
+		return EditorData.Id.Contains("INTERNAL");
+	}
+
+	public bool IsUserMap()
+	{
+		if (EditorData == null)
+		{
+			return false;
+		}
+		return !IsInternalMap();
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/MapEditorData.cs
+SIZE_BYTES: 1091
+SHA256: 199e6d47475d6ccba170f808adb225139adda62242e3e1f924177a27f57aad59
+####################################################################################################
+
+using System;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+[Serializable]
+public class MapEditorData
+{
+	public enum EMapSource
+	{
+		[Description("MAP_SOURCE_LOCAL", "")]
+		Local,
+		[Description("MAP_SOURCE_COMMUNITY", "")]
+		Community
+	}
+
+	public enum EMapState
+	{
+		[Description("MAP_STATUS_CURRENT", "")]
+		Current,
+		[Description("MAP_STATUS_OLDER", "")]
+		Older,
+		[Description("MAP_STATUS_UNAVAILABLE", "")]
+		Unavailable
+	}
+
+	[NonSerialized]
+	public bool Valid = true;
+
+	public string Id = Guid.NewGuid().ToString();
+
+	public int VersionNumber;
+
+	public string GameVersionNumber = BuildInformation.BuildVersion.ToPaddedString();
+
+	public EMapSource Source;
+
+	public EMapState State;
+
+	public Zone.BiomeType Biome = Zone.BiomeType.ISLAND;
+
+	public string Name = "";
+
+	public string Author = "";
+
+	public string Description = "";
+
+	public string DateCreated = "--";
+
+	public string DateEdited = "--";
+
+	public string DateAdded = "--";
+
+	public byte[] LargePreviewImageBytes;
+
+	[NonSerialized]
+	public Texture2D LargePreviewImage;
+
+	[NonSerialized]
+	public Texture2D SmallPreviewImage;
+}
+
+####################################################################################################
+FILE: Beam.Terrain/Maps.cs
+SIZE_BYTES: 11373
+SHA256: 2ad14f56cbf00c2c874b0f02603fae51dd6c4e221e6ed7a598660b9c0662a941
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public static class Maps
+{
+	public const string MAP_EXTENSION = ".map";
+
+	public const string MAP_PREFIX = "MAP_";
+
+	public const string MAP_EDITOR_SUFFIX = "_EDITOR";
+
+	public const string MAP_OBJECT_SUFFIX = "_OBJECT";
+
+	public const string MAP_HEIGHT_SUFFIX = "_HEIGHT";
+
+	public const string MAP_INTERNAL_ID = "INTERNAL";
+
+	public const string MAP_PROCEDURAL_ID = "INTERNAL_PROCEDURAL";
+
+	public const string MAP_MISSION_ID = "INTERNAL_MISSION";
+
+	private static List<Map> _defaultMapList;
+
+	private static List<Map> _remoteMaps;
+
+	private static List<Map> _userMapList;
+
+	public static IList<Map> DefaultMapList => _defaultMapList;
+
+	public static IEnumerable<Map> RemoteMaps => _remoteMaps;
+
+	public static IEnumerable<Map> UserMapList => _userMapList;
+
+	public static IEnumerable<Map> AllMapList => _defaultMapList.Concat(_userMapList).Concat(_remoteMaps);
+
+	static Maps()
+	{
+		_defaultMapList = new List<Map>();
+		_remoteMaps = new List<Map>();
+		_userMapList = new List<Map>();
+		Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
+	}
+
+	private static LoadingResult CreateMapFolders()
+	{
+		try
+		{
+			if (!Directory.Exists(FilePath.LOCAL_MAPS_FOLDER))
+			{
+				Directory.CreateDirectory(FilePath.LOCAL_MAPS_FOLDER);
+			}
+		}
+		catch (Exception ex)
+		{
+			return new LoadingResult
+			{
+				Message = "MAP_MSG_MAP_DIR_NOT_FOUND " + ex.Message,
+				Succeeded = false
+			};
+		}
+		return new LoadingResult
+		{
+			Succeeded = true
+		};
+	}
+
+	public static bool ValidateMapFolder(string mapPath, string mapName)
+	{
+		if (File.Exists(PathTools.Combine(mapPath, mapName + "_EDITOR.map")) && File.Exists(PathTools.Combine(mapPath, mapName + "_OBJECT.map")))
+		{
+			return File.Exists(PathTools.Combine(mapPath, mapName + "_HEIGHT.map"));
+		}
+		return false;
+	}
+
+	public static string GetMapFolderName(Map map)
+	{
+		return "MAP_" + MapTools.FormatNameForSave(map.EditorData.Id);
+	}
+
+	public static void SaveMap(Map map, string directoryPath)
+	{
+		string mapFolderName = GetMapFolderName(map);
+		string text = PathTools.Combine(directoryPath, mapFolderName);
+		if (!Directory.Exists(text))
+		{
+			Directory.CreateDirectory(text);
+		}
+		using FileStream streamEditor = new FileStream(PathTools.Combine(text, mapFolderName + "_EDITOR.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+		using FileStream streamObject = new FileStream(PathTools.Combine(text, mapFolderName + "_OBJECT.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+		using FileStream streamHeight = new FileStream(PathTools.Combine(text, mapFolderName + "_HEIGHT.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+		map.Save(streamEditor, streamObject, streamHeight);
+	}
+
+	public static void Save(this Map map, Stream streamEditor, Stream streamObject, Stream streamHeight)
+	{
+		if (!MPExtensions.IsCompressStableValuesInitialized())
+		{
+			MPExtensions.InitializeCompressStableValues();
+		}
+		try
+		{
+			new BinaryFormatter().Serialize(streamEditor, map.EditorData);
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Map::SaveMap:: Error saving map editor data: " + ex.Message);
+			throw;
+		}
+		try
+		{
+			using StreamWriter streamWriter = new StreamWriter(streamObject);
+			streamWriter.Write(map.ObjectData.ToString());
+		}
+		catch (Exception ex2)
+		{
+			Debug.LogError("Map::SaveMap:: Error saving map object data: " + ex2.Message);
+			throw;
+		}
+		try
+		{
+			using BinaryWriter binaryWriter = new BinaryWriter(streamHeight);
+			for (int i = 0; i < 257; i++)
+			{
+				for (int j = 0; j < 257; j++)
+				{
+					binaryWriter.Write(map.HeightmapData[i, j].Compress());
+				}
+			}
+		}
+		catch (Exception ex3)
+		{
+			Debug.LogError("Map::SaveMap:: Error saving map heightmap data: " + ex3.Message);
+			throw;
+		}
+	}
+
+	public static Map LoadMap(string mapPath, string mapName, bool checkVersion = false)
+	{
+		using FileStream editorStream = new FileStream(PathTools.Combine(mapPath, mapName + "_EDITOR.map"), FileMode.Open, FileAccess.Read);
+		using FileStream objectStream = new FileStream(PathTools.Combine(mapPath, mapName + "_OBJECT.map"), FileMode.Open, FileAccess.Read);
+		using FileStream heightStream = new FileStream(PathTools.Combine(mapPath, mapName + "_HEIGHT.map"), FileMode.Open, FileAccess.Read);
+		Map map = new Map();
+		map.Load(editorStream, objectStream, heightStream, checkVersion);
+		return map;
+	}
+
+	public static void CreateTextures(this Map map)
+	{
+		if (!(map?.EditorData?.LargePreviewImage != null))
+		{
+			Texture2D texture2D = new Texture2D(1, 1);
+			texture2D.LoadImage(map.EditorData.LargePreviewImageBytes);
+			texture2D.wrapMode = TextureWrapMode.Clamp;
+			map.EditorData.LargePreviewImage = texture2D;
+			map.EditorData.Valid = true;
+			if (map.EditorData.Biome == Zone.BiomeType.CARRIER)
+			{
+				map.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Carrier") as Texture2D;
+			}
+			else if (map.EditorData.Biome == Zone.BiomeType.MISSION)
+			{
+				map.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Mission") as Texture2D;
+			}
+			else
+			{
+				map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+			}
+		}
+	}
+
+	public static void Load(this Map map, Stream editorStream, Stream objectStream, Stream heightStream, bool checkVersion, bool createTextures = true)
+	{
+		if (!MPExtensions.IsCompressStableValuesInitialized())
+		{
+			MPExtensions.InitializeCompressStableValues();
+		}
+		try
+		{
+			MapEditorData editorData = (MapEditorData)new BinaryFormatter().Deserialize(editorStream);
+			map.EditorData = editorData;
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Map::LoadMap:: Error loading map editor data:\n\n" + ex.Message + "\n" + ex.StackTrace);
+			throw;
+		}
+		if (checkVersion)
+		{
+			try
+			{
+				if (!SaveManager.ValidateVersionNumber(new Version(map.EditorData.GameVersionNumber)))
+				{
+					throw new VersionException("Map [" + map.EditorData.Name + "] is out of date and no longer supported.");
+				}
+			}
+			catch (ArgumentNullException)
+			{
+				throw new VersionException("Map [" + map.EditorData.Name + "] is out of date and no longer supported.");
+			}
+		}
+		try
+		{
+			using StreamReader streamReader = new StreamReader(objectStream);
+			try
+			{
+				JObject jObject = new JObject(streamReader.ReadToEnd());
+				PatchObjectsReferenceId(jObject);
+				map.ObjectData = jObject;
+			}
+			catch (JSerializerException ex3)
+			{
+				Debug.LogError(ex3.Message);
+				throw;
+			}
+		}
+		catch (Exception ex4)
+		{
+			Debug.LogError("Map::LoadMap:: Error loading map [" + map.EditorData.Name + "] object data:\n\n" + ex4.Message + "\n" + ex4.StackTrace);
+			throw;
+		}
+		try
+		{
+			using BinaryReader binaryReader = new BinaryReader(heightStream);
+			binaryReader.BaseStream.Seek(0L, SeekOrigin.Begin);
+			float[,] array = new float[257, 257];
+			for (int i = 0; i < 257; i++)
+			{
+				for (int j = 0; j < 257; j++)
+				{
+					ushort value = binaryReader.ReadUInt16().ToCompressStable();
+					array[i, j] = value.Decompress();
+				}
+			}
+			map.HeightmapData = array;
+		}
+		catch (Exception ex5)
+		{
+			Debug.LogError("Map::LoadMap:: Error loading map heightmap data:\n\n" + ex5.Message + "\n" + ex5.StackTrace);
+			throw;
+		}
+		if (createTextures)
+		{
+			map.CreateTextures();
+		}
+	}
+
+	private static void PatchObjectsReferenceId(JObject objects)
+	{
+		if (objects == null || objects.Children == null)
+		{
+			return;
+		}
+		foreach (JObject child in objects.Children)
+		{
+			if (child != null)
+			{
+				uint prefabId = Prefabs.GetPrefabId(child);
+				if (prefabId != 0 && Prefabs.GetReferenceId(child, safe: false).IsDefault())
+				{
+					Prefabs.SetReferenceId(child, MiniGuid.NewFrom(Prefabs.GetPosition(child), prefabId, 48879));
+				}
+			}
+		}
+	}
+
+	public static IEnumerable<Map> LoadDefaultMaps(out LoadingResult result)
+	{
+		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.DEFAULT_MAPS_FOLDER), out result);
+		if (list != null && list.Count > 0)
+		{
+			_defaultMapList.Clear();
+			_defaultMapList.AddRange(list);
+		}
+		return _defaultMapList;
+	}
+
+	public static IEnumerable<Map> LoadLocalMaps(out LoadingResult result)
+	{
+		_userMapList.Clear();
+		result = CreateMapFolders();
+		if (!result.Succeeded)
+		{
+			return _userMapList;
+		}
+		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.LOCAL_MAPS_FOLDER), out result);
+		if (list != null && list.Count > 0)
+		{
+			_userMapList.AddRange(list);
+		}
+		return _userMapList;
+	}
+
+	public static IEnumerable<Map> LoadRemoteMaps(IEnumerable<string> paths, out LoadingResult result)
+	{
+		IList<Map> list = LoadMaps(paths, out result);
+		if (list != null && list.Count > 0)
+		{
+			_remoteMaps.Clear();
+			foreach (Map item in list)
+			{
+				item.EditorData.Source = MapEditorData.EMapSource.Community;
+				_remoteMaps.Add(item);
+			}
+		}
+		return _remoteMaps;
+	}
+
+	private static IList<Map> LoadMaps(IEnumerable<string> paths, out LoadingResult result)
+	{
+		result = new LoadingResult
+		{
+			Succeeded = true
+		};
+		if (paths == null)
+		{
+			Debug.LogError("Map paths were null.");
+			return null;
+		}
+		if (paths.Count() == 0)
+		{
+			Debug.LogWarning("Map paths were empty.");
+			return null;
+		}
+		List<Map> list = new List<Map>();
+		try
+		{
+			foreach (string path in paths)
+			{
+				string fileName = Path.GetFileName(path);
+				if (ValidateMapFolder(path, fileName))
+				{
+					try
+					{
+						Map item = LoadMap(path, fileName, checkVersion: true);
+						list.Add(item);
+					}
+					catch (Exception ex)
+					{
+						LoadingResult loadingResult = result;
+						loadingResult.Message = loadingResult.Message + "MAP_MSG_ERROR_LOADING_MAP " + path + "\n\n" + ex.Message;
+						result.Succeeded = false;
+						Debug.LogError("Map::LoadMaps:: " + ex.Message);
+					}
+				}
+				else
+				{
+					LoadingResult obj = result;
+					obj.Message = obj.Message + "MAP_MSG_ERROR_LOADING_MAP_FILES_NOT_FOUND " + path + "\n ";
+					result.Succeeded = false;
+					Debug.LogError("Error loading map. Not all files were found: " + path);
+				}
+			}
+		}
+		catch (Exception ex2)
+		{
+			result.Message = "MAP_MSG_ERROR_LOADING_MAPS " + ex2.Message;
+			result.Succeeded = false;
+			Debug.LogError("Map::LoadMaps:: " + ex2.Message);
+		}
+		return list;
+	}
+
+	public static void DeleteUserMap(Map map)
+	{
+		if (map != null)
+		{
+			_userMapList.Remove(map);
+			DeleteMap(map);
+		}
+	}
+
+	public static void DeleteMap(Map map)
+	{
+		if (map != null)
+		{
+			string text = PathTools.Combine(FilePath.LOCAL_MAPS_FOLDER, GetMapFolderName(map));
+			DeleteMapFolder(new string[1] { text });
+		}
+	}
+
+	public static void DeleteMapFolder(string[] folder)
+	{
+		try
+		{
+			for (int i = 0; i < folder.Length; i++)
+			{
+				Directory.Delete(folder[i], recursive: true);
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Map::DeleteMapFolder:: Error deleting map folder: " + ex.Message);
+		}
+	}
+
+	private static void DeleteFilesInFolder(string folder)
+	{
+		try
+		{
+			string[] files = Directory.GetFiles(folder);
+			for (int i = 0; i < files.Length; i++)
+			{
+				File.Delete(files[i]);
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Map::DeleteFilesInFolder:: Error deleting files in folder: " + ex.Message);
+		}
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/World.cs
+SIZE_BYTES: 19040
+SHA256: 58d5ce4ac8b9694d3267464e4471c28fa28032cac9e60d65184506c1e7933d5b
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Runtime.Serialization.Formatters.Binary;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using SharpNeatLib.Maths;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public static class World
+{
+	public struct Bundle
+	{
+		public Map[] Maps;
+
+		public Vector2[] GenerationZonePositons;
+
+		public Vector2[] GeneratedZonePoints;
+
+		public Bundle Clear()
+		{
+			Maps = new Map[49];
+			GenerationZonePositons = (GeneratedZonePoints = null);
+			return this;
+		}
+
+		public static Bundle New()
+		{
+			return default(Bundle).Clear();
+		}
+
+		public void Save(Stream stream, byte[] header = null)
+		{
+			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Compress, leaveOpen: true);
+			if (header != null && header.Length != 0)
+			{
+				gZipStream.Write(header, 0, header.Length);
+			}
+			using BinaryWriter binaryWriter = new BinaryWriter(gZipStream);
+			for (int i = 0; i < 49; i++)
+			{
+				Map map = Maps[i];
+				using MemoryStream memoryStream = new MemoryStream();
+				using MemoryStream memoryStream2 = new MemoryStream();
+				using MemoryStream memoryStream3 = new MemoryStream();
+				map.Save(memoryStream, memoryStream2, memoryStream3);
+				byte[] array = memoryStream.ToArray();
+				byte[] array2 = memoryStream2.ToArray();
+				byte[] array3 = memoryStream3.ToArray();
+				binaryWriter.Write(array.Length);
+				binaryWriter.Write(array2.Length);
+				binaryWriter.Write(array3.Length);
+				binaryWriter.Write(array);
+				binaryWriter.Write(array2);
+				binaryWriter.Write(array3);
+			}
+			for (int j = 0; j < 49; j++)
+			{
+				binaryWriter.Write(GenerationZonePositons[j]);
+			}
+			binaryWriter.Write((ushort)GeneratedZonePoints.Length);
+			for (int k = 0; k < GeneratedZonePoints.Length; k++)
+			{
+				binaryWriter.Write(GeneratedZonePoints[k]);
+			}
+		}
+
+		public void Load(Stream stream, bool createTextures, byte[] header = null)
+		{
+			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+			if (header != null && header.Length != 0)
+			{
+				gZipStream.Read(header, 0, header.Length);
+			}
+			using BinaryReader binaryReader = new BinaryReader(gZipStream);
+			Maps = new Map[49];
+			for (int i = 0; i < 49; i++)
+			{
+				Map map = new Map();
+				int num = binaryReader.ReadInt32();
+				int num2 = binaryReader.ReadInt32();
+				int num3 = binaryReader.ReadInt32();
+				byte[] buffer = new byte[num];
+				byte[] buffer2 = new byte[num2];
+				byte[] buffer3 = new byte[num3];
+				binaryReader.Read(buffer, 0, num);
+				binaryReader.Read(buffer2, 0, num2);
+				binaryReader.Read(buffer3, 0, num3);
+				using (MemoryStream editorStream = new MemoryStream(buffer, 0, num))
+				{
+					using MemoryStream objectStream = new MemoryStream(buffer2, 0, num2);
+					using MemoryStream heightStream = new MemoryStream(buffer3, 0, num3);
+					map.Load(editorStream, objectStream, heightStream, checkVersion: false, createTextures);
+				}
+				Maps[i] = map;
+			}
+			GenerationZonePositons = new Vector2[49];
+			for (int j = 0; j < 49; j++)
+			{
+				GenerationZonePositons[j] = binaryReader.ReadVector2();
+			}
+			ushort num4 = binaryReader.ReadUInt16();
+			GeneratedZonePoints = new Vector2[num4];
+			for (int k = 0; k < num4; k++)
+			{
+				GeneratedZonePoints[k] = binaryReader.ReadVector2();
+			}
+		}
+
+		public override string ToString()
+		{
+			string text = base.ToString();
+			if (Maps.IsValid() && Maps.Length != 0)
+			{
+				int num = 0;
+				Map[] maps = Maps;
+				foreach (Map map in maps)
+				{
+					num += map.HeightmapData.GetLength(0) * map.HeightmapData.GetLength(1);
+				}
+				num /= Maps.Length;
+				int num2 = (int)Mathf.Sqrt(num);
+				text += $"\nMaps[{Maps.Length}] {num2}x{num2}";
+			}
+			if (GenerationZonePositons.IsValid())
+			{
+				text += $"\nGenerationZonePositons[{GenerationZonePositons.Length}]";
+			}
+			if (GeneratedZonePoints.IsValid())
+			{
+				text += $"\nGeneratedZonePoints[{GeneratedZonePoints.Length}]";
+			}
+			return text;
+		}
+	}
+
+	public delegate void WorldSavedCallback(LoadingResult result);
+
+	public const string WORLD_SEED_FILENAME = "Seed.sdd";
+
+	private const int NUM_MISSIONS = 4;
+
+	private static Bundle[] _worlds = new Bundle[2]
+	{
+		Bundle.New(),
+		Bundle.New()
+	};
+
+	private static int _currentWorld = 0;
+
+	public static Bundle CurrentWorld => _worlds[_currentWorld];
+
+	private static Map[] _mapList
+	{
+		get
+		{
+			return _worlds[_currentWorld].Maps;
+		}
+		set
+		{
+			_worlds[_currentWorld].Maps = value;
+		}
+	}
+
+	public static Map[] MapList => _mapList;
+
+	private static Vector2[] _generationZonePositons
+	{
+		get
+		{
+			return _worlds[_currentWorld].GenerationZonePositons;
+		}
+		set
+		{
+			_worlds[_currentWorld].GenerationZonePositons = value;
+		}
+	}
+
+	public static Vector2[] GenerationZonePositons => _generationZonePositons;
+
+	private static Vector2[] _generatedZonePoints
+	{
+		get
+		{
+			return _worlds[_currentWorld].GeneratedZonePoints;
+		}
+		set
+		{
+			_worlds[_currentWorld].GeneratedZonePoints = value;
+		}
+	}
+
+	public static Vector2[] GeneratedZonePoints => _generatedZonePoints;
+
+	public static void PushWorld(Bundle world)
+	{
+		if (_currentWorld == 1)
+		{
+			Debug.LogError("World is already back-up. This is client map flow issue.");
+		}
+		_worlds[++_currentWorld] = world;
+	}
+
+	public static void PopWorld()
+	{
+		if (_currentWorld != 0)
+		{
+			_worlds[_currentWorld].Clear();
+			_currentWorld--;
+		}
+	}
+
+	private static LoadingResult CreateWorldFolders()
+	{
+		try
+		{
+			if (!Directory.Exists(FilePath.WORLD_FOLDER))
+			{
+				Directory.CreateDirectory(FilePath.WORLD_FOLDER);
+			}
+		}
+		catch (Exception ex)
+		{
+			return new LoadingResult
+			{
+				Message = "WORLD_MSG_WORLD_DIR_NOT_FOUND " + ex.Message,
+				Succeeded = false
+			};
+		}
+		return new LoadingResult
+		{
+			Succeeded = true
+		};
+	}
+
+	public static void UpgradeLegacyWorld(out LoadingResult result)
+	{
+		Map[] array = new Map[25];
+		result = LoadWorld_(legacy: true);
+		if (result.Succeeded)
+		{
+			CopyLegacyMapsRefs(array);
+			CreateWorld(legacy: true);
+			MergeLegacyMaps(array);
+			SaveWorld(null);
+		}
+	}
+
+	private static void CopyLegacyMapsRefs(Map[] maps)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				int num = j * 5 + i;
+				maps[num] = _mapList[num];
+			}
+		}
+	}
+
+	private static void MergeLegacyMaps(Map[] legacyMaps)
+	{
+		int num = 1;
+		int num2 = 1;
+		for (int i = 0; i < 5; i++)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				Map map = legacyMaps[j * 5 + i];
+				int num3 = i + num;
+				int num4 = j + num2;
+				_mapList[num4 * 7 + num3] = map;
+			}
+		}
+	}
+
+	private static LoadingResult ValidateWorldFolders(bool legacy = false)
+	{
+		if (!File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd")))
+		{
+			return new LoadingResult
+			{
+				Message = "WORLD_MSG_SEED_FILE_MISSING",
+				Succeeded = false
+			};
+		}
+		try
+		{
+			if (Directory.GetDirectories(FilePath.WORLD_FOLDER).Length == 0)
+			{
+				return new LoadingResult
+				{
+					Message = "WORLD_MSG_EMPTY_WORLD_FOLDER",
+					Succeeded = false
+				};
+			}
+		}
+		catch (Exception ex)
+		{
+			return new LoadingResult
+			{
+				Message = ex.Message,
+				Succeeded = false
+			};
+		}
+		try
+		{
+			int num = (legacy ? 5 : 7);
+			for (int i = 0; i < num * num; i++)
+			{
+				string worldMapFolderName = GetWorldMapFolderName(i, legacy);
+				string text = PathTools.Combine(FilePath.WORLD_FOLDER, worldMapFolderName);
+				if (Directory.Exists(text))
+				{
+					string[] directories = Directory.GetDirectories(text);
+					for (int j = 0; j < directories.Length; j++)
+					{
+						string fileName = Path.GetFileName(directories[j]);
+						if (!Maps.ValidateMapFolder(PathTools.Combine(text, fileName), fileName))
+						{
+							return new LoadingResult
+							{
+								Message = "WORLD_MSG_MISSING_MAP_FOLDER " + fileName,
+								Succeeded = false
+							};
+						}
+					}
+					continue;
+				}
+				return new LoadingResult
+				{
+					Message = "WORLD_MSG_MISSING_WORLD_FOLDER",
+					Succeeded = false
+				};
+			}
+		}
+		catch (Exception ex2)
+		{
+			return new LoadingResult
+			{
+				Message = ex2.Message,
+				Succeeded = false
+			};
+		}
+		return new LoadingResult
+		{
+			Succeeded = true
+		};
+	}
+
+	private static Map CreateProceduralMap(int index, int seed)
+	{
+		Map map = new Map();
+		Zone.BiomeType biomeType = WorldTools.GenerateZoneBiome(Zone.BiomeType.RANDOM, StrandedWorld.WORLD_SEED - seed);
+		if (index == 0)
+		{
+			biomeType = Zone.BiomeType.ISLAND_SMALL;
+		}
+		float[,] heightmapData = WorldTools.GenerateZoneHeightmap(biomeType, StrandedWorld.WORLD_SEED - seed);
+		map.EditorData = new MapEditorData
+		{
+			Name = MapNameGenerator.GenerateRandomMapName(seed),
+			Id = string.Format("{0}_{1}", "INTERNAL_PROCEDURAL", index),
+			VersionNumber = 0,
+			Biome = biomeType,
+			Author = "Beam Team",
+			Description = "MAP_DESC_PROCEDURAL"
+		};
+		map.ObjectData = new JObject();
+		map.HeightmapData = heightmapData;
+		map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+		return map;
+	}
+
+	public static bool ReplaceMapWithProceduralMap(Map replaceMap, out Map proceduralMap)
+	{
+		proceduralMap = null;
+		int num = 0;
+		for (int i = 0; i < 49; i++)
+		{
+			if (_mapList[i] == replaceMap)
+			{
+				Map map = CreateProceduralMap(i, num);
+				_mapList[i] = map;
+				proceduralMap = map;
+				return true;
+			}
+			num++;
+		}
+		return false;
+	}
+
+	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+	{
+		for (int i = 0; i < 49; i++)
+		{
+			if (_mapList[i] == mapToReplace)
+			{
+				_mapList[i] = replacingMap;
+				break;
+			}
+		}
+	}
+
+	private static int[] CreateMissionTiles()
+	{
+		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+		int upperBound = 48;
+		List<int> list = new List<int>();
+		int[] array = new int[4];
+		for (int i = 0; i < 4; i++)
+		{
+			int num = fastRandom.Next(1, upperBound);
+			while (list.Contains(num))
+			{
+				num = fastRandom.Next(1, upperBound);
+			}
+			list.Add(num);
+			array[i] = num;
+		}
+		return array;
+	}
+
+	public static void CreateWorld(bool legacy = false)
+	{
+		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+		_mapList = new Map[49];
+		for (int i = 0; i < _generationZonePositons.Length; i++)
+		{
+			int seed = i;
+			Map map = CreateProceduralMap(i, seed);
+			_mapList[i] = map;
+		}
+		if (legacy)
+		{
+			return;
+		}
+		int[] array = CreateMissionTiles();
+		int num = 0;
+		if (Maps.DefaultMapList.Count == 0)
+		{
+			Maps.LoadDefaultMaps(out var result);
+			_ = result.Succeeded;
+		}
+		for (int j = 0; j < 49; j++)
+		{
+			bool flag = false;
+			for (int k = 0; k < 4; k++)
+			{
+				if (j == array[k])
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (flag && num < Maps.DefaultMapList.Count)
+			{
+				Map map2 = Maps.DefaultMapList[num];
+				_mapList[j] = map2;
+				if (map2.EditorData.Biome == Zone.BiomeType.CARRIER)
+				{
+					map2.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Carrier") as Texture2D;
+				}
+				else if (map2.EditorData.Biome == Zone.BiomeType.MISSION)
+				{
+					map2.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Mission") as Texture2D;
+				}
+				num++;
+			}
+			else
+			{
+				int seed2 = j;
+				Map map3 = CreateProceduralMap(j, seed2);
+				_mapList[j] = map3;
+			}
+		}
+	}
+
+	public static void CreateWorldZonePoints(int seed)
+	{
+		int num = 49;
+		float num2 = 500f;
+		float num3 = num2 * 1.25f * 7f;
+		int numSamplesBeforeRejection = 30;
+		_generatedZonePoints = ZonePositionGenerator.GeneratePoints(seed, num2, new Vector2(num3, num3), numSamplesBeforeRejection);
+		_generationZonePositons = new Vector2[num];
+		FastRandom fastRandom = new FastRandom(seed);
+		List<int> list = new List<int>();
+		int upperBound = _generatedZonePoints.Length;
+		for (int i = 0; i < num; i++)
+		{
+			int num4 = fastRandom.Next(0, upperBound);
+			while (list.Contains(num4))
+			{
+				num4 = fastRandom.Next(0, upperBound);
+			}
+			if (i == 0)
+			{
+				num4 = 0;
+			}
+			list.Add(num4);
+			_generationZonePositons[i] = _generatedZonePoints[num4];
+		}
+		if (_generationZonePositons.Length < num - 1)
+		{
+			Debug.LogError("Error: Not enough island positions");
+		}
+	}
+
+	public static void SaveWorld(WorldSavedCallback callback)
+	{
+		LoadingResult loadingResult = CreateWorldFolders();
+		if (loadingResult.Succeeded)
+		{
+			loadingResult = SaveWorldSeed();
+		}
+		if (loadingResult.Succeeded)
+		{
+			loadingResult = SaveWorldMaps();
+		}
+		if (!loadingResult.Succeeded)
+		{
+			DeleteWorld(FilePath.WORLD_FOLDER);
+			callback?.Invoke(loadingResult);
+		}
+		else
+		{
+			callback?.Invoke(loadingResult);
+		}
+	}
+
+	private static void DeleteWorld(string folderPath)
+	{
+		if (string.IsNullOrWhiteSpace(folderPath))
+		{
+			return;
+		}
+		try
+		{
+			if (!Directory.Exists(folderPath))
+			{
+				return;
+			}
+			DirectoryInfo directoryInfo = new DirectoryInfo(folderPath);
+			foreach (FileInfo item in directoryInfo.EnumerateFiles())
+			{
+				item.Delete();
+			}
+			foreach (DirectoryInfo item2 in directoryInfo.EnumerateDirectories())
+			{
+				item2.Delete(recursive: true);
+			}
+		}
+		catch (Exception exception)
+		{
+			Debug.LogException(exception);
+		}
+	}
+
+	private static LoadingResult SaveWorldSeed()
+	{
+		try
+		{
+			using (FileStream serializationStream = new FileStream(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+			{
+				new BinaryFormatter().Serialize(serializationStream, StrandedWorld.LOCAL_WORLD_SEED);
+			}
+			return new LoadingResult
+			{
+				Message = "WORLD_MSG_SUCCESS",
+				Succeeded = true
+			};
+		}
+		catch (Exception ex)
+		{
+			LoadingResult result = new LoadingResult
+			{
+				Message = "WORLD_MSG_ERROR_SAVING_WORLD_SEED " + ex.Message,
+				Succeeded = false
+			};
+			Debug.LogError("World::SaveWorldSeed:: " + ex.Message);
+			return result;
+		}
+	}
+
+	private static LoadingResult SaveWorldMaps()
+	{
+		try
+		{
+			for (int i = 0; i < 49; i++)
+			{
+				string text = PathTools.Combine(FilePath.WORLD_FOLDER, i.ToString());
+				if (Directory.Exists(text))
+				{
+					Directory.Delete(text, recursive: true);
+				}
+				Directory.CreateDirectory(text);
+				Maps.DeleteMapFolder(Directory.GetDirectories(text));
+				Maps.SaveMap(_mapList[i], text);
+			}
+			return new LoadingResult
+			{
+				Message = "WORLD_MSG_SUCCESS",
+				Succeeded = true
+			};
+		}
+		catch (Exception ex)
+		{
+			LoadingResult result = new LoadingResult
+			{
+				Message = "WORLD_MSG_ERROR_SAVING_WORLD " + ex.Message,
+				Succeeded = false
+			};
+			Debug.LogError("World::SaveWorldMaps:: " + ex.Message);
+			return result;
+		}
+	}
+
+	public static LoadingResult LoadWorld()
+	{
+		return LoadWorld_();
+	}
+
+	private static LoadingResult LoadWorld_(bool legacy = false)
+	{
+		LoadingResult loadingResult = ValidateWorldFolders(legacy);
+		if (loadingResult.Succeeded)
+		{
+			LoadingResult loadingResult2 = LoadWorldSeed();
+			if (!loadingResult2.Succeeded)
+			{
+				return loadingResult2;
+			}
+			if (!legacy)
+			{
+				CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+			}
+			loadingResult2 = LoadWorldMaps(legacy);
+			if (!loadingResult2.Succeeded)
+			{
+				return loadingResult2;
+			}
+			return new LoadingResult
+			{
+				Succeeded = true
+			};
+		}
+		LoadingResult result = new LoadingResult
+		{
+			Message = "WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE " + loadingResult.Message,
+			Succeeded = false
+		};
+		Debug.LogError("World::LoadWorld:: " + loadingResult.Message);
+		return result;
+	}
+
+	public static bool CheckWorldSeedFileExists()
+	{
+		return File.Exists(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"));
+	}
+
+	private static LoadingResult LoadWorldSeed()
+	{
+		try
+		{
+			using (FileStream serializationStream = new FileStream(PathTools.Combine(FilePath.WORLD_FOLDER, "Seed.sdd"), FileMode.Open, FileAccess.Read))
+			{
+				StrandedWorld.SetWorldSeed(((int)new BinaryFormatter().Deserialize(serializationStream)).ToString());
+			}
+			LoadingResult result = new LoadingResult
+			{
+				Message = "WORLD_MSG_SUCCESS",
+				Succeeded = true
+			};
+			Debug.Log("World::LoadWorldSeed:: Success.");
+			return result;
+		}
+		catch (Exception ex)
+		{
+			LoadingResult result2 = new LoadingResult
+			{
+				Message = "WORLD_MSG_ERROR_LOADING_WORLD_SEED " + ex.Message,
+				Succeeded = false
+			};
+			Debug.LogError("World::LoadWorldSeed:: " + ex.Message);
+			return result2;
+		}
+	}
+
+	private static LoadingResult LoadWorldMaps(bool legacy = false)
+	{
+		LoadingResult loadingResult = new LoadingResult
+		{
+			Succeeded = true
+		};
+		try
+		{
+			int num = (legacy ? 5 : 7);
+			_mapList = new Map[num * num];
+			for (int i = 0; i < num * num; i++)
+			{
+				string worldMapFolderName = GetWorldMapFolderName(i, legacy);
+				string text = PathTools.Combine(FilePath.WORLD_FOLDER, worldMapFolderName);
+				string[] directories = Directory.GetDirectories(text);
+				for (int j = 0; j < directories.Length; j++)
+				{
+					string fileName = Path.GetFileName(directories[j]);
+					string mapPath = PathTools.Combine(text, fileName);
+					try
+					{
+						Map map = Maps.LoadMap(mapPath, fileName, checkVersion: true);
+						_mapList[i] = map;
+					}
+					catch (VersionException ex)
+					{
+						loadingResult.Message = "WORLD_MSG_MAP_VERSION_EXCEPTION";
+						loadingResult.Succeeded = false;
+						Debug.LogError("World::LoadWorldMaps:: " + ex.Message);
+						goto end_IL_0138;
+					}
+					catch (Exception ex2)
+					{
+						LoadingResult loadingResult2 = loadingResult;
+						loadingResult2.Message = loadingResult2.Message + "WORLD_MSG_ERROR_LOADING_MAP " + fileName + "\n\n" + ex2.Message;
+						loadingResult.Succeeded = false;
+						Debug.LogError("World::LoadWorldMaps:: " + ex2.Message);
+					}
+				}
+				continue;
+				end_IL_0138:
+				break;
+			}
+			if (loadingResult.Succeeded)
+			{
+				loadingResult.Message = "WORLD_MSG_SUCCESS";
+				Debug.Log("World::LoadWorldMaps:: Success.");
+			}
+			return loadingResult;
+		}
+		catch (Exception ex3)
+		{
+			loadingResult.Message = "WORLD_MSG_ERROR_LOADING_WORLD_MAPS " + ex3.Message;
+			loadingResult.Succeeded = false;
+			Debug.LogError("World::LoadWorldMaps:: " + ex3.Message);
+			return loadingResult;
+		}
+	}
+
+	private static string GetWorldMapFolderName(int index, bool legacy = false)
+	{
+		if (legacy)
+		{
+			int num = index % 5;
+			int num2 = (index - num) / 5;
+			return $"{num}_{num2}";
+		}
+		return index.ToString();
+	}
+
+	public static float[,] ImportHeightmapFromRawFile(string path)
+	{
+		float[,] array = new float[257, 257];
+		int num = 66049;
+		num *= 2;
+		byte[] array2 = new byte[num];
+		try
+		{
+			using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+			try
+			{
+				fileStream.Read(array2, 0, num);
+			}
+			catch (ArgumentException)
+			{
+				throw new Exception("Error raw heightmap import.");
+			}
+		}
+		catch (Exception ex2)
+		{
+			Debug.LogError("World::ImportHeightmapFromRawFile::\n\n" + ex2.Message);
+			return array;
+		}
+		int num2 = 0;
+		for (int i = 0; i < 257; i++)
+		{
+			for (int j = 0; j < 257; j++)
+			{
+				float num3 = (float)(int)array2[num2++] + (float)(int)array2[num2++] * 256f;
+				array[257 - i - 1, j] = num3 / 65535f;
+			}
+		}
+		return array;
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/ZoneEvents.cs
+SIZE_BYTES: 1327
+SHA256: a4cdd7041d110d651e4c64f4df4c395daf51078cab03e22c7fd8200901235fb0
+####################################################################################################
+
+using System;
+using Beam.Events;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class ZoneEvents : MonoBehaviour
+{
+	public event Action<Zone> CampFirePlaced;
+
+	public event Action<Zone, PlantType> CropPlanted;
+
+	private void Awake()
+	{
+		EventManager.AddListener<CampFirePlacedEvent>(EventManager_CampFirePlacedEvent);
+		EventManager.AddListener<CropPlantedEvent>(EventManager_PlantedCropEvent);
+	}
+
+	private void OnDestroy()
+	{
+		EventManager.RemoveListener<CampFirePlacedEvent>(EventManager_CampFirePlacedEvent);
+		EventManager.RemoveListener<CropPlantedEvent>(EventManager_PlantedCropEvent);
+		CampFirePlaced = null;
+		CropPlanted = null;
+	}
+
+	private void EventManager_CampFirePlacedEvent(CampFirePlacedEvent e)
+	{
+		Zone zone = StrandedWorld.GetZone(e.Position);
+		if (zone != null)
+		{
+			zone.Attributes.CampFires++;
+			CampFirePlaced?.Invoke(zone);
+			Debug.Log("ZoneEvents: '" + zone.name + "' campfires: " + zone.Attributes.CampFires);
+		}
+	}
+
+	private void EventManager_PlantedCropEvent(CropPlantedEvent e)
+	{
+		Zone zone = StrandedWorld.GetZone(e.Position);
+		if (zone != null && zone.Attributes.Crops.ContainsKey(e.PlantType))
+		{
+			zone.Attributes.Crops[e.PlantType]++;
+			CropPlanted?.Invoke(zone, e.PlantType);
+			Debug.Log("ZoneEvents: '" + zone.name + "' crops: " + zone.Attributes.CampFires);
+		}
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/ZoneLoader.cs
+SIZE_BYTES: 25252
+SHA256: 4e3a59b52d0645f6ab951cd432f74169b011d5375b50b4c4b0885f418bcc5273
+####################################################################################################
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Beam.Rendering;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using SharpNeatLib.Maths;
+using Sirenix.Utilities;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class ZoneLoader : ILoader
+{
+	public delegate void GenerationCallback(IGenerationObject obj, Vector3 position, Quaternion rotation, Zone zone);
+
+	public delegate void ProcessCollectionCallback<in T>(T obj, Zone zone);
+
+	public enum EObjectProcessingMode
+	{
+		Stepped,
+		Faster
+	}
+
+	private const int MIN_PROCESSING_STEPS_PER_FRAME = 4;
+
+	private const int MAX_PROCESSING_STEPS_PER_FRAME = 200;
+
+	private const int INDEX_SIZE = 256;
+
+	[SerializeField]
+	private bool _simulateSlowLoad;
+
+	private List<Action> _internalDeferredLoading = new List<Action>();
+
+	private List<Action> _deferredLoading = new List<Action>();
+
+	private List<Action> _postLoading = new List<Action>();
+
+	private List<Action> _physicalLoading = new List<Action>();
+
+	private bool _isGenerating;
+
+	private FastRandom _random = new FastRandom();
+
+	private Vector3 _position;
+
+	private int _processes;
+
+	private Stopwatch _timer = new Stopwatch();
+
+	private float _timeout;
+
+	public IList<Action> DeferredLoading => _deferredLoading;
+
+	public IList<Action> PostLoading => _postLoading;
+
+	public IList<Action> PhysicalLoading => _physicalLoading;
+
+	public bool IsGenerating => _isGenerating;
+
+	public bool IsLoading { get; set; }
+
+	public FastRandom Random => _random;
+
+	public EObjectProcessingMode ObjectProcessingMode { get; set; }
+
+	public event Action<Zone> CreatedZone;
+
+	public event Action<Zone> LoadedZone;
+
+	private void OnDestroy()
+	{
+		CreatedZone = null;
+		LoadedZone = null;
+	}
+
+	public float LoadZone_Async(Zone zone, JObject data)
+	{
+		return Timing.WaitUntilDone(LoadZone(zone, data));
+	}
+
+	public CoroutineHandle LoadZone(Zone zone, JObject data)
+	{
+		return Timing.RunCoroutine(LoadZone_Sequence(zone, data), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> LoadZone_Sequence(Zone zone, JObject data)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		LevelLoader.Instance.LoadingZones.Add(zone);
+		LevelLoader.Instance.HashCodes.Clear();
+		LevelLoader.CurrentLoader = this;
+		LevelLoader.CurrentLoader.IsLoading = true;
+		ResetTemporaryLoadingPosition();
+		zone.Loading = true;
+		zone.Enter();
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		JObject field = data.GetField("Attributes");
+		if (field != null)
+		{
+			SavingUtilities.Load(zone.Attributes, field);
+		}
+		_processes = 4;
+		JObject field2 = data.GetField("Objects");
+		if (field2 != null && !field2.IsNull())
+		{
+			yield return ProcessCollection_Async(field2.Children, CreateLoadedPrefab, zone);
+			if (Game.Mode.IsClient())
+			{
+				yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+			}
+		}
+		else
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Zone [" + zone.ZoneName + "] [Objects] field is null or empty.");
+		}
+		yield return 0f;
+		yield return 0f;
+		yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.ProcessLoading));
+		yield return ProcessCollection_Async(_internalDeferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_deferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_postLoading, InvokeCallback, zone);
+		if (AssetBundleManager.IsLoading)
+		{
+			UnityEngine.Debug.Log("ZoneLoader::LoadZoneAsync:: [" + zone.ZoneName + "] waiting for bundles to load...");
+		}
+		while (AssetBundleManager.IsLoading)
+		{
+			yield return 0f;
+		}
+		yield return 0f;
+		for (int i = 0; i < _physicalLoading.Count; i++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(_physicalLoading[i]);
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		LoadedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		if (Game.Mode.IsMaster())
+		{
+			Singleton<StrandedWorld>.Instance.HandleOutOfGameBounds(zone, handleNmlContainer: true);
+		}
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public void AbortLoadingZone(Zone zone)
+	{
+		Timing.KillCoroutines(100);
+		BeamTeam.DestroyAllChildrenImmediate(zone.SaveContainer);
+		Transform parent = Singleton<StrandedWorld>.Instance.GetParent();
+		for (int num = parent.childCount - 1; num >= 0; num--)
+		{
+			Transform child = parent.GetChild(num);
+			if (Singleton<StrandedWorld>.Instance.InBounds(child.position))
+			{
+				BeamTeam.DestroyImmediate(child.gameObject);
+			}
+		}
+		zone.Exit();
+		zone.Loading = false;
+		zone.Loaded = false;
+		_ = _isGenerating;
+		CleanUp(zone);
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void CleanUp(Zone zone)
+	{
+		_timer.Stop();
+		_isGenerating = false;
+		if (!LevelLoader.CurrentLoader.IsNullOrDestroyed())
+		{
+			_internalDeferredLoading.Clear();
+			_deferredLoading.Clear();
+			_postLoading.Clear();
+			_physicalLoading.Clear();
+			LevelLoader.CurrentLoader.IsLoading = false;
+			LevelLoader.CurrentLoader = null;
+			LevelLoader.Instance.HashCodes.Clear();
+			LevelLoader.Instance.LoadingZones.Remove(zone);
+		}
+	}
+
+	public bool CreateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		CreateZoneObjects(zone);
+		return true;
+	}
+
+	public float CreateZoneObjects_Async(Zone zone, int seed)
+	{
+		return Timing.WaitUntilDone(CreateZoneObjects(zone));
+	}
+
+	private CoroutineHandle CreateZoneObjects(Zone zone)
+	{
+		return Timing.RunCoroutine(CreateZoneObjects_Sequence(zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> CreateZoneObjects_Sequence(Zone zone)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		_isGenerating = true;
+		zone.Loading = true;
+		zone.Enter();
+		_processes = 1;
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		yield return ProcessCollection_Async(zone.GeneratedObjects, CreateGeneratedPrefab, zone);
+		if (Game.Mode.IsClient())
+		{
+			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		CreatedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		_isGenerating = false;
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public bool GenerateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		GenerateObjects(zone, GenerateObject);
+		return true;
+	}
+
+	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
+	{
+		_isGenerating = true;
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		zone.GenerateGridData();
+		zone.GeneratedObjects.Clear();
+		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
+		if (zone.HasShelter)
+		{
+			GenerateShelter(sheltersGeneration, zone, generationCallback);
+		}
+		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
+		{
+			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
+			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
+			{
+				continue;
+			}
+			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
+			{
+				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
+				switch (zoneObjects.generationType)
+				{
+				case ZoneGenerationType.Position:
+					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
+					break;
+				case ZoneGenerationType.Procedural:
+					GenerateProceduralObjectsProcedural(zoneObjects, zone, generationCallback);
+					break;
+				}
+			}
+		}
+		if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL)
+		{
+			for (int k = 0; k < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration.Count; k++)
+			{
+				ObjectCategory objectCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration[k];
+				for (int l = 0; l < objectCategory.ProceduralObjects.Count; l++)
+				{
+					ZoneObjects zoneObjects2 = objectCategory.ProceduralObjects[l];
+					switch (zoneObjects2.generationType)
+					{
+					case ZoneGenerationType.Position:
+						GenerateProceduralObjectsPosition(zoneObjects2, zone, generationCallback);
+						break;
+					case ZoneGenerationType.Procedural:
+						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
+						break;
+					}
+				}
+			}
+		}
+		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+		_isGenerating = false;
+	}
+
+	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+		{
+			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			int num2 = 0;
+			if (zoneObjects.Objects.Length != 0)
+			{
+				float num3 = (float)_random.NextDouble() * num;
+				for (int k = 0; k < zoneObjects.Objects.Length; k++)
+				{
+					if (num3 < zoneObjects.Objects[k].Rarity)
+					{
+						num2 = k;
+						break;
+					}
+					num3 -= zoneObjects.Objects[k].Rarity;
+				}
+			}
+			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+			Quaternion identity = Quaternion.identity;
+			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+			generationCallback(obj, position, identity, zone);
+		}
+	}
+
+	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num2 = 0;
+		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
+		{
+			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
+			{
+				if (num2 >= zoneObjects.maxObjectCount)
+				{
+					return;
+				}
+				GenerationPoints generationPoints = zone.GenerationPoints[j, k];
+				if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f) || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+				{
+					continue;
+				}
+				int num3 = 0;
+				if (zoneObjects.Objects.Length != 0)
+				{
+					float num4 = (float)_random.NextDouble() * num;
+					for (int l = 0; l < zoneObjects.Objects.Length; l++)
+					{
+						if (num4 < zoneObjects.Objects[l].Rarity)
+						{
+							num3 = l;
+							break;
+						}
+						num4 -= zoneObjects.Objects[l].Rarity;
+					}
+				}
+				Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+				Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+				Quaternion quaternion = Quaternion.identity;
+				if (zoneObjects.terrainSnap)
+				{
+					quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+				}
+				int num5 = _random.Next(0, 360);
+				if (zoneObjects.randomRotation)
+				{
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num5)) : Quaternion.Euler(Vector3.up * num5));
+				}
+				else if (zoneObjects.randomFullRotation)
+				{
+					int num6 = _random.Next(0, 360);
+					int num7 = _random.Next(0, 360);
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num6, num5, num7))) : Quaternion.Euler(new Vector3(num6, num5, num7)));
+				}
+				if (zoneObjects.occupyPoint)
+				{
+					generationPoints.Occupied = true;
+				}
+				IGenerationObject obj = zoneObjects.Objects[num3].Obj;
+				generationCallback(obj, position, quaternion, zone);
+				if (zoneObjects.maxObjectCount != 0)
+				{
+					num2++;
+				}
+			}
+		}
+	}
+
+	private void GenerateShelter(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (!zone.HasShelter)
+		{
+			return;
+		}
+		int shelterType = zone.ShelterType;
+		UnityEngine.Debug.Log(">>Generating shelter type : " + zoneObjects.Objects[shelterType].Obj.gameObject.name + ", on Zone :" + zone.ZoneName);
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num = 0;
+		int num2 = ((shelterType == 7) ? 8 : ((int)Mathf.Sqrt(zoneObjects.detailAmountFactor)));
+		int num3 = 257;
+		int num4 = 100;
+		int num5 = num3 * num3 % num4;
+		int num6 = 0;
+		int num7 = 0;
+		_ = num3 * num3 / num4;
+		if (num3 * num3 % num4 <= 0)
+		{
+		}
+		while (num6 < num3 * num3 && num < 1)
+		{
+			num7 = 0;
+			int num8 = num6 % num4;
+			int num9 = num6 / num4;
+			num6++;
+			for (int i = 0; i < num8; i++)
+			{
+				num7 = ((i >= num5) ? (num7 + num3 * num3 / detailAmountFactor) : (num7 + (num3 * num3 / num4 + 1)));
+			}
+			num7 += num9;
+			if (num7 >= num3 * num3)
+			{
+				continue;
+			}
+			int num10 = num7 / num3;
+			int num11 = num7 % num3;
+			if (num10 >= num3 - 1 || num11 >= num3 - 1 || !((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			GenerationPoints generationPoints = zone.GenerationPoints[num10, num11];
+			bool flag = false;
+			for (int j = num10 - num2; j <= num10 + num2; j++)
+			{
+				if (j < 0 || j >= num3 - 1)
+				{
+					continue;
+				}
+				for (int k = num11 - num2; k <= num11 + num2; k++)
+				{
+					if (k >= 0 && k < num3 - 1 && zone.GenerationPoints[j, k].Occupied)
+					{
+						flag = true;
+					}
+				}
+			}
+			if (flag || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+			{
+				continue;
+			}
+			Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+			Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+			Quaternion quaternion = Quaternion.identity;
+			if (zoneObjects.terrainSnap)
+			{
+				quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+			}
+			int num12 = _random.Next(0, 360);
+			if (zoneObjects.randomRotation)
+			{
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num12)) : Quaternion.Euler(Vector3.up * num12));
+			}
+			else if (zoneObjects.randomFullRotation)
+			{
+				int num13 = _random.Next(0, 360);
+				int num14 = _random.Next(0, 360);
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num13, num12, num14))) : Quaternion.Euler(new Vector3(num13, num12, num14)));
+			}
+			if (zoneObjects.occupyPoint)
+			{
+				generationPoints.Occupied = true;
+				for (int l = num10 - num2; l <= num10 + num2; l++)
+				{
+					if (l < 0 || l >= num3 - 1)
+					{
+						continue;
+					}
+					for (int m = num11 - num2; m <= num11 + num2; m++)
+					{
+						if (m >= 0 && m < num3 - 1)
+						{
+							zone.GenerationPoints[l, m].Occupied = true;
+						}
+					}
+				}
+			}
+			IGenerationObject obj = zoneObjects.Objects[shelterType].Obj;
+			generationCallback(obj, position, quaternion, zone);
+			num++;
+		}
+	}
+
+	private void GenerateObject(IGenerationObject generationObject, Vector3 position, Quaternion rotation, Zone zone)
+	{
+		GeneratedObject generatedObject = new GeneratedObject();
+		generatedObject.Prefab = generationObject.gameObject;
+		generatedObject.Position = position;
+		generatedObject.Rotation = rotation;
+		generatedObject.ImpostorParentPrefab = generationObject.gameObject.GetInterface<IImpostorParent>();
+		zone.OnObjectGenerated(generatedObject);
+	}
+
+	private void CreateGeneratedPrefab(GeneratedObject objectData, Zone zone)
+	{
+		SaveablePrefab component = objectData.Prefab.GetComponent<SaveablePrefab>();
+		GameObject gameObject;
+		if (component != null)
+		{
+			uint prefabId = component.PrefabId;
+			MiniGuid referenceId = MiniGuid.NewFrom(objectData.Position, prefabId, 48879);
+			if (Game.Mode.IsClient() && component.IsMultiplayerEntity)
+			{
+				MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneGeneration, referenceId, ClientSetParent, null, zone);
+				return;
+			}
+			gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, objectData.Position, objectData.Rotation, referenceId).gameObject;
+		}
+		else
+		{
+			gameObject = UnityEngine.Object.Instantiate(objectData.Prefab, objectData.Position, objectData.Rotation);
+		}
+		gameObject.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		gameObject.transform.position = objectData.Position;
+		gameObject.transform.rotation = objectData.Rotation;
+		zone.OnObjectCreated(gameObject);
+	}
+
+	private void CreateLoadedPrefab(JObject data, Zone zone)
+	{
+		JObject field = data.GetField("prefab");
+		if (field == null)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading. No prefab id field found for object data.");
+			return;
+		}
+		uint num = Prefabs.ConvertLegacyPrefabId(field);
+		if (num == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading instantiated object with empty prefab id.");
+			return;
+		}
+		bool flag = Prefabs.TryGetMultiplayerPrefabName(num, out var _);
+		if (Game.Mode.IsClient() & flag)
+		{
+			MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneLoading, Prefabs.GetReferenceId(data), ClientLoad, data, zone);
+		}
+		else
+		{
+			Load(data, _position, zone, MultiplayerMng.Instantiate<SaveablePrefab>(num, Prefabs.GetReferenceId(data)));
+		}
+		_position += new Vector3(0f, 0f, 50f);
+	}
+
+	private void Load(JObject data, Vector3 position, Zone zone, SaveablePrefab instance)
+	{
+		LevelLoader.Instance.HashCodes.Add(instance.gameObject.GetHashCode());
+		instance.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		instance.transform.position = position;
+		string prefabName = instance.name;
+		_internalDeferredLoading.Add(() =>
+		{
+			if (instance.gameObject == null)
+			{
+				UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading prefab [" + prefabName + "]->Object was modified before loading began.\nCheck the object's Awake, Start, Update and FixedUpdate methods for missing [LevelLoader.IsLoading] checks.");
+			}
+			else
+			{
+				if (zone.IsMapEditor && !zone.HasVisited)
+				{
+					try
+					{
+						JSerializer.DeserializeInto(data.GetField("Transform"), instance.gameObject.transform);
+						instance.CompleteTransformSerialization();
+						instance.OnCustomMapLoaded();
+					}
+					catch (Exception ex)
+					{
+						UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading editor object [" + instance.name + "] Object has now been destroyed.\n\n" + ex);
+						MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+					}
+				}
+				else if (!SavingUtilities.Load(instance, data))
+				{
+					UnityEngine.Debug.LogError($"ZoneLoader::LoadZoneAsync:: Error loading [{instance.name}] [{instance.ReferenceId}]->Object has now been destroyed.");
+					MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+				}
+				if (instance.gameObject != null)
+				{
+					zone.OnObjectLoaded(instance.gameObject);
+				}
+			}
+		});
+	}
+
+	private void ClientLoad(MultiplayerZoneSync.Command command)
+	{
+		Load(command.Data, Vector3.zero, command.Zone, command.Instance);
+	}
+
+	private void ClientSetParent(MultiplayerZoneSync.Command command)
+	{
+		command.Instance.transform.SetParent(command.Zone.SaveContainer);
+	}
+
+	private void InvokeCallback(Action action, Zone zone)
+	{
+		LoadingActionUtilities.ExecuteDeferredAction(action);
+	}
+
+	private void ResetTemporaryLoadingPosition()
+	{
+		_position = new Vector3(0f, 5000f, 0f);
+	}
+
+	private float ProcessCollection_Async<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.WaitUntilDone(ProcessCollection(collection, callback, zone));
+	}
+
+	private CoroutineHandle ProcessCollection<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.RunCoroutine(ProcessCollection_Sequence(collection, callback, zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> ProcessCollection_Sequence<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		IEnumerator<T> enumerator = collection.GetEnumerator();
+		int index = 0;
+		bool stop = false;
+		while (!stop)
+		{
+			_ = collection.Count;
+			_ = index;
+			int processingSteps = GetProcessingSteps(collection.Count, zone.transform.position);
+			for (int i = 0; i < processingSteps; i++)
+			{
+				if (!enumerator.MoveNext())
+				{
+					stop = true;
+					break;
+				}
+				callback?.Invoke(enumerator.Current, zone);
+				index++;
+			}
+			yield return float.NegativeInfinity;
+		}
+		enumerator.Dispose();
+	}
+
+	private int GetProcessingSteps(int quantity, Vector3 position)
+	{
+		int b = ((ObjectProcessingMode == EObjectProcessingMode.Faster) ? 200 : 4);
+		Transform closestPlayer = GetClosestPlayer(position);
+		if (closestPlayer.IsNullOrDestroyed())
+		{
+			return 1;
+		}
+		float num = (position - closestPlayer.position).magnitude - 125f;
+		num /= (float)_processes;
+		return Mathf.Max(Mathf.CeilToInt((float)quantity / Mathf.Max(1f, num)), b);
+	}
+
+	private Transform GetClosestPlayer(Vector3 position)
+	{
+		if (PlayerRegistry.AllPlayers.IsNullOrDestroyed() || PlayerRegistry.AllPlayers.Count == 0)
+		{
+			return null;
+		}
+		IPlayer player = PlayerRegistry.AllPlayers[0];
+		if (Game.Mode.GetPlayersCount() == 1)
+		{
+			return player.transform;
+		}
+		float num = float.PositiveInfinity;
+		for (int i = 1; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			IPlayer player2 = PlayerRegistry.AllPlayers[i];
+			float magnitude = (position - player2.transform.position).magnitude;
+			if (magnitude < num)
+			{
+				num = magnitude;
+				player = player2;
+			}
+		}
+		return player.transform;
+	}
+
+	private void UpdateSessionToken_IsBusy(bool isBusy)
+	{
+		if (Game.Mode.IsServer())
+		{
+			if (isBusy && !MultiplayerMng.GetSessionToken().IsBusy)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+			}
+			else if (!isBusy && !LevelLoader.IsCreatingOrLoading)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			}
+		}
+	}
+
+	private IEnumerator<float> ClientLinking()
+	{
+		float startTime = Time.unscaledTime;
+		bool shutdown = false;
+		do
+		{
+			if (Time.unscaledTime - startTime > MultiplayerZoneSync.CLIENT_LINK_TIME && !shutdown)
+			{
+				shutdown = true;
+				PlayerRegistry.LocalPeer.ReplicatedDisconnect(DisconnectDetail.Timeout_Linking, null, forceLocalShutdown: true);
+				MultiplayerZoneSync.Instance.DumpNotCompleted();
+			}
+			yield return 0f;
+		}
+		while (!MultiplayerZoneSync.Instance.IsLinked());
+	}
+}
+
+####################################################################################################
+FILE: Beam.Terrain/ZoneObjectGenerator.cs
+SIZE_BYTES: 1952
+SHA256: d03e9589b3ce2676ba18e3ae33e8472684c53a4f201c7c001a763551377d1b78
+####################################################################################################
+
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public static class ZoneObjectGenerator
+{
+	private const int INDEX_SIZE = 256;
+
+	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+	{
+		float num = 125f / 128f;
+		GenerationPoints[,] array = new GenerationPoints[256, 256];
+		UnityEngine.Terrain terrain = zone.Terrain;
+		TerrainData terrainData = zone.Terrain.terrainData;
+		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+		for (int i = 0; i < 256; i++)
+		{
+			for (int j = 0; j < 256; j++)
+			{
+				float y = 150f * heights[i, j] + -100f;
+				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+				float x = (pos.x - terrain.transform.position.x) / 250f;
+				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+				float steepness = terrainData.GetSteepness(x, y2);
+				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+			}
+		}
+		array2 = null;
+		heights = null;
+		return array;
+	}
+
+	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+	{
+		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+		gameObject.gameObject.name = "Debug_SoilMap";
+		gameObject.transform.parent = zone.transform;
+		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+		texture2D.wrapMode = TextureWrapMode.Clamp;
+		texture2D.Apply();
+		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+	}
+}
