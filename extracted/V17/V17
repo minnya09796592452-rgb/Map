@@ -1,0 +1,7 @@
+~ $ proot-distro login debian
+root@localhost:~# python3 "/storage/emulated/0/Map Check/mission_3_source_extract_v17.py" V17 EXPORT COMPLETE
+Output: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH                            Exported C# files: 33
+Source bytes: 239061                                                                      Missing: 0
+Errors: 0                                                                                 Source SHA256 changed: 0
+Manifest: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/V17_SOURCE_MANIFEST.csv  Summary: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/00_V17_MASTER_SUMMARY.txt
+STATUS: VERIFIED (source hashes unchanged)                                                root@localhost:~#
