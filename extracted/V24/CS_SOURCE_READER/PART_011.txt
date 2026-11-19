@@ -1,0 +1,5089 @@
+
+====================================================================================================
+SOURCE FILE 251
+PATH: Assembly-CSharp__Beam.UI__ULobbyMenuViewAdapter.cs
+SIZE: 5096 bytes
+SHA256: 9229843cc531b1fd748ffaa54d24ea3c53c0c4abd44868722408283154af2990
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Utilities;
+using Funlabs;
+using UdpKit;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class ULobbyMenuViewAdapter : LobbyMenuViewAdapterBase
+{
+	[SerializeField]
+	private GameObject _panel;
+
+	[SerializeField]
+	private ULobbyElement _lobbyElementButtonPrefab;
+
+	[SerializeField]
+	private ULobbyEntryElement _lobbyEntryElementPrefab;
+
+	[SerializeField]
+	private Transform _lobbyButtonContainer;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _scrollView;
+
+	[SerializeField]
+	private Transform _lobbyEntryElementContainer;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _retrievingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _noLobbyEntriesLabel;
+
+	[SerializeField]
+	private UButtonViewAdapter _enterCodeButton;
+
+	[SerializeField]
+	private UButtonViewAdapter _backButton;
+
+	[SerializeField]
+	private UButtonViewAdapter _applyButton;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _crollview;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _regionOptionButton;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _regionLabel;
+
+	private HashSet<ILobbyElement> _lobbyButtons = new HashSet<ILobbyElement>();
+
+	public override IButtonViewAdapter EnterCodeButton => _enterCodeButton;
+
+	public override IButtonViewAdapter BackButton => _backButton;
+
+	public override IButtonViewAdapter ApplyButton => _applyButton;
+
+	public override IScrollviewViewAdapter Scrollview => _crollview;
+
+	public override IOptionButtonViewAdapter RegionOptionButton => _regionOptionButton;
+
+	public override ILabelViewAdapter RegionLabel => _regionLabel;
+
+	public override IEnumerable<ILobbyElement> LobyButtons => _lobbyButtons;
+
+	private void Awake()
+	{
+		Visible = _panel.activeSelf;
+	}
+
+	public override void Show()
+	{
+		if (!_panel.activeSelf)
+		{
+			_panel.SetActive(value: true);
+		}
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		if (_panel.activeSelf)
+		{
+			BeamTeam.DestroyAllChildren(_lobbyButtonContainer);
+			BeamTeam.DestroyAllChildren(_lobbyEntryElementContainer);
+			_lobbyButtons.Clear();
+			_panel.SetActive(value: false);
+		}
+		base.Hide();
+	}
+
+	public override ILobbyElement CreateLobbyButton(Session_Filter sessionFilter)
+	{
+		ULobbyElement uLobbyElement = UnityEngine.Object.Instantiate(_lobbyElementButtonPrefab);
+		uLobbyElement.transform.SetParent(_lobbyButtonContainer, worldPositionStays: false);
+		uLobbyElement.SetLobbyFilter(sessionFilter);
+		uLobbyElement.Selected += SessionFilterButton_Selected;
+		_lobbyButtons.Add(uLobbyElement);
+		return uLobbyElement;
+	}
+
+	private ULobbyEntryElement CreateLobbyEntryElement()
+	{
+		ULobbyEntryElement uLobbyEntryElement = UnityEngine.Object.Instantiate(_lobbyEntryElementPrefab);
+		uLobbyEntryElement.transform.SetParent(_lobbyEntryElementContainer, worldPositionStays: false);
+		return uLobbyEntryElement;
+	}
+
+	public override void UpdateLobbydEntries(Map<Guid, UdpSession> sessionList)
+	{
+		foreach (Transform item in _lobbyEntryElementContainer)
+		{
+			ULobbyEntryElement component = item.GetComponent<ULobbyEntryElement>();
+			if (!component.IsNullOrDestroyed() && sessionList.TryFind(component.GetGuid(), out var value) && !value.GetToken().IsNullOrDestroyed())
+			{
+				component.SetSession(component.GetGuid(), value, component.GetSessionFilter());
+			}
+		}
+	}
+
+	public override ULobbyEntryElement CreateLobbydEntries(List<UdpSession> sessionList, Session_Filter selectedFilter, Guid selectedGuid, Action<object> onEntryButtonClick, Action<ISelectableViewAdapter> onEntryButtonSelect)
+	{
+		CleanButtons();
+		int num = 1;
+		ULobbyEntryElement uLobbyEntryElement = null;
+		foreach (UdpSession session in sessionList)
+		{
+			MultiplayerTokens.Session token = session.GetToken();
+			if (token != null && token.IsShowable())
+			{
+				ULobbyEntryElement uLobbyEntryElement2 = CreateLobbyEntryElement();
+				uLobbyEntryElement2.SetSession(session.Id, session, selectedFilter);
+				uLobbyEntryElement2.SetRank(num);
+				num++;
+				if (uLobbyEntryElement == null)
+				{
+					uLobbyEntryElement = uLobbyEntryElement2;
+				}
+				if (uLobbyEntryElement2.GetGuid() == selectedGuid)
+				{
+					uLobbyEntryElement = uLobbyEntryElement2;
+				}
+				TMPLabelButtonViewAdapter component = uLobbyEntryElement2.gameObject.GetComponent<TMPLabelButtonViewAdapter>();
+				component.Click += onEntryButtonClick;
+				component.Selected += onEntryButtonSelect;
+			}
+		}
+		Canvas.ForceUpdateCanvases();
+		return uLobbyEntryElement;
+	}
+
+	public override IButtonViewAdapter GetFirstButton()
+	{
+		IButtonViewAdapter buttonViewAdapter = _lobbyButtons.FirstOrDefault_NonAlloc();
+		if (buttonViewAdapter.IsNullOrDestroyed())
+		{
+			return _backButton;
+		}
+		return buttonViewAdapter;
+	}
+
+	public override void CleanButtons()
+	{
+		foreach (Transform item in _lobbyEntryElementContainer)
+		{
+			UnityEngine.Object.Destroy(item.gameObject);
+		}
+	}
+
+	private void SessionFilterButton_Selected(ISelectableViewAdapter widget)
+	{
+		_scrollView.FocusElement(widget.transform);
+	}
+
+	public void ToggleNoEntriesFoundLabel(bool value)
+	{
+		_noLobbyEntriesLabel.transform.gameObject.SetActive(value);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 252
+PATH: Assembly-CSharp__Beam.UI__UMainMenuViewAdapter.cs
+SIZE: 16799 bytes
+SHA256: 3ab2d28d7e42ad8b6f8469b9bd20859b8338b8f2e534791dae48d59d57b5c14d
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using Rewired;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class UMainMenuViewAdapter : MainMenuViewAdapterBase
+{
+	[SerializeField]
+	private GameObject _mainMenuGameObject;
+
+	[SerializeField]
+	private Canvas _canvas;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private GameObject _mainMenuControlGroup;
+
+	[SerializeField]
+	private GameObject _pauseMenuControlGroup;
+
+	[SerializeField]
+	private GameObject _playSubMenu;
+
+	[SerializeField]
+	private GameObject _playSubMenuControlGroup;
+
+	[SerializeField]
+	private GameObject _playOnlineSubMenu;
+
+	[SerializeField]
+	private GameObject _playOnlineSubMenuControlGroup;
+
+	[SerializeField]
+	private GameObject _playOnlineHostSubMenu;
+
+	[SerializeField]
+	private GameObject _playOnlineHostSubMenuControlGroup;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playSubMenuBackButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _newGameButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _continueGameButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _continueCoopButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineBackButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineHostBackButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineContinueButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineNewGameButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineHostButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _playOnlineJoinButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _changeSaveSlotButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _cartographerButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _leaderboardsButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _optionsButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _quitToDesktopButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _resumePauseButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _optionsPauseButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _quitGamePauseButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _quitToDesktopPauseButton;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _versionNumberLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _versionTypeLabel;
+
+	[SerializeField]
+	private GameObject _userDetailsGroup;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _userNameLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _userDetailsDayLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _userDetailsHoursLabel;
+
+	[SerializeField]
+	private GameObject _lobbyCodeGroup;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _lobbyCodeLabel;
+
+	[SerializeField]
+	private UButtonViewAdapter _copyLobbyCodeButton;
+
+	[SerializeField]
+	private UTextureViewAdapter _backgroundTexture;
+
+	[SerializeField]
+	private TooltipController _tooltipController;
+
+	private Dictionary<object, string> _tooltips;
+
+	public override GameObject MainMenuGameObject => _mainMenuGameObject;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override GameObject MainMenuControlGroup => _mainMenuControlGroup;
+
+	public override GameObject PauseMenuControlGroup => _pauseMenuControlGroup;
+
+	public override GameObject PlaySubMenu => _playSubMenu;
+
+	public override GameObject PlaySubMenuControlGroup => _playSubMenuControlGroup;
+
+	public override GameObject PlayOnlineSubMenu => _playOnlineSubMenu;
+
+	public override GameObject PlayOnlineSubMenuControlGroup => _playOnlineSubMenuControlGroup;
+
+	public override GameObject PlayOnlineHostSubMenu => _playOnlineHostSubMenu;
+
+	public override GameObject PlayOnlineHostSubMenuControlGroup => _playOnlineHostSubMenuControlGroup;
+
+	public override ILabelButtonViewAdapter PlayButton => _playButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineButton => _playOnlineButton;
+
+	public override ILabelButtonViewAdapter PlaySubMenuBackButton => _playSubMenuBackButton;
+
+	public override ILabelButtonViewAdapter NewGameButton => _newGameButton;
+
+	public override ILabelButtonViewAdapter ContinueButton => _continueGameButton;
+
+	public override ILabelButtonViewAdapter ContinueCoopButton => _continueCoopButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineBackButton => _playOnlineBackButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineHostBackButton => _playOnlineHostBackButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineContinueButton => _playOnlineContinueButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineNewGameButton => _playOnlineNewGameButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineHostButton => _playOnlineHostButton;
+
+	public override ILabelButtonViewAdapter PlayOnlineJoinButton => _playOnlineJoinButton;
+
+	public override ILabelButtonViewAdapter ChangeSaveSlotButton => _changeSaveSlotButton;
+
+	public override ILabelButtonViewAdapter CartographerButton => _cartographerButton;
+
+	public override ILabelButtonViewAdapter LeaderboardsButton => _leaderboardsButton;
+
+	public override ILabelButtonViewAdapter OptionsButton => _optionsButton;
+
+	public override ILabelButtonViewAdapter QuitToDesktopButton => _quitToDesktopButton;
+
+	public override ILabelButtonViewAdapter ResumePauseButton => _resumePauseButton;
+
+	public override ILabelButtonViewAdapter OptionsPauseButton => _optionsPauseButton;
+
+	public override ILabelButtonViewAdapter QuitGamePauseButton => _quitGamePauseButton;
+
+	public override ILabelButtonViewAdapter QuitToDesktopPauseButton => _quitToDesktopPauseButton;
+
+	public override ILabelViewAdapter VersionNumberLabel => _versionNumberLabel;
+
+	public override ILabelViewAdapter VersionTypeLabel => _versionTypeLabel;
+
+	public override GameObject UserDetailsGroup => _userDetailsGroup;
+
+	public override ILabelViewAdapter UserNameLabel => _userNameLabel;
+
+	public override ILabelViewAdapter UserDetailsDaysLabel => _userDetailsDayLabel;
+
+	public override ILabelViewAdapter UserDetailsHoursLabel => _userDetailsHoursLabel;
+
+	public override GameObject LobbyCodeGroup => _lobbyCodeGroup;
+
+	public override ILabelViewAdapter LobbyCodeLabel => _lobbyCodeLabel;
+
+	public override UButtonViewAdapter CopyLobbyCodeButton => _copyLobbyCodeButton;
+
+	public override ITextureViewAdapter BackgroundTexture => _backgroundTexture;
+
+	private void Awake()
+	{
+		Visible = _mainMenuGameObject.activeInHierarchy;
+		_tooltips = new Dictionary<object, string>
+		{
+			{ _playButton, "MAIN_MENU_BUTTON_PLAY_DESC" },
+			{ _playOnlineButton, "MAIN_MENU_BUTTON_PLAY_ONLINE_DESC" },
+			{ _cartographerButton, "MAIN_MENU_BUTTON_CARTOGRAPHER_DESC" },
+			{ _leaderboardsButton, "MAIN_MENU_BUTTON_LEADERBOARDS_DESC" },
+			{ _continueGameButton, "MAIN_MENU_BUTTON_CONTINUE_DESC" },
+			{ _continueCoopButton, "MAIN_MENU_BUTTON_CONTINUE_COOP_DESC" },
+			{ _newGameButton, "MAIN_MENU_BUTTON_NEW_GAME_DESC" },
+			{ _playOnlineContinueButton, "PLAY_ONLINE_MENU_BUTTON_CONTINUE_DESC" },
+			{ _playOnlineHostButton, "PLAY_ONLINE_MENU_BUTTON_HOST_DESC" },
+			{ _playOnlineJoinButton, "PLAY_ONLINE_MENU_BUTTON_JOIN_DESC" },
+			{ _playOnlineNewGameButton, "PLAY_ONLINE_MENU_BUTTON_NEW_GAME_DESC" }
+		};
+		_tooltipController.ClearTooltip();
+		_playButton.Selected += Widget_Selected;
+		_playButton.MouseEnter += Widget_MouseEnter;
+		_playButton.MouseLeave += Widget_MouseLeave;
+		_playOnlineButton.Selected += Widget_Selected;
+		_playOnlineButton.MouseEnter += Widget_MouseEnter;
+		_playOnlineButton.MouseLeave += Widget_MouseLeave;
+		_changeSaveSlotButton.Selected += Widget_Selected;
+		_cartographerButton.Selected += Widget_Selected;
+		_cartographerButton.MouseEnter += Widget_MouseEnter;
+		_cartographerButton.MouseLeave += Widget_MouseLeave;
+		_leaderboardsButton.Selected += Widget_Selected;
+		_leaderboardsButton.MouseEnter += Widget_MouseEnter;
+		_leaderboardsButton.MouseLeave += Widget_MouseLeave;
+		_optionsButton.Selected += Widget_Selected;
+		_quitToDesktopButton.Selected += Widget_Selected;
+		_continueGameButton.Selected += Widget_Selected;
+		_continueGameButton.MouseEnter += Widget_MouseEnter;
+		_continueGameButton.MouseLeave += Widget_MouseLeave;
+		_continueCoopButton.Selected += Widget_Selected;
+		_continueCoopButton.MouseEnter += Widget_MouseEnter;
+		_continueCoopButton.MouseLeave += Widget_MouseLeave;
+		_newGameButton.Selected += Widget_Selected;
+		_newGameButton.MouseEnter += Widget_MouseEnter;
+		_newGameButton.MouseLeave += Widget_MouseLeave;
+		_playSubMenuBackButton.Selected += Widget_Clear_Tooltip;
+		_playOnlineContinueButton.Selected += Widget_Selected;
+		_playOnlineContinueButton.MouseEnter += Widget_MouseEnter;
+		_playOnlineContinueButton.MouseLeave += Widget_MouseLeave;
+		_playOnlineHostButton.Selected += Widget_Selected;
+		_playOnlineHostButton.MouseEnter += Widget_MouseEnter;
+		_playOnlineHostButton.MouseLeave += Widget_MouseLeave;
+		_playOnlineJoinButton.Selected += Widget_Selected;
+		_playOnlineJoinButton.MouseEnter += Widget_MouseEnter;
+		_playOnlineJoinButton.MouseLeave += Widget_MouseLeave;
+		_playOnlineBackButton.Selected += Widget_Clear_Tooltip;
+		_playOnlineNewGameButton.Selected += Widget_Selected;
+		_playOnlineNewGameButton.MouseEnter += Widget_MouseEnter;
+		_playOnlineNewGameButton.MouseLeave += Widget_MouseLeave;
+		_playOnlineHostBackButton.Selected += Widget_Clear_Tooltip;
+	}
+
+	private void OnDestroy()
+	{
+		_playButton.Selected -= Widget_Selected;
+		_playButton.MouseEnter -= Widget_MouseEnter;
+		_playButton.MouseLeave -= Widget_MouseLeave;
+		_playOnlineButton.Selected -= Widget_Selected;
+		_playOnlineButton.MouseEnter -= Widget_MouseEnter;
+		_playOnlineButton.MouseLeave -= Widget_MouseLeave;
+		_cartographerButton.Selected -= Widget_Selected;
+		_cartographerButton.MouseEnter -= Widget_MouseEnter;
+		_cartographerButton.MouseLeave -= Widget_MouseLeave;
+		_leaderboardsButton.Selected -= Widget_Selected;
+		_leaderboardsButton.MouseEnter -= Widget_MouseEnter;
+		_leaderboardsButton.MouseLeave -= Widget_MouseLeave;
+		_optionsButton.Selected -= Widget_Selected;
+		_quitToDesktopButton.Selected -= Widget_Selected;
+		_continueGameButton.Selected -= Widget_Selected;
+		_continueGameButton.MouseEnter -= Widget_MouseEnter;
+		_continueGameButton.MouseLeave -= Widget_MouseLeave;
+		_continueCoopButton.Selected -= Widget_Selected;
+		_continueCoopButton.MouseEnter -= Widget_MouseEnter;
+		_continueCoopButton.MouseLeave -= Widget_MouseLeave;
+		_newGameButton.Selected -= Widget_Selected;
+		_newGameButton.MouseEnter -= Widget_MouseEnter;
+		_newGameButton.MouseLeave -= Widget_MouseLeave;
+		_playSubMenuBackButton.Selected -= Widget_Clear_Tooltip;
+		_playOnlineContinueButton.Selected -= Widget_Selected;
+		_playOnlineContinueButton.MouseEnter -= Widget_MouseEnter;
+		_playOnlineContinueButton.MouseLeave -= Widget_MouseLeave;
+		_playOnlineHostButton.Selected -= Widget_Selected;
+		_playOnlineHostButton.MouseEnter -= Widget_MouseEnter;
+		_playOnlineHostButton.MouseLeave -= Widget_MouseLeave;
+		_playOnlineJoinButton.Selected -= Widget_Selected;
+		_playOnlineJoinButton.MouseEnter -= Widget_MouseEnter;
+		_playOnlineJoinButton.MouseLeave -= Widget_MouseLeave;
+		_playOnlineBackButton.Selected -= Widget_Clear_Tooltip;
+		_playOnlineNewGameButton.Selected -= Widget_Selected;
+		_playOnlineNewGameButton.MouseEnter -= Widget_MouseEnter;
+		_playOnlineNewGameButton.MouseLeave -= Widget_MouseLeave;
+		_playOnlineHostBackButton.Selected -= Widget_Clear_Tooltip;
+	}
+
+	private void Widget_Selected(object sender)
+	{
+		_tooltips.TryGetValue(sender, out var value);
+		_tooltipController.transform.SetParent(((IButtonViewAdapter)sender).transform.parent, worldPositionStays: false);
+		_tooltipController.transform.SetAsLastSibling();
+		_tooltipController.SetTooltip(value);
+	}
+
+	private void Widget_MouseEnter(ISelectableViewAdapter sender)
+	{
+		Widget_Selected(sender);
+	}
+
+	private void Widget_MouseLeave(ISelectableViewAdapter sender)
+	{
+		_tooltipController.SetTooltip(string.Empty);
+	}
+
+	private void Widget_Clear_Tooltip(ISelectableViewAdapter sender)
+	{
+		_tooltipController.SetTooltip(string.Empty);
+	}
+
+	public override void Show()
+	{
+		_tooltipController.ClearTooltip();
+		_mainMenuGameObject.SetActive(value: true);
+		_canvas.enabled = true;
+		_canvasGroup.Interactable = true;
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		_mainMenuGameObject.SetActive(value: false);
+		_canvas.enabled = false;
+		_canvasGroup.Interactable = false;
+		base.Hide();
+	}
+
+	public override void SetInput(Rewired.Player input)
+	{
+		base.SetInput(input);
+		if (Input != null)
+		{
+			RewiredUtilities.SetUserInterfaceFromInput(transform.GetComponentsInChildren<Selectable>(includeInactive: true), Input);
+		}
+	}
+
+	public override void SetNavigation()
+	{
+		Transform element = (_playOnlineButton.gameObject.activeSelf ? _playOnlineButton.transform : _changeSaveSlotButton.transform);
+		_playButton.transform.SetNavigation(NavigationDirection.Down, element);
+		_playOnlineButton.transform.SetNavigation(NavigationDirection.Up, _playButton.transform);
+		_playOnlineButton.transform.SetNavigation(NavigationDirection.Down, _changeSaveSlotButton.transform);
+		Transform element2 = (_playOnlineButton.gameObject.activeSelf ? _playOnlineButton.transform : _playButton.transform);
+		_changeSaveSlotButton.transform.SetNavigation(NavigationDirection.Up, element2);
+		_changeSaveSlotButton.transform.SetNavigation(NavigationDirection.Down, _cartographerButton.transform);
+		Transform element3 = (_leaderboardsButton.gameObject.activeSelf ? _leaderboardsButton.transform : _optionsButton.transform);
+		_cartographerButton.transform.SetNavigation(NavigationDirection.Up, _changeSaveSlotButton.transform);
+		_cartographerButton.transform.SetNavigation(NavigationDirection.Down, element3);
+		_leaderboardsButton.transform.SetNavigation(NavigationDirection.Up, _cartographerButton.transform);
+		_leaderboardsButton.transform.SetNavigation(NavigationDirection.Down, _optionsButton.transform);
+		Transform element4 = (_leaderboardsButton.gameObject.activeSelf ? _leaderboardsButton.transform : _cartographerButton.transform);
+		_optionsButton.transform.SetNavigation(NavigationDirection.Up, element4);
+		_optionsButton.transform.SetNavigation(NavigationDirection.Down, _quitToDesktopButton.transform);
+		_quitToDesktopButton.transform.SetNavigation(NavigationDirection.Up, _optionsButton.transform);
+		Transform element5 = (_continueCoopButton.gameObject.activeSelf ? _continueCoopButton.transform : _newGameButton.transform);
+		_continueGameButton.transform.SetNavigation(NavigationDirection.Down, element5);
+		_continueCoopButton.transform.SetNavigation(NavigationDirection.Up, _continueGameButton.transform);
+		_continueCoopButton.transform.SetNavigation(NavigationDirection.Down, _newGameButton.transform);
+		Transform element6 = (_continueCoopButton.gameObject.activeSelf ? _continueCoopButton.transform : _continueGameButton.transform);
+		_newGameButton.transform.SetNavigation(NavigationDirection.Up, element6);
+		_newGameButton.transform.SetNavigation(NavigationDirection.Down, _playSubMenuBackButton.transform);
+		_playSubMenuBackButton.transform.SetNavigation(NavigationDirection.Up, _newGameButton.transform);
+		_playOnlineContinueButton.transform.SetNavigation(NavigationDirection.Down, _playOnlineNewGameButton.transform);
+		_playOnlineNewGameButton.transform.SetNavigation(NavigationDirection.Up, _playOnlineContinueButton.transform);
+		_playOnlineNewGameButton.transform.SetNavigation(NavigationDirection.Down, _playOnlineHostBackButton.transform);
+		_playOnlineHostBackButton.transform.SetNavigation(NavigationDirection.Up, _playOnlineNewGameButton.transform);
+		_playOnlineHostButton.transform.SetNavigation(NavigationDirection.Down, _playOnlineJoinButton.transform);
+		_playOnlineJoinButton.transform.SetNavigation(NavigationDirection.Up, _playOnlineHostButton.transform);
+		_playOnlineJoinButton.transform.SetNavigation(NavigationDirection.Down, _playOnlineBackButton.transform);
+	}
+
+	public override IButtonViewAdapter GetFirstButton()
+	{
+		return GetActiveMenuControlsGroup().GetFirstChild(active: true).GetInterface<IButtonViewAdapter>();
+	}
+
+	private Transform GetActiveMenuControlsGroup()
+	{
+		if (_playSubMenu.activeSelf)
+		{
+			return _playSubMenuControlGroup.transform;
+		}
+		if (_playOnlineSubMenu.activeSelf)
+		{
+			return _playOnlineSubMenuControlGroup.transform;
+		}
+		if (_playOnlineHostSubMenu.activeSelf)
+		{
+			return _playOnlineHostSubMenuControlGroup.transform;
+		}
+		if (_pauseMenuControlGroup.activeSelf)
+		{
+			return _pauseMenuControlGroup.transform;
+		}
+		return _mainMenuControlGroup.transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 253
+PATH: Assembly-CSharp__Beam.UI__UQuickCrafterRadialMenuViewAdapter.cs
+SIZE: 1572 bytes
+SHA256: c623b345d2c975825933e38657a4ce9e53df1a6b06264bff5c717b2b11de7cfe
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UQuickCrafterRadialMenuViewAdapter : QuickCrafterRadialMenuViewAdapterBase
+{
+	[SerializeField]
+	private QuickCrafterRadialMenuElement _elementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementPlaceholderPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementContainer;
+
+	[SerializeField]
+	private TransformViewAdapter _pooledElementContainer;
+
+	[SerializeField]
+	private UImageViewAdapter _selector;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _titleLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _descriptionLabel;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _detailsCanvasGroup;
+
+	[SerializeField]
+	private Texture2D _blurMaskTexture;
+
+	public override QuickCrafterRadialMenuElement ElementPrefab => _elementPrefab;
+
+	public override ITransformViewAdapter ElementPlaceholderPrefab => _elementPlaceholderPrefab;
+
+	public override ITransformViewAdapter ElementContainer => _elementContainer;
+
+	public override ITransformViewAdapter PooledElementContainer => _pooledElementContainer;
+
+	public override IImageViewAdapter SelectorImage => _selector;
+
+	public override ILabelViewAdapter TitleLabel => _titleLabel;
+
+	public override ILabelViewAdapter DescriptionLabel => _descriptionLabel;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override ICanvasGroupViewAdapter DetailsCanvasGroup => _detailsCanvasGroup;
+
+	public override Texture2D BlurMaskTexture => _blurMaskTexture;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 254
+PATH: Assembly-CSharp__Beam.UI__UScrollviewViewAdapter.cs
+SIZE: 721 bytes
+SHA256: 2809f41176670281ae3e9768c3b14356db1199bc6137f24b75c257dd8a203650
+====================================================================================================
+
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class UScrollviewViewAdapter : ScrollviewViewAdapterBase<ScrollRect>
+{
+	private TransformViewAdapter _content;
+
+	public override ITransformViewAdapter Content
+	{
+		get
+		{
+			if (_content == null)
+			{
+				_content = new TransformViewAdapter(Scrollview.content);
+			}
+			return _content;
+		}
+	}
+
+	public override float NormalizedHorizontalPosition
+	{
+		get
+		{
+			return Scrollview.horizontalNormalizedPosition;
+		}
+		set
+		{
+			Scrollview.horizontalNormalizedPosition = value;
+		}
+	}
+
+	public override float NormalizedVerticalPosition
+	{
+		get
+		{
+			return Scrollview.verticalNormalizedPosition;
+		}
+		set
+		{
+			Scrollview.verticalNormalizedPosition = value;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 255
+PATH: Assembly-CSharp__Beam.UI__USkillNotificationsViewAdapter.cs
+SIZE: 283 bytes
+SHA256: c4605103a4e040abeecdbea35a1ef56dd4f72db8a4e5cfe811223dcf26caa443
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class USkillNotificationsViewAdapter : NotificationsViewAdapterBase
+{
+	[SerializeField]
+	private TransformViewAdapter _notificationsContainer;
+
+	public override ITransformViewAdapter NotificationsContainer => _notificationsContainer;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 256
+PATH: Assembly-CSharp__Beam.UI__UStorageRadialMenuViewAdapter.cs
+SIZE: 2182 bytes
+SHA256: 7bdd392cde88744289b8a1dbe94e8635381d6e20d5b3308672333ad1d78724fc
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UStorageRadialMenuViewAdapter : InventoryRadialMenuViewAdapterBase
+{
+	[SerializeField]
+	private InventoryRadialMenuElement _elementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementPlaceholderPrefab;
+
+	[SerializeField]
+	private InventoryRadialMenuElement _emptyHandElementPrefab;
+
+	[SerializeField]
+	private InventoryRadialMenuElement _storageElementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementContainer;
+
+	[SerializeField]
+	private TransformViewAdapter _pooledElementContainer;
+
+	[SerializeField]
+	private UImageViewAdapter _selector;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _titleLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _descriptionLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _classificationLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _healthLabel;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _detailsCanvasGroup;
+
+	[SerializeField]
+	private Texture2D _blurMaskTexture;
+
+	public override InventoryRadialMenuElement ElementPrefab => _elementPrefab;
+
+	public override ITransformViewAdapter ElementPlaceholderPrefab => _elementPlaceholderPrefab;
+
+	public override InventoryRadialMenuElement EmptyHandElementPrefab => _emptyHandElementPrefab;
+
+	public override InventoryRadialMenuElement StorageElementPrefab => _storageElementPrefab;
+
+	public override ITransformViewAdapter ElementContainer => _elementContainer;
+
+	public override ITransformViewAdapter PooledElementContainer => _pooledElementContainer;
+
+	public override IImageViewAdapter SelectorImage => _selector;
+
+	public override ILabelViewAdapter TitleLabel => _titleLabel;
+
+	public override ILabelViewAdapter DescriptionLabel => _descriptionLabel;
+
+	public override ILabelViewAdapter ClassificationLabel => _classificationLabel;
+
+	public override ILabelViewAdapter HealthLabel => _healthLabel;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override ICanvasGroupViewAdapter DetailsCanvasGroup => _detailsCanvasGroup;
+
+	public override Texture2D BlurMaskTexture => _blurMaskTexture;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 257
+PATH: Assembly-CSharp__Beam.UI__UVideoScreenViewAdapter.cs
+SIZE: 606 bytes
+SHA256: 7d08aa1e1266f62685aef1bfe4cbf1c3336978b687d91026a68484f929d9640f
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UVideoScreenViewAdapter : MonoBehaviour
+{
+	[SerializeField]
+	private GameObject _gameObject;
+
+	[SerializeField]
+	private RectTransform _temp;
+
+	[SerializeField]
+	private AudioClip _tempClip;
+
+	public void Show()
+	{
+		_gameObject.SetActive(value: true);
+		LeanTween.value(gameObject, SetScale, 0f, 1f, 0.15f);
+		AudioManager.GetAudioPlayer().Play2D(_tempClip, AudioMixerChannels.Master);
+	}
+
+	public void Hide()
+	{
+		_gameObject.SetActive(value: false);
+	}
+
+	private void SetScale(float value)
+	{
+		_temp.localScale = new Vector3(value, value, 1f);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 258
+PATH: Assembly-CSharp__Beam.UI__VomitPlayerEffect.cs
+SIZE: 1205 bytes
+SHA256: 9623084699f646a485d13536e67327adbed9088ea66f58d22c7e23e2f353cc1d
+====================================================================================================
+
+using System.Collections.Generic;
+using MEC;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class VomitPlayerEffect : MonoBehaviour
+{
+	[SerializeField]
+	private ParticleSystem _view;
+
+	[SerializeField]
+	private Player _player;
+
+	[SerializeField]
+	private AudioClip[] _clips;
+
+	[SerializeField]
+	private AudioClip[] _clipsFemale;
+
+	private CoroutineHandle _sequence;
+
+	private void Start()
+	{
+		_player.Statistics.Vomited += PlayerStatistics_Vomited;
+		_view.transform.parent = _player.Character.CameraRigTransform;
+		_view.transform.localPosition = Vector3.zero;
+	}
+
+	private void OnDestroy()
+	{
+		if (_player.Statistics != null)
+		{
+			_player.Statistics.Vomited -= PlayerStatistics_Vomited;
+		}
+	}
+
+	private void PlayerStatistics_Vomited(float vomitTime)
+	{
+		Timing.KillCoroutines(_sequence);
+		_sequence = Timing.RunCoroutine(Vomit_Sequence(vomitTime));
+	}
+
+	private IEnumerator<float> Vomit_Sequence(float vomitTime)
+	{
+		AudioManager.GetAudioPlayer().Play3D((_player.Gender == 0) ? _clips : _clipsFemale, transform.position, AudioMixerChannels.FX, AudioRollOffDistance.Near);
+		_view.time = 0f;
+		_view.Play(withChildren: true);
+		yield return Timing.WaitForSeconds(vomitTime);
+		_view.Stop();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 259
+PATH: Assembly-CSharp__Beam.UI__WatchScreenViewAdapter.cs
+SIZE: 1531 bytes
+SHA256: 2a8f65af3bf1341161a34eb08d1ee03ced9be2c4d88fbfe151f78dd88f83c3f6
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class WatchScreenViewAdapter : WatchScreenViewAdapterBase
+{
+	[SerializeField]
+	private Renderer _watchScreenRenderer;
+
+	private Renderer _watchRenderer;
+
+	[SerializeField]
+	private Renderer _watchRendererMale;
+
+	[SerializeField]
+	private Renderer _watchRendererFemale;
+
+	[SerializeField]
+	private Transform _watchMaleScreenPos;
+
+	[SerializeField]
+	private Transform _watchFemaleScreenPos;
+
+	[SerializeField]
+	private Light _light;
+
+	public override void SetWatchMesh(int type)
+	{
+		if (type == 0)
+		{
+			_watchRenderer = _watchRendererMale;
+			_watchRendererMale.enabled = true;
+			_watchRendererFemale.enabled = false;
+			_watchScreenRenderer.transform.position = _watchMaleScreenPos.position;
+		}
+		else
+		{
+			_watchRenderer = _watchRendererFemale;
+			_watchRendererFemale.enabled = true;
+			_watchRendererMale.enabled = false;
+			_watchScreenRenderer.transform.position = _watchFemaleScreenPos.position;
+		}
+	}
+
+	public override void SetWatchTexture(Texture texture)
+	{
+		_watchScreenRenderer.material.mainTexture = texture;
+	}
+
+	public override void SetBacklight(bool enabled)
+	{
+		if (!(_watchRenderer == null))
+		{
+			_light.intensity = (enabled ? 1f : 0.3f);
+			for (int i = 0; i < _watchRenderer.sharedMaterials.Length; i++)
+			{
+				_watchRenderer.sharedMaterials[i].EnableKeyword("_EMISSION");
+				_watchRenderer.sharedMaterials[i].SetColor("_EmissionColor", enabled ? Color.Lerp(Color.black, Color.white, 0.5f) : Color.Lerp(Color.black, Color.white, 0.2f));
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 260
+PATH: Assembly-CSharp__Beam.Utilities__BeamTeam.cs
+SIZE: 6204 bytes
+SHA256: f5f43f413c51831a1894a2e2a3a731026ab90581ab6eb67a2f9685b3a4a4054a
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Beam.UI;
+using MEC;
+using UnityEngine;
+
+namespace Beam.Utilities;
+
+public static class BeamTeam
+{
+	public static CoroutineHandle RunCoroutine(this Timing timing, IEnumerator<float> enumerator, Action<Exception> onComplete)
+	{
+		return timing.RunCoroutineOnInstance(RunThrowingIterator(enumerator, onComplete));
+	}
+
+	public static IEnumerator<float> RunThrowingIterator(IEnumerator<float> enumerator, Action<Exception> onComplete)
+	{
+		while (true)
+		{
+			float current;
+			try
+			{
+				if (!enumerator.MoveNext())
+				{
+					break;
+				}
+				current = enumerator.Current;
+			}
+			catch (Exception obj)
+			{
+				onComplete(obj);
+				break;
+			}
+			onComplete(null);
+			yield return current;
+		}
+	}
+
+	public static float WaitForTask<T>(Func<Task<T>> task, Action<T> callback)
+	{
+		return Timing.WaitUntilDone(Timing.RunCoroutine(WaitForTask_Sequence(task, callback)));
+	}
+
+	private static IEnumerator<float> WaitForTask_Sequence<T>(Func<Task<T>> task, Action<T> callback)
+	{
+		Task<T> t = Task.Run(task);
+		while (!t.IsCompleted)
+		{
+			yield return 0f;
+		}
+		callback?.Invoke(t.Result);
+	}
+
+	public static void InvokeDelayed(float delay, Action callback)
+	{
+		if (callback != null)
+		{
+			Timing.RunCoroutine(InvokeDelayed_Sequence(delay, callback));
+		}
+	}
+
+	private static IEnumerator<float> InvokeDelayed_Sequence(float delay, Action callback)
+	{
+		yield return float.NegativeInfinity;
+		float timer = 0f;
+		while (timer < delay)
+		{
+			timer += Time.unscaledDeltaTime;
+			yield return 0f;
+		}
+		callback?.Invoke();
+	}
+
+	public static void CopyDirectory(string srcDir, string dstDir, bool overwrite = false)
+	{
+		if (!Directory.Exists(srcDir))
+		{
+			Debug.LogError(srcDir + " does not exist!");
+			return;
+		}
+		if (!Directory.Exists(dstDir))
+		{
+			Directory.CreateDirectory(dstDir);
+		}
+		foreach (string item in from name in Directory.EnumerateFiles(srcDir)
+			where !name.EndsWith(".meta", StringComparison.InvariantCultureIgnoreCase)
+			select name)
+		{
+			File.Copy(item, Path.Combine(dstDir, Path.GetFileName(item)), overwrite);
+		}
+		string[] directories = Directory.GetDirectories(srcDir);
+		foreach (string text in directories)
+		{
+			CopyDirectory(text, Path.Combine(dstDir, Path.GetFileName(text)));
+		}
+	}
+
+	public static float LinearToDecibel(float value)
+	{
+		if (!(value > 0f))
+		{
+			return -144f;
+		}
+		return 20f * Mathf.Log10(value);
+	}
+
+	public static void SafeStopCoroutine(this MonoBehaviour behaviour, Coroutine coroutine)
+	{
+		if (coroutine != null)
+		{
+			behaviour.StopCoroutine(coroutine);
+		}
+	}
+
+	public static TInterface GetInterface<TInterface>(this GameObject gameObject) where TInterface : class
+	{
+		return gameObject.GetComponent(typeof(TInterface)) as TInterface;
+	}
+
+	public static TInterface GetInterface<TInterface>(this Component behaviour) where TInterface : class
+	{
+		return behaviour.GetComponent(typeof(TInterface)) as TInterface;
+	}
+
+	public static TInterface GetInterfaceInChildren<TInterface>(this Component behaviour, bool includeInactive) where TInterface : class
+	{
+		return behaviour.GetComponentInChildren(typeof(TInterface), includeInactive) as TInterface;
+	}
+
+	public static TInterface[] GetInterfaces<TInterface>(this Component behaviour) where TInterface : class
+	{
+		return behaviour.GetComponents(typeof(TInterface)) as TInterface[];
+	}
+
+	public static TInterface[] GetInterfacesInChildren<TInterface>(this Component behaviour, bool includeInactive) where TInterface : class
+	{
+		return behaviour.GetComponentsInChildren(typeof(TInterface), includeInactive) as TInterface[];
+	}
+
+	public static Transform FindChildWithTag(this Transform transform, string tag)
+	{
+		Transform[] componentsInChildren = transform.GetComponentsInChildren<Transform>(includeInactive: true);
+		foreach (Transform transform2 in componentsInChildren)
+		{
+			if (transform2.CompareTag(tag))
+			{
+				return transform2;
+			}
+		}
+		return null;
+	}
+
+	public static bool IsNullOrDestroyed(this object value)
+	{
+		return value?.Equals(null) ?? true;
+	}
+
+	public static bool IsValid(this object value)
+	{
+		return !value.IsNullOrDestroyed();
+	}
+
+	public static void Destroy<T>(T component) where T : UnityEngine.Object
+	{
+		if ((bool)component)
+		{
+			UnityEngine.Object.Destroy(component);
+			component = null;
+		}
+	}
+
+	public static void DestroyAll<T>(T[] components) where T : UnityEngine.Object
+	{
+		for (int num = components.Length - 1; num >= 0; num--)
+		{
+			Destroy(components[num]);
+		}
+	}
+
+	public static void DestroyImmediate<T>(T component, bool sceneObjects = false) where T : UnityEngine.Object
+	{
+		if ((bool)component)
+		{
+			UnityEngine.Object.DestroyImmediate(component, sceneObjects);
+			component = null;
+		}
+	}
+
+	public static void DestroyAllImmediate<T>(T[] components, bool sceneObjects = false) where T : UnityEngine.Object
+	{
+		for (int num = components.Length - 1; num >= 0; num--)
+		{
+			DestroyImmediate(components[num], sceneObjects);
+		}
+	}
+
+	public static void DestroyAllChildren(Transform transform)
+	{
+		if (transform == null)
+		{
+			return;
+		}
+		Transform[] componentsInChildren = transform.GetComponentsInChildren<Transform>(includeInactive: true);
+		for (int num = componentsInChildren.Length - 1; num >= 0; num--)
+		{
+			Transform transform2 = componentsInChildren[num];
+			if (!(transform2 == transform) && !transform2.IsNullOrDestroyed())
+			{
+				Destroy(transform2.gameObject);
+			}
+		}
+	}
+
+	public static void DestroyAllChildrenImmediate(Transform transform)
+	{
+		if (transform == null)
+		{
+			return;
+		}
+		Transform[] componentsInChildren = transform.GetComponentsInChildren<Transform>(includeInactive: true);
+		for (int num = componentsInChildren.Length - 1; num >= 0; num--)
+		{
+			Transform transform2 = componentsInChildren[num];
+			if (!(transform2 == transform) && !transform2.IsNullOrDestroyed())
+			{
+				DestroyImmediate(transform2.gameObject);
+			}
+		}
+	}
+
+	public static void DestroyAllChildren(ITransformViewAdapter transform)
+	{
+		if (transform == null || transform.Transform == null)
+		{
+			return;
+		}
+		foreach (Transform item in transform.Transform)
+		{
+			Destroy(item.gameObject);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 261
+PATH: Assembly-CSharp__Beam.Utilities__Debug3DText.cs
+SIZE: 1226 bytes
+SHA256: e677763143740c58decf46b6c0dea908534e3234eb249c3963daaf95d92eaf55
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Utilities;
+
+public static class Debug3DText
+{
+	public static void Update(Transform parent, ref TextMesh textMesh, string value, float localOffset = 1.67f, bool attach = true, float localScale = 0.1f)
+	{
+		if (textMesh.IsNullOrDestroyed())
+		{
+			GameObject gameObject = new GameObject("DebugText", typeof(TextMesh))
+			{
+				layer = Layers.PLAYER
+			};
+			textMesh = gameObject.GetComponent<TextMesh>();
+			textMesh.alignment = TextAlignment.Center;
+			textMesh.anchor = TextAnchor.MiddleCenter;
+		}
+		GameObject gameObject2 = textMesh.gameObject;
+		if (attach)
+		{
+			gameObject2.transform.parent = parent;
+			gameObject2.transform.localRotation = Quaternion.identity;
+			gameObject2.transform.localScale = new Vector3(localScale, localScale, localScale);
+			gameObject2.transform.localPosition = new Vector3(0f, localOffset, 0f);
+		}
+		else
+		{
+			gameObject2.transform.position = parent.position;
+			gameObject2.transform.rotation = parent.rotation;
+			gameObject2.transform.localScale = new Vector3(localScale, localScale, localScale);
+			gameObject2.transform.localRotation = Quaternion.identity;
+			gameObject2.transform.localPosition = Vector3.zero;
+		}
+		textMesh.text = value;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 262
+PATH: Assembly-CSharp__Beam.Utilities__ExtensionMethods.cs
+SIZE: 7978 bytes
+SHA256: 102f9ef49c3dd1f679e807a38c223fa1cd4cd201860af1b4ac10202f21743675
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Crafting;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Utilities;
+
+public static class ExtensionMethods
+{
+	public static bool IsPrefab(this GameObject gameObject)
+	{
+		if (gameObject == null)
+		{
+			throw new ArgumentNullException("gameObject");
+		}
+		if (!gameObject.scene.IsValid() && !gameObject.scene.isLoaded)
+		{
+			return !gameObject.hideFlags.HasFlag(HideFlags.HideInHierarchy);
+		}
+		return false;
+	}
+
+	public static void SetLayerRecursively(this GameObject go, int layer)
+	{
+		if ((bool)go)
+		{
+			Transform[] componentsInChildren = go.GetComponentsInChildren<Transform>(includeInactive: true);
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				componentsInChildren[i].gameObject.layer = layer;
+			}
+		}
+	}
+
+	public static TElement FirstOrDefault_NonAlloc<TElement>(this IList<TElement> list)
+	{
+		if (list != null && list.Count > 0)
+		{
+			return list[0];
+		}
+		return default;
+	}
+
+	public static TElement FirstOrDefault_NonAlloc<TElement>(this IEnumerable<TElement> enumerable)
+	{
+		if (enumerable == null)
+		{
+			return default;
+		}
+		using (IEnumerator<TElement> enumerator = enumerable.GetEnumerator())
+		{
+			if (enumerator.MoveNext())
+			{
+				return enumerator.Current;
+			}
+		}
+		return default;
+	}
+
+	public static TElement FirstOrDefault_NonAlloc<TElement, TArg>(this IEnumerable<TElement> enumerable, Func<TElement, TArg, bool> predicate, TArg arg)
+	{
+		if (enumerable == null || predicate == null)
+		{
+			return default;
+		}
+		foreach (TElement item in enumerable)
+		{
+			if (predicate(item, arg))
+			{
+				return item;
+			}
+		}
+		return default;
+	}
+
+	public static T LastOrDefault_NonAlloc<T>(this IList<T> list)
+	{
+		if (list != null && list.Count > 0)
+		{
+			return list[list.Count - 1];
+		}
+		return default;
+	}
+
+	public static bool IsLast<T>(this IList<T> list, int index)
+	{
+		return index == ((list != null) ? new int?(list.Count - 1) : ((int?)null));
+	}
+
+	public static void Shuffle<T>(this IList<T> list)
+	{
+		System.Random random = new System.Random();
+		int num = list.Count;
+		while (num > 1)
+		{
+			num--;
+			int index = random.Next(num + 1);
+			T value = list[index];
+			list[index] = list[num];
+			list[num] = value;
+		}
+	}
+
+	public static bool Any_NonAlloc<TElement>(this IEnumerable<TElement> collection)
+	{
+		if (collection == null)
+		{
+			return false;
+		}
+		using (IEnumerator<TElement> enumerator = collection.GetEnumerator())
+		{
+			if (enumerator.MoveNext())
+			{
+				_ = enumerator.Current;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool Any_NonAlloc<TElement, TArg>(this IEnumerable<TElement> collection, Func<TElement, TArg, bool> predicate, TArg arg)
+	{
+		if (collection == null || predicate == null)
+		{
+			return false;
+		}
+		foreach (TElement item in collection)
+		{
+			if (predicate(item, arg))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool Any_NonAlloc<TElement, TArg>(this IList<TElement> list, Func<TElement, TArg, bool> predicate, TArg arg)
+	{
+		if (list == null || predicate == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < list.Count; i++)
+		{
+			TElement arg2 = list[i];
+			if (predicate(arg2, arg))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool Any_NonAlloc<TElement>(this IList<TElement> list, Func<TElement, bool> predicate)
+	{
+		if (list == null || predicate == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < list.Count; i++)
+		{
+			TElement arg = list[i];
+			if (predicate(arg))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool All_NonAlloc<TElement>(this IEnumerable<TElement> collection, Func<TElement, bool> predicate)
+	{
+		if (collection == null || predicate == null)
+		{
+			return false;
+		}
+		foreach (TElement item in collection)
+		{
+			if (!predicate(item))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static void ForEach_NonAlloc<TElement>(this IEnumerable<TElement> enumerable, Action<TElement> del)
+	{
+		if (enumerable == null || del == null)
+		{
+			return;
+		}
+		foreach (TElement item in enumerable)
+		{
+			del(item);
+		}
+	}
+
+	public static void ForEach_NonAlloc<TElement>(this IList<TElement> list, Action<TElement> del)
+	{
+		if (list != null && del != null)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				TElement obj = list[i];
+				del(obj);
+			}
+		}
+	}
+
+	public static bool DoesntContain<T>(this IList<T> list, T item)
+	{
+		return !list.Contains(item);
+	}
+
+	public static List<T> Swap<T>(this List<T> list, int indexA, int indexB)
+	{
+		T value = list[indexA];
+		list[indexA] = list[indexB];
+		list[indexB] = value;
+		return list;
+	}
+
+	public static bool Find<T>(this IList<T> list, T obj)
+	{
+		if (list == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < list.Count; i++)
+		{
+			if (list[i].Equals(obj))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static int FindIndex<T>(this IEnumerable<T> collection, Predicate<T> predicate)
+	{
+		if (collection == null || predicate == null)
+		{
+			return -1;
+		}
+		int num = 0;
+		foreach (T item in collection)
+		{
+			if (predicate(item))
+			{
+				return num;
+			}
+			num++;
+		}
+		return -1;
+	}
+
+	public static MiniGuid ToMiniGuid(this string v)
+	{
+		if (string.IsNullOrEmpty(v))
+		{
+			return default;
+		}
+		try
+		{
+			return new MiniGuid(new Guid(v));
+		}
+		catch (Exception)
+		{
+			Debug.LogError(v + " - unable to covert to Guid");
+			return default;
+		}
+	}
+
+	public static MiniGuid ToMiniGuid(this ulong v)
+	{
+		return new MiniGuid(v);
+	}
+
+	public static string ToSize(this int value, ESizeUnits unit)
+	{
+		return ((double)value / Math.Pow(1024.0, (double)unit)).ToString("0.00");
+	}
+
+	public static void CheckForProjectilesInChildren(this Transform transform)
+	{
+		BaseObject[] componentsInChildren = transform.gameObject.GetComponentsInChildren<BaseObject>();
+		foreach (BaseObject baseObject in componentsInChildren)
+		{
+			if (!(baseObject.transform == transform) && baseObject.gameObject.layer == Layers.PROJECTILES && baseObject is IProjectile projectile)
+			{
+				baseObject.gameObject.transform.parent = null;
+				baseObject.TransformParent = null;
+				baseObject.Parent();
+				projectile.Reset();
+			}
+		}
+	}
+
+	public static void DestroyProjectilesInChildren(this Transform transform)
+	{
+		BaseObject[] componentsInChildren = transform.gameObject.GetComponentsInChildren<BaseObject>();
+		foreach (BaseObject baseObject in componentsInChildren)
+		{
+			if (!(baseObject.transform == transform) && baseObject.gameObject.layer == Layers.PROJECTILES && baseObject is IProjectile)
+			{
+				MultiplayerMng.Destroy(baseObject.GetComponent<SaveablePrefab>());
+			}
+		}
+	}
+
+	public static Transform FindNestedChild(this Transform parent, string name)
+	{
+		if (parent.name == name)
+		{
+			return parent;
+		}
+		for (int i = 0; i < parent.childCount; i++)
+		{
+			Transform child = parent.GetChild(i);
+			if (child.name == name)
+			{
+				return child;
+			}
+			Transform transform = child.FindNestedChild(name);
+			if (transform != null)
+			{
+				return transform;
+			}
+		}
+		return null;
+	}
+
+	public static bool ContainsNestedChild(this Transform parent, Transform child)
+	{
+		if (parent == child)
+		{
+			return parent;
+		}
+		for (int i = 0; i < parent.childCount; i++)
+		{
+			Transform child2 = parent.GetChild(i);
+			if (child2 == child)
+			{
+				return true;
+			}
+			if (child2.ContainsNestedChild(child))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static Transform GetFirstChild(this Transform parent, bool active = false)
+	{
+		for (int i = 0; i < parent.childCount; i++)
+		{
+			Transform child = parent.GetChild(i);
+			if (child != null && (!active || child.gameObject.activeSelf))
+			{
+				return child;
+			}
+		}
+		return null;
+	}
+
+	public static void ForEachChild(this Transform transform, Action<Transform> del)
+	{
+		if (transform.childCount != 0)
+		{
+			for (int i = 0; i < transform.childCount; i++)
+			{
+				Transform child = transform.GetChild(i);
+				del(child);
+				child.ForEachChild(del);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 263
+PATH: Assembly-CSharp__Beam__BaseExtensions.cs
+SIZE: 398 bytes
+SHA256: 0c56a6904445e54a345727f1588c01a43fd28b54d6618afb125f893ef823b2cb
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam;
+
+public static class BaseExtensions
+{
+	public static void SetLayerRecursively(this Transform transform, int layer, int ignoreLayerMask = 0)
+	{
+		if ((ignoreLayerMask & (1 << transform.gameObject.layer)) == 0)
+		{
+			transform.gameObject.layer = layer;
+		}
+		foreach (Transform item in transform)
+		{
+			item.SetLayerRecursively(layer, ignoreLayerMask);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 264
+PATH: Assembly-CSharp__Beam__BaseObject.cs
+SIZE: 5253 bytes
+SHA256: b9224bd663340de5829b70ee7dfef40094d6e0c7d95f54c7fb340e9375d3dccc
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Crafting;
+using Beam.Language;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam;
+
+public class BaseObject : SaveablePrefab, IBase, IHasCraftingType
+{
+	private Transform _transform;
+
+	[SerializeField]
+	[FormerlySerializedAs("_cType")]
+	private CraftingType _craftingType = new CraftingType(AttributeType.INVALID, InteractiveType.INVALID);
+
+	private ObservableSortedList<string, int> _displayNamePrefixes = new ObservableSortedList<string, int>(new SortedList<string, int>());
+
+	private string _originalDisplayName;
+
+	private string _cachedDisplayName;
+
+	private string _displayName = "";
+
+	[Header("INTERACTING")]
+	[SerializeField]
+	private RaycastMode _raycastMode = RaycastMode.Rigidbody;
+
+	[SerializeField]
+	private bool _isDamageable;
+
+	[SerializeField]
+	private float _healthPoints;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	[HideInInspector]
+	private MaterialRefunder _materialRefunder;
+
+	[FormerlySerializedAs("_onDamaged")]
+	[SerializeField]
+	[HideInInspector]
+	private BaseActionUnityEvent _damaged;
+
+	private BaseActionEventData _actionEventData = new BaseActionEventData();
+
+	protected int LastPlayerIdToDamageThis = -1;
+
+	public new Transform transform => _transform ?? (_transform = base.transform);
+
+	public Transform TransformParent { get; set; }
+
+	public CraftingType CraftingType => _craftingType;
+
+	public ObservableSortedList<string, int> DisplayNamePrefixes => _displayNamePrefixes;
+
+	[LocalizationTermPreview]
+	protected string DisplayNameTerms => _craftingType.ToString();
+
+	public string DisplayName
+	{
+		get
+		{
+			InitDisplayName();
+			return _cachedDisplayName;
+		}
+		set
+		{
+			_displayName = value;
+			OnDisplayNameChanged();
+		}
+	}
+
+	public RaycastMode RaycastMode => _raycastMode;
+
+	public bool IsDamageable
+	{
+		get
+		{
+			return _isDamageable;
+		}
+		set
+		{
+			_isDamageable = value;
+		}
+	}
+
+	public float HealthPoints
+	{
+		get
+		{
+			return _healthPoints;
+		}
+		set
+		{
+			_healthPoints = value;
+		}
+	}
+
+	protected float OriginalHealthPoints { get; set; }
+
+	public BaseActionUnityEvent Damaged => _damaged;
+
+	protected BaseActionEventData ActionEventData => _actionEventData;
+
+	private void DisplayNamePrefixes_CollectionChanged()
+	{
+		CacheDisplayName();
+	}
+
+	private void InitDisplayName()
+	{
+		if (string.IsNullOrEmpty(_displayName))
+		{
+			SetNewDisplayName(DisplayNameTerms);
+		}
+	}
+
+	private void CacheDisplayName()
+	{
+		if (DisplayNamePrefixes.Count > 0)
+		{
+			_cachedDisplayName = string.Join(" ", DisplayNamePrefixes, _displayName);
+		}
+		else
+		{
+			_cachedDisplayName = _displayName;
+		}
+	}
+
+	protected virtual void OnDisplayNameChanged()
+	{
+		CacheDisplayName();
+	}
+
+	protected void SetNewDisplayName(string displayName)
+	{
+		_displayName = displayName;
+		_originalDisplayName = _displayName;
+		CacheDisplayName();
+	}
+
+	public bool HasCustomDisplayName()
+	{
+		return !_displayName.Equals(_originalDisplayName, StringComparison.InvariantCulture);
+	}
+
+	protected virtual void OnDamaged(float value, IBase damager)
+	{
+		_actionEventData.Populate(this, damager);
+		_actionEventData.Value = value;
+		Damaged?.Invoke(this, _actionEventData);
+	}
+
+	protected virtual void Awake()
+	{
+		_transform = transform;
+		OriginalHealthPoints = HealthPoints;
+		InitDisplayName();
+		DisplayNamePrefixes.CollectionChanged += DisplayNamePrefixes_CollectionChanged;
+	}
+
+	protected virtual void Start()
+	{
+		Parent();
+	}
+
+	public virtual void Parent()
+	{
+		if (transform.parent == null)
+		{
+			if (TransformParent == null)
+			{
+				TransformParent = Singleton<StrandedWorld>.Instance?.NmlZone.SaveContainer;
+			}
+			transform.parent = TransformParent;
+		}
+	}
+
+	public virtual void Damage(float damage, IBase damager)
+	{
+		OnDamaged(damage, damager);
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			LastPlayerIdToDamageThis = pickupable.PreviousOwnerId;
+		}
+		HealthPoints -= damage;
+		if (HealthPoints <= 0f)
+		{
+			if (_materialRefunder != null)
+			{
+				_materialRefunder.RefundMaterials(LastPlayerIdToDamageThis);
+			}
+			Destroy();
+		}
+	}
+
+	public void Damage(DamageUnityEventArgs args)
+	{
+		Damage(args.Damage, args.Damager);
+	}
+
+	public virtual void Destroy()
+	{
+		BeamTeam.Destroy(gameObject);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		if (!_displayName.Equals(_originalDisplayName, StringComparison.InvariantCultureIgnoreCase))
+		{
+			jObject.AddField("dName", JSerializer.Serialize(_displayName));
+		}
+		if (!Mathf.Approximately(_healthPoints, OriginalHealthPoints))
+		{
+			jObject.AddField("healthPoints", JSerializer.Serialize(_healthPoints));
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+		CompleteTransformSerialization();
+		JObject field = data.GetField("dName");
+		if (field != null)
+		{
+			string value = field.GetValue<string>();
+			DisplayName = value;
+		}
+		JObject field2 = data.GetField("healthPoints");
+		if (field2 != null)
+		{
+			_healthPoints = field2.GetValue<float>();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 265
+PATH: Assembly-CSharp__Beam__Base_FRUIT_TREE.cs
+SIZE: 1514 bytes
+SHA256: 1abac80fe48f112d46cc29c60f9ac81f6f571985ef04ef22d1cde399e0cb80a1
+====================================================================================================
+
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam;
+
+public class Base_FRUIT_TREE : BaseObject
+{
+	[SerializeField]
+	private InteractiveObject_FOOD _fruitPrefab;
+
+	[SerializeField]
+	private Transform _fruitPosition;
+
+	private bool _fruitCreated;
+
+	protected override void Start()
+	{
+		base.Start();
+		if (!LevelLoader.IsLoading())
+		{
+			CreateFruit();
+		}
+	}
+
+	private void CreateFruit()
+	{
+		if (_fruitCreated)
+		{
+			return;
+		}
+		_fruitCreated = true;
+		MiniGuid referenceId = MiniGuid.NewFrom(ReferenceId);
+		if (Game.Mode.IsMaster())
+		{
+			Setup(MultiplayerMng.Instantiate<InteractiveObject_FOOD>(_fruitPrefab.PrefabId, _fruitPosition.position, _fruitPosition.rotation, referenceId));
+			return;
+		}
+		MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.Fruit, referenceId, (MultiplayerZoneSync.Command command) =>
+		{
+			Setup((InteractiveObject_FOOD)command.Instance);
+		});
+	}
+
+	private void Setup(InteractiveObject_FOOD fruit)
+	{
+		fruit.Attach(new StaticAttachingAnchor(_fruitPosition));
+		fruit.IsGrowing = true;
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		CreateFruit();
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("fruitCreated", _fruitCreated);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("fruitCreated");
+		if (field != null && !field.IsNull())
+		{
+			_fruitCreated = field.GetValue<bool>();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 266
+PATH: Assembly-CSharp__Beam__Buoyancy.cs
+SIZE: 7908 bytes
+SHA256: 3ef8a8968d1fd592d73eecb333904303f9a1233fa7459f5869ee0c47d6710f0f
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.UI;
+using Ceto;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam;
+
+public class Buoyancy : MonoBehaviour, IQueryWaves
+{
+	[Serializable]
+	private class SlicesPerAxis
+	{
+		public int X = 2;
+
+		public int Y = 2;
+
+		public int Z = 2;
+	}
+
+	private const float WATER_DENSITY = 1000f;
+
+	private List<WaveQuery> _waveQueries = new List<WaveQuery>();
+
+	private int _outOfRangeCount;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Rigidbody _rigidbody;
+
+	[SerializeField]
+	private Collider _bouyancyCollider;
+
+	[FormerlySerializedAs("density")]
+	[SerializeField]
+	private float _density = 500f;
+
+	[SerializeField]
+	private SlicesPerAxis _slicesPerAxis = new SlicesPerAxis();
+
+	[FormerlySerializedAs("voxelsLimit")]
+	[SerializeField]
+	private int _voxelsLimit = 8;
+
+	[FormerlySerializedAs("damper")]
+	[SerializeField]
+	private float _damper = 0.1f;
+
+	private float _originalDamper;
+
+	private float _voxelHalfHeight;
+
+	private Vector3 _localArchimedesForce;
+
+	private List<Vector3> _voxels;
+
+	private bool _wind = true;
+
+	private bool _waveQueriesInitialized;
+
+	private bool _floating;
+
+	private bool _isInWater;
+
+	bool IQueryWaves.Active
+	{
+		get
+		{
+			if (gameObject != null)
+			{
+				return gameObject.activeInHierarchy;
+			}
+			return false;
+		}
+	}
+
+	IEnumerable<WaveQuery> IQueryWaves.WaveQueries => _waveQueries;
+
+	public Rigidbody Rigidbody => _rigidbody;
+
+	public bool Floating
+	{
+		get
+		{
+			if (_isInWater)
+			{
+				return _floating;
+			}
+			return false;
+		}
+	}
+
+	public bool IsInWater => _isInWater;
+
+	void IQueryWaves.InRange()
+	{
+		_outOfRangeCount = 0;
+	}
+
+	void IQueryWaves.OutOfRange()
+	{
+		if (_outOfRangeCount >= 3)
+		{
+			_outOfRangeCount++;
+			BaseObject component = GetComponent<BaseObject>();
+			if (!(component == null))
+			{
+				LocalizedNotification localizedNotification = new LocalizedNotification(new Notification());
+				localizedNotification.Priority = NotificationPriority.Immediate;
+				localizedNotification.Duration = 8f;
+				localizedNotification.MessageText.SetTerm("ITEM_NTF_LOST_AT_SEA_DESC");
+				localizedNotification.MessageText.SetArgs(component.DisplayName);
+				localizedNotification.Raise();
+			}
+		}
+	}
+
+	private void Awake()
+	{
+		Quaternion rotation = transform.rotation;
+		Vector3 position = transform.position;
+		transform.rotation = Quaternion.identity;
+		transform.position = Vector3.zero;
+		if (!_bouyancyCollider)
+		{
+			_bouyancyCollider = GetComponent<Collider>();
+		}
+		Bounds bounds = _bouyancyCollider.bounds;
+		if (bounds.size.x < bounds.size.y)
+		{
+			_voxelHalfHeight = bounds.size.x;
+			_voxelHalfHeight /= 2 * _slicesPerAxis.X;
+		}
+		else
+		{
+			_voxelHalfHeight = bounds.size.y;
+			_voxelHalfHeight /= 2 * _slicesPerAxis.Y;
+		}
+		float num = bounds.size.z / (float)(2 * _slicesPerAxis.Z);
+		if (num < _voxelHalfHeight)
+		{
+			_voxelHalfHeight = num;
+		}
+		_rigidbody.centerOfMass = new Vector3(0f, (0f - bounds.extents.y) * 0f, 0f) + transform.InverseTransformPoint(bounds.center);
+		_voxels = SliceIntoVoxels();
+		transform.rotation = rotation;
+		transform.position = position;
+		float num2 = _rigidbody.mass / _density;
+		WeldPoints(_voxels, _voxelsLimit);
+		CreateWaveQueries();
+		float y = 1000f * Mathf.Abs(Physics.gravity.y) * num2;
+		_localArchimedesForce = new Vector3(0f, y, 0f) / _voxels.Count;
+		_originalDamper = _damper;
+	}
+
+	private void CreateWaveQueries()
+	{
+		_waveQueries.Clear();
+		for (int i = 0; i < _voxels.Count; i++)
+		{
+			Vector3 vector = transform.TransformPoint(_voxels[i]);
+			_waveQueries.Add(new WaveQuery(vector.x, vector.z));
+		}
+	}
+
+	private void Start()
+	{
+		if (LevelLoader.IsLoading(gameObject))
+		{
+			LevelLoader.CurrentLoader.PhysicalLoading.Add(() =>
+			{
+				AddWaveQueries();
+			});
+		}
+		else
+		{
+			AddWaveQueries();
+		}
+	}
+
+	private void AddWaveQueries()
+	{
+		if (!_waveQueriesInitialized)
+		{
+			if ((bool)Singleton<BuoyancyManager>.Instance)
+			{
+				Singleton<BuoyancyManager>.Instance.Add(this);
+			}
+			_waveQueriesInitialized = true;
+		}
+	}
+
+	private void RemoveWaveQueries()
+	{
+		if (_waveQueriesInitialized)
+		{
+			if ((bool)Singleton<BuoyancyManager>.Instance)
+			{
+				Singleton<BuoyancyManager>.Instance.Remove(this);
+			}
+			_waveQueriesInitialized = false;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		RemoveWaveQueries();
+	}
+
+	public void EnableWind(bool enable)
+	{
+		_wind = enable;
+	}
+
+	public void SetDampening(float dampening)
+	{
+		_damper = dampening;
+	}
+
+	public void ResetDampening()
+	{
+		_damper = _originalDamper;
+	}
+
+	private List<Vector3> SliceIntoVoxels()
+	{
+		List<Vector3> list = new List<Vector3>(_slicesPerAxis.X * _slicesPerAxis.Y * _slicesPerAxis.Z);
+		Bounds bounds = _bouyancyCollider.bounds;
+		for (int i = 0; i < _slicesPerAxis.X; i++)
+		{
+			for (int j = 0; j < _slicesPerAxis.Y; j++)
+			{
+				for (int k = 0; k < _slicesPerAxis.Z; k++)
+				{
+					float x = bounds.min.x + bounds.size.x / (float)_slicesPerAxis.X * (0.5f + (float)i);
+					float y = bounds.min.y + bounds.size.y / (float)_slicesPerAxis.Y * (0.5f + (float)j);
+					float z = bounds.min.z + bounds.size.z / (float)_slicesPerAxis.Z * (0.5f + (float)k);
+					Vector3 item = transform.InverseTransformPoint(new Vector3(x, y, z));
+					list.Add(item);
+				}
+			}
+		}
+		return list;
+	}
+
+	private static void FindClosestPoints(IList<Vector3> list, out int firstIndex, out int secondIndex)
+	{
+		float num = float.MaxValue;
+		float num2 = float.MinValue;
+		firstIndex = 0;
+		secondIndex = 1;
+		for (int i = 0; i < list.Count - 1; i++)
+		{
+			for (int j = i + 1; j < list.Count; j++)
+			{
+				float num3 = Vector3.Distance(list[i], list[j]);
+				if (num3 < num)
+				{
+					num = num3;
+					firstIndex = i;
+					secondIndex = j;
+				}
+				if (num3 > num2)
+				{
+					num2 = num3;
+				}
+			}
+		}
+	}
+
+	private void OnTransformParentChanged()
+	{
+		if (!_rigidbody)
+		{
+			_rigidbody = GetComponent<Rigidbody>();
+		}
+	}
+
+	private static void WeldPoints(IList<Vector3> list, int targetCount)
+	{
+		if (list.Count > 2 && targetCount >= 2)
+		{
+			while (list.Count > targetCount)
+			{
+				FindClosestPoints(list, out var firstIndex, out var secondIndex);
+				Vector3 item = (list[firstIndex] + list[secondIndex]) * 0.5f;
+				list.RemoveAt(secondIndex);
+				list.RemoveAt(firstIndex);
+				list.Add(item);
+			}
+		}
+	}
+
+	private void UpdateWaterAndQueries()
+	{
+		CheckIfInWater();
+		if (_isInWater)
+		{
+			AddWaveQueries();
+		}
+		else
+		{
+			RemoveWaveQueries();
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		if (!Physics.autoSimulation)
+		{
+			return;
+		}
+		for (int i = 0; i < _voxels.Count; i++)
+		{
+			Vector3 position = _voxels[i];
+			Vector3 vector = transform.TransformPoint(position);
+			WaveQuery waveQuery = _waveQueries[i];
+			waveQuery.posX = vector.x;
+			waveQuery.posZ = vector.z;
+		}
+		if (!_rigidbody || !_rigidbody.useGravity || !_bouyancyCollider.enabled)
+		{
+			return;
+		}
+		UpdateWaterAndQueries();
+		if (!_isInWater)
+		{
+			_floating = false;
+			return;
+		}
+		int num = 0;
+		for (int j = 0; j < _voxels.Count; j++)
+		{
+			Vector3 position2 = _voxels[j];
+			Vector3 vector2 = transform.TransformPoint(position2);
+			float height = _waveQueries[j].result.height;
+			if (vector2.y - _voxelHalfHeight < height)
+			{
+				float value = (height - vector2.y) / (2f * _voxelHalfHeight) + 0.5f;
+				value = Mathf.Clamp01(value);
+				Vector3 force = -_rigidbody.GetPointVelocity(vector2) * (_damper * _rigidbody.mass) + Mathf.Sqrt(value) * _localArchimedesForce;
+				_rigidbody.AddForceAtPosition(force, vector2);
+				num++;
+			}
+		}
+		if (!LevelLoader.IsLoadingScene() && !LevelLoader.IsLoading(gameObject))
+		{
+			_floating = num > 0;
+			if (_floating && _wind)
+			{
+				_rigidbody.AddForce(Current.GetVelocity(), ForceMode.VelocityChange);
+			}
+		}
+	}
+
+	public void CheckIfInWater()
+	{
+		float num = Ceto.Ocean.Instance.QueryWaves(transform.position.x, transform.position.z) + 0.1f;
+		_isInWater = num >= transform.position.y;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 267
+PATH: Assembly-CSharp__Beam__CameraMovement.cs
+SIZE: 4083 bytes
+SHA256: a5bb6501196a2e226bff06d304fa2b95c24c51c51d9fbb70f7f17f568bf267d7
+====================================================================================================
+
+using Beam.Events;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam;
+
+public class CameraMovement : MonoBehaviour, INeedPlayerComponent, IIdleUntilInitialized
+{
+	public Condition IsBusy;
+
+	[SerializeField]
+	private Transform _cameraRotation;
+
+	private float _rotationSmoothness = 75f;
+
+	private Transform _cameraTarget;
+
+	private float _targetSpeed;
+
+	private float _shakeElapsed;
+
+	private float _duration;
+
+	private float _cameraShakeMagnitude;
+
+	private float _oceanRotationIntensity;
+
+	private Quaternion _movingPlatformRotation = Quaternion.identity;
+
+	private IPlayer _player;
+
+	private bool _initialized;
+
+	public float CameraOffset => Mathf.Abs(_cameraRotation.transform.localPosition.z);
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public bool IsInitialized => _initialized;
+
+	public void Initialize()
+	{
+		if (!_initialized)
+		{
+			_initialized = true;
+			EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+			LoadOptions();
+		}
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		ResetCameraTarget();
+	}
+
+	private void OnDestroy()
+	{
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+	}
+
+	private void EventManager_OptionsApplied(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	public void LoadOptions()
+	{
+		_oceanRotationIntensity = Options.GeneralSettings.OceanRotationIntensity * 0.9f;
+		Debug.Log("CameraMovement:: Loaded settings.");
+	}
+
+	public void Freeze(bool freeze)
+	{
+		enabled = !freeze;
+	}
+
+	public void SetPosition(Transform target)
+	{
+		transform.position = target.position;
+	}
+
+	public void SetRotation(Transform target)
+	{
+		Vector3 localEulerAngles = target.localEulerAngles;
+		if (target == _player.Character.CameraRigTransform)
+		{
+			localEulerAngles.y = 0f;
+		}
+		_cameraRotation.rotation *= Quaternion.Euler(localEulerAngles);
+	}
+
+	public void SetCameraTarget(Transform target)
+	{
+		if (!(target == null))
+		{
+			_cameraTarget = target;
+		}
+	}
+
+	public void ResetCameraTarget()
+	{
+		_cameraTarget = _player.Character.CameraRigTransform;
+	}
+
+	private void LateUpdate()
+	{
+		if (_initialized && !LevelLoader.IsLoadingScene())
+		{
+			DoMovement();
+		}
+	}
+
+	private void DoMovement()
+	{
+		if (!(Time.timeScale > 0f) || !(Time.deltaTime > 0f))
+		{
+			return;
+		}
+		_targetSpeed = Mathf.MoveTowards(_targetSpeed, 256f, Time.smoothDeltaTime * 8f);
+		Vector3 position = Vector3.Lerp(base.transform.position, _cameraTarget.position, Time.smoothDeltaTime * _targetSpeed);
+		if (_shakeElapsed < _duration || _duration == -1f)
+		{
+			_shakeElapsed += Time.deltaTime;
+			float num = _shakeElapsed / 20f;
+			float num2 = 1f - Mathf.Clamp(4f * num - 3f, 0f, 1f);
+			float num3 = Random.value * 2f - 1f;
+			float num4 = Random.value * 2f - 1f;
+			num3 *= _cameraShakeMagnitude * num2;
+			num4 *= _cameraShakeMagnitude * num2;
+			position += new Vector3(num3, num4, 0f);
+		}
+		Vector3 euler = Vector3.zero;
+		float num5 = _oceanRotationIntensity;
+		Transform transform = ((_player.Movement.Vehicle != null) ? _player.Movement.Vehicle.VehicleMovement.OperatingPosition : _player.Movement.ActivePlatform);
+		if (transform != null)
+		{
+			float num6 = Vector3.Dot(transform.up, Vector3.up);
+			euler = transform.rotation.eulerAngles;
+			euler.y = 0f;
+			if (num6 < 0f)
+			{
+				euler.z -= 180f;
+			}
+		}
+		else
+		{
+			num5 = 0.3f;
+		}
+		_movingPlatformRotation = Quaternion.Lerp(_movingPlatformRotation, Quaternion.Euler(euler), Time.smoothDeltaTime * _rotationSmoothness * num5);
+		base.transform.position = position;
+		if (_cameraTarget == _player.Character.CharacterFirstPerson.CameraRigPosition)
+		{
+			_cameraRotation.rotation = _cameraTarget.rotation;
+			return;
+		}
+		Vector3 localEulerAngles = _cameraTarget.localEulerAngles;
+		if (_cameraTarget == _player.Character.CameraRigTransform)
+		{
+			localEulerAngles.y = 0f;
+		}
+		_cameraRotation.localRotation = Quaternion.Euler(localEulerAngles) * _movingPlatformRotation;
+	}
+
+	public void ShakeCamera(float duration, float magnitude)
+	{
+		_shakeElapsed = 0f;
+		_duration = duration;
+		_cameraShakeMagnitude = magnitude;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 268
+PATH: Assembly-CSharp__Beam__Cameras.cs
+SIZE: 9177 bytes
+SHA256: 564183ce9a7506fc4506cb429101367887d908201ce3bbab49fde878fc6a7e5e
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Ceto;
+using UnityEngine;
+
+namespace Beam;
+
+public class Cameras : Singleton<Cameras>
+{
+	private static List<IGameCamera> _AllCameras = new List<IGameCamera>();
+
+	private static Camera _Main;
+
+	private static Camera _Current;
+
+	private static float _DefaultFov;
+
+	private static Plane[] _planes;
+
+	private Camera _postCamera;
+
+	public static IReadOnlyList<IGameCamera> AllCameras => _AllCameras;
+
+	public static Camera Main
+	{
+		get
+		{
+			if (_Main == null)
+			{
+				_Main = Camera.main;
+			}
+			return _Main;
+		}
+	}
+
+	public static Camera Current
+	{
+		get
+		{
+			if (_Current == null)
+			{
+				return Main;
+			}
+			return _Current;
+		}
+	}
+
+	public static float DefaultFOV => _DefaultFov;
+
+	public Dictionary<Camera, IImpostorCameraData> CameraData { get; } = new Dictionary<Camera, IImpostorCameraData>();
+
+	public static event Action<Camera> OnPreCull;
+
+	public static Camera GetPostCamera()
+	{
+		return Singleton<Cameras>.Instance?._postCamera;
+	}
+
+	public static bool TryGetCameraData(Camera camera, out IImpostorCameraData cameraData)
+	{
+		cameraData = null;
+		return Singleton<Cameras>.Instance?.CameraData.TryGetValue(camera, out cameraData) ?? false;
+	}
+
+	private void Awake()
+	{
+		_planes = new Plane[6];
+		_postCamera = CreatePostCamera();
+	}
+
+	private void Start()
+	{
+		Camera.onPreCull = (Camera.CameraCallback)Delegate.Combine(Camera.onPreCull, new Camera.CameraCallback(Camera_OnPreCull));
+		EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		LoadOptions();
+	}
+
+	protected override void OnDestroy()
+	{
+		OnPreCull = null;
+		_AllCameras.Clear();
+		_Main = null;
+		_Current = null;
+		DestroyCamera(_postCamera);
+		_planes = null;
+		Camera.onPreCull = (Camera.CameraCallback)Delegate.Remove(Camera.onPreCull, new Camera.CameraCallback(Camera_OnPreCull));
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		base.OnDestroy();
+	}
+
+	private Camera CreatePostCamera()
+	{
+		Camera camera = UnityEngine.Object.Instantiate(Resources.Load<Camera>("Prefabs/PostCamera"));
+		camera.gameObject.name = "~PostCamera";
+		camera.transform.SetParent(transform);
+		camera.transform.position = Vector3.zero;
+		camera.transform.rotation = Quaternion.identity;
+		return camera;
+	}
+
+	public Camera CreateCamera(Camera copy)
+	{
+		Camera camera = UnityEngine.Object.Instantiate(copy);
+		camera.gameObject.name = "~Camera";
+		camera.transform.SetParent(transform);
+		camera.transform.position = Vector3.zero;
+		camera.transform.rotation = Quaternion.identity;
+		camera.rect = new Rect(0f, 0f, 1f, 1f);
+		CameraUtils component = camera.GetComponent<CameraUtils>();
+		if ((object)component != null)
+		{
+			component.RemoveComponents();
+			return camera;
+		}
+		return camera;
+	}
+
+	private void DestroyCamera(Camera camera)
+	{
+		CameraData.Remove(camera);
+		BeamTeam.Destroy(camera.gameObject);
+	}
+
+	public static void AddCamera(IGameCamera playerCamera)
+	{
+		_AllCameras.Add(playerCamera);
+	}
+
+	public static void RemoveCamera(IGameCamera playerCamera)
+	{
+		_AllCameras.Remove(playerCamera);
+	}
+
+	private void EventManager_OptionsApplied(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	private void LoadOptions()
+	{
+		float num = 60f + Options.GraphicsSettings.FieldOfView * 15f;
+		if (num < 60f || num > 75f)
+		{
+			Debug.LogError("Cameras::LoadOptions:: Something went wrong. Saved field of view value was out of bounds.Field of view is now set to 75.0");
+			num = 75f;
+		}
+		_DefaultFov = num;
+		_AllCameras.SetFieldOfView(_DefaultFov);
+	}
+
+	public static bool IsUnderwater(Transform t)
+	{
+		if (Ceto.Ocean.Instance == null || t == null)
+		{
+			return false;
+		}
+		return t.position.y < Ceto.Ocean.Instance.QueryWaves(t.position.x, t.position.z);
+	}
+
+	public static bool IsVisible(Bounds bounds)
+	{
+		for (int i = 0; i < _AllCameras.Count; i++)
+		{
+			IGameCamera gameCamera = _AllCameras[i];
+			BeamGeometryUtility.CalculateFrustumPlanes(_planes, gameCamera.Camera.projectionMatrix * gameCamera.Camera.worldToCameraMatrix);
+			if (GeometryUtility.TestPlanesAABB(_planes, bounds))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool IsCulled(Vector3 position, float cullingDistance)
+	{
+		for (int i = 0; i < _AllCameras.Count; i++)
+		{
+			if ((_AllCameras[i].Camera.transform.position - position).sqrMagnitude < BeamMath.Sqr(cullingDistance))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void Camera_OnPreCull(Camera camera)
+	{
+		if (!(camera == null) && (camera.CompareTag("MainCamera") || camera.CompareTag("PlayerCamera")))
+		{
+			_Current = camera;
+			OnPreCull?.Invoke(_Current);
+			CalculateFrustumCorners(_Current);
+		}
+	}
+
+	private void CalculateFrustumCorners(Camera camera)
+	{
+		float nearClipPlane = camera.nearClipPlane;
+		float farClipPlane = camera.farClipPlane;
+		float fieldOfView = camera.fieldOfView;
+		float aspect = camera.aspect;
+		Matrix4x4 identity = Matrix4x4.identity;
+		float num = fieldOfView * 0.5f;
+		Vector3 vector = camera.transform.right * nearClipPlane * Mathf.Tan(num * (MathF.PI / 180f)) * aspect;
+		Vector3 vector2 = camera.transform.up * nearClipPlane * Mathf.Tan(num * (MathF.PI / 180f));
+		Vector3 vector3 = camera.transform.forward * nearClipPlane - vector + vector2;
+		float num2 = vector3.magnitude * farClipPlane / nearClipPlane;
+		vector3.Normalize();
+		vector3 *= num2;
+		Vector3 vector4 = camera.transform.forward * nearClipPlane + vector + vector2;
+		vector4.Normalize();
+		vector4 *= num2;
+		Vector3 vector5 = camera.transform.forward * nearClipPlane + vector - vector2;
+		vector5.Normalize();
+		vector5 *= num2;
+		Vector3 vector6 = camera.transform.forward * nearClipPlane - vector - vector2;
+		vector6.Normalize();
+		vector6 *= num2;
+		identity.SetRow(0, vector3);
+		identity.SetRow(1, vector4);
+		identity.SetRow(2, vector5);
+		identity.SetRow(3, vector6);
+		Shader.SetGlobalMatrix("_ShaderFrustumCorners", identity);
+	}
+
+	private void DoScreenshot()
+	{
+		Vector3 down = Vector3.down;
+		Vector3 position = StrandedWorld.GetZone(Vector3.zero).transform.position + Vector3.up * 128f;
+		CaptureScreen(position, down, 1920, 1080, "default");
+	}
+
+	private void SaveManager_BeforeWrite(JObject rootData)
+	{
+		Zone zone = StrandedWorld.GetZone(Main.transform.position);
+		Vector3 down = Vector3.down;
+		Vector3 vector = zone.transform.position + Vector3.up * 128f;
+		string text = ((Game.Mode == GameMode.SinglePlayer) ? "dynamic" : "dynamic_COOP");
+		CaptureScreen(vector, down, Screen.width, Screen.height, text);
+		JObject jObject = new JObject();
+		jObject.AddField("Pos", JSerializer.Serialize(vector));
+		jObject.AddField("Dir", JSerializer.Serialize(down));
+		rootData.AddField("ScreenCap", jObject);
+	}
+
+	private void CaptureScreen(Vector3 position, Vector3 direction, int width, int height, string name)
+	{
+		Debug.Log("Cameras::CaptureScreen:: Capturing Screen...");
+		Camera camera = CreateCamera(_postCamera);
+		camera.depth = GetPostCamera().depth + 2f;
+		Camera camera2 = CreateCamera(PlayerRegistry.AllPlayers[0].PlayerCamera.Camera);
+		camera2.depth = camera.depth - 1f;
+		if (!CameraData.ContainsKey(camera2))
+		{
+			CameraData.Add(camera2, new AlwaysCameraData(camera2));
+		}
+		Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
+		RenderTexture temporary = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGB32);
+		RenderInto(camera2, temporary, position, rotation);
+		RenderInto(camera, temporary, position, rotation);
+		RenderTexture active = RenderTexture.active;
+		RenderTexture.active = temporary;
+		Texture2D texture2D = new Texture2D(temporary.width, temporary.height, TextureFormat.RGB24, mipChain: false);
+		texture2D.ReadPixels(new Rect(0f, 0f, texture2D.width, texture2D.height), 0, 0);
+		texture2D.Apply(updateMipmaps: false);
+		RenderTexture.active = active;
+		temporary.Release();
+		DestroyCamera(camera2);
+		DestroyCamera(camera);
+		Debug.Log("Cameras::CaptureScreen:: Writing screenshot to file...");
+		string path = PathTools.Combine(SaveManager.GetSaveFolderPath(), name + ".bytes");
+		try
+		{
+			using (FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+			{
+				byte[] array = texture2D.EncodeToPNG();
+				fileStream.Write(array, 0, array.Length);
+			}
+			Debug.Log("Cameras::CaptureScreen:: Complete.");
+		}
+		catch (Exception)
+		{
+			Debug.LogError("Cameras::CaptureScreen:: Error writing screenshot to file: ");
+			LocalizedNotification localizedNotification = new LocalizedNotification(new Notification());
+			localizedNotification.Priority = NotificationPriority.Immediate;
+			localizedNotification.Duration = 8f;
+			localizedNotification.PlayerId = 0;
+			localizedNotification.MessageText.SetTerm("Error writing screenshot to file. Please contact Beam Team on the Steam Forum.");
+			localizedNotification.Raise();
+		}
+	}
+
+	private void RenderInto(Camera camera, RenderTexture target, Vector3 position, Quaternion rotation)
+	{
+		camera.transform.position = position;
+		camera.transform.rotation = rotation;
+		camera.targetTexture = target;
+		camera.Render();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 269
+PATH: Assembly-CSharp__Beam__CaptureCameraMovement.cs
+SIZE: 3401 bytes
+SHA256: ce18d77ec21c3001b2768674b7bd3a4c9f73616a0437e24cd5eadff32884a242
+====================================================================================================
+
+using Beam.Utilities;
+using UnityEngine;
+using kode80.Clouds;
+
+namespace Beam;
+
+public class CaptureCameraMovement : MonoBehaviour, IGameCamera
+{
+	private const float MOVEMENT_SPEED = 20f;
+
+	private const float PIVOT_SPEED = 20f;
+
+	[SerializeField]
+	private Camera m_camera;
+
+	public int SpeedIncrement = 2;
+
+	private float m_speed = 20f;
+
+	private float m_pivotSpeed = 20f;
+
+	private float m_angle;
+
+	public Camera Camera => m_camera;
+
+	public int Id { get; set; }
+
+	private void OnEnable()
+	{
+		Cameras.AddCamera(this);
+		Object.FindObjectOfType<kode80Clouds>().SetCamera(m_camera);
+		RewiredUtilities.Players.FirstOrDefault_NonAlloc()?.DisableMaps();
+	}
+
+	private void OnDisable()
+	{
+		Cameras.RemoveCamera(this);
+		Object.FindObjectOfType<kode80Clouds>().SetCamera(Cameras.Main);
+		RewiredUtilities.Players.FirstOrDefault_NonAlloc()?.RestoreMapsEnabled();
+	}
+
+	private void UpdateSpeed()
+	{
+		m_speed = 20f;
+		m_pivotSpeed = 20f;
+		if (Input.GetKey(KeyCode.LeftShift))
+		{
+			m_speed *= 2f;
+			m_pivotSpeed *= 2f;
+		}
+		bool key = Input.GetKey(KeyCode.RightControl);
+		if (Input.GetAxis("Mouse ScrollWheel") < 0f)
+		{
+			if (key)
+			{
+				m_pivotSpeed -= SpeedIncrement;
+				m_pivotSpeed = Mathf.Max(m_pivotSpeed, 0f);
+			}
+			else
+			{
+				m_speed -= SpeedIncrement;
+				m_speed = Mathf.Max(m_speed, 0f);
+			}
+		}
+		else if (Input.GetAxis("Mouse ScrollWheel") > 0f)
+		{
+			if (key)
+			{
+				m_pivotSpeed += SpeedIncrement;
+			}
+			else
+			{
+				m_speed += SpeedIncrement;
+			}
+		}
+	}
+
+	private void UpdateCameraPosition()
+	{
+		Vector3 localPosition = Camera.transform.localPosition;
+		if (Input.GetKey(KeyCode.I))
+		{
+			localPosition += Vector3.forward * m_speed * Time.unscaledDeltaTime;
+		}
+		if (Input.GetKey(KeyCode.K))
+		{
+			localPosition -= Vector3.forward * m_speed * Time.unscaledDeltaTime;
+		}
+		if (Input.GetKey(KeyCode.O))
+		{
+			localPosition += Vector3.up * m_speed * 0.5f * Time.unscaledDeltaTime;
+		}
+		if (Input.GetKey(KeyCode.U))
+		{
+			localPosition -= Vector3.up * m_speed * 0.5f * Time.unscaledDeltaTime;
+		}
+		Camera.transform.localPosition = localPosition;
+		if (Input.GetKey(KeyCode.P) || Vector3.Dot(transform.forward, (transform.position - Camera.transform.position).normalized) < 0f)
+		{
+			Camera.transform.localPosition = Vector3.zero;
+			Camera.transform.forward = transform.forward;
+		}
+	}
+
+	private void DoPivot()
+	{
+		float num = 0f;
+		if (Input.GetKey(KeyCode.J))
+		{
+			num += m_pivotSpeed * Time.unscaledDeltaTime;
+		}
+		if (Input.GetKey(KeyCode.L))
+		{
+			num -= m_pivotSpeed * Time.unscaledDeltaTime;
+		}
+		m_angle = num;
+		transform.Rotate(Vector3.up, m_angle);
+		Vector3 vector = transform.position - Camera.transform.position;
+		Camera.transform.rotation = Quaternion.Lerp(Quaternion.LookRotation(transform.forward), Quaternion.LookRotation(vector.normalized), Mathf.Clamp01(vector.magnitude));
+	}
+
+	private void DoMovement()
+	{
+		float axis = Input.GetAxis("Horizontal");
+		float axis2 = Input.GetAxis("Vertical");
+		Vector3 direction = new Vector3(axis, 0f, axis2);
+		direction = transform.TransformDirection(direction);
+		if (Input.GetKey(KeyCode.E))
+		{
+			direction += Vector3.up;
+		}
+		else if (Input.GetKey(KeyCode.Q))
+		{
+			direction += -Vector3.up;
+		}
+		direction *= m_speed;
+		transform.position += direction * Time.unscaledDeltaTime;
+	}
+
+	private void Update()
+	{
+		UpdateSpeed();
+		UpdateCameraPosition();
+		DoPivot();
+		DoMovement();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 270
+PATH: Assembly-CSharp__Beam__Cell.cs
+SIZE: 1984 bytes
+SHA256: c11c324debfe82c16b8c6230442e6cd3d6ccaa2bc1ac874e3c87fbbdf7d61713
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam;
+
+public class Cell<TCellObject> : ICell where TCellObject : class, ICellObject
+{
+	private readonly Transform _transform;
+
+	private readonly Vector3 _size;
+
+	private int _lod = -1;
+
+	private List<TCellObject> _objects = new List<TCellObject>();
+
+	public int Id
+	{
+		get
+		{
+			float num = Mathf.Atan2(Position.z, Position.x) * 180f / MathF.PI;
+			return (int)(Position.x + Position.z + num);
+		}
+	}
+
+	public Vector3 Position
+	{
+		get
+		{
+			return _transform.position;
+		}
+		set
+		{
+			_transform.position = value;
+		}
+	}
+
+	public Vector3 Size => _size;
+
+	public int Lod
+	{
+		get
+		{
+			return _lod;
+		}
+		set
+		{
+			if (_lod != value)
+			{
+				_lod = value;
+				LodChanged?.Invoke(_lod);
+			}
+		}
+	}
+
+	public IList<TCellObject> Objects => _objects;
+
+	public Transform ObjectContainer { get; set; }
+
+	public bool Generated { get; set; }
+
+	public bool Loaded { get; set; }
+
+	public event Action<int> LodChanged;
+
+	public event Action<TCellObject> CellObjectFreed;
+
+	public event Action<TCellObject> CellObjectDestroyed;
+
+	public Cell(Transform transform, Vector3 size)
+	{
+		_transform = transform;
+		_size = size;
+	}
+
+	public void ResetLod()
+	{
+		_lod = -1;
+	}
+
+	public void AddCellObject(TCellObject cellObject)
+	{
+		_objects.Add(cellObject);
+		cellObject.Subscribe(this);
+		cellObject.Freed += CellObject_Freed;
+		cellObject.Destroyed += CellObject_Destroyed;
+	}
+
+	public void RemoveCellObject(TCellObject cellObject)
+	{
+		if (_objects.Remove(cellObject))
+		{
+			cellObject.Unsubscribe(this);
+			cellObject.Freed -= CellObject_Freed;
+			cellObject.Destroyed -= CellObject_Destroyed;
+		}
+	}
+
+	private void CellObject_Freed(ICellObject obj)
+	{
+		TCellObject val = (TCellObject)obj;
+		RemoveCellObject(val);
+		CellObjectFreed?.Invoke(val);
+	}
+
+	private void CellObject_Destroyed(ICellObject obj)
+	{
+		TCellObject val = (TCellObject)obj;
+		RemoveCellObject(val);
+		CellObjectDestroyed?.Invoke(val);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 271
+PATH: Assembly-CSharp__Beam__CellObjectPool.cs
+SIZE: 1363 bytes
+SHA256: e53e59922f3a920e82e69a9b9f84c5386d70655fb6c3582ff9df5ccfc25d902f
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam;
+
+[Serializable]
+public class CellObjectPool<TCellObject> : ICreateCellObjects<TCellObject>, IFreeCellObjects<TCellObject> where TCellObject : MonoBehaviour, ICellObject
+{
+	[SerializeField]
+	private Transform _pooledContainer;
+
+	[SerializeField]
+	[HideInInspector]
+	private Dictionary<int, Stack<TCellObject>> _pools = new Dictionary<int, Stack<TCellObject>>();
+
+	TCellObject ICreateCellObjects<TCellObject>.CreateCellObject(TCellObject prefab)
+	{
+		return PopCellObject(prefab);
+	}
+
+	void IFreeCellObjects<TCellObject>.FreeCellObject(TCellObject obj)
+	{
+		PoolCellObject(obj);
+	}
+
+	private TCellObject PopCellObject(TCellObject prefab)
+	{
+		_pools.TryGetValue(prefab.PrefabId, out var value);
+		TCellObject val;
+		if (value != null && value.Count > 0)
+		{
+			val = value.Pop();
+			val.transform.SetParent(null);
+		}
+		else
+		{
+			val = UnityEngine.Object.Instantiate(prefab);
+		}
+		return val;
+	}
+
+	private void PoolCellObject(TCellObject obj)
+	{
+		if (!_pools.TryGetValue(obj.PrefabId, out var value))
+		{
+			value = new Stack<TCellObject>();
+			_pools.Add(obj.PrefabId, value);
+		}
+		obj.transform.SetParent(_pooledContainer, worldPositionStays: false);
+		obj.transform.localPosition = Vector3.zero;
+		obj.transform.localRotation = Quaternion.identity;
+		value.Push(obj);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 272
+PATH: Assembly-CSharp__Beam__CellObjectSpawner.cs
+SIZE: 13421 bytes
+SHA256: 1677286feb2b8f4d1387a893562f8c8542d22d07a2a1e36e3a5591d872e51006
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Events;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using SharpNeatLib.Maths;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
+namespace Beam;
+
+public abstract class CellObjectSpawner : SerializedMonoBehaviour
+{
+	private Transform _following;
+
+	protected Transform Following => _following;
+
+	protected T GetFollowing<T>()
+	{
+		if (_following != null && !_following.gameObject.IsNullOrDestroyed())
+		{
+			return _following.gameObject.GetComponent<T>();
+		}
+		return default;
+	}
+
+	public virtual void Initialize(Transform follow)
+	{
+		_following = follow;
+	}
+
+	protected virtual void Start()
+	{
+		EventManager.AddListener<PlayerDisconnectedEvent>(EventManager_PlayerDisconnected);
+	}
+
+	protected virtual void OnDestroy()
+	{
+		EventManager.RemoveListener<PlayerDisconnectedEvent>(EventManager_PlayerDisconnected);
+	}
+
+	private void EventManager_PlayerDisconnected(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		OnPlayerDisconnect(disconnectedEvent);
+	}
+
+	protected virtual void OnPlayerDisconnect(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		IPlayer following = GetFollowing<IPlayer>();
+		if (!following.IsNullOrDestroyed() && following.Id == disconnectedEvent.PlayerId)
+		{
+			_following = null;
+		}
+	}
+}
+public class CellObjectSpawner<TCellObject> : CellObjectSpawner, IHashCollection where TCellObject : MonoBehaviour, ICellObject
+{
+	[Tooltip("Hash offset to separate cell comparisons for spawners that share the same type if needed.")]
+	[SerializeField]
+	private int _hashOffset;
+
+	private const int CELLS = 3;
+
+	private const int CELL_RESOLUTION = 8;
+
+	[SerializeField]
+	private int _cellWidth = 20;
+
+	[SerializeField]
+	private ICreateCellObjects<TCellObject> _cellObjectCreator;
+
+	[SerializeField]
+	private IFreeCellObjects<TCellObject> _cellObjectDestroyer;
+
+	[SerializeField]
+	private List<CellObjectSettings<TCellObject>> _cellObjectsSettings;
+
+	private Dictionary<int, IList<JObject>> _cellObjectsDataCache = new Dictionary<int, IList<JObject>>();
+
+	private Cell<TCellObject>[][] _cellsBuffers;
+
+	private List<Placement> _placements = new List<Placement>();
+
+	private FastRandom _random = new FastRandom();
+
+	public IList<CellObjectSettings<TCellObject>> CellObjectsSettings => _cellObjectsSettings;
+
+	protected float HalfCellWidth => (float)_cellWidth * 0.5f;
+
+	private Cell<TCellObject>[] _cells
+	{
+		get
+		{
+			return _cellsBuffers[0];
+		}
+		set
+		{
+			_cellsBuffers[0] = value;
+		}
+	}
+
+	bool IHashCollection.HasHash(int hash)
+	{
+		for (int i = 0; i < _cells.Length; i++)
+		{
+			if (_cells[i].Position.Hash() + _hashOffset == hash)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public override void Initialize(Transform follow)
+	{
+		base.Initialize(follow);
+		CreateCells();
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		HashCollectionCache.Remove(this);
+	}
+
+	private void CreateCells()
+	{
+		_cellsBuffers = new Cell<TCellObject>[2][];
+		_cellsBuffers[0] = new Cell<TCellObject>[9];
+		_cellsBuffers[1] = new Cell<TCellObject>[9];
+		Vector3 vector = new Vector3(Mathf.Round(Following.position.x / 16f) * 16f, 0f, Mathf.Round(Following.position.z / 16f) * 16f);
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				float num = (float)i - 1.5f;
+				float num2 = (float)j - 1.5f;
+				Vector3 zero = Vector3.zero;
+				zero.x = vector.x + num * (float)_cellWidth + HalfCellWidth;
+				zero.z = vector.z + num2 * (float)_cellWidth + HalfCellWidth;
+				GameObject gameObject = new GameObject("Cell");
+				gameObject.transform.parent = transform;
+				gameObject.transform.position = zero;
+				GameObject gameObject2 = new GameObject("Objects");
+				gameObject2.transform.parent = gameObject.transform;
+				gameObject2.transform.localPosition = Vector3.zero;
+				Cell<TCellObject> cell = new Cell<TCellObject>(gameObject.transform, Vector3.one * _cellWidth);
+				cell.ObjectContainer = gameObject2.transform;
+				cell.CellObjectFreed += FreeCellObject;
+				_cells[j * 3 + i] = cell;
+			}
+		}
+		UpdateCellPositions();
+		UpdateCellObjects();
+		HashCollectionCache.Add(this);
+		InvokeRepeating("UpdateCenterCell", 1f, 0.5f);
+	}
+
+	private void UpdateCenterCell()
+	{
+		if (Following.IsNullOrDestroyed() || LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		Vector3 position = Following.position;
+		Cell<TCellObject> cell = null;
+		int num = 0;
+		int num2 = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Cell<TCellObject> cell2 = _cells[j * 3 + i];
+				if (position.x > cell2.Position.x - HalfCellWidth && position.x < cell2.Position.x + HalfCellWidth && position.z > cell2.Position.z - HalfCellWidth && position.z < cell2.Position.z + HalfCellWidth)
+				{
+					cell = cell2;
+					num = 1 - i;
+					num2 = 1 - j;
+					break;
+				}
+			}
+		}
+		int num3 = 4;
+		if (cell != _cells[num3])
+		{
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					Cell<TCellObject> cell3 = _cells[l * 3 + k];
+					int num4 = k + num;
+					int num5 = l + num2;
+					if (num4 < 0 || num4 > 2 || num5 < 0 || num5 > 2)
+					{
+						cell3.Generated = false;
+						cell3.Loaded = false;
+					}
+					num4 = (3 + num4) % 3;
+					num5 = (3 + num5) % 3;
+					_cellsBuffers[1][num5 * 3 + num4] = cell3;
+				}
+			}
+			Cell<TCellObject>[] array = _cellsBuffers[0];
+			_cellsBuffers[0] = _cellsBuffers[1];
+			_cellsBuffers[1] = array;
+		}
+		UpdateCellPositions();
+		UpdateCellObjects();
+	}
+
+	private void UpdateCellPositions()
+	{
+		int num = 4;
+		Cell<TCellObject> cell = _cells[num];
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				int num2 = j * 3 + i;
+				float num3 = (1 - i) * -_cellWidth;
+				float num4 = (1 - j) * -_cellWidth;
+				_cells[num2].Position = new Vector3(cell.Position.x + num3, 0f, cell.Position.z + num4);
+			}
+		}
+	}
+
+	private void UpdateCellObjects()
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				int num = j * 3 + i;
+				Cell<TCellObject> cell = _cells[num];
+				UpdateCellObjects(cell);
+				UpdateCellLodLevel(num);
+			}
+		}
+	}
+
+	private void UpdateCellObjects(Cell<TCellObject> cell)
+	{
+		if (!cell.Generated && !HashCollectionCache.HasHash(this, cell.Position.Hash() + _hashOffset))
+		{
+			ClearCellObjects(cell);
+			CreateCellObjects(cell);
+		}
+	}
+
+	private void UpdateCellLodLevel(int index)
+	{
+		int num = 4;
+		int lod = ((index != num) ? 1 : 0);
+		_cells[index].Lod = lod;
+	}
+
+	private void FreeCellObject(TCellObject cellObject)
+	{
+		_cellObjectDestroyer.FreeCellObject(cellObject);
+	}
+
+	private void ClearCellObjects(Cell<TCellObject> cell)
+	{
+		for (int num = cell.Objects.Count - 1; num >= 0; num--)
+		{
+			TCellObject cellObject = cell.Objects[num];
+			cell.RemoveCellObject(cellObject);
+			FreeCellObject(cellObject);
+		}
+		cell.Objects.Clear();
+		cell.ResetLod();
+	}
+
+	private void CreateCellObjects(Cell<TCellObject> cell)
+	{
+		cell.Generated = true;
+		_random.Reinitialise(cell.Id);
+		for (int i = 0; i < _cellObjectsSettings.Count; i++)
+		{
+			CellObjectSettings<TCellObject> cellObjectSettings = _cellObjectsSettings[i];
+			if (cellObjectSettings.MaximumInstances != 0)
+			{
+				IList<Placement> list = cellObjectSettings.DistributionType switch
+				{
+					DistributionType.Even => EvenPlacement(cell.Position, cellObjectSettings), 
+					DistributionType.Radial => RadialPlacement(cell.Position, cellObjectSettings), 
+					_ => RandomPlacement(cell.Position, cellObjectSettings), 
+				};
+				for (int j = 0; j < list.Count; j++)
+				{
+					Placement placement = list[j];
+					TCellObject val = _cellObjectCreator.CreateCellObject(cellObjectSettings.Prefab);
+					val.transform.parent = cell.ObjectContainer;
+					val.transform.position = placement.Position;
+					val.transform.rotation = placement.Rotation;
+					cell.AddCellObject(val);
+				}
+			}
+		}
+	}
+
+	private IList<Placement> RandomPlacement(Vector3 center, CellObjectSettings<TCellObject> settings)
+	{
+		_placements.Clear();
+		for (int i = 0; i < settings.MaximumInstances; i++)
+		{
+			for (int j = 0; j < 12; j++)
+			{
+				if ((float)_random.Next(100) > settings.Rarity)
+				{
+					continue;
+				}
+				float num = ((!((float)_random.NextDouble() > 0.5f)) ? 1 : (-1));
+				float num2 = (float)_random.NextDouble() * settings.XPositionJitter * num;
+				float num3 = (float)_random.NextDouble() * settings.ZPositionJitter * num;
+				float num4 = settings.XPositionJitter + (float)_random.NextDouble() * ((float)_cellWidth - settings.XPositionJitter);
+				float num5 = settings.ZPositionJitter + (float)_random.NextDouble() * ((float)_cellWidth - settings.ZPositionJitter);
+				Vector3 zero = Vector3.zero;
+				zero.x = center.x - HalfCellWidth + num4 + num2;
+				zero.z = center.z - HalfCellWidth + num5 + num3;
+				Placement placement = new Placement(zero, Quaternion.identity);
+				for (int k = 0; k < settings.PlacementModifiers?.Length; k++)
+				{
+					settings.PlacementModifiers[k].ModifyPlacement(ref placement, settings);
+				}
+				bool flag = true;
+				for (int l = 0; l < settings.PlacementValidators?.Length; l++)
+				{
+					if (!settings.PlacementValidators[l].ValidatePlacement(placement, settings))
+					{
+						flag = false;
+						break;
+					}
+				}
+				if (flag)
+				{
+					_placements.Add(placement);
+					break;
+				}
+			}
+		}
+		return _placements;
+	}
+
+	private IList<Placement> RadialPlacement(Vector3 center, CellObjectSettings<TCellObject> settings)
+	{
+		_placements.Clear();
+		for (int i = 0; i < settings.MaximumInstances; i++)
+		{
+			for (int j = 0; j < 12; j++)
+			{
+				if ((float)_random.Next(100) > settings.Rarity)
+				{
+					continue;
+				}
+				float num = ((!((float)_random.NextDouble() > 0.5f)) ? 1 : (-1));
+				Vector3 zero = Vector3.zero;
+				zero.x = (float)_random.NextDouble() * num * settings.XPositionJitter;
+				zero.z = (float)_random.NextDouble() * num * settings.ZPositionJitter;
+				if (zero.sqrMagnitude > BeamMath.Sqr(HalfCellWidth))
+				{
+					zero.Normalize();
+					zero *= HalfCellWidth;
+				}
+				Placement placement = new Placement(center + zero, Quaternion.identity);
+				for (int k = 0; k < settings.PlacementModifiers?.Length; k++)
+				{
+					settings.PlacementModifiers[k].ModifyPlacement(ref placement, settings);
+				}
+				bool flag = true;
+				for (int l = 0; l < settings.PlacementValidators?.Length; l++)
+				{
+					if (!settings.PlacementValidators[l].ValidatePlacement(placement, settings))
+					{
+						flag = false;
+						break;
+					}
+				}
+				if (flag)
+				{
+					_placements.Add(placement);
+					break;
+				}
+			}
+		}
+		return _placements;
+	}
+
+	private IList<Placement> EvenPlacement(Vector3 center, CellObjectSettings<TCellObject> settings)
+	{
+		_placements.Clear();
+		float num = (float)_cellWidth / Mathf.Min(8f, Mathf.Sqrt(settings.MaximumInstances));
+		for (float num2 = num / 2f; num2 < (float)_cellWidth; num2 += num)
+		{
+			for (float num3 = num / 2f; num3 < (float)_cellWidth; num3 += num)
+			{
+				float num4 = ((!((float)_random.NextDouble() > 0.5f)) ? 1 : (-1));
+				float num5 = (float)_random.NextDouble() * settings.XPositionJitter * num4;
+				float num6 = (float)_random.NextDouble() * settings.ZPositionJitter * num4;
+				if ((float)_random.Next(100) > settings.Rarity)
+				{
+					continue;
+				}
+				Vector3 zero = Vector3.zero;
+				zero.x = center.x - HalfCellWidth + num2 + num5;
+				zero.z = center.z - HalfCellWidth + num3 + num6;
+				Placement placement = new Placement(zero, Quaternion.identity);
+				for (int i = 0; i < settings.PlacementModifiers?.Length; i++)
+				{
+					settings.PlacementModifiers[i].ModifyPlacement(ref placement, settings);
+				}
+				bool flag = true;
+				for (int j = 0; j < settings.PlacementValidators?.Length; j++)
+				{
+					if (!settings.PlacementValidators[j].ValidatePlacement(placement, settings))
+					{
+						flag = false;
+						break;
+					}
+				}
+				if (flag)
+				{
+					_placements.Add(placement);
+					break;
+				}
+			}
+		}
+		return _placements;
+	}
+
+	private void SaveCellObjects(Cell<TCellObject> cell)
+	{
+		if (!_cellObjectsDataCache.ContainsKey(cell.Id))
+		{
+			_cellObjectsDataCache.Add(cell.Id, new List<JObject>());
+		}
+		IList<JObject> list = _cellObjectsDataCache[cell.Id];
+		list.Clear();
+		for (int i = 0; i < cell.Objects.Count; i++)
+		{
+			JObject jObject = SavingUtilities.Save(cell.Objects[i]);
+			if (jObject != null && !jObject.IsNull())
+			{
+				list.Add(jObject);
+			}
+		}
+	}
+
+	private void LoadCellObjects(Cell<TCellObject> cell, IList<JObject> cellObjectsData)
+	{
+		Debug.Log("LOADING CELL " + cell.Id);
+		cell.Loaded = true;
+		for (int i = 0; i < cellObjectsData.Count; i++)
+		{
+			JObject jObject = cellObjectsData[i];
+			int value = jObject.GetField("Id").GetValue<int>();
+			TCellObject val = FindCellObjectPrefab(value);
+			if (val != null)
+			{
+				TCellObject val2 = Object.Instantiate(val);
+				val2.transform.parent = cell.ObjectContainer;
+				val2.Subscribe(cell);
+				if (SavingUtilities.Load(val2, jObject))
+				{
+					cell.Objects.Add(val2);
+					continue;
+				}
+				val2.Unsubscribe(cell);
+				val2.Destroy();
+			}
+		}
+	}
+
+	private TCellObject FindCellObjectPrefab(int prefabId)
+	{
+		for (int i = 0; i < _cellObjectsSettings.Count; i++)
+		{
+			CellObjectSettings<TCellObject> cellObjectSettings = _cellObjectsSettings[i];
+			if (cellObjectSettings.Prefab.PrefabId == prefabId)
+			{
+				return cellObjectSettings.Prefab;
+			}
+		}
+		return null;
+	}
+
+	public JObject Save()
+	{
+		return null;
+	}
+
+	public void Load(JObject data)
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 273
+PATH: Assembly-CSharp__Beam__Character.cs
+SIZE: 21487 bytes
+SHA256: 511650f0efd93378b17344a4dd595a74afdf34632fe8f84b0d0480a9c648930e
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam;
+
+public class Character : MonoBehaviour, INeedPlayerComponent
+{
+	private bool _viewingThirdPerson;
+
+	[FormerlySerializedAs("PlayerCharacters")]
+	[SerializeField]
+	private CharacterRenderer[] _playerCharacters;
+
+	[SerializeField]
+	private CharacterRenderer _characterFirstPerson;
+
+	[SerializeField]
+	private CharacterRenderer _characterThirdPerson;
+
+	[FormerlySerializedAs("_cameraTarget")]
+	[SerializeField]
+	private Transform _cameraRigTransform;
+
+	[FormerlySerializedAs("WatchPosition")]
+	[SerializeField]
+	private Transform _watchPosition;
+
+	[FormerlySerializedAs("HoldingPosition")]
+	[SerializeField]
+	private Transform _holdingPosition;
+
+	[FormerlySerializedAs("ItemProxiesHand")]
+	[SerializeField]
+	private Transform _itemProxiesHand;
+
+	[FormerlySerializedAs("ItemProxiesBody")]
+	[SerializeField]
+	private Transform _itemProxiesBody;
+
+	[FormerlySerializedAs("Animater")]
+	[SerializeField]
+	private Animater _animater;
+
+	[FormerlySerializedAs("AnimatorOverrideController")]
+	[SerializeField]
+	private AnimatorOverrideController _animatorOverrideController;
+
+	[SerializeField]
+	private Transform _playerCharacterPosition;
+
+	[SerializeField]
+	private Transform _currentCharacterPosition;
+
+	[FormerlySerializedAs("AimTarget")]
+	[SerializeField]
+	private Transform _aimTarget;
+
+	private Vector3 _aimIKTargetPos;
+
+	private Quaternion _aimIKTargetRot;
+
+	private Vector3 _playerVelocity;
+
+	private Vector3 _playerLocalVelocity;
+
+	private float _mouseTurning;
+
+	private bool _playingEventAnimation;
+
+	private bool _playingAnimation;
+
+	private Transform _ladderHelperPosition;
+
+	private IPlayer _player;
+
+	private const string NULL_STATE_NAME = "NULL";
+
+	[SerializeField]
+	private string _itemUseLayerName = "Item_Use";
+
+	private Coroutine _sequence;
+
+	private bool _showingLeftArm;
+
+	private float inputX;
+
+	private float inputY;
+
+	private Vector3 _CompassCrouchPos = new Vector3(-0.133f, -0.12f, 0.04f);
+
+	public CharacterRenderer CharacterFirstPerson => _characterFirstPerson;
+
+	public CharacterRenderer CharacterThirdPerson => _characterThirdPerson;
+
+	public Transform CameraRigTransform => _cameraRigTransform;
+
+	public Transform WatchPosition => _watchPosition;
+
+	public Transform HoldingPosition => _holdingPosition;
+
+	public Transform ItemProxiesHand => _itemProxiesHand;
+
+	public Transform ItemProxiesBody => _itemProxiesBody;
+
+	public Animater Animater => _animater;
+
+	public AnimatorOverrideController AnimatorOverrideController => _animatorOverrideController;
+
+	public Transform PlayerCharacterPosition => _playerCharacterPosition;
+
+	public Transform CurrentCharacterPosition
+	{
+		get
+		{
+			return _currentCharacterPosition;
+		}
+		set
+		{
+			_currentCharacterPosition = value;
+		}
+	}
+
+	public Transform AimTarget => _aimTarget;
+
+	public bool PlayingEventAnimation
+	{
+		get
+		{
+			return _playingEventAnimation;
+		}
+		set
+		{
+			_playingEventAnimation = value;
+		}
+	}
+
+	public Transform LadderHelperPosition => _ladderHelperPosition;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public event Action ShowLeftArm;
+
+	public event Action HideLeftArm;
+
+	protected virtual void OnShowLeftArm()
+	{
+		ShowLeftArm?.Invoke();
+	}
+
+	protected virtual void OnHideLeftArm()
+	{
+		HideLeftArm?.Invoke();
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_player.PlayerCamera.RenderingCameraChanged += PlayerCamera_RenderingCameraChanged;
+		_player.Statistics.KnockedOut += PlayerStatistics_KnockedOut;
+		CreateCharacters(player);
+		Initialize();
+	}
+
+	private void CreateCharacters(IPlayer player)
+	{
+		if (player.Id > _playerCharacters.Length)
+		{
+			Debug.LogError("Character :: Not Enough Assigned 'PlayerCharacters' for number of players");
+		}
+		int genderById = (int)Options.CustomSettings.GetGenderById(player.Id);
+		CharacterRenderer original = _playerCharacters[genderById];
+		_player.Gender = genderById;
+		_characterFirstPerson = UnityEngine.Object.Instantiate(original, transform.position, transform.rotation, transform);
+		_characterFirstPerson.gameObject.name = "FirstPerson";
+		_characterFirstPerson.THIRD_PERSON_CHARACTER = false;
+		_characterFirstPerson.SetPlayer(player);
+		_characterThirdPerson = UnityEngine.Object.Instantiate(original, transform.position, transform.rotation, transform);
+		_characterThirdPerson.gameObject.name = "ThirdPerson";
+		_characterThirdPerson.THIRD_PERSON_CHARACTER = true;
+		_characterThirdPerson.SetPlayer(player);
+		Player player2 = (Player)player;
+		if ((bool)player2)
+		{
+			player2.SetStateAnimator();
+		}
+	}
+
+	private void Initialize()
+	{
+		_animatorOverrideController = new AnimatorOverrideController();
+		AnimatorOverrideController.runtimeAnimatorController = _characterFirstPerson.AnimController.runtimeAnimatorController;
+		_ladderHelperPosition = new GameObject("LadderHelperPosition").transform;
+		_ladderHelperPosition.parent = transform.parent;
+		_ladderHelperPosition.localPosition = Vector3.zero;
+		_watchPosition.transform.parent = _characterFirstPerson.WatchPosition;
+		_watchPosition.localPosition = Vector3.zero;
+		_watchPosition.localRotation = Quaternion.identity;
+	}
+
+	public void RefreshPosition()
+	{
+		_aimIKTargetPos = _currentCharacterPosition.position;
+		transform.position = _aimIKTargetPos;
+	}
+
+	public void RefreshRotation()
+	{
+		_aimIKTargetRot = _currentCharacterPosition.rotation;
+		transform.rotation = _aimIKTargetRot;
+	}
+
+	private void OnDestroy()
+	{
+		if (_player != null && _player.PlayerCamera != null)
+		{
+			_player.PlayerCamera.RenderingCameraChanged -= PlayerCamera_RenderingCameraChanged;
+			_player.Statistics.KnockedOut -= PlayerStatistics_KnockedOut;
+		}
+	}
+
+	public void SpyGlassRendering(bool value)
+	{
+		_characterFirstPerson.SetSpyglassRenderers(value);
+	}
+
+	private void PlayerCamera_RenderingCameraChanged(bool ourCamera)
+	{
+		if (ourCamera)
+		{
+			bool flag = _player.PlayerCamera.CameraMode == PlayerCameraMode.First;
+			_characterFirstPerson.SetRenderers(flag);
+			_characterFirstPerson.SetArmEffectActive(flag);
+			_characterFirstPerson.SetHeadRenderers(flag, shadowsOnly: true);
+			bool flag2 = _player.PlayerCamera.CameraMode == PlayerCameraMode.Third;
+			_characterThirdPerson.SetRenderers(flag2);
+			_characterThirdPerson.SetArmEffectActive(flag2);
+			_characterThirdPerson.SetHeadRenderers(flag2);
+			_holdingPosition.parent = (flag ? _characterFirstPerson : _characterThirdPerson).HoldingPosition;
+			_holdingPosition.localPosition = Vector3.zero;
+			_holdingPosition.localRotation = Quaternion.identity;
+			_holdingPosition.localScale = Vector3.one;
+			_itemProxiesHand.parent = (flag ? _characterFirstPerson : _characterThirdPerson).HoldingPosition;
+			_itemProxiesHand.localPosition = Vector3.zero;
+			_itemProxiesHand.localRotation = Quaternion.identity;
+			_itemProxiesHand.localScale = Vector3.one;
+			_itemProxiesBody.parent = (flag ? _characterFirstPerson : _characterThirdPerson).ProxyBodyPosition;
+			_itemProxiesBody.localPosition = Vector3.zero;
+			_itemProxiesBody.localRotation = Quaternion.identity;
+			_itemProxiesBody.localScale = Vector3.one;
+			_watchPosition.transform.parent = (flag ? _characterFirstPerson : _characterThirdPerson).WatchPosition;
+			_watchPosition.localPosition = Vector3.zero;
+			_watchPosition.localRotation = Quaternion.identity;
+			_watchPosition.localScale = Vector3.one;
+		}
+		else
+		{
+			_characterFirstPerson.SetRenderers(enabled: false);
+			_characterFirstPerson.SetArmEffectActive(enabled: false);
+			_characterFirstPerson.SetHeadRenderers(enabled: false);
+			_characterThirdPerson.SetRenderers(enabled: true);
+			_characterThirdPerson.SetArmEffectActive(enabled: true);
+			_characterThirdPerson.SetHeadRenderers(enabled: true);
+			_holdingPosition.parent = _characterThirdPerson.HoldingPosition;
+			_holdingPosition.localPosition = Vector3.zero;
+			_holdingPosition.localRotation = Quaternion.identity;
+			_holdingPosition.localScale = Vector3.one;
+			_itemProxiesHand.parent = _characterThirdPerson.HoldingPosition;
+			_itemProxiesHand.localPosition = Vector3.zero;
+			_itemProxiesHand.localRotation = Quaternion.identity;
+			_itemProxiesHand.localScale = Vector3.one;
+			_itemProxiesBody.parent = _characterThirdPerson.ProxyBodyPosition;
+			_itemProxiesBody.localPosition = Vector3.zero;
+			_itemProxiesBody.localRotation = Quaternion.identity;
+			_itemProxiesBody.localScale = Vector3.one;
+			_watchPosition.transform.parent = _characterThirdPerson.WatchPosition;
+			_watchPosition.localPosition = Vector3.zero;
+			_watchPosition.localRotation = Quaternion.identity;
+			_watchPosition.localScale = Vector3.one;
+		}
+	}
+
+	private void PlayerStatistics_KnockedOut(bool obj)
+	{
+		ResetValuesOnKnockout();
+	}
+
+	public void ResetValuesOnKnockout()
+	{
+		OnHideLeftArm();
+		_showingLeftArm = false;
+		SetFloat("watch", 0f);
+	}
+
+	public void SetCameraMode(PlayerCameraMode mode)
+	{
+		_viewingThirdPerson = mode == PlayerCameraMode.Third;
+		SetPositions();
+		PlayerCamera_RenderingCameraChanged(_player.IsOwner);
+	}
+
+	private void SetPositions()
+	{
+		if (_viewingThirdPerson)
+		{
+			_cameraRigTransform.transform.parent = _characterThirdPerson.CameraPosition;
+			_cameraRigTransform.localPosition = Vector3.zero;
+			_cameraRigTransform.localRotation = Quaternion.identity;
+			_cameraRigTransform.localScale = Vector3.one;
+			_characterFirstPerson.AnimationEventPlayer.enabled = false;
+			_characterThirdPerson.AnimationEventPlayer.enabled = true;
+		}
+		else
+		{
+			_cameraRigTransform.transform.parent = _characterFirstPerson.CameraPosition;
+			_cameraRigTransform.localPosition = Vector3.zero;
+			_cameraRigTransform.localRotation = Quaternion.identity;
+			_cameraRigTransform.localScale = Vector3.one;
+			_characterThirdPerson.AnimationEventPlayer.enabled = false;
+			_characterFirstPerson.AnimationEventPlayer.enabled = true;
+		}
+	}
+
+	public void SetPosition(Vector3 position)
+	{
+		_aimIKTargetPos = _currentCharacterPosition.position;
+		transform.position = _aimIKTargetPos;
+	}
+
+	public void SetRotation(Quaternion rotation)
+	{
+		_aimIKTargetRot = _currentCharacterPosition.rotation;
+		transform.rotation = _aimIKTargetRot;
+	}
+
+	private void Update()
+	{
+		if (_player != null && _player.Input != null)
+		{
+			CheckWatch();
+			if (!_playingEventAnimation)
+			{
+				float num = 100f;
+				float num2 = 100f;
+				_aimIKTargetPos = Vector3.Lerp(_aimIKTargetPos, _currentCharacterPosition.position, Time.deltaTime * num);
+				_aimIKTargetRot = Quaternion.Lerp(_aimIKTargetRot, _currentCharacterPosition.rotation, Time.deltaTime * num2);
+				transform.position = _aimIKTargetPos;
+				transform.rotation = _aimIKTargetRot;
+				_playerVelocity = _player.Movement.GetVelocity();
+				_playerLocalVelocity = ((_player.Movement.Vehicle != null) ? Vector3.zero : transform.InverseTransformDirection(_playerVelocity));
+				_mouseTurning = Mathf.Lerp(_mouseTurning, _player.Movement.IsBusy ? 0f : _player.Input.GetAxis(2), Time.deltaTime * 8f);
+			}
+		}
+	}
+
+	public void CrossFade(string name, float transitionTime = 0.3f, int layer = -1, float offset = 0f)
+	{
+		_characterFirstPerson.AnimController.CrossFade(name, transitionTime, layer, offset);
+		_characterThirdPerson.AnimController.CrossFade(name, transitionTime, layer, offset);
+	}
+
+	public void Play(string name, int layer = -1, float offset = 0f)
+	{
+		_characterFirstPerson.AnimController.Play(name, layer, offset);
+		_characterThirdPerson.AnimController.Play(name, layer, offset);
+	}
+
+	public void SetTrigger(string name)
+	{
+		_characterFirstPerson.AnimController.SetTrigger(name);
+		_characterThirdPerson.AnimController.SetTrigger(name);
+	}
+
+	public void SetFloat(string name, float val)
+	{
+		_characterFirstPerson.AnimController.SetFloat(name, val);
+		_characterThirdPerson.AnimController.SetFloat(name, val);
+	}
+
+	public void SetInteger(string name, int val)
+	{
+		_characterFirstPerson.AnimController.SetInteger(name, val);
+		_characterThirdPerson.AnimController.SetInteger(name, val);
+	}
+
+	public void SetBool(string name, bool val)
+	{
+		_characterFirstPerson.AnimController.SetBool(name, val);
+		_characterThirdPerson.AnimController.SetBool(name, val);
+	}
+
+	public void Hold(IPickupable pickupable)
+	{
+		if (Game.Mode.IsMultiplayer() && !_player.IsOwner)
+		{
+			PlayerRegistry.LocalPlayer?.PlayerCamera?.PickupableLocalCorrection?.Set(pickupable);
+		}
+		if (pickupable.IsNullOrDestroyed())
+		{
+			PlayIdleAnimation(AnimationType.NONE);
+			return;
+		}
+		pickupable.transform.localPosition = pickupable.LocalHoldingPosition;
+		pickupable.transform.localEulerAngles = pickupable.LocalHoldingRotation;
+		PlayIdleAnimation(pickupable.Idle);
+	}
+
+	public void PlayPickupAnimation()
+	{
+		CrossFade("Pickup Item", 0.2f, 8);
+	}
+
+	public void PlayWarmUpCharacterAnimation(int val = 0)
+	{
+		SetInteger("Warm_Up_Pose", val);
+		PlayEventAnimation("Warm_Up");
+	}
+
+	public void PlayDeathAnimation()
+	{
+		PlayEventAnimation("Death");
+	}
+
+	public void PlayEventAnimation(string animName)
+	{
+		SetTrigger(animName);
+	}
+
+	public Coroutine PlayUseAnimation(AnimationType type, float animationSpeed, float normalizedTime, float delay, bool useAnimation = true, Action Callback = null, AnimationBlendMode blend = AnimationBlendMode.Crossfade)
+	{
+		this.SafeStopCoroutine(_sequence);
+		_sequence = StartCoroutine(PlayUseAnimation_Sequence(type, animationSpeed, normalizedTime, delay, useAnimation, Callback, blend));
+		return _sequence;
+	}
+
+	private IEnumerator PlayUseAnimation_Sequence(AnimationType type, float animationSpeed, float normalizedTime, float delay, bool useAnimation, Action Callback, AnimationBlendMode blend)
+	{
+		_playingAnimation = true;
+		string text = type.ToString();
+		AnimationClip animationClip = _player.Character.AnimatorOverrideController[text];
+		if (animationClip == null)
+		{
+			yield return new WaitForSeconds(Math.Max(delay, 0.3f));
+			Callback?.Invoke();
+			_playingAnimation = false;
+			yield break;
+		}
+		float num = animationClip.length / Mathf.Abs(animationSpeed);
+		float num2 = num * delay;
+		float leftOver = num - num2;
+		_playingAnimation = true;
+		if (animationSpeed == 0f)
+		{
+			animationSpeed = 1f;
+		}
+		SetFloat("ItemReverseSpeed", animationSpeed);
+		SetFloat("ItemUseSpeed", animationSpeed);
+		if (blend == AnimationBlendMode.Crossfade)
+		{
+			if (useAnimation)
+			{
+				CrossFade(text, 0.1f, 3, normalizedTime);
+				CrossFade(text, 0.33f, 6, normalizedTime);
+				CrossFade(text, 0.33f, 7, normalizedTime);
+			}
+			else
+			{
+				CrossFade(text, 0.1f, 2, normalizedTime);
+				CrossFade(text, 0.33f, 5, normalizedTime);
+			}
+		}
+		else if (useAnimation)
+		{
+			Play(text, 3, normalizedTime);
+			Play(text, 6, normalizedTime);
+			Play(text, 7, normalizedTime);
+		}
+		else
+		{
+			Play(text, 2, normalizedTime);
+			Play(text, 5, normalizedTime);
+		}
+		yield return new WaitForSeconds(delay);
+		Callback?.Invoke();
+		if (leftOver > 0f)
+		{
+			yield return new WaitForSeconds(leftOver);
+		}
+		_playingAnimation = false;
+	}
+
+	public void PlayUseAnimation(string typeName, float animationSpeed = 1f)
+	{
+		if (animationSpeed == 0f)
+		{
+			animationSpeed = 1f;
+		}
+		SetFloat("ItemReverseSpeed", animationSpeed);
+		SetFloat("ItemUseSpeed", animationSpeed);
+		CrossFade(typeName, 0.1f, 3);
+		CrossFade(typeName, 0.33f, 6);
+		CrossFade(typeName, 0.33f, 7);
+	}
+
+	public float PlayAnimationAsync(string name)
+	{
+		return Timing.WaitUntilDone(PlayAnimation(name));
+	}
+
+	public CoroutineHandle PlayAnimation(string name)
+	{
+		return Timing.RunCoroutine(PlayAnimation_Sequence(name));
+	}
+
+	public IEnumerator<float> PlayAnimation_Sequence(string clipName)
+	{
+		_playingAnimation = true;
+		AnimationClip animationClip = _player.Character.AnimatorOverrideController[clipName];
+		if (animationClip != null)
+		{
+			CrossFade(clipName, 0.1f);
+			CrossFade(clipName, 0.1f, 7);
+			yield return Timing.WaitForSeconds(animationClip.length);
+		}
+		_playingAnimation = false;
+	}
+
+	public IEnumerator PlayEventAnimation(string animationClip, float WaitTime = 0f, float AnimationSpeed = 1f)
+	{
+		_playingAnimation = true;
+		yield return new WaitForSeconds(WaitTime);
+		_playingAnimation = false;
+	}
+
+	public void PlayIdleAnimation(AnimationType type)
+	{
+		PlayIdleAnimation((type == AnimationType.NONE) ? "NULL" : type.ToString());
+	}
+
+	public void PlayIdleAnimation(string clipName)
+	{
+		_playingAnimation = false;
+		CrossFade("NULL", 0.5f, 2);
+		CrossFade("NULL", 0.5f, 5);
+		_characterFirstPerson.AnimController.Update(0.1f);
+		_characterThirdPerson.AnimController.Update(0.1f);
+		CrossFade(clipName, 0.2f, 1);
+		CrossFade(clipName, 0.2f, 2);
+		CrossFade(clipName, 0.5f, 4);
+		CrossFade(clipName, 0.5f, 5);
+	}
+
+	public void ShowCurrentItem()
+	{
+		_player.Holder.ShowCurrent();
+		PlayIdleAnimation((!_player.Holder.CurrentObject.IsNullOrDestroyed()) ? _player.Holder.CurrentObject.Idle : AnimationType.NONE);
+	}
+
+	public void HideCurrentItem()
+	{
+		_player.Holder.HideCurrent();
+		PlayIdleAnimation("NULL");
+	}
+
+	public void NoNull(bool value)
+	{
+		SetBool("nonull", value);
+	}
+
+	public bool CheckIfUseStateNull()
+	{
+		int layerIndex = CharacterThirdPerson.AnimController.GetLayerIndex(_itemUseLayerName);
+		return CharacterThirdPerson.AnimController.GetCurrentAnimatorStateInfo(layerIndex).IsName("NULL");
+	}
+
+	private void CheckWatch()
+	{
+		if (_playingAnimation)
+		{
+			return;
+		}
+		if (_player.Input.GetButton(11) && !_player.Movement.ClimbingLadder && !_player.Movement.ClimbingLedge && !_playingEventAnimation)
+		{
+			if (!_showingLeftArm)
+			{
+				ScaleWatch();
+			}
+			OnShowLeftArm();
+			_showingLeftArm = true;
+			SetFloat("watch", 1f);
+			_player.PlayerCamera.ForceFirstPersonView();
+		}
+		else
+		{
+			if (_showingLeftArm)
+			{
+				OnHideLeftArm();
+				_showingLeftArm = false;
+			}
+			SetFloat("watch", 0f);
+		}
+	}
+
+	private void ScaleWatch()
+	{
+		float fieldOfView = _player.PlayerCamera.Camera.fieldOfView;
+		float num = 90f;
+		float num2 = 60f;
+		float num3 = (num - fieldOfView) / (num - num2);
+		float num4 = -0.01f;
+		float num5 = 0.025f;
+		if (_player.Movement.InWater && !_player.Movement.isFloating)
+		{
+			num4 = 0.01f;
+		}
+		float z = num4 + num5 * num3;
+		_characterFirstPerson.watchTargetParent.transform.localPosition = new Vector3(0f, 0f, z);
+	}
+
+	public void Moving(float inputXRaw, float inputYRaw)
+	{
+		inputX = Mathf.Lerp(inputX, inputXRaw, Time.deltaTime * 3f);
+		inputY = Mathf.Lerp(inputY, inputYRaw, Time.deltaTime * 3f);
+		SetFloat("Heading", inputX);
+		SetFloat("Direction", inputY);
+		SetFloat("crouch", 0f);
+		SetFloat("swim", 0f);
+		SetFloat("Climb", 0f);
+		SetFloat("fall", 0f);
+		float val = 0f;
+		Vector3 vector = new Vector3(_playerLocalVelocity.z, 0f, _playerLocalVelocity.x);
+		if (_player.Movement.ClimbingLadder && (bool)_player.Movement.activeLadder)
+		{
+			if (_player.Movement.activeLadder.gameObject.GetComponent<Ladders>().isTree)
+			{
+				SetFloat("Climb", 2f);
+			}
+			else
+			{
+				SetFloat("Climb", 1f);
+			}
+			if (_playerLocalVelocity.y > 0.005f)
+			{
+				val = 1f;
+			}
+			else
+			{
+				val = ((!(_playerLocalVelocity.y < -0.005f)) ? 0f : (-1f));
+			}
+		}
+		else if (_player.Movement.InWater)
+		{
+			if (_player.Movement.isFloating)
+			{
+				if (vector.magnitude > 0.01f)
+				{
+					SetFloat("swim", 2f);
+				}
+				else
+				{
+					SetFloat("swim", 1f);
+				}
+			}
+			else if (vector.magnitude > 0.01f)
+			{
+				SetFloat("swim", 2f);
+			}
+			else
+			{
+				SetFloat("swim", 1f);
+			}
+		}
+		else if (_player.Movement.grounded)
+		{
+			CheckBrokenBones();
+			_holdingPosition.localPosition = FixCompassPosition();
+			if (_player.Movement.crouched)
+			{
+				SetFloat("crouch", 1f);
+				if (vector.magnitude > 0.01f)
+				{
+					val = ((!(vector.z < -0.01f)) ? 1f : (-1f));
+				}
+				else
+				{
+					val = 0f;
+				}
+			}
+			else if (_player.Movement.sprinting)
+			{
+				if (vector.magnitude > 0.01f)
+				{
+					val = 2f;
+				}
+			}
+			else if (vector.magnitude > 0.01f)
+			{
+				val = ((!(vector.z < -0.01f)) ? 1f : (-1f));
+			}
+			else
+			{
+				SetFloat("Heading", _mouseTurning * 0.1f);
+			}
+		}
+		else if (_playerVelocity.y < 0f && _player.Movement.falling)
+		{
+			SetFloat("fall", 1f);
+		}
+		if (_player.Movement.ActivePlatform != null || _player.Movement.Vehicle != null)
+		{
+			SetFloat("speed", 0f);
+		}
+		SetFloat("speed", val);
+	}
+
+	public IEnumerator ClimbAnimation()
+	{
+		SetFloat("LedgeClimb", 1f);
+		yield return new WaitForSeconds(1.688f);
+		SetFloat("LedgeClimb", 0f);
+		_player.Movement.FinishLedgeClimb();
+	}
+
+	public void Jump()
+	{
+		SetFloat("jump", 1f);
+		StartCoroutine(jumptimer(0.617f));
+	}
+
+	private IEnumerator jumptimer(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+		SetFloat("jump", 0f);
+	}
+
+	public void Sliding()
+	{
+	}
+
+	public void Land()
+	{
+		SetFloat("fall", 0f);
+	}
+
+	public void Fall_Land()
+	{
+		SetFloat("fall", 0f);
+	}
+
+	private void CheckBrokenBones()
+	{
+		bool val = _player.Statistics.HasStatusEffect(StatusEffect.BROKEN_BONES);
+		SetBool("Limping", val);
+	}
+
+	public void DoSunburnEffect(float value)
+	{
+		_characterFirstPerson.SunburnEffect.DoEffect(value);
+	}
+
+	private Vector3 FixCompassPosition()
+	{
+		if (_player.Movement.crouched && _player.PlayerCamera.CameraMode == PlayerCameraMode.First && _player.IsOwner && !_player.Holder.CurrentObject.IsNullOrDestroyed() && _player.Holder.CurrentObject.CraftingType.InteractiveType == InteractiveType.TOOLS_COMPASS)
+		{
+			return Vector3.Lerp(_holdingPosition.localPosition, _CompassCrouchPos, Time.deltaTime * 5f);
+		}
+		return Vector3.Lerp(_holdingPosition.localPosition, Vector3.zero, Time.deltaTime * 15f);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 274
+PATH: Assembly-CSharp__Beam__CharacterRenderer.cs
+SIZE: 7964 bytes
+SHA256: a69fbd80e7188214573054efdd922d0a53823a45276badc22dd36ed62e7c5753
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using Funlabs;
+using Photon.Bolt;
+using RootMotion.FinalIK;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Serialization;
+
+namespace Beam;
+
+public class CharacterRenderer : MonoBehaviour, INeedPlayerComponent
+{
+	public enum RAGDOLL_TYPE
+	{
+		Male_Ragdoll,
+		Female_Ragdoll
+	}
+
+	public bool THIRD_PERSON_CHARACTER;
+
+	public Transform CameraPosition;
+
+	public Transform CameraRigPosition;
+
+	public Transform WatchPosition;
+
+	public Transform HoldingPosition;
+
+	public Transform ProxyBodyPosition;
+
+	[SerializeField]
+	private Animator _animatorController;
+
+	[SerializeField]
+	private AnimationEventPlayer _animationEventPlayer;
+
+	[SerializeField]
+	private DynamicBone _tiePhysics;
+
+	[SerializeField]
+	private LimbIK Left_Arm;
+
+	private float _leftHandIKWeight;
+
+	[SerializeField]
+	private AimIK _aimIK;
+
+	private Transform _aimTarget;
+
+	private Vector3 _aimTargetSmooth;
+
+	private float armCameraFollowSmoothness = 15f;
+
+	public Transform watchTargetParent;
+
+	[SerializeField]
+	private Transform _aimTargetTransform;
+
+	[FormerlySerializedAs("_characterRenderers")]
+	[SerializeField]
+	private List<Renderer> _renderers;
+
+	[FormerlySerializedAs("_characterHeadRenderers")]
+	[SerializeField]
+	private Renderer[] _headRenderers;
+
+	[SerializeField]
+	private ArmEffectBase[] _armEffects;
+
+	[SerializeField]
+	private RAGDOLL_TYPE _playerRagdollType;
+
+	[SerializeField]
+	private RendererPlayerStatusEffectView _sunburnEffect;
+
+	[SerializeField]
+	private GameObject _hatEasy;
+
+	[SerializeField]
+	private GameObject _hatHard;
+
+	private IPlayer _player;
+
+	public Animator AnimController => _animatorController;
+
+	public AnimationEventPlayer AnimationEventPlayer => _animationEventPlayer;
+
+	public RAGDOLL_TYPE PlayerRagdollType => _playerRagdollType;
+
+	public RendererPlayerStatusEffectView SunburnEffect => _sunburnEffect;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	private void Start()
+	{
+		if (Game.State == GameState.MAIN_MENU)
+		{
+			_animatorController.SetTrigger("Menu_Pose");
+			_animatorController.updateMode = AnimatorUpdateMode.UnscaledTime;
+			Object.Destroy(_aimIK);
+			Object.Destroy(Left_Arm);
+			Object.Destroy(_tiePhysics);
+			Object.Destroy(this);
+			return;
+		}
+		if (_tiePhysics != null)
+		{
+			if (THIRD_PERSON_CHARACTER)
+			{
+				_tiePhysics.enabled = true;
+			}
+			else
+			{
+				_tiePhysics.enabled = false;
+			}
+		}
+		SetDifficultyHatRenderers();
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_animationEventPlayer.SetPlayer(player);
+		for (int i = 0; i < _armEffects.Length; i++)
+		{
+			_armEffects[i].SetPlayer(player);
+		}
+		_aimTarget = _player.Character.AimTarget;
+		SetupWatchIK();
+	}
+
+	private void SetDifficultyHatRenderers()
+	{
+		bool active = PlayerUtilities.GetServerGameDifficulty() == EGameDifficultyMode.Creative;
+		bool active2 = PlayerUtilities.GetServerGameDifficulty() == EGameDifficultyMode.Hard;
+		if (_hatEasy != null)
+		{
+			_hatEasy.SetActive(active);
+		}
+		if (_hatHard != null)
+		{
+			_hatHard.SetActive(active2);
+		}
+	}
+
+	public void SetSpyglassRenderers(bool shadowsOnly = false)
+	{
+		for (int i = 0; i < _renderers.Count; i++)
+		{
+			_renderers[i].shadowCastingMode = ((!shadowsOnly) ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly);
+			_renderers[i].receiveShadows = true;
+		}
+	}
+
+	public void SetHeadRenderers(bool enabled, bool shadowsOnly = false)
+	{
+		for (int i = 0; i < _headRenderers.Length; i++)
+		{
+			_headRenderers[i].enabled = enabled;
+			_headRenderers[i].shadowCastingMode = ((!shadowsOnly) ? ShadowCastingMode.On : ShadowCastingMode.ShadowsOnly);
+			_headRenderers[i].receiveShadows = enabled;
+		}
+	}
+
+	public void SetArmEffectActive(bool enabled)
+	{
+		for (int i = 0; i < _armEffects.Length; i++)
+		{
+			_armEffects[i].SetActive(enabled);
+		}
+	}
+
+	public void SetRenderers(bool enabled)
+	{
+		for (int i = 0; i < _renderers.Count; i++)
+		{
+			_renderers[i].enabled = enabled;
+		}
+	}
+
+	private void SetupWatchIK()
+	{
+		Transform transform = new GameObject("Watch_IK_Target").transform;
+		transform.transform.parent = watchTargetParent;
+		transform.localPosition = new Vector3(-0.2382f, -0.0417f, 0.118f);
+		transform.localRotation = Quaternion.Euler(new Vector3(52.206f, -181.599f, -6.622f));
+		Left_Arm.solver.target = transform;
+	}
+
+	private void Update()
+	{
+		if (_player.IsNullOrDestroyed())
+		{
+			return;
+		}
+		SetupAnimatorMasks();
+		if (_player.IsOwner)
+		{
+			_animatorController.SetBool("HoldingItem", _player.Holder.CheckCurrent());
+			_animatorController.SetFloat("HoldingItemFloat", (_animatorController.GetBool("HoldingItem") && !THIRD_PERSON_CHARACTER) ? 1 : 0);
+		}
+		if (_animatorController.GetFloat("watch") > 0.1f)
+		{
+			if (!THIRD_PERSON_CHARACTER && _leftHandIKWeight <= 1f)
+			{
+				_leftHandIKWeight += 3.5f * Time.deltaTime;
+			}
+		}
+		else if (_leftHandIKWeight > 0f)
+		{
+			_leftHandIKWeight -= 3.5f * Time.deltaTime;
+		}
+		Left_Arm.solver.IKPositionWeight = _leftHandIKWeight;
+		Left_Arm.solver.IKRotationWeight = _leftHandIKWeight;
+		if (_player.Character.PlayingEventAnimation || _player.Movement.ClimbingLedge || _player.Movement.ClimbingLadder || _player.Movement.Vehicle != null || _player.GameInput.FireLighter.IsLightingFire)
+		{
+			_aimIK.solver.bones[0].weight = 0f;
+			_aimIK.solver.bones[1].weight = 0f;
+		}
+		else if (THIRD_PERSON_CHARACTER)
+		{
+			_aimIK.solver.bones[0].weight = 0.1f;
+			_aimIK.solver.bones[1].weight = 0.1f;
+		}
+		else
+		{
+			_aimIK.solver.bones[0].weight = 1f;
+			_aimIK.solver.bones[1].weight = 1f;
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (!_player.IsNullOrDestroyed())
+		{
+			if (_player.Movement.InWater)
+			{
+				_aimTargetTransform.localPosition = new Vector3(_aimTargetTransform.localPosition.x, 4.35f, _aimTargetTransform.localPosition.z);
+			}
+			else
+			{
+				_aimTargetTransform.localPosition = new Vector3(_aimTargetTransform.localPosition.x, 0f, _aimTargetTransform.localPosition.z);
+			}
+			_aimTargetSmooth = Vector3.Lerp(_aimTargetSmooth, _player.PlayerCamera.transform.position + _player.PlayerCamera.transform.up * 3.8f + _player.PlayerCamera.transform.forward * 20f, Time.deltaTime * armCameraFollowSmoothness);
+			_aimTarget.transform.position = _aimTargetSmooth;
+			_aimIK.solver.transform.LookAt(_aimTarget);
+			_aimIK.solver.axis = _aimIK.solver.transform.InverseTransformDirection(transform.forward);
+			_aimIK.solver.IKPosition = _aimTarget.position;
+		}
+	}
+
+	private void SetupAnimatorMasks()
+	{
+		if (THIRD_PERSON_CHARACTER)
+		{
+			_animatorController.SetLayerWeight(1, 0f);
+			_animatorController.SetLayerWeight(2, 0f);
+			_animatorController.SetLayerWeight(3, 0f);
+			_animatorController.SetLayerWeight(4, 1f);
+			_animatorController.SetLayerWeight(5, 1f);
+			_animatorController.SetLayerWeight(6, 1f);
+			_animatorController.SetLayerWeight(7, 1f);
+		}
+		else
+		{
+			_animatorController.SetLayerWeight(4, 0f);
+			_animatorController.SetLayerWeight(5, 0f);
+			_animatorController.SetLayerWeight(6, 0f);
+			_animatorController.SetLayerWeight(7, 0f);
+			_animatorController.SetLayerWeight(1, 1f);
+			_animatorController.SetLayerWeight(2, 1f);
+			_animatorController.SetLayerWeight(3, 1f);
+		}
+		if (_player.Character.PlayingEventAnimation || _player.Movement.ClimbingLadder || _player.Movement.ClimbingLedge)
+		{
+			_animatorController.SetLayerWeight(1, 0f);
+			_animatorController.SetLayerWeight(2, 0f);
+			_animatorController.SetLayerWeight(3, 0f);
+			_animatorController.SetLayerWeight(4, 0f);
+			_animatorController.SetLayerWeight(5, 0f);
+			_animatorController.SetLayerWeight(6, 0f);
+			_animatorController.SetLayerWeight(7, 0f);
+		}
+	}
+
+	public void InstantiatePlayerRagdoll(Vector3 position)
+	{
+		MultiplayerMng.Instantiate<InteractiveObject_PLAYER_RAGDOLL>((_playerRagdollType == RAGDOLL_TYPE.Male_Ragdoll) ? BoltPrefabs.Player_Ragdoll_Male : BoltPrefabs.Player_Ragdoll_Female, new MultiplayerTokens.SaveablePrefab
+		{
+			Id = MiniGuid.PLAYER_RAGDOLL(_player)
+		}).transform.position = position;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 275
+PATH: Assembly-CSharp__Beam__Constructing_FUEL_STILL_COLLECTOR.cs
+SIZE: 3588 bytes
+SHA256: 91b6a29c6dd10e47dd132f517d94bb6bd4d3772aab54f40a7c68107405bb7973
+====================================================================================================
+
+using System;
+using Beam.Crafting;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam;
+
+public class Constructing_FUEL_STILL_COLLECTOR : ReplicableMonoBehaviour, IInteractable, IBase, IHasCraftingType, IHaveAttribute, IHaveFuel, ISelectable, ISaveable
+{
+	[SerializeField]
+	private Constructing_FUEL_STILL_BOILER _constructingStillBoiler;
+
+	private MiniGuid _referenceId;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Selecting _selecting;
+
+	private float _fuel;
+
+	private string _displayName = "";
+
+	public DamageUnityEvent Damaged;
+
+	public override MiniGuid ReferenceId
+	{
+		get
+		{
+			if (_referenceId.IsDefault() && _constructingStillBoiler.Structure.IsValid())
+			{
+				_referenceId = MiniGuid.NewFrom(_constructingStillBoiler.Structure.ReferenceId);
+			}
+			return _referenceId;
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Selecting Selecting => _selecting;
+
+	public IconType Type { get; } = IconType.Water;
+
+	public float FuelCapacity => 4f;
+
+	public float Fuel => _fuel;
+
+	public bool CanInteract { get; set; } = true;
+
+	public string DisplayName
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(_displayName))
+			{
+				_displayName = CraftingType.ToString();
+			}
+			return _displayName;
+		}
+	}
+
+	public bool CanParent { get; set; }
+
+	public Transform TransformParent { get; set; }
+
+	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.CRAFTING_FUEL_STILL_COLLECTOR);
+
+	public RaycastMode RaycastMode { get; }
+
+	public bool IsDamageable => true;
+
+	public float GetValue()
+	{
+		return _fuel / FuelCapacity;
+	}
+
+	public string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (_fuel == 0f || obj.IsNullOrDestroyed())
+		{
+			return string.Empty;
+		}
+		if (obj.CraftingType.InteractiveType == InteractiveType.TOOLS_JERRYCAN)
+		{
+			InteractiveObject_FUELCAN interactiveObject_FUELCAN = obj as InteractiveObject_FUELCAN;
+			if (interactiveObject_FUELCAN != null && interactiveObject_FUELCAN.CanRefill())
+			{
+				return "ITEM_INTERACTION_DESCRIPTION_REFILL";
+			}
+		}
+		return string.Empty;
+	}
+
+	private void OnDestroy()
+	{
+		Damaged.RemoveAllListeners();
+		Damaged = null;
+	}
+
+	public void Damage(float damage, IBase damager)
+	{
+		Damaged?.Invoke(new DamageUnityEventArgs(damage, damager));
+	}
+
+	public void Destroy()
+	{
+	}
+
+	public void Parent()
+	{
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		return false;
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return false;
+		}
+		InteractiveObject_FUELCAN interactiveObject_FUELCAN = obj as InteractiveObject_FUELCAN;
+		if (interactiveObject_FUELCAN != null && interactiveObject_FUELCAN.CanRefill())
+		{
+			Fill(interactiveObject_FUELCAN);
+			return true;
+		}
+		return Interact(player);
+	}
+
+	public void Refill(float availableFuel)
+	{
+		((IHaveFuel)this).Refill(availableFuel);
+	}
+
+	float IHaveFuel.Refill(float availableFuel)
+	{
+		float num = Mathf.Min(FuelCapacity - _fuel, availableFuel);
+		if (num > 0f)
+		{
+			_fuel += num;
+			_fuel = Mathf.Clamp(_fuel, 0f, FuelCapacity);
+		}
+		return num;
+	}
+
+	public float Fill(IHaveFuel fuelable)
+	{
+		int num = Mathf.CeilToInt(fuelable.Refill(_fuel));
+		if (num > 0)
+		{
+			_fuel -= num;
+			_fuel = Mathf.Clamp(_fuel, 0f, FuelCapacity);
+		}
+		return num;
+	}
+
+	public new JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("Fuel", _fuel);
+		return jObject;
+	}
+
+	public new void Load(JObject data)
+	{
+		int value = data.GetField("Fuel").GetValue<int>();
+		_fuel = value;
+	}
+}
+
+

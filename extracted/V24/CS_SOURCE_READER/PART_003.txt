@@ -1,0 +1,5312 @@
+
+====================================================================================================
+SOURCE FILE 051
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__ConstraintPosition.cs
+SIZE: 442 bytes
+SHA256: b3b68ecdc10722c3f4c6dead008822f69f72b07c118c4be991005479d2d20b93
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class ConstraintPosition : Constraint
+{
+	public Vector3 position;
+
+	public override void UpdateConstraint()
+	{
+		if (!(weight <= 0f) && isValid)
+		{
+			transform.position = Vector3.Lerp(transform.position, position, weight);
+		}
+	}
+
+	public ConstraintPosition()
+	{
+	}
+
+	public ConstraintPosition(Transform transform)
+	{
+		base.transform = transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 052
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__ConstraintPositionOffset.cs
+SIZE: 944 bytes
+SHA256: 3ad8176688b8e8eaff488f6accd9ec1eb7eda557b01e65708327bb07071f29e5
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class ConstraintPositionOffset : Constraint
+{
+	public Vector3 offset;
+
+	private Vector3 defaultLocalPosition;
+
+	private Vector3 lastLocalPosition;
+
+	private bool initiated;
+
+	private bool positionChanged => transform.localPosition != lastLocalPosition;
+
+	public override void UpdateConstraint()
+	{
+		if (!(weight <= 0f) && isValid)
+		{
+			if (!initiated)
+			{
+				defaultLocalPosition = transform.localPosition;
+				lastLocalPosition = transform.localPosition;
+				initiated = true;
+			}
+			if (positionChanged)
+			{
+				defaultLocalPosition = transform.localPosition;
+			}
+			transform.localPosition = defaultLocalPosition;
+			transform.position += offset * weight;
+			lastLocalPosition = transform.localPosition;
+		}
+	}
+
+	public ConstraintPositionOffset()
+	{
+	}
+
+	public ConstraintPositionOffset(Transform transform)
+	{
+		base.transform = transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 053
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__ConstraintRotation.cs
+SIZE: 449 bytes
+SHA256: 7e022bb96d474b555e6f72a7fb4d9d9a46b75175e87dde20d5d414f7efd4cc58
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class ConstraintRotation : Constraint
+{
+	public Quaternion rotation;
+
+	public override void UpdateConstraint()
+	{
+		if (!(weight <= 0f) && isValid)
+		{
+			transform.rotation = Quaternion.Slerp(transform.rotation, rotation, weight);
+		}
+	}
+
+	public ConstraintRotation()
+	{
+	}
+
+	public ConstraintRotation(Transform transform)
+	{
+		base.transform = transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 054
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__ConstraintRotationOffset.cs
+SIZE: 1076 bytes
+SHA256: ac1fcaf3a36c513de361dc73a943712a180c56faf9e1807a015dd3c736bcaa3b
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class ConstraintRotationOffset : Constraint
+{
+	public Quaternion offset;
+
+	private Quaternion defaultRotation;
+
+	private Quaternion defaultLocalRotation;
+
+	private Quaternion lastLocalRotation;
+
+	private Quaternion defaultTargetLocalRotation;
+
+	private bool initiated;
+
+	private bool rotationChanged => transform.localRotation != lastLocalRotation;
+
+	public override void UpdateConstraint()
+	{
+		if (!(weight <= 0f) && isValid)
+		{
+			if (!initiated)
+			{
+				defaultLocalRotation = transform.localRotation;
+				lastLocalRotation = transform.localRotation;
+				initiated = true;
+			}
+			if (rotationChanged)
+			{
+				defaultLocalRotation = transform.localRotation;
+			}
+			transform.localRotation = defaultLocalRotation;
+			transform.rotation = Quaternion.Slerp(transform.rotation, offset, weight);
+			lastLocalRotation = transform.localRotation;
+		}
+	}
+
+	public ConstraintRotationOffset()
+	{
+	}
+
+	public ConstraintRotationOffset(Transform transform)
+	{
+		base.transform = transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 055
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Constraints.cs
+SIZE: 1163 bytes
+SHA256: 33179136b7e549b02cdfde808cbaacb24a216fd5a37ab8d228412f2a9f4152b7
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class Constraints
+{
+	public Transform transform;
+
+	public Transform target;
+
+	public Vector3 positionOffset;
+
+	public Vector3 position;
+
+	[Range(0f, 1f)]
+	public float positionWeight;
+
+	public Vector3 rotationOffset;
+
+	public Vector3 rotation;
+
+	[Range(0f, 1f)]
+	public float rotationWeight;
+
+	public bool IsValid()
+	{
+		return transform != null;
+	}
+
+	public void Initiate(Transform transform)
+	{
+		this.transform = transform;
+		position = transform.position;
+		rotation = transform.eulerAngles;
+	}
+
+	public void Update()
+	{
+		if (IsValid())
+		{
+			if (target != null)
+			{
+				position = target.position;
+			}
+			transform.position += positionOffset;
+			if (positionWeight > 0f)
+			{
+				transform.position = Vector3.Lerp(transform.position, position, positionWeight);
+			}
+			if (target != null)
+			{
+				rotation = target.eulerAngles;
+			}
+			transform.rotation = Quaternion.Euler(rotationOffset) * transform.rotation;
+			if (rotationWeight > 0f)
+			{
+				transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(rotation), rotationWeight);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 056
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__EditorIK.cs
+SIZE: 2682 bytes
+SHA256: 93230f9b5db641daa9dc792b8791a289ba897a49f7eaf03b10f1e502f861e466
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[ExecuteInEditMode]
+public class EditorIK : MonoBehaviour
+{
+	[Tooltip("If slot assigned, will update Animator before IK.")]
+	public Animator animator;
+
+	[Tooltip("Create/Final IK/Editor IK Pose")]
+	public EditorIKPose defaultPose;
+
+	[HideInInspector]
+	public Transform[] bones = new Transform[0];
+
+	public IK ik { get; private set; }
+
+	private void OnEnable()
+	{
+		if (!Application.isPlaying)
+		{
+			if (ik == null)
+			{
+				ik = GetComponent<IK>();
+			}
+			if (ik == null)
+			{
+				Debug.LogError("EditorIK needs to have an IK component on the same GameObject.", transform);
+			}
+			else if (bones.Length == 0)
+			{
+				bones = ik.transform.GetComponentsInChildren<Transform>();
+			}
+		}
+	}
+
+	private void OnDisable()
+	{
+		if (!Application.isPlaying)
+		{
+			if (defaultPose != null && defaultPose.poseStored)
+			{
+				defaultPose.Restore(bones);
+			}
+			if (ik != null)
+			{
+				ik.GetIKSolver().executedInEditor = false;
+			}
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (!Application.isPlaying && !(ik == null))
+		{
+			if (bones.Length == 0)
+			{
+				bones = ik.transform.GetComponentsInChildren<Transform>();
+			}
+			if (defaultPose != null && defaultPose.poseStored && bones.Length != 0)
+			{
+				defaultPose.Restore(bones);
+			}
+			ik.GetIKSolver().executedInEditor = false;
+		}
+	}
+
+	public void StoreDefaultPose()
+	{
+		bones = ik.transform.GetComponentsInChildren<Transform>();
+		defaultPose.Store(bones);
+	}
+
+	public bool Initiate()
+	{
+		if (defaultPose == null)
+		{
+			return false;
+		}
+		if (!defaultPose.poseStored)
+		{
+			return false;
+		}
+		if (bones.Length == 0)
+		{
+			return false;
+		}
+		if (ik == null)
+		{
+			ik = GetComponent<IK>();
+		}
+		if (ik == null)
+		{
+			Debug.LogError("EditorIK can not find an IK component.", transform);
+			return false;
+		}
+		defaultPose.Restore(bones);
+		ik.GetIKSolver().executedInEditor = false;
+		ik.GetIKSolver().Initiate(ik.transform);
+		ik.GetIKSolver().executedInEditor = true;
+		return true;
+	}
+
+	public void Update()
+	{
+		if (Application.isPlaying || ik == null || !ik.enabled || !ik.GetIKSolver().executedInEditor)
+		{
+			return;
+		}
+		if (bones.Length == 0)
+		{
+			bones = ik.transform.GetComponentsInChildren<Transform>();
+		}
+		if (bones.Length == 0 || !defaultPose.Restore(bones))
+		{
+			return;
+		}
+		ik.GetIKSolver().executedInEditor = false;
+		if (!ik.GetIKSolver().initiated)
+		{
+			ik.GetIKSolver().Initiate(ik.transform);
+		}
+		if (ik.GetIKSolver().initiated)
+		{
+			ik.GetIKSolver().executedInEditor = true;
+			if (animator != null && animator.runtimeAnimatorController != null)
+			{
+				animator.Update(Time.deltaTime);
+			}
+			ik.GetIKSolver().Update();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 057
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__EditorIKPose.cs
+SIZE: 1048 bytes
+SHA256: 77e7d4468946d119db9e4d73c7feded80bd724fd996338d3eda4b63743075a4b
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[CreateAssetMenu(fileName = "Editor IK Pose", menuName = "Final IK/Editor IK Pose", order = 1)]
+public class EditorIKPose : ScriptableObject
+{
+	public Vector3[] localPositions = new Vector3[0];
+
+	public Quaternion[] localRotations = new Quaternion[0];
+
+	public bool poseStored => localPositions.Length != 0;
+
+	public void Store(Transform[] T)
+	{
+		localPositions = new Vector3[T.Length];
+		localRotations = new Quaternion[T.Length];
+		for (int i = 1; i < T.Length; i++)
+		{
+			localPositions[i] = T[i].localPosition;
+			localRotations[i] = T[i].localRotation;
+		}
+	}
+
+	public bool Restore(Transform[] T)
+	{
+		if (localPositions.Length != T.Length)
+		{
+			Debug.LogError("Can not restore pose (unmatched bone count). Please stop the solver and click on 'Store Default Pose' if you have made changes to character hierarchy.");
+			return false;
+		}
+		for (int i = 1; i < T.Length; i++)
+		{
+			T[i].localPosition = localPositions[i];
+			T[i].localRotation = localRotations[i];
+		}
+		return true;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 058
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__FBBIKHeadEffector.cs
+SIZE: 15957 bytes
+SHA256: a4e8644b01aa7e83f8c5158bf7d142f06e45c7c7cc4fa3361ed7c6a91255c6e6
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class FBBIKHeadEffector : MonoBehaviour
+{
+	[Serializable]
+	public class BendBone
+	{
+		[Tooltip("Assign spine and/or neck bones.")]
+		public Transform transform;
+
+		[Tooltip("The weight of rotating this bone.")]
+		[Range(0f, 1f)]
+		public float weight = 0.5f;
+
+		private Quaternion defaultLocalRotation = Quaternion.identity;
+
+		public BendBone()
+		{
+		}
+
+		public BendBone(Transform transform, float weight)
+		{
+			this.transform = transform;
+			this.weight = weight;
+		}
+
+		public void StoreDefaultLocalState()
+		{
+			defaultLocalRotation = transform.localRotation;
+		}
+
+		public void FixTransforms()
+		{
+			transform.localRotation = defaultLocalRotation;
+		}
+	}
+
+	[Tooltip("Reference to the FBBIK component.")]
+	public FullBodyBipedIK ik;
+
+	[LargeHeader("Position")]
+	[Tooltip("Master weight for positioning the head.")]
+	[Range(0f, 1f)]
+	public float positionWeight = 1f;
+
+	[Tooltip("The weight of moving the body along with the head")]
+	[Range(0f, 1f)]
+	public float bodyWeight = 0.8f;
+
+	[Tooltip("The weight of moving the thighs along with the head")]
+	[Range(0f, 1f)]
+	public float thighWeight = 0.8f;
+
+	[Tooltip("If false, hands will not pull the head away if they are too far. Disabling this will improve performance significantly.")]
+	public bool handsPullBody = true;
+
+	[LargeHeader("Rotation")]
+	[Tooltip("The weight of rotating the head bone after solving")]
+	[Range(0f, 1f)]
+	public float rotationWeight;
+
+	[Tooltip("Clamping the rotation of the body")]
+	[Range(0f, 1f)]
+	public float bodyClampWeight = 0.5f;
+
+	[Tooltip("Clamping the rotation of the head")]
+	[Range(0f, 1f)]
+	public float headClampWeight = 0.5f;
+
+	[Tooltip("The master weight of bending/twisting the spine to the rotation of the head effector. This is similar to CCD, but uses the rotation of the head effector not the position.")]
+	[Range(0f, 1f)]
+	public float bendWeight = 1f;
+
+	[Tooltip("The bones to use for bending.")]
+	public BendBone[] bendBones = new BendBone[0];
+
+	[LargeHeader("CCD")]
+	[Tooltip("Optional. The master weight of the CCD (Cyclic Coordinate Descent) IK effect that bends the spine towards the head effector before FBBIK solves.")]
+	[Range(0f, 1f)]
+	public float CCDWeight = 1f;
+
+	[Tooltip("The weight of rolling the bones in towards the target")]
+	[Range(0f, 1f)]
+	public float roll;
+
+	[Tooltip("Smoothing the CCD effect.")]
+	[Range(0f, 1000f)]
+	public float damper = 500f;
+
+	[Tooltip("Bones to use for the CCD pass. Assign spine and/or neck bones.")]
+	public Transform[] CCDBones = new Transform[0];
+
+	[LargeHeader("Stretching")]
+	[Tooltip("Stretching the spine/neck to help reach the target. This is useful for making sure the head stays locked relative to the VR headset. NB! Stretching is done after FBBIK has solved so if you have the hand effectors pinned and spine bones included in the 'Stretch Bones', the hands might become offset from their target positions.")]
+	[Range(0f, 1f)]
+	public float postStretchWeight = 1f;
+
+	[Tooltip("Stretch magnitude limit.")]
+	public float maxStretch = 0.1f;
+
+	[Tooltip("If > 0, dampers the stretching effect.")]
+	public float stretchDamper;
+
+	[Tooltip("If true, will fix head position to this Transform no matter what. Good for making sure the head will not budge away from the VR headset")]
+	public bool fixHead;
+
+	[Tooltip("Bones to use for stretching. The more bones you add, the less noticable the effect.")]
+	public Transform[] stretchBones = new Transform[0];
+
+	[LargeHeader("Chest Direction")]
+	public Vector3 chestDirection = Vector3.forward;
+
+	[Range(0f, 1f)]
+	public float chestDirectionWeight = 1f;
+
+	public Transform[] chestBones = new Transform[0];
+
+	public IKSolver.UpdateDelegate OnPostHeadEffectorFK;
+
+	private Vector3 offset;
+
+	private Vector3 headToBody;
+
+	private Vector3 shoulderCenterToHead;
+
+	private Vector3 headToLeftThigh;
+
+	private Vector3 headToRightThigh;
+
+	private Vector3 leftShoulderPos;
+
+	private Vector3 rightShoulderPos;
+
+	private float shoulderDist;
+
+	private float leftShoulderDist;
+
+	private float rightShoulderDist;
+
+	private Quaternion chestRotation;
+
+	private Quaternion headRotationRelativeToRoot;
+
+	private Quaternion[] ccdDefaultLocalRotations = new Quaternion[0];
+
+	private Vector3 headLocalPosition;
+
+	private Quaternion headLocalRotation;
+
+	private Vector3[] stretchLocalPositions = new Vector3[0];
+
+	private Quaternion[] stretchLocalRotations = new Quaternion[0];
+
+	private Vector3[] chestLocalPositions = new Vector3[0];
+
+	private Quaternion[] chestLocalRotations = new Quaternion[0];
+
+	private int bendBonesCount;
+
+	private int ccdBonesCount;
+
+	private int stretchBonesCount;
+
+	private int chestBonesCount;
+
+	private void Start()
+	{
+		IKSolverFullBodyBiped solver = ik.solver;
+		solver.OnPreRead = (IKSolver.UpdateDelegate)Delegate.Combine(solver.OnPreRead, new IKSolver.UpdateDelegate(OnPreRead));
+		IKSolverFullBodyBiped solver2 = ik.solver;
+		solver2.OnPreIteration = (IKSolver.IterationDelegate)Delegate.Combine(solver2.OnPreIteration, new IKSolver.IterationDelegate(Iterate));
+		IKSolverFullBodyBiped solver3 = ik.solver;
+		solver3.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(solver3.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostUpdate));
+		IKSolverFullBodyBiped solver4 = ik.solver;
+		solver4.OnStoreDefaultLocalState = (IKSolver.UpdateDelegate)Delegate.Combine(solver4.OnStoreDefaultLocalState, new IKSolver.UpdateDelegate(OnStoreDefaultLocalState));
+		IKSolverFullBodyBiped solver5 = ik.solver;
+		solver5.OnFixTransforms = (IKSolver.UpdateDelegate)Delegate.Combine(solver5.OnFixTransforms, new IKSolver.UpdateDelegate(OnFixTransforms));
+		OnStoreDefaultLocalState();
+		headRotationRelativeToRoot = Quaternion.Inverse(ik.references.root.rotation) * ik.references.head.rotation;
+	}
+
+	private void OnStoreDefaultLocalState()
+	{
+		BendBone[] array = bendBones;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i]?.StoreDefaultLocalState();
+		}
+		ccdDefaultLocalRotations = new Quaternion[CCDBones.Length];
+		for (int j = 0; j < CCDBones.Length; j++)
+		{
+			if (CCDBones[j] != null)
+			{
+				ccdDefaultLocalRotations[j] = CCDBones[j].localRotation;
+			}
+		}
+		headLocalPosition = ik.references.head.localPosition;
+		headLocalRotation = ik.references.head.localRotation;
+		stretchLocalPositions = new Vector3[stretchBones.Length];
+		stretchLocalRotations = new Quaternion[stretchBones.Length];
+		for (int k = 0; k < stretchBones.Length; k++)
+		{
+			if (stretchBones[k] != null)
+			{
+				stretchLocalPositions[k] = stretchBones[k].localPosition;
+				stretchLocalRotations[k] = stretchBones[k].localRotation;
+			}
+		}
+		chestLocalPositions = new Vector3[chestBones.Length];
+		chestLocalRotations = new Quaternion[chestBones.Length];
+		for (int l = 0; l < chestBones.Length; l++)
+		{
+			if (chestBones[l] != null)
+			{
+				chestLocalPositions[l] = chestBones[l].localPosition;
+				chestLocalRotations[l] = chestBones[l].localRotation;
+			}
+		}
+		bendBonesCount = bendBones.Length;
+		ccdBonesCount = CCDBones.Length;
+		stretchBonesCount = stretchBones.Length;
+		chestBonesCount = chestBones.Length;
+	}
+
+	private void OnFixTransforms()
+	{
+		if (!enabled)
+		{
+			return;
+		}
+		BendBone[] array = bendBones;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i]?.FixTransforms();
+		}
+		for (int j = 0; j < CCDBones.Length; j++)
+		{
+			if (CCDBones[j] != null)
+			{
+				CCDBones[j].localRotation = ccdDefaultLocalRotations[j];
+			}
+		}
+		ik.references.head.localPosition = headLocalPosition;
+		ik.references.head.localRotation = headLocalRotation;
+		for (int k = 0; k < stretchBones.Length; k++)
+		{
+			if (stretchBones[k] != null)
+			{
+				stretchBones[k].localPosition = stretchLocalPositions[k];
+				stretchBones[k].localRotation = stretchLocalRotations[k];
+			}
+		}
+		for (int l = 0; l < chestBones.Length; l++)
+		{
+			if (chestBones[l] != null)
+			{
+				chestBones[l].localPosition = chestLocalPositions[l];
+				chestBones[l].localRotation = chestLocalRotations[l];
+			}
+		}
+	}
+
+	private void OnPreRead()
+	{
+		if (enabled && gameObject.activeInHierarchy && ik.solver.iterations != 0)
+		{
+			ik.solver.FABRIKPass = handsPullBody;
+			if (bendBonesCount != bendBones.Length || ccdBonesCount != CCDBones.Length || stretchBonesCount != stretchBones.Length || chestBonesCount != chestBones.Length)
+			{
+				OnStoreDefaultLocalState();
+			}
+			ChestDirection();
+			SpineBend();
+			CCDPass();
+			offset = transform.position - ik.references.head.position;
+			shoulderDist = Vector3.Distance(ik.references.leftUpperArm.position, ik.references.rightUpperArm.position);
+			leftShoulderDist = Vector3.Distance(ik.references.head.position, ik.references.leftUpperArm.position);
+			rightShoulderDist = Vector3.Distance(ik.references.head.position, ik.references.rightUpperArm.position);
+			headToBody = ik.solver.rootNode.position - ik.references.head.position;
+			headToLeftThigh = ik.references.leftThigh.position - ik.references.head.position;
+			headToRightThigh = ik.references.rightThigh.position - ik.references.head.position;
+			leftShoulderPos = ik.references.leftUpperArm.position + offset * bodyWeight;
+			rightShoulderPos = ik.references.rightUpperArm.position + offset * bodyWeight;
+			chestRotation = Quaternion.LookRotation(ik.references.head.position - ik.references.leftUpperArm.position, ik.references.rightUpperArm.position - ik.references.leftUpperArm.position);
+			if (OnPostHeadEffectorFK != null)
+			{
+				OnPostHeadEffectorFK();
+			}
+		}
+	}
+
+	private void SpineBend()
+	{
+		float num = bendWeight * ik.solver.IKPositionWeight;
+		if (num <= 0f || bendBones.Length == 0)
+		{
+			return;
+		}
+		Quaternion rotation = transform.rotation * Quaternion.Inverse(ik.references.root.rotation * headRotationRelativeToRoot);
+		rotation = QuaTools.ClampRotation(rotation, bodyClampWeight, 2);
+		float num2 = 1f / (float)bendBones.Length;
+		for (int i = 0; i < bendBones.Length; i++)
+		{
+			if (bendBones[i].transform != null)
+			{
+				bendBones[i].transform.rotation = Quaternion.Lerp(Quaternion.identity, rotation, num2 * bendBones[i].weight * num) * bendBones[i].transform.rotation;
+			}
+		}
+	}
+
+	private void CCDPass()
+	{
+		float num = CCDWeight * ik.solver.IKPositionWeight;
+		if (!(num <= 0f))
+		{
+			for (int num2 = CCDBones.Length - 1; num2 > -1; num2--)
+			{
+				Quaternion quaternion = Quaternion.FromToRotation(ik.references.head.position - CCDBones[num2].position, transform.position - CCDBones[num2].position) * CCDBones[num2].rotation;
+				float num3 = Mathf.Lerp((CCDBones.Length - num2) / CCDBones.Length, 1f, roll);
+				float num4 = Quaternion.Angle(Quaternion.identity, quaternion);
+				num4 = Mathf.Lerp(0f, num4, (damper - num4) / damper);
+				CCDBones[num2].rotation = Quaternion.RotateTowards(CCDBones[num2].rotation, quaternion, num4 * num * num3);
+			}
+		}
+	}
+
+	private void Iterate(int iteration)
+	{
+		if (enabled && gameObject.activeInHierarchy && ik.solver.iterations != 0)
+		{
+			leftShoulderPos = transform.position + (leftShoulderPos - transform.position).normalized * leftShoulderDist;
+			rightShoulderPos = transform.position + (rightShoulderPos - transform.position).normalized * rightShoulderDist;
+			Solve(ref leftShoulderPos, ref rightShoulderPos, shoulderDist);
+			LerpSolverPosition(ik.solver.leftShoulderEffector, leftShoulderPos, positionWeight * ik.solver.IKPositionWeight, ik.solver.leftShoulderEffector.positionOffset);
+			LerpSolverPosition(ik.solver.rightShoulderEffector, rightShoulderPos, positionWeight * ik.solver.IKPositionWeight, ik.solver.rightShoulderEffector.positionOffset);
+			Quaternion to = Quaternion.LookRotation(transform.position - leftShoulderPos, rightShoulderPos - leftShoulderPos);
+			Quaternion quaternion = QuaTools.FromToRotation(chestRotation, to);
+			Vector3 vector = quaternion * headToBody;
+			LerpSolverPosition(ik.solver.bodyEffector, transform.position + vector, positionWeight * ik.solver.IKPositionWeight, ik.solver.bodyEffector.positionOffset - ik.solver.pullBodyOffset);
+			Quaternion quaternion2 = Quaternion.Lerp(Quaternion.identity, quaternion, thighWeight);
+			Vector3 vector2 = quaternion2 * headToLeftThigh;
+			Vector3 vector3 = quaternion2 * headToRightThigh;
+			LerpSolverPosition(ik.solver.leftThighEffector, transform.position + vector2, positionWeight * ik.solver.IKPositionWeight, ik.solver.bodyEffector.positionOffset - ik.solver.pullBodyOffset + ik.solver.leftThighEffector.positionOffset);
+			LerpSolverPosition(ik.solver.rightThighEffector, transform.position + vector3, positionWeight * ik.solver.IKPositionWeight, ik.solver.bodyEffector.positionOffset - ik.solver.pullBodyOffset + ik.solver.rightThighEffector.positionOffset);
+		}
+	}
+
+	private void OnPostUpdate()
+	{
+		if (enabled && gameObject.activeInHierarchy)
+		{
+			PostStretching();
+			Quaternion rotation = QuaTools.FromToRotation(ik.references.head.rotation, transform.rotation);
+			rotation = QuaTools.ClampRotation(rotation, headClampWeight, 2);
+			ik.references.head.rotation = Quaternion.Lerp(Quaternion.identity, rotation, rotationWeight * ik.solver.IKPositionWeight) * ik.references.head.rotation;
+		}
+	}
+
+	private void ChestDirection()
+	{
+		float num = chestDirectionWeight * ik.solver.IKPositionWeight;
+		if (num <= 0f)
+		{
+			return;
+		}
+		bool changed = false;
+		chestDirection = V3Tools.ClampDirection(chestDirection, ik.references.root.forward, 0.45f, 2, out changed);
+		if (!(chestDirection == Vector3.zero))
+		{
+			Quaternion b = Quaternion.FromToRotation(ik.references.root.forward, chestDirection);
+			b = Quaternion.Lerp(Quaternion.identity, b, num * (1f / (float)chestBones.Length));
+			Transform[] array = chestBones;
+			foreach (Transform transform in array)
+			{
+				transform.rotation = b * transform.rotation;
+			}
+		}
+	}
+
+	private void PostStretching()
+	{
+		float num = postStretchWeight * ik.solver.IKPositionWeight;
+		if (num > 0f)
+		{
+			Vector3 vector = Vector3.ClampMagnitude(transform.position - ik.references.head.position, maxStretch);
+			vector *= num;
+			stretchDamper = Mathf.Max(stretchDamper, 0f);
+			if (stretchDamper > 0f)
+			{
+				vector /= (1f + vector.magnitude) * (1f + stretchDamper);
+			}
+			for (int i = 0; i < stretchBones.Length; i++)
+			{
+				if (stretchBones[i] != null)
+				{
+					stretchBones[i].position += vector / stretchBones.Length;
+				}
+			}
+		}
+		if (fixHead && ik.solver.IKPositionWeight > 0f)
+		{
+			ik.references.head.position = transform.position;
+		}
+	}
+
+	private void LerpSolverPosition(IKEffector effector, Vector3 position, float weight, Vector3 offset)
+	{
+		effector.GetNode(ik.solver).solverPosition = Vector3.Lerp(effector.GetNode(ik.solver).solverPosition, position + offset, weight);
+	}
+
+	private void Solve(ref Vector3 pos1, ref Vector3 pos2, float nominalDistance)
+	{
+		Vector3 vector = pos2 - pos1;
+		float magnitude = vector.magnitude;
+		if (magnitude != nominalDistance && magnitude != 0f)
+		{
+			float num = 1f;
+			num *= 1f - nominalDistance / magnitude;
+			Vector3 vector2 = vector * num * 0.5f;
+			pos1 += vector2;
+			pos2 -= vector2;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (ik != null)
+		{
+			IKSolverFullBodyBiped solver = ik.solver;
+			solver.OnPreRead = (IKSolver.UpdateDelegate)Delegate.Remove(solver.OnPreRead, new IKSolver.UpdateDelegate(OnPreRead));
+			IKSolverFullBodyBiped solver2 = ik.solver;
+			solver2.OnPreIteration = (IKSolver.IterationDelegate)Delegate.Remove(solver2.OnPreIteration, new IKSolver.IterationDelegate(Iterate));
+			IKSolverFullBodyBiped solver3 = ik.solver;
+			solver3.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(solver3.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostUpdate));
+			IKSolverFullBodyBiped solver4 = ik.solver;
+			solver4.OnStoreDefaultLocalState = (IKSolver.UpdateDelegate)Delegate.Remove(solver4.OnStoreDefaultLocalState, new IKSolver.UpdateDelegate(OnStoreDefaultLocalState));
+			IKSolverFullBodyBiped solver5 = ik.solver;
+			solver5.OnFixTransforms = (IKSolver.UpdateDelegate)Delegate.Remove(solver5.OnFixTransforms, new IKSolver.UpdateDelegate(OnFixTransforms));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 059
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__FBIKChain.cs
+SIZE: 13187 bytes
+SHA256: e6136f1276b1eef5f7d934eefced42006034a3c759e04982b5aa6298cf94b288
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class FBIKChain
+{
+	[Serializable]
+	public class ChildConstraint
+	{
+		public float pushElasticity;
+
+		public float pullElasticity;
+
+		[SerializeField]
+		private Transform bone1;
+
+		[SerializeField]
+		private Transform bone2;
+
+		private float crossFade;
+
+		private float inverseCrossFade;
+
+		private int chain1Index;
+
+		private int chain2Index;
+
+		public float nominalDistance { get; private set; }
+
+		public bool isRigid { get; private set; }
+
+		public ChildConstraint(Transform bone1, Transform bone2, float pushElasticity = 0f, float pullElasticity = 0f)
+		{
+			this.bone1 = bone1;
+			this.bone2 = bone2;
+			this.pushElasticity = pushElasticity;
+			this.pullElasticity = pullElasticity;
+		}
+
+		public void Initiate(IKSolverFullBody solver)
+		{
+			chain1Index = solver.GetChainIndex(bone1);
+			chain2Index = solver.GetChainIndex(bone2);
+			OnPreSolve(solver);
+		}
+
+		public void OnPreSolve(IKSolverFullBody solver)
+		{
+			nominalDistance = Vector3.Distance(solver.chain[chain1Index].nodes[0].transform.position, solver.chain[chain2Index].nodes[0].transform.position);
+			isRigid = pushElasticity <= 0f && pullElasticity <= 0f;
+			if (isRigid)
+			{
+				float num = solver.chain[chain1Index].pull - solver.chain[chain2Index].pull;
+				crossFade = 1f - (0.5f + num * 0.5f);
+			}
+			else
+			{
+				crossFade = 0.5f;
+			}
+			inverseCrossFade = 1f - crossFade;
+		}
+
+		public void Solve(IKSolverFullBody solver)
+		{
+			if (pushElasticity >= 1f && pullElasticity >= 1f)
+			{
+				return;
+			}
+			Vector3 vector = solver.chain[chain2Index].nodes[0].solverPosition - solver.chain[chain1Index].nodes[0].solverPosition;
+			float magnitude = vector.magnitude;
+			if (magnitude != nominalDistance && magnitude != 0f)
+			{
+				float num = 1f;
+				if (!isRigid)
+				{
+					float num2 = ((magnitude > nominalDistance) ? pullElasticity : pushElasticity);
+					num = 1f - num2;
+				}
+				num *= 1f - nominalDistance / magnitude;
+				Vector3 vector2 = vector * num;
+				solver.chain[chain1Index].nodes[0].solverPosition += vector2 * crossFade;
+				solver.chain[chain2Index].nodes[0].solverPosition -= vector2 * inverseCrossFade;
+			}
+		}
+	}
+
+	[Serializable]
+	public enum Smoothing
+	{
+		None,
+		Exponential,
+		Cubic
+	}
+
+	[Range(0f, 1f)]
+	public float pin;
+
+	[Range(0f, 1f)]
+	public float pull = 1f;
+
+	[Range(0f, 1f)]
+	public float push;
+
+	[Range(-1f, 1f)]
+	public float pushParent;
+
+	[Range(0f, 1f)]
+	public float reach = 0.1f;
+
+	public Smoothing reachSmoothing = Smoothing.Exponential;
+
+	public Smoothing pushSmoothing = Smoothing.Exponential;
+
+	public IKSolver.Node[] nodes = new IKSolver.Node[0];
+
+	public int[] children = new int[0];
+
+	public ChildConstraint[] childConstraints = new ChildConstraint[0];
+
+	public IKConstraintBend bendConstraint = new IKConstraintBend();
+
+	private float rootLength;
+
+	private bool initiated;
+
+	private float length;
+
+	private float distance;
+
+	private IKSolver.Point p;
+
+	private float reachForce;
+
+	private float pullParentSum;
+
+	private float[] crossFades;
+
+	private float sqrMag1;
+
+	private float sqrMag2;
+
+	private float sqrMagDif;
+
+	private const float maxLimbLength = 0.99999f;
+
+	public FBIKChain()
+	{
+	}
+
+	public FBIKChain(float pin, float pull, params Transform[] nodeTransforms)
+	{
+		this.pin = pin;
+		this.pull = pull;
+		SetNodes(nodeTransforms);
+		children = new int[0];
+	}
+
+	public void SetNodes(params Transform[] boneTransforms)
+	{
+		nodes = new IKSolver.Node[boneTransforms.Length];
+		for (int i = 0; i < boneTransforms.Length; i++)
+		{
+			nodes[i] = new IKSolver.Node(boneTransforms[i]);
+		}
+	}
+
+	public int GetNodeIndex(Transform boneTransform)
+	{
+		for (int i = 0; i < nodes.Length; i++)
+		{
+			if (nodes[i].transform == boneTransform)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public bool IsValid(ref string message)
+	{
+		if (nodes.Length == 0)
+		{
+			message = "FBIK chain contains no nodes.";
+			return false;
+		}
+		IKSolver.Node[] array = nodes;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].transform == null)
+			{
+				message = "Node transform is null in FBIK chain.";
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void Initiate(IKSolverFullBody solver)
+	{
+		initiated = false;
+		IKSolver.Node[] array = nodes;
+		foreach (IKSolver.Node obj in array)
+		{
+			obj.solverPosition = obj.transform.position;
+		}
+		CalculateBoneLengths(solver);
+		ChildConstraint[] array2 = childConstraints;
+		for (int i = 0; i < array2.Length; i++)
+		{
+			array2[i].Initiate(solver);
+		}
+		if (nodes.Length == 3)
+		{
+			bendConstraint.SetBones(nodes[0].transform, nodes[1].transform, nodes[2].transform);
+			bendConstraint.Initiate(solver);
+		}
+		crossFades = new float[children.Length];
+		initiated = true;
+	}
+
+	public void ReadPose(IKSolverFullBody solver, bool fullBody)
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		for (int i = 0; i < nodes.Length; i++)
+		{
+			nodes[i].solverPosition = nodes[i].transform.position + nodes[i].offset;
+		}
+		CalculateBoneLengths(solver);
+		if (!fullBody)
+		{
+			return;
+		}
+		for (int j = 0; j < childConstraints.Length; j++)
+		{
+			childConstraints[j].OnPreSolve(solver);
+		}
+		if (children.Length != 0)
+		{
+			float num = nodes[nodes.Length - 1].effectorPositionWeight;
+			for (int k = 0; k < children.Length; k++)
+			{
+				num += solver.chain[children[k]].nodes[0].effectorPositionWeight * solver.chain[children[k]].pull;
+			}
+			num = Mathf.Clamp(num, 1f, float.PositiveInfinity);
+			for (int l = 0; l < children.Length; l++)
+			{
+				crossFades[l] = solver.chain[children[l]].nodes[0].effectorPositionWeight * solver.chain[children[l]].pull / num;
+			}
+		}
+		pullParentSum = 0f;
+		for (int m = 0; m < children.Length; m++)
+		{
+			pullParentSum += solver.chain[children[m]].pull;
+		}
+		pullParentSum = Mathf.Clamp(pullParentSum, 1f, float.PositiveInfinity);
+		if (nodes.Length == 3)
+		{
+			reachForce = reach * Mathf.Clamp(nodes[2].effectorPositionWeight, 0f, 1f);
+		}
+		else
+		{
+			reachForce = 0f;
+		}
+		if (push > 0f && nodes.Length > 1)
+		{
+			distance = Vector3.Distance(nodes[0].transform.position, nodes[nodes.Length - 1].transform.position);
+		}
+	}
+
+	private void CalculateBoneLengths(IKSolverFullBody solver)
+	{
+		length = 0f;
+		for (int i = 0; i < nodes.Length - 1; i++)
+		{
+			nodes[i].length = Vector3.Distance(nodes[i].transform.position, nodes[i + 1].transform.position);
+			length += nodes[i].length;
+			if (nodes[i].length == 0f)
+			{
+				Warning.Log("Bone " + nodes[i].transform.name + " - " + nodes[i + 1].transform.name + " length is zero, can not solve.", nodes[i].transform);
+				return;
+			}
+		}
+		for (int j = 0; j < children.Length; j++)
+		{
+			solver.chain[children[j]].rootLength = (solver.chain[children[j]].nodes[0].transform.position - nodes[nodes.Length - 1].transform.position).magnitude;
+			if (solver.chain[children[j]].rootLength == 0f)
+			{
+				return;
+			}
+		}
+		if (nodes.Length == 3)
+		{
+			sqrMag1 = nodes[0].length * nodes[0].length;
+			sqrMag2 = nodes[1].length * nodes[1].length;
+			sqrMagDif = sqrMag1 - sqrMag2;
+		}
+	}
+
+	public void Reach(IKSolverFullBody solver)
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		for (int i = 0; i < children.Length; i++)
+		{
+			solver.chain[children[i]].Reach(solver);
+		}
+		if (reachForce <= 0f)
+		{
+			return;
+		}
+		Vector3 vector = nodes[2].solverPosition - nodes[0].solverPosition;
+		if (!(vector == Vector3.zero))
+		{
+			float magnitude = vector.magnitude;
+			Vector3 vector2 = vector / magnitude * length;
+			float num = Mathf.Clamp(magnitude / length, 1f - reachForce, 1f + reachForce) - 1f;
+			num = Mathf.Clamp(num + reachForce, -1f, 1f);
+			switch (reachSmoothing)
+			{
+			case Smoothing.Exponential:
+				num *= num;
+				break;
+			case Smoothing.Cubic:
+				num *= num * num;
+				break;
+			}
+			Vector3 vector3 = vector2 * Mathf.Clamp(num, 0f, magnitude);
+			nodes[0].solverPosition += vector3 * (1f - nodes[0].effectorPositionWeight);
+			nodes[2].solverPosition += vector3;
+		}
+	}
+
+	public Vector3 Push(IKSolverFullBody solver)
+	{
+		Vector3 zero = Vector3.zero;
+		for (int i = 0; i < children.Length; i++)
+		{
+			zero += solver.chain[children[i]].Push(solver) * solver.chain[children[i]].pushParent;
+		}
+		nodes[nodes.Length - 1].solverPosition += zero;
+		if (nodes.Length < 2)
+		{
+			return Vector3.zero;
+		}
+		if (push <= 0f)
+		{
+			return Vector3.zero;
+		}
+		Vector3 vector = nodes[2].solverPosition - nodes[0].solverPosition;
+		float magnitude = vector.magnitude;
+		if (magnitude == 0f)
+		{
+			return Vector3.zero;
+		}
+		float num = 1f - magnitude / distance;
+		if (num <= 0f)
+		{
+			return Vector3.zero;
+		}
+		switch (pushSmoothing)
+		{
+		case Smoothing.Exponential:
+			num *= num;
+			break;
+		case Smoothing.Cubic:
+			num *= num * num;
+			break;
+		}
+		Vector3 vector2 = -vector * num * push;
+		nodes[0].solverPosition += vector2;
+		return vector2;
+	}
+
+	public void SolveTrigonometric(IKSolverFullBody solver, bool calculateBendDirection = false)
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		for (int i = 0; i < children.Length; i++)
+		{
+			solver.chain[children[i]].SolveTrigonometric(solver, calculateBendDirection);
+		}
+		if (nodes.Length == 3)
+		{
+			Vector3 vector = nodes[2].solverPosition - nodes[0].solverPosition;
+			float magnitude = vector.magnitude;
+			if (magnitude != 0f)
+			{
+				float num = Mathf.Clamp(magnitude, 0f, length * 0.99999f);
+				Vector3 direction = vector / magnitude * num;
+				Vector3 bendDirection = ((calculateBendDirection && bendConstraint.initiated) ? bendConstraint.GetDir(solver) : (nodes[1].solverPosition - nodes[0].solverPosition));
+				Vector3 dirToBendPoint = GetDirToBendPoint(direction, bendDirection, num);
+				nodes[1].solverPosition = nodes[0].solverPosition + dirToBendPoint;
+			}
+		}
+	}
+
+	public void Stage1(IKSolverFullBody solver)
+	{
+		for (int i = 0; i < children.Length; i++)
+		{
+			solver.chain[children[i]].Stage1(solver);
+		}
+		if (children.Length == 0)
+		{
+			ForwardReach(nodes[nodes.Length - 1].solverPosition);
+			return;
+		}
+		Vector3 solverPosition = nodes[nodes.Length - 1].solverPosition;
+		SolveChildConstraints(solver);
+		for (int j = 0; j < children.Length; j++)
+		{
+			Vector3 vector = solver.chain[children[j]].nodes[0].solverPosition;
+			if (solver.chain[children[j]].rootLength > 0f)
+			{
+				vector = SolveFABRIKJoint(nodes[nodes.Length - 1].solverPosition, solver.chain[children[j]].nodes[0].solverPosition, solver.chain[children[j]].rootLength);
+			}
+			if (pullParentSum > 0f)
+			{
+				solverPosition += (vector - nodes[nodes.Length - 1].solverPosition) * (solver.chain[children[j]].pull / pullParentSum);
+			}
+		}
+		ForwardReach(Vector3.Lerp(solverPosition, nodes[nodes.Length - 1].solverPosition, pin));
+	}
+
+	public void Stage2(IKSolverFullBody solver, Vector3 position)
+	{
+		BackwardReach(position);
+		int num = Mathf.Clamp(solver.iterations, 2, 4);
+		if (childConstraints.Length != 0)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				SolveConstraintSystems(solver);
+			}
+		}
+		for (int j = 0; j < children.Length; j++)
+		{
+			solver.chain[children[j]].Stage2(solver, nodes[nodes.Length - 1].solverPosition);
+		}
+	}
+
+	public void SolveConstraintSystems(IKSolverFullBody solver)
+	{
+		SolveChildConstraints(solver);
+		for (int i = 0; i < children.Length; i++)
+		{
+			SolveLinearConstraint(nodes[nodes.Length - 1], solver.chain[children[i]].nodes[0], crossFades[i], solver.chain[children[i]].rootLength);
+		}
+	}
+
+	private Vector3 SolveFABRIKJoint(Vector3 pos1, Vector3 pos2, float length)
+	{
+		return pos2 + (pos1 - pos2).normalized * length;
+	}
+
+	protected Vector3 GetDirToBendPoint(Vector3 direction, Vector3 bendDirection, float directionMagnitude)
+	{
+		float num = (directionMagnitude * directionMagnitude + sqrMagDif) / 2f / directionMagnitude;
+		float y = (float)Math.Sqrt(Mathf.Clamp(sqrMag1 - num * num, 0f, float.PositiveInfinity));
+		if (direction == Vector3.zero)
+		{
+			return Vector3.zero;
+		}
+		return Quaternion.LookRotation(direction, bendDirection) * new Vector3(0f, y, num);
+	}
+
+	private void SolveChildConstraints(IKSolverFullBody solver)
+	{
+		for (int i = 0; i < childConstraints.Length; i++)
+		{
+			childConstraints[i].Solve(solver);
+		}
+	}
+
+	private void SolveLinearConstraint(IKSolver.Node node1, IKSolver.Node node2, float crossFade, float distance)
+	{
+		Vector3 vector = node2.solverPosition - node1.solverPosition;
+		float magnitude = vector.magnitude;
+		if (distance != magnitude && magnitude != 0f)
+		{
+			Vector3 vector2 = vector * (1f - distance / magnitude);
+			node1.solverPosition += vector2 * crossFade;
+			node2.solverPosition -= vector2 * (1f - crossFade);
+		}
+	}
+
+	public void ForwardReach(Vector3 position)
+	{
+		nodes[nodes.Length - 1].solverPosition = position;
+		for (int num = nodes.Length - 2; num > -1; num--)
+		{
+			nodes[num].solverPosition = SolveFABRIKJoint(nodes[num].solverPosition, nodes[num + 1].solverPosition, nodes[num].length);
+		}
+	}
+
+	private void BackwardReach(Vector3 position)
+	{
+		if (rootLength > 0f)
+		{
+			position = SolveFABRIKJoint(nodes[0].solverPosition, position, rootLength);
+		}
+		nodes[0].solverPosition = position;
+		for (int i = 1; i < nodes.Length; i++)
+		{
+			nodes[i].solverPosition = SolveFABRIKJoint(nodes[i].solverPosition, nodes[i - 1].solverPosition, nodes[i - 1].length);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 060
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Finger.cs
+SIZE: 5174 bytes
+SHA256: 366f32bbd78a612d8686eb9798279ecb54d0f8af973674da7c8ca2ee173805b0
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class Finger
+{
+	[Serializable]
+	public enum DOF
+	{
+		One,
+		Three
+	}
+
+	[Tooltip("Master Weight for the finger.")]
+	[Range(0f, 1f)]
+	public float weight = 1f;
+
+	[Tooltip("The weight of rotating the finger tip and bending the finger to the target.")]
+	[Range(0f, 1f)]
+	public float rotationWeight = 1f;
+
+	[Tooltip("Rotational degrees of freedom. When set to 'One' the fingers will be able to be rotated only around a single axis. When 3, all 3 axes are free to rotate around.")]
+	public DOF rotationDOF;
+
+	[Tooltip("If enabled, keeps bone1 twist angle fixed relative to bone2.")]
+	public bool fixBone1Twist;
+
+	[Tooltip("The first bone of the finger.")]
+	public Transform bone1;
+
+	[Tooltip("The second bone of the finger.")]
+	public Transform bone2;
+
+	[Tooltip("The (optional) third bone of the finger. This can be ignored for thumbs.")]
+	public Transform bone3;
+
+	[Tooltip("The fingertip object. If your character doesn't have tip bones, you can create an empty GameObject and parent it to the last bone in the finger. Place it to the tip of the finger.")]
+	public Transform tip;
+
+	[Tooltip("The IK target (optional, can use IKPosition and IKRotation directly).")]
+	public Transform target;
+
+	private IKSolverLimb solver;
+
+	private Quaternion bone3RelativeToTarget;
+
+	private Vector3 bone3DefaultLocalPosition;
+
+	private Quaternion bone3DefaultLocalRotation;
+
+	private Vector3 bone1Axis;
+
+	private Vector3 tipAxis;
+
+	private Vector3 bone1TwistAxis;
+
+	private Vector3 defaultBendNormal;
+
+	public bool initiated { get; private set; }
+
+	public Vector3 IKPosition
+	{
+		get
+		{
+			return solver.IKPosition;
+		}
+		set
+		{
+			solver.IKPosition = value;
+		}
+	}
+
+	public Quaternion IKRotation
+	{
+		get
+		{
+			return solver.IKRotation;
+		}
+		set
+		{
+			solver.IKRotation = value;
+		}
+	}
+
+	public bool IsValid(ref string errorMessage)
+	{
+		if (bone1 == null || bone2 == null || tip == null)
+		{
+			errorMessage = "One of the bones in the Finger Rig is null, can not initiate solvers.";
+			return false;
+		}
+		return true;
+	}
+
+	public void Initiate(Transform hand, int index)
+	{
+		initiated = false;
+		string errorMessage = string.Empty;
+		if (!IsValid(ref errorMessage))
+		{
+			Warning.Log(errorMessage, hand);
+			return;
+		}
+		solver = new IKSolverLimb();
+		solver.IKPositionWeight = weight;
+		solver.bendModifier = IKSolverLimb.BendModifier.Target;
+		solver.bendModifierWeight = 1f;
+		defaultBendNormal = -Vector3.Cross(tip.position - bone1.position, bone2.position - bone1.position).normalized;
+		solver.bendNormal = defaultBendNormal;
+		Vector3 vector = Vector3.Cross(bone2.position - bone1.position, tip.position - bone1.position);
+		bone1Axis = Quaternion.Inverse(bone1.rotation) * vector;
+		tipAxis = Quaternion.Inverse(tip.rotation) * vector;
+		Vector3 normal = bone2.position - bone1.position;
+		Vector3 tangent = -Vector3.Cross(tip.position - bone1.position, bone2.position - bone1.position);
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		bone1TwistAxis = Quaternion.Inverse(bone1.rotation) * tangent;
+		IKPosition = tip.position;
+		IKRotation = tip.rotation;
+		if (bone3 != null)
+		{
+			bone3RelativeToTarget = Quaternion.Inverse(IKRotation) * bone3.rotation;
+			bone3DefaultLocalPosition = bone3.localPosition;
+			bone3DefaultLocalRotation = bone3.localRotation;
+		}
+		solver.SetChain(bone1, bone2, tip, hand);
+		solver.Initiate(hand);
+		initiated = true;
+	}
+
+	public void FixTransforms()
+	{
+		if (initiated && !(weight <= 0f))
+		{
+			solver.FixTransforms();
+			if (bone3 != null)
+			{
+				bone3.localPosition = bone3DefaultLocalPosition;
+				bone3.localRotation = bone3DefaultLocalRotation;
+			}
+		}
+	}
+
+	public void StoreDefaultLocalState()
+	{
+		if (initiated)
+		{
+			solver.StoreDefaultLocalState();
+			if (bone3 != null)
+			{
+				bone3DefaultLocalPosition = bone3.localPosition;
+				bone3DefaultLocalRotation = bone3.localRotation;
+			}
+		}
+	}
+
+	public void Update(float masterWeight)
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		float num = weight * masterWeight;
+		if (num <= 0f)
+		{
+			return;
+		}
+		solver.target = target;
+		if (target != null)
+		{
+			IKPosition = target.position;
+			IKRotation = target.rotation;
+		}
+		if (rotationDOF == DOF.One)
+		{
+			Quaternion quaternion = Quaternion.FromToRotation(IKRotation * tipAxis, bone1.rotation * bone1Axis);
+			IKRotation = quaternion * IKRotation;
+		}
+		if (bone3 != null)
+		{
+			if (num * rotationWeight >= 1f)
+			{
+				bone3.rotation = IKRotation * bone3RelativeToTarget;
+			}
+			else
+			{
+				bone3.rotation = Quaternion.Lerp(bone3.rotation, IKRotation * bone3RelativeToTarget, num * rotationWeight);
+			}
+		}
+		solver.IKPositionWeight = num;
+		solver.IKRotationWeight = rotationWeight;
+		solver.Update();
+		if (fixBone1Twist)
+		{
+			Quaternion rotation = bone2.rotation;
+			Vector3 vector = Quaternion.Inverse(Quaternion.LookRotation(bone1.rotation * bone1TwistAxis, bone2.position - bone1.position)) * solver.bendNormal;
+			float angle = Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+			bone1.rotation = Quaternion.AngleAxis(angle, bone2.position - bone1.position) * bone1.rotation;
+			bone2.rotation = rotation;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 061
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__FingerRig.cs
+SIZE: 3276 bytes
+SHA256: 5f70db1ee2371d3d6552eba4cd08623b2cb68e6e4960ca392bb36d8d31d261c9
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class FingerRig : SolverManager
+{
+	[Tooltip("The master weight for all fingers.")]
+	[Range(0f, 1f)]
+	public float weight = 1f;
+
+	public Finger[] fingers = new Finger[0];
+
+	public bool initiated { get; private set; }
+
+	public bool IsValid(ref string errorMessage)
+	{
+		Finger[] array = fingers;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (!array[i].IsValid(ref errorMessage))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	[ContextMenu("Auto-detect")]
+	public void AutoDetect()
+	{
+		fingers = new Finger[0];
+		for (int i = 0; i < transform.childCount; i++)
+		{
+			Transform[] array = new Transform[0];
+			AddChildrenRecursive(transform.GetChild(i), ref array);
+			if (array.Length == 3 || array.Length == 4)
+			{
+				Finger finger = new Finger();
+				finger.bone1 = array[0];
+				finger.bone2 = array[1];
+				if (array.Length == 3)
+				{
+					finger.tip = array[2];
+				}
+				else
+				{
+					finger.bone3 = array[2];
+					finger.tip = array[3];
+				}
+				finger.weight = 1f;
+				Array.Resize(ref fingers, fingers.Length + 1);
+				fingers[fingers.Length - 1] = finger;
+			}
+		}
+	}
+
+	public void AddFinger(Transform bone1, Transform bone2, Transform bone3, Transform tip, Transform target = null)
+	{
+		Finger finger = new Finger();
+		finger.bone1 = bone1;
+		finger.bone2 = bone2;
+		finger.bone3 = bone3;
+		finger.tip = tip;
+		finger.target = target;
+		Array.Resize(ref fingers, fingers.Length + 1);
+		fingers[fingers.Length - 1] = finger;
+		initiated = false;
+		finger.Initiate(transform, fingers.Length - 1);
+		if (fingers[fingers.Length - 1].initiated)
+		{
+			initiated = true;
+		}
+	}
+
+	public void RemoveFinger(int index)
+	{
+		if ((float)index < 0f || index >= fingers.Length)
+		{
+			Warning.Log("RemoveFinger index out of bounds.", transform);
+			return;
+		}
+		if (fingers.Length == 1)
+		{
+			fingers = new Finger[0];
+			return;
+		}
+		Finger[] array = new Finger[fingers.Length - 1];
+		int num = 0;
+		for (int i = 0; i < fingers.Length; i++)
+		{
+			if (i != index)
+			{
+				array[num] = fingers[i];
+				num++;
+			}
+		}
+		fingers = array;
+	}
+
+	private void AddChildrenRecursive(Transform parent, ref Transform[] array)
+	{
+		Array.Resize(ref array, array.Length + 1);
+		array[array.Length - 1] = parent;
+		if (parent.childCount == 1)
+		{
+			AddChildrenRecursive(parent.GetChild(0), ref array);
+		}
+	}
+
+	protected override void InitiateSolver()
+	{
+		initiated = true;
+		for (int i = 0; i < fingers.Length; i++)
+		{
+			fingers[i].Initiate(transform, i);
+			if (!fingers[i].initiated)
+			{
+				initiated = false;
+			}
+		}
+	}
+
+	public void UpdateFingerSolvers()
+	{
+		Finger[] array = fingers;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Update(weight);
+		}
+	}
+
+	public void FixFingerTransforms()
+	{
+		if (!(weight <= 0f))
+		{
+			Finger[] array = fingers;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].FixTransforms();
+			}
+		}
+	}
+
+	public void StoreDefaultLocalState()
+	{
+		Finger[] array = fingers;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].StoreDefaultLocalState();
+		}
+	}
+
+	protected override void UpdateSolver()
+	{
+		UpdateFingerSolvers();
+	}
+
+	protected override void FixTransforms()
+	{
+		if (!(weight <= 0f))
+		{
+			FixFingerTransforms();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 062
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__FullBodyBipedIK.cs
+SIZE: 4582 bytes
+SHA256: 2e8777ff780129db7aed2e87c2d1b7c58d7b61bb457477f06697f192d7e84a61
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("https://www.youtube.com/watch?v=7__IafZGwvI&index=1&list=PLVxSIA1OaTOu8Nos3CalXbJ2DrKnntMv6")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/IK/Full Body Biped IK")]
+public class FullBodyBipedIK : IK
+{
+	public BipedReferences references = new BipedReferences();
+
+	public IKSolverFullBodyBiped solver = new IKSolverFullBodyBiped();
+
+	[ContextMenu("User Manual")]
+	protected override void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page8.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	protected override void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_full_body_biped_i_k.html");
+	}
+
+	[ContextMenu("TUTORIAL VIDEO (SETUP)")]
+	private void OpenSetupTutorial()
+	{
+		Application.OpenURL("https://www.youtube.com/watch?v=7__IafZGwvI");
+	}
+
+	[ContextMenu("TUTORIAL VIDEO (INSPECTOR)")]
+	private void OpenInspectorTutorial()
+	{
+		Application.OpenURL("https://www.youtube.com/watch?v=tgRMsTphjJo");
+	}
+
+	[ContextMenu("Support Group")]
+	private void SupportGroup()
+	{
+		Application.OpenURL("https://groups.google.com/forum/#!forum/final-ik");
+	}
+
+	[ContextMenu("Asset Store Thread")]
+	private void ASThread()
+	{
+		Application.OpenURL("http://forum.unity3d.com/threads/final-ik-full-body-ik-aim-look-at-fabrik-ccd-ik-1-0-released.222685/");
+	}
+
+	public void SetReferences(BipedReferences references, Transform rootNode)
+	{
+		this.references = references;
+		solver.SetToReferences(this.references, rootNode);
+	}
+
+	public override IKSolver GetIKSolver()
+	{
+		return solver;
+	}
+
+	public bool ReferencesError(ref string errorMessage)
+	{
+		if (BipedReferences.SetupError(references, ref errorMessage))
+		{
+			return true;
+		}
+		if (references.spine.Length == 0)
+		{
+			errorMessage = "References has no spine bones assigned, can not initiate the solver.";
+			return true;
+		}
+		if (solver.rootNode == null)
+		{
+			errorMessage = "Root Node bone is null, can not initiate the solver.";
+			return true;
+		}
+		if (solver.rootNode != references.pelvis)
+		{
+			bool flag = false;
+			for (int i = 0; i < references.spine.Length; i++)
+			{
+				if (solver.rootNode == references.spine[i])
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (!flag)
+			{
+				errorMessage = "The Root Node has to be one of the bones in the Spine or the Pelvis, can not initiate the solver.";
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool ReferencesWarning(ref string warningMessage)
+	{
+		if (BipedReferences.SetupWarning(references, ref warningMessage))
+		{
+			return true;
+		}
+		Vector3 vector = references.rightUpperArm.position - references.leftUpperArm.position;
+		Vector3 vector2 = solver.rootNode.position - references.leftUpperArm.position;
+		if (Vector3.Dot(vector.normalized, vector2.normalized) > 0.95f)
+		{
+			warningMessage = "The root node, the left upper arm and the right upper arm bones should ideally form a triangle that is as close to equilateral as possible. Currently the root node bone seems to be very close to the line between the left upper arm and the right upper arm bones. This might cause unwanted behaviour like the spine turning upside down when pulled by a hand effector.Please set the root node bone to be one of the lower bones in the spine.";
+			return true;
+		}
+		Vector3 vector3 = references.rightThigh.position - references.leftThigh.position;
+		Vector3 vector4 = solver.rootNode.position - references.leftThigh.position;
+		if (Vector3.Dot(vector3.normalized, vector4.normalized) > 0.95f)
+		{
+			warningMessage = "The root node, the left thigh and the right thigh bones should ideally form a triangle that is as close to equilateral as possible. Currently the root node bone seems to be very close to the line between the left thigh and the right thigh bones. This might cause unwanted behaviour like the hip turning upside down when pulled by an effector.Please set the root node bone to be one of the higher bones in the spine.";
+			return true;
+		}
+		return false;
+	}
+
+	[ContextMenu("Reinitiate")]
+	private void Reinitiate()
+	{
+		SetReferences(references, solver.rootNode);
+	}
+
+	[ContextMenu("Auto-detect References")]
+	private void AutoDetectReferences()
+	{
+		references = new BipedReferences();
+		BipedReferences.AutoDetectReferences(ref references, transform, new BipedReferences.AutoDetectParams(legsParentInSpine: true, includeEyes: false));
+		solver.rootNode = IKSolverFullBodyBiped.DetectRootNodeBone(references);
+		solver.SetToReferences(references, solver.rootNode);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 063
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__GenericPoser.cs
+SIZE: 2512 bytes
+SHA256: 0d8e53ee3157d73169c37d9b79c6bc04d0c09a2a7d973025e3e5db78f06fa7d7
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class GenericPoser : Poser
+{
+	[Serializable]
+	public class Map
+	{
+		public Transform bone;
+
+		public Transform target;
+
+		private Vector3 defaultLocalPosition;
+
+		private Quaternion defaultLocalRotation;
+
+		public Map(Transform bone, Transform target)
+		{
+			this.bone = bone;
+			this.target = target;
+			StoreDefaultState();
+		}
+
+		public void StoreDefaultState()
+		{
+			defaultLocalPosition = bone.localPosition;
+			defaultLocalRotation = bone.localRotation;
+		}
+
+		public void FixTransform()
+		{
+			bone.localPosition = defaultLocalPosition;
+			bone.localRotation = defaultLocalRotation;
+		}
+
+		public void Update(float localRotationWeight, float localPositionWeight)
+		{
+			bone.localRotation = Quaternion.Lerp(bone.localRotation, target.localRotation, localRotationWeight);
+			bone.localPosition = Vector3.Lerp(bone.localPosition, target.localPosition, localPositionWeight);
+		}
+	}
+
+	public Map[] maps;
+
+	[ContextMenu("Auto-Mapping")]
+	public override void AutoMapping()
+	{
+		if (poseRoot == null)
+		{
+			maps = new Map[0];
+			return;
+		}
+		maps = new Map[0];
+		Transform[] componentsInChildren = transform.GetComponentsInChildren<Transform>();
+		Transform[] componentsInChildren2 = poseRoot.GetComponentsInChildren<Transform>();
+		for (int i = 1; i < componentsInChildren.Length; i++)
+		{
+			Transform targetNamed = GetTargetNamed(componentsInChildren[i].name, componentsInChildren2);
+			if (targetNamed != null)
+			{
+				Array.Resize(ref maps, maps.Length + 1);
+				maps[maps.Length - 1] = new Map(componentsInChildren[i], targetNamed);
+			}
+		}
+		StoreDefaultState();
+	}
+
+	protected override void InitiatePoser()
+	{
+		StoreDefaultState();
+	}
+
+	protected override void UpdatePoser()
+	{
+		if (!(weight <= 0f) && (!(localPositionWeight <= 0f) || !(localRotationWeight <= 0f)) && !(poseRoot == null))
+		{
+			float num = localRotationWeight * weight;
+			float num2 = localPositionWeight * weight;
+			for (int i = 0; i < maps.Length; i++)
+			{
+				maps[i].Update(num, num2);
+			}
+		}
+	}
+
+	protected override void FixPoserTransforms()
+	{
+		for (int i = 0; i < maps.Length; i++)
+		{
+			maps[i].FixTransform();
+		}
+	}
+
+	private void StoreDefaultState()
+	{
+		for (int i = 0; i < maps.Length; i++)
+		{
+			maps[i].StoreDefaultState();
+		}
+	}
+
+	private Transform GetTargetNamed(string tName, Transform[] array)
+	{
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].name == tName)
+			{
+				return array[i];
+			}
+		}
+		return null;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 064
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__GrounderBipedIK.cs
+SIZE: 4910 bytes
+SHA256: 10f3b64931c7e9c32e5a53d5b2573a4dfe78fff8fdbf2b7c8d407393678eba58
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("http://www.root-motion.com/finalikdox/html/page9.html")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/Grounder/Grounder Biped")]
+public class GrounderBipedIK : Grounder
+{
+	[Tooltip("The BipedIK componet.")]
+	public BipedIK ik;
+
+	[Tooltip("The amount of spine bending towards upward slopes.")]
+	public float spineBend = 7f;
+
+	[Tooltip("The interpolation speed of spine bending.")]
+	public float spineSpeed = 3f;
+
+	private Transform[] feet = new Transform[2];
+
+	private Quaternion[] footRotations = new Quaternion[2];
+
+	private Vector3 animatedPelvisLocalPosition;
+
+	private Vector3 solvedPelvisLocalPosition;
+
+	private Vector3 spineOffset;
+
+	private float lastWeight;
+
+	[ContextMenu("User Manual")]
+	protected override void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page9.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	protected override void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_grounder_biped_i_k.html");
+	}
+
+	public override void ResetPosition()
+	{
+		solver.Reset();
+		spineOffset = Vector3.zero;
+	}
+
+	private bool IsReadyToInitiate()
+	{
+		if (ik == null)
+		{
+			return false;
+		}
+		if (!ik.solvers.leftFoot.initiated)
+		{
+			return false;
+		}
+		if (!ik.solvers.rightFoot.initiated)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private void Update()
+	{
+		weight = Mathf.Clamp(weight, 0f, 1f);
+		if (!(weight <= 0f) && !initiated && IsReadyToInitiate())
+		{
+			Initiate();
+		}
+	}
+
+	private void Initiate()
+	{
+		feet = new Transform[2];
+		footRotations = new Quaternion[2];
+		feet[0] = ik.references.leftFoot;
+		feet[1] = ik.references.rightFoot;
+		footRotations[0] = Quaternion.identity;
+		footRotations[1] = Quaternion.identity;
+		IKSolverFABRIK spine = ik.solvers.spine;
+		spine.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(spine.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+		IKSolverLimb rightFoot = ik.solvers.rightFoot;
+		rightFoot.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(rightFoot.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		animatedPelvisLocalPosition = ik.references.pelvis.localPosition;
+		solver.Initiate(ik.references.root, feet);
+		initiated = true;
+	}
+
+	private void OnDisable()
+	{
+		if (initiated)
+		{
+			ik.solvers.leftFoot.IKPositionWeight = 0f;
+			ik.solvers.rightFoot.IKPositionWeight = 0f;
+		}
+	}
+
+	private void OnSolverUpdate()
+	{
+		if (!enabled)
+		{
+			return;
+		}
+		if (weight <= 0f)
+		{
+			if (lastWeight <= 0f)
+			{
+				return;
+			}
+			OnDisable();
+		}
+		lastWeight = weight;
+		if (OnPreGrounder != null)
+		{
+			OnPreGrounder();
+		}
+		if (ik.references.pelvis.localPosition != solvedPelvisLocalPosition)
+		{
+			animatedPelvisLocalPosition = ik.references.pelvis.localPosition;
+		}
+		else
+		{
+			ik.references.pelvis.localPosition = animatedPelvisLocalPosition;
+		}
+		solver.Update();
+		ik.references.pelvis.position += solver.pelvis.IKOffset * weight;
+		SetLegIK(ik.solvers.leftFoot, 0);
+		SetLegIK(ik.solvers.rightFoot, 1);
+		if (spineBend != 0f && ik.references.spine.Length != 0)
+		{
+			spineSpeed = Mathf.Clamp(spineSpeed, 0f, spineSpeed);
+			Vector3 vector = GetSpineOffsetTarget() * weight;
+			spineOffset = Vector3.Lerp(spineOffset, vector * spineBend, Time.deltaTime * spineSpeed);
+			Quaternion rotation = ik.references.leftUpperArm.rotation;
+			Quaternion rotation2 = ik.references.rightUpperArm.rotation;
+			Vector3 up = solver.up;
+			Quaternion quaternion = Quaternion.FromToRotation(up, up + spineOffset);
+			ik.references.spine[0].rotation = quaternion * ik.references.spine[0].rotation;
+			ik.references.leftUpperArm.rotation = rotation;
+			ik.references.rightUpperArm.rotation = rotation2;
+			ik.solvers.lookAt.SetDirty();
+		}
+		if (OnPostGrounder != null)
+		{
+			OnPostGrounder();
+		}
+	}
+
+	private void SetLegIK(IKSolverLimb limb, int index)
+	{
+		footRotations[index] = feet[index].rotation;
+		limb.IKPosition = solver.legs[index].IKPosition;
+		limb.IKPositionWeight = weight;
+	}
+
+	private void OnPostSolverUpdate()
+	{
+		if (!(weight <= 0f) && enabled)
+		{
+			for (int i = 0; i < feet.Length; i++)
+			{
+				feet[i].rotation = Quaternion.Slerp(Quaternion.identity, solver.legs[i].rotationOffset, weight) * footRotations[i];
+			}
+			solvedPelvisLocalPosition = ik.references.pelvis.localPosition;
+			if (OnPostIK != null)
+			{
+				OnPostIK();
+			}
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (initiated && ik != null)
+		{
+			IKSolverFABRIK spine = ik.solvers.spine;
+			spine.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(spine.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+			IKSolverLimb rightFoot = ik.solvers.rightFoot;
+			rightFoot.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(rightFoot.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 065
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__GrounderFBBIK.cs
+SIZE: 5290 bytes
+SHA256: 6399eb1d5bf3b6914822481ee237759febb33877a218a223df0b5c802e1da308
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("https://www.youtube.com/watch?v=9MiZiaJorws&index=6&list=PLVxSIA1OaTOu8Nos3CalXbJ2DrKnntMv6")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/Grounder/Grounder Full Body Biped")]
+public class GrounderFBBIK : Grounder
+{
+	[Serializable]
+	public class SpineEffector
+	{
+		[Tooltip("The type of the effector.")]
+		public FullBodyBipedEffector effectorType;
+
+		[Tooltip("The weight of horizontal bend offset towards the slope.")]
+		public float horizontalWeight = 1f;
+
+		[Tooltip("The vertical bend offset weight.")]
+		public float verticalWeight;
+
+		public SpineEffector()
+		{
+		}
+
+		public SpineEffector(FullBodyBipedEffector effectorType, float horizontalWeight, float verticalWeight)
+		{
+			this.effectorType = effectorType;
+			this.horizontalWeight = horizontalWeight;
+			this.verticalWeight = verticalWeight;
+		}
+	}
+
+	[Tooltip("Reference to the FBBIK componet.")]
+	public FullBodyBipedIK ik;
+
+	[Tooltip("The amount of spine bending towards upward slopes.")]
+	public float spineBend = 2f;
+
+	[Tooltip("The interpolation speed of spine bending.")]
+	public float spineSpeed = 3f;
+
+	public SpineEffector[] spine = new SpineEffector[0];
+
+	private Transform[] feet = new Transform[2];
+
+	private Vector3 spineOffset;
+
+	private bool firstSolve;
+
+	[ContextMenu("TUTORIAL VIDEO")]
+	private void OpenTutorial()
+	{
+		Application.OpenURL("https://www.youtube.com/watch?v=9MiZiaJorws&index=6&list=PLVxSIA1OaTOu8Nos3CalXbJ2DrKnntMv6");
+	}
+
+	[ContextMenu("User Manual")]
+	protected override void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page9.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	protected override void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_grounder_f_b_b_i_k.html");
+	}
+
+	public override void ResetPosition()
+	{
+		solver.Reset();
+		spineOffset = Vector3.zero;
+	}
+
+	private bool IsReadyToInitiate()
+	{
+		if (ik == null)
+		{
+			return false;
+		}
+		if (!ik.solver.initiated)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private void Update()
+	{
+		firstSolve = true;
+		weight = Mathf.Clamp(weight, 0f, 1f);
+		if (!(weight <= 0f) && !initiated && IsReadyToInitiate())
+		{
+			Initiate();
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		firstSolve = true;
+	}
+
+	private void LateUpdate()
+	{
+		firstSolve = true;
+	}
+
+	private void Initiate()
+	{
+		ik.solver.leftLegMapping.maintainRotationWeight = 1f;
+		ik.solver.rightLegMapping.maintainRotationWeight = 1f;
+		feet = new Transform[2];
+		feet[0] = ik.solver.leftFootEffector.bone;
+		feet[1] = ik.solver.rightFootEffector.bone;
+		IKSolverFullBodyBiped iKSolverFullBodyBiped = ik.solver;
+		iKSolverFullBodyBiped.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolverFullBodyBiped.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+		IKSolverFullBodyBiped iKSolverFullBodyBiped2 = ik.solver;
+		iKSolverFullBodyBiped2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolverFullBodyBiped2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		solver.Initiate(ik.references.root, feet);
+		initiated = true;
+	}
+
+	private void OnSolverUpdate()
+	{
+		if (!firstSolve)
+		{
+			return;
+		}
+		firstSolve = false;
+		if (!enabled || weight <= 0f)
+		{
+			return;
+		}
+		if (OnPreGrounder != null)
+		{
+			OnPreGrounder();
+		}
+		solver.Update();
+		ik.references.pelvis.position += solver.pelvis.IKOffset * weight;
+		SetLegIK(ik.solver.leftFootEffector, solver.legs[0]);
+		SetLegIK(ik.solver.rightFootEffector, solver.legs[1]);
+		if (spineBend != 0f)
+		{
+			spineSpeed = Mathf.Clamp(spineSpeed, 0f, spineSpeed);
+			Vector3 vector = GetSpineOffsetTarget() * weight;
+			spineOffset = Vector3.Lerp(spineOffset, vector * spineBend, Time.deltaTime * spineSpeed);
+			Vector3 vector2 = ik.references.root.up * spineOffset.magnitude;
+			for (int i = 0; i < spine.Length; i++)
+			{
+				ik.solver.GetEffector(spine[i].effectorType).positionOffset += spineOffset * spine[i].horizontalWeight + vector2 * spine[i].verticalWeight;
+			}
+		}
+		if (OnPostGrounder != null)
+		{
+			OnPostGrounder();
+		}
+	}
+
+	private void SetLegIK(IKEffector effector, Grounding.Leg leg)
+	{
+		effector.positionOffset += (leg.IKPosition - effector.bone.position) * weight;
+		effector.bone.rotation = Quaternion.Slerp(Quaternion.identity, leg.rotationOffset, weight) * effector.bone.rotation;
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		if (ik == null)
+		{
+			ik = GetComponent<FullBodyBipedIK>();
+		}
+		if (ik == null)
+		{
+			ik = GetComponentInParent<FullBodyBipedIK>();
+		}
+		if (ik == null)
+		{
+			ik = GetComponentInChildren<FullBodyBipedIK>();
+		}
+	}
+
+	private void OnPostSolverUpdate()
+	{
+		if (OnPostIK != null)
+		{
+			OnPostIK();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (initiated && ik != null)
+		{
+			IKSolverFullBodyBiped iKSolverFullBodyBiped = ik.solver;
+			iKSolverFullBodyBiped.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolverFullBodyBiped.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+			IKSolverFullBodyBiped iKSolverFullBodyBiped2 = ik.solver;
+			iKSolverFullBodyBiped2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolverFullBodyBiped2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 066
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__GrounderIK.cs
+SIZE: 7358 bytes
+SHA256: 5c1898f0b4ddcc846542d984abc93e21e73b51299e5e157598a4b89a406e1e3b
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("http://www.root-motion.com/finalikdox/html/page9.html")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/Grounder/Grounder IK")]
+public class GrounderIK : Grounder
+{
+	public IK[] legs;
+
+	[Tooltip("The pelvis transform. Common ancestor of all the legs.")]
+	public Transform pelvis;
+
+	[Tooltip("The root Transform of the character, with the rigidbody and the collider.")]
+	public Transform characterRoot;
+
+	[Tooltip("The weight of rotating the character root to the ground normal (range: 0 - 1).")]
+	[Range(0f, 1f)]
+	public float rootRotationWeight;
+
+	[Tooltip("The speed of rotating the character root to the ground normal (range: 0 - inf).")]
+	public float rootRotationSpeed = 5f;
+
+	[Tooltip("The maximum angle of root rotation (range: 0 - 90).")]
+	public float maxRootRotationAngle = 45f;
+
+	private Transform[] feet = new Transform[0];
+
+	private Quaternion[] footRotations = new Quaternion[0];
+
+	private Vector3 animatedPelvisLocalPosition;
+
+	private Vector3 solvedPelvisLocalPosition;
+
+	private int solvedFeet;
+
+	private bool solved;
+
+	private float lastWeight;
+
+	private Rigidbody characterRootRigidbody;
+
+	[ContextMenu("User Manual")]
+	protected override void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page9.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	protected override void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_grounder_i_k.html");
+	}
+
+	public override void ResetPosition()
+	{
+		for (int i = 0; i < legs.Length; i++)
+		{
+			legs[i].GetIKSolver().IKPosition = feet[i].transform.position;
+			if (legs[i] is LimbIK)
+			{
+				(legs[i] as LimbIK).solver.IKRotation = solver.legs[i].transform.rotation;
+			}
+			footRotations[i] = feet[i].rotation;
+		}
+		animatedPelvisLocalPosition = pelvis.localPosition;
+		solvedPelvisLocalPosition = pelvis.localPosition;
+		solver.Reset();
+	}
+
+	private bool IsReadyToInitiate()
+	{
+		if (pelvis == null)
+		{
+			return false;
+		}
+		if (legs.Length == 0)
+		{
+			return false;
+		}
+		IK[] array = legs;
+		foreach (IK iK in array)
+		{
+			if (iK == null)
+			{
+				return false;
+			}
+			if (iK is FullBodyBipedIK)
+			{
+				LogWarning("GrounderIK does not support FullBodyBipedIK, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead. If you want to use FullBodyBipedIK, use the GrounderFBBIK component.");
+				return false;
+			}
+			if (iK is FABRIKRoot)
+			{
+				LogWarning("GrounderIK does not support FABRIKRoot, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead.");
+				return false;
+			}
+			if (iK is AimIK)
+			{
+				LogWarning("GrounderIK does not support AimIK, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void OnDisable()
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		for (int i = 0; i < legs.Length; i++)
+		{
+			if (legs[i] != null)
+			{
+				legs[i].GetIKSolver().IKPositionWeight = 0f;
+			}
+		}
+	}
+
+	private void Update()
+	{
+		weight = Mathf.Clamp(weight, 0f, 1f);
+		if (weight <= 0f)
+		{
+			return;
+		}
+		solved = false;
+		if (initiated)
+		{
+			rootRotationWeight = Mathf.Clamp(rootRotationWeight, 0f, 1f);
+			rootRotationSpeed = Mathf.Clamp(rootRotationSpeed, 0f, rootRotationSpeed);
+			if (characterRoot != null && rootRotationSpeed > 0f && rootRotationWeight > 0f && solver.isGrounded)
+			{
+				Vector3 vector = solver.GetLegsPlaneNormal();
+				if (rootRotationWeight < 1f)
+				{
+					vector = Vector3.Slerp(Vector3.up, vector, rootRotationWeight);
+				}
+				Quaternion b = Quaternion.RotateTowards(Quaternion.FromToRotation(transform.up, Vector3.up) * characterRoot.rotation, Quaternion.FromToRotation(transform.up, vector) * characterRoot.rotation, maxRootRotationAngle);
+				if (characterRootRigidbody == null)
+				{
+					characterRoot.rotation = Quaternion.Lerp(characterRoot.rotation, b, Time.deltaTime * rootRotationSpeed);
+				}
+				else
+				{
+					characterRootRigidbody.MoveRotation(Quaternion.Lerp(characterRoot.rotation, b, Time.deltaTime * rootRotationSpeed));
+				}
+			}
+		}
+		else if (IsReadyToInitiate())
+		{
+			Initiate();
+		}
+	}
+
+	private void Initiate()
+	{
+		feet = new Transform[legs.Length];
+		footRotations = new Quaternion[legs.Length];
+		for (int i = 0; i < feet.Length; i++)
+		{
+			footRotations[i] = Quaternion.identity;
+		}
+		for (int j = 0; j < legs.Length; j++)
+		{
+			IKSolver.Point[] points = legs[j].GetIKSolver().GetPoints();
+			feet[j] = points[^1].transform;
+			IKSolver iKSolver = legs[j].GetIKSolver();
+			iKSolver.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolver.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+			IKSolver iKSolver2 = legs[j].GetIKSolver();
+			iKSolver2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolver2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		}
+		animatedPelvisLocalPosition = pelvis.localPosition;
+		solver.Initiate(transform, feet);
+		for (int k = 0; k < legs.Length; k++)
+		{
+			if (legs[k] is LegIK)
+			{
+				solver.legs[k].invertFootCenter = true;
+			}
+		}
+		characterRootRigidbody = characterRoot.GetComponent<Rigidbody>();
+		initiated = true;
+	}
+
+	private void OnSolverUpdate()
+	{
+		if (!enabled)
+		{
+			return;
+		}
+		if (weight <= 0f)
+		{
+			if (lastWeight <= 0f)
+			{
+				return;
+			}
+			OnDisable();
+		}
+		lastWeight = weight;
+		if (!solved)
+		{
+			if (OnPreGrounder != null)
+			{
+				OnPreGrounder();
+			}
+			if (pelvis.localPosition != solvedPelvisLocalPosition)
+			{
+				animatedPelvisLocalPosition = pelvis.localPosition;
+			}
+			else
+			{
+				pelvis.localPosition = animatedPelvisLocalPosition;
+			}
+			solver.Update();
+			for (int i = 0; i < legs.Length; i++)
+			{
+				SetLegIK(i);
+			}
+			pelvis.position += solver.pelvis.IKOffset * weight;
+			solved = true;
+			solvedFeet = 0;
+			if (OnPostGrounder != null)
+			{
+				OnPostGrounder();
+			}
+		}
+	}
+
+	private void SetLegIK(int index)
+	{
+		footRotations[index] = feet[index].rotation;
+		if (legs[index] is LegIK)
+		{
+			(legs[index].GetIKSolver() as IKSolverLeg).IKRotation = Quaternion.Slerp(Quaternion.identity, solver.legs[index].rotationOffset, weight) * footRotations[index];
+			(legs[index].GetIKSolver() as IKSolverLeg).IKRotationWeight = 1f;
+		}
+		legs[index].GetIKSolver().IKPosition = solver.legs[index].IKPosition;
+		legs[index].GetIKSolver().IKPositionWeight = weight;
+	}
+
+	private void OnPostSolverUpdate()
+	{
+		if (weight <= 0f || !enabled)
+		{
+			return;
+		}
+		solvedFeet++;
+		if (solvedFeet >= feet.Length)
+		{
+			solved = false;
+			for (int i = 0; i < feet.Length; i++)
+			{
+				feet[i].rotation = Quaternion.Slerp(Quaternion.identity, solver.legs[i].rotationOffset, weight) * footRotations[i];
+			}
+			solvedPelvisLocalPosition = pelvis.localPosition;
+			if (OnPostIK != null)
+			{
+				OnPostIK();
+			}
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		IK[] array = legs;
+		foreach (IK iK in array)
+		{
+			if (iK != null)
+			{
+				IKSolver iKSolver = iK.GetIKSolver();
+				iKSolver.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolver.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+				IKSolver iKSolver2 = iK.GetIKSolver();
+				iKSolver2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolver2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 067
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__GrounderQuadruped.cs
+SIZE: 12108 bytes
+SHA256: 703d135a26cba8ea3f008a89795d81324c114ceb36c2edfeb333ef02f8b504ff
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("http://www.root-motion.com/finalikdox/html/page9.html")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/Grounder/Grounder Quadruped")]
+public class GrounderQuadruped : Grounder
+{
+	public struct Foot(IKSolver solver, Transform transform)
+	{
+		public IKSolver solver = solver;
+
+		public Transform transform = transform;
+
+		public Quaternion rotation = transform.rotation;
+
+		public Grounding.Leg leg = null;
+	}
+
+	[Tooltip("The Grounding solver for the forelegs.")]
+	public Grounding forelegSolver = new Grounding();
+
+	[Tooltip("The weight of rotating the character root to the ground angle (range: 0 - 1).")]
+	[Range(0f, 1f)]
+	public float rootRotationWeight = 0.5f;
+
+	[Tooltip("The maximum angle of rotating the quadruped downwards (going downhill, range: -90 - 0).")]
+	[Range(-90f, 0f)]
+	public float minRootRotation = -25f;
+
+	[Tooltip("The maximum angle of rotating the quadruped upwards (going uphill, range: 0 - 90).")]
+	[Range(0f, 90f)]
+	public float maxRootRotation = 45f;
+
+	[Tooltip("The speed of interpolating the character root rotation (range: 0 - inf).")]
+	public float rootRotationSpeed = 5f;
+
+	[Tooltip("The maximum IK offset for the legs (range: 0 - inf).")]
+	public float maxLegOffset = 0.5f;
+
+	[Tooltip("The maximum IK offset for the forelegs (range: 0 - inf).")]
+	public float maxForeLegOffset = 0.5f;
+
+	[Tooltip("The weight of maintaining the head's rotation as it was before solving the Grounding (range: 0 - 1).")]
+	[Range(0f, 1f)]
+	public float maintainHeadRotationWeight = 0.5f;
+
+	[Tooltip("The root Transform of the character, with the rigidbody and the collider.")]
+	public Transform characterRoot;
+
+	[Tooltip("The pelvis transform. Common ancestor of both legs and the spine.")]
+	public Transform pelvis;
+
+	[Tooltip("The last bone in the spine that is the common parent for both forelegs.")]
+	public Transform lastSpineBone;
+
+	[Tooltip("The head (optional, if you intend to maintain its rotation).")]
+	public Transform head;
+
+	public IK[] legs;
+
+	public IK[] forelegs;
+
+	[HideInInspector]
+	public Vector3 gravity = Vector3.down;
+
+	private Foot[] feet = new Foot[0];
+
+	private Vector3 animatedPelvisLocalPosition;
+
+	private Quaternion animatedPelvisLocalRotation;
+
+	private Quaternion animatedHeadLocalRotation;
+
+	private Vector3 solvedPelvisLocalPosition;
+
+	private Quaternion solvedPelvisLocalRotation;
+
+	private Quaternion solvedHeadLocalRotation;
+
+	private int solvedFeet;
+
+	private bool solved;
+
+	private float angle;
+
+	private Transform forefeetRoot;
+
+	private Quaternion headRotation;
+
+	private float lastWeight;
+
+	private Rigidbody characterRootRigidbody;
+
+	[ContextMenu("User Manual")]
+	protected override void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page9.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	protected override void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_grounder_quadruped.html");
+	}
+
+	public override void ResetPosition()
+	{
+		for (int i = 0; i < legs.Length; i++)
+		{
+			legs[i].GetIKSolver().IKPosition = feet[i].transform.position;
+			if (legs[i] is LimbIK)
+			{
+				(legs[i] as LimbIK).solver.IKRotation = solver.legs[i].transform.rotation;
+			}
+		}
+		solver.Reset();
+		forelegSolver.Reset();
+	}
+
+	private bool IsReadyToInitiate()
+	{
+		if (pelvis == null)
+		{
+			return false;
+		}
+		if (lastSpineBone == null)
+		{
+			return false;
+		}
+		if (legs.Length == 0)
+		{
+			return false;
+		}
+		if (forelegs.Length == 0)
+		{
+			return false;
+		}
+		if (characterRoot == null)
+		{
+			return false;
+		}
+		if (!IsReadyToInitiateLegs(legs))
+		{
+			return false;
+		}
+		if (!IsReadyToInitiateLegs(forelegs))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private bool IsReadyToInitiateLegs(IK[] ikComponents)
+	{
+		foreach (IK iK in ikComponents)
+		{
+			if (iK == null)
+			{
+				return false;
+			}
+			if (iK is FullBodyBipedIK)
+			{
+				LogWarning("GrounderIK does not support FullBodyBipedIK, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead. If you want to use FullBodyBipedIK, use the GrounderFBBIK component.");
+				return false;
+			}
+			if (iK is FABRIKRoot)
+			{
+				LogWarning("GrounderIK does not support FABRIKRoot, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead.");
+				return false;
+			}
+			if (iK is AimIK)
+			{
+				LogWarning("GrounderIK does not support AimIK, use CCDIK, FABRIK, LimbIK or TrigonometricIK instead.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void OnDisable()
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		for (int i = 0; i < feet.Length; i++)
+		{
+			if (feet[i].solver != null)
+			{
+				feet[i].solver.IKPositionWeight = 0f;
+			}
+		}
+	}
+
+	private void Update()
+	{
+		weight = Mathf.Clamp(weight, 0f, 1f);
+		if (!(weight <= 0f))
+		{
+			solved = false;
+			if (!initiated && IsReadyToInitiate())
+			{
+				Initiate();
+			}
+		}
+	}
+
+	private void Initiate()
+	{
+		feet = new Foot[legs.Length + forelegs.Length];
+		Transform[] array = InitiateFeet(legs, ref feet, 0);
+		Transform[] array2 = InitiateFeet(forelegs, ref feet, legs.Length);
+		animatedPelvisLocalPosition = pelvis.localPosition;
+		animatedPelvisLocalRotation = pelvis.localRotation;
+		if (head != null)
+		{
+			animatedHeadLocalRotation = head.localRotation;
+		}
+		forefeetRoot = new GameObject().transform;
+		forefeetRoot.parent = transform;
+		forefeetRoot.name = "Forefeet Root";
+		solver.Initiate(transform, array);
+		forelegSolver.Initiate(forefeetRoot, array2);
+		for (int i = 0; i < array.Length; i++)
+		{
+			feet[i].leg = solver.legs[i];
+		}
+		for (int j = 0; j < array2.Length; j++)
+		{
+			feet[j + legs.Length].leg = forelegSolver.legs[j];
+		}
+		characterRootRigidbody = characterRoot.GetComponent<Rigidbody>();
+		initiated = true;
+	}
+
+	private Transform[] InitiateFeet(IK[] ikComponents, ref Foot[] f, int indexOffset)
+	{
+		Transform[] array = new Transform[ikComponents.Length];
+		for (int i = 0; i < ikComponents.Length; i++)
+		{
+			IKSolver.Point[] points = ikComponents[i].GetIKSolver().GetPoints();
+			f[i + indexOffset] = new Foot(ikComponents[i].GetIKSolver(), points[^1].transform);
+			array[i] = f[i + indexOffset].transform;
+			IKSolver iKSolver = f[i + indexOffset].solver;
+			iKSolver.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolver.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+			IKSolver iKSolver2 = f[i + indexOffset].solver;
+			iKSolver2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolver2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+		}
+		return array;
+	}
+
+	private void LateUpdate()
+	{
+		if (!(weight <= 0f))
+		{
+			rootRotationWeight = Mathf.Clamp(rootRotationWeight, 0f, 1f);
+			minRootRotation = Mathf.Clamp(minRootRotation, -90f, maxRootRotation);
+			maxRootRotation = Mathf.Clamp(maxRootRotation, minRootRotation, 90f);
+			rootRotationSpeed = Mathf.Clamp(rootRotationSpeed, 0f, rootRotationSpeed);
+			maxLegOffset = Mathf.Clamp(maxLegOffset, 0f, maxLegOffset);
+			maxForeLegOffset = Mathf.Clamp(maxForeLegOffset, 0f, maxForeLegOffset);
+			maintainHeadRotationWeight = Mathf.Clamp(maintainHeadRotationWeight, 0f, 1f);
+			RootRotation();
+		}
+	}
+
+	private void RootRotation()
+	{
+		if (!(rootRotationWeight <= 0f) && !(rootRotationSpeed <= 0f))
+		{
+			solver.rotateSolver = true;
+			forelegSolver.rotateSolver = true;
+			Vector3 tangent = characterRoot.forward;
+			Vector3 normal = -gravity;
+			Vector3.OrthoNormalize(ref normal, ref tangent);
+			Quaternion quaternion = Quaternion.LookRotation(tangent, -gravity);
+			Vector3 vector = forelegSolver.rootHit.point - solver.rootHit.point;
+			Vector3 vector2 = Quaternion.Inverse(quaternion) * vector;
+			float num = Mathf.Atan2(vector2.y, vector2.z) * 57.29578f;
+			num = Mathf.Clamp(num * rootRotationWeight, minRootRotation, maxRootRotation);
+			angle = Mathf.Lerp(angle, num, Time.deltaTime * rootRotationSpeed);
+			if (characterRootRigidbody == null)
+			{
+				characterRoot.rotation = Quaternion.Slerp(characterRoot.rotation, Quaternion.AngleAxis(0f - angle, characterRoot.right) * quaternion, weight);
+			}
+			else
+			{
+				characterRootRigidbody.MoveRotation(Quaternion.Slerp(characterRoot.rotation, Quaternion.AngleAxis(0f - angle, characterRoot.right) * quaternion, weight));
+			}
+		}
+	}
+
+	private void OnSolverUpdate()
+	{
+		if (!enabled)
+		{
+			return;
+		}
+		if (weight <= 0f)
+		{
+			if (lastWeight <= 0f)
+			{
+				return;
+			}
+			OnDisable();
+		}
+		lastWeight = weight;
+		if (solved)
+		{
+			return;
+		}
+		if (OnPreGrounder != null)
+		{
+			OnPreGrounder();
+		}
+		if (pelvis.localPosition != solvedPelvisLocalPosition)
+		{
+			animatedPelvisLocalPosition = pelvis.localPosition;
+		}
+		else
+		{
+			pelvis.localPosition = animatedPelvisLocalPosition;
+		}
+		if (pelvis.localRotation != solvedPelvisLocalRotation)
+		{
+			animatedPelvisLocalRotation = pelvis.localRotation;
+		}
+		else
+		{
+			pelvis.localRotation = animatedPelvisLocalRotation;
+		}
+		if (head != null)
+		{
+			if (head.localRotation != solvedHeadLocalRotation)
+			{
+				animatedHeadLocalRotation = head.localRotation;
+			}
+			else
+			{
+				head.localRotation = animatedHeadLocalRotation;
+			}
+		}
+		for (int i = 0; i < feet.Length; i++)
+		{
+			feet[i].rotation = feet[i].transform.rotation;
+		}
+		if (head != null)
+		{
+			headRotation = head.rotation;
+		}
+		UpdateForefeetRoot();
+		solver.Update();
+		forelegSolver.Update();
+		pelvis.position += solver.pelvis.IKOffset * weight;
+		Vector3 fromDirection = lastSpineBone.position - pelvis.position;
+		Vector3 toDirection = lastSpineBone.position + forelegSolver.root.up * Mathf.Clamp(forelegSolver.pelvis.heightOffset, float.NegativeInfinity, 0f) - solver.root.up * solver.pelvis.heightOffset - pelvis.position;
+		Quaternion b = Quaternion.FromToRotation(fromDirection, toDirection);
+		pelvis.rotation = Quaternion.Slerp(Quaternion.identity, b, weight) * pelvis.rotation;
+		for (int j = 0; j < feet.Length; j++)
+		{
+			SetFootIK(feet[j], (j < 2) ? maxLegOffset : maxForeLegOffset);
+		}
+		solved = true;
+		solvedFeet = 0;
+		if (OnPostGrounder != null)
+		{
+			OnPostGrounder();
+		}
+	}
+
+	private void UpdateForefeetRoot()
+	{
+		Vector3 zero = Vector3.zero;
+		for (int i = 0; i < forelegSolver.legs.Length; i++)
+		{
+			zero += forelegSolver.legs[i].transform.position;
+		}
+		zero /= (float)forelegs.Length;
+		Vector3 vector = zero - transform.position;
+		Vector3 normal = transform.up;
+		Vector3 tangent = vector;
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		forefeetRoot.position = transform.position + tangent.normalized * vector.magnitude;
+	}
+
+	private void SetFootIK(Foot foot, float maxOffset)
+	{
+		Vector3 vector = foot.leg.IKPosition - foot.transform.position;
+		foot.solver.IKPosition = foot.transform.position + Vector3.ClampMagnitude(vector, maxOffset);
+		foot.solver.IKPositionWeight = weight;
+	}
+
+	private void OnPostSolverUpdate()
+	{
+		if (weight <= 0f || !enabled)
+		{
+			return;
+		}
+		solvedFeet++;
+		if (solvedFeet >= feet.Length)
+		{
+			for (int i = 0; i < feet.Length; i++)
+			{
+				feet[i].transform.rotation = Quaternion.Slerp(Quaternion.identity, feet[i].leg.rotationOffset, weight) * feet[i].rotation;
+			}
+			if (head != null)
+			{
+				head.rotation = Quaternion.Lerp(head.rotation, headRotation, maintainHeadRotationWeight * weight);
+			}
+			solvedPelvisLocalPosition = pelvis.localPosition;
+			solvedPelvisLocalRotation = pelvis.localRotation;
+			if (head != null)
+			{
+				solvedHeadLocalRotation = head.localRotation;
+			}
+			if (OnPostIK != null)
+			{
+				OnPostIK();
+			}
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (initiated)
+		{
+			DestroyLegs(legs);
+			DestroyLegs(forelegs);
+		}
+	}
+
+	private void DestroyLegs(IK[] ikComponents)
+	{
+		foreach (IK iK in ikComponents)
+		{
+			if (iK != null)
+			{
+				IKSolver iKSolver = iK.GetIKSolver();
+				iKSolver.OnPreUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolver.OnPreUpdate, new IKSolver.UpdateDelegate(OnSolverUpdate));
+				IKSolver iKSolver2 = iK.GetIKSolver();
+				iKSolver2.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(iKSolver2.OnPostUpdate, new IKSolver.UpdateDelegate(OnPostSolverUpdate));
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 068
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Grounding.cs
+SIZE: 18338 bytes
+SHA256: 3ee532d3825f4e24b4ad4f9b158a9185112ec907582cb67f98bf250b3adb9c1c
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class Grounding
+{
+	[Serializable]
+	public enum Quality
+	{
+		Fastest,
+		Simple,
+		Best
+	}
+
+	public delegate bool OnRaycastDelegate(Vector3 origin, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask, QueryTriggerInteraction queryTriggerInteraction);
+
+	public delegate bool OnCapsuleCastDelegate(Vector3 point1, Vector3 point2, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask, QueryTriggerInteraction queryTriggerInteraction);
+
+	public delegate bool OnSphereCastDelegate(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask, QueryTriggerInteraction queryTriggerInteraction);
+
+	public class Leg
+	{
+		public Quaternion rotationOffset = Quaternion.identity;
+
+		public bool invertFootCenter;
+
+		private Grounding grounding;
+
+		private float lastTime;
+
+		private float deltaTime;
+
+		private Vector3 lastPosition;
+
+		private Quaternion toHitNormal;
+
+		private Quaternion r;
+
+		private Vector3 up = Vector3.up;
+
+		private bool doOverrideFootPosition;
+
+		private Vector3 overrideFootPosition;
+
+		private Vector3 transformPosition;
+
+		public bool isGrounded { get; private set; }
+
+		public Vector3 IKPosition { get; private set; }
+
+		public bool initiated { get; private set; }
+
+		public float heightFromGround { get; private set; }
+
+		public Vector3 velocity { get; private set; }
+
+		public Transform transform { get; private set; }
+
+		public float IKOffset { get; private set; }
+
+		public RaycastHit heelHit { get; private set; }
+
+		public RaycastHit capsuleHit { get; private set; }
+
+		public RaycastHit GetHitPoint
+		{
+			get
+			{
+				if (grounding.quality == Quality.Best)
+				{
+					return capsuleHit;
+				}
+				return heelHit;
+			}
+		}
+
+		public float stepHeightFromGround => Mathf.Clamp(heightFromGround, 0f - grounding.maxStep, grounding.maxStep);
+
+		private float rootYOffset => grounding.GetVerticalOffset(transformPosition, grounding.root.position - up * grounding.heightOffset);
+
+		public void SetFootPosition(Vector3 position)
+		{
+			doOverrideFootPosition = true;
+			overrideFootPosition = position;
+		}
+
+		public void Initiate(Grounding grounding, Transform transform)
+		{
+			initiated = false;
+			this.grounding = grounding;
+			this.transform = transform;
+			up = Vector3.up;
+			IKPosition = transform.position;
+			rotationOffset = Quaternion.identity;
+			initiated = true;
+			OnEnable();
+		}
+
+		public void OnEnable()
+		{
+			if (initiated)
+			{
+				lastPosition = transform.position;
+				lastTime = Time.deltaTime;
+			}
+		}
+
+		public void Reset()
+		{
+			lastPosition = transform.position;
+			lastTime = Time.deltaTime;
+			IKOffset = 0f;
+			IKPosition = transform.position;
+			rotationOffset = Quaternion.identity;
+		}
+
+		public void Process()
+		{
+			if (!initiated || grounding.maxStep <= 0f)
+			{
+				return;
+			}
+			transformPosition = (doOverrideFootPosition ? overrideFootPosition : transform.position);
+			doOverrideFootPosition = false;
+			deltaTime = Time.time - lastTime;
+			lastTime = Time.time;
+			if (deltaTime == 0f)
+			{
+				return;
+			}
+			up = grounding.up;
+			heightFromGround = float.PositiveInfinity;
+			velocity = (transformPosition - lastPosition) / deltaTime;
+			lastPosition = transformPosition;
+			Vector3 vector = velocity * grounding.prediction;
+			if (grounding.footRadius <= 0f)
+			{
+				grounding.quality = Quality.Fastest;
+			}
+			isGrounded = false;
+			switch (grounding.quality)
+			{
+			case Quality.Fastest:
+			{
+				RaycastHit raycastHit = GetRaycastHit(vector);
+				SetFootToPoint(raycastHit.normal, raycastHit.point);
+				if (raycastHit.collider != null)
+				{
+					isGrounded = true;
+				}
+				break;
+			}
+			case Quality.Simple:
+			{
+				heelHit = GetRaycastHit(Vector3.zero);
+				Vector3 vector2 = grounding.GetFootCenterOffset();
+				if (invertFootCenter)
+				{
+					vector2 = -vector2;
+				}
+				RaycastHit raycastHit2 = GetRaycastHit(vector2 + vector);
+				RaycastHit raycastHit3 = GetRaycastHit(grounding.root.right * grounding.footRadius * 0.5f);
+				if (heelHit.collider != null || raycastHit2.collider != null || raycastHit3.collider != null)
+				{
+					isGrounded = true;
+				}
+				Vector3 vector3 = Vector3.Cross(raycastHit2.point - heelHit.point, raycastHit3.point - heelHit.point).normalized;
+				if (Vector3.Dot(vector3, up) < 0f)
+				{
+					vector3 = -vector3;
+				}
+				SetFootToPlane(vector3, heelHit.point, heelHit.point);
+				break;
+			}
+			case Quality.Best:
+				heelHit = GetRaycastHit(invertFootCenter ? (-grounding.GetFootCenterOffset()) : Vector3.zero);
+				capsuleHit = GetCapsuleHit(vector);
+				if (heelHit.collider != null || capsuleHit.collider != null)
+				{
+					isGrounded = true;
+				}
+				SetFootToPlane(capsuleHit.normal, capsuleHit.point, heelHit.point);
+				break;
+			}
+			float num = stepHeightFromGround;
+			if (!grounding.rootGrounded)
+			{
+				num = 0f;
+			}
+			IKOffset = Interp.LerpValue(IKOffset, num, grounding.footSpeed, grounding.footSpeed);
+			IKOffset = Mathf.Lerp(IKOffset, num, deltaTime * grounding.footSpeed);
+			float verticalOffset = grounding.GetVerticalOffset(transformPosition, grounding.root.position);
+			float num2 = Mathf.Clamp(grounding.maxStep - verticalOffset, 0f, grounding.maxStep);
+			IKOffset = Mathf.Clamp(IKOffset, 0f - num2, IKOffset);
+			RotateFoot();
+			IKPosition = transformPosition - up * IKOffset;
+			float footRotationWeight = grounding.footRotationWeight;
+			rotationOffset = ((footRotationWeight >= 1f) ? r : Quaternion.Slerp(Quaternion.identity, r, footRotationWeight));
+		}
+
+		private RaycastHit GetCapsuleHit(Vector3 offsetFromHeel)
+		{
+			RaycastHit hitInfo = default;
+			Vector3 vector = grounding.GetFootCenterOffset();
+			if (invertFootCenter)
+			{
+				vector = -vector;
+			}
+			Vector3 vector2 = transformPosition + vector;
+			if (grounding.overstepFallsDown)
+			{
+				hitInfo.point = vector2 - up * grounding.maxStep;
+			}
+			else
+			{
+				hitInfo.point = new Vector3(vector2.x, grounding.root.position.y, vector2.z);
+			}
+			hitInfo.normal = up;
+			Vector3 vector3 = vector2 + grounding.maxStep * up;
+			Vector3 point = vector3 + offsetFromHeel;
+			if (grounding.CapsuleCast(vector3, point, grounding.footRadius, -up, out hitInfo, grounding.maxStep * 2f, grounding.layers, QueryTriggerInteraction.Ignore) && float.IsNaN(hitInfo.point.x))
+			{
+				hitInfo.point = vector2 - up * grounding.maxStep * 2f;
+				hitInfo.normal = up;
+			}
+			if (hitInfo.point == Vector3.zero && hitInfo.normal == Vector3.zero)
+			{
+				if (grounding.overstepFallsDown)
+				{
+					hitInfo.point = vector2 - up * grounding.maxStep;
+				}
+				else
+				{
+					hitInfo.point = new Vector3(vector2.x, grounding.root.position.y, vector2.z);
+				}
+			}
+			return hitInfo;
+		}
+
+		private RaycastHit GetRaycastHit(Vector3 offsetFromHeel)
+		{
+			RaycastHit hitInfo = default;
+			Vector3 vector = transformPosition + offsetFromHeel;
+			if (grounding.overstepFallsDown)
+			{
+				hitInfo.point = vector - up * grounding.maxStep;
+			}
+			else
+			{
+				hitInfo.point = new Vector3(vector.x, grounding.root.position.y, vector.z);
+			}
+			hitInfo.normal = up;
+			if (grounding.maxStep <= 0f)
+			{
+				return hitInfo;
+			}
+			grounding.Raycast(vector + grounding.maxStep * up, -up, out hitInfo, grounding.maxStep * 2f, grounding.layers, QueryTriggerInteraction.Ignore);
+			if (hitInfo.point == Vector3.zero && hitInfo.normal == Vector3.zero)
+			{
+				if (grounding.overstepFallsDown)
+				{
+					hitInfo.point = vector - up * grounding.maxStep;
+				}
+				else
+				{
+					hitInfo.point = new Vector3(vector.x, grounding.root.position.y, vector.z);
+				}
+			}
+			return hitInfo;
+		}
+
+		private Vector3 RotateNormal(Vector3 normal)
+		{
+			if (grounding.quality == Quality.Best)
+			{
+				return normal;
+			}
+			return Vector3.RotateTowards(up, normal, grounding.maxFootRotationAngle * (MathF.PI / 180f), deltaTime);
+		}
+
+		private void SetFootToPoint(Vector3 normal, Vector3 point)
+		{
+			toHitNormal = Quaternion.FromToRotation(up, RotateNormal(normal));
+			heightFromGround = GetHeightFromGround(point);
+		}
+
+		private void SetFootToPlane(Vector3 planeNormal, Vector3 planePoint, Vector3 heelHitPoint)
+		{
+			planeNormal = RotateNormal(planeNormal);
+			toHitNormal = Quaternion.FromToRotation(up, planeNormal);
+			Vector3 hitPoint = V3Tools.LineToPlane(transformPosition + up * grounding.maxStep, -up, planeNormal, planePoint);
+			heightFromGround = GetHeightFromGround(hitPoint);
+			float max = GetHeightFromGround(heelHitPoint);
+			heightFromGround = Mathf.Clamp(heightFromGround, float.NegativeInfinity, max);
+		}
+
+		private float GetHeightFromGround(Vector3 hitPoint)
+		{
+			return grounding.GetVerticalOffset(transformPosition, hitPoint) - rootYOffset;
+		}
+
+		private void RotateFoot()
+		{
+			Quaternion rotationOffsetTarget = GetRotationOffsetTarget();
+			r = Quaternion.Slerp(r, rotationOffsetTarget, deltaTime * grounding.footRotationSpeed);
+		}
+
+		private Quaternion GetRotationOffsetTarget()
+		{
+			if (grounding.maxFootRotationAngle <= 0f)
+			{
+				return Quaternion.identity;
+			}
+			if (grounding.maxFootRotationAngle >= 180f)
+			{
+				return toHitNormal;
+			}
+			return Quaternion.RotateTowards(Quaternion.identity, toHitNormal, grounding.maxFootRotationAngle);
+		}
+	}
+
+	public class Pelvis
+	{
+		private Grounding grounding;
+
+		private Vector3 lastRootPosition;
+
+		private float damperF;
+
+		private bool initiated;
+
+		private float lastTime;
+
+		public Vector3 IKOffset { get; private set; }
+
+		public float heightOffset { get; private set; }
+
+		public void Initiate(Grounding grounding)
+		{
+			this.grounding = grounding;
+			initiated = true;
+			OnEnable();
+		}
+
+		public void Reset()
+		{
+			lastRootPosition = grounding.root.transform.position;
+			lastTime = Time.deltaTime;
+			IKOffset = Vector3.zero;
+			heightOffset = 0f;
+		}
+
+		public void OnEnable()
+		{
+			if (initiated)
+			{
+				lastRootPosition = grounding.root.transform.position;
+				lastTime = Time.time;
+			}
+		}
+
+		public void Process(float lowestOffset, float highestOffset, bool isGrounded)
+		{
+			if (!initiated)
+			{
+				return;
+			}
+			float num = Time.time - lastTime;
+			lastTime = Time.time;
+			if (!(num <= 0f))
+			{
+				float b = lowestOffset + highestOffset;
+				if (!grounding.rootGrounded)
+				{
+					b = 0f;
+				}
+				heightOffset = Mathf.Lerp(heightOffset, b, num * grounding.pelvisSpeed);
+				Vector3 p = grounding.root.position - lastRootPosition;
+				lastRootPosition = grounding.root.position;
+				damperF = Interp.LerpValue(damperF, isGrounded ? 1f : 0f, 1f, 10f);
+				heightOffset -= grounding.GetVerticalOffset(p, Vector3.zero) * grounding.pelvisDamper * damperF;
+				IKOffset = grounding.up * heightOffset;
+			}
+		}
+	}
+
+	[Tooltip("Layers to ground the character to. Make sure to exclude the layer of the character controller.")]
+	public LayerMask layers;
+
+	[Tooltip("Max step height. Maximum vertical distance of Grounding from the root of the character.")]
+	public float maxStep = 0.5f;
+
+	[Tooltip("The height offset of the root.")]
+	public float heightOffset;
+
+	[Tooltip("The speed of moving the feet up/down.")]
+	public float footSpeed = 2.5f;
+
+	[Tooltip("CapsuleCast radius. Should match approximately with the size of the feet.")]
+	public float footRadius = 0.15f;
+
+	[Tooltip("Offset of the foot center along character forward axis.")]
+	[HideInInspector]
+	public float footCenterOffset;
+
+	[Tooltip("Amount of velocity based prediction of the foot positions.")]
+	public float prediction = 0.05f;
+
+	[Tooltip("Weight of rotating the feet to the ground normal offset.")]
+	[Range(0f, 1f)]
+	public float footRotationWeight = 1f;
+
+	[Tooltip("Speed of slerping the feet to their grounded rotations.")]
+	public float footRotationSpeed = 7f;
+
+	[Tooltip("Max Foot Rotation Angle. Max angular offset from the foot's rotation.")]
+	[Range(0f, 90f)]
+	public float maxFootRotationAngle = 45f;
+
+	[Tooltip("If true, solver will rotate with the character root so the character can be grounded for example to spherical planets. For performance reasons leave this off unless needed.")]
+	public bool rotateSolver;
+
+	[Tooltip("The speed of moving the character up/down.")]
+	public float pelvisSpeed = 5f;
+
+	[Tooltip("Used for smoothing out vertical pelvis movement (range 0 - 1).")]
+	[Range(0f, 1f)]
+	public float pelvisDamper;
+
+	[Tooltip("The weight of lowering the pelvis to the lowest foot.")]
+	public float lowerPelvisWeight = 1f;
+
+	[Tooltip("The weight of lifting the pelvis to the highest foot. This is useful when you don't want the feet to go too high relative to the body when crouching.")]
+	public float liftPelvisWeight;
+
+	[Tooltip("The radius of the spherecast from the root that determines whether the character root is grounded.")]
+	public float rootSphereCastRadius = 0.1f;
+
+	[Tooltip("If false, keeps the foot that is over a ledge at the root level. If true, lowers the overstepping foot and body by the 'Max Step' value.")]
+	public bool overstepFallsDown = true;
+
+	[Tooltip("The raycasting quality. Fastest is a single raycast per foot, Simple is three raycasts, Best is one raycast and a capsule cast per foot.")]
+	public Quality quality = Quality.Best;
+
+	public OnRaycastDelegate Raycast = Physics.Raycast;
+
+	public OnCapsuleCastDelegate CapsuleCast = Physics.CapsuleCast;
+
+	public OnSphereCastDelegate SphereCast = Physics.SphereCast;
+
+	private bool initiated;
+
+	public Leg[] legs { get; private set; }
+
+	public Pelvis pelvis { get; private set; }
+
+	public bool isGrounded { get; private set; }
+
+	public Transform root { get; private set; }
+
+	public RaycastHit rootHit { get; private set; }
+
+	public bool rootGrounded => rootHit.distance < maxStep * 2f;
+
+	public Vector3 up
+	{
+		get
+		{
+			if (!useRootRotation)
+			{
+				return Vector3.up;
+			}
+			return root.up;
+		}
+	}
+
+	private bool useRootRotation
+	{
+		get
+		{
+			if (!rotateSolver)
+			{
+				return false;
+			}
+			if (root.up == Vector3.up)
+			{
+				return false;
+			}
+			return true;
+		}
+	}
+
+	public RaycastHit GetRootHit(float maxDistanceMlp = 10f)
+	{
+		RaycastHit hitInfo = default;
+		Vector3 vector = up;
+		Vector3 zero = Vector3.zero;
+		Leg[] array = legs;
+		foreach (Leg leg in array)
+		{
+			zero += leg.transform.position;
+		}
+		zero /= (float)legs.Length;
+		hitInfo.point = zero - vector * maxStep * 10f;
+		float num = maxDistanceMlp + 1f;
+		hitInfo.distance = maxStep * num;
+		if (maxStep <= 0f)
+		{
+			return hitInfo;
+		}
+		if (quality != Quality.Best)
+		{
+			Raycast(zero + vector * maxStep, -vector, out hitInfo, maxStep * num, layers, QueryTriggerInteraction.Ignore);
+		}
+		else
+		{
+			SphereCast(zero + vector * maxStep, rootSphereCastRadius, -up, out hitInfo, maxStep * num, layers, QueryTriggerInteraction.Ignore);
+		}
+		return hitInfo;
+	}
+
+	public bool IsValid(ref string errorMessage)
+	{
+		if (root == null)
+		{
+			errorMessage = "Root transform is null. Can't initiate Grounding.";
+			return false;
+		}
+		if (legs == null)
+		{
+			errorMessage = "Grounding legs is null. Can't initiate Grounding.";
+			return false;
+		}
+		if (pelvis == null)
+		{
+			errorMessage = "Grounding pelvis is null. Can't initiate Grounding.";
+			return false;
+		}
+		if (legs.Length == 0)
+		{
+			errorMessage = "Grounding has 0 legs. Can't initiate Grounding.";
+			return false;
+		}
+		return true;
+	}
+
+	public void Initiate(Transform root, Transform[] feet)
+	{
+		this.root = root;
+		initiated = false;
+		rootHit = default;
+		if (legs == null)
+		{
+			legs = new Leg[feet.Length];
+		}
+		if (legs.Length != feet.Length)
+		{
+			legs = new Leg[feet.Length];
+		}
+		for (int i = 0; i < feet.Length; i++)
+		{
+			if (legs[i] == null)
+			{
+				legs[i] = new Leg();
+			}
+		}
+		if (pelvis == null)
+		{
+			pelvis = new Pelvis();
+		}
+		string errorMessage = string.Empty;
+		if (!IsValid(ref errorMessage))
+		{
+			Warning.Log(errorMessage, root);
+		}
+		else if (Application.isPlaying)
+		{
+			for (int j = 0; j < feet.Length; j++)
+			{
+				legs[j].Initiate(this, feet[j]);
+			}
+			pelvis.Initiate(this);
+			initiated = true;
+		}
+	}
+
+	public void Update()
+	{
+		if (!initiated)
+		{
+			return;
+		}
+		if ((int)layers == 0)
+		{
+			LogWarning("Grounding layers are set to nothing. Please add a ground layer.");
+		}
+		maxStep = Mathf.Clamp(maxStep, 0f, maxStep);
+		footRadius = Mathf.Clamp(footRadius, 0.0001f, maxStep);
+		pelvisDamper = Mathf.Clamp(pelvisDamper, 0f, 1f);
+		rootSphereCastRadius = Mathf.Clamp(rootSphereCastRadius, 0.0001f, rootSphereCastRadius);
+		maxFootRotationAngle = Mathf.Clamp(maxFootRotationAngle, 0f, 90f);
+		prediction = Mathf.Clamp(prediction, 0f, prediction);
+		footSpeed = Mathf.Clamp(footSpeed, 0f, footSpeed);
+		rootHit = GetRootHit();
+		float num = float.NegativeInfinity;
+		float num2 = float.PositiveInfinity;
+		isGrounded = false;
+		Leg[] array = legs;
+		foreach (Leg leg in array)
+		{
+			leg.Process();
+			if (leg.IKOffset > num)
+			{
+				num = leg.IKOffset;
+			}
+			if (leg.IKOffset < num2)
+			{
+				num2 = leg.IKOffset;
+			}
+			if (leg.isGrounded)
+			{
+				isGrounded = true;
+			}
+		}
+		num = Mathf.Max(num, 0f);
+		num2 = Mathf.Min(num2, 0f);
+		pelvis.Process((0f - num) * lowerPelvisWeight, (0f - num2) * liftPelvisWeight, isGrounded);
+	}
+
+	public Vector3 GetLegsPlaneNormal()
+	{
+		if (!initiated)
+		{
+			return Vector3.up;
+		}
+		Vector3 vector = up;
+		Vector3 vector2 = vector;
+		for (int i = 0; i < legs.Length; i++)
+		{
+			Vector3 vector3 = legs[i].IKPosition - root.position;
+			Vector3 normal = vector;
+			Vector3 tangent = vector3;
+			Vector3.OrthoNormalize(ref normal, ref tangent);
+			vector2 = Quaternion.FromToRotation(tangent, vector3) * vector2;
+		}
+		return vector2;
+	}
+
+	public void Reset()
+	{
+		if (Application.isPlaying)
+		{
+			pelvis.Reset();
+			Leg[] array = legs;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].Reset();
+			}
+		}
+	}
+
+	public void LogWarning(string message)
+	{
+		Warning.Log(message, root);
+	}
+
+	public float GetVerticalOffset(Vector3 p1, Vector3 p2)
+	{
+		if (useRootRotation)
+		{
+			return (Quaternion.Inverse(root.rotation) * (p1 - p2)).y;
+		}
+		return p1.y - p2.y;
+	}
+
+	public Vector3 Flatten(Vector3 v)
+	{
+		if (useRootRotation)
+		{
+			Vector3 tangent = v;
+			Vector3 normal = root.up;
+			Vector3.OrthoNormalize(ref normal, ref tangent);
+			return Vector3.Project(v, tangent);
+		}
+		v.y = 0f;
+		return v;
+	}
+
+	public Vector3 GetFootCenterOffset()
+	{
+		return root.forward * footRadius + root.forward * footCenterOffset;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 069
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__HandPoser.cs
+SIZE: 1939 bytes
+SHA256: 6a1ab5448c0a266639003f682b62e4680ec3f25ceae1ce4f74f25026618e3abf
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class HandPoser : Poser
+{
+	protected Transform[] children;
+
+	private Transform _poseRoot;
+
+	private Transform[] poseChildren;
+
+	private Vector3[] defaultLocalPositions;
+
+	private Quaternion[] defaultLocalRotations;
+
+	public override void AutoMapping()
+	{
+		if (poseRoot == null)
+		{
+			poseChildren = new Transform[0];
+		}
+		else
+		{
+			poseChildren = poseRoot.GetComponentsInChildren<Transform>();
+		}
+		_poseRoot = poseRoot;
+	}
+
+	protected override void InitiatePoser()
+	{
+		children = GetComponentsInChildren<Transform>();
+		StoreDefaultState();
+	}
+
+	protected override void FixPoserTransforms()
+	{
+		for (int i = 0; i < children.Length; i++)
+		{
+			children[i].localPosition = defaultLocalPositions[i];
+			children[i].localRotation = defaultLocalRotations[i];
+		}
+	}
+
+	protected override void UpdatePoser()
+	{
+		if (weight <= 0f || (localPositionWeight <= 0f && localRotationWeight <= 0f))
+		{
+			return;
+		}
+		if (_poseRoot != poseRoot)
+		{
+			AutoMapping();
+		}
+		if (poseRoot == null)
+		{
+			return;
+		}
+		if (children.Length != poseChildren.Length)
+		{
+			Warning.Log("Number of children does not match with the pose", transform);
+			return;
+		}
+		float t = localRotationWeight * weight;
+		float t2 = localPositionWeight * weight;
+		for (int i = 0; i < children.Length; i++)
+		{
+			if (children[i] != transform)
+			{
+				children[i].localRotation = Quaternion.Lerp(children[i].localRotation, poseChildren[i].localRotation, t);
+				children[i].localPosition = Vector3.Lerp(children[i].localPosition, poseChildren[i].localPosition, t2);
+			}
+		}
+	}
+
+	protected void StoreDefaultState()
+	{
+		defaultLocalPositions = new Vector3[children.Length];
+		defaultLocalRotations = new Quaternion[children.Length];
+		for (int i = 0; i < children.Length; i++)
+		{
+			defaultLocalPositions[i] = children[i].localPosition;
+			defaultLocalRotations[i] = children[i].localRotation;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 070
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__HitReaction.cs
+SIZE: 7104 bytes
+SHA256: cf77717ae4fd4ee1991cf694b43a28745006fb3e60317abdc68de9c4fe8fc563
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class HitReaction : OffsetModifier
+{
+	[Serializable]
+	public abstract class HitPoint
+	{
+		[Tooltip("Just for visual clarity, not used at all")]
+		public string name;
+
+		[Tooltip("Linking this hit point to a collider")]
+		public Collider collider;
+
+		[Tooltip("Only used if this hit point gets hit when already processing another hit")]
+		[SerializeField]
+		private float crossFadeTime = 0.1f;
+
+		private float length;
+
+		private float crossFadeSpeed;
+
+		private float lastTime;
+
+		public bool inProgress => timer < length;
+
+		protected float crossFader { get; private set; }
+
+		protected float timer { get; private set; }
+
+		protected Vector3 force { get; private set; }
+
+		public virtual void Hit(Vector3 force, Vector3 point)
+		{
+			if (length == 0f)
+			{
+				length = GetLength();
+			}
+			if (length <= 0f)
+			{
+				Debug.LogError("Hit Point WeightCurve length is zero.");
+				return;
+			}
+			if (timer < 1f)
+			{
+				crossFader = 0f;
+			}
+			crossFadeSpeed = ((crossFadeTime > 0f) ? (1f / crossFadeTime) : 0f);
+			CrossFadeStart();
+			timer = 0f;
+			this.force = force;
+		}
+
+		public void Apply(IKSolverFullBodyBiped solver, float weight)
+		{
+			float num = Time.time - lastTime;
+			lastTime = Time.time;
+			if (!(timer >= length))
+			{
+				timer = Mathf.Clamp(timer + num, 0f, length);
+				if (crossFadeSpeed > 0f)
+				{
+					crossFader = Mathf.Clamp(crossFader + num * crossFadeSpeed, 0f, 1f);
+				}
+				else
+				{
+					crossFader = 1f;
+				}
+				OnApply(solver, weight);
+			}
+		}
+
+		protected abstract float GetLength();
+
+		protected abstract void CrossFadeStart();
+
+		protected abstract void OnApply(IKSolverFullBodyBiped solver, float weight);
+	}
+
+	[Serializable]
+	public class HitPointEffector : HitPoint
+	{
+		[Serializable]
+		public class EffectorLink
+		{
+			[Tooltip("The FBBIK effector type")]
+			public FullBodyBipedEffector effector;
+
+			[Tooltip("The weight of this effector (could also be negative)")]
+			public float weight;
+
+			private Vector3 lastValue;
+
+			private Vector3 current;
+
+			public void Apply(IKSolverFullBodyBiped solver, Vector3 offset, float crossFader)
+			{
+				current = Vector3.Lerp(lastValue, offset * weight, crossFader);
+				solver.GetEffector(effector).positionOffset += current;
+			}
+
+			public void CrossFadeStart()
+			{
+				lastValue = current;
+			}
+		}
+
+		[Tooltip("Offset magnitude in the direction of the hit force")]
+		public AnimationCurve offsetInForceDirection;
+
+		[Tooltip("Offset magnitude in the direction of character.up")]
+		public AnimationCurve offsetInUpDirection;
+
+		[Tooltip("Linking this offset to the FBBIK effectors")]
+		public EffectorLink[] effectorLinks;
+
+		protected override float GetLength()
+		{
+			float num = ((offsetInForceDirection.keys.Length != 0) ? offsetInForceDirection.keys[offsetInForceDirection.length - 1].time : 0f);
+			float min = ((offsetInUpDirection.keys.Length != 0) ? offsetInUpDirection.keys[offsetInUpDirection.length - 1].time : 0f);
+			return Mathf.Clamp(num, min, num);
+		}
+
+		protected override void CrossFadeStart()
+		{
+			EffectorLink[] array = effectorLinks;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].CrossFadeStart();
+			}
+		}
+
+		protected override void OnApply(IKSolverFullBodyBiped solver, float weight)
+		{
+			Vector3 vector = solver.GetRoot().up * force.magnitude;
+			Vector3 offset = offsetInForceDirection.Evaluate(timer) * force + offsetInUpDirection.Evaluate(timer) * vector;
+			offset *= weight;
+			EffectorLink[] array = effectorLinks;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].Apply(solver, offset, crossFader);
+			}
+		}
+	}
+
+	[Serializable]
+	public class HitPointBone : HitPoint
+	{
+		[Serializable]
+		public class BoneLink
+		{
+			[Tooltip("Reference to the bone that this hit point rotates")]
+			public Transform bone;
+
+			[Tooltip("Weight of rotating the bone")]
+			[Range(0f, 1f)]
+			public float weight;
+
+			private Quaternion lastValue = Quaternion.identity;
+
+			private Quaternion current = Quaternion.identity;
+
+			public void Apply(IKSolverFullBodyBiped solver, Quaternion offset, float crossFader)
+			{
+				current = Quaternion.Lerp(lastValue, Quaternion.Lerp(Quaternion.identity, offset, weight), crossFader);
+				bone.rotation = current * bone.rotation;
+			}
+
+			public void CrossFadeStart()
+			{
+				lastValue = current;
+			}
+		}
+
+		[Tooltip("The angle to rotate the bone around its rigidbody's world center of mass")]
+		public AnimationCurve aroundCenterOfMass;
+
+		[Tooltip("Linking this hit point to bone(s)")]
+		public BoneLink[] boneLinks;
+
+		private Rigidbody rigidbody;
+
+		private Vector3 comAxis;
+
+		public override void Hit(Vector3 force, Vector3 point)
+		{
+			base.Hit(force, point);
+			if (rigidbody == null)
+			{
+				rigidbody = collider.GetComponent<Rigidbody>();
+			}
+			Vector3 vector = ((rigidbody != null) ? rigidbody.worldCenterOfMass : collider.transform.position);
+			comAxis = Vector3.Cross(force, point - vector);
+		}
+
+		protected override float GetLength()
+		{
+			if (aroundCenterOfMass.keys.Length == 0)
+			{
+				return 0f;
+			}
+			return aroundCenterOfMass.keys[aroundCenterOfMass.length - 1].time;
+		}
+
+		protected override void CrossFadeStart()
+		{
+			BoneLink[] array = boneLinks;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].CrossFadeStart();
+			}
+		}
+
+		protected override void OnApply(IKSolverFullBodyBiped solver, float weight)
+		{
+			Quaternion offset = Quaternion.AngleAxis(aroundCenterOfMass.Evaluate(timer) * weight, comAxis);
+			BoneLink[] array = boneLinks;
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].Apply(solver, offset, crossFader);
+			}
+		}
+	}
+
+	[Tooltip("Hit points for the FBBIK effectors")]
+	public HitPointEffector[] effectorHitPoints;
+
+	[Tooltip(" Hit points for bones without an effector, such as the head")]
+	public HitPointBone[] boneHitPoints;
+
+	public bool inProgress
+	{
+		get
+		{
+			HitPointEffector[] array = effectorHitPoints;
+			for (int i = 0; i < array.Length; i++)
+			{
+				if (array[i].inProgress)
+				{
+					return true;
+				}
+			}
+			HitPointBone[] array2 = boneHitPoints;
+			for (int i = 0; i < array2.Length; i++)
+			{
+				if (array2[i].inProgress)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	protected override void OnModifyOffset()
+	{
+		HitPointEffector[] array = effectorHitPoints;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Apply(ik.solver, weight);
+		}
+		HitPointBone[] array2 = boneHitPoints;
+		for (int i = 0; i < array2.Length; i++)
+		{
+			array2[i].Apply(ik.solver, weight);
+		}
+	}
+
+	public void Hit(Collider collider, Vector3 force, Vector3 point)
+	{
+		if (ik == null)
+		{
+			Debug.LogError("No IK assigned in HitReaction");
+			return;
+		}
+		HitPointEffector[] array = effectorHitPoints;
+		foreach (HitPointEffector hitPointEffector in array)
+		{
+			if (hitPointEffector.collider == collider)
+			{
+				hitPointEffector.Hit(force, point);
+			}
+		}
+		HitPointBone[] array2 = boneHitPoints;
+		foreach (HitPointBone hitPointBone in array2)
+		{
+			if (hitPointBone.collider == collider)
+			{
+				hitPointBone.Hit(force, point);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 071
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IK.cs
+SIZE: 632 bytes
+SHA256: 0dd2a423f1e35c73ae5efe9d9c0ba98e9c70876ac09ec84956a65440e796de41
+====================================================================================================
+
+namespace RootMotion.FinalIK;
+
+public abstract class IK : SolverManager
+{
+	public abstract IKSolver GetIKSolver();
+
+	protected override void UpdateSolver()
+	{
+		if (!GetIKSolver().initiated)
+		{
+			InitiateSolver();
+		}
+		if (GetIKSolver().initiated)
+		{
+			GetIKSolver().Update();
+		}
+	}
+
+	protected override void InitiateSolver()
+	{
+		if (!GetIKSolver().initiated)
+		{
+			GetIKSolver().Initiate(transform);
+		}
+	}
+
+	protected override void FixTransforms()
+	{
+		if (GetIKSolver().initiated)
+		{
+			GetIKSolver().FixTransforms();
+		}
+	}
+
+	protected abstract void OpenUserManual();
+
+	protected abstract void OpenScriptReference();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 072
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKConstraintBend.cs
+SIZE: 5811 bytes
+SHA256: 46c970d800e2a0e34cc7df61f9e97cc41ceae2fe104cd047c2a4e3f34221c075
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class IKConstraintBend
+{
+	public Transform bone1;
+
+	public Transform bone2;
+
+	public Transform bone3;
+
+	public Transform bendGoal;
+
+	public Vector3 direction = Vector3.right;
+
+	public Quaternion rotationOffset;
+
+	[Range(0f, 1f)]
+	public float weight;
+
+	public Vector3 defaultLocalDirection;
+
+	public Vector3 defaultChildDirection;
+
+	[NonSerialized]
+	public float clampF = 0.505f;
+
+	private int chainIndex1;
+
+	private int nodeIndex1;
+
+	private int chainIndex2;
+
+	private int nodeIndex2;
+
+	private int chainIndex3;
+
+	private int nodeIndex3;
+
+	private bool limbOrientationsSet;
+
+	public bool initiated { get; private set; }
+
+	public bool IsValid(IKSolverFullBody solver, Warning.Logger logger)
+	{
+		if (bone1 == null || bone2 == null || bone3 == null)
+		{
+			logger?.Invoke("Bend Constraint contains a null reference.");
+			return false;
+		}
+		if (solver.GetPoint(bone1) == null)
+		{
+			logger?.Invoke("Bend Constraint is referencing to a bone '" + bone1.name + "' that does not excist in the Node Chain.");
+			return false;
+		}
+		if (solver.GetPoint(bone2) == null)
+		{
+			logger?.Invoke("Bend Constraint is referencing to a bone '" + bone2.name + "' that does not excist in the Node Chain.");
+			return false;
+		}
+		if (solver.GetPoint(bone3) == null)
+		{
+			logger?.Invoke("Bend Constraint is referencing to a bone '" + bone3.name + "' that does not excist in the Node Chain.");
+			return false;
+		}
+		return true;
+	}
+
+	public IKConstraintBend()
+	{
+	}
+
+	public IKConstraintBend(Transform bone1, Transform bone2, Transform bone3)
+	{
+		SetBones(bone1, bone2, bone3);
+	}
+
+	public void SetBones(Transform bone1, Transform bone2, Transform bone3)
+	{
+		this.bone1 = bone1;
+		this.bone2 = bone2;
+		this.bone3 = bone3;
+	}
+
+	public void Initiate(IKSolverFullBody solver)
+	{
+		solver.GetChainAndNodeIndexes(bone1, out chainIndex1, out nodeIndex1);
+		solver.GetChainAndNodeIndexes(bone2, out chainIndex2, out nodeIndex2);
+		solver.GetChainAndNodeIndexes(bone3, out chainIndex3, out nodeIndex3);
+		direction = OrthoToBone1(solver, OrthoToLimb(solver, bone2.position - bone1.position));
+		if (!limbOrientationsSet)
+		{
+			defaultLocalDirection = Quaternion.Inverse(bone1.rotation) * direction;
+			Vector3 vector = Vector3.Cross((bone3.position - bone1.position).normalized, direction);
+			defaultChildDirection = Quaternion.Inverse(bone3.rotation) * vector;
+		}
+		initiated = true;
+	}
+
+	public void SetLimbOrientation(Vector3 upper, Vector3 lower, Vector3 last)
+	{
+		if (upper == Vector3.zero)
+		{
+			Debug.LogError("Attempting to set limb orientation to Vector3.zero axis");
+		}
+		if (lower == Vector3.zero)
+		{
+			Debug.LogError("Attempting to set limb orientation to Vector3.zero axis");
+		}
+		if (last == Vector3.zero)
+		{
+			Debug.LogError("Attempting to set limb orientation to Vector3.zero axis");
+		}
+		defaultLocalDirection = upper.normalized;
+		defaultChildDirection = last.normalized;
+		limbOrientationsSet = true;
+	}
+
+	public void LimitBend(float solverWeight, float positionWeight)
+	{
+		if (initiated)
+		{
+			Vector3 vector = bone1.rotation * -defaultLocalDirection;
+			Vector3 fromDirection = bone3.position - bone2.position;
+			bool changed = false;
+			Vector3 toDirection = V3Tools.ClampDirection(fromDirection, vector, clampF * solverWeight, 0, out changed);
+			Quaternion rotation = bone3.rotation;
+			if (changed)
+			{
+				Quaternion quaternion = Quaternion.FromToRotation(fromDirection, toDirection);
+				bone2.rotation = quaternion * bone2.rotation;
+			}
+			if (positionWeight > 0f)
+			{
+				Vector3 normal = bone2.position - bone1.position;
+				Vector3 tangent = bone3.position - bone2.position;
+				Vector3.OrthoNormalize(ref normal, ref tangent);
+				Quaternion quaternion2 = Quaternion.FromToRotation(tangent, vector);
+				bone2.rotation = Quaternion.Lerp(bone2.rotation, quaternion2 * bone2.rotation, positionWeight * solverWeight);
+			}
+			if (changed || positionWeight > 0f)
+			{
+				bone3.rotation = rotation;
+			}
+		}
+	}
+
+	public Vector3 GetDir(IKSolverFullBody solver)
+	{
+		if (!initiated)
+		{
+			return Vector3.zero;
+		}
+		float num = weight * solver.IKPositionWeight;
+		if (bendGoal != null)
+		{
+			Vector3 vector = bendGoal.position - solver.GetNode(chainIndex1, nodeIndex1).solverPosition;
+			if (vector != Vector3.zero)
+			{
+				direction = vector;
+			}
+		}
+		if (num >= 1f)
+		{
+			return direction.normalized;
+		}
+		Vector3 vector2 = solver.GetNode(chainIndex3, nodeIndex3).solverPosition - solver.GetNode(chainIndex1, nodeIndex1).solverPosition;
+		Vector3 vector3 = Quaternion.FromToRotation(bone3.position - bone1.position, vector2) * (bone2.position - bone1.position);
+		if (solver.GetNode(chainIndex3, nodeIndex3).effectorRotationWeight > 0f)
+		{
+			Vector3 b = -Vector3.Cross(vector2, solver.GetNode(chainIndex3, nodeIndex3).solverRotation * defaultChildDirection);
+			vector3 = Vector3.Lerp(vector3, b, solver.GetNode(chainIndex3, nodeIndex3).effectorRotationWeight);
+		}
+		if (rotationOffset != Quaternion.identity)
+		{
+			vector3 = Quaternion.FromToRotation(rotationOffset * vector2, vector2) * rotationOffset * vector3;
+		}
+		if (num <= 0f)
+		{
+			return vector3;
+		}
+		return Vector3.Lerp(vector3, direction.normalized, num);
+	}
+
+	private Vector3 OrthoToLimb(IKSolverFullBody solver, Vector3 tangent)
+	{
+		Vector3 normal = solver.GetNode(chainIndex3, nodeIndex3).solverPosition - solver.GetNode(chainIndex1, nodeIndex1).solverPosition;
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		return tangent;
+	}
+
+	private Vector3 OrthoToBone1(IKSolverFullBody solver, Vector3 tangent)
+	{
+		Vector3 normal = solver.GetNode(chainIndex2, nodeIndex2).solverPosition - solver.GetNode(chainIndex1, nodeIndex1).solverPosition;
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		return tangent;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 073
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKEffector.cs
+SIZE: 9165 bytes
+SHA256: 4fe57685abc0e6b349df1caa24eed9beefb8152053c4687ca2e6db1b047ac01c
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class IKEffector
+{
+	public Transform bone;
+
+	public Transform target;
+
+	[Range(0f, 1f)]
+	public float positionWeight;
+
+	[Range(0f, 1f)]
+	public float rotationWeight;
+
+	public Vector3 position = Vector3.zero;
+
+	public Quaternion rotation = Quaternion.identity;
+
+	public Vector3 positionOffset;
+
+	public bool effectChildNodes = true;
+
+	[Range(0f, 1f)]
+	public float maintainRelativePositionWeight;
+
+	public Transform[] childBones = new Transform[0];
+
+	public Transform planeBone1;
+
+	public Transform planeBone2;
+
+	public Transform planeBone3;
+
+	public Quaternion planeRotationOffset = Quaternion.identity;
+
+	private float posW;
+
+	private float rotW;
+
+	private Vector3[] localPositions = new Vector3[0];
+
+	private bool usePlaneNodes;
+
+	private Quaternion animatedPlaneRotation = Quaternion.identity;
+
+	private Vector3 animatedPosition;
+
+	private bool firstUpdate;
+
+	private int chainIndex = -1;
+
+	private int nodeIndex = -1;
+
+	private int plane1ChainIndex;
+
+	private int plane1NodeIndex = -1;
+
+	private int plane2ChainIndex = -1;
+
+	private int plane2NodeIndex = -1;
+
+	private int plane3ChainIndex = -1;
+
+	private int plane3NodeIndex = -1;
+
+	private int[] childChainIndexes = new int[0];
+
+	private int[] childNodeIndexes = new int[0];
+
+	public bool isEndEffector { get; private set; }
+
+	public IKSolver.Node GetNode(IKSolverFullBody solver)
+	{
+		return solver.chain[chainIndex].nodes[nodeIndex];
+	}
+
+	public void PinToBone(float positionWeight, float rotationWeight)
+	{
+		position = bone.position;
+		this.positionWeight = Mathf.Clamp(positionWeight, 0f, 1f);
+		rotation = bone.rotation;
+		this.rotationWeight = Mathf.Clamp(rotationWeight, 0f, 1f);
+	}
+
+	public IKEffector()
+	{
+	}
+
+	public IKEffector(Transform bone, Transform[] childBones)
+	{
+		this.bone = bone;
+		this.childBones = childBones;
+	}
+
+	public bool IsValid(IKSolver solver, ref string message)
+	{
+		if (bone == null)
+		{
+			message = "IK Effector bone is null.";
+			return false;
+		}
+		if (solver.GetPoint(bone) == null)
+		{
+			message = "IK Effector is referencing to a bone '" + bone.name + "' that does not excist in the Node Chain.";
+			return false;
+		}
+		Transform[] array = childBones;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i] == null)
+			{
+				message = "IK Effector contains a null reference.";
+				return false;
+			}
+		}
+		array = childBones;
+		foreach (Transform transform in array)
+		{
+			if (solver.GetPoint(transform) == null)
+			{
+				message = "IK Effector is referencing to a bone '" + transform.name + "' that does not excist in the Node Chain.";
+				return false;
+			}
+		}
+		if (planeBone1 != null && solver.GetPoint(planeBone1) == null)
+		{
+			message = "IK Effector is referencing to a bone '" + planeBone1.name + "' that does not excist in the Node Chain.";
+			return false;
+		}
+		if (planeBone2 != null && solver.GetPoint(planeBone2) == null)
+		{
+			message = "IK Effector is referencing to a bone '" + planeBone2.name + "' that does not excist in the Node Chain.";
+			return false;
+		}
+		if (planeBone3 != null && solver.GetPoint(planeBone3) == null)
+		{
+			message = "IK Effector is referencing to a bone '" + planeBone3.name + "' that does not excist in the Node Chain.";
+			return false;
+		}
+		return true;
+	}
+
+	public void Initiate(IKSolverFullBody solver)
+	{
+		position = bone.position;
+		rotation = bone.rotation;
+		animatedPlaneRotation = Quaternion.identity;
+		solver.GetChainAndNodeIndexes(bone, out chainIndex, out nodeIndex);
+		childChainIndexes = new int[childBones.Length];
+		childNodeIndexes = new int[childBones.Length];
+		for (int i = 0; i < childBones.Length; i++)
+		{
+			solver.GetChainAndNodeIndexes(childBones[i], out childChainIndexes[i], out childNodeIndexes[i]);
+		}
+		localPositions = new Vector3[childBones.Length];
+		usePlaneNodes = false;
+		if (planeBone1 != null)
+		{
+			solver.GetChainAndNodeIndexes(planeBone1, out plane1ChainIndex, out plane1NodeIndex);
+			if (planeBone2 != null)
+			{
+				solver.GetChainAndNodeIndexes(planeBone2, out plane2ChainIndex, out plane2NodeIndex);
+				if (planeBone3 != null)
+				{
+					solver.GetChainAndNodeIndexes(planeBone3, out plane3ChainIndex, out plane3NodeIndex);
+					usePlaneNodes = true;
+				}
+			}
+			isEndEffector = true;
+		}
+		else
+		{
+			isEndEffector = false;
+		}
+	}
+
+	public void ResetOffset(IKSolverFullBody solver)
+	{
+		solver.GetNode(chainIndex, nodeIndex).offset = Vector3.zero;
+		for (int i = 0; i < childChainIndexes.Length; i++)
+		{
+			solver.GetNode(childChainIndexes[i], childNodeIndexes[i]).offset = Vector3.zero;
+		}
+	}
+
+	public void SetToTarget()
+	{
+		if (!(target == null))
+		{
+			position = target.position;
+			rotation = target.rotation;
+		}
+	}
+
+	public void OnPreSolve(IKSolverFullBody solver)
+	{
+		positionWeight = Mathf.Clamp(positionWeight, 0f, 1f);
+		rotationWeight = Mathf.Clamp(rotationWeight, 0f, 1f);
+		maintainRelativePositionWeight = Mathf.Clamp(maintainRelativePositionWeight, 0f, 1f);
+		posW = positionWeight * solver.IKPositionWeight;
+		rotW = rotationWeight * solver.IKPositionWeight;
+		solver.GetNode(chainIndex, nodeIndex).effectorPositionWeight = posW;
+		solver.GetNode(chainIndex, nodeIndex).effectorRotationWeight = rotW;
+		solver.GetNode(chainIndex, nodeIndex).solverRotation = rotation;
+		if (float.IsInfinity(positionOffset.x) || float.IsInfinity(positionOffset.y) || float.IsInfinity(positionOffset.z))
+		{
+			Debug.LogError("Invalid IKEffector.positionOffset (contains Infinity)! Please make sure not to set IKEffector.positionOffset to infinite values.", bone);
+		}
+		if (float.IsNaN(positionOffset.x) || float.IsNaN(positionOffset.y) || float.IsNaN(positionOffset.z))
+		{
+			Debug.LogError("Invalid IKEffector.positionOffset (contains NaN)! Please make sure not to set IKEffector.positionOffset to NaN values.", bone);
+		}
+		if (positionOffset.sqrMagnitude > 1E+10f)
+		{
+			Debug.LogError("Additive effector positionOffset detected in Full Body IK (extremely large value). Make sure you are not circularily adding to effector positionOffset each frame.", bone);
+		}
+		if (float.IsInfinity(position.x) || float.IsInfinity(position.y) || float.IsInfinity(position.z))
+		{
+			Debug.LogError("Invalid IKEffector.position (contains Infinity)!");
+		}
+		solver.GetNode(chainIndex, nodeIndex).offset += positionOffset * solver.IKPositionWeight;
+		if (effectChildNodes && solver.iterations > 0)
+		{
+			for (int i = 0; i < childBones.Length; i++)
+			{
+				localPositions[i] = childBones[i].transform.position - bone.transform.position;
+				solver.GetNode(childChainIndexes[i], childNodeIndexes[i]).offset += positionOffset * solver.IKPositionWeight;
+			}
+		}
+		if (usePlaneNodes && maintainRelativePositionWeight > 0f)
+		{
+			animatedPlaneRotation = Quaternion.LookRotation(planeBone2.position - planeBone1.position, planeBone3.position - planeBone1.position);
+		}
+		firstUpdate = true;
+	}
+
+	public void OnPostWrite()
+	{
+		positionOffset = Vector3.zero;
+	}
+
+	private Quaternion GetPlaneRotation(IKSolverFullBody solver)
+	{
+		Vector3 solverPosition = solver.GetNode(plane1ChainIndex, plane1NodeIndex).solverPosition;
+		Vector3 solverPosition2 = solver.GetNode(plane2ChainIndex, plane2NodeIndex).solverPosition;
+		Vector3 solverPosition3 = solver.GetNode(plane3ChainIndex, plane3NodeIndex).solverPosition;
+		Vector3 vector = solverPosition2 - solverPosition;
+		Vector3 upwards = solverPosition3 - solverPosition;
+		if (vector == Vector3.zero)
+		{
+			Warning.Log("Make sure you are not placing 2 or more FBBIK effectors of the same chain to exactly the same position.", bone);
+			return Quaternion.identity;
+		}
+		return Quaternion.LookRotation(vector, upwards);
+	}
+
+	public void Update(IKSolverFullBody solver)
+	{
+		if (firstUpdate)
+		{
+			animatedPosition = bone.position + solver.GetNode(chainIndex, nodeIndex).offset;
+			firstUpdate = false;
+		}
+		solver.GetNode(chainIndex, nodeIndex).solverPosition = Vector3.Lerp(GetPosition(solver, out planeRotationOffset), position, posW);
+		if (effectChildNodes)
+		{
+			for (int i = 0; i < childBones.Length; i++)
+			{
+				solver.GetNode(childChainIndexes[i], childNodeIndexes[i]).solverPosition = Vector3.Lerp(solver.GetNode(childChainIndexes[i], childNodeIndexes[i]).solverPosition, solver.GetNode(chainIndex, nodeIndex).solverPosition + localPositions[i], posW);
+			}
+		}
+	}
+
+	private Vector3 GetPosition(IKSolverFullBody solver, out Quaternion planeRotationOffset)
+	{
+		planeRotationOffset = Quaternion.identity;
+		if (!isEndEffector)
+		{
+			return solver.GetNode(chainIndex, nodeIndex).solverPosition;
+		}
+		if (maintainRelativePositionWeight <= 0f)
+		{
+			return animatedPosition;
+		}
+		Vector3 vector = bone.position;
+		Vector3 vector2 = vector - planeBone1.position;
+		planeRotationOffset = GetPlaneRotation(solver) * Quaternion.Inverse(animatedPlaneRotation);
+		vector = solver.GetNode(plane1ChainIndex, plane1NodeIndex).solverPosition + planeRotationOffset * vector2;
+		planeRotationOffset = Quaternion.Lerp(Quaternion.identity, planeRotationOffset, maintainRelativePositionWeight);
+		return Vector3.Lerp(animatedPosition, vector + solver.GetNode(chainIndex, nodeIndex).offset, maintainRelativePositionWeight);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 074
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKExecutionOrder.cs
+SIZE: 1235 bytes
+SHA256: e3df5e2efba47c0322c1a8e26d2ee8dd7a9e4bdeb0c4136ccc0fe80743e56c9d
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class IKExecutionOrder : MonoBehaviour
+{
+	[Tooltip("The IK components, assign in the order in which you wish to update them.")]
+	public IK[] IKComponents;
+
+	[Tooltip("Optional. Assign it if you are using 'Animate Physics' as the Update Mode.")]
+	public Animator animator;
+
+	private bool fixedFrame;
+
+	private bool animatePhysics
+	{
+		get
+		{
+			if (animator == null)
+			{
+				return false;
+			}
+			return animator.updateMode == AnimatorUpdateMode.AnimatePhysics;
+		}
+	}
+
+	private void Start()
+	{
+		for (int i = 0; i < IKComponents.Length; i++)
+		{
+			IKComponents[i].enabled = false;
+		}
+	}
+
+	private void Update()
+	{
+		if (!animatePhysics)
+		{
+			FixTransforms();
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		fixedFrame = true;
+		if (animatePhysics)
+		{
+			FixTransforms();
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (!animatePhysics || fixedFrame)
+		{
+			for (int i = 0; i < IKComponents.Length; i++)
+			{
+				IKComponents[i].GetIKSolver().Update();
+			}
+			fixedFrame = false;
+		}
+	}
+
+	private void FixTransforms()
+	{
+		for (int i = 0; i < IKComponents.Length; i++)
+		{
+			if (IKComponents[i].fixTransforms)
+			{
+				IKComponents[i].GetIKSolver().FixTransforms();
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 075
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKMapping.cs
+SIZE: 7560 bytes
+SHA256: cac8833b8a055d69c3abc19ddbdb4624088a885506cc6bc79487b78a1674c04b
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public class IKMapping
+{
+	[Serializable]
+	public class BoneMap
+	{
+		public Transform transform;
+
+		public int chainIndex = -1;
+
+		public int nodeIndex = -1;
+
+		public Vector3 defaultLocalPosition;
+
+		public Quaternion defaultLocalRotation;
+
+		public Vector3 localSwingAxis;
+
+		public Vector3 localTwistAxis;
+
+		public Vector3 planePosition;
+
+		public Vector3 ikPosition;
+
+		public Quaternion defaultLocalTargetRotation;
+
+		private Quaternion maintainRotation;
+
+		public float length;
+
+		public Quaternion animatedRotation;
+
+		private Transform planeBone1;
+
+		private Transform planeBone2;
+
+		private Transform planeBone3;
+
+		private int plane1ChainIndex = -1;
+
+		private int plane1NodeIndex = -1;
+
+		private int plane2ChainIndex = -1;
+
+		private int plane2NodeIndex = -1;
+
+		private int plane3ChainIndex = -1;
+
+		private int plane3NodeIndex = -1;
+
+		public Vector3 swingDirection => transform.rotation * localSwingAxis;
+
+		public bool isNodeBone => nodeIndex != -1;
+
+		private Quaternion lastAnimatedTargetRotation
+		{
+			get
+			{
+				if (planeBone1.position == planeBone3.position)
+				{
+					return Quaternion.identity;
+				}
+				return Quaternion.LookRotation(planeBone2.position - planeBone1.position, planeBone3.position - planeBone1.position);
+			}
+		}
+
+		public void Initiate(Transform transform, IKSolverFullBody solver)
+		{
+			this.transform = transform;
+			solver.GetChainAndNodeIndexes(transform, out chainIndex, out nodeIndex);
+		}
+
+		public void StoreDefaultLocalState()
+		{
+			defaultLocalPosition = transform.localPosition;
+			defaultLocalRotation = transform.localRotation;
+		}
+
+		public void FixTransform(bool position)
+		{
+			if (position)
+			{
+				transform.localPosition = defaultLocalPosition;
+			}
+			transform.localRotation = defaultLocalRotation;
+		}
+
+		public void SetLength(BoneMap nextBone)
+		{
+			length = Vector3.Distance(transform.position, nextBone.transform.position);
+		}
+
+		public void SetLocalSwingAxis(BoneMap swingTarget)
+		{
+			SetLocalSwingAxis(swingTarget, this);
+		}
+
+		public void SetLocalSwingAxis(BoneMap bone1, BoneMap bone2)
+		{
+			localSwingAxis = Quaternion.Inverse(transform.rotation) * (bone1.transform.position - bone2.transform.position);
+		}
+
+		public void SetLocalTwistAxis(Vector3 twistDirection, Vector3 normalDirection)
+		{
+			Vector3.OrthoNormalize(ref normalDirection, ref twistDirection);
+			localTwistAxis = Quaternion.Inverse(transform.rotation) * twistDirection;
+		}
+
+		public void SetPlane(IKSolverFullBody solver, Transform planeBone1, Transform planeBone2, Transform planeBone3)
+		{
+			this.planeBone1 = planeBone1;
+			this.planeBone2 = planeBone2;
+			this.planeBone3 = planeBone3;
+			solver.GetChainAndNodeIndexes(planeBone1, out plane1ChainIndex, out plane1NodeIndex);
+			solver.GetChainAndNodeIndexes(planeBone2, out plane2ChainIndex, out plane2NodeIndex);
+			solver.GetChainAndNodeIndexes(planeBone3, out plane3ChainIndex, out plane3NodeIndex);
+			UpdatePlane(rotation: true, position: true);
+		}
+
+		public void UpdatePlane(bool rotation, bool position)
+		{
+			Quaternion rotation2 = lastAnimatedTargetRotation;
+			if (rotation)
+			{
+				defaultLocalTargetRotation = QuaTools.RotationToLocalSpace(transform.rotation, rotation2);
+			}
+			if (position)
+			{
+				planePosition = Quaternion.Inverse(rotation2) * (transform.position - planeBone1.position);
+			}
+		}
+
+		public void SetIKPosition()
+		{
+			ikPosition = transform.position;
+		}
+
+		public void MaintainRotation()
+		{
+			maintainRotation = transform.rotation;
+		}
+
+		public void SetToIKPosition()
+		{
+			transform.position = ikPosition;
+		}
+
+		public void FixToNode(IKSolverFullBody solver, float weight, IKSolver.Node fixNode = null)
+		{
+			if (fixNode == null)
+			{
+				fixNode = solver.GetNode(chainIndex, nodeIndex);
+			}
+			if (weight >= 1f)
+			{
+				transform.position = fixNode.solverPosition;
+			}
+			else
+			{
+				transform.position = Vector3.Lerp(transform.position, fixNode.solverPosition, weight);
+			}
+		}
+
+		public Vector3 GetPlanePosition(IKSolverFullBody solver)
+		{
+			return solver.GetNode(plane1ChainIndex, plane1NodeIndex).solverPosition + GetTargetRotation(solver) * planePosition;
+		}
+
+		public void PositionToPlane(IKSolverFullBody solver)
+		{
+			transform.position = GetPlanePosition(solver);
+		}
+
+		public void RotateToPlane(IKSolverFullBody solver, float weight)
+		{
+			Quaternion quaternion = GetTargetRotation(solver) * defaultLocalTargetRotation;
+			if (weight >= 1f)
+			{
+				transform.rotation = quaternion;
+			}
+			else
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, quaternion, weight);
+			}
+		}
+
+		public void Swing(Vector3 swingTarget, float weight)
+		{
+			Swing(swingTarget, transform.position, weight);
+		}
+
+		public void Swing(Vector3 pos1, Vector3 pos2, float weight)
+		{
+			Quaternion quaternion = Quaternion.FromToRotation(transform.rotation * localSwingAxis, pos1 - pos2) * transform.rotation;
+			if (weight >= 1f)
+			{
+				transform.rotation = quaternion;
+			}
+			else
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, quaternion, weight);
+			}
+		}
+
+		public void Twist(Vector3 twistDirection, Vector3 normalDirection, float weight)
+		{
+			Vector3.OrthoNormalize(ref normalDirection, ref twistDirection);
+			Quaternion quaternion = Quaternion.FromToRotation(transform.rotation * localTwistAxis, twistDirection) * transform.rotation;
+			if (weight >= 1f)
+			{
+				transform.rotation = quaternion;
+			}
+			else
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, quaternion, weight);
+			}
+		}
+
+		public void RotateToMaintain(float weight)
+		{
+			if (!(weight <= 0f))
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, maintainRotation, weight);
+			}
+		}
+
+		public void RotateToEffector(IKSolverFullBody solver, float weight)
+		{
+			if (!isNodeBone)
+			{
+				return;
+			}
+			float num = weight * solver.GetNode(chainIndex, nodeIndex).effectorRotationWeight;
+			if (!(num <= 0f))
+			{
+				if (num >= 1f)
+				{
+					transform.rotation = solver.GetNode(chainIndex, nodeIndex).solverRotation;
+				}
+				else
+				{
+					transform.rotation = Quaternion.Lerp(transform.rotation, solver.GetNode(chainIndex, nodeIndex).solverRotation, num);
+				}
+			}
+		}
+
+		private Quaternion GetTargetRotation(IKSolverFullBody solver)
+		{
+			Vector3 solverPosition = solver.GetNode(plane1ChainIndex, plane1NodeIndex).solverPosition;
+			Vector3 solverPosition2 = solver.GetNode(plane2ChainIndex, plane2NodeIndex).solverPosition;
+			Vector3 solverPosition3 = solver.GetNode(plane3ChainIndex, plane3NodeIndex).solverPosition;
+			if (solverPosition == solverPosition3)
+			{
+				return Quaternion.identity;
+			}
+			return Quaternion.LookRotation(solverPosition2 - solverPosition, solverPosition3 - solverPosition);
+		}
+	}
+
+	public virtual bool IsValid(IKSolver solver, ref string message)
+	{
+		return true;
+	}
+
+	public virtual void Initiate(IKSolverFullBody solver)
+	{
+	}
+
+	protected bool BoneIsValid(Transform bone, IKSolver solver, ref string message, Warning.Logger logger = null)
+	{
+		if (bone == null)
+		{
+			message = "IKMappingLimb contains a null reference.";
+			logger?.Invoke(message);
+			return false;
+		}
+		if (solver.GetPoint(bone) == null)
+		{
+			message = "IKMappingLimb is referencing to a bone '" + bone.name + "' that does not excist in the Node Chain.";
+			logger?.Invoke(message);
+			return false;
+		}
+		return true;
+	}
+
+	protected Vector3 SolveFABRIKJoint(Vector3 pos1, Vector3 pos2, float length)
+	{
+		return pos2 + (pos1 - pos2).normalized * length;
+	}
+}
+
+

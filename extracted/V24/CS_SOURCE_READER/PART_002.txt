@@ -1,0 +1,2491 @@
+
+====================================================================================================
+SOURCE FILE 026
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__MotionAbsorbCharacter.cs
+SIZE: 964 bytes
+SHA256: 9de5acaaeb50bfba4b349a0804dcdeff89e49cec9e21498b0723d5a3a7b03c5a
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class MotionAbsorbCharacter : MonoBehaviour
+{
+	public Animator animator;
+
+	public MotionAbsorb motionAbsorb;
+
+	public Transform cube;
+
+	public float cubeRandomPosition = 0.1f;
+
+	public AnimationCurve motionAbsorbWeight;
+
+	private Vector3 cubeDefaultPosition;
+
+	private AnimatorStateInfo info;
+
+	private Rigidbody cubeRigidbody;
+
+	private void Start()
+	{
+		cubeDefaultPosition = cube.position;
+		cubeRigidbody = cube.GetComponent<Rigidbody>();
+	}
+
+	private void Update()
+	{
+		info = animator.GetCurrentAnimatorStateInfo(0);
+		motionAbsorb.weight = motionAbsorbWeight.Evaluate(info.normalizedTime - (float)(int)info.normalizedTime);
+	}
+
+	private void SwingStart()
+	{
+		cubeRigidbody.MovePosition(cubeDefaultPosition + Random.insideUnitSphere * cubeRandomPosition);
+		cubeRigidbody.MoveRotation(Quaternion.identity);
+		cubeRigidbody.velocity = Vector3.zero;
+		cubeRigidbody.angularVelocity = Vector3.zero;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 027
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__Navigator.cs
+SIZE: 4611 bytes
+SHA256: b72ac78f3ededb7563f66d885887bf4aedee993e091f10adae121e677650bb2e
+====================================================================================================
+
+using System;
+using UnityEngine;
+using UnityEngine.AI;
+
+namespace RootMotion.Demos;
+
+[Serializable]
+public class Navigator
+{
+	public enum State
+	{
+		Idle,
+		Seeking,
+		OnPath
+	}
+
+	[Tooltip("Should this Navigator be actively seeking a path.")]
+	public bool activeTargetSeeking;
+
+	[Tooltip("Increase this value if the character starts running in a circle, not able to reach the corner because of a too large turning radius.")]
+	public float cornerRadius = 0.5f;
+
+	[Tooltip("Recalculate path if target position has moved by this distance from the position it was at when the path was originally calculated")]
+	public float recalculateOnPathDistance = 1f;
+
+	[Tooltip("Sample within this distance from sourcePosition.")]
+	public float maxSampleDistance = 5f;
+
+	[Tooltip("Interval of updating the path")]
+	public float nextPathInterval = 3f;
+
+	private Transform transform;
+
+	private int cornerIndex;
+
+	private Vector3[] corners = new Vector3[0];
+
+	private NavMeshPath path;
+
+	private Vector3 lastTargetPosition;
+
+	private bool initiated;
+
+	private float nextPathTime;
+
+	public Vector3 normalizedDeltaPosition { get; private set; }
+
+	public State state { get; private set; }
+
+	public void Initiate(Transform transform)
+	{
+		this.transform = transform;
+		path = new NavMeshPath();
+		initiated = true;
+		cornerIndex = 0;
+		corners = new Vector3[0];
+		state = State.Idle;
+		lastTargetPosition = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+	}
+
+	public void Update(Vector3 targetPosition)
+	{
+		if (!initiated)
+		{
+			Debug.LogError("Trying to update an uninitiated Navigator.");
+			return;
+		}
+		switch (state)
+		{
+		case State.Seeking:
+			normalizedDeltaPosition = Vector3.zero;
+			if (path.status == NavMeshPathStatus.PathComplete)
+			{
+				corners = path.corners;
+				cornerIndex = 0;
+				if (corners.Length == 0)
+				{
+					Debug.LogWarning("Zero Corner Path", transform);
+					Stop();
+				}
+				else
+				{
+					state = State.OnPath;
+				}
+			}
+			if (path.status == NavMeshPathStatus.PathPartial)
+			{
+				Debug.LogWarning("Path Partial", transform);
+			}
+			if (path.status == NavMeshPathStatus.PathInvalid)
+			{
+				Debug.LogWarning("Path Invalid", transform);
+			}
+			break;
+		case State.OnPath:
+			if (activeTargetSeeking && Time.time > nextPathTime && HorDistance(targetPosition, lastTargetPosition) > recalculateOnPathDistance)
+			{
+				CalculatePath(targetPosition);
+			}
+			else
+			{
+				if (cornerIndex >= corners.Length)
+				{
+					break;
+				}
+				Vector3 vector = corners[cornerIndex] - transform.position;
+				vector.y = 0f;
+				float magnitude = vector.magnitude;
+				if (magnitude > 0f)
+				{
+					normalizedDeltaPosition = vector / vector.magnitude;
+				}
+				else
+				{
+					normalizedDeltaPosition = Vector3.zero;
+				}
+				if (magnitude < cornerRadius)
+				{
+					cornerIndex++;
+					if (cornerIndex >= corners.Length)
+					{
+						Stop();
+					}
+				}
+			}
+			break;
+		case State.Idle:
+			if (activeTargetSeeking && Time.time > nextPathTime)
+			{
+				CalculatePath(targetPosition);
+			}
+			break;
+		}
+	}
+
+	private void CalculatePath(Vector3 targetPosition)
+	{
+		if (Find(targetPosition))
+		{
+			lastTargetPosition = targetPosition;
+			state = State.Seeking;
+		}
+		else
+		{
+			Stop();
+		}
+		nextPathTime = Time.time + nextPathInterval;
+	}
+
+	private bool Find(Vector3 targetPosition)
+	{
+		if (HorDistance(transform.position, targetPosition) < cornerRadius * 2f)
+		{
+			return false;
+		}
+		if (NavMesh.CalculatePath(transform.position, targetPosition, -1, path))
+		{
+			return true;
+		}
+		NavMeshHit hit = default;
+		if (NavMesh.SamplePosition(targetPosition, out hit, maxSampleDistance, -1) && NavMesh.CalculatePath(transform.position, hit.position, -1, path))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private void Stop()
+	{
+		state = State.Idle;
+		normalizedDeltaPosition = Vector3.zero;
+	}
+
+	private float HorDistance(Vector3 p1, Vector3 p2)
+	{
+		return Vector2.Distance(new Vector2(p1.x, p1.z), new Vector2(p2.x, p2.z));
+	}
+
+	public void Visualize()
+	{
+		if (state == State.Idle)
+		{
+			Gizmos.color = Color.gray;
+		}
+		if (state == State.Seeking)
+		{
+			Gizmos.color = Color.red;
+		}
+		if (state == State.OnPath)
+		{
+			Gizmos.color = Color.green;
+		}
+		if (corners.Length != 0 && state == State.OnPath && cornerIndex == 0)
+		{
+			Gizmos.DrawLine(transform.position, corners[0]);
+		}
+		for (int i = 0; i < corners.Length; i++)
+		{
+			Gizmos.DrawSphere(corners[i], 0.1f);
+		}
+		if (corners.Length > 1)
+		{
+			for (int j = 0; j < corners.Length - 1; j++)
+			{
+				Gizmos.DrawLine(corners[j], corners[j + 1]);
+			}
+		}
+		Gizmos.color = Color.white;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 028
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__OffsetEffector.cs
+SIZE: 1944 bytes
+SHA256: 82d037786baab68684a802e0affdce650db554e3276918a1c1bf506580b88baa
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class OffsetEffector : OffsetModifier
+{
+	[Serializable]
+	public class EffectorLink
+	{
+		public FullBodyBipedEffector effectorType;
+
+		public float weightMultiplier = 1f;
+
+		[HideInInspector]
+		public Vector3 localPosition;
+	}
+
+	[Tooltip("Optional. Assign the bone Transform that is closest to this OffsetEffector to be able to call OffsetEffector.Anchor() in LateUpdate to match its position and rotation to animation.")]
+	public Transform anchor;
+
+	public EffectorLink[] effectorLinks;
+
+	private Vector3 posRelToAnchor;
+
+	private Quaternion rotRelToAnchor = Quaternion.identity;
+
+	protected override void Start()
+	{
+		base.Start();
+		if (anchor != null)
+		{
+			posRelToAnchor = anchor.InverseTransformPoint(transform.position);
+			rotRelToAnchor = Quaternion.Inverse(anchor.rotation) * transform.rotation;
+		}
+		EffectorLink[] array = effectorLinks;
+		foreach (EffectorLink effectorLink in array)
+		{
+			Transform bone = ik.solver.GetEffector(effectorLink.effectorType).bone;
+			effectorLink.localPosition = transform.InverseTransformPoint(bone.position);
+			if (effectorLink.effectorType == FullBodyBipedEffector.Body)
+			{
+				ik.solver.bodyEffector.effectChildNodes = false;
+			}
+		}
+	}
+
+	protected override void OnModifyOffset()
+	{
+		EffectorLink[] array = effectorLinks;
+		foreach (EffectorLink effectorLink in array)
+		{
+			Vector3 vector = transform.TransformPoint(effectorLink.localPosition);
+			ik.solver.GetEffector(effectorLink.effectorType).positionOffset += (vector - (ik.solver.GetEffector(effectorLink.effectorType).bone.position + ik.solver.GetEffector(effectorLink.effectorType).positionOffset)) * weight * effectorLink.weightMultiplier;
+		}
+	}
+
+	public void Anchor()
+	{
+		if (!(anchor == null))
+		{
+			transform.position = anchor.TransformPoint(posRelToAnchor);
+			transform.rotation = anchor.rotation * rotRelToAnchor;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 029
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PendulumExample.cs
+SIZE: 3335 bytes
+SHA256: 3a7bd1346b813860ecac2c3b58a0482611fba8d4bf350aaca11ee0f7d4f8955b
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class PendulumExample : MonoBehaviour
+{
+	[Tooltip("The master weight of this script.")]
+	[Range(0f, 1f)]
+	public float weight = 1f;
+
+	[Tooltip("Multiplier for the distance of the root to the target.")]
+	public float hangingDistanceMlp = 1.3f;
+
+	[Tooltip("Where does the root of the character land when weight is blended out?")]
+	[HideInInspector]
+	public Vector3 rootTargetPosition;
+
+	[Tooltip("How is the root of the character rotated when weight is blended out?")]
+	[HideInInspector]
+	public Quaternion rootTargetRotation;
+
+	public Transform target;
+
+	public Transform leftHandTarget;
+
+	public Transform rightHandTarget;
+
+	public Transform leftFootTarget;
+
+	public Transform rightFootTarget;
+
+	public Transform pelvisTarget;
+
+	public Transform bodyTarget;
+
+	public Transform headTarget;
+
+	public Vector3 pelvisDownAxis = Vector3.right;
+
+	private FullBodyBipedIK ik;
+
+	private Quaternion rootRelativeToPelvis;
+
+	private Vector3 pelvisToRoot;
+
+	private float lastWeight;
+
+	private void Start()
+	{
+		ik = GetComponent<FullBodyBipedIK>();
+		Quaternion rotation = target.rotation;
+		target.rotation = leftHandTarget.rotation;
+		target.gameObject.AddComponent<FixedJoint>().connectedBody = leftHandTarget.GetComponent<Rigidbody>();
+		target.GetComponent<Rigidbody>().MoveRotation(rotation);
+		rootRelativeToPelvis = Quaternion.Inverse(pelvisTarget.rotation) * transform.rotation;
+		pelvisToRoot = Quaternion.Inverse(ik.references.pelvis.rotation) * (transform.position - ik.references.pelvis.position);
+		rootTargetPosition = transform.position;
+		rootTargetRotation = transform.rotation;
+		lastWeight = weight;
+	}
+
+	private void LateUpdate()
+	{
+		if (weight > 0f)
+		{
+			ik.solver.leftHandEffector.positionWeight = weight;
+			ik.solver.leftHandEffector.rotationWeight = weight;
+		}
+		else
+		{
+			rootTargetPosition = transform.position;
+			rootTargetRotation = transform.rotation;
+			if (lastWeight > 0f)
+			{
+				ik.solver.leftHandEffector.positionWeight = 0f;
+				ik.solver.leftHandEffector.rotationWeight = 0f;
+			}
+		}
+		lastWeight = weight;
+		if (!(weight <= 0f))
+		{
+			transform.position = Vector3.Lerp(rootTargetPosition, pelvisTarget.position + pelvisTarget.rotation * pelvisToRoot * hangingDistanceMlp, weight);
+			transform.rotation = Quaternion.Lerp(rootTargetRotation, pelvisTarget.rotation * rootRelativeToPelvis, weight);
+			ik.solver.leftHandEffector.position = leftHandTarget.position;
+			ik.solver.leftHandEffector.rotation = leftHandTarget.rotation;
+			Vector3 fromDirection = ik.references.pelvis.rotation * pelvisDownAxis;
+			Quaternion b = Quaternion.FromToRotation(fromDirection, rightHandTarget.position - headTarget.position);
+			ik.references.rightUpperArm.rotation = Quaternion.Lerp(Quaternion.identity, b, weight) * ik.references.rightUpperArm.rotation;
+			Quaternion b2 = Quaternion.FromToRotation(fromDirection, leftFootTarget.position - bodyTarget.position);
+			ik.references.leftThigh.rotation = Quaternion.Lerp(Quaternion.identity, b2, weight) * ik.references.leftThigh.rotation;
+			Quaternion b3 = Quaternion.FromToRotation(fromDirection, rightFootTarget.position - bodyTarget.position);
+			ik.references.rightThigh.rotation = Quaternion.Lerp(Quaternion.identity, b3, weight) * ik.references.rightThigh.rotation;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 030
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PickUp2Handed.cs
+SIZE: 4949 bytes
+SHA256: 3a07592bd77a7bae391d87afaf9a2c0d6cd0d8182ae6b2f2f5bedb57c4d7326c
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public abstract class PickUp2Handed : MonoBehaviour
+{
+	public int GUIspace;
+
+	public InteractionSystem interactionSystem;
+
+	public InteractionObject obj;
+
+	public Transform pivot;
+
+	public Transform holdPoint;
+
+	public float pickUpTime = 0.3f;
+
+	private float holdWeight;
+
+	private float holdWeightVel;
+
+	private Vector3 pickUpPosition;
+
+	private Quaternion pickUpRotation;
+
+	private bool holding
+	{
+		get
+		{
+			if (!holdingLeft)
+			{
+				return holdingRight;
+			}
+			return true;
+		}
+	}
+
+	private bool holdingLeft
+	{
+		get
+		{
+			if (interactionSystem.IsPaused(FullBodyBipedEffector.LeftHand))
+			{
+				return interactionSystem.GetInteractionObject(FullBodyBipedEffector.LeftHand) == obj;
+			}
+			return false;
+		}
+	}
+
+	private bool holdingRight
+	{
+		get
+		{
+			if (interactionSystem.IsPaused(FullBodyBipedEffector.RightHand))
+			{
+				return interactionSystem.GetInteractionObject(FullBodyBipedEffector.RightHand) == obj;
+			}
+			return false;
+		}
+	}
+
+	private void OnGUI()
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(GUIspace);
+		if (!holding)
+		{
+			if (GUILayout.Button("Pick Up " + obj.name))
+			{
+				interactionSystem.StartInteraction(FullBodyBipedEffector.LeftHand, obj, interrupt: false);
+				interactionSystem.StartInteraction(FullBodyBipedEffector.RightHand, obj, interrupt: false);
+			}
+		}
+		else
+		{
+			GUILayout.BeginVertical();
+			if (holdingRight && GUILayout.Button("Release Right"))
+			{
+				interactionSystem.ResumeInteraction(FullBodyBipedEffector.RightHand);
+			}
+			if (holdingLeft && GUILayout.Button("Release Left"))
+			{
+				interactionSystem.ResumeInteraction(FullBodyBipedEffector.LeftHand);
+			}
+			if (GUILayout.Button("Drop " + obj.name))
+			{
+				interactionSystem.ResumeAll();
+			}
+			GUILayout.EndVertical();
+		}
+		GUILayout.EndHorizontal();
+	}
+
+	protected abstract void RotatePivot();
+
+	private void Start()
+	{
+		InteractionSystem interactionSystem = this.interactionSystem;
+		interactionSystem.OnInteractionStart = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem.OnInteractionStart, new InteractionSystem.InteractionDelegate(OnStart));
+		InteractionSystem interactionSystem2 = this.interactionSystem;
+		interactionSystem2.OnInteractionPause = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem2.OnInteractionPause, new InteractionSystem.InteractionDelegate(OnPause));
+		InteractionSystem interactionSystem3 = this.interactionSystem;
+		interactionSystem3.OnInteractionResume = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem3.OnInteractionResume, new InteractionSystem.InteractionDelegate(OnDrop));
+	}
+
+	private void OnPause(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+	{
+		if (effectorType == FullBodyBipedEffector.LeftHand && !(interactionObject != obj))
+		{
+			obj.transform.parent = interactionSystem.transform;
+			Rigidbody component = obj.GetComponent<Rigidbody>();
+			if (component != null)
+			{
+				component.isKinematic = true;
+			}
+			pickUpPosition = obj.transform.position;
+			pickUpRotation = obj.transform.rotation;
+			holdWeight = 0f;
+			holdWeightVel = 0f;
+		}
+	}
+
+	private void OnStart(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+	{
+		if (effectorType == FullBodyBipedEffector.LeftHand && !(interactionObject != obj))
+		{
+			RotatePivot();
+			holdPoint.rotation = obj.transform.rotation;
+		}
+	}
+
+	private void OnDrop(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+	{
+		if (!holding && !(interactionObject != obj))
+		{
+			obj.transform.parent = null;
+			if (obj.GetComponent<Rigidbody>() != null)
+			{
+				obj.GetComponent<Rigidbody>().isKinematic = false;
+			}
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (holding)
+		{
+			holdWeight = Mathf.SmoothDamp(holdWeight, 1f, ref holdWeightVel, pickUpTime);
+			obj.transform.position = Vector3.Lerp(pickUpPosition, holdPoint.position, holdWeight);
+			obj.transform.rotation = Quaternion.Lerp(pickUpRotation, holdPoint.rotation, holdWeight);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (!(this.interactionSystem == null))
+		{
+			InteractionSystem interactionSystem = this.interactionSystem;
+			interactionSystem.OnInteractionStart = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem.OnInteractionStart, new InteractionSystem.InteractionDelegate(OnStart));
+			InteractionSystem interactionSystem2 = this.interactionSystem;
+			interactionSystem2.OnInteractionPause = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem2.OnInteractionPause, new InteractionSystem.InteractionDelegate(OnPause));
+			InteractionSystem interactionSystem3 = this.interactionSystem;
+			interactionSystem3.OnInteractionResume = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem3.OnInteractionResume, new InteractionSystem.InteractionDelegate(OnDrop));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 031
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PickUpBox.cs
+SIZE: 508 bytes
+SHA256: 872bf40ea5eb72f42be092cb1dcd01ad09228b315e8471f767e6a2618fc3bd0c
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class PickUpBox : PickUp2Handed
+{
+	protected override void RotatePivot()
+	{
+		Vector3 normalized = (pivot.position - interactionSystem.transform.position).normalized;
+		normalized.y = 0f;
+		Vector3 axis = QuaTools.GetAxis(obj.transform.InverseTransformDirection(normalized));
+		Vector3 axis2 = QuaTools.GetAxis(obj.transform.InverseTransformDirection(interactionSystem.transform.up));
+		pivot.localRotation = Quaternion.LookRotation(axis, axis2);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 032
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__RagdollUtilityDemo.cs
+SIZE: 725 bytes
+SHA256: f04ccac4152984a26d955bfc5610991fbbb440abdae3d7d7f6a4aefe7bae49b3
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class RagdollUtilityDemo : MonoBehaviour
+{
+	public RagdollUtility ragdollUtility;
+
+	public Transform root;
+
+	public Rigidbody pelvis;
+
+	private void OnGUI()
+	{
+		GUILayout.Label(" Press R to switch to ragdoll. \n Weigh in one of the FBBIK effectors to make kinematic changes to the ragdoll pose.\n A to blend back to animation");
+	}
+
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+			ragdollUtility.EnableRagdoll();
+		}
+		if (Input.GetKeyDown(KeyCode.A))
+		{
+			Vector3 vector = pelvis.position - root.position;
+			root.position += vector;
+			pelvis.transform.position -= vector;
+			ragdollUtility.DisableRagdoll();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 033
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__ResetInteractionObject.cs
+SIZE: 1078 bytes
+SHA256: dff39006820ea72821edc1307c9bff11739cdf2b3931e9d223ec225a1a6e70f6
+====================================================================================================
+
+using System.Collections;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class ResetInteractionObject : MonoBehaviour
+{
+	public float resetDelay = 1f;
+
+	private Vector3 defaultPosition;
+
+	private Quaternion defaultRotation;
+
+	private Transform defaultParent;
+
+	private Rigidbody r;
+
+	private void Start()
+	{
+		defaultPosition = transform.position;
+		defaultRotation = transform.rotation;
+		defaultParent = transform.parent;
+		r = GetComponent<Rigidbody>();
+	}
+
+	private void OnPickUp(Transform t)
+	{
+		if (enabled)
+		{
+			StopAllCoroutines();
+			StartCoroutine(ResetObject(Time.time + resetDelay));
+		}
+	}
+
+	private IEnumerator ResetObject(float resetTime)
+	{
+		while (Time.time < resetTime)
+		{
+			yield return null;
+		}
+		Poser component = transform.parent.GetComponent<Poser>();
+		if (component != null)
+		{
+			component.poseRoot = null;
+			component.weight = 0f;
+		}
+		transform.parent = defaultParent;
+		transform.position = defaultPosition;
+		transform.rotation = defaultRotation;
+		if (r != null)
+		{
+			r.isKinematic = false;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 034
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SecondHandOnGun.cs
+SIZE: 1113 bytes
+SHA256: 663bf54d383c10fc933fa7106520e48268cff88779d81d327bed732d1514be44
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class SecondHandOnGun : MonoBehaviour
+{
+	public AimIK aim;
+
+	public LimbIK leftArmIK;
+
+	public Transform leftHand;
+
+	public Transform rightHand;
+
+	public GrounderFBBIK grounder;
+
+	public Vector3 leftHandPositionOffset;
+
+	public Vector3 leftHandRotationOffset;
+
+	private Vector3 leftHandPosRelToRight;
+
+	private Quaternion leftHandRotRelToRight;
+
+	private void Start()
+	{
+		aim.enabled = false;
+		leftArmIK.enabled = false;
+		if (grounder != null)
+		{
+			grounder.ik.enabled = false;
+		}
+	}
+
+	private void LateUpdate()
+	{
+		leftHandPosRelToRight = rightHand.InverseTransformPoint(leftHand.position);
+		leftHandRotRelToRight = Quaternion.Inverse(rightHand.rotation) * leftHand.rotation;
+		if (grounder != null)
+		{
+			grounder.ik.solver.Update();
+		}
+		aim.solver.Update();
+		leftArmIK.solver.IKPosition = rightHand.TransformPoint(leftHandPosRelToRight + leftHandPositionOffset);
+		leftArmIK.solver.IKRotation = rightHand.rotation * Quaternion.Euler(leftHandRotationOffset) * leftHandRotRelToRight;
+		leftArmIK.solver.Update();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 035
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SimpleAimingSystem.cs
+SIZE: 1998 bytes
+SHA256: 707828afc8da2f75848aa3719b9fd80625f70e42a7d45a47023b3b7198126cf2
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class SimpleAimingSystem : MonoBehaviour
+{
+	[Tooltip("AimPoser is a tool that returns an animation name based on direction.")]
+	public AimPoser aimPoser;
+
+	[Tooltip("Reference to the AimIK component.")]
+	public AimIK aim;
+
+	[Tooltip("Reference to the LookAt component (only used for the head in this instance).")]
+	public LookAtIK lookAt;
+
+	[Tooltip("Reference to the Animator component.")]
+	public Animator animator;
+
+	[Tooltip("Time of cross-fading from pose to pose.")]
+	public float crossfadeTime = 0.2f;
+
+	[Tooltip("Will keep the aim target at a distance.")]
+	public float minAimDistance = 0.5f;
+
+	private AimPoser.Pose aimPose;
+
+	private AimPoser.Pose lastPose;
+
+	private void Start()
+	{
+		aim.enabled = false;
+		lookAt.enabled = false;
+	}
+
+	private void LateUpdate()
+	{
+		Pose();
+		aim.solver.Update();
+		if (lookAt != null)
+		{
+			lookAt.solver.Update();
+		}
+	}
+
+	private void Pose()
+	{
+		LimitAimTarget();
+		Vector3 direction = aim.solver.IKPosition - aim.solver.bones[0].transform.position;
+		Vector3 localDirection = transform.InverseTransformDirection(direction);
+		aimPose = aimPoser.GetPose(localDirection);
+		if (aimPose != lastPose)
+		{
+			aimPoser.SetPoseActive(aimPose);
+			lastPose = aimPose;
+		}
+		AimPoser.Pose[] poses = aimPoser.poses;
+		foreach (AimPoser.Pose pose in poses)
+		{
+			if (pose == aimPose)
+			{
+				DirectCrossFade(pose.name, 1f);
+			}
+			else
+			{
+				DirectCrossFade(pose.name, 0f);
+			}
+		}
+	}
+
+	private void LimitAimTarget()
+	{
+		Vector3 position = aim.solver.bones[0].transform.position;
+		Vector3 vector = aim.solver.IKPosition - position;
+		vector = vector.normalized * Mathf.Max(vector.magnitude, minAimDistance);
+		aim.solver.IKPosition = position + vector;
+	}
+
+	private void DirectCrossFade(string state, float target)
+	{
+		float value = Mathf.MoveTowards(animator.GetFloat(state), target, Time.deltaTime * (1f / crossfadeTime));
+		animator.SetFloat(state, value);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 036
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SimpleLocomotion.cs
+SIZE: 3356 bytes
+SHA256: 7af4a2637862191162550a14081311178aad833e69e88326e82b2db3aa846e21
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class SimpleLocomotion : MonoBehaviour
+{
+	[Serializable]
+	public enum RotationMode
+	{
+		Smooth,
+		Linear
+	}
+
+	[Tooltip("The component that updates the camera.")]
+	public CameraController cameraController;
+
+	[Tooltip("Acceleration of movement.")]
+	public float accelerationTime = 0.2f;
+
+	[Tooltip("Turning speed.")]
+	public float turnTime = 0.2f;
+
+	[Tooltip("If true, will run on left shift, if not will walk on left shift.")]
+	public bool walkByDefault = true;
+
+	[Tooltip("Smooth or linear rotation.")]
+	public RotationMode rotationMode;
+
+	[Tooltip("Procedural motion speed (if not using root motion).")]
+	public float moveSpeed = 3f;
+
+	private Animator animator;
+
+	private float speed;
+
+	private float angleVel;
+
+	private float speedVel;
+
+	private Vector3 linearTargetDirection;
+
+	private CharacterController characterController;
+
+	public bool isGrounded { get; private set; }
+
+	private void Start()
+	{
+		animator = GetComponent<Animator>();
+		characterController = GetComponent<CharacterController>();
+		cameraController.enabled = false;
+	}
+
+	private void Update()
+	{
+		isGrounded = transform.position.y < 0.1f;
+		Rotate();
+		Move();
+	}
+
+	private void LateUpdate()
+	{
+		cameraController.UpdateInput();
+		cameraController.UpdateTransform();
+	}
+
+	private void Rotate()
+	{
+		if (!isGrounded)
+		{
+			return;
+		}
+		Vector3 inputVector = GetInputVector();
+		if (inputVector == Vector3.zero)
+		{
+			return;
+		}
+		Vector3 forward = transform.forward;
+		switch (rotationMode)
+		{
+		case RotationMode.Smooth:
+		{
+			Vector3 vector = cameraController.transform.rotation * inputVector;
+			float current = Mathf.Atan2(forward.x, forward.z) * 57.29578f;
+			float target = Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+			float angle = Mathf.SmoothDampAngle(current, target, ref angleVel, turnTime);
+			transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
+			break;
+		}
+		case RotationMode.Linear:
+		{
+			Vector3 inputVectorRaw = GetInputVectorRaw();
+			if (inputVectorRaw != Vector3.zero)
+			{
+				linearTargetDirection = cameraController.transform.rotation * inputVectorRaw;
+			}
+			forward = Vector3.RotateTowards(forward, linearTargetDirection, Time.deltaTime * (1f / turnTime), 1f);
+			forward.y = 0f;
+			transform.rotation = Quaternion.LookRotation(forward);
+			break;
+		}
+		}
+	}
+
+	private void Move()
+	{
+		float target;
+		if (walkByDefault)
+		{
+			target = (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.5f);
+		}
+		else
+		{
+			target = (Input.GetKey(KeyCode.LeftShift) ? 0.5f : 1f);
+		}
+		speed = Mathf.SmoothDamp(speed, target, ref speedVel, accelerationTime);
+		float num = GetInputVector().magnitude * speed;
+		animator.SetFloat("Speed", num);
+		if (!animator.hasRootMotion && isGrounded)
+		{
+			Vector3 vector = transform.forward * num * moveSpeed;
+			if (characterController != null)
+			{
+				characterController.SimpleMove(vector);
+			}
+			else
+			{
+				transform.position += vector * Time.deltaTime;
+			}
+		}
+	}
+
+	private Vector3 GetInputVector()
+	{
+		Vector3 result = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+		result.z += Mathf.Abs(result.x) * 0.05f;
+		result.x -= Mathf.Abs(result.z) * 0.05f;
+		return result;
+	}
+
+	private Vector3 GetInputVectorRaw()
+	{
+		return new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 037
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TouchWalls.cs
+SIZE: 6576 bytes
+SHA256: 1ed592e1c37b1dabad9ce735c782eb0d0bcb27b79ae179c4b585472fb9db609e
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class TouchWalls : MonoBehaviour
+{
+	[Serializable]
+	public class EffectorLink
+	{
+		public bool enabled = true;
+
+		public FullBodyBipedEffector effectorType;
+
+		public InteractionObject interactionObject;
+
+		public Transform spherecastFrom;
+
+		public float spherecastRadius = 0.1f;
+
+		public float minDistance = 0.3f;
+
+		public float distanceMlp = 1f;
+
+		public LayerMask touchLayers;
+
+		public float lerpSpeed = 10f;
+
+		public float minSwitchTime = 0.2f;
+
+		public float releaseDistance = 0.4f;
+
+		public bool sliding;
+
+		private Vector3 raycastDirectionLocal;
+
+		private float raycastDistance;
+
+		private bool inTouch;
+
+		private RaycastHit hit;
+
+		private Vector3 targetPosition;
+
+		private Quaternion targetRotation;
+
+		private bool initiated;
+
+		private float nextSwitchTime;
+
+		private float speedF;
+
+		public void Initiate(InteractionSystem interactionSystem)
+		{
+			raycastDirectionLocal = spherecastFrom.InverseTransformDirection(interactionObject.transform.position - spherecastFrom.position);
+			raycastDistance = Vector3.Distance(spherecastFrom.position, interactionObject.transform.position);
+			interactionSystem.OnInteractionStart = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem.OnInteractionStart, new InteractionSystem.InteractionDelegate(OnInteractionStart));
+			interactionSystem.OnInteractionResume = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem.OnInteractionResume, new InteractionSystem.InteractionDelegate(OnInteractionResume));
+			interactionSystem.OnInteractionStop = (InteractionSystem.InteractionDelegate)Delegate.Combine(interactionSystem.OnInteractionStop, new InteractionSystem.InteractionDelegate(OnInteractionStop));
+			hit.normal = Vector3.forward;
+			targetPosition = interactionObject.transform.position;
+			targetRotation = interactionObject.transform.rotation;
+			initiated = true;
+		}
+
+		private bool FindWalls(Vector3 direction)
+		{
+			if (!enabled)
+			{
+				return false;
+			}
+			bool result = Physics.SphereCast(spherecastFrom.position, spherecastRadius, direction, out hit, raycastDistance * distanceMlp, touchLayers);
+			if (hit.distance < minDistance)
+			{
+				result = false;
+			}
+			return result;
+		}
+
+		public void Update(InteractionSystem interactionSystem)
+		{
+			if (!initiated)
+			{
+				return;
+			}
+			Vector3 vector = spherecastFrom.TransformDirection(raycastDirectionLocal);
+			hit.point = spherecastFrom.position + vector;
+			bool flag = FindWalls(vector);
+			if (!inTouch)
+			{
+				if (flag && Time.time > nextSwitchTime)
+				{
+					interactionObject.transform.parent = null;
+					interactionSystem.StartInteraction(effectorType, interactionObject, interrupt: true);
+					nextSwitchTime = Time.time + minSwitchTime / interactionSystem.speed;
+					targetPosition = hit.point;
+					targetRotation = Quaternion.LookRotation(-hit.normal);
+					interactionObject.transform.position = targetPosition;
+					interactionObject.transform.rotation = targetRotation;
+				}
+			}
+			else
+			{
+				if (!flag)
+				{
+					StopTouch(interactionSystem);
+				}
+				else if (!interactionSystem.IsPaused(effectorType) || sliding)
+				{
+					targetPosition = hit.point;
+					targetRotation = Quaternion.LookRotation(-hit.normal);
+				}
+				if (Vector3.Distance(interactionObject.transform.position, hit.point) > releaseDistance)
+				{
+					if (flag)
+					{
+						targetPosition = hit.point;
+						targetRotation = Quaternion.LookRotation(-hit.normal);
+					}
+					else
+					{
+						StopTouch(interactionSystem);
+					}
+				}
+			}
+			float b = ((!inTouch || (interactionSystem.IsPaused(effectorType) && interactionObject.transform.position == targetPosition)) ? 0f : 1f);
+			speedF = Mathf.Lerp(speedF, b, Time.deltaTime * 3f * interactionSystem.speed);
+			float t = Time.deltaTime * lerpSpeed * speedF * interactionSystem.speed;
+			interactionObject.transform.position = Vector3.Lerp(interactionObject.transform.position, targetPosition, t);
+			interactionObject.transform.rotation = Quaternion.Slerp(interactionObject.transform.rotation, targetRotation, t);
+		}
+
+		private void StopTouch(InteractionSystem interactionSystem)
+		{
+			interactionObject.transform.parent = interactionSystem.transform;
+			nextSwitchTime = Time.time + minSwitchTime / interactionSystem.speed;
+			if (interactionSystem.IsPaused(effectorType))
+			{
+				interactionSystem.ResumeInteraction(effectorType);
+				return;
+			}
+			speedF = 0f;
+			targetPosition = hit.point;
+			targetRotation = Quaternion.LookRotation(-hit.normal);
+		}
+
+		private void OnInteractionStart(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+		{
+			if (effectorType == this.effectorType && !(interactionObject != this.interactionObject))
+			{
+				inTouch = true;
+			}
+		}
+
+		private void OnInteractionResume(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+		{
+			if (effectorType == this.effectorType && !(interactionObject != this.interactionObject))
+			{
+				inTouch = false;
+			}
+		}
+
+		private void OnInteractionStop(FullBodyBipedEffector effectorType, InteractionObject interactionObject)
+		{
+			if (effectorType == this.effectorType && !(interactionObject != this.interactionObject))
+			{
+				inTouch = false;
+			}
+		}
+
+		public void Destroy(InteractionSystem interactionSystem)
+		{
+			if (initiated)
+			{
+				interactionSystem.OnInteractionStart = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem.OnInteractionStart, new InteractionSystem.InteractionDelegate(OnInteractionStart));
+				interactionSystem.OnInteractionResume = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem.OnInteractionResume, new InteractionSystem.InteractionDelegate(OnInteractionResume));
+				interactionSystem.OnInteractionStop = (InteractionSystem.InteractionDelegate)Delegate.Remove(interactionSystem.OnInteractionStop, new InteractionSystem.InteractionDelegate(OnInteractionStop));
+			}
+		}
+	}
+
+	public InteractionSystem interactionSystem;
+
+	public EffectorLink[] effectorLinks;
+
+	private void Start()
+	{
+		EffectorLink[] array = effectorLinks;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Initiate(interactionSystem);
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		for (int i = 0; i < effectorLinks.Length; i++)
+		{
+			effectorLinks[i].Update(interactionSystem);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (interactionSystem != null)
+		{
+			for (int i = 0; i < effectorLinks.Length; i++)
+			{
+				effectorLinks[i].Destroy(interactionSystem);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 038
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TransferMotion.cs
+SIZE: 537 bytes
+SHA256: 104c37b08eb78b925037605811d1dc9bceba84cfde30b08c56941e9425846aea
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class TransferMotion : MonoBehaviour
+{
+	[Tooltip("The Transform to transfer motion to.")]
+	public Transform to;
+
+	[Tooltip("The amount of motion to transfer.")]
+	[Range(0f, 1f)]
+	public float transferMotion = 0.9f;
+
+	private Vector3 lastPosition;
+
+	private void OnEnable()
+	{
+		lastPosition = transform.position;
+	}
+
+	private void Update()
+	{
+		Vector3 vector = transform.position - lastPosition;
+		to.position += vector * transferMotion;
+		lastPosition = transform.position;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 039
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__Turret.cs
+SIZE: 675 bytes
+SHA256: 99c50e70bfcf872eec2e8b5170ec33f3ac7141b8f2d9eab6722a79ac0a998bdd
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class Turret : MonoBehaviour
+{
+	[Serializable]
+	public class Part
+	{
+		public Transform transform;
+
+		private RotationLimit rotationLimit;
+
+		public void AimAt(Transform target)
+		{
+			transform.LookAt(target.position, transform.up);
+			if (rotationLimit == null)
+			{
+				rotationLimit = transform.GetComponent<RotationLimit>();
+				rotationLimit.Disable();
+			}
+			rotationLimit.Apply();
+		}
+	}
+
+	public Transform target;
+
+	public Part[] parts;
+
+	private void Update()
+	{
+		Part[] array = parts;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].AimAt(target);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 040
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TwoHandedProp.cs
+SIZE: 2302 bytes
+SHA256: 22ab861592cf0ca46fe21779bdad98072a7cdecf3e84ff7aa9e72f3562b604b2
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class TwoHandedProp : MonoBehaviour
+{
+	[Range(0f, 1f)]
+	public float weight = 1f;
+
+	[Tooltip("The left hand target parented to the right hand.")]
+	public Transform leftHandTarget;
+
+	[Tooltip("Left hand poser (poses fingers to match the left hand target).")]
+	public Poser leftHandPoser;
+
+	[Tooltip("The weight of pinning the left hand to the prop.")]
+	[Range(0f, 1f)]
+	public float leftHandWeight = 1f;
+
+	private FullBodyBipedIK ik;
+
+	private Vector3 targetPosRelativeToRight;
+
+	private Quaternion targetRotRelativeToRight;
+
+	private void Start()
+	{
+		ik = GetComponent<FullBodyBipedIK>();
+		IKSolverFullBodyBiped solver = ik.solver;
+		solver.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(solver.OnPostUpdate, new IKSolver.UpdateDelegate(AfterFBBIK));
+		if (ik.solver.rightHandEffector.target == null)
+		{
+			Debug.LogError("Right Hand Effector needs a Target in this demo.");
+		}
+	}
+
+	private void LateUpdate()
+	{
+		targetPosRelativeToRight = ik.references.rightHand.InverseTransformPoint(leftHandTarget.position);
+		targetRotRelativeToRight = Quaternion.Inverse(ik.references.rightHand.rotation) * leftHandTarget.rotation;
+		ik.solver.leftHandEffector.position = ik.solver.rightHandEffector.target.position + ik.solver.rightHandEffector.target.rotation * targetPosRelativeToRight;
+		ik.solver.leftHandEffector.rotation = ik.solver.rightHandEffector.target.rotation * targetRotRelativeToRight;
+		ik.solver.rightHandEffector.positionWeight = weight;
+		float positionWeight = leftHandWeight * weight;
+		ik.solver.leftHandEffector.positionWeight = positionWeight;
+		leftHandPoser.weight = positionWeight;
+	}
+
+	private void AfterFBBIK()
+	{
+		ik.solver.leftHandEffector.bone.rotation = Quaternion.Slerp(ik.solver.leftHandEffector.bone.rotation, ik.solver.leftHandEffector.rotation, leftHandWeight * weight);
+		ik.solver.rightHandEffector.bone.rotation = Quaternion.Slerp(ik.solver.rightHandEffector.bone.rotation, ik.solver.rightHandEffector.rotation, weight);
+	}
+
+	private void OnDestroy()
+	{
+		if (ik != null)
+		{
+			IKSolverFullBodyBiped solver = ik.solver;
+			solver.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Remove(solver.OnPostUpdate, new IKSolver.UpdateDelegate(AfterFBBIK));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 041
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__UserControlAI.cs
+SIZE: 1082 bytes
+SHA256: afd4be7e0ebeef4c8ad9ac89a180da140dc8c5fd2948d461262ff943680c173d
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class UserControlAI : UserControlThirdPerson
+{
+	public Transform moveTarget;
+
+	public float stoppingDistance = 0.5f;
+
+	public float stoppingThreshold = 1.5f;
+
+	public Navigator navigator;
+
+	protected override void Start()
+	{
+		base.Start();
+		navigator.Initiate(transform);
+	}
+
+	protected override void Update()
+	{
+		float num = (walkByDefault ? 0.5f : 1f);
+		if (navigator.activeTargetSeeking)
+		{
+			navigator.Update(moveTarget.position);
+			state.move = navigator.normalizedDeltaPosition * num;
+			return;
+		}
+		Vector3 tangent = moveTarget.position - transform.position;
+		float magnitude = tangent.magnitude;
+		Vector3 normal = transform.up;
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		float num2 = ((state.move != Vector3.zero) ? stoppingDistance : (stoppingDistance * stoppingThreshold));
+		state.move = ((magnitude > num2) ? (tangent * num) : Vector3.zero);
+		state.lookPos = moveTarget.position;
+	}
+
+	private void OnDrawGizmos()
+	{
+		if (navigator.activeTargetSeeking)
+		{
+			navigator.Visualize();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 042
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__UserControlThirdPerson.cs
+SIZE: 1224 bytes
+SHA256: 56fe667efb6f7a4be55cc8277bdc12fbc2b4597b43b877527e43a5864d246820
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class UserControlThirdPerson : MonoBehaviour
+{
+	public struct State
+	{
+		public Vector3 move;
+
+		public Vector3 lookPos;
+
+		public bool crouch;
+
+		public bool jump;
+
+		public int actionIndex;
+	}
+
+	public bool walkByDefault;
+
+	public bool canCrouch = true;
+
+	public bool canJump = true;
+
+	public State state;
+
+	protected Transform cam;
+
+	protected virtual void Start()
+	{
+		cam = Camera.main.transform;
+	}
+
+	protected virtual void Update()
+	{
+		state.crouch = canCrouch && Input.GetKey(KeyCode.C);
+		state.jump = canJump && Input.GetButton("Jump");
+		float axisRaw = Input.GetAxisRaw("Horizontal");
+		float axisRaw2 = Input.GetAxisRaw("Vertical");
+		Vector3 tangent = cam.rotation * new Vector3(axisRaw, 0f, axisRaw2).normalized;
+		if (tangent != Vector3.zero)
+		{
+			Vector3 normal = transform.up;
+			Vector3.OrthoNormalize(ref normal, ref tangent);
+			state.move = tangent;
+		}
+		else
+		{
+			state.move = Vector3.zero;
+		}
+		bool key = Input.GetKey(KeyCode.LeftShift);
+		float num;
+		if (walkByDefault)
+		{
+			num = (key ? 1f : 0.5f);
+		}
+		else
+		{
+			num = (key ? 0.5f : 1f);
+		}
+		state.move *= num;
+		state.lookPos = transform.position + cam.forward * 100f;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 043
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRController.cs
+SIZE: 1809 bytes
+SHA256: dee4ed7485c445c6aaf6dbaaa722ef0667ecbd5fa87700911fcaa120e510156b
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class VRController : MonoBehaviour
+{
+	[Serializable]
+	public enum InputMode
+	{
+		Input,
+		WASDOnly
+	}
+
+	public InputMode inputMode;
+
+	public VRIK ik;
+
+	public Transform centerEyeAnchor;
+
+	public float walkSpeed = 1f;
+
+	public float runSpeed = 3f;
+
+	public float walkForwardSpeedMlp = 1f;
+
+	public float runForwardSpeedMlp = 1f;
+
+	private Vector3 smoothInput;
+
+	private Vector3 smoothInputV;
+
+	private void Update()
+	{
+		Vector3 input = GetInput();
+		input *= ik.solver.scale;
+		bool flag = Vector3.Dot(input, Vector3.forward) > 0f;
+		float num = walkSpeed;
+		if (Input.GetKey(KeyCode.LeftShift))
+		{
+			num = runSpeed;
+			if (flag)
+			{
+				num *= runForwardSpeedMlp;
+			}
+		}
+		else if (flag)
+		{
+			num *= walkForwardSpeedMlp;
+		}
+		smoothInput = Vector3.SmoothDamp(smoothInput, input * num, ref smoothInputV, 0.1f);
+		Vector3 forward = centerEyeAnchor.forward;
+		forward.y = 0f;
+		Quaternion quaternion = Quaternion.LookRotation(forward);
+		transform.position += quaternion * smoothInput * Time.deltaTime;
+	}
+
+	private Vector3 GetInput()
+	{
+		switch (inputMode)
+		{
+		case InputMode.Input:
+		{
+			Vector3 vector = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+			if (vector.sqrMagnitude < 0.3f)
+			{
+				return Vector3.zero;
+			}
+			return vector.normalized;
+		}
+		case InputMode.WASDOnly:
+		{
+			Vector3 zero = Vector3.zero;
+			if (Input.GetKey(KeyCode.W))
+			{
+				zero += Vector3.forward;
+			}
+			if (Input.GetKey(KeyCode.S))
+			{
+				zero += Vector3.back;
+			}
+			if (Input.GetKey(KeyCode.A))
+			{
+				zero += Vector3.left;
+			}
+			if (Input.GetKey(KeyCode.D))
+			{
+				zero += Vector3.right;
+			}
+			return zero.normalized;
+		}
+		default:
+			return Vector3.zero;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 044
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKCalibrationBasic.cs
+SIZE: 1934 bytes
+SHA256: 782cec494655a9c3564cc7a04efe16c14401163b81d505105897e37ce44c3d22
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class VRIKCalibrationBasic : MonoBehaviour
+{
+	[Tooltip("The VRIK component.")]
+	public VRIK ik;
+
+	[Header("Head")]
+	[Tooltip("HMD.")]
+	public Transform centerEyeAnchor;
+
+	[Tooltip("Position offset of the camera from the head bone (root space).")]
+	public Vector3 headAnchorPositionOffset;
+
+	[Tooltip("Rotation offset of the camera from the head bone (root space).")]
+	public Vector3 headAnchorRotationOffset;
+
+	[Header("Hands")]
+	[Tooltip("Left Hand Controller")]
+	public Transform leftHandAnchor;
+
+	[Tooltip("Right Hand Controller")]
+	public Transform rightHandAnchor;
+
+	[Tooltip("Position offset of the hand controller from the hand bone (controller space).")]
+	public Vector3 handAnchorPositionOffset;
+
+	[Tooltip("Rotation offset of the hand controller from the hand bone (controller space).")]
+	public Vector3 handAnchorRotationOffset;
+
+	[Header("Scale")]
+	[Tooltip("Multiplies the scale of the root.")]
+	public float scaleMlp = 1f;
+
+	[Header("Data stored by Calibration")]
+	public VRIKCalibrator.CalibrationData data = new VRIKCalibrator.CalibrationData();
+
+	private void LateUpdate()
+	{
+		if (Input.GetKeyDown(KeyCode.C))
+		{
+			data = VRIKCalibrator.Calibrate(ik, centerEyeAnchor, leftHandAnchor, rightHandAnchor, headAnchorPositionOffset, headAnchorRotationOffset, handAnchorPositionOffset, handAnchorRotationOffset, scaleMlp);
+		}
+		if (Input.GetKeyDown(KeyCode.D))
+		{
+			if (data.scale == 0f)
+			{
+				Debug.LogError("No Calibration Data to calibrate to, please calibrate with 'C' first.");
+			}
+			else
+			{
+				VRIKCalibrator.Calibrate(ik, data, centerEyeAnchor, null, leftHandAnchor, rightHandAnchor);
+			}
+		}
+		if (Input.GetKeyDown(KeyCode.S))
+		{
+			if (data.scale == 0f)
+			{
+				Debug.LogError("Avatar needs to be calibrated before RecalibrateScale is called.");
+			}
+			VRIKCalibrator.RecalibrateScale(ik, data, scaleMlp);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 045
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKCalibrationController.cs
+SIZE: 1984 bytes
+SHA256: e014912902b9830b23dfb2e25e6a77d7163ce5ea652a6d08123e64593f00f8fc
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class VRIKCalibrationController : MonoBehaviour
+{
+	[Tooltip("Reference to the VRIK component on the avatar.")]
+	public VRIK ik;
+
+	[Tooltip("The settings for VRIK calibration.")]
+	public VRIKCalibrator.Settings settings;
+
+	[Tooltip("The HMD.")]
+	public Transform headTracker;
+
+	[Tooltip("(Optional) A tracker placed anywhere on the body of the player, preferrably close to the pelvis, on the belt area.")]
+	public Transform bodyTracker;
+
+	[Tooltip("(Optional) A tracker or hand controller device placed anywhere on or in the player's left hand.")]
+	public Transform leftHandTracker;
+
+	[Tooltip("(Optional) A tracker or hand controller device placed anywhere on or in the player's right hand.")]
+	public Transform rightHandTracker;
+
+	[Tooltip("(Optional) A tracker placed anywhere on the ankle or toes of the player's left leg.")]
+	public Transform leftFootTracker;
+
+	[Tooltip("(Optional) A tracker placed anywhere on the ankle or toes of the player's right leg.")]
+	public Transform rightFootTracker;
+
+	[Header("Data stored by Calibration")]
+	public VRIKCalibrator.CalibrationData data = new VRIKCalibrator.CalibrationData();
+
+	private void LateUpdate()
+	{
+		if (Input.GetKeyDown(KeyCode.C))
+		{
+			data = VRIKCalibrator.Calibrate(ik, settings, headTracker, bodyTracker, leftHandTracker, rightHandTracker, leftFootTracker, rightFootTracker);
+		}
+		if (Input.GetKeyDown(KeyCode.D))
+		{
+			if (data.scale == 0f)
+			{
+				Debug.LogError("No Calibration Data to calibrate to, please calibrate with settings first.");
+			}
+			else
+			{
+				VRIKCalibrator.Calibrate(ik, data, headTracker, bodyTracker, leftHandTracker, rightHandTracker, leftFootTracker, rightFootTracker);
+			}
+		}
+		if (Input.GetKeyDown(KeyCode.S))
+		{
+			if (data.scale == 0f)
+			{
+				Debug.LogError("Avatar needs to be calibrated before RecalibrateScale is called.");
+			}
+			VRIKCalibrator.RecalibrateScale(ik, data, settings);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 046
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKPlatformController.cs
+SIZE: 1357 bytes
+SHA256: 704dd957c27726bfbda797f1c639b899472c5d5f722912215f31162653844dd1
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class VRIKPlatformController : MonoBehaviour
+{
+	public VRIK ik;
+
+	public Transform trackingSpace;
+
+	public Transform platform;
+
+	public bool moveToPlatform = true;
+
+	private Transform lastPlatform;
+
+	private Vector3 lastPosition;
+
+	private Quaternion lastRotation = Quaternion.identity;
+
+	private void LateUpdate()
+	{
+		if (platform != lastPlatform)
+		{
+			if (platform != null)
+			{
+				if (moveToPlatform)
+				{
+					lastPosition = ik.transform.position;
+					lastRotation = ik.transform.rotation;
+					ik.transform.position = platform.position;
+					ik.transform.rotation = platform.rotation;
+					trackingSpace.position = platform.position;
+					trackingSpace.rotation = platform.rotation;
+					ik.solver.AddPlatformMotion(platform.position - lastPosition, platform.rotation * Quaternion.Inverse(lastRotation), platform.position);
+				}
+				lastPosition = platform.position;
+				lastRotation = platform.rotation;
+			}
+			ik.transform.parent = platform;
+			trackingSpace.parent = platform;
+			lastPlatform = platform;
+		}
+		if (platform != null)
+		{
+			ik.solver.AddPlatformMotion(platform.position - lastPosition, platform.rotation * Quaternion.Inverse(lastRotation), platform.position);
+			lastRotation = platform.rotation;
+			lastPosition = platform.position;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 047
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__AimController.cs
+SIZE: 7338 bytes
+SHA256: 977114259d1e1dd7a98e03407dfb8427466d7a7fec6b7a5fc1bc2fd4adf50bb9
+====================================================================================================
+
+using System.Collections;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class AimController : MonoBehaviour
+{
+	[Tooltip("Reference to the AimIK component.")]
+	public AimIK ik;
+
+	[Tooltip("Master weight of the IK solver.")]
+	[Range(0f, 1f)]
+	public float weight = 1f;
+
+	[Header("Target Smoothing")]
+	[Tooltip("The target to aim at. Do not use the Target transform that is assigned to AimIK. Set to null if you wish to stop aiming.")]
+	public Transform target;
+
+	[Tooltip("The time it takes to switch targets.")]
+	public float targetSwitchSmoothTime = 0.3f;
+
+	[Tooltip("The time it takes to blend in/out of AimIK weight.")]
+	public float weightSmoothTime = 0.3f;
+
+	[Header("Turning Towards The Target")]
+	[Tooltip("Enables smooth turning towards the target according to the parameters under this header.")]
+	public bool smoothTurnTowardsTarget = true;
+
+	[Tooltip("Speed of turning towards the target using Vector3.RotateTowards.")]
+	public float maxRadiansDelta = 3f;
+
+	[Tooltip("Speed of moving towards the target using Vector3.RotateTowards.")]
+	public float maxMagnitudeDelta = 3f;
+
+	[Tooltip("Speed of slerping towards the target.")]
+	public float slerpSpeed = 3f;
+
+	[Tooltip("Smoothing time for turning towards the yaw and pitch of the target using Mathf.SmoothDampAngle. Value of 0 means smooth damping is disabled.")]
+	public float smoothDampTime;
+
+	[Tooltip("The position of the pivot that the aim target is rotated around relative to the root of the character.")]
+	public Vector3 pivotOffsetFromRoot = Vector3.up;
+
+	[Tooltip("Minimum distance of aiming from the first bone. Keeps the solver from failing if the target is too close.")]
+	public float minDistance = 1f;
+
+	[Tooltip("Offset applied to the target in world space. Convenient for scripting aiming inaccuracy.")]
+	public Vector3 offset;
+
+	[Header("RootRotation")]
+	[Tooltip("Character root will be rotate around the Y axis to keep root forward within this angle from the aiming direction.")]
+	[Range(0f, 180f)]
+	public float maxRootAngle = 45f;
+
+	[Tooltip("If enabled, aligns the root forward to target direction after 'Max Root Angle' has been exceeded.")]
+	public bool turnToTarget;
+
+	[Tooltip("The time of turning towards the target direction if 'Max Root Angle has been exceeded and 'Turn To Target' is enabled.")]
+	public float turnToTargetTime = 0.2f;
+
+	[Header("Mode")]
+	[Tooltip("If true, AimIK will consider whatever the current direction of the weapon to be the forward aiming direction and work additively on top of that. This enables you to use recoil and reloading animations seamlessly with AimIK. Adjust the Vector3 value below if the weapon is not aiming perfectly forward in the aiming animation clip.")]
+	public bool useAnimatedAimDirection;
+
+	[Tooltip("The direction of the animated weapon aiming in character space. Tweak this value to adjust the aiming. 'Use Animated Aim Direction' must be enabled for this property to work.")]
+	public Vector3 animatedAimDirection = Vector3.forward;
+
+	private Transform lastTarget;
+
+	private float switchWeight;
+
+	private float switchWeightV;
+
+	private float weightV;
+
+	private Vector3 lastPosition;
+
+	private Vector3 dir;
+
+	private bool lastSmoothTowardsTarget;
+
+	private bool turningToTarget;
+
+	private float turnToTargetMlp = 1f;
+
+	private float turnToTargetMlpV;
+
+	private float yawV;
+
+	private float pitchV;
+
+	private float dirMagV;
+
+	private Vector3 pivot => ik.transform.position + ik.transform.rotation * pivotOffsetFromRoot;
+
+	private void Start()
+	{
+		lastPosition = ik.solver.IKPosition;
+		dir = ik.solver.IKPosition - pivot;
+		ik.solver.target = null;
+	}
+
+	private void LateUpdate()
+	{
+		if (target != lastTarget)
+		{
+			if (lastTarget == null && target != null && ik.solver.IKPositionWeight <= 0f)
+			{
+				lastPosition = target.position;
+				dir = target.position - pivot;
+				ik.solver.IKPosition = target.position + offset;
+			}
+			else
+			{
+				lastPosition = ik.solver.IKPosition;
+				dir = ik.solver.IKPosition - pivot;
+			}
+			switchWeight = 0f;
+			lastTarget = target;
+		}
+		float num = ((target != null) ? weight : 0f);
+		ik.solver.IKPositionWeight = Mathf.SmoothDamp(ik.solver.IKPositionWeight, num, ref weightV, weightSmoothTime);
+		if (ik.solver.IKPositionWeight >= 0.999f && num > ik.solver.IKPositionWeight)
+		{
+			ik.solver.IKPositionWeight = 1f;
+		}
+		if (ik.solver.IKPositionWeight <= 0.001f && num < ik.solver.IKPositionWeight)
+		{
+			ik.solver.IKPositionWeight = 0f;
+		}
+		if (ik.solver.IKPositionWeight <= 0f)
+		{
+			return;
+		}
+		switchWeight = Mathf.SmoothDamp(switchWeight, 1f, ref switchWeightV, targetSwitchSmoothTime);
+		if (switchWeight >= 0.999f)
+		{
+			switchWeight = 1f;
+		}
+		if (target != null)
+		{
+			ik.solver.IKPosition = Vector3.Lerp(lastPosition, target.position + offset, switchWeight);
+		}
+		if (smoothTurnTowardsTarget != lastSmoothTowardsTarget)
+		{
+			dir = ik.solver.IKPosition - pivot;
+			lastSmoothTowardsTarget = smoothTurnTowardsTarget;
+		}
+		if (smoothTurnTowardsTarget)
+		{
+			Vector3 vector = ik.solver.IKPosition - pivot;
+			if (slerpSpeed > 0f)
+			{
+				dir = Vector3.Slerp(dir, vector, Time.deltaTime * slerpSpeed);
+			}
+			if (maxRadiansDelta > 0f || maxMagnitudeDelta > 0f)
+			{
+				dir = Vector3.RotateTowards(dir, vector, Time.deltaTime * maxRadiansDelta, maxMagnitudeDelta);
+			}
+			if (smoothDampTime > 0f)
+			{
+				float yaw = V3Tools.GetYaw(dir);
+				float yaw2 = V3Tools.GetYaw(vector);
+				float y = Mathf.SmoothDampAngle(yaw, yaw2, ref yawV, smoothDampTime);
+				float pitch = V3Tools.GetPitch(dir);
+				float pitch2 = V3Tools.GetPitch(vector);
+				float x = Mathf.SmoothDampAngle(pitch, pitch2, ref pitchV, smoothDampTime);
+				float num2 = Mathf.SmoothDamp(dir.magnitude, vector.magnitude, ref dirMagV, smoothDampTime);
+				dir = Quaternion.Euler(x, y, 0f) * Vector3.forward * num2;
+			}
+			ik.solver.IKPosition = pivot + dir;
+		}
+		ApplyMinDistance();
+		RootRotation();
+		if (useAnimatedAimDirection)
+		{
+			ik.solver.axis = ik.solver.transform.InverseTransformVector(ik.transform.rotation * animatedAimDirection);
+		}
+	}
+
+	private void ApplyMinDistance()
+	{
+		Vector3 vector = pivot;
+		Vector3 vector2 = ik.solver.IKPosition - vector;
+		vector2 = vector2.normalized * Mathf.Max(vector2.magnitude, minDistance);
+		ik.solver.IKPosition = vector + vector2;
+	}
+
+	private void RootRotation()
+	{
+		float num = Mathf.Lerp(180f, maxRootAngle * turnToTargetMlp, ik.solver.IKPositionWeight);
+		if (!(num < 180f))
+		{
+			return;
+		}
+		Vector3 vector = Quaternion.Inverse(ik.transform.rotation) * (ik.solver.IKPosition - pivot);
+		float num2 = Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+		float angle = 0f;
+		if (num2 > num)
+		{
+			angle = num2 - num;
+			if (!turningToTarget && turnToTarget)
+			{
+				StartCoroutine(TurnToTarget());
+			}
+		}
+		if (num2 < 0f - num)
+		{
+			angle = num2 + num;
+			if (!turningToTarget && turnToTarget)
+			{
+				StartCoroutine(TurnToTarget());
+			}
+		}
+		ik.transform.rotation = Quaternion.AngleAxis(angle, ik.transform.up) * ik.transform.rotation;
+	}
+
+	private IEnumerator TurnToTarget()
+	{
+		turningToTarget = true;
+		while (turnToTargetMlp > 0f)
+		{
+			turnToTargetMlp = Mathf.SmoothDamp(turnToTargetMlp, 0f, ref turnToTargetMlpV, turnToTargetTime);
+			if (turnToTargetMlp < 0.01f)
+			{
+				turnToTargetMlp = 0f;
+			}
+			yield return null;
+		}
+		turnToTargetMlp = 1f;
+		turningToTarget = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 048
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Amplifier.cs
+SIZE: 2694 bytes
+SHA256: 83b2a6c471c6af44e6f6b7e2c1213875afce117b4d6c30af785c28c98ce6cf07
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+public class Amplifier : OffsetModifier
+{
+	[Serializable]
+	public class Body
+	{
+		[Serializable]
+		public class EffectorLink
+		{
+			[Tooltip("Type of the FBBIK effector to use")]
+			public FullBodyBipedEffector effector;
+
+			[Tooltip("Weight of using this effector")]
+			public float weight;
+		}
+
+		[Tooltip("The Transform that's motion we are reading.")]
+		public Transform transform;
+
+		[Tooltip("Amplify the 'transform's' position relative to this Transform.")]
+		public Transform relativeTo;
+
+		[Tooltip("Linking the body to effectors. One Body can be used to offset more than one effector.")]
+		public EffectorLink[] effectorLinks;
+
+		[Tooltip("Amplification magnitude along the up axis of the character.")]
+		public float verticalWeight = 1f;
+
+		[Tooltip("Amplification magnitude along the horizontal axes of the character.")]
+		public float horizontalWeight = 1f;
+
+		[Tooltip("Speed of the amplifier. 0 means instant.")]
+		public float speed = 3f;
+
+		private Vector3 lastRelativePos;
+
+		private Vector3 smoothDelta;
+
+		private bool firstUpdate;
+
+		public void Update(IKSolverFullBodyBiped solver, float w, float deltaTime)
+		{
+			if (!(transform == null) && !(relativeTo == null))
+			{
+				Vector3 vector = relativeTo.InverseTransformDirection(transform.position - relativeTo.position);
+				if (firstUpdate)
+				{
+					lastRelativePos = vector;
+					firstUpdate = false;
+				}
+				Vector3 vector2 = (vector - lastRelativePos) / deltaTime;
+				smoothDelta = ((speed <= 0f) ? vector2 : Vector3.Lerp(smoothDelta, vector2, deltaTime * speed));
+				Vector3 v = relativeTo.TransformDirection(smoothDelta);
+				Vector3 vector3 = V3Tools.ExtractVertical(v, solver.GetRoot().up, verticalWeight) + V3Tools.ExtractHorizontal(v, solver.GetRoot().up, horizontalWeight);
+				for (int i = 0; i < effectorLinks.Length; i++)
+				{
+					solver.GetEffector(effectorLinks[i].effector).positionOffset += vector3 * w * effectorLinks[i].weight;
+				}
+				lastRelativePos = vector;
+			}
+		}
+
+		private static Vector3 Multiply(Vector3 v1, Vector3 v2)
+		{
+			v1.x *= v2.x;
+			v1.y *= v2.y;
+			v1.z *= v2.z;
+			return v1;
+		}
+	}
+
+	[Tooltip("The amplified bodies.")]
+	public Body[] bodies;
+
+	protected override void OnModifyOffset()
+	{
+		if (!ik.fixTransforms)
+		{
+			if (!Warning.logged)
+			{
+				Warning.Log("Amplifier needs the Fix Transforms option of the FBBIK to be set to true. Otherwise it might amplify to infinity, should the animator of the character stop because of culling.", transform);
+			}
+			return;
+		}
+		Body[] array = bodies;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Update(ik.solver, weight, deltaTime);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 049
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__BipedIK.cs
+SIZE: 4855 bytes
+SHA256: 8b48f2b72a5c8f81d2cca867b8a59941ca61752383393a0bfa242d436ba23aa1
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[HelpURL("http://www.root-motion.com/finalikdox/html/page4.html")]
+[AddComponentMenu("Scripts/RootMotion.FinalIK/IK/Biped IK")]
+public class BipedIK : SolverManager
+{
+	public BipedReferences references = new BipedReferences();
+
+	public BipedIKSolvers solvers = new BipedIKSolvers();
+
+	[ContextMenu("User Manual")]
+	private void OpenUserManual()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/page4.html");
+	}
+
+	[ContextMenu("Scrpt Reference")]
+	private void OpenScriptReference()
+	{
+		Application.OpenURL("http://www.root-motion.com/finalikdox/html/class_root_motion_1_1_final_i_k_1_1_biped_i_k.html");
+	}
+
+	[ContextMenu("Support Group")]
+	private void SupportGroup()
+	{
+		Application.OpenURL("https://groups.google.com/forum/#!forum/final-ik");
+	}
+
+	[ContextMenu("Asset Store Thread")]
+	private void ASThread()
+	{
+		Application.OpenURL("http://forum.unity3d.com/threads/final-ik-full-body-ik-aim-look-at-fabrik-ccd-ik-1-0-released.222685/");
+	}
+
+	public float GetIKPositionWeight(AvatarIKGoal goal)
+	{
+		return GetGoalIK(goal).GetIKPositionWeight();
+	}
+
+	public float GetIKRotationWeight(AvatarIKGoal goal)
+	{
+		return GetGoalIK(goal).GetIKRotationWeight();
+	}
+
+	public void SetIKPositionWeight(AvatarIKGoal goal, float weight)
+	{
+		GetGoalIK(goal).SetIKPositionWeight(weight);
+	}
+
+	public void SetIKRotationWeight(AvatarIKGoal goal, float weight)
+	{
+		GetGoalIK(goal).SetIKRotationWeight(weight);
+	}
+
+	public void SetIKPosition(AvatarIKGoal goal, Vector3 IKPosition)
+	{
+		GetGoalIK(goal).SetIKPosition(IKPosition);
+	}
+
+	public void SetIKRotation(AvatarIKGoal goal, Quaternion IKRotation)
+	{
+		GetGoalIK(goal).SetIKRotation(IKRotation);
+	}
+
+	public Vector3 GetIKPosition(AvatarIKGoal goal)
+	{
+		return GetGoalIK(goal).GetIKPosition();
+	}
+
+	public Quaternion GetIKRotation(AvatarIKGoal goal)
+	{
+		return GetGoalIK(goal).GetIKRotation();
+	}
+
+	public void SetLookAtWeight(float weight, float bodyWeight, float headWeight, float eyesWeight, float clampWeight, float clampWeightHead, float clampWeightEyes)
+	{
+		solvers.lookAt.SetLookAtWeight(weight, bodyWeight, headWeight, eyesWeight, clampWeight, clampWeightHead, clampWeightEyes);
+	}
+
+	public void SetLookAtPosition(Vector3 lookAtPosition)
+	{
+		solvers.lookAt.SetIKPosition(lookAtPosition);
+	}
+
+	public void SetSpinePosition(Vector3 spinePosition)
+	{
+		solvers.spine.SetIKPosition(spinePosition);
+	}
+
+	public void SetSpineWeight(float weight)
+	{
+		solvers.spine.SetIKPositionWeight(weight);
+	}
+
+	public IKSolverLimb GetGoalIK(AvatarIKGoal goal)
+	{
+		return goal switch
+		{
+			AvatarIKGoal.LeftFoot => solvers.leftFoot, 
+			AvatarIKGoal.RightFoot => solvers.rightFoot, 
+			AvatarIKGoal.LeftHand => solvers.leftHand, 
+			AvatarIKGoal.RightHand => solvers.rightHand, 
+			_ => null, 
+		};
+	}
+
+	public void InitiateBipedIK()
+	{
+		InitiateSolver();
+	}
+
+	public void UpdateBipedIK()
+	{
+		UpdateSolver();
+	}
+
+	public void SetToDefaults()
+	{
+		IKSolverLimb[] limbs = solvers.limbs;
+		foreach (IKSolverLimb obj in limbs)
+		{
+			obj.SetIKPositionWeight(0f);
+			obj.SetIKRotationWeight(0f);
+			obj.bendModifier = IKSolverLimb.BendModifier.Animation;
+			obj.bendModifierWeight = 1f;
+		}
+		solvers.leftHand.maintainRotationWeight = 0f;
+		solvers.rightHand.maintainRotationWeight = 0f;
+		solvers.spine.SetIKPositionWeight(0f);
+		solvers.spine.tolerance = 0f;
+		solvers.spine.maxIterations = 2;
+		solvers.spine.useRotationLimits = false;
+		solvers.aim.SetIKPositionWeight(0f);
+		solvers.aim.tolerance = 0f;
+		solvers.aim.maxIterations = 2;
+		SetLookAtWeight(0f, 0.5f, 1f, 1f, 0.5f, 0.7f, 0.5f);
+	}
+
+	protected override void FixTransforms()
+	{
+		solvers.lookAt.FixTransforms();
+		for (int i = 0; i < solvers.limbs.Length; i++)
+		{
+			solvers.limbs[i].FixTransforms();
+		}
+	}
+
+	protected override void InitiateSolver()
+	{
+		string errorMessage = "";
+		if (BipedReferences.SetupError(references, ref errorMessage))
+		{
+			Warning.Log(errorMessage, references.root);
+			return;
+		}
+		solvers.AssignReferences(references);
+		if (solvers.spine.bones.Length > 1)
+		{
+			solvers.spine.Initiate(transform);
+		}
+		solvers.lookAt.Initiate(transform);
+		solvers.aim.Initiate(transform);
+		IKSolverLimb[] limbs = solvers.limbs;
+		for (int i = 0; i < limbs.Length; i++)
+		{
+			limbs[i].Initiate(transform);
+		}
+		solvers.pelvis.Initiate(references.pelvis);
+	}
+
+	protected override void UpdateSolver()
+	{
+		for (int i = 0; i < solvers.limbs.Length; i++)
+		{
+			solvers.limbs[i].MaintainBend();
+			solvers.limbs[i].MaintainRotation();
+		}
+		solvers.pelvis.Update();
+		if (solvers.spine.bones.Length > 1)
+		{
+			solvers.spine.Update();
+		}
+		solvers.aim.Update();
+		solvers.lookAt.Update();
+		for (int j = 0; j < solvers.limbs.Length; j++)
+		{
+			solvers.limbs[j].Update();
+		}
+	}
+
+	public void LogWarning(string message)
+	{
+		Warning.Log(message, transform);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 050
+PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Constraint.cs
+SIZE: 256 bytes
+SHA256: f3aad76bfc8764e92358d02007aa80f404fc9310f995366a8341a970f63574ff
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.FinalIK;
+
+[Serializable]
+public abstract class Constraint
+{
+	public Transform transform;
+
+	public float weight;
+
+	public bool isValid => transform != null;
+
+	public abstract void UpdateConstraint();
+}
+
+

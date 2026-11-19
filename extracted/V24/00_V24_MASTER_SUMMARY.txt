@@ -1,0 +1,28 @@
+CASTAWAY-DEPTHS V24
+PHASE 1 - C# SOURCE RECOVERY
+============================================================
+Created UTC: 2026-11-19T23:01:01.633375+00:00
+C# files scanned: 3182
+Selected source files: 449
+Output parts: 449
+Total source bytes: 2700232
+Maximum part size: 15728640
+Errors: 0
+
+SOURCE ROOTS:
+/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED
+/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH
+
+OUTPUT:
+/storage/emulated/0/Map Check/reports/V24_SOURCE_RECOVERY
+
+POLICY:
+- Original sources are read-only.
+- Every output part is at most 15 MiB.
+- Source bytes are preserved exactly.
+- SHA-256 recorded for source and every part.
+- Parts must be concatenated in part_number order.
+- Missing source roots are reported, not silently ignored.
+
+ERRORS:
+NONE

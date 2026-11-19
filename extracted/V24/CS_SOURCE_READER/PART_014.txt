@@ -1,0 +1,4051 @@
+
+====================================================================================================
+SOURCE FILE 326
+PATH: Assembly-CSharp__Beam__TransformAttracterRepeller.cs
+SIZE: 555 bytes
+SHA256: b91a5b8729a09b2c77047dfeb4dcea812eebfea64ae3fa1ee6191448029322a0
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam;
+
+[Serializable]
+public struct TransformAttracterRepeller : IAttracterRepeller
+{
+	[SerializeField]
+	private TransformPosition _transformPosition;
+
+	[SerializeField]
+	private float _radius;
+
+	private int _id;
+
+	public Vector3 Position => _transformPosition.Position;
+
+	public float Radius => _radius;
+
+	public int Id => _id;
+
+	public TransformAttracterRepeller(TransformPosition transformPosition, float radius, int id = -1)
+	{
+		_transformPosition = transformPosition;
+		_radius = radius;
+		_id = id;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 327
+PATH: Assembly-CSharp__Beam__TransformPosition.cs
+SIZE: 297 bytes
+SHA256: c17aaef9e13c8d798752184723ccaa5db5f582509bff6c2a1c24f26db9bdeacd
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam;
+
+[Serializable]
+public struct TransformPosition : IHavePosition
+{
+	[SerializeField]
+	private Transform _transform;
+
+	public Vector3 Position => _transform.position;
+
+	public TransformPosition(Transform transform)
+	{
+		_transform = transform;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 328
+PATH: Assembly-CSharp__Beam__TransformProxy.cs
+SIZE: 546 bytes
+SHA256: 8ef8521cc37c88471c176214cfa470179af968543b112e0ed26069f88a97b42e
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam;
+
+public class TransformProxy
+{
+	public Vector3 position;
+
+	public Quaternion rotation;
+
+	public Vector3 up => rotation * Vector3.up;
+
+	public Vector3 down => rotation * Vector3.down;
+
+	public Vector3 left => rotation * Vector3.left;
+
+	public Vector3 right => rotation * Vector3.right;
+
+	public Vector3 forward => rotation * Vector3.forward;
+
+	public Vector3 back => rotation * Vector3.back;
+
+	public TransformProxy(Transform transform)
+	{
+		position = transform.position;
+		rotation = transform.rotation;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 329
+PATH: Assembly-CSharp__Beam__UAudioSource.cs
+SIZE: 2301 bytes
+SHA256: f7cb40fd39098c174366d67c17931d0d2df78155d6458930a4988d54bb5d7630
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.Audio;
+
+namespace Beam;
+
+public class UAudioSource : IAudioSource
+{
+	private readonly AudioSource _audioSource;
+
+	private float _volume = 1f;
+
+	private float _level = 1f;
+
+	private bool _isPaused;
+
+	public Transform transform => _audioSource.transform;
+
+	public AudioClip Clip
+	{
+		get
+		{
+			return _audioSource.clip;
+		}
+		set
+		{
+			_audioSource.clip = value;
+		}
+	}
+
+	public float Volume
+	{
+		get
+		{
+			return _volume;
+		}
+		set
+		{
+			_volume = value;
+			_audioSource.volume = _level * _volume;
+		}
+	}
+
+	public float Level
+	{
+		get
+		{
+			return _level;
+		}
+		set
+		{
+			_level = value;
+			_audioSource.volume = _level * _volume;
+		}
+	}
+
+	public float Pitch
+	{
+		get
+		{
+			return _audioSource.pitch;
+		}
+		set
+		{
+			_audioSource.pitch = value;
+		}
+	}
+
+	public float DopplerLevel
+	{
+		get
+		{
+			return _audioSource.dopplerLevel;
+		}
+		set
+		{
+			_audioSource.dopplerLevel = value;
+		}
+	}
+
+	public float SpatialBlend
+	{
+		get
+		{
+			return _audioSource.spatialBlend;
+		}
+		set
+		{
+			_audioSource.spatialBlend = value;
+		}
+	}
+
+	public float Spread
+	{
+		get
+		{
+			return _audioSource.spread;
+		}
+		set
+		{
+			_audioSource.spread = value;
+		}
+	}
+
+	public float Pan
+	{
+		get
+		{
+			return _audioSource.panStereo;
+		}
+		set
+		{
+			_audioSource.panStereo = value;
+		}
+	}
+
+	public int Priority
+	{
+		get
+		{
+			return _audioSource.priority;
+		}
+		set
+		{
+			_audioSource.priority = value;
+		}
+	}
+
+	public bool Loop
+	{
+		get
+		{
+			return _audioSource.loop;
+		}
+		set
+		{
+			_audioSource.loop = value;
+		}
+	}
+
+	public bool IsPlaying
+	{
+		get
+		{
+			if (!_audioSource.isPlaying)
+			{
+				return _isPaused;
+			}
+			return true;
+		}
+	}
+
+	public bool IsPaused => _isPaused;
+
+	public AudioRollOff RollOff { get; set; }
+
+	public AudioMixerGroup OutputAudioMixerGroup
+	{
+		get
+		{
+			return _audioSource.outputAudioMixerGroup;
+		}
+		set
+		{
+			_audioSource.outputAudioMixerGroup = value;
+		}
+	}
+
+	public UAudioSource(AudioSource audioSource)
+	{
+		_audioSource = audioSource;
+	}
+
+	public void Play()
+	{
+		_audioSource.Play();
+		_isPaused = false;
+	}
+
+	public void Pause()
+	{
+		_audioSource.Pause();
+		_isPaused = true;
+	}
+
+	public void Unpause()
+	{
+		_audioSource.UnPause();
+		_isPaused = false;
+	}
+
+	public void Stop()
+	{
+		_audioSource.Stop();
+		_isPaused = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 330
+PATH: Assembly-CSharp__Beam__VehicleMovementBase.cs
+SIZE: 7020 bytes
+SHA256: 57b963b5aabd7fd301ee7f1d75f94be916e7c5f4cadfa06e43533bfc4c871eab
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Events;
+using Funlabs;
+using MEC;
+using UnityEngine;
+
+namespace Beam;
+
+public abstract class VehicleMovementBase : MonoBehaviour
+{
+	[SerializeField]
+	private Transform _operatingPosition;
+
+	[SerializeField]
+	private VehicleSeat[] _passengerSeats;
+
+	[SerializeField]
+	private Transform _passengerSeat;
+
+	private CoroutineHandle _inputSequence;
+
+	private CoroutineHandle _movingSequence;
+
+	public IPlayer Operator { get; set; }
+
+	public bool Operating => Operator != null;
+
+	public Transform OperatingPosition => _operatingPosition;
+
+	public VehicleSeat[] PassengerSeats => _passengerSeats;
+
+	public Transform PassengerSeat => _passengerSeat;
+
+	public Rigidbody Rigidbody { get; set; }
+
+	public float Throttle { get; protected set; }
+
+	public float Steering { get; protected set; }
+
+	public event Action<bool> Operated;
+
+	public event Action OperatingFailed;
+
+	public event Action Using;
+
+	protected virtual void OnOperated(bool value)
+	{
+		Operated?.Invoke(value);
+	}
+
+	protected virtual void OnOperatingFailed()
+	{
+		OperatingFailed?.Invoke();
+	}
+
+	protected virtual void OnUsing()
+	{
+		Using?.Invoke();
+	}
+
+	public abstract void Move();
+
+	protected virtual float GetThrottleInput()
+	{
+		if (!Operator.IsOwner)
+		{
+			return Operator.MultiplayerState.VehicleThrottle;
+		}
+		return Operator.Movement.GetVerticalInput();
+	}
+
+	protected virtual float GetSteeringInput()
+	{
+		if (!Operator.IsOwner)
+		{
+			return Operator.MultiplayerState.VehicleSteering;
+		}
+		return Operator.Movement.GetHorizontalInput();
+	}
+
+	public virtual float GetEngineLoad()
+	{
+		return Throttle;
+	}
+
+	public virtual bool EngineIsRunning()
+	{
+		return Operating;
+	}
+
+	private void TempCollision(IPlayer player, bool state)
+	{
+		player.Movement.CharacterController.enabled = !state;
+	}
+
+	public void Operate(IPlayer player, bool operate)
+	{
+		Operator = player;
+		OnOperated(operate);
+		if (operate)
+		{
+			_inputSequence = Timing.RunCoroutine(Input_Sequence(), Segment.Update);
+			_movingSequence = Timing.RunCoroutine(Movement_Sequence(), Segment.FixedUpdate);
+		}
+		else
+		{
+			Operator = null;
+			Timing.KillCoroutines(_inputSequence);
+			Timing.KillCoroutines(_movingSequence);
+		}
+	}
+
+	public virtual bool StartOperating(IPlayer player)
+	{
+		if (Operator == null && player.Movement.Vehicle == null && player.Movement.grounded && !IsOverturned())
+		{
+			TempCollision(player, state: true);
+			if (player.IsOwner)
+			{
+				player.Input.SetAndCacheMapsEnabled(state: true, 10);
+				player.Input.SetAndCacheMapsEnabled(state: false, 0);
+			}
+			player.Holder.SetEnabled(enabled: false);
+			player.Character.CurrentCharacterPosition = OperatingPosition;
+			player.Character.CurrentCharacterPosition.rotation = OperatingPosition.rotation;
+			player.Character.HideCurrentItem();
+			player.Movement.sprinting = false;
+			Operate(player, operate: true);
+			return true;
+		}
+		return false;
+	}
+
+	public virtual bool StopOperating(IPlayer player)
+	{
+		if (Operator != null && Operator.Equals(player))
+		{
+			TempCollision(player, state: false);
+			if (player.IsOwner)
+			{
+				player.Input.SetAndCacheMapsEnabled(state: false, 10);
+				player.Input.SetAndCacheMapsEnabled(state: true, 0);
+			}
+			player.Holder.SetEnabled(enabled: true);
+			player.Character.ShowCurrentItem();
+			player.Movement.Vehicle = null;
+			Operate(player, operate: false);
+			return true;
+		}
+		return false;
+	}
+
+	public bool StartRiding(IPlayer passenger)
+	{
+		if (!passenger.Movement.grounded)
+		{
+			return false;
+		}
+		if (Operator != null && Operator.Equals(passenger))
+		{
+			return false;
+		}
+		VehicleSeat passengerSeat = GetPassengerSeat(passenger.Id);
+		if (passengerSeat != null)
+		{
+			return false;
+		}
+		passengerSeat = GetPassengerSeat();
+		if (passengerSeat != null)
+		{
+			TempCollision(passenger, state: true);
+			if (passenger.IsOwner)
+			{
+				passenger.Input.SetAndCacheMapsEnabled(state: true, 10);
+				passenger.Input.SetAndCacheMapsEnabled(state: false, 0);
+			}
+			passenger.Character.CurrentCharacterPosition = _passengerSeat;
+			passenger.Character.CurrentCharacterPosition.rotation = _passengerSeat.rotation;
+			passenger.Holder.SetEnabled(enabled: false);
+			passenger.Character.HideCurrentItem();
+			passenger.Character.SetInteger("Vehicle_Pose", 3);
+			passengerSeat.PlayerId = passenger.Id;
+			return true;
+		}
+		return false;
+	}
+
+	public bool StopRiding(IPlayer passenger)
+	{
+		VehicleSeat passengerSeat = GetPassengerSeat(passenger.Id);
+		if (passengerSeat != null)
+		{
+			TempCollision(passenger, state: false);
+			if (passenger.IsOwner)
+			{
+				passenger.Input.SetAndCacheMapsEnabled(state: false, 10);
+				passenger.Input.SetAndCacheMapsEnabled(state: true, 0);
+			}
+			passenger.Holder.SetEnabled(enabled: true);
+			passenger.Character.ShowCurrentItem();
+			passenger.Character.SetInteger("Vehicle_Pose", 0);
+			passenger.Movement.Vehicle = null;
+			passengerSeat.PlayerId = -1;
+			return true;
+		}
+		return false;
+	}
+
+	public void Eject(IPlayer player)
+	{
+		if (!StopOperating(player))
+		{
+			StopRiding(player);
+			player.Movement.Vehicle = null;
+		}
+	}
+
+	public virtual bool IsOverturned()
+	{
+		return Vector3.Dot(transform.up, Vector3.up) < 0.7f;
+	}
+
+	protected virtual void Start()
+	{
+		EventManager.AddListener<PlayerDisconnectedEvent>(EventManager_PlayerDisconnected);
+	}
+
+	protected virtual void OnDestroy()
+	{
+		Operated = null;
+		OperatingFailed = null;
+		Using = null;
+		EventManager.RemoveListener<PlayerDisconnectedEvent>(EventManager_PlayerDisconnected);
+	}
+
+	private void EventManager_PlayerDisconnected(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		if (Operator != null && Operator.Id == disconnectedEvent.PlayerId)
+		{
+			Eject(Operator);
+		}
+	}
+
+	protected IEnumerator<float> Input_Sequence()
+	{
+		while (Operating)
+		{
+			Input();
+			yield return 0f;
+		}
+	}
+
+	protected virtual void Input()
+	{
+		Throttle = GetThrottleInput();
+		Steering = GetSteeringInput();
+		if (Operator.IsOwner)
+		{
+			Operator.MultiplayerState.VehicleThrottle = Throttle;
+			Operator.MultiplayerState.VehicleSteering = Steering;
+		}
+	}
+
+	protected IEnumerator<float> Movement_Sequence()
+	{
+		while (Operating)
+		{
+			Move();
+			yield return 0f;
+		}
+	}
+
+	public VehicleSeat GetPassengerSeat(int id = -1)
+	{
+		for (int i = 0; i < _passengerSeats.Length; i++)
+		{
+			VehicleSeat vehicleSeat = _passengerSeats[i];
+			if (vehicleSeat.PlayerId == id)
+			{
+				vehicleSeat.Rotation.w = 1f;
+				return vehicleSeat;
+			}
+		}
+		return null;
+	}
+
+	public VehicleSeatOrientation GetSeatOrientation(IPlayer player)
+	{
+		if (Operator != null && Operator.Equals(player))
+		{
+			return new VehicleSeatOrientation
+			{
+				Position = OperatingPosition.position,
+				Rotation = OperatingPosition.rotation
+			};
+		}
+		VehicleSeat passengerSeat = GetPassengerSeat(player.Id);
+		if (passengerSeat != null)
+		{
+			return new VehicleSeatOrientation
+			{
+				Position = transform.TransformPoint(passengerSeat.Position),
+				Rotation = transform.rotation * passengerSeat.Rotation
+			};
+		}
+		return default;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 331
+PATH: Assembly-CSharp__Beam__VerletLine.cs
+SIZE: 3060 bytes
+SHA256: 4c14c4eee5fe821a23bf60335b1df1e4c070020c65324b6a4fe4c0d762270720
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam;
+
+public class VerletLine : MonoBehaviour
+{
+	public Transform CableStart;
+
+	public Transform CableEnd;
+
+	public float CableLength = 10f;
+
+	public int CableSegments = 10;
+
+	public int SolverIterations = 1;
+
+	[SerializeField]
+	private LineRenderer _lineRenderer;
+
+	private readonly List<VParticle> _particles = new List<VParticle>();
+
+	private float _timeRemainder;
+
+	private float SubstepTime = 0.02f;
+
+	private void Start()
+	{
+		Vector3 vector = CableEnd.position - CableStart.position;
+		_particles.Clear();
+		int num = CableSegments + 1;
+		for (int i = 0; i < num; i++)
+		{
+			float num2 = (float)i / (float)num;
+			VParticle vParticle = new VParticle(CableStart.transform.position + num2 * vector);
+			vParticle.Free = i != 0 && i != num - 1;
+			_particles.Add(vParticle);
+		}
+		_lineRenderer.positionCount = _particles.Count;
+	}
+
+	private void Update()
+	{
+		VParticle vParticle = _particles[0];
+		vParticle.Position = (vParticle.OldPosition = CableStart.position);
+		VParticle vParticle2 = _particles[CableSegments];
+		vParticle2.Position = (vParticle2.OldPosition = CableEnd.position);
+		Vector3 gravity = Physics.gravity;
+		float num = Mathf.Max(SubstepTime, 0.005f);
+		_timeRemainder += Time.deltaTime;
+		while (_timeRemainder > num)
+		{
+			PreformSubstep(num, gravity);
+			_timeRemainder -= num;
+		}
+	}
+
+	private void LateUpdate()
+	{
+		for (int i = 0; i < _particles.Count; i++)
+		{
+			VParticle vParticle = _particles[i];
+			_lineRenderer.SetPosition(i, vParticle.Position);
+		}
+	}
+
+	private void PreformSubstep(float substepTime, Vector3 gravity)
+	{
+		VerletIntegrate(substepTime, gravity);
+		SolveConstraints();
+	}
+
+	private void VerletIntegrate(float substepTime, Vector3 gravity)
+	{
+		int num = CableSegments + 1;
+		float num2 = substepTime * substepTime;
+		for (int i = 0; i < num; i++)
+		{
+			VParticle vParticle = _particles[i];
+			if (vParticle.Free)
+			{
+				Vector3 vector = vParticle.Position - vParticle.OldPosition;
+				Vector3 position = vParticle.Position + vector + num2 * gravity;
+				vParticle.OldPosition = vParticle.Position;
+				vParticle.Position = position;
+			}
+		}
+	}
+
+	private void SolveConstraints()
+	{
+		float distance = CableLength / (float)CableSegments;
+		for (int i = 0; i < SolverIterations; i++)
+		{
+			for (int j = 0; j < CableSegments; j++)
+			{
+				VParticle particleA = _particles[j];
+				VParticle particleB = _particles[j + 1];
+				SolveDistanceConstraint(particleA, particleB, distance);
+			}
+		}
+	}
+
+	private void SolveDistanceConstraint(VParticle particleA, VParticle particleB, float distance)
+	{
+		Vector3 vector = particleB.Position - particleA.Position;
+		float magnitude = vector.magnitude;
+		float num = (magnitude - distance) / magnitude;
+		if (particleA.Free && particleB.Free)
+		{
+			particleA.Position += num * 0.5f * vector;
+			particleB.Position -= num * 0.5f * vector;
+		}
+		else if (particleA.Free)
+		{
+			particleA.Position += num * vector;
+		}
+		else if (particleB.Free)
+		{
+			particleB.Position -= num * vector;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 332
+PATH: Assembly-CSharp__Beam__ZoneUtilities.cs
+SIZE: 1754 bytes
+SHA256: 9683be38f6e129ff63d46c49baf3a46659d5d295ecd0140de15402dfe3ff0ee9
+====================================================================================================
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam;
+
+public static class ZoneUtilities
+{
+	public static T FindObject<T>(this IEnumerable<Zone> zones, MiniGuid referenceId) where T : ISaveableReference
+	{
+		return zones.Select((Zone z) => z.SaveContainer.FindObject<T>(referenceId)).FirstOrDefault_NonAlloc();
+	}
+
+	public static T FindObjectRanged<T>(this IEnumerable<Zone> zones, MiniGuid referenceId, int startIndex, int range = -1) where T : ISaveableReference
+	{
+		return zones.Select((Zone z) => z.SaveContainer.FindObjectRanged<T>(referenceId, startIndex, range)).FirstOrDefault_NonAlloc();
+	}
+
+	public static T FindObject<T>(this Transform transform, MiniGuid referenceId, bool includeInactive = false) where T : ISaveableReference
+	{
+		if (referenceId.IsDefault())
+		{
+			Debug.LogError("FindObject:: Reference id was empty!");
+			return default;
+		}
+		return transform.GetComponentsInChildren<T>(includeInactive).FirstOrDefault_NonAlloc((T obj, MiniGuid id) => obj.ReferenceId.Equals(id), referenceId);
+	}
+
+	public static T FindObjectRanged<T>(this Transform transform, MiniGuid referenceId, int startIndex, int range = -1) where T : ISaveableReference
+	{
+		if (referenceId.IsDefault())
+		{
+			Debug.LogError("FindObjectRanged:: Reference id was empty!");
+			return default;
+		}
+		int childCount = transform.childCount;
+		int num = Mathf.Max(0, startIndex);
+		int num2 = ((range == -1) ? childCount : Mathf.Min(startIndex + range, childCount));
+		for (int i = num; i < num2; i++)
+		{
+			T component = transform.GetChild(i).GetComponent<T>();
+			if (component != null && component.ReferenceId.Equals(referenceId))
+			{
+				return component;
+			}
+		}
+		return default;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 333
+PATH: Assembly-CSharp__Boss_Squid.cs
+SIZE: 5707 bytes
+SHA256: b9b273a884ce4d78977df204a06330495f0bbb465be0117ed6c70c4da630a8d8
+====================================================================================================
+
+using System.Collections;
+using System.Collections.Generic;
+using Beam;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+
+public class Boss_Squid : Piscus_Creature
+{
+	public class ReplicateIntroSetup : MultiplayerMessage
+	{
+		[Replicate]
+		public Piscus_Creature Creature;
+
+		public override void OnPeer()
+		{
+			((Boss_Squid)Creature).Setup_Intro();
+		}
+	}
+
+	private bool _introSetup;
+
+	[SerializeField]
+	private Boss_Squid_Tentacle _tentacle;
+
+	private Vector3 _goalStartPosition;
+
+	private Quaternion _goalStartRotation;
+
+	public Boss_Squid_Tentacle Tentacle => _tentacle;
+
+	protected override void Start()
+	{
+		base.Start();
+		Timing.RunCoroutine(Start_Sequence());
+	}
+
+	private IEnumerator<float> Start_Sequence()
+	{
+		while (LevelLoader.IsLoading())
+		{
+			yield return 0f;
+		}
+		PostAssetLoad();
+	}
+
+	private void PostAssetLoad()
+	{
+		CurrentState = PiscusBehaviour.Idle;
+		BiomePosition = transform.position;
+		BiomeSize = 100f;
+		_goalStartPosition = transform.position;
+		_goalStartRotation = transform.rotation;
+		SetDifficultyParams();
+	}
+
+	protected override void Initialize()
+	{
+	}
+
+	protected override void SEARCH_FOR_PLAYER()
+	{
+		IPlayer currentTarget = PlayerUtilities.FindClosestPlayer(transform.position);
+		CurrentTarget = currentTarget;
+	}
+
+	public override void ApplyDamage(float damageTaken)
+	{
+		base.ApplyDamage(damageTaken);
+		Setup_Intro();
+		_tentacle.TakeDamage();
+	}
+
+	protected IEnumerator Idle_EnterState()
+	{
+		CurrentSpeed = 0f;
+		Animation.AnimatorController.SetFloat("Speed", 0f);
+		transform.LookAt(transform.position + Vector3.up);
+		yield break;
+	}
+
+	protected void Idle_FixedUpdate()
+	{
+		SEARCH_FOR_PLAYER();
+		if (CurrentTarget == null)
+		{
+			CurrentState = PiscusBehaviour.Explore;
+			return;
+		}
+		if (!_introSetup)
+		{
+			if (Vector3.Distance(CurrentTarget.transform.position, transform.position) < EngagePlayerDistance)
+			{
+				ReplicatedIntroSetup();
+			}
+			return;
+		}
+		UPDATE_MOVEMENT(checkAvoidance: false);
+		if (Vector3.Distance(MovementPosition, transform.position) < 4f)
+		{
+			ReplicatedChangeState(PiscusBehaviour.CircleTarget, CurrentTarget);
+		}
+	}
+
+	private void Setup_Intro()
+	{
+		if (!_introSetup)
+		{
+			_introSetup = true;
+			MovementPosition = transform.position + transform.forward * 20f + transform.right * 25f;
+			MovementPosition = ClampToBounds(MovementPosition);
+			CurrentSpeed = MaxSpeed;
+			OnAwakened();
+		}
+	}
+
+	protected override void Damage_Avoid()
+	{
+	}
+
+	protected override void Attempt_Attacks()
+	{
+		if (CanAttack)
+		{
+			if (CurrentTarget.Movement.InWater)
+			{
+				Attempt_Attack_Player_InWater();
+			}
+			else
+			{
+				Attempt_Tentacle_GrabAttack();
+			}
+		}
+	}
+
+	protected override bool IsAttackPositionValid_Player_InWater(Vector3 attackPosition)
+	{
+		if (attackPosition.y < transform.position.y - 1f)
+		{
+			return false;
+		}
+		return base.IsAttackPositionValid_Player_InWater(attackPosition);
+	}
+
+	private void Attempt_Tentacle_GrabAttack()
+	{
+		if (!CheckAttackTimer())
+		{
+			Vector3 a = new Vector3(CurrentTarget.transform.position.x, 0f, CurrentTarget.transform.position.z);
+			Vector3 b = new Vector3(transform.position.x, 0f, transform.position.z);
+			float num = Vector3.Distance(a, b);
+			if (!(num > 40f) && !(num < 5f) && !(Vector3.Angle(-transform.forward, CurrentTarget.transform.position - transform.position) > 110f) && !(transform.position.y < -5f))
+			{
+				_tentacle.ReplicatedAttackTarget(CurrentTarget);
+				LastAttack *= 0.5f;
+			}
+		}
+	}
+
+	private void Attempt_Tentacle_RaftAttack()
+	{
+		if (CurrentTarget == null)
+		{
+			return;
+		}
+		Transform activePlatform = CurrentTarget.Movement.ActivePlatform;
+		if (activePlatform == null || activePlatform.transform.position.y > 5f)
+		{
+			return;
+		}
+		Vector3 vector = transform.position + transform.forward * 20f;
+		Vector2 vector2 = ClampPositionToCircle(new Vector2(activePlatform.transform.position.x, activePlatform.transform.position.z), MaxCircleRadius, new Vector2(vector.x, vector.z));
+		MovementPosition = new Vector3(vector2.x, Mathf.Lerp(MovementPosition.y, -0.65f, 8f * FixedTime.TimeStep(this)), vector2.y);
+		MovementPosition = ClampToBounds(MovementPosition);
+		if (!(transform.position.y < activePlatform.position.y - 5f))
+		{
+			Vector3 direction = activePlatform.position - transform.position;
+			if (!Physics.SphereCast(transform.position, AvoidanceRayWidth, direction, out var hitInfo, direction.magnitude, 1 << Layers.TERRAIN, QueryTriggerInteraction.Ignore) || !hitInfo.collider)
+			{
+				_tentacle.ReplicatedAttackTarget(CurrentTarget);
+			}
+		}
+	}
+
+	public void Reset()
+	{
+		if (CurrentState.Equals(PiscusBehaviour.AttackingPlayer))
+		{
+			ReplicatedFinishAttack();
+		}
+		_introSetup = false;
+		transform.position = _goalStartPosition;
+		transform.rotation = _goalStartRotation;
+		CurrentTarget = null;
+		ReplicatedChangeState(PiscusBehaviour.Idle, CurrentTarget);
+		transform.DestroyProjectilesInChildren();
+	}
+
+	private void ReplicatedIntroSetup()
+	{
+		if (Game.Mode.IsServer())
+		{
+			ReplicateIntroSetup replicateIntroSetup = new ReplicateIntroSetup();
+			replicateIntroSetup.Creature = this;
+			replicateIntroSetup.Post();
+		}
+		Setup_Intro();
+	}
+
+	protected override void EventManager_PlayerDisconnected_Core(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		if (disconnectedEvent.PlayerId == 1)
+		{
+			if (CurrentAttackTarget != null && PlayerUtilities.GetPlayerId_Safe(CurrentAttackTarget) == disconnectedEvent.PlayerId)
+			{
+				FinishAttack(completedAttack: true);
+			}
+			if (CurrentTarget != null && PlayerUtilities.GetPlayerId_Safe(CurrentTarget) == disconnectedEvent.PlayerId)
+			{
+				IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(0);
+				CurrentTarget = playerFromId;
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 334
+PATH: Assembly-CSharp__Boss_Squid_Environment.cs
+SIZE: 1176 bytes
+SHA256: 8cc990ca2109d1013778a34d1be380896d49b2163a436d040517dea19a2e2a10
+====================================================================================================
+
+using Beam;
+using UnityEngine;
+
+public class Boss_Squid_Environment : MonoBehaviour
+{
+	[SerializeField]
+	private Transform _buoy;
+
+	[SerializeField]
+	private Transform _buoyChain;
+
+	[SerializeField]
+	private Light _buoyLight;
+
+	[SerializeField]
+	private AudioSource _buoyBellAudio;
+
+	private float _buoyBellTime;
+
+	private float _buoyBellTimer;
+
+	private void Start()
+	{
+		TriggerLight();
+		if ((bool)Singleton<Atmosphere>.Instance)
+		{
+			Singleton<Atmosphere>.Instance.SunsetEvent += TriggerLight;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if ((bool)Singleton<Atmosphere>.Instance)
+		{
+			Singleton<Atmosphere>.Instance.SunsetEvent -= TriggerLight;
+		}
+	}
+
+	private void Update()
+	{
+		_buoyChain.position = new Vector3(_buoyChain.position.x, _buoy.position.y, _buoyChain.position.z);
+		_buoyBellTime += Time.deltaTime;
+		if (_buoyBellTime > _buoyBellTimer)
+		{
+			_buoyBellTime = 0f;
+			_buoyBellTimer = Random.Range(5, 15);
+			_buoyBellAudio.pitch = Random.Range(0.95f, 1.05f);
+			_buoyBellAudio.Play();
+			if (Random.value < 0.1f)
+			{
+				_buoyBellTimer = 1f;
+			}
+		}
+	}
+
+	private void TriggerLight()
+	{
+		_buoyLight.enabled = !Singleton<Atmosphere>.Instance.DayTime;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 335
+PATH: Assembly-CSharp__Boss_Squid_Tentacle.cs
+SIZE: 5596 bytes
+SHA256: 2fa01864f0214bcb6dc74c6897547c3e7dc1b7d796aee723971ca3f616efa18a
+====================================================================================================
+
+using Beam;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+using UnityEngine.Events;
+
+public class Boss_Squid_Tentacle : MonoBehaviour
+{
+	public class ReplicateAttackTarget : MultiplayerMessage
+	{
+		[Replicate]
+		public Piscus_Creature Creature;
+
+		[Replicate]
+		public IPlayer Player;
+
+		public override void OnPeer()
+		{
+			((Boss_Squid)Creature).Tentacle.AttackTarget(Player);
+		}
+	}
+
+	public class ReplicatePushAndDamagePlayer : MultiplayerMessage
+	{
+		[Replicate]
+		public Piscus_Creature Creature;
+
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public Vector3 Direction;
+
+		[Replicate]
+		public float Damage;
+
+		public override void OnPeer()
+		{
+			((Boss_Squid)Creature).Tentacle.PushAndDamagePlayer(Player, Direction, Damage);
+		}
+	}
+
+	[SerializeField]
+	private Boss_Squid _bossSquid;
+
+	[SerializeField]
+	private Transform _Grab;
+
+	[SerializeField]
+	private SkinnedMeshRenderer _renderer;
+
+	private Animation _animation;
+
+	private Vector3 _grabTargetPosition;
+
+	private float _grabSpeed = 0.75f;
+
+	private float _reachDist;
+
+	private bool _targetGrabbed;
+
+	private bool _tentacleAttacking;
+
+	private AnimationState _animReach;
+
+	private AnimationState _animMiss;
+
+	private AnimationState _animGrab;
+
+	public UnityEvent Attacked;
+
+	public UnityEvent AttackedGrabbed;
+
+	public UnityEvent AttackedPushed;
+
+	private void Start()
+	{
+		_animation = GetComponent<Animation>();
+		_animReach = _animation["Reach_1"];
+		_animMiss = _animation["Miss"];
+		_animGrab = _animation["Grab"];
+		_animation.wrapMode = WrapMode.ClampForever;
+		_animGrab.wrapMode = WrapMode.Once;
+		_animGrab.layer = 2;
+	}
+
+	private IPlayer FindClosestPlayer(Vector3 position)
+	{
+		IPlayer player = PlayerUtilities.FindClosestPlayer(position, out var _);
+		if (!player.IsNullOrDestroyed())
+		{
+			return player;
+		}
+		return null;
+	}
+
+	private void Update()
+	{
+		if (_renderer.enabled != _tentacleAttacking)
+		{
+			_renderer.enabled = _tentacleAttacking;
+		}
+		if (!_tentacleAttacking)
+		{
+			return;
+		}
+		transform.LookAt(_grabTargetPosition);
+		IPlayer player = FindClosestPlayer(_Grab.position);
+		if (player != null)
+		{
+			if (Vector3.Distance(_Grab.position, player.transform.position) < 1f && !_targetGrabbed)
+			{
+				_targetGrabbed = true;
+				_reachDist = _animReach.time;
+				HitTarget(player);
+			}
+			float num = _animReach.length * _animReach.normalizedTime;
+			if (num >= _animReach.length)
+			{
+				MissTarget();
+			}
+			else if (_animReach.speed < 0f && num <= 0f)
+			{
+				_tentacleAttacking = false;
+			}
+			else if (_animMiss.length * _animMiss.normalizedTime >= _animMiss.length)
+			{
+				_tentacleAttacking = false;
+			}
+		}
+	}
+
+	public void TakeDamage()
+	{
+		if (_tentacleAttacking)
+		{
+			IPlayer player = FindClosestPlayer(_Grab.position);
+			if (player == null)
+			{
+				_animation.Stop();
+			}
+			else if (Vector3.Distance(_Grab.position, player.transform.position) < 12f)
+			{
+				_reachDist = _animReach.time;
+				_animation.Stop();
+				_animation.CrossFade("Grab", 0.03f);
+				_animReach.time = _reachDist;
+				_animReach.speed = 0f - _grabSpeed;
+				_animation.Play("Reach_1");
+			}
+		}
+	}
+
+	public void AttackTarget(IPlayer player)
+	{
+		_tentacleAttacking = true;
+		ReachForTarget(player);
+	}
+
+	private void ReachForTarget(IPlayer player)
+	{
+		_targetGrabbed = false;
+		_grabTargetPosition = player.transform.position;
+		_animation.Stop();
+		_animGrab.time = 0f;
+		_animReach.time = 0f;
+		_animReach.speed = _grabSpeed;
+		_animation.Play("Reach_1");
+		Attacked?.Invoke();
+	}
+
+	private void HitTarget(IPlayer player)
+	{
+		_animation.Stop();
+		_animation.CrossFade("Grab", 0.03f);
+		_animReach.time = _reachDist;
+		_animReach.speed = 0f - _grabSpeed;
+		_animation.Play("Reach_1");
+		if (player.IsOwner)
+		{
+			if (Random.value < 0.75f)
+			{
+				Grab_Player(player);
+			}
+			else
+			{
+				Push_Player(player);
+			}
+		}
+	}
+
+	private void MissTarget()
+	{
+		_animation.Play("Miss");
+	}
+
+	private void Grab_Player(IPlayer player)
+	{
+		AttackedGrabbed?.Invoke();
+		Vector3 vector = new Vector3(transform.position.x, player.transform.position.y, transform.position.z);
+		Vector3 position = player.transform.position;
+		Vector3 direction = vector - position;
+		ReplicatedPushAndDamagePlayer(player, direction, 25f);
+	}
+
+	private void Push_Player(IPlayer player)
+	{
+		AttackedPushed?.Invoke();
+		Vector3 position = transform.position;
+		Vector3 direction = player.transform.position - position;
+		ReplicatedPushAndDamagePlayer(player, direction, 25f);
+	}
+
+	private void PushAndDamagePlayer(IPlayer player, Vector3 direction, float damage)
+	{
+		player.Movement.AddVelocity(direction, 3f);
+		player.Statistics.ApplyDamage(damage, transform.position, "Tentacle");
+	}
+
+	public void ReplicatedAttackTarget(IPlayer player)
+	{
+		if (Game.Mode.IsMaster())
+		{
+			ReplicateAttackTarget replicateAttackTarget = new ReplicateAttackTarget();
+			replicateAttackTarget.Creature = _bossSquid.GetComponent<Piscus_Creature>();
+			replicateAttackTarget.Player = player;
+			replicateAttackTarget.Post();
+		}
+		AttackTarget(player);
+	}
+
+	private void ReplicatedPushAndDamagePlayer(IPlayer player, Vector3 direction, float damage)
+	{
+		if (Game.Mode.IsServer())
+		{
+			ReplicatePushAndDamagePlayer replicatePushAndDamagePlayer = new ReplicatePushAndDamagePlayer();
+			replicatePushAndDamagePlayer.Creature = _bossSquid.GetComponent<Piscus_Creature>();
+			replicatePushAndDamagePlayer.Player = player;
+			replicatePushAndDamagePlayer.Direction = direction;
+			replicatePushAndDamagePlayer.Damage = damage;
+			replicatePushAndDamagePlayer.Post();
+		}
+		PushAndDamagePlayer(player, direction, damage);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 336
+PATH: Assembly-CSharp__BoundsTest.cs
+SIZE: 1484 bytes
+SHA256: dc413e112c290353d99826e8c59399b2d01d21ecf11d40cd4ebb8ae9fddb8993
+====================================================================================================
+
+using System.Linq;
+using Beam;
+using UnityEngine;
+
+[ExecuteInEditMode]
+public class BoundsTest : MonoBehaviour
+{
+	public Bounds bounds;
+
+	[SerializeField]
+	private BoxCollider _collider;
+
+	private Vector3[] _points = new Vector3[8];
+
+	private void OnDrawGizmos()
+	{
+		OOBB oobb = new OOBB(transform, _collider.size);
+		float num = oobb.Size.x / 2f;
+		float num2 = oobb.Size.y / 2f;
+		float num3 = oobb.Size.z / 2f;
+		_points[0] = new Vector3(num, num2, num3);
+		_points[1] = new Vector3(0f - num, num2, num3);
+		_points[2] = new Vector3(num, 0f - num2, num3);
+		_points[3] = new Vector3(0f - num, 0f - num2, num3);
+		_points[4] = new Vector3(num, num2, 0f - num3);
+		_points[5] = new Vector3(0f - num, num2, 0f - num3);
+		_points[6] = new Vector3(num, 0f - num2, 0f - num3);
+		_points[7] = new Vector3(0f - num, 0f - num2, 0f - num3);
+		Gizmos.color = Color.green;
+		Vector3[] array = new Vector3[8];
+		for (int i = 0; i < _points.Length; i++)
+		{
+			array[i] = transform.TransformPoint(_points[i]);
+		}
+		Vector3[] array2 = array;
+		for (int j = 0; j < array2.Length; j++)
+		{
+			Gizmos.DrawSphere(array2[j], 0.2f);
+		}
+		Gizmos.color = Color.white;
+		Test(oobb);
+	}
+
+	public void Test(OOBB oobb)
+	{
+		foreach (BoxCollider item in (from c in Physics.OverlapSphere(transform.position, 3f)
+			where c != _collider && c is BoxCollider
+			select c).Cast<BoxCollider>())
+		{
+			if (new OOBB(item.transform, item.size).Intersects(oobb))
+			{
+				Debug.Log("INTERSECTING!!");
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 337
+PATH: Assembly-CSharp__BuoyMultiplayerSync.cs
+SIZE: 776 bytes
+SHA256: 38d9d068eb6ac795629b19a8abaa338be117019af9bc66745696cef36e6f81c4
+====================================================================================================
+
+using Beam;
+using Beam.Rendering;
+using Funlabs;
+using Photon.Bolt;
+using UnityEngine;
+
+public class BuoyMultiplayerSync : MultiplayerBehaviour
+{
+	[SerializeField]
+	private GameObject _buoy;
+
+	public override void Attached()
+	{
+		state.SetTransforms(((IBuoyState)state).Transform, _buoy.transform);
+	}
+
+	private void Start()
+	{
+		if (Game.Mode.IsClient())
+		{
+			_buoy.GetComponent<Rigidbody>().isKinematic = true;
+			TryToAttachToBouy();
+		}
+	}
+
+	public void TryToAttachToBouy()
+	{
+		GameObject gameObject = GameObject.FindGameObjectWithTag("Mission_Squid");
+		if (gameObject != null)
+		{
+			transform.SetParent(gameObject.transform, worldPositionStays: false);
+			transform.localPosition = Vector3.zero;
+			GetComponent<LodControllerChild>().AdoptParentLodGroup();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 338
+PATH: Assembly-CSharp__CPG_CameraPerspective__CPG_CameraPerspectiveGizmo.cs
+SIZE: 6621 bytes
+SHA256: cc11501169b11aadeb70485417f7ed22f1baba06e3b0b0b87c9fe18123a4721f
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace CPG_CameraPerspective;
+
+public class CPG_CameraPerspectiveGizmo : MonoBehaviour
+{
+	public enum EButtonTypes
+	{
+		TOGGLE_ORTHO,
+		X_POS,
+		X_NEG,
+		Y_POS,
+		Y_NEG,
+		Z_POS,
+		Z_NEG
+	}
+
+	[SerializeField]
+	private Vector2 m_relativeScreenPos = Vector2.one * 0.85f;
+
+	[SerializeField]
+	private float m_relativeScreenSize = 0.1f;
+
+	[SerializeField]
+	private int m_layerToUse = 31;
+
+	[SerializeField]
+	private Vector3 m_pivot = Vector3.zero;
+
+	[SerializeField]
+	private float m_minDistToPivot = 15f;
+
+	[SerializeField]
+	private float m_orthoOffset;
+
+	private Camera m_targetCamera;
+
+	private Camera m_ownCamera;
+
+	public EventHandler m_onBeforeSwitchToOrthographic;
+
+	public EventHandler m_onAfterSwitchToOrthographic;
+
+	public EventHandler m_onBeforeSwitchToPerspective;
+
+	public EventHandler m_onAfterSwitchToPerspective;
+
+	public Vector2 RelativeScreenPos
+	{
+		get
+		{
+			return m_relativeScreenPos;
+		}
+		set
+		{
+			m_relativeScreenPos = value;
+		}
+	}
+
+	public float RelativeScreenSize
+	{
+		get
+		{
+			return m_relativeScreenSize;
+		}
+		set
+		{
+			m_relativeScreenSize = value;
+		}
+	}
+
+	public int LayerToUse
+	{
+		get
+		{
+			return m_layerToUse;
+		}
+		set
+		{
+			m_layerToUse = value;
+		}
+	}
+
+	public Vector3 Pivot
+	{
+		get
+		{
+			return m_pivot;
+		}
+		set
+		{
+			m_pivot = value;
+		}
+	}
+
+	public float MinDistToPivot
+	{
+		get
+		{
+			return m_minDistToPivot;
+		}
+		set
+		{
+			m_minDistToPivot = value;
+		}
+	}
+
+	public float OrthoOffset
+	{
+		get
+		{
+			return m_orthoOffset;
+		}
+		set
+		{
+			m_orthoOffset = value;
+		}
+	}
+
+	public Camera TargetCamera
+	{
+		get
+		{
+			if (m_targetCamera == null)
+			{
+				m_targetCamera = Camera.main;
+			}
+			return m_targetCamera;
+		}
+		set
+		{
+			m_targetCamera = value;
+		}
+	}
+
+	public Camera OwnCamera
+	{
+		get
+		{
+			if (m_ownCamera == null)
+			{
+				m_ownCamera = GetComponentInChildren<Camera>();
+			}
+			return m_ownCamera;
+		}
+	}
+
+	public static CPG_CameraPerspectiveGizmo Create(Camera p_targetCamera, int p_layerToUse)
+	{
+		if (p_targetCamera != null)
+		{
+			UnityEngine.Object obj = Resources.Load("CPG_CameraPerspectiveGizmo");
+			if (obj != null)
+			{
+				CPG_CameraPerspectiveGizmo component = ((GameObject)UnityEngine.Object.Instantiate(obj)).GetComponent<CPG_CameraPerspectiveGizmo>();
+				component.TargetCamera = p_targetCamera;
+				component.LayerToUse = p_layerToUse;
+				return component;
+			}
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: prefab 'CPG_CameraPerspectiveGizmo' not found!");
+		}
+		else
+		{
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: p_targetCamera is null!");
+		}
+		return null;
+	}
+
+	public void ReportClick(EButtonTypes p_type)
+	{
+		switch (p_type)
+		{
+		case EButtonTypes.TOGGLE_ORTHO:
+			ToggleOrtho();
+			break;
+		case EButtonTypes.X_POS:
+			ToogleAxis(Vector3.right);
+			break;
+		case EButtonTypes.X_NEG:
+			ToogleAxis(Vector3.left);
+			break;
+		case EButtonTypes.Y_POS:
+			ToogleAxis(Vector3.up);
+			break;
+		case EButtonTypes.Y_NEG:
+			ToogleAxis(Vector3.down);
+			break;
+		case EButtonTypes.Z_POS:
+			ToogleAxis(Vector3.forward);
+			break;
+		case EButtonTypes.Z_NEG:
+			ToogleAxis(Vector3.back);
+			break;
+		}
+	}
+
+	private void ToggleOrtho()
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null)
+		{
+			if (targetCamera.orthographic && m_onBeforeSwitchToPerspective != null)
+			{
+				m_onBeforeSwitchToPerspective(this, EventArgs.Empty);
+			}
+			if (!targetCamera.orthographic && m_onBeforeSwitchToOrthographic != null)
+			{
+				m_onBeforeSwitchToOrthographic(this, EventArgs.Empty);
+			}
+			if (targetCamera.orthographic)
+			{
+				targetCamera.transform.position += targetCamera.transform.forward * m_orthoOffset;
+			}
+			else
+			{
+				targetCamera.transform.position -= targetCamera.transform.forward * m_orthoOffset;
+			}
+			targetCamera.orthographic = !targetCamera.orthographic;
+			if (targetCamera.orthographic && m_onAfterSwitchToOrthographic != null)
+			{
+				m_onAfterSwitchToOrthographic(this, EventArgs.Empty);
+			}
+			if (!targetCamera.orthographic && m_onAfterSwitchToPerspective != null)
+			{
+				m_onAfterSwitchToPerspective(this, EventArgs.Empty);
+			}
+		}
+	}
+
+	private void ToogleAxis(Vector3 p_axis)
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null)
+		{
+			float num = (targetCamera.transform.position - Pivot).magnitude;
+			if (num == 0f)
+			{
+				num = 1f;
+			}
+			float num2 = m_minDistToPivot;
+			if (targetCamera.orthographic)
+			{
+				num2 += m_orthoOffset;
+			}
+			targetCamera.transform.position = Pivot + Mathf.Max(num2, num) * p_axis;
+			targetCamera.transform.LookAt(m_pivot);
+		}
+	}
+
+	private void Start()
+	{
+		MoveToLayer(transform, m_layerToUse);
+		m_ownCamera = GetComponentInChildren<Camera>();
+		if (m_ownCamera != null)
+		{
+			m_ownCamera.aspect = 1f;
+			Camera targetCamera = TargetCamera;
+			if (targetCamera != null && targetCamera.pixelRect.xMax - targetCamera.pixelRect.xMin > 1f && targetCamera.pixelRect.yMax - targetCamera.pixelRect.yMin > 1f)
+			{
+				Rect rect = targetCamera.rect;
+				float num = m_relativeScreenSize / targetCamera.aspect * rect.width;
+				float num2 = m_relativeScreenSize * rect.height;
+				Vector2 vector = new Vector2(rect.x, rect.y) + m_relativeScreenPos - new Vector2(1f - rect.xMax, 1f - rect.yMax) - 0.5f * new Vector2(num, num2);
+				m_ownCamera.rect = new Rect(vector.x, vector.y, num, num2);
+			}
+			else
+			{
+				Debug.LogError("CPG_CameraPerspectiveGizmo: Start: could not find any camera with a non empty view rect! Will destroy self now!");
+				UnityEngine.Object.Destroy(gameObject);
+			}
+			m_ownCamera.cullingMask = 1 << m_layerToUse;
+		}
+		else
+		{
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Start: CPG_CameraPerspectiveGizmo prefab seems to be broken it needs a camera in its children!");
+		}
+	}
+
+	private void Update()
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null && m_ownCamera != null)
+		{
+			m_ownCamera.orthographic = targetCamera.orthographic;
+			m_ownCamera.transform.localPosition = -5.2f * targetCamera.transform.forward;
+			m_ownCamera.transform.rotation = targetCamera.transform.rotation;
+		}
+		else
+		{
+			Debug.LogWarning("CPG_CameraPerspectiveGizmo: Update: lost reference to camera ! Will destroy self now!");
+			UnityEngine.Object.Destroy(gameObject);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		m_onBeforeSwitchToOrthographic = null;
+		m_onBeforeSwitchToPerspective = null;
+		m_onAfterSwitchToOrthographic = null;
+		m_onAfterSwitchToPerspective = null;
+	}
+
+	private void MoveToLayer(Transform root, int layer)
+	{
+		root.gameObject.layer = layer;
+		foreach (Transform item in root)
+		{
+			MoveToLayer(item, layer);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 339
+PATH: Assembly-CSharp__Ceto.Common.Unity.Utility__ExtendedFind.cs
+SIZE: 4016 bytes
+SHA256: 609e5a340e8db9a4bd0c955962f8b838ec62972de5be80ada5d238d042b57df0
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Ceto.Common.Unity.Utility;
+
+public static class ExtendedFind
+{
+	public static T GetInterface<T>(GameObject obj) where T : class
+	{
+		Component[] components = obj.GetComponents<Component>();
+		foreach (Component component in components)
+		{
+			if (component is T)
+			{
+				return component as T;
+			}
+		}
+		return null;
+	}
+
+	public static T GetInterfaceInChildren<T>(GameObject obj) where T : class
+	{
+		Component[] componentsInChildren = obj.GetComponentsInChildren<Component>();
+		foreach (Component component in componentsInChildren)
+		{
+			if (component is T)
+			{
+				return component as T;
+			}
+		}
+		return null;
+	}
+
+	public static T GetInterfaceImmediateChildren<T>(GameObject obj) where T : class
+	{
+		foreach (Transform item in obj.transform)
+		{
+			Component[] components = item.GetComponents<Component>();
+			foreach (Component component in components)
+			{
+				if (component is T)
+				{
+					return component as T;
+				}
+			}
+		}
+		return null;
+	}
+
+	public static T[] GetInterfaces<T>(GameObject obj) where T : class
+	{
+		Component[] components = obj.GetComponents<Component>();
+		List<T> list = new List<T>();
+		Component[] array = components;
+		foreach (Component component in array)
+		{
+			if (component is T)
+			{
+				list.Add(component as T);
+			}
+		}
+		return list.ToArray();
+	}
+
+	public static T[] GetInterfacesInChildren<T>(GameObject obj) where T : class
+	{
+		Component[] componentsInChildren = obj.GetComponentsInChildren<Component>();
+		List<T> list = new List<T>();
+		Component[] array = componentsInChildren;
+		foreach (Component component in array)
+		{
+			if (component is T)
+			{
+				list.Add(component as T);
+			}
+		}
+		return list.ToArray();
+	}
+
+	public static T[] GetInterfacesImmediateChildren<T>(GameObject obj) where T : class
+	{
+		List<T> list = new List<T>();
+		foreach (Transform item in obj.transform)
+		{
+			Component[] components = item.GetComponents<Component>();
+			foreach (Component component in components)
+			{
+				if (component is T)
+				{
+					list.Add(component as T);
+				}
+			}
+		}
+		return list.ToArray();
+	}
+
+	public static T GetComponetInImmediateParent<T>(GameObject obj) where T : Component
+	{
+		if (obj.transform.parent == null)
+		{
+			return null;
+		}
+		return obj.transform.parent.GetComponent<T>();
+	}
+
+	public static T[] GetComponentsInImmediateParent<T>(GameObject obj) where T : Component
+	{
+		if (obj.transform.parent == null)
+		{
+			return new T[0];
+		}
+		return obj.transform.parent.GetComponents<T>();
+	}
+
+	public static T GetComponetInImmediateChildren<T>(GameObject obj) where T : Component
+	{
+		foreach (Transform item in obj.transform)
+		{
+			T component = item.GetComponent<T>();
+			if (component != null)
+			{
+				return component;
+			}
+		}
+		return null;
+	}
+
+	public static T[] GetComponetsInImmediateChildren<T>(GameObject obj) where T : Component
+	{
+		List<T> list = new List<T>();
+		foreach (Transform item2 in obj.transform)
+		{
+			T[] components = item2.GetComponents<T>();
+			foreach (T item in components)
+			{
+				list.Add(item);
+			}
+		}
+		return list.ToArray();
+	}
+
+	public static T FindComponentOnGameObject<T>(string name) where T : Component
+	{
+		GameObject gameObject = GameObject.Find(name);
+		if (gameObject == null)
+		{
+			return null;
+		}
+		return gameObject.GetComponent<T>();
+	}
+
+	public static T[] FindComponentsOnGameObject<T>(string name) where T : Component
+	{
+		GameObject gameObject = GameObject.Find(name);
+		if (gameObject == null)
+		{
+			return new T[0];
+		}
+		return gameObject.GetComponents<T>();
+	}
+
+	public static T FindInterfaceOnGameObject<T>(string name) where T : class
+	{
+		GameObject gameObject = GameObject.Find(name);
+		if (gameObject == null)
+		{
+			return null;
+		}
+		return GetInterface<T>(gameObject);
+	}
+
+	public static T[] FindInterfacesOnGameObject<T>(string name) where T : class
+	{
+		GameObject gameObject = GameObject.Find(name);
+		if (gameObject == null)
+		{
+			return new T[0];
+		}
+		return GetInterfaces<T>(gameObject);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 340
+PATH: Assembly-CSharp__Ceto__AddAutoShoreMask.cs
+SIZE: 5266 bytes
+SHA256: d4415c2e97203af725bfe002a30da783b6396f3bddf0834584f95551aa2110de
+====================================================================================================
+
+using Ceto.Common.Containers.Interpolation;
+using UnityEngine;
+
+namespace Ceto;
+
+[AddComponentMenu("Ceto/Overlays/AddAutoShoreMask")]
+[DisallowMultipleComponent]
+public class AddAutoShoreMask : AddWaveOverlayBase
+{
+	public bool ignoreQuerys;
+
+	public bool textureFoam = true;
+
+	[Range(0.1f, 100f)]
+	public float heightSpread = 10f;
+
+	[Range(0.1f, 10f)]
+	public float foamSpread = 2f;
+
+	[Range(0.1f, 10f)]
+	public float clipOffset = 4f;
+
+	public int resolution = 1024;
+
+	public bool useHeightMask = true;
+
+	[Range(0f, 1f)]
+	public float heightAlpha = 0.9f;
+
+	public bool useNormalMask = true;
+
+	[Range(0f, 1f)]
+	public float normalAlpha = 0.8f;
+
+	public bool useEdgeFoam = true;
+
+	[Range(0f, 10f)]
+	public float edgeFoamAlpha = 1f;
+
+	public bool useFoamMask = true;
+
+	[Range(0f, 1f)]
+	public float foamMaskAlpha = 1f;
+
+	public bool useClipMask = true;
+
+	private bool m_registered;
+
+	private float m_width;
+
+	private float m_height;
+
+	private Texture2D m_heightMask;
+
+	private Texture2D m_edgeFoam;
+
+	private Texture2D m_clipMask;
+
+	private float m_heightSpread;
+
+	private float m_foamSpread;
+
+	private float m_clipOffset;
+
+	private float m_resolution;
+
+	protected override void Start()
+	{
+		m_overlays.Add(new WaveOverlay());
+		UpdateOverlay();
+	}
+
+	protected override void Update()
+	{
+		if (m_overlays != null && m_overlays.Count == 1)
+		{
+			UpdateOverlay();
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		Release();
+	}
+
+	private void UpdateOverlay()
+	{
+		if (Ocean.Instance != null && (!m_registered || SettingsChanged()))
+		{
+			CreateShoreMasks();
+		}
+		Vector2 halfSize = new Vector2(m_width * 0.5f, m_height * 0.5f);
+		Vector3 position = transform.position;
+		position.x += halfSize.x;
+		position.z += halfSize.y;
+		m_overlays[0].Position = position;
+		m_overlays[0].HalfSize = halfSize;
+		m_overlays[0].HeightTex.maskAlpha = (useHeightMask ? heightAlpha : 0f);
+		m_overlays[0].HeightTex.ignoreQuerys = ignoreQuerys;
+		m_overlays[0].NormalTex.maskAlpha = (useNormalMask ? normalAlpha : 0f);
+		m_overlays[0].NormalTex.maskMode = OVERLAY_MASK_MODE.WAVES_AND_OVERLAY_BLEND;
+		m_overlays[0].FoamTex.alpha = (useEdgeFoam ? edgeFoamAlpha : 0f);
+		m_overlays[0].FoamTex.textureFoam = textureFoam;
+		m_overlays[0].FoamTex.maskAlpha = (useFoamMask ? foamMaskAlpha : 0f);
+		m_overlays[0].ClipTex.alpha = (useClipMask ? 1f : 0f);
+		m_overlays[0].ClipTex.ignoreQuerys = ignoreQuerys;
+		m_overlays[0].UpdateOverlay();
+	}
+
+	private void CreateShoreMasks()
+	{
+		Release();
+		Terrain component = GetComponent<Terrain>();
+		if (component == null)
+		{
+			Ocean.LogWarning("The AddAutoShoreMask script must be attached to a component with a Terrain. The shore mask will not be created.");
+			enabled = false;
+			return;
+		}
+		if (component.terrainData == null)
+		{
+			Ocean.LogWarning("The terrain data is null. The shore mask will not be created.");
+			enabled = false;
+			return;
+		}
+		Vector3 size = component.terrainData.size;
+		resolution = Mathf.Clamp(resolution, 32, 4096);
+		m_width = size.x;
+		m_height = size.z;
+		float level = Ocean.Instance.level;
+		float[] data = ShoreMaskGenerator.CreateHeightMap(component);
+		int heightmapResolution = component.terrainData.heightmapResolution;
+		InterpolatedArray2f heightMap = new InterpolatedArray2f(data, heightmapResolution, heightmapResolution, 1, wrap: false);
+		if (useHeightMask || useNormalMask || useFoamMask)
+		{
+			m_heightMask = ShoreMaskGenerator.CreateMask(heightMap, resolution, resolution, level, heightSpread, TextureFormat.ARGB32);
+		}
+		if (useEdgeFoam)
+		{
+			m_edgeFoam = ShoreMaskGenerator.CreateMask(heightMap, resolution, resolution, level, foamSpread, TextureFormat.ARGB32);
+		}
+		if (useClipMask)
+		{
+			m_clipMask = ShoreMaskGenerator.CreateClipMask(heightMap, resolution, resolution, level + clipOffset, TextureFormat.ARGB32);
+		}
+		if (useHeightMask)
+		{
+			m_overlays[0].HeightTex.mask = m_heightMask;
+		}
+		if (useNormalMask)
+		{
+			m_overlays[0].NormalTex.mask = m_heightMask;
+		}
+		if (useFoamMask)
+		{
+			m_overlays[0].FoamTex.mask = m_heightMask;
+		}
+		if (useEdgeFoam)
+		{
+			m_overlays[0].FoamTex.tex = m_edgeFoam;
+		}
+		if (useClipMask)
+		{
+			m_overlays[0].ClipTex.tex = m_clipMask;
+		}
+		if (!m_registered)
+		{
+			Ocean.Instance.OverlayManager.Add(m_overlays[0]);
+			m_registered = true;
+		}
+		m_heightSpread = heightSpread;
+		m_foamSpread = foamSpread;
+		m_clipOffset = clipOffset;
+		m_resolution = resolution;
+	}
+
+	private bool SettingsChanged()
+	{
+		if (m_heightSpread != heightSpread)
+		{
+			return true;
+		}
+		if (m_foamSpread != foamSpread)
+		{
+			return true;
+		}
+		if (m_clipOffset != clipOffset)
+		{
+			return true;
+		}
+		if (m_resolution != (float)resolution)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private void Release()
+	{
+		if (m_heightMask != null)
+		{
+			Object.Destroy(m_heightMask);
+			m_heightMask = null;
+		}
+		if (m_edgeFoam != null)
+		{
+			Object.Destroy(m_edgeFoam);
+			m_edgeFoam = null;
+		}
+		if (m_clipMask != null)
+		{
+			Object.Destroy(m_clipMask);
+			m_clipMask = null;
+		}
+		if (m_overlays != null && m_overlays.Count == 1)
+		{
+			m_overlays[0].HeightTex.mask = null;
+			m_overlays[0].NormalTex.mask = null;
+			m_overlays[0].FoamTex.mask = null;
+			m_overlays[0].FoamTex.tex = null;
+			m_overlays[0].ClipTex.tex = null;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 341
+PATH: Assembly-CSharp__Ceto__ShoreMaskGenerator.cs
+SIZE: 4038 bytes
+SHA256: 7e25123e056219f718fa13a40d07e9e0a0e8f86d090c2ed6fb37873846f62b99
+====================================================================================================
+
+using Ceto.Common.Containers.Interpolation;
+using UnityEngine;
+
+namespace Ceto;
+
+public static class ShoreMaskGenerator
+{
+	public static float[] CreateHeightMap(Terrain terrain)
+	{
+		TerrainData terrainData = terrain.terrainData;
+		int heightmapResolution = terrainData.heightmapResolution;
+		Vector3 heightmapScale = terrainData.heightmapScale;
+		float[,] heights = terrainData.GetHeights(0, 0, heightmapResolution, heightmapResolution);
+		float[] array = new float[heightmapResolution * heightmapResolution];
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution; j++)
+			{
+				array[j + i * heightmapResolution] = heights[i, j] * heightmapScale.y + terrain.transform.position.y;
+			}
+		}
+		return array;
+	}
+
+	public static Texture2D CreateMask(float[] heightMap, int size, float shoreLevel, float spread, TextureFormat format)
+	{
+		Texture2D texture2D = new Texture2D(size, size, format, mipChain: false, linear: true);
+		texture2D.filterMode = FilterMode.Bilinear;
+		int num = size * size;
+		Color[] array = new Color[num];
+		for (int i = 0; i < num; i++)
+		{
+			float num2 = Mathf.Clamp(shoreLevel - heightMap[i], 0f, spread);
+			num2 = 1f - num2 / spread;
+			array[i].r = num2;
+			array[i].g = num2;
+			array[i].b = num2;
+			array[i].a = num2;
+		}
+		texture2D.SetPixels(array);
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	public static Texture2D CreateMask(InterpolatedArray2f heightMap, int width, int height, float shoreLevel, float spread, TextureFormat format)
+	{
+		Texture2D texture2D = new Texture2D(width, height, format, mipChain: false, linear: true);
+		texture2D.filterMode = FilterMode.Bilinear;
+		Color[] array = new Color[width * height];
+		bool flag = width == heightMap.SX && height == heightMap.SY;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				int num = j + i * height;
+				float num2 = 0f;
+				if (flag)
+				{
+					num2 = Mathf.Clamp(shoreLevel - heightMap.Data[num], 0f, spread);
+				}
+				else
+				{
+					float x = (float)j / ((float)width - 1f);
+					float y = (float)i / ((float)height - 1f);
+					num2 = Mathf.Clamp(shoreLevel - heightMap.Get(x, y, 0), 0f, spread);
+				}
+				num2 = 1f - num2 / spread;
+				array[num].r = num2;
+				array[num].g = num2;
+				array[num].b = num2;
+				array[num].a = num2;
+			}
+		}
+		texture2D.SetPixels(array);
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	public static Texture2D CreateClipMask(float[] heightMap, int size, float shoreLevel, TextureFormat format)
+	{
+		Texture2D texture2D = new Texture2D(size, size, format, mipChain: false, linear: true);
+		texture2D.filterMode = FilterMode.Bilinear;
+		int num = size * size;
+		Color[] array = new Color[num];
+		for (int i = 0; i < num; i++)
+		{
+			float num2 = Mathf.Clamp(heightMap[i] - shoreLevel, 0f, 1f);
+			if (num2 > 0f)
+			{
+				num2 = 1f;
+			}
+			array[i].r = num2;
+			array[i].g = num2;
+			array[i].b = num2;
+			array[i].a = num2;
+		}
+		texture2D.SetPixels(array);
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	public static Texture2D CreateClipMask(InterpolatedArray2f heightMap, int width, int height, float shoreLevel, TextureFormat format)
+	{
+		Texture2D texture2D = new Texture2D(width, height, format, mipChain: false, linear: true);
+		texture2D.filterMode = FilterMode.Bilinear;
+		Color[] array = new Color[width * height];
+		bool flag = width == heightMap.SX && height == heightMap.SY;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				int num = j + i * height;
+				float num2 = 0f;
+				if (flag)
+				{
+					num2 = Mathf.Clamp(heightMap.Data[num] - shoreLevel, 0f, 1f);
+				}
+				else
+				{
+					float x = (float)j / ((float)width - 1f);
+					float y = (float)i / ((float)height - 1f);
+					num2 = Mathf.Clamp(heightMap.Get(x, y, 0) - shoreLevel, 0f, 1f);
+				}
+				if (num2 > 0f)
+				{
+					num2 = 1f;
+				}
+				array[num].r = num2;
+				array[num].g = num2;
+				array[num].b = num2;
+				array[num].a = num2;
+			}
+		}
+		texture2D.SetPixels(array);
+		texture2D.Apply();
+		return texture2D;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 342
+PATH: Assembly-CSharp__ConstructionObject_SPEAR.cs
+SIZE: 8799 bytes
+SHA256: 9cf57ea0229691626a4d927a324b1a7724d1241e37424dc2380d4dcbcbbc059a
+====================================================================================================
+
+using Beam;
+using Beam.Crafting;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class ConstructionObject_SPEAR : ProjectileObject, IChargeable, IUseable, IAnimatablePrimary, IBase, IHasCraftingType, IReloadable, IAnimatableSecondary, IProjectile
+{
+	private class ReplicateKillAndAttach : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public SaveablePrefab Spearead;
+
+		[Replicate]
+		public ConstructionObject_SPEAR Spear;
+
+		public override void OnPeer()
+		{
+			Spear.KillAndAttach((ISpearedInstance)Spearead);
+		}
+	}
+
+	private class ReplicateLocalFaunaCreateSpearedInstanceOnMaster : MultiplayerMessage
+	{
+		[Replicate]
+		public ConstructionObject_SPEAR Spear;
+
+		[Replicate]
+		public uint PrefabId;
+
+		[Replicate]
+		public Vector3 Position;
+
+		[Replicate]
+		public Quaternion Rotation;
+
+		public override void OnPeer()
+		{
+			Spear.ReplicatedKillAndAttach(LocalFaunaCreateSpeared(PrefabId, Position, Rotation));
+		}
+	}
+
+	[SerializeField]
+	private Transform _spearAttachingAnchor;
+
+	[SerializeField]
+	private bool _canUseSecondary;
+
+	[SerializeField]
+	private bool _canSpearFish;
+
+	private bool _reloaded = true;
+
+	[Header("Secondary Animations")]
+	[SerializeField]
+	private AnimationType _secondaryIdle;
+
+	[SerializeField]
+	private AnimationType _secondary;
+
+	[SerializeField]
+	private AnimationType _reloadAnimation;
+
+	[SerializeField]
+	private float _spearSpeed;
+
+	private ISpearedInstance _attachedChild;
+
+	[SerializeField]
+	[HideInInspector]
+	private BaseActionUnityEvent _charged;
+
+	[SerializeField]
+	[HideInInspector]
+	private BaseActionUnityEvent _usedSecondary;
+
+	public bool CanUseSecondary
+	{
+		get
+		{
+			return _canUseSecondary;
+		}
+		set
+		{
+			_canUseSecondary = value;
+		}
+	}
+
+	public bool Reloaded => _reloaded;
+
+	public AnimationType SecondaryIdle => _secondaryIdle;
+
+	public AnimationType Secondary => _secondary;
+
+	public AnimationType ReloadAnimation => _reloadAnimation;
+
+	BaseActionUnityEvent IChargeable.Charged => _charged;
+
+	BaseActionUnityEvent IChargeable.UsedSecondary => _usedSecondary;
+
+	public override bool ValidatePrimary(IBase obj)
+	{
+		if (_attachedChild.IsValid())
+		{
+			CollectAttached();
+			return false;
+		}
+		return base.ValidatePrimary(obj);
+	}
+
+	public override void Use()
+	{
+		base.Use();
+	}
+
+	private void CollectAttached()
+	{
+		if (_attachedChild.IsValid() && (Owner.Holder.Storage.CanPush(_attachedChild.PickupableObject) || Owner.Holder.CurrentObject.IsNullOrDestroyed()))
+		{
+			Owner.Holder.Pickup(_attachedChild.PickupableObject);
+		}
+	}
+
+	public bool ValidateSecondary(IBase obj)
+	{
+		return _attachedChild.IsNullOrDestroyed();
+	}
+
+	public void PreSecondary()
+	{
+		ActionEventData.Populate(this, null);
+		_charged.Invoke(this, ActionEventData);
+	}
+
+	public void UseSecondary()
+	{
+		ActionEventData.Populate(this, null);
+		ActionEventData.Position = Owner.transform.position;
+		_usedSecondary.Invoke(this, ActionEventData);
+		IPlayer owner = Owner;
+		BeamRay ray = owner.PlayerCamera.GetRay(7f);
+		float huntingMultiplier = owner.PlayerSkills.HuntingMultiplier;
+		owner.Holder.DropCurrent();
+		float num = Vector3.Distance(transform.position, ray.OriginPoint);
+		transform.transform.position = ray.OriginPoint;
+		transform.transform.LookAt(ray.EndPoint);
+		transform.transform.position += transform.transform.forward * num;
+		ProjectileMovement.enabled = true;
+		ProjectileMovement.Fire(owner);
+		rigidbody.AddForce(transform.forward * _spearSpeed * huntingMultiplier, ForceMode.Impulse);
+	}
+
+	public void PostSecondary()
+	{
+	}
+
+	public bool CanReloadWith(IPickupable pickupable)
+	{
+		return false;
+	}
+
+	public void Reload(IPickupable pickupable)
+	{
+	}
+
+	public override void DamageObject(IBase obj)
+	{
+		if (!StabObject(obj) && !obj.transform.GetComponent<Shootable>().IsNullOrDestroyed())
+		{
+			base.DamageObject(obj);
+		}
+	}
+
+	private bool StabObject(IBase obj)
+	{
+		ISpearable spearable = obj as ISpearable;
+		if (spearable.IsNullOrDestroyed() || !spearable.CanSpear)
+		{
+			return false;
+		}
+		if (!_canSpearFish && spearable.Type == InteractiveType.ANIMALS_FISH)
+		{
+			return false;
+		}
+		if (spearable.IsLocalFauna && spearable.LocalFaunaCheckHit(_spearAttachingAnchor.position))
+		{
+			LocalFaunaHandleSpearedInstanceOnMaster(spearable.LocalFaunaSpearedInstancePrefabId, obj.transform.position, obj.transform.rotation);
+			spearable.LocalFaunaRelease();
+			return true;
+		}
+		ISpearedInstance spearedInstance = spearable.GetSpearedInstance(_spearAttachingAnchor.position);
+		if (KillAndAttach(spearedInstance))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private void LocalFaunaHandleSpearedInstanceOnMaster(uint prefabId, Vector3 position, Quaternion rotation)
+	{
+		if (Game.Mode.IsMaster())
+		{
+			ReplicatedKillAndAttach(LocalFaunaCreateSpeared(prefabId, position, rotation));
+			return;
+		}
+		ReplicateLocalFaunaCreateSpearedInstanceOnMaster replicateLocalFaunaCreateSpearedInstanceOnMaster = new ReplicateLocalFaunaCreateSpearedInstanceOnMaster();
+		replicateLocalFaunaCreateSpearedInstanceOnMaster.Spear = this;
+		replicateLocalFaunaCreateSpearedInstanceOnMaster.PrefabId = prefabId;
+		replicateLocalFaunaCreateSpearedInstanceOnMaster.Position = position;
+		replicateLocalFaunaCreateSpearedInstanceOnMaster.Rotation = rotation;
+		replicateLocalFaunaCreateSpearedInstanceOnMaster.Post();
+	}
+
+	private bool KillAndAttach(ISpearedInstance speared)
+	{
+		if (!speared.IsNullOrDestroyed())
+		{
+			speared.Kill(OwnerId);
+			IPhysical physicsObject = speared.PhysicsObject;
+			IDraggable draggable = physicsObject as IDraggable;
+			if (!draggable.IsNullOrDestroyed())
+			{
+				draggable.CanDrag = false;
+			}
+			physicsObject.RemoveRigidbody((physicsObject as ISaveablePrefab)?.IsOwner ?? true);
+			physicsObject.transform.CheckForProjectilesInChildren();
+			physicsObject.transform.parent = null;
+			physicsObject.TransformParent = _spearAttachingAnchor;
+			physicsObject.Parent();
+			physicsObject.CanParent = false;
+			physicsObject.transform.localPosition = Vector3.zero;
+			physicsObject.transform.localRotation = Quaternion.identity;
+			speared.PickupableObject.PickedUp += SpearedInstance_PickedUp;
+			_attachedChild = speared;
+			return true;
+		}
+		return false;
+	}
+
+	private static ISpearedInstance LocalFaunaCreateSpeared(uint prefabId, Vector3 position, Quaternion rotation)
+	{
+		Interactive_FISH interactive_FISH = MultiplayerMng.Instantiate<Interactive_FISH>(prefabId, MiniGuid.New());
+		interactive_FISH.transform.position = position;
+		interactive_FISH.transform.rotation = rotation;
+		interactive_FISH.Parent();
+		return interactive_FISH;
+	}
+
+	private void SpearedInstance_PickedUp(IPickupable sender)
+	{
+		if (!_attachedChild.IsNullOrDestroyed())
+		{
+			_attachedChild.PhysicsObject.EnablePhysics();
+			_attachedChild.PhysicsObject.CanParent = true;
+			_attachedChild.PickupableObject.PickedUp -= SpearedInstance_PickedUp;
+			_attachedChild = null;
+		}
+	}
+
+	private void ReplicatedKillAndAttach(ISpearedInstance speared)
+	{
+		bool flag = KillAndAttach(speared);
+		if (Game.Mode.IsMultiplayer() & flag)
+		{
+			ReplicateKillAndAttach replicateKillAndAttach = new ReplicateKillAndAttach();
+			replicateKillAndAttach.Spearead = (SaveablePrefab)speared;
+			replicateKillAndAttach.Spear = this;
+			replicateKillAndAttach.Post();
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		if (!_attachedChild.IsNullOrDestroyed())
+		{
+			if (!Owner.IsNullOrDestroyed() && (Owner.Holder.Storage.Has(this) || (!Owner.Holder.CurrentObject.IsNullOrDestroyed() && Owner.Holder.CurrentObject.Equals(this))))
+			{
+				JObject jObject2 = SavingUtilities.SavePrefabToJObject(_attachedChild.PickupableObject);
+				if (jObject2 != null)
+				{
+					jObject.AddField("AttachedChildData", jObject2);
+				}
+			}
+			else
+			{
+				jObject.AddField("AttachedChild", JSerializer.Serialize(_attachedChild.PickupableObject.ReferenceId.ToString()));
+			}
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("AttachedChildData");
+		if (field != null)
+		{
+			SavingUtilities.LoadPrefabFromJData(MultiplayerZoneSync.Usage.Spear, field, null, (SaveablePrefab instance) =>
+			{
+				KillAndAttach((ISpearedInstance)instance);
+			});
+			return;
+		}
+		JObject field2 = data.GetField("AttachedChild");
+		if (!field2)
+		{
+			return;
+		}
+		MiniGuid childReferenceData = field2.GetValue<string>().ToMiniGuid();
+		LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+		{
+			InteractiveObject interactiveObject = MultiplayerMng.FindObject<InteractiveObject>(childReferenceData);
+			if (interactiveObject != null)
+			{
+				KillAndAttach((ISpearedInstance)interactiveObject);
+			}
+			else
+			{
+				Debug.LogError($"InteractiveObject_SPEAR::Load:: Error finding child [{childReferenceData}]");
+			}
+		});
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 343
+PATH: Assembly-CSharp__ContainerObjectSpawner.cs
+SIZE: 421 bytes
+SHA256: 3d72cd624adea51dc587ba97c134e71f06065fc2b70023fae0a0f5a984bb7f43
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+public class ContainerObjectSpawner : MonoBehaviour
+{
+	[Serializable]
+	public class Slot
+	{
+		public Transform slot;
+
+		public SlotItem[] items;
+
+		[HideInInspector]
+		public bool occupied;
+	}
+
+	[Serializable]
+	public class SlotItem
+	{
+		public GameObject prefab;
+
+		public float rarity;
+	}
+
+	[SerializeField]
+	private Slot[] _objectSlots;
+
+	public Slot[] objectSlots => _objectSlots;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 344
+PATH: Assembly-CSharp__CreateSavePointHelper.cs
+SIZE: 774 bytes
+SHA256: 727d5b005eb8286feed9840105fce4b7d279a69a6236627cc40a35edf641e71f
+====================================================================================================
+
+using Beam.Crafting;
+using UnityEngine;
+
+public class CreateSavePointHelper : MonoBehaviour
+{
+	[SerializeField]
+	private ConstructionObject_BED _missionBedSavePrefab;
+
+	[SerializeField]
+	private Transform _missionBedSavePosition;
+
+	private void Start()
+	{
+		if (!LevelLoader.IsLoading())
+		{
+			ConstructionObject_BED constructionObject_BED = Object.Instantiate(_missionBedSavePrefab);
+			constructionObject_BED.transform.SetParent(transform.parent, worldPositionStays: false);
+			constructionObject_BED.transform.position = _missionBedSavePosition.position;
+			constructionObject_BED.transform.rotation = _missionBedSavePosition.rotation;
+			constructionObject_BED.CanDrag = false;
+			constructionObject_BED.CanPickUp = false;
+			constructionObject_BED.SetLOD(1);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 345
+PATH: Assembly-CSharp__DeluxeTonemapper.cs
+SIZE: 6857 bytes
+SHA256: 93397f5d4bb470b82801f32dc9ced85eb3a1d7fdf54869f3b7f476eb6e7c9532
+====================================================================================================
+
+using UnityEngine;
+
+[ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
+public class DeluxeTonemapper : MonoBehaviour
+{
+	public enum Mode
+	{
+		Color,
+		Luminance,
+		ExtendedLuminance,
+		ColorHD
+	}
+
+	[SerializeField]
+	public FilmicCurve m_MainCurve = new FilmicCurve();
+
+	[SerializeField]
+	public Color m_Tint = new Color(1f, 1f, 1f, 1f);
+
+	[SerializeField]
+	public float m_MoodAmount;
+
+	[SerializeField]
+	public float m_Sharpness;
+
+	[SerializeField]
+	public float m_SharpnessKernel = 0.5f;
+
+	[SerializeField]
+	public Mode m_Mode = Mode.ColorHD;
+
+	public bool m_EnableLut0;
+
+	public float m_Saturation = 1f;
+
+	public bool m_DisableColorGrading;
+
+	private bool m_LastDisableColorGrading;
+
+	public float m_Lut0Amount = 1f;
+
+	public Texture2D m_2DLut0;
+
+	public Texture3D m_3DLut0;
+
+	private FTDLut m_LutTool = new FTDLut();
+
+	public bool m_FilmicCurveOpened = true;
+
+	public bool m_ColorGradingOpened;
+
+	public bool m_HDREffectsgOpened;
+
+	public bool m_BannerIsOpened = true;
+
+	public bool m_Use2DLut;
+
+	private bool m_LastUse2DLut;
+
+	[SerializeField]
+	private bool m_IsInitialized;
+
+	private Mode m_LastMode;
+
+	private Material m_Material;
+
+	private Shader m_Shader;
+
+	public FTDLut LutTool => m_LutTool;
+
+	public Shader TonemappingShader => m_Shader;
+
+	private void DestroyMaterial(Material mat)
+	{
+		if ((bool)mat)
+		{
+			Object.DestroyImmediate(mat);
+			mat = null;
+		}
+	}
+
+	private void CreateMaterials()
+	{
+		if (m_Shader == null)
+		{
+			if (m_Mode == Mode.Color)
+			{
+				m_Shader = Shader.Find("Hidden/Deluxe/TonemapperColor");
+			}
+			if (m_Mode == Mode.Luminance)
+			{
+				m_Shader = Shader.Find("Hidden/Deluxe/TonemapperLuminosity");
+			}
+			if (m_Mode == Mode.ExtendedLuminance)
+			{
+				m_Shader = Shader.Find("Hidden/Deluxe/TonemapperLuminosityExtended");
+			}
+			if (m_Mode == Mode.ColorHD)
+			{
+				m_Shader = Shader.Find("Hidden/Deluxe/TonemapperColorHD");
+			}
+		}
+		if (m_Material == null && m_Shader != null && m_Shader.isSupported)
+		{
+			m_Material = CreateMaterial(m_Shader);
+		}
+	}
+
+	private Material CreateMaterial(Shader shader)
+	{
+		if (!shader)
+		{
+			return null;
+		}
+		return new Material(shader)
+		{
+			hideFlags = HideFlags.HideAndDontSave
+		};
+	}
+
+	private void OnDisable()
+	{
+		DestroyMaterial(m_Material);
+		m_Material = null;
+		m_Shader = null;
+	}
+
+	public void ClearLutTextures()
+	{
+		if (m_3DLut0 != null)
+		{
+			Object.DestroyImmediate(m_3DLut0);
+			m_3DLut0 = null;
+		}
+		m_2DLut0 = null;
+	}
+
+	public void ConvertAndApply2dLut()
+	{
+		if (m_2DLut0 != null)
+		{
+			m_3DLut0 = LutTool.Allocate3DLut(m_2DLut0);
+			LutTool.ConvertLUT(m_2DLut0, m_3DLut0);
+		}
+	}
+
+	public void SetLut0(Texture2D lut0)
+	{
+		ClearLutTextures();
+		m_2DLut0 = lut0;
+		ConvertAndApply2dLut();
+	}
+
+	public void VerifyAndUpdateShaderVariations(bool forceUpdate)
+	{
+		if (m_Material == null)
+		{
+			return;
+		}
+		if (!SystemInfo.supports3DTextures)
+		{
+			m_Use2DLut = true;
+		}
+		if ((m_DisableColorGrading != m_LastDisableColorGrading) | forceUpdate)
+		{
+			m_Material.DisableKeyword("FTD_DISABLE_CGRADING");
+			if (m_DisableColorGrading)
+			{
+				m_Material.EnableKeyword("FTD_DISABLE_CGRADING");
+			}
+		}
+		if ((m_Use2DLut != m_LastUse2DLut) | forceUpdate)
+		{
+			m_Material.DisableKeyword("FTD_2D_LUT");
+			if (m_Use2DLut)
+			{
+				m_Material.EnableKeyword("FTD_2D_LUT");
+			}
+		}
+		m_LastUse2DLut = m_Use2DLut;
+		m_LastDisableColorGrading = m_DisableColorGrading;
+	}
+
+	public void UpdateCoefficients()
+	{
+		if (m_Mode == Mode.ColorHD)
+		{
+			m_MainCurve.m_UseLegacyCurve = false;
+		}
+		else
+		{
+			m_MainCurve.m_UseLegacyCurve = true;
+		}
+		m_MainCurve.UpdateCoefficients();
+		if (!(m_Material == null))
+		{
+			if (m_2DLut0 == null)
+			{
+				ClearLutTextures();
+			}
+			m_Material.SetFloat("_K", m_MainCurve.m_k);
+			m_Material.SetFloat("_Crossover", m_MainCurve.m_CrossOverPoint);
+			m_Material.SetVector("_Toe", m_MainCurve.m_ToeCoef);
+			m_Material.SetVector("_Shoulder", m_MainCurve.m_ShoulderCoef);
+			m_Material.SetFloat("_LuminosityWhite", m_MainCurve.m_LuminositySaturationPoint * m_MainCurve.m_LuminositySaturationPoint);
+			m_Material.SetFloat("_Sharpness", m_Sharpness);
+			m_Material.SetFloat("_Saturation", m_Saturation);
+			if (m_2DLut0 != null && m_3DLut0 == null && LutTool.Validate2DLut(m_2DLut0))
+			{
+				ConvertAndApply2dLut();
+			}
+			float value = ((QualitySettings.activeColorSpace == ColorSpace.Linear) ? 0.5f : 1f);
+			if (m_Use2DLut && m_2DLut0 != null)
+			{
+				m_2DLut0.filterMode = FilterMode.Bilinear;
+				float num = Mathf.Sqrt(m_2DLut0.width);
+				m_Material.SetTexture("_2dLut0", m_2DLut0);
+				m_Material.SetVector("_Lut0Params", new Vector4(m_Lut0Amount, 1f / (float)m_2DLut0.width, 1f / (float)m_2DLut0.height, num - 1f));
+				m_Material.SetFloat("_IsLinear", value);
+			}
+			else if (m_3DLut0 != null)
+			{
+				int width = m_3DLut0.width;
+				float y = (float)(width - 1) / (1f * (float)width);
+				float z = 1f / (2f * (float)width);
+				m_3DLut0.filterMode = FilterMode.Trilinear;
+				m_Material.SetVector("_Lut0Params", new Vector4(m_Lut0Amount, y, z, 0f));
+				m_Material.SetTexture("_Lut0", m_3DLut0);
+				m_Material.SetFloat("_IsLinear", value);
+			}
+			else
+			{
+				m_Material.SetVector("_Lut0Params", Vector4.zero);
+			}
+		}
+	}
+
+	public void ReloadShaders()
+	{
+		OnDisable();
+	}
+
+	public void SetCurveParameters(float range, float crossover, float toe, float shoulder)
+	{
+		SetCurveParameters(0f, range, crossover, toe, shoulder);
+	}
+
+	public void SetCurveParameters(float crossover, float toe, float shoulder)
+	{
+		SetCurveParameters(0f, 1f, crossover, toe, shoulder);
+	}
+
+	public void SetCurveParameters(float blackPoint, float whitePoint, float crossover, float toe, float shoulder)
+	{
+		m_MainCurve.m_BlackPoint = blackPoint;
+		m_MainCurve.m_WhitePoint = whitePoint;
+		m_MainCurve.m_ToeStrength = -1f * toe;
+		m_MainCurve.m_ShoulderStrength = shoulder;
+		m_MainCurve.m_CrossOverPoint = crossover * (whitePoint - blackPoint) + blackPoint;
+		UpdateCoefficients();
+	}
+
+	private void OnEnable()
+	{
+		if (m_MainCurve == null)
+		{
+			m_MainCurve = new FilmicCurve();
+		}
+		CreateMaterials();
+		UpdateCoefficients();
+		VerifyAndUpdateShaderVariations(forceUpdate: true);
+	}
+
+	private void Initialize()
+	{
+	}
+
+	[ImageEffectTransformsToLDR]
+	private void OnRenderImage(RenderTexture source, RenderTexture destination)
+	{
+		Initialize();
+		if (m_Mode != m_LastMode)
+		{
+			ReloadShaders();
+			CreateMaterials();
+			VerifyAndUpdateShaderVariations(forceUpdate: true);
+		}
+		m_LastMode = m_Mode;
+		UpdateCoefficients();
+		VerifyAndUpdateShaderVariations(forceUpdate: false);
+		m_Material.SetVector("_Tint", m_Tint);
+		m_Material.SetVector("_Offsets", new Vector4(m_SharpnessKernel / (float)source.width, m_SharpnessKernel / (float)source.height));
+		if (m_EnableLut0)
+		{
+			Graphics.Blit(source, destination, m_Material, 1);
+		}
+		else
+		{
+			Graphics.Blit(source, destination, m_Material, 0);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 346
+PATH: Assembly-CSharp__DemoReactivator.cs
+SIZE: 452 bytes
+SHA256: 1eb45c724c26aa591db6188b07217483a13e09325c759cc608fe0ca1042011ca
+====================================================================================================
+
+using UnityEngine;
+
+public class DemoReactivator : MonoBehaviour
+{
+	public float TimeDelayToReactivate = 3f;
+
+	private void Start()
+	{
+		InvokeRepeating("Reactivate", 0f, TimeDelayToReactivate);
+	}
+
+	private void Reactivate()
+	{
+		Transform[] componentsInChildren = GetComponentsInChildren<Transform>();
+		foreach (Transform obj in componentsInChildren)
+		{
+			obj.gameObject.SetActive(value: false);
+			obj.gameObject.SetActive(value: true);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 347
+PATH: Assembly-CSharp__DifficultyHatPropellar.cs
+SIZE: 247 bytes
+SHA256: 7b5a938e4837b58fc85b3166ca8d9fd35bf2ac4b6688f4148be789492dacfae5
+====================================================================================================
+
+using UnityEngine;
+
+public class DifficultyHatPropellar : MonoBehaviour
+{
+	[SerializeField]
+	private Transform _hatPropellar;
+
+	private void Update()
+	{
+		float yAngle = 80f * Time.deltaTime;
+		_hatPropellar.transform.Rotate(0f, yAngle, 0f);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 348
+PATH: Assembly-CSharp__Distant_Plane_Manager.cs
+SIZE: 1853 bytes
+SHA256: e5b5603a98aa7de5afeafacaab7c3c074d4248d37f64658a68d974e4b75d4c34
+====================================================================================================
+
+using System;
+using Beam;
+using UnityEngine;
+
+public class Distant_Plane_Manager : MonoBehaviour
+{
+	[SerializeField]
+	private Transform _distantPlane;
+
+	private DateTime _lastFlightTime;
+
+	private int flightInterval = 100;
+
+	private float _speed = 0.5f;
+
+	private bool _activated;
+
+	private void Start()
+	{
+		Activate(activate: false);
+		InvokeRepeating("Poll_FlightPath", 10f, GameTime.OneGameHour);
+	}
+
+	private void Update()
+	{
+		if (_activated)
+		{
+			_distantPlane.transform.position += _distantPlane.transform.forward * _speed;
+			Vector3 position = Singleton<Atmosphere>.Instance.transform.position;
+			position.y = _distantPlane.transform.position.y;
+			if (Vector3.Distance(_distantPlane.transform.position, position) > 2200f)
+			{
+				Activate(activate: false);
+			}
+		}
+	}
+
+	private void Poll_FlightPath()
+	{
+		if (!_activated && GameTime.GetHoursSince(_lastFlightTime) > (float)flightInterval)
+		{
+			SetNewFlightPath();
+			Activate(activate: true);
+		}
+	}
+
+	private void Activate(bool activate)
+	{
+		_activated = activate;
+		_distantPlane.gameObject.SetActive(activate);
+		if (!activate)
+		{
+			_lastFlightTime = GameTime.Now;
+			flightInterval = UnityEngine.Random.Range(12, 48);
+		}
+	}
+
+	private void SetNewFlightPath()
+	{
+		Vector3 position = Singleton<Atmosphere>.Instance.transform.position;
+		_distantPlane.transform.position = RandomCircle(position, 2000f);
+		Vector3 forward = position - _distantPlane.transform.position;
+		forward.y = 0f;
+		_distantPlane.transform.rotation = Quaternion.LookRotation(forward);
+	}
+
+	private Vector3 RandomCircle(Vector3 center, float radius)
+	{
+		float num = UnityEngine.Random.value * 360f;
+		Vector3 result = default;
+		result.x = center.x + radius * Mathf.Sin(num * (MathF.PI / 180f));
+		result.z = center.z + radius * Mathf.Cos(num * (MathF.PI / 180f));
+		result.y = 950f;
+		return result;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 349
+PATH: Assembly-CSharp__DistortionMobile.cs
+SIZE: 3385 bytes
+SHA256: d5d37246126dce4b64aae6469bf1c4a228869ee511d671a0cc57f1239baadb18
+====================================================================================================
+
+using System.Collections;
+using UnityEngine;
+
+public class DistortionMobile : MonoBehaviour
+{
+	public float TextureScale = 1f;
+
+	public RenderTextureFormat RenderTextureFormat;
+
+	public FilterMode FilterMode;
+
+	public LayerMask CullingMask = -17;
+
+	public RenderingPath RenderingPath;
+
+	public int FPSWhenMoveCamera = 40;
+
+	public int FPSWhenStaticCamera = 20;
+
+	private RenderTexture renderTexture;
+
+	private Camera cameraInstance;
+
+	private GameObject goCamera;
+
+	private Vector3 oldPosition;
+
+	private Quaternion oldRotation;
+
+	private Transform instanceCameraTransform;
+
+	private bool canUpdateCamera;
+
+	private bool isStaticUpdate;
+
+	private WaitForSeconds fpsMove;
+
+	private WaitForSeconds fpsStatic;
+
+	private const int dropedFrames = 50;
+
+	private int frameCountWhenCameraIsStatic;
+
+	private bool isInitialized;
+
+	private void OnEnable()
+	{
+		fpsMove = new WaitForSeconds(1f / (float)FPSWhenMoveCamera);
+		fpsStatic = new WaitForSeconds(1f / (float)FPSWhenStaticCamera);
+	}
+
+	private void Update()
+	{
+		if (!isInitialized)
+		{
+			Initialize();
+			StartCoroutine(RepeatCameraMove());
+			StartCoroutine(RepeatCameraStatic());
+		}
+		if (Vector3.SqrMagnitude(instanceCameraTransform.position - oldPosition) <= 1E-05f && instanceCameraTransform.rotation == oldRotation)
+		{
+			frameCountWhenCameraIsStatic++;
+			if (frameCountWhenCameraIsStatic >= 50)
+			{
+				isStaticUpdate = true;
+			}
+		}
+		else
+		{
+			frameCountWhenCameraIsStatic = 0;
+			isStaticUpdate = false;
+		}
+		oldPosition = instanceCameraTransform.position;
+		oldRotation = instanceCameraTransform.rotation;
+		if (canUpdateCamera)
+		{
+			cameraInstance.enabled = true;
+			canUpdateCamera = false;
+		}
+		else if (cameraInstance.enabled)
+		{
+			cameraInstance.enabled = false;
+		}
+	}
+
+	private IEnumerator RepeatCameraMove()
+	{
+		while (true)
+		{
+			if (!isStaticUpdate)
+			{
+				canUpdateCamera = true;
+			}
+			yield return fpsMove;
+		}
+	}
+
+	private IEnumerator RepeatCameraStatic()
+	{
+		while (true)
+		{
+			if (isStaticUpdate)
+			{
+				canUpdateCamera = true;
+			}
+			yield return fpsStatic;
+		}
+	}
+
+	private void OnBecameVisible()
+	{
+		if (goCamera != null)
+		{
+			goCamera.SetActive(value: true);
+		}
+	}
+
+	private void OnBecameInvisible()
+	{
+		if (goCamera != null)
+		{
+			goCamera.SetActive(value: false);
+		}
+	}
+
+	private void Initialize()
+	{
+		goCamera = new GameObject("RenderTextureCamera");
+		cameraInstance = goCamera.AddComponent<Camera>();
+		Camera main = Camera.main;
+		cameraInstance.CopyFrom(main);
+		cameraInstance.depth++;
+		cameraInstance.cullingMask = CullingMask;
+		cameraInstance.renderingPath = RenderingPath;
+		goCamera.transform.parent = main.transform;
+		renderTexture = new RenderTexture(Mathf.RoundToInt((float)Screen.width * TextureScale), Mathf.RoundToInt((float)Screen.height * TextureScale), 16, RenderTextureFormat);
+		renderTexture.DiscardContents();
+		renderTexture.filterMode = FilterMode;
+		cameraInstance.targetTexture = renderTexture;
+		instanceCameraTransform = cameraInstance.transform;
+		oldPosition = instanceCameraTransform.position;
+		Shader.SetGlobalTexture("_GrabTextureMobile", renderTexture);
+		isInitialized = true;
+	}
+
+	private void OnDisable()
+	{
+		if ((bool)goCamera)
+		{
+			Object.DestroyImmediate(goCamera);
+			goCamera = null;
+		}
+		if ((bool)renderTexture)
+		{
+			Object.DestroyImmediate(renderTexture);
+			renderTexture = null;
+		}
+		isInitialized = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 350
+PATH: Assembly-CSharp__DynamicBone.cs
+SIZE: 15704 bytes
+SHA256: d5210c15c8f8ac7759356036284d20fb98b85818997a8ad94f8817763d3b28f6
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+
+[AddComponentMenu("Dynamic Bone/Dynamic Bone")]
+public class DynamicBone : MonoBehaviour
+{
+	public enum UpdateMode
+	{
+		Normal,
+		AnimatePhysics,
+		UnscaledTime
+	}
+
+	public enum FreezeAxis
+	{
+		None,
+		X,
+		Y,
+		Z
+	}
+
+	private class Particle
+	{
+		public Transform m_Transform;
+
+		public int m_ParentIndex = -1;
+
+		public float m_Damping;
+
+		public float m_Elasticity;
+
+		public float m_Stiffness;
+
+		public float m_Inert;
+
+		public float m_Radius;
+
+		public float m_BoneLength;
+
+		public Vector3 m_Position = Vector3.zero;
+
+		public Vector3 m_PrevPosition = Vector3.zero;
+
+		public Vector3 m_EndOffset = Vector3.zero;
+
+		public Vector3 m_InitLocalPosition = Vector3.zero;
+
+		public Quaternion m_InitLocalRotation = Quaternion.identity;
+	}
+
+	public Transform m_Root;
+
+	public float m_UpdateRate = 60f;
+
+	public UpdateMode m_UpdateMode;
+
+	[Range(0f, 1f)]
+	public float m_Damping = 0.1f;
+
+	public AnimationCurve m_DampingDistrib;
+
+	[Range(0f, 1f)]
+	public float m_Elasticity = 0.1f;
+
+	public AnimationCurve m_ElasticityDistrib;
+
+	[Range(0f, 1f)]
+	public float m_Stiffness = 0.1f;
+
+	public AnimationCurve m_StiffnessDistrib;
+
+	[Range(0f, 1f)]
+	public float m_Inert;
+
+	public AnimationCurve m_InertDistrib;
+
+	public float m_Radius;
+
+	public AnimationCurve m_RadiusDistrib;
+
+	public float m_EndLength;
+
+	public Vector3 m_EndOffset = Vector3.zero;
+
+	public Vector3 m_Gravity = Vector3.zero;
+
+	public Vector3 m_Force = Vector3.zero;
+
+	public List<DynamicBoneColliderBase> m_Colliders;
+
+	public List<Transform> m_Exclusions;
+
+	public FreezeAxis m_FreezeAxis;
+
+	public bool m_DistantDisable;
+
+	public Transform m_ReferenceObject;
+
+	public float m_DistanceToObject = 20f;
+
+	private Vector3 m_LocalGravity = Vector3.zero;
+
+	private Vector3 m_ObjectMove = Vector3.zero;
+
+	private Vector3 m_ObjectPrevPosition = Vector3.zero;
+
+	private float m_BoneTotalLength;
+
+	private float m_ObjectScale = 1f;
+
+	private float m_Time;
+
+	private float m_Weight = 1f;
+
+	private bool m_DistantDisabled;
+
+	private List<Particle> m_Particles = new List<Particle>();
+
+	private void Start()
+	{
+		SetupParticles();
+	}
+
+	private void FixedUpdate()
+	{
+		if (m_UpdateMode == UpdateMode.AnimatePhysics)
+		{
+			PreUpdate();
+		}
+	}
+
+	private void Update()
+	{
+		if (m_UpdateMode != UpdateMode.AnimatePhysics)
+		{
+			PreUpdate();
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (m_DistantDisable)
+		{
+			CheckDistance();
+		}
+		if (m_Weight > 0f && (!m_DistantDisable || !m_DistantDisabled))
+		{
+			float deltaTime = Time.deltaTime;
+			UpdateDynamicBones(deltaTime);
+		}
+	}
+
+	private void PreUpdate()
+	{
+		if (m_Weight > 0f && (!m_DistantDisable || !m_DistantDisabled))
+		{
+			InitTransforms();
+		}
+	}
+
+	private void CheckDistance()
+	{
+		Transform referenceObject = m_ReferenceObject;
+		if (referenceObject == null && Camera.main != null)
+		{
+			referenceObject = Camera.main.transform;
+		}
+		if (!(referenceObject != null))
+		{
+			return;
+		}
+		bool flag = (referenceObject.position - transform.position).sqrMagnitude > m_DistanceToObject * m_DistanceToObject;
+		if (flag != m_DistantDisabled)
+		{
+			if (!flag)
+			{
+				ResetParticlesPosition();
+			}
+			m_DistantDisabled = flag;
+		}
+	}
+
+	private void OnEnable()
+	{
+		ResetParticlesPosition();
+	}
+
+	private void OnDisable()
+	{
+		InitTransforms();
+	}
+
+	private void OnValidate()
+	{
+		m_UpdateRate = Mathf.Max(m_UpdateRate, 0f);
+		m_Damping = Mathf.Clamp01(m_Damping);
+		m_Elasticity = Mathf.Clamp01(m_Elasticity);
+		m_Stiffness = Mathf.Clamp01(m_Stiffness);
+		m_Inert = Mathf.Clamp01(m_Inert);
+		m_Radius = Mathf.Max(m_Radius, 0f);
+		if (Application.isEditor && Application.isPlaying)
+		{
+			InitTransforms();
+			SetupParticles();
+		}
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		if (!enabled || m_Root == null)
+		{
+			return;
+		}
+		if (Application.isEditor && !Application.isPlaying && transform.hasChanged)
+		{
+			InitTransforms();
+			SetupParticles();
+		}
+		Gizmos.color = Color.white;
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_ParentIndex >= 0)
+			{
+				Particle particle2 = m_Particles[particle.m_ParentIndex];
+				Gizmos.DrawLine(particle.m_Position, particle2.m_Position);
+			}
+			if (particle.m_Radius > 0f)
+			{
+				Gizmos.DrawWireSphere(particle.m_Position, particle.m_Radius * m_ObjectScale);
+			}
+		}
+	}
+
+	public void SetWeight(float w)
+	{
+		if (m_Weight != w)
+		{
+			if (w == 0f)
+			{
+				InitTransforms();
+			}
+			else if (m_Weight == 0f)
+			{
+				ResetParticlesPosition();
+			}
+			m_Weight = w;
+		}
+	}
+
+	public float GetWeight()
+	{
+		return m_Weight;
+	}
+
+	private void UpdateDynamicBones(float t)
+	{
+		if (m_Root == null)
+		{
+			return;
+		}
+		m_ObjectScale = Mathf.Abs(transform.lossyScale.x);
+		m_ObjectMove = transform.position - m_ObjectPrevPosition;
+		m_ObjectPrevPosition = transform.position;
+		int num = 1;
+		if (m_UpdateRate > 0f)
+		{
+			float num2 = 1f / m_UpdateRate;
+			m_Time += t;
+			num = 0;
+			while (m_Time >= num2)
+			{
+				m_Time -= num2;
+				if (++num >= 3)
+				{
+					m_Time = 0f;
+					break;
+				}
+			}
+		}
+		if (num > 0)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				UpdateParticles1();
+				UpdateParticles2();
+				m_ObjectMove = Vector3.zero;
+			}
+		}
+		else
+		{
+			SkipUpdateParticles();
+		}
+		ApplyParticlesToTransforms();
+	}
+
+	private void SetupParticles()
+	{
+		m_Particles.Clear();
+		if (!(m_Root == null))
+		{
+			m_LocalGravity = m_Root.InverseTransformDirection(m_Gravity);
+			m_ObjectScale = Mathf.Abs(transform.lossyScale.x);
+			m_ObjectPrevPosition = transform.position;
+			m_ObjectMove = Vector3.zero;
+			m_BoneTotalLength = 0f;
+			AppendParticles(m_Root, -1, 0f);
+			UpdateParameters();
+		}
+	}
+
+	private void AppendParticles(Transform b, int parentIndex, float boneLength)
+	{
+		Particle particle = new Particle();
+		particle.m_Transform = b;
+		particle.m_ParentIndex = parentIndex;
+		if (b != null)
+		{
+			particle.m_Position = (particle.m_PrevPosition = b.position);
+			particle.m_InitLocalPosition = b.localPosition;
+			particle.m_InitLocalRotation = b.localRotation;
+		}
+		else
+		{
+			Transform transform = m_Particles[parentIndex].m_Transform;
+			if (m_EndLength > 0f)
+			{
+				Transform parent = transform.parent;
+				if (parent != null)
+				{
+					particle.m_EndOffset = transform.InverseTransformPoint(transform.position * 2f - parent.position) * m_EndLength;
+				}
+				else
+				{
+					particle.m_EndOffset = new Vector3(m_EndLength, 0f, 0f);
+				}
+			}
+			else
+			{
+				particle.m_EndOffset = transform.InverseTransformPoint(base.transform.TransformDirection(m_EndOffset) + transform.position);
+			}
+			particle.m_Position = (particle.m_PrevPosition = transform.TransformPoint(particle.m_EndOffset));
+		}
+		if (parentIndex >= 0)
+		{
+			boneLength += (m_Particles[parentIndex].m_Transform.position - particle.m_Position).magnitude;
+			particle.m_BoneLength = boneLength;
+			m_BoneTotalLength = Mathf.Max(m_BoneTotalLength, boneLength);
+		}
+		int count = m_Particles.Count;
+		m_Particles.Add(particle);
+		if (!(b != null))
+		{
+			return;
+		}
+		for (int i = 0; i < b.childCount; i++)
+		{
+			bool flag = false;
+			if (m_Exclusions != null)
+			{
+				for (int j = 0; j < m_Exclusions.Count; j++)
+				{
+					if (m_Exclusions[j] == b.GetChild(i))
+					{
+						flag = true;
+						break;
+					}
+				}
+			}
+			if (!flag)
+			{
+				AppendParticles(b.GetChild(i), count, boneLength);
+			}
+			else if (m_EndLength > 0f || m_EndOffset != Vector3.zero)
+			{
+				AppendParticles(null, count, boneLength);
+			}
+		}
+		if (b.childCount == 0 && (m_EndLength > 0f || m_EndOffset != Vector3.zero))
+		{
+			AppendParticles(null, count, boneLength);
+		}
+	}
+
+	public void UpdateParameters()
+	{
+		if (m_Root == null)
+		{
+			return;
+		}
+		m_LocalGravity = m_Root.InverseTransformDirection(m_Gravity);
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			particle.m_Damping = m_Damping;
+			particle.m_Elasticity = m_Elasticity;
+			particle.m_Stiffness = m_Stiffness;
+			particle.m_Inert = m_Inert;
+			particle.m_Radius = m_Radius;
+			if (m_BoneTotalLength > 0f)
+			{
+				float time = particle.m_BoneLength / m_BoneTotalLength;
+				if (m_DampingDistrib != null && m_DampingDistrib.keys.Length != 0)
+				{
+					particle.m_Damping *= m_DampingDistrib.Evaluate(time);
+				}
+				if (m_ElasticityDistrib != null && m_ElasticityDistrib.keys.Length != 0)
+				{
+					particle.m_Elasticity *= m_ElasticityDistrib.Evaluate(time);
+				}
+				if (m_StiffnessDistrib != null && m_StiffnessDistrib.keys.Length != 0)
+				{
+					particle.m_Stiffness *= m_StiffnessDistrib.Evaluate(time);
+				}
+				if (m_InertDistrib != null && m_InertDistrib.keys.Length != 0)
+				{
+					particle.m_Inert *= m_InertDistrib.Evaluate(time);
+				}
+				if (m_RadiusDistrib != null && m_RadiusDistrib.keys.Length != 0)
+				{
+					particle.m_Radius *= m_RadiusDistrib.Evaluate(time);
+				}
+			}
+			particle.m_Damping = Mathf.Clamp01(particle.m_Damping);
+			particle.m_Elasticity = Mathf.Clamp01(particle.m_Elasticity);
+			particle.m_Stiffness = Mathf.Clamp01(particle.m_Stiffness);
+			particle.m_Inert = Mathf.Clamp01(particle.m_Inert);
+			particle.m_Radius = Mathf.Max(particle.m_Radius, 0f);
+		}
+	}
+
+	private void InitTransforms()
+	{
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_Transform != null)
+			{
+				particle.m_Transform.localPosition = particle.m_InitLocalPosition;
+				particle.m_Transform.localRotation = particle.m_InitLocalRotation;
+			}
+		}
+	}
+
+	private void ResetParticlesPosition()
+	{
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_Transform != null)
+			{
+				particle.m_Position = (particle.m_PrevPosition = particle.m_Transform.position);
+				continue;
+			}
+			Transform transform = m_Particles[particle.m_ParentIndex].m_Transform;
+			particle.m_Position = (particle.m_PrevPosition = transform.TransformPoint(particle.m_EndOffset));
+		}
+		m_ObjectPrevPosition = base.transform.position;
+	}
+
+	private void UpdateParticles1()
+	{
+		Vector3 gravity = m_Gravity;
+		Vector3 normalized = m_Gravity.normalized;
+		Vector3 lhs = m_Root.TransformDirection(m_LocalGravity);
+		Vector3 vector = normalized * Mathf.Max(Vector3.Dot(lhs, normalized), 0f);
+		gravity -= vector;
+		gravity = (gravity + m_Force) * m_ObjectScale;
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_ParentIndex >= 0)
+			{
+				Vector3 vector2 = particle.m_Position - particle.m_PrevPosition;
+				Vector3 vector3 = m_ObjectMove * particle.m_Inert;
+				particle.m_PrevPosition = particle.m_Position + vector3;
+				particle.m_Position += vector2 * (1f - particle.m_Damping) + gravity + vector3;
+			}
+			else
+			{
+				particle.m_PrevPosition = particle.m_Position;
+				particle.m_Position = particle.m_Transform.position;
+			}
+		}
+	}
+
+	private void UpdateParticles2()
+	{
+		Plane plane = default;
+		for (int i = 1; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			Particle particle2 = m_Particles[particle.m_ParentIndex];
+			float num = ((!(particle.m_Transform != null)) ? particle2.m_Transform.localToWorldMatrix.MultiplyVector(particle.m_EndOffset).magnitude : (particle2.m_Transform.position - particle.m_Transform.position).magnitude);
+			float num2 = Mathf.Lerp(1f, particle.m_Stiffness, m_Weight);
+			if (num2 > 0f || particle.m_Elasticity > 0f)
+			{
+				Matrix4x4 localToWorldMatrix = particle2.m_Transform.localToWorldMatrix;
+				localToWorldMatrix.SetColumn(3, particle2.m_Position);
+				Vector3 vector = ((!(particle.m_Transform != null)) ? localToWorldMatrix.MultiplyPoint3x4(particle.m_EndOffset) : localToWorldMatrix.MultiplyPoint3x4(particle.m_Transform.localPosition));
+				Vector3 vector2 = vector - particle.m_Position;
+				particle.m_Position += vector2 * particle.m_Elasticity;
+				if (num2 > 0f)
+				{
+					vector2 = vector - particle.m_Position;
+					float magnitude = vector2.magnitude;
+					float num3 = num * (1f - num2) * 2f;
+					if (magnitude > num3)
+					{
+						particle.m_Position += vector2 * ((magnitude - num3) / magnitude);
+					}
+				}
+			}
+			if (m_Colliders != null)
+			{
+				float particleRadius = particle.m_Radius * m_ObjectScale;
+				for (int j = 0; j < m_Colliders.Count; j++)
+				{
+					DynamicBoneColliderBase dynamicBoneColliderBase = m_Colliders[j];
+					if (dynamicBoneColliderBase != null && dynamicBoneColliderBase.enabled)
+					{
+						dynamicBoneColliderBase.Collide(ref particle.m_Position, particleRadius);
+					}
+				}
+			}
+			if (m_FreezeAxis != FreezeAxis.None)
+			{
+				switch (m_FreezeAxis)
+				{
+				case FreezeAxis.X:
+					plane.SetNormalAndPosition(particle2.m_Transform.right, particle2.m_Position);
+					break;
+				case FreezeAxis.Y:
+					plane.SetNormalAndPosition(particle2.m_Transform.up, particle2.m_Position);
+					break;
+				case FreezeAxis.Z:
+					plane.SetNormalAndPosition(particle2.m_Transform.forward, particle2.m_Position);
+					break;
+				}
+				particle.m_Position -= plane.normal * plane.GetDistanceToPoint(particle.m_Position);
+			}
+			Vector3 vector3 = particle2.m_Position - particle.m_Position;
+			float magnitude2 = vector3.magnitude;
+			if (magnitude2 > 0f)
+			{
+				particle.m_Position += vector3 * ((magnitude2 - num) / magnitude2);
+			}
+		}
+	}
+
+	private void SkipUpdateParticles()
+	{
+		for (int i = 0; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			if (particle.m_ParentIndex >= 0)
+			{
+				particle.m_PrevPosition += m_ObjectMove;
+				particle.m_Position += m_ObjectMove;
+				Particle particle2 = m_Particles[particle.m_ParentIndex];
+				float num = ((!(particle.m_Transform != null)) ? particle2.m_Transform.localToWorldMatrix.MultiplyVector(particle.m_EndOffset).magnitude : (particle2.m_Transform.position - particle.m_Transform.position).magnitude);
+				float num2 = Mathf.Lerp(1f, particle.m_Stiffness, m_Weight);
+				if (num2 > 0f)
+				{
+					Matrix4x4 localToWorldMatrix = particle2.m_Transform.localToWorldMatrix;
+					localToWorldMatrix.SetColumn(3, particle2.m_Position);
+					Vector3 vector = ((!(particle.m_Transform != null)) ? localToWorldMatrix.MultiplyPoint3x4(particle.m_EndOffset) : localToWorldMatrix.MultiplyPoint3x4(particle.m_Transform.localPosition));
+					Vector3 vector2 = vector - particle.m_Position;
+					float magnitude = vector2.magnitude;
+					float num3 = num * (1f - num2) * 2f;
+					if (magnitude > num3)
+					{
+						particle.m_Position += vector2 * ((magnitude - num3) / magnitude);
+					}
+				}
+				Vector3 vector3 = particle2.m_Position - particle.m_Position;
+				float magnitude2 = vector3.magnitude;
+				if (magnitude2 > 0f)
+				{
+					particle.m_Position += vector3 * ((magnitude2 - num) / magnitude2);
+				}
+			}
+			else
+			{
+				particle.m_PrevPosition = particle.m_Position;
+				particle.m_Position = particle.m_Transform.position;
+			}
+		}
+	}
+
+	private static Vector3 MirrorVector(Vector3 v, Vector3 axis)
+	{
+		return v - axis * (Vector3.Dot(v, axis) * 2f);
+	}
+
+	private void ApplyParticlesToTransforms()
+	{
+		for (int i = 1; i < m_Particles.Count; i++)
+		{
+			Particle particle = m_Particles[i];
+			Particle particle2 = m_Particles[particle.m_ParentIndex];
+			if (particle2.m_Transform.childCount <= 1)
+			{
+				Vector3 direction = ((!(particle.m_Transform != null)) ? particle.m_EndOffset : particle.m_Transform.localPosition);
+				Vector3 toDirection = particle.m_Position - particle2.m_Position;
+				Quaternion quaternion = Quaternion.FromToRotation(particle2.m_Transform.TransformDirection(direction), toDirection);
+				particle2.m_Transform.rotation = quaternion * particle2.m_Transform.rotation;
+			}
+			if (particle.m_Transform != null)
+			{
+				particle.m_Transform.position = particle.m_Position;
+			}
+		}
+	}
+}
+
+

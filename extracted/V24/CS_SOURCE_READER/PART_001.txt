@@ -1,0 +1,6622 @@
+
+====================================================================================================
+SOURCE FILE 001
+PATH: Assembly-CSharp-firstpass__FilePath.cs
+SIZE: 5322 bytes
+SHA256: c7bafe1268c97f0e0e55088c8116c41a1e5e8d5cd4dc87b007e988ff091e1939
+====================================================================================================
+
+using System;
+using System.IO;
+using Beam;
+using Beam.Utilities;
+using UnityEngine;
+
+public static class FilePath
+{
+	public static readonly string LEGACY_USER_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+	public static readonly string LEGACY_SAVE_FOLDER = PathTools.Combine(LEGACY_USER_FOLDER, "Stranded Deep/Data/");
+
+	public static readonly string USER_FOLDER = Application.persistentDataPath;
+
+	public static readonly string SAVE_ROOT = "Data/";
+
+	public static readonly string SAVE_FOLDER = PathTools.Combine(USER_FOLDER, SAVE_ROOT);
+
+	public static readonly string ASSET_BUNDLES_FOLDER = PathTools.Combine(Application.dataPath, "Data/Bundles/");
+
+	public const string SAVE_SLOT_FOLDER_PREFIX = "Slot";
+
+	public const string SAVE_FILE_NAME = "data";
+
+	public const string OPTIONS_FILE_NAME = "Options.json";
+
+	public static readonly string OPTIONS_FILE = PathTools.Combine(SAVE_FOLDER, "Options.json");
+
+	public const string PLAYER_PREFAB_PATH = "Prefabs/Player";
+
+	public const string PREFAB_REFERENCE_FILE = "Prefabs/Prefabs";
+
+	public const string PREFAB_LEGACY_MAPPING_FILE = "Prefabs/PrefabsLegacyMappping";
+
+	public const string CRAFTING_COMBOS_FILE = "CraftingCombinations";
+
+	public const string BUILDING_COMBOS_FILE = "BuildingCombinations";
+
+	public const string BAD_WORDS_FILE = "bad-words";
+
+	public const string SCREENSHOTS_EXTENSION = ".bytes";
+
+	public const string DEFAULT_BACKGROUND_NAME = "default";
+
+	public const string DYNAMIC_BACKGROUND_NAME = "dynamic";
+
+	public const string DYNAMIC_BACKGROUND_NAME_COOP = "dynamic_COOP";
+
+	public const string WORLD_FOLDER_NAME = "World";
+
+	public const string HEIGHTMAPS_FOLDER_NAME = "Heightmaps";
+
+	public const string LOCAL_MAPS_FOLDER_NAME = "Maps";
+
+	public static string WORLD_FOLDER = PathTools.Combine(SAVE_FOLDER, GetSlotFolderName(0), "World");
+
+	public static string HEIGHTMAPS_FOLDER = PathTools.Combine(SAVE_FOLDER, GetSlotFolderName(0), "Heightmaps");
+
+	public static readonly string LOCAL_MAPS_FOLDER = PathTools.Combine(SAVE_FOLDER, "Maps");
+
+	public static readonly string MODS_ROOT_FOLDER = PathTools.Combine(Application.dataPath, "Mods");
+
+	public static readonly string MODS_MAPS_FOLDER = PathTools.Combine(MODS_ROOT_FOLDER, "Maps");
+
+	public static readonly string MODS_LOCALIZATION_FOLDER = PathTools.Combine(MODS_ROOT_FOLDER, "Localization");
+
+	public static readonly string DEFAULT_MAPS_FOLDER = PathTools.Combine(Application.dataPath, "Data/Default Maps/");
+
+	public const string PREFS_FALLBACK_FOLDER_NAME = ".prefs/";
+
+	public static readonly string PREFS_FALLBACK_FOLDER = PathTools.Combine(SAVE_FOLDER, ".prefs/");
+
+	public const string PREFS_SESSION_KEY = "__aus_s";
+
+	public const string PREFS_TOTAL_KEY = "__aus_t";
+
+	private static readonly string[] _layout = new string[14]
+	{
+		SAVE_ROOT ?? "",
+		SAVE_ROOT + "/Maps",
+		SAVE_ROOT + "/Slot0",
+		SAVE_ROOT + "/Slot0/World",
+		SAVE_ROOT + "/Slot0/Heightmaps",
+		SAVE_ROOT + "/Slot1",
+		SAVE_ROOT + "/Slot1/World",
+		SAVE_ROOT + "/Slot1/Heightmaps",
+		SAVE_ROOT + "/Slot2",
+		SAVE_ROOT + "/Slot2/World",
+		SAVE_ROOT + "/Slot2/Heightmaps",
+		SAVE_ROOT + "/Slot3",
+		SAVE_ROOT + "/Slot3/World",
+		SAVE_ROOT + "/Slot3/Heightmaps"
+	};
+
+	public static string GetSlotFolderName(int slotNumber)
+	{
+		return "Slot" + slotNumber;
+	}
+
+	public static string GetSaveFileSuffix(GameMode mode)
+	{
+		switch (mode)
+		{
+		case GameMode.Coop_2:
+		case GameMode.Coop_3:
+		case GameMode.Coop_4:
+			return "_COOP";
+		case GameMode.Coop_Server:
+		case GameMode.Coop_Client:
+			return "_MP_COOP";
+		default:
+			return string.Empty;
+		}
+	}
+
+	public static string GetSaveFileExtension(GameMode mode)
+	{
+		return GetSaveFileSuffix(mode) + ".json";
+	}
+
+	public static string GetPrefsSessionKey(int slotNumber, GameMode mode)
+	{
+		return ((slotNumber > 0) ? string.Format("{0}_{1}", "__aus_s", slotNumber) : "__aus_s") + GetSaveFileSuffix(mode).ToLower();
+	}
+
+	public static string GetPrefsTotalKey(int slotNumber, GameMode mode)
+	{
+		return ((slotNumber > 0) ? string.Format("{0}_{1}", "__aus_t", slotNumber) : "__aus_t") + GetSaveFileSuffix(mode).ToLower();
+	}
+
+	public static bool CheckFilePermissions()
+	{
+		try
+		{
+			string text = Path.Combine(USER_FOLDER, "temp");
+			if (Directory.Exists(text))
+			{
+				Directory.Delete(text);
+			}
+			Directory.CreateDirectory(text);
+			FileInfo fileInfo = new FileInfo(text);
+			fileInfo.Attributes |= FileAttributes.ReadOnly;
+			fileInfo.Attributes &= ~FileAttributes.ReadOnly;
+			Directory.Delete(text);
+			string text2 = Path.Combine(USER_FOLDER, "temp.txt");
+			if (File.Exists(text2))
+			{
+				File.Delete(text2);
+			}
+			using (File.Create(text2))
+			{
+			}
+			FileInfo fileInfo2 = new FileInfo(text2);
+			fileInfo2.Attributes |= FileAttributes.ReadOnly;
+			fileInfo2.Attributes &= ~FileAttributes.ReadOnly;
+			File.Delete(text2);
+			return true;
+		}
+		catch (Exception exception)
+		{
+			Debug.LogException(exception);
+			return false;
+		}
+	}
+
+	public static bool CreateDirectories()
+	{
+		try
+		{
+			string[] layout = _layout;
+			foreach (string text in layout)
+			{
+				string path = PathTools.Combine(USER_FOLDER, text);
+				if (!Directory.Exists(path))
+				{
+					Directory.CreateDirectory(path);
+				}
+			}
+			return true;
+		}
+		catch (Exception exception)
+		{
+			Debug.LogException(exception);
+			return false;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 002
+PATH: Assembly-CSharp-firstpass__ILeanTween.cs
+SIZE: 5942 bytes
+SHA256: 115d8ceb31107cccf06838c59e134f8889e0f8c2173d3c6922fe0327ab393b58
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+public interface ILeanTween
+{
+	GameObject tweenEmpty { get; }
+
+	void removeTween(int i, int uniqueId);
+
+	void removeTween(int i);
+
+	Vector3[] add(Vector3[] a, Vector3 b);
+
+	float closestRot(float from, float to);
+
+	void cancelAll();
+
+	void cancelAll(bool callComplete);
+
+	void cancel(GameObject gameObject);
+
+	void cancel(GameObject gameObject, bool callOnComplete);
+
+	void cancel(GameObject gameObject, int uniqueId);
+
+	void cancel(LTRect ltRect, int uniqueId);
+
+	void cancel(int uniqueId);
+
+	void cancel(int uniqueId, bool callOnComplete);
+
+	LTDescr descr(int uniqueId);
+
+	LTDescr description(int uniqueId);
+
+	LTDescr[] descriptions(GameObject gameObject = null);
+
+	void pause(int uniqueId);
+
+	void pause(GameObject gameObject);
+
+	void pauseAll();
+
+	void resumeAll();
+
+	void resume(int uniqueId);
+
+	void resume(GameObject gameObject);
+
+	bool isTweening(GameObject gameObject = null);
+
+	bool isTweening(int uniqueId);
+
+	bool isTweening(LTRect ltRect);
+
+	void drawBezierPath(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float arrowSize = 0f, Transform arrowTransform = null);
+
+	LTDescr options(LTDescr seed);
+
+	LTDescr options();
+
+	LTDescr alpha(GameObject gameObject, float to, float time);
+
+	LTDescr alpha(LTRect ltRect, float to, float time);
+
+	LTDescr alphaVertex(GameObject gameObject, float to, float time);
+
+	LTDescr color(GameObject gameObject, Color to, float time);
+
+	LTDescr delayedCall(float delayTime, Action callback);
+
+	LTDescr delayedCall(float delayTime, Action<object> callback);
+
+	LTDescr delayedCall(GameObject gameObject, float delayTime, Action callback);
+
+	LTDescr delayedCall(GameObject gameObject, float delayTime, Action<object> callback);
+
+	LTDescr destroyAfter(LTRect rect, float delayTime);
+
+	LTDescr move(GameObject gameObject, Vector3 to, float time);
+
+	LTDescr move(GameObject gameObject, Vector2 to, float time);
+
+	LTDescr move(GameObject gameObject, Vector3[] to, float time);
+
+	LTDescr move(GameObject gameObject, LTBezierPath to, float time);
+
+	LTDescr move(GameObject gameObject, LTSpline to, float time);
+
+	LTDescr moveSpline(GameObject gameObject, Vector3[] to, float time);
+
+	LTDescr moveSplineLocal(GameObject gameObject, Vector3[] to, float time);
+
+	LTDescr move(LTRect ltRect, Vector2 to, float time);
+
+	LTDescr moveMargin(LTRect ltRect, Vector2 to, float time);
+
+	LTDescr moveX(GameObject gameObject, float to, float time);
+
+	LTDescr moveY(GameObject gameObject, float to, float time);
+
+	LTDescr moveZ(GameObject gameObject, float to, float time);
+
+	LTDescr moveLocal(GameObject gameObject, Vector3 to, float time);
+
+	LTDescr moveLocal(GameObject gameObject, Vector3[] to, float time);
+
+	LTDescr moveLocalX(GameObject gameObject, float to, float time);
+
+	LTDescr moveLocalY(GameObject gameObject, float to, float time);
+
+	LTDescr moveLocalZ(GameObject gameObject, float to, float time);
+
+	LTDescr moveLocal(GameObject gameObject, LTBezierPath to, float time);
+
+	LTDescr moveLocal(GameObject gameObject, LTSpline to, float time);
+
+	LTDescr move(GameObject gameObject, Transform to, float time);
+
+	LTDescr rotate(GameObject gameObject, Vector3 to, float time);
+
+	LTDescr rotate(LTRect ltRect, float to, float time);
+
+	LTDescr rotateLocal(GameObject gameObject, Vector3 to, float time);
+
+	LTDescr rotateX(GameObject gameObject, float to, float time);
+
+	LTDescr rotateY(GameObject gameObject, float to, float time);
+
+	LTDescr rotateZ(GameObject gameObject, float to, float time);
+
+	LTDescr rotateAround(GameObject gameObject, Vector3 axis, float add, float time);
+
+	LTDescr rotateAroundLocal(GameObject gameObject, Vector3 axis, float add, float time);
+
+	LTDescr scale(GameObject gameObject, Vector3 to, float time);
+
+	LTDescr scale(LTRect ltRect, Vector2 to, float time);
+
+	LTDescr scaleX(GameObject gameObject, float to, float time);
+
+	LTDescr scaleY(GameObject gameObject, float to, float time);
+
+	LTDescr scaleZ(GameObject gameObject, float to, float time);
+
+	LTDescr value(GameObject gameObject, float from, float to, float time);
+
+	LTDescr value(GameObject gameObject, Vector2 from, Vector2 to, float time);
+
+	LTDescr value(GameObject gameObject, Vector3 from, Vector3 to, float time);
+
+	LTDescr value(GameObject gameObject, Color from, Color to, float time);
+
+	LTDescr value(GameObject gameObject, Action<float> callOnUpdate, float from, float to, float time);
+
+	LTDescr value(GameObject gameObject, Action<float, float> callOnUpdateRatio, float from, float to, float time);
+
+	LTDescr value(GameObject gameObject, Action<Color> callOnUpdate, Color from, Color to, float time);
+
+	LTDescr value(GameObject gameObject, Action<Vector2> callOnUpdate, Vector2 from, Vector2 to, float time);
+
+	LTDescr value(GameObject gameObject, Action<Vector3> callOnUpdate, Vector3 from, Vector3 to, float time);
+
+	LTDescr value(GameObject gameObject, Action<float, object> callOnUpdate, float from, float to, float time);
+
+	LTDescr delayedSound(AudioClip audio, Vector3 pos, float volume);
+
+	LTDescr delayedSound(GameObject gameObject, AudioClip audio, Vector3 pos, float volume);
+
+	LTDescr play(RectTransform rectTransform, Sprite[] sprites);
+
+	LTDescr textAlpha(RectTransform rectTransform, float to, float time);
+
+	LTDescr textColor(RectTransform rectTransform, Color to, float time);
+
+	LTDescr move(RectTransform rectTrans, Vector3 to, float time);
+
+	LTDescr moveX(RectTransform rectTrans, float to, float time);
+
+	LTDescr moveY(RectTransform rectTrans, float to, float time);
+
+	LTDescr moveZ(RectTransform rectTrans, float to, float time);
+
+	LTDescr rotate(RectTransform rectTrans, float to, float time);
+
+	LTDescr rotateAround(RectTransform rectTrans, Vector3 axis, float to, float time);
+
+	LTDescr rotateAroundLocal(RectTransform rectTrans, Vector3 axis, float to, float time);
+
+	LTDescr scale(RectTransform rectTrans, Vector3 to, float time);
+
+	LTDescr alpha(RectTransform rectTrans, float to, float time);
+
+	LTDescr color(RectTransform rectTrans, Color to, float time);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 003
+PATH: Assembly-CSharp-firstpass__LTBezierPath.cs
+SIZE: 3467 bytes
+SHA256: e6d52ce59a0a95b96eba9c42e0f13fc56e06ee121e32f0fa0ca6da035e88849d
+====================================================================================================
+
+using UnityEngine;
+
+public class LTBezierPath
+{
+	public Vector3[] pts;
+
+	public float length;
+
+	public bool orientToPath;
+
+	public bool orientToPath2d;
+
+	private LTBezier[] beziers;
+
+	private float[] lengthRatio;
+
+	private int currentBezier;
+
+	private int previousBezier;
+
+	public float distance => length;
+
+	public LTBezierPath()
+	{
+	}
+
+	public LTBezierPath(Vector3[] pts_)
+	{
+		setPoints(pts_);
+	}
+
+	public void setPoints(Vector3[] pts_)
+	{
+		if (pts_.Length < 4)
+		{
+			LeanTween.logError("LeanTween - When passing values for a vector path, you must pass four or more values!");
+		}
+		if (pts_.Length % 4 != 0)
+		{
+			LeanTween.logError("LeanTween - When passing values for a vector path, they must be in sets of four: controlPoint1, controlPoint2, endPoint2, controlPoint2, controlPoint2...");
+		}
+		pts = pts_;
+		int num = 0;
+		beziers = new LTBezier[pts.Length / 4];
+		lengthRatio = new float[beziers.Length];
+		length = 0f;
+		for (int i = 0; i < pts.Length; i += 4)
+		{
+			beziers[num] = new LTBezier(pts[i], pts[i + 2], pts[i + 1], pts[i + 3], 0.05f);
+			length += beziers[num].length;
+			num++;
+		}
+		for (int i = 0; i < beziers.Length; i++)
+		{
+			lengthRatio[i] = beziers[i].length / length;
+		}
+	}
+
+	public Vector3 point(float ratio)
+	{
+		float num = 0f;
+		for (int i = 0; i < lengthRatio.Length; i++)
+		{
+			num += lengthRatio[i];
+			if (num >= ratio)
+			{
+				return beziers[i].point((ratio - (num - lengthRatio[i])) / lengthRatio[i]);
+			}
+		}
+		return beziers[lengthRatio.Length - 1].point(1f);
+	}
+
+	public void place2d(Transform transform, float ratio)
+	{
+		transform.position = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			Vector3 vector = point(ratio) - transform.position;
+			float z = Mathf.Atan2(vector.y, vector.x) * 57.29578f;
+			transform.eulerAngles = new Vector3(0f, 0f, z);
+		}
+	}
+
+	public void placeLocal2d(Transform transform, float ratio)
+	{
+		transform.localPosition = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			Vector3 vector = transform.parent.TransformPoint(point(ratio)) - transform.localPosition;
+			float z = Mathf.Atan2(vector.y, vector.x) * 57.29578f;
+			transform.eulerAngles = new Vector3(0f, 0f, z);
+		}
+	}
+
+	public void place(Transform transform, float ratio)
+	{
+		place(transform, ratio, Vector3.up);
+	}
+
+	public void place(Transform transform, float ratio, Vector3 worldUp)
+	{
+		transform.position = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			transform.LookAt(point(ratio), worldUp);
+		}
+	}
+
+	public void placeLocal(Transform transform, float ratio)
+	{
+		placeLocal(transform, ratio, Vector3.up);
+	}
+
+	public void placeLocal(Transform transform, float ratio, Vector3 worldUp)
+	{
+		ratio = getRationInOneRange(ratio);
+		transform.localPosition = point(ratio);
+		ratio = getRationInOneRange(ratio + 0.001f);
+		if (ratio <= 1f)
+		{
+			transform.LookAt(transform.parent.TransformPoint(point(ratio)), worldUp);
+		}
+	}
+
+	public float getRationInOneRange(float ratio)
+	{
+		if (ratio >= 0f && ratio <= 1f)
+		{
+			return ratio;
+		}
+		if (ratio < 0f)
+		{
+			return Mathf.Ceil(ratio) - ratio;
+		}
+		return ratio - Mathf.Floor(ratio);
+	}
+
+	public void gizmoDraw(float t = -1f)
+	{
+		Vector3 to = point(0f);
+		for (int i = 1; i <= 120; i++)
+		{
+			float ratio = (float)i / 120f;
+			Vector3 vector = point(ratio);
+			Gizmos.color = ((previousBezier == currentBezier) ? Color.magenta : Color.grey);
+			Gizmos.DrawLine(vector, to);
+			to = vector;
+			previousBezier = currentBezier;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 004
+PATH: Assembly-CSharp-firstpass__LTDescr.cs
+SIZE: 4849 bytes
+SHA256: 60ca49fa88b8a6bf5cc2fa5067cde3e1d9608d77ce7605d81315c35946c2bb3d
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+public interface LTDescr
+{
+	bool toggle { get; set; }
+
+	bool useEstimatedTime { get; set; }
+
+	bool useFrames { get; set; }
+
+	bool useManualTime { get; set; }
+
+	bool hasInitiliazed { get; set; }
+
+	bool hasPhysics { get; set; }
+
+	bool onCompleteOnRepeat { get; set; }
+
+	bool onCompleteOnStart { get; set; }
+
+	bool useRecursion { get; set; }
+
+	float passed { get; set; }
+
+	float delay { get; set; }
+
+	float time { get; set; }
+
+	float lastVal { get; set; }
+
+	int loopCount { get; set; }
+
+	uint counter { get; set; }
+
+	float direction { get; set; }
+
+	float directionLast { get; set; }
+
+	float overshoot { get; set; }
+
+	float period { get; set; }
+
+	bool destroyOnComplete { get; set; }
+
+	Transform trans { get; set; }
+
+	Transform toTrans { get; set; }
+
+	LTRect ltRect { get; set; }
+
+	Vector3 from { get; set; }
+
+	Vector3 to { get; set; }
+
+	Vector3 diff { get; set; }
+
+	Vector3 point { get; set; }
+
+	Vector3 axis { get; set; }
+
+	Quaternion origRotation { get; set; }
+
+	LTBezierPath path { get; set; }
+
+	LTSpline spline { get; set; }
+
+	TweenAction type { get; set; }
+
+	LeanTweenType tweenType { get; set; }
+
+	AnimationCurve animationCurve { get; set; }
+
+	LeanTweenType loopType { get; set; }
+
+	bool hasUpdateCallback { get; set; }
+
+	Action<float> onUpdateFloat { get; set; }
+
+	Action<float, float> onUpdateFloatRatio { get; set; }
+
+	Action<float, object> onUpdateFloatObject { get; set; }
+
+	Action<Vector2> onUpdateVector2 { get; set; }
+
+	Action<Vector3> onUpdateVector3 { get; set; }
+
+	Action<Vector3, object> onUpdateVector3Object { get; set; }
+
+	Action<Color> onUpdateColor { get; set; }
+
+	Action onComplete { get; set; }
+
+	Action<object> onCompleteObject { get; set; }
+
+	object onCompleteParam { get; set; }
+
+	object onUpdateParam { get; set; }
+
+	Action onStart { get; set; }
+
+	int uniqueId { get; }
+
+	int id { get; }
+
+	SpriteRenderer spriteRen { get; set; }
+
+	[Obsolete("Use 'LeanTween.cancel( id )' instead")]
+	LTDescr cancel(GameObject gameObject);
+
+	void cleanup();
+
+	void init();
+
+	LTDescr pause();
+
+	void reset();
+
+	LTDescr resume();
+
+	LTDescr setAudio(object audio);
+
+	LTDescr setAxis(Vector3 axis);
+
+	LTDescr setDelay(float delay);
+
+	LTDescr setDestroyOnComplete(bool doesDestroy);
+
+	LTDescr setDiff(Vector3 diff);
+
+	LTDescr setDirection(float direction);
+
+	LTDescr setEase(LeanTweenType easeType);
+
+	LTDescr setEase(AnimationCurve easeCurve);
+
+	LTDescr setFrom(float from);
+
+	LTDescr setFrom(Vector3 from);
+
+	LTDescr setFromColor(Color col);
+
+	LTDescr setHasInitialized(bool has);
+
+	LTDescr setId(uint id);
+
+	LTDescr setIgnoreTimeScale(bool useUnScaledTime);
+
+	LTDescr setSpeed(float speed);
+
+	LTDescr setLoopClamp();
+
+	LTDescr setLoopClamp(int loops);
+
+	LTDescr setLoopCount(int loopCount);
+
+	LTDescr setLoopOnce();
+
+	LTDescr setLoopPingPong();
+
+	LTDescr setLoopPingPong(int loops);
+
+	LTDescr setLoopType(LeanTweenType loopType);
+
+	LTDescr setOnComplete(Action onComplete);
+
+	LTDescr setOnComplete(Action<object> onComplete);
+
+	LTDescr setOnComplete(Action<object> onComplete, object onCompleteParam);
+
+	LTDescr setOnCompleteOnRepeat(bool isOn);
+
+	LTDescr setOnCompleteOnStart(bool isOn);
+
+	LTDescr setOnCompleteParam(object onCompleteParam);
+
+	LTDescr setOnStart(Action onStart);
+
+	LTDescr setOnUpdate(Action<float, object> onUpdate, object onUpdateParam = null);
+
+	LTDescr setOnUpdate(Action<float> onUpdate);
+
+	LTDescr setOnUpdate(Action<Color> onUpdate);
+
+	LTDescr setOnUpdate(Action<Color, object> onUpdate);
+
+	LTDescr setOnUpdate(Action<Vector2> onUpdate, object onUpdateParam = null);
+
+	LTDescr setOnUpdate(Action<Vector3, object> onUpdate, object onUpdateParam = null);
+
+	LTDescr setOnUpdate(Action<Vector3> onUpdate, object onUpdateParam = null);
+
+	LTDescr setOnUpdateColor(Action<Color> onUpdate);
+
+	LTDescr setOnUpdateColor(Action<Color, object> onUpdate);
+
+	LTDescr setOnUpdateObject(Action<float, object> onUpdate);
+
+	LTDescr setOnUpdateParam(object onUpdateParam);
+
+	LTDescr setOnUpdateRatio(Action<float, float> onUpdate);
+
+	LTDescr setOnUpdateVector2(Action<Vector2> onUpdate);
+
+	LTDescr setOnUpdateVector3(Action<Vector3> onUpdate);
+
+	LTDescr setOrientToPath(bool doesOrient);
+
+	LTDescr setOrientToPath2d(bool doesOrient2d);
+
+	LTDescr setOvershoot(float overshoot);
+
+	LTDescr setPath(LTBezierPath path);
+
+	LTDescr setPeriod(float period);
+
+	LTDescr setPoint(Vector3 point);
+
+	LTDescr setRect(LTRect rect);
+
+	LTDescr setRect(Rect rect);
+
+	LTDescr setRepeat(int repeat);
+
+	LTDescr setRecursive(bool useRecursion);
+
+	LTDescr setRect(RectTransform rect);
+
+	LTDescr setSprites(Sprite[] sprites);
+
+	LTDescr setFrameRate(float frameRate);
+
+	LTDescr setTime(float time);
+
+	LTDescr setTo(Transform to);
+
+	LTDescr setTo(Vector3 to);
+
+	LTDescr setUseEstimatedTime(bool useEstimatedTime);
+
+	LTDescr setUseFrames(bool useFrames);
+
+	LTDescr setUseManualTime(bool useManualTime);
+
+	new string ToString();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 005
+PATH: Assembly-CSharp-firstpass__LTDescrImpl.cs
+SIZE: 21242 bytes
+SHA256: bfd9cc53106342fd3a0cb20de010bd8c2bc291485f1b55ebaca3fa33deac1487
+====================================================================================================
+
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class LTDescrImpl : LTDescr
+{
+	private uint _id;
+
+	internal Vector3 fromInternal;
+
+	internal Vector3 toInternal;
+
+	internal Vector3 diffInternal;
+
+	public RectTransform rectTransform;
+
+	public Text uiText;
+
+	public Image uiImage;
+
+	public Sprite[] sprites;
+
+	private static uint global_counter;
+
+	public bool toggle { get; set; }
+
+	public bool useEstimatedTime { get; set; }
+
+	public bool useFrames { get; set; }
+
+	public bool useManualTime { get; set; }
+
+	public bool hasInitiliazed { get; set; }
+
+	public bool hasPhysics { get; set; }
+
+	public bool onCompleteOnRepeat { get; set; }
+
+	public bool onCompleteOnStart { get; set; }
+
+	public bool useRecursion { get; set; }
+
+	public float passed { get; set; }
+
+	public float delay { get; set; }
+
+	public float time { get; set; }
+
+	public float speed { get; set; }
+
+	public float lastVal { get; set; }
+
+	public int loopCount { get; set; }
+
+	public uint counter { get; set; }
+
+	public float direction { get; set; }
+
+	public float directionLast { get; set; }
+
+	public float overshoot { get; set; }
+
+	public float period { get; set; }
+
+	public bool destroyOnComplete { get; set; }
+
+	public Transform trans { get; set; }
+
+	public Transform toTrans { get; set; }
+
+	public LTRect ltRect { get; set; }
+
+	public Vector3 from
+	{
+		get
+		{
+			return fromInternal;
+		}
+		set
+		{
+			fromInternal = value;
+		}
+	}
+
+	public Vector3 to
+	{
+		get
+		{
+			return toInternal;
+		}
+		set
+		{
+			toInternal = value;
+		}
+	}
+
+	public Vector3 diff
+	{
+		get
+		{
+			return diffInternal;
+		}
+		set
+		{
+			diffInternal = value;
+		}
+	}
+
+	public Vector3 point { get; set; }
+
+	public Vector3 axis { get; set; }
+
+	public Quaternion origRotation { get; set; }
+
+	public LTBezierPath path { get; set; }
+
+	public LTSpline spline { get; set; }
+
+	public TweenAction type { get; set; }
+
+	public LeanTweenType tweenType { get; set; }
+
+	public AnimationCurve animationCurve { get; set; }
+
+	public LeanTweenType loopType { get; set; }
+
+	public bool hasUpdateCallback { get; set; }
+
+	public Action<float> onUpdateFloat { get; set; }
+
+	public Action<float, float> onUpdateFloatRatio { get; set; }
+
+	public Action<float, object> onUpdateFloatObject { get; set; }
+
+	public Action<Vector2> onUpdateVector2 { get; set; }
+
+	public Action<Vector3> onUpdateVector3 { get; set; }
+
+	public Action<Vector3, object> onUpdateVector3Object { get; set; }
+
+	public Action<Color> onUpdateColor { get; set; }
+
+	public Action<Color, object> onUpdateColorObject { get; set; }
+
+	public Action onComplete { get; set; }
+
+	public Action<object> onCompleteObject { get; set; }
+
+	public object onCompleteParam { get; set; }
+
+	public object onUpdateParam { get; set; }
+
+	public Action onStart { get; set; }
+
+	public SpriteRenderer spriteRen { get; set; }
+
+	public int uniqueId => (int)(_id | (counter << 16));
+
+	public int id => uniqueId;
+
+	public override string ToString()
+	{
+		return ((trans != null) ? ("gameObject:" + trans.gameObject) : "gameObject:null") + " toggle:" + toggle + " passed:" + passed + " time:" + time + " delay:" + delay + " direction:" + direction + " from:" + from.ToString() + " to:" + to.ToString() + " type:" + type.ToString() + " ease:" + tweenType.ToString() + " useEstimatedTime:" + useEstimatedTime + " id:" + id + " hasInitiliazed:" + hasInitiliazed;
+	}
+
+	[Obsolete("Use 'LeanTween.cancel( id )' instead")]
+	public LTDescr cancel(GameObject gameObject)
+	{
+		if (gameObject == trans.gameObject)
+		{
+			LeanTween.removeTween((int)_id, uniqueId);
+		}
+		return this;
+	}
+
+	public void reset()
+	{
+		bool flag = (useRecursion = true);
+		toggle = flag;
+		trans = null;
+		float num = (lastVal = 0f);
+		float num3 = (delay = num);
+		passed = num3;
+		bool flag3 = (useManualTime = false);
+		bool flag5 = (onCompleteOnStart = flag3);
+		bool flag7 = (destroyOnComplete = flag5);
+		bool flag9 = (onCompleteOnRepeat = flag7);
+		bool flag11 = (hasInitiliazed = flag9);
+		bool flag13 = (useFrames = flag11);
+		flag = (useEstimatedTime = flag13);
+		hasUpdateCallback = flag;
+		animationCurve = null;
+		tweenType = LeanTweenType.linear;
+		loopType = LeanTweenType.once;
+		loopCount = 0;
+		num = (overshoot = 1f);
+		num3 = (directionLast = num);
+		direction = num3;
+		period = 0.3f;
+		speed = -1f;
+		point = Vector3.zero;
+		cleanup();
+		global_counter++;
+		if (global_counter > 32768)
+		{
+			global_counter = 0u;
+		}
+	}
+
+	public void cleanup()
+	{
+		onUpdateFloat = null;
+		onUpdateFloatRatio = null;
+		onUpdateVector2 = null;
+		onUpdateVector3 = null;
+		onUpdateFloatObject = null;
+		onUpdateVector3Object = null;
+		onUpdateColor = null;
+		onComplete = null;
+		onCompleteObject = null;
+		onCompleteParam = null;
+		onStart = null;
+		rectTransform = null;
+		uiText = null;
+		uiImage = null;
+		sprites = null;
+	}
+
+	public void init()
+	{
+		hasInitiliazed = true;
+		if (onStart != null)
+		{
+			onStart();
+		}
+		switch (type)
+		{
+		case TweenAction.MOVE:
+		case TweenAction.MOVE_TO_TRANSFORM:
+			from = trans.position;
+			break;
+		case TweenAction.MOVE_X:
+			fromInternal.x = trans.position.x;
+			break;
+		case TweenAction.MOVE_Y:
+			fromInternal.x = trans.position.y;
+			break;
+		case TweenAction.MOVE_Z:
+			fromInternal.x = trans.position.z;
+			break;
+		case TweenAction.MOVE_LOCAL_X:
+			fromInternal.x = trans.localPosition.x;
+			break;
+		case TweenAction.MOVE_LOCAL_Y:
+			fromInternal.x = trans.localPosition.y;
+			break;
+		case TweenAction.MOVE_LOCAL_Z:
+			fromInternal.x = trans.localPosition.z;
+			break;
+		case TweenAction.SCALE_X:
+			fromInternal.x = trans.localScale.x;
+			break;
+		case TweenAction.SCALE_Y:
+			fromInternal.x = trans.localScale.y;
+			break;
+		case TweenAction.SCALE_Z:
+			fromInternal.x = trans.localScale.z;
+			break;
+		case TweenAction.ALPHA:
+		{
+			SpriteRenderer component2 = trans.gameObject.GetComponent<SpriteRenderer>();
+			if (component2 != null)
+			{
+				fromInternal.x = component2.color.a;
+			}
+			else if (trans.gameObject.GetComponent<Renderer>() != null && trans.gameObject.GetComponent<Renderer>().material.HasProperty("_Color"))
+			{
+				fromInternal.x = trans.gameObject.GetComponent<Renderer>().material.color.a;
+			}
+			else if (trans.gameObject.GetComponent<Renderer>() != null && trans.gameObject.GetComponent<Renderer>().material.HasProperty("_TintColor"))
+			{
+				Color color5 = trans.gameObject.GetComponent<Renderer>().material.GetColor("_TintColor");
+				fromInternal.x = color5.a;
+			}
+			else
+			{
+				if (trans.childCount <= 0)
+				{
+					break;
+				}
+				foreach (Transform tran in trans)
+				{
+					if (tran.gameObject.GetComponent<Renderer>() != null)
+					{
+						Color color6 = tran.gameObject.GetComponent<Renderer>().material.color;
+						fromInternal.x = color6.a;
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case TweenAction.MOVE_LOCAL:
+			from = trans.localPosition;
+			break;
+		case TweenAction.MOVE_CURVED:
+		case TweenAction.MOVE_CURVED_LOCAL:
+		case TweenAction.MOVE_SPLINE:
+		case TweenAction.MOVE_SPLINE_LOCAL:
+			fromInternal.x = 0f;
+			break;
+		case TweenAction.ROTATE:
+			from = trans.eulerAngles;
+			to = new Vector3(LeanTween.closestRot(fromInternal.x, toInternal.x), LeanTween.closestRot(from.y, to.y), LeanTween.closestRot(from.z, to.z));
+			break;
+		case TweenAction.ROTATE_X:
+			fromInternal.x = trans.eulerAngles.x;
+			toInternal.x = LeanTween.closestRot(fromInternal.x, toInternal.x);
+			break;
+		case TweenAction.ROTATE_Y:
+			fromInternal.x = trans.eulerAngles.y;
+			toInternal.x = LeanTween.closestRot(fromInternal.x, toInternal.x);
+			break;
+		case TweenAction.ROTATE_Z:
+			fromInternal.x = trans.eulerAngles.z;
+			toInternal.x = LeanTween.closestRot(fromInternal.x, toInternal.x);
+			break;
+		case TweenAction.ROTATE_AROUND:
+			lastVal = 0f;
+			fromInternal.x = 0f;
+			origRotation = trans.rotation;
+			break;
+		case TweenAction.ROTATE_AROUND_LOCAL:
+			lastVal = 0f;
+			fromInternal.x = 0f;
+			origRotation = trans.localRotation;
+			break;
+		case TweenAction.ROTATE_LOCAL:
+			from = trans.localEulerAngles;
+			to = new Vector3(LeanTween.closestRot(fromInternal.x, toInternal.x), LeanTween.closestRot(from.y, to.y), LeanTween.closestRot(from.z, to.z));
+			break;
+		case TweenAction.SCALE:
+			from = trans.localScale;
+			break;
+		case TweenAction.GUI_MOVE:
+			from = new Vector3(ltRect.rect.x, ltRect.rect.y, 0f);
+			break;
+		case TweenAction.GUI_MOVE_MARGIN:
+			from = new Vector2(ltRect.margin.x, ltRect.margin.y);
+			break;
+		case TweenAction.GUI_SCALE:
+			from = new Vector3(ltRect.rect.width, ltRect.rect.height, 0f);
+			break;
+		case TweenAction.GUI_ALPHA:
+			fromInternal.x = ltRect.alpha;
+			break;
+		case TweenAction.GUI_ROTATE:
+			if (!ltRect.rotateEnabled)
+			{
+				ltRect.rotateEnabled = true;
+				ltRect.resetForRotation();
+			}
+			fromInternal.x = ltRect.rotation;
+			break;
+		case TweenAction.ALPHA_VERTEX:
+			fromInternal.x = (int)trans.GetComponent<MeshFilter>().mesh.colors32[0].a;
+			break;
+		case TweenAction.CALLBACK_COLOR:
+			diff = new Vector3(1f, 0f, 0f);
+			break;
+		case TweenAction.COLOR:
+		{
+			SpriteRenderer component = trans.gameObject.GetComponent<SpriteRenderer>();
+			if (component != null)
+			{
+				Color color = component.color;
+				setFromColor(color);
+			}
+			else if (trans.gameObject.GetComponent<Renderer>() != null && trans.gameObject.GetComponent<Renderer>().material.HasProperty("_Color"))
+			{
+				Color color2 = trans.gameObject.GetComponent<Renderer>().material.color;
+				setFromColor(color2);
+			}
+			else if (trans.gameObject.GetComponent<Renderer>() != null && trans.gameObject.GetComponent<Renderer>().material.HasProperty("_TintColor"))
+			{
+				Color color3 = trans.gameObject.GetComponent<Renderer>().material.GetColor("_TintColor");
+				setFromColor(color3);
+			}
+			else
+			{
+				if (trans.childCount <= 0)
+				{
+					break;
+				}
+				foreach (Transform tran2 in trans)
+				{
+					if (tran2.gameObject.GetComponent<Renderer>() != null)
+					{
+						Color color4 = tran2.gameObject.GetComponent<Renderer>().material.color;
+						setFromColor(color4);
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case TweenAction.CANVAS_ALPHA:
+			uiImage = trans.gameObject.GetComponent<Image>();
+			if (uiImage != null)
+			{
+				fromInternal.x = uiImage.color.a;
+			}
+			else
+			{
+				fromInternal.x = 1f;
+			}
+			break;
+		case TweenAction.CANVAS_COLOR:
+			uiImage = trans.gameObject.GetComponent<Image>();
+			if (uiImage != null)
+			{
+				setFromColor(uiImage.color);
+			}
+			else
+			{
+				setFromColor(Color.white);
+			}
+			break;
+		case TweenAction.CANVASGROUP_ALPHA:
+			fromInternal.x = trans.gameObject.GetComponent<CanvasGroup>().alpha;
+			break;
+		case TweenAction.TEXT_ALPHA:
+			uiText = trans.gameObject.GetComponent<Text>();
+			if (uiText != null)
+			{
+				fromInternal.x = uiText.color.a;
+			}
+			else
+			{
+				fromInternal.x = 1f;
+			}
+			break;
+		case TweenAction.TEXT_COLOR:
+			uiText = trans.gameObject.GetComponent<Text>();
+			if (uiText != null)
+			{
+				setFromColor(uiText.color);
+			}
+			else
+			{
+				setFromColor(Color.white);
+			}
+			break;
+		case TweenAction.CANVAS_MOVE:
+			fromInternal = rectTransform.anchoredPosition3D;
+			break;
+		case TweenAction.CANVAS_MOVE_X:
+			fromInternal.x = rectTransform.anchoredPosition3D.x;
+			break;
+		case TweenAction.CANVAS_MOVE_Y:
+			fromInternal.x = rectTransform.anchoredPosition3D.y;
+			break;
+		case TweenAction.CANVAS_MOVE_Z:
+			fromInternal.x = rectTransform.anchoredPosition3D.z;
+			break;
+		case TweenAction.CANVAS_ROTATEAROUND:
+		case TweenAction.CANVAS_ROTATEAROUND_LOCAL:
+			lastVal = 0f;
+			fromInternal.x = 0f;
+			origRotation = rectTransform.rotation;
+			break;
+		case TweenAction.CANVAS_SCALE:
+			from = rectTransform.localScale;
+			break;
+		case TweenAction.CANVAS_PLAYSPRITE:
+			uiImage = trans.gameObject.GetComponent<Image>();
+			fromInternal.x = 0f;
+			break;
+		}
+		if (type != TweenAction.CALLBACK_COLOR && type != TweenAction.COLOR && type != TweenAction.TEXT_COLOR && type != TweenAction.CANVAS_COLOR)
+		{
+			diff = to - from;
+		}
+		if (onCompleteOnStart)
+		{
+			if (onComplete != null)
+			{
+				onComplete();
+			}
+			else if (onCompleteObject != null)
+			{
+				onCompleteObject(onCompleteParam);
+			}
+		}
+		if (speed >= 0f)
+		{
+			if (type == TweenAction.MOVE_CURVED || type == TweenAction.MOVE_CURVED_LOCAL)
+			{
+				time = path.distance / speed;
+			}
+			else if (type == TweenAction.MOVE_SPLINE || type == TweenAction.MOVE_SPLINE_LOCAL)
+			{
+				time = spline.distance / speed;
+			}
+			else
+			{
+				time = (to - from).magnitude / speed;
+			}
+		}
+	}
+
+	public LTDescr setFromColor(Color col)
+	{
+		from = new Vector3(0f, col.a, 0f);
+		diff = new Vector3(1f, 0f, 0f);
+		axis = new Vector3(col.r, col.g, col.b);
+		return this;
+	}
+
+	public LTDescr pause()
+	{
+		if (direction != 0f)
+		{
+			directionLast = direction;
+			direction = 0f;
+		}
+		return this;
+	}
+
+	public LTDescr resume()
+	{
+		direction = directionLast;
+		return this;
+	}
+
+	public LTDescr setAxis(Vector3 axis)
+	{
+		this.axis = axis;
+		return this;
+	}
+
+	public LTDescr setDelay(float delay)
+	{
+		if (useEstimatedTime)
+		{
+			this.delay = delay;
+		}
+		else
+		{
+			this.delay = delay;
+		}
+		return this;
+	}
+
+	public LTDescr setEase(LeanTweenType easeType)
+	{
+		tweenType = easeType;
+		return this;
+	}
+
+	public LTDescr setOvershoot(float overshoot)
+	{
+		this.overshoot = overshoot;
+		return this;
+	}
+
+	public LTDescr setPeriod(float period)
+	{
+		this.period = period;
+		return this;
+	}
+
+	public LTDescr setEase(AnimationCurve easeCurve)
+	{
+		animationCurve = easeCurve;
+		return this;
+	}
+
+	public LTDescr setTo(Vector3 to)
+	{
+		if (hasInitiliazed)
+		{
+			this.to = to;
+			diff = to - from;
+		}
+		else
+		{
+			this.to = to;
+		}
+		return this;
+	}
+
+	public LTDescr setTo(Transform to)
+	{
+		toTrans = to;
+		return this;
+	}
+
+	public LTDescr setFrom(Vector3 from)
+	{
+		if ((bool)trans)
+		{
+			init();
+		}
+		this.from = from;
+		diff = to - this.from;
+		return this;
+	}
+
+	public LTDescr setFrom(float from)
+	{
+		return setFrom(new Vector3(from, 0f, 0f));
+	}
+
+	public LTDescr setDiff(Vector3 diff)
+	{
+		this.diff = diff;
+		return this;
+	}
+
+	public LTDescr setHasInitialized(bool has)
+	{
+		hasInitiliazed = has;
+		return this;
+	}
+
+	public LTDescr setId(uint id)
+	{
+		_id = id;
+		counter = global_counter;
+		return this;
+	}
+
+	public LTDescr setTime(float time)
+	{
+		float num = passed / this.time;
+		passed = time * num;
+		this.time = time;
+		return this;
+	}
+
+	public LTDescr setSpeed(float speed)
+	{
+		this.speed = speed;
+		return this;
+	}
+
+	public LTDescr setRepeat(int repeat)
+	{
+		loopCount = repeat;
+		if ((repeat > 1 && loopType == LeanTweenType.once) || (repeat < 0 && loopType == LeanTweenType.once))
+		{
+			loopType = LeanTweenType.clamp;
+		}
+		if (type == TweenAction.CALLBACK || type == TweenAction.CALLBACK_COLOR)
+		{
+			setOnCompleteOnRepeat(isOn: true);
+		}
+		return this;
+	}
+
+	public LTDescr setLoopType(LeanTweenType loopType)
+	{
+		this.loopType = loopType;
+		return this;
+	}
+
+	public LTDescr setUseEstimatedTime(bool useEstimatedTime)
+	{
+		this.useEstimatedTime = useEstimatedTime;
+		return this;
+	}
+
+	public LTDescr setIgnoreTimeScale(bool useUnScaledTime)
+	{
+		useEstimatedTime = useUnScaledTime;
+		return this;
+	}
+
+	public LTDescr setUseFrames(bool useFrames)
+	{
+		this.useFrames = useFrames;
+		return this;
+	}
+
+	public LTDescr setUseManualTime(bool useManualTime)
+	{
+		this.useManualTime = useManualTime;
+		return this;
+	}
+
+	public LTDescr setLoopCount(int loopCount)
+	{
+		this.loopCount = loopCount;
+		return this;
+	}
+
+	public LTDescr setLoopOnce()
+	{
+		loopType = LeanTweenType.once;
+		return this;
+	}
+
+	public LTDescr setLoopClamp()
+	{
+		loopType = LeanTweenType.clamp;
+		if (loopCount == 0)
+		{
+			loopCount = -1;
+		}
+		return this;
+	}
+
+	public LTDescr setLoopClamp(int loops)
+	{
+		loopCount = loops;
+		return this;
+	}
+
+	public LTDescr setLoopPingPong()
+	{
+		loopType = LeanTweenType.pingPong;
+		if (loopCount == 0)
+		{
+			loopCount = -1;
+		}
+		return this;
+	}
+
+	public LTDescr setLoopPingPong(int loops)
+	{
+		loopType = LeanTweenType.pingPong;
+		loopCount = ((loops == -1) ? loops : (loops * 2));
+		return this;
+	}
+
+	public LTDescr setOnComplete(Action onComplete)
+	{
+		this.onComplete = onComplete;
+		return this;
+	}
+
+	public LTDescr setOnComplete(Action<object> onComplete)
+	{
+		onCompleteObject = onComplete;
+		return this;
+	}
+
+	public LTDescr setOnComplete(Action<object> onComplete, object onCompleteParam)
+	{
+		onCompleteObject = onComplete;
+		if (onCompleteParam != null)
+		{
+			this.onCompleteParam = onCompleteParam;
+		}
+		return this;
+	}
+
+	public LTDescr setOnCompleteParam(object onCompleteParam)
+	{
+		this.onCompleteParam = onCompleteParam;
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<float> onUpdate)
+	{
+		onUpdateFloat = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateRatio(Action<float, float> onUpdate)
+	{
+		onUpdateFloatRatio = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateObject(Action<float, object> onUpdate)
+	{
+		onUpdateFloatObject = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateVector2(Action<Vector2> onUpdate)
+	{
+		onUpdateVector2 = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateVector3(Action<Vector3> onUpdate)
+	{
+		onUpdateVector3 = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateColor(Action<Color> onUpdate)
+	{
+		onUpdateColor = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdateColor(Action<Color, object> onUpdate)
+	{
+		onUpdateColorObject = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<Color> onUpdate)
+	{
+		onUpdateColor = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<Color, object> onUpdate)
+	{
+		onUpdateColorObject = onUpdate;
+		hasUpdateCallback = true;
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<float, object> onUpdate, object onUpdateParam = null)
+	{
+		onUpdateFloatObject = onUpdate;
+		hasUpdateCallback = true;
+		if (onUpdateParam != null)
+		{
+			this.onUpdateParam = onUpdateParam;
+		}
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<Vector3, object> onUpdate, object onUpdateParam = null)
+	{
+		onUpdateVector3Object = onUpdate;
+		hasUpdateCallback = true;
+		if (onUpdateParam != null)
+		{
+			this.onUpdateParam = onUpdateParam;
+		}
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<Vector2> onUpdate, object onUpdateParam = null)
+	{
+		onUpdateVector2 = onUpdate;
+		hasUpdateCallback = true;
+		if (onUpdateParam != null)
+		{
+			this.onUpdateParam = onUpdateParam;
+		}
+		return this;
+	}
+
+	public LTDescr setOnUpdate(Action<Vector3> onUpdate, object onUpdateParam = null)
+	{
+		onUpdateVector3 = onUpdate;
+		hasUpdateCallback = true;
+		if (onUpdateParam != null)
+		{
+			this.onUpdateParam = onUpdateParam;
+		}
+		return this;
+	}
+
+	public LTDescr setOnUpdateParam(object onUpdateParam)
+	{
+		this.onUpdateParam = onUpdateParam;
+		return this;
+	}
+
+	public LTDescr setOrientToPath(bool doesOrient)
+	{
+		if (type == TweenAction.MOVE_CURVED || type == TweenAction.MOVE_CURVED_LOCAL)
+		{
+			if (path == null)
+			{
+				path = new LTBezierPath();
+			}
+			path.orientToPath = doesOrient;
+		}
+		else
+		{
+			spline.orientToPath = doesOrient;
+		}
+		return this;
+	}
+
+	public LTDescr setOrientToPath2d(bool doesOrient2d)
+	{
+		setOrientToPath(doesOrient2d);
+		if (type == TweenAction.MOVE_CURVED || type == TweenAction.MOVE_CURVED_LOCAL)
+		{
+			path.orientToPath2d = doesOrient2d;
+		}
+		else
+		{
+			spline.orientToPath2d = doesOrient2d;
+		}
+		return this;
+	}
+
+	public LTDescr setRect(LTRect rect)
+	{
+		ltRect = rect;
+		return this;
+	}
+
+	public LTDescr setRect(Rect rect)
+	{
+		ltRect = new LTRect(rect);
+		return this;
+	}
+
+	public LTDescr setPath(LTBezierPath path)
+	{
+		this.path = path;
+		return this;
+	}
+
+	public LTDescr setPoint(Vector3 point)
+	{
+		this.point = point;
+		return this;
+	}
+
+	public LTDescr setDestroyOnComplete(bool doesDestroy)
+	{
+		destroyOnComplete = doesDestroy;
+		return this;
+	}
+
+	public LTDescr setAudio(object audio)
+	{
+		onCompleteParam = audio;
+		return this;
+	}
+
+	public LTDescr setOnCompleteOnRepeat(bool isOn)
+	{
+		onCompleteOnRepeat = isOn;
+		return this;
+	}
+
+	public LTDescr setOnCompleteOnStart(bool isOn)
+	{
+		onCompleteOnStart = isOn;
+		return this;
+	}
+
+	public LTDescr setRect(RectTransform rect)
+	{
+		rectTransform = rect;
+		return this;
+	}
+
+	public LTDescr setSprites(Sprite[] sprites)
+	{
+		this.sprites = sprites;
+		return this;
+	}
+
+	public LTDescr setFrameRate(float frameRate)
+	{
+		time = (float)sprites.Length / frameRate;
+		return this;
+	}
+
+	public LTDescr setOnStart(Action onStart)
+	{
+		this.onStart = onStart;
+		return this;
+	}
+
+	public LTDescr setDirection(float direction)
+	{
+		if (this.direction != -1f && this.direction != 1f)
+		{
+			Debug.LogWarning("You have passed an incorrect direction of '" + direction + "', direction must be -1f or 1f");
+			return this;
+		}
+		if (this.direction != direction)
+		{
+			if (hasInitiliazed)
+			{
+				this.direction = direction;
+			}
+			else if (path != null)
+			{
+				path = new LTBezierPath(LTUtility.reverse(path.pts));
+			}
+			else if (spline != null)
+			{
+				spline = new LTSpline(LTUtility.reverse(spline.pts));
+			}
+		}
+		return this;
+	}
+
+	public LTDescr setRecursive(bool useRecursion)
+	{
+		this.useRecursion = useRecursion;
+		return this;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 006
+PATH: Assembly-CSharp-firstpass__LTSpline.cs
+SIZE: 5793 bytes
+SHA256: 5a7a393ebd3032d61a34728ed9279f40408270b2065ced263c62302c6096d0c9
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+[Serializable]
+public class LTSpline
+{
+	public static int DISTANCE_COUNT = 3;
+
+	public static int SUBLINE_COUNT = 20;
+
+	public float distance;
+
+	public bool constantSpeed = true;
+
+	public Vector3[] pts;
+
+	[NonSerialized]
+	public Vector3[] ptsAdj;
+
+	public int ptsAdjLength;
+
+	public bool orientToPath;
+
+	public bool orientToPath2d;
+
+	private int numSections;
+
+	private int currPt;
+
+	public LTSpline(Vector3[] pts)
+	{
+		init(pts, constantSpeed: true);
+	}
+
+	public LTSpline(Vector3[] pts, bool constantSpeed)
+	{
+		this.constantSpeed = constantSpeed;
+		init(pts, constantSpeed);
+	}
+
+	private void init(Vector3[] pts, bool constantSpeed)
+	{
+		if (pts.Length < 4)
+		{
+			LeanTween.logError("LeanTween - When passing values for a spline path, you must pass four or more values!");
+			return;
+		}
+		this.pts = new Vector3[pts.Length];
+		Array.Copy(pts, this.pts, pts.Length);
+		numSections = pts.Length - 3;
+		float num = float.PositiveInfinity;
+		Vector3 b = this.pts[1];
+		float num2 = 0f;
+		for (int i = 1; i < this.pts.Length - 1; i++)
+		{
+			float num3 = Vector3.Distance(this.pts[i], b);
+			if (num3 < num)
+			{
+				num = num3;
+			}
+			num2 += num3;
+		}
+		if (!constantSpeed)
+		{
+			return;
+		}
+		num = num2 / (float)(numSections * SUBLINE_COUNT);
+		float num4 = num / (float)SUBLINE_COUNT;
+		int num5 = (int)Mathf.Ceil(num2 / num4) * DISTANCE_COUNT;
+		if (num5 <= 1)
+		{
+			num5 = 2;
+		}
+		ptsAdj = new Vector3[num5];
+		b = interp(0f);
+		int num6 = 1;
+		ptsAdj[0] = b;
+		distance = 0f;
+		for (int j = 0; j < num5 + 1; j++)
+		{
+			float num7 = (float)j / (float)num5;
+			Vector3 vector = interp(num7);
+			float num8 = Vector3.Distance(vector, b);
+			if (num8 >= num4 || num7 >= 1f)
+			{
+				ptsAdj[num6] = vector;
+				distance += num8;
+				b = vector;
+				num6++;
+			}
+		}
+		ptsAdjLength = num6;
+	}
+
+	public Vector3 map(float u)
+	{
+		if (u >= 1f)
+		{
+			return pts[pts.Length - 2];
+		}
+		float num = u * (float)(ptsAdjLength - 1);
+		int num2 = (int)Mathf.Floor(num);
+		int num3 = (int)Mathf.Ceil(num);
+		if (num2 < 0)
+		{
+			num2 = 0;
+		}
+		Vector3 vector = ptsAdj[num2];
+		Vector3 vector2 = ptsAdj[num3];
+		float num4 = num - (float)num2;
+		return vector + (vector2 - vector) * num4;
+	}
+
+	public Vector3 interp(float t)
+	{
+		currPt = Mathf.Min(Mathf.FloorToInt(t * (float)numSections), numSections - 1);
+		float num = t * (float)numSections - (float)currPt;
+		Vector3 vector = pts[currPt];
+		Vector3 vector2 = pts[currPt + 1];
+		Vector3 vector3 = pts[currPt + 2];
+		Vector3 vector4 = pts[currPt + 3];
+		return 0.5f * ((-vector + 3f * vector2 - 3f * vector3 + vector4) * (num * num * num) + (2f * vector - 5f * vector2 + 4f * vector3 - vector4) * (num * num) + (-vector + vector3) * num + 2f * vector2);
+	}
+
+	public float ratioAtPoint(Vector3 pt)
+	{
+		float num = float.MaxValue;
+		int num2 = 0;
+		for (int i = 0; i < ptsAdjLength; i++)
+		{
+			float num3 = Vector3.Distance(pt, ptsAdj[i]);
+			if (num3 < num)
+			{
+				num = num3;
+				num2 = i;
+			}
+		}
+		return (float)num2 / (float)(ptsAdjLength - 1);
+	}
+
+	public Vector3 point(float ratio)
+	{
+		float num = ((ratio > 1f) ? 1f : ratio);
+		if (!constantSpeed)
+		{
+			return interp(num);
+		}
+		return map(num);
+	}
+
+	public void place2d(Transform transform, float ratio)
+	{
+		transform.position = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			Vector3 vector = point(ratio) - transform.position;
+			float z = Mathf.Atan2(vector.y, vector.x) * 57.29578f;
+			transform.eulerAngles = new Vector3(0f, 0f, z);
+		}
+	}
+
+	public void placeLocal2d(Transform transform, float ratio)
+	{
+		transform.localPosition = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			Vector3 vector = transform.parent.TransformPoint(point(ratio)) - transform.localPosition;
+			float z = Mathf.Atan2(vector.y, vector.x) * 57.29578f;
+			transform.eulerAngles = new Vector3(0f, 0f, z);
+		}
+	}
+
+	public void place(Transform transform, float ratio)
+	{
+		place(transform, ratio, Vector3.up);
+	}
+
+	public void place(Transform transform, float ratio, Vector3 worldUp)
+	{
+		transform.position = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			transform.LookAt(point(ratio), worldUp);
+		}
+	}
+
+	public void placeLocal(Transform transform, float ratio)
+	{
+		placeLocal(transform, ratio, Vector3.up);
+	}
+
+	public void placeLocal(Transform transform, float ratio, Vector3 worldUp)
+	{
+		transform.localPosition = point(ratio);
+		ratio += 0.001f;
+		if (ratio <= 1f)
+		{
+			transform.LookAt(transform.parent.TransformPoint(point(ratio)), worldUp);
+		}
+	}
+
+	public void gizmoDraw(float t = -1f)
+	{
+		if (ptsAdj != null && ptsAdj.Length != 0)
+		{
+			Vector3 vector = ptsAdj[0];
+			for (int i = 0; i < ptsAdjLength; i++)
+			{
+				Vector3 vector2 = ptsAdj[i];
+				Gizmos.DrawLine(vector, vector2);
+				vector = vector2;
+			}
+		}
+	}
+
+	public void drawGizmo(Color color)
+	{
+		if (ptsAdjLength >= 4)
+		{
+			Vector3 vector = ptsAdj[0];
+			Color color2 = Gizmos.color;
+			Gizmos.color = color;
+			for (int i = 0; i < ptsAdjLength; i++)
+			{
+				Vector3 vector2 = ptsAdj[i];
+				Gizmos.DrawLine(vector, vector2);
+				vector = vector2;
+			}
+			Gizmos.color = color2;
+		}
+	}
+
+	public static void drawGizmo(Transform[] arr, Color color)
+	{
+		if (arr.Length >= 4)
+		{
+			Vector3[] array = new Vector3[arr.Length];
+			for (int i = 0; i < arr.Length; i++)
+			{
+				array[i] = arr[i].position;
+			}
+			LTSpline lTSpline = new LTSpline(array);
+			Vector3 vector = lTSpline.ptsAdj[0];
+			Color color2 = Gizmos.color;
+			Gizmos.color = color;
+			for (int j = 0; j < lTSpline.ptsAdjLength; j++)
+			{
+				Vector3 vector2 = lTSpline.ptsAdj[j];
+				Gizmos.DrawLine(vector, vector2);
+				vector = vector2;
+			}
+			Gizmos.color = color2;
+		}
+	}
+
+	public static void drawLine(Transform[] arr, float width, Color color)
+	{
+		_ = arr.Length;
+		_ = 4;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 007
+PATH: Assembly-CSharp-firstpass__LeanTween.cs
+SIZE: 74223 bytes
+SHA256: fbc4c9122af7cd9738059bf0c22aacb1de54ee841bd0432ad98fabcae6c27e7f
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class LeanTween : MonoBehaviour
+{
+	public static bool throwErrors = true;
+
+	public static float tau = MathF.PI * 2f;
+
+	private static LTDescrImpl[] tweens;
+
+	private static int[] tweensFinished;
+
+	private static LTDescrImpl tween;
+
+	private static int tweenMaxSearch = -1;
+
+	private static int maxTweens = 400;
+
+	private static int frameRendered = -1;
+
+	private static GameObject _tweenEmpty;
+
+	private static float dtEstimated = -1f;
+
+	public static float dtManual;
+
+	private static float dt;
+
+	private static float dtActual;
+
+	private static int i;
+
+	private static int j;
+
+	private static int finishedCnt;
+
+	private static AnimationCurve punch = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.112586f, 0.9976035f), new Keyframe(0.3120486f, -0.1720615f), new Keyframe(0.4316337f, 0.07030682f), new Keyframe(0.5524869f, -0.03141804f), new Keyframe(0.6549395f, 0.003909959f), new Keyframe(0.770987f, -0.009817753f), new Keyframe(0.8838775f, 0.001939224f), new Keyframe(1f, 0f));
+
+	private static AnimationCurve shake = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.25f, 1f), new Keyframe(0.75f, -1f), new Keyframe(1f, 0f));
+
+	private static Transform trans;
+
+	private static float timeTotal;
+
+	private static TweenAction tweenAction;
+
+	private static float ratioPassed;
+
+	private static float from;
+
+	private static float val;
+
+	private static bool isTweenFinished;
+
+	private static int maxTweenReached;
+
+	private static Vector3 newVect;
+
+	private static GameObject target;
+
+	private static GameObject customTarget;
+
+	public static int startSearch = 0;
+
+	public static LTDescr d;
+
+	private static Action<LTEvent>[] eventListeners;
+
+	private static GameObject[] goListeners;
+
+	private static int eventsMaxSearch = 0;
+
+	public static int EVENTS_MAX = 10;
+
+	public static int LISTENERS_MAX = 10;
+
+	private static int INIT_LISTENERS_MAX = LISTENERS_MAX;
+
+	public static int maxSearch => tweenMaxSearch;
+
+	public static int maxSimulataneousTweens => maxTweens;
+
+	public static int tweensRunning
+	{
+		get
+		{
+			int num = 0;
+			for (int i = 0; i <= tweenMaxSearch; i++)
+			{
+				if (tweens[i].toggle)
+				{
+					num++;
+				}
+			}
+			return num;
+		}
+	}
+
+	public static GameObject tweenEmpty
+	{
+		get
+		{
+			init(maxTweens);
+			return _tweenEmpty;
+		}
+	}
+
+	public static void init()
+	{
+		init(maxTweens);
+	}
+
+	public static void init(int maxSimultaneousTweens)
+	{
+		if (tweens == null)
+		{
+			maxTweens = maxSimultaneousTweens;
+			tweens = new LTDescrImpl[maxTweens];
+			tweensFinished = new int[maxTweens];
+			_tweenEmpty = new GameObject();
+			_tweenEmpty.name = "~LeanTween";
+			_tweenEmpty.transform.SetAsFirstSibling();
+			_tweenEmpty.AddComponent(typeof(LeanTween));
+			_tweenEmpty.isStatic = true;
+			_tweenEmpty.hideFlags = HideFlags.HideAndDontSave;
+			UnityEngine.Object.DontDestroyOnLoad(_tweenEmpty);
+			for (int i = 0; i < maxTweens; i++)
+			{
+				tweens[i] = new LTDescrImpl();
+			}
+			SceneManager.sceneLoaded += onLevelWasLoaded54;
+		}
+	}
+
+	public static void reset()
+	{
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			tweens[i].toggle = false;
+		}
+		tweens = null;
+		UnityEngine.Object.Destroy(_tweenEmpty);
+	}
+
+	public void Update()
+	{
+		update();
+	}
+
+	private static void onLevelWasLoaded54(Scene scene, LoadSceneMode mode)
+	{
+		internalOnLevelWasLoaded(scene.buildIndex);
+	}
+
+	private static void internalOnLevelWasLoaded(int lvl)
+	{
+		LTGUI.reset();
+	}
+
+	public static void update()
+	{
+		if (frameRendered == Time.frameCount)
+		{
+			return;
+		}
+		init();
+		if (dtEstimated < 0f)
+		{
+			dtEstimated = 0f;
+		}
+		else
+		{
+			dtEstimated = Time.unscaledDeltaTime;
+		}
+		dtActual = Time.deltaTime;
+		maxTweenReached = 0;
+		finishedCnt = 0;
+		for (int i = 0; i <= tweenMaxSearch && i < maxTweens; i++)
+		{
+			if (!tweens[i].toggle)
+			{
+				continue;
+			}
+			maxTweenReached = i;
+			tween = tweens[i];
+			trans = tween.trans;
+			timeTotal = tween.time;
+			tweenAction = tween.type;
+			if (tween.useEstimatedTime)
+			{
+				dt = dtEstimated;
+			}
+			else if (tween.useFrames)
+			{
+				dt = 1f;
+			}
+			else if (tween.useManualTime)
+			{
+				dt = dtManual;
+			}
+			else if (tween.direction == 0f)
+			{
+				dt = 0f;
+			}
+			else
+			{
+				dt = dtActual;
+			}
+			if (trans == null)
+			{
+				removeTween(i);
+				continue;
+			}
+			if (tweenAction == TweenAction.MOVE_TO_TRANSFORM)
+			{
+				tween.to = tween.toTrans.position;
+				tween.diff = tween.to - tween.from;
+			}
+			isTweenFinished = false;
+			if (tween.delay <= 0f)
+			{
+				if (tween.passed + dt > tween.time && tween.direction > 0f)
+				{
+					isTweenFinished = true;
+					tween.passed = tween.time;
+				}
+				else if (tween.direction < 0f && tween.passed - dt < 0f)
+				{
+					isTweenFinished = true;
+					tween.passed = Mathf.Epsilon;
+				}
+			}
+			if (!tween.hasInitiliazed && (((double)tween.passed == 0.0 && (double)tween.delay == 0.0) || (double)tween.passed > 0.0))
+			{
+				tween.init();
+			}
+			if (tween.delay <= 0f && tween.direction != 0f)
+			{
+				if (timeTotal <= 0f)
+				{
+					ratioPassed = 1f;
+				}
+				else
+				{
+					ratioPassed = tween.passed / timeTotal;
+				}
+				if (ratioPassed > 1f)
+				{
+					ratioPassed = 1f;
+				}
+				else if (ratioPassed < 0f)
+				{
+					ratioPassed = 0f;
+				}
+				if (tweenAction >= TweenAction.MOVE_X && tweenAction < TweenAction.MOVE)
+				{
+					if (tween.animationCurve != null)
+					{
+						val = tweenOnCurve(tween, ratioPassed);
+					}
+					else
+					{
+						switch (tween.tweenType)
+						{
+						case LeanTweenType.linear:
+							val = tween.from.x + tween.diff.x * ratioPassed;
+							break;
+						case LeanTweenType.easeOutQuad:
+							val = easeOutQuadOpt(tween.from.x, tween.diff.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInQuad:
+							val = easeInQuadOpt(tween.from.x, tween.diff.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutQuad:
+							val = easeInOutQuadOpt(tween.from.x, tween.diff.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInCubic:
+							val = easeInCubic(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutCubic:
+							val = easeOutCubic(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutCubic:
+							val = easeInOutCubic(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInQuart:
+							val = easeInQuart(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutQuart:
+							val = easeOutQuart(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutQuart:
+							val = easeInOutQuart(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInQuint:
+							val = easeInQuint(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutQuint:
+							val = easeOutQuint(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutQuint:
+							val = easeInOutQuint(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInSine:
+							val = easeInSine(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutSine:
+							val = easeOutSine(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutSine:
+							val = easeInOutSine(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInExpo:
+							val = easeInExpo(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutExpo:
+							val = easeOutExpo(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutExpo:
+							val = easeInOutExpo(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInCirc:
+							val = easeInCirc(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutCirc:
+							val = easeOutCirc(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutCirc:
+							val = easeInOutCirc(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInBounce:
+							val = easeInBounce(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeOutBounce:
+							val = easeOutBounce(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInOutBounce:
+							val = easeInOutBounce(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						case LeanTweenType.easeInBack:
+							val = easeInBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot);
+							break;
+						case LeanTweenType.easeOutBack:
+							val = easeOutBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot);
+							break;
+						case LeanTweenType.easeInOutBack:
+							val = easeInOutBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot);
+							break;
+						case LeanTweenType.easeInElastic:
+							val = easeInElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period);
+							break;
+						case LeanTweenType.easeOutElastic:
+							val = easeOutElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period);
+							break;
+						case LeanTweenType.easeInOutElastic:
+							val = easeInOutElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period);
+							break;
+						case LeanTweenType.easeShake:
+						case LeanTweenType.punch:
+							if (tween.tweenType == LeanTweenType.punch)
+							{
+								tween.animationCurve = punch;
+							}
+							else if (tween.tweenType == LeanTweenType.easeShake)
+							{
+								tween.animationCurve = shake;
+							}
+							tween.toInternal.x = tween.from.x + tween.to.x;
+							tween.diffInternal.x = tween.to.x - tween.from.x;
+							val = tweenOnCurve(tween, ratioPassed);
+							break;
+						case LeanTweenType.easeSpring:
+							val = spring(tween.from.x, tween.to.x, ratioPassed);
+							break;
+						default:
+							val = tween.from.x + tween.diff.x * ratioPassed;
+							break;
+						}
+					}
+					if (tweenAction == TweenAction.MOVE_X)
+					{
+						trans.position = new Vector3(val, trans.position.y, trans.position.z);
+					}
+					else if (tweenAction == TweenAction.MOVE_Y)
+					{
+						trans.position = new Vector3(trans.position.x, val, trans.position.z);
+					}
+					else if (tweenAction == TweenAction.MOVE_Z)
+					{
+						trans.position = new Vector3(trans.position.x, trans.position.y, val);
+					}
+					if (tweenAction == TweenAction.MOVE_LOCAL_X)
+					{
+						trans.localPosition = new Vector3(val, trans.localPosition.y, trans.localPosition.z);
+					}
+					else if (tweenAction == TweenAction.MOVE_LOCAL_Y)
+					{
+						trans.localPosition = new Vector3(trans.localPosition.x, val, trans.localPosition.z);
+					}
+					else if (tweenAction == TweenAction.MOVE_LOCAL_Z)
+					{
+						trans.localPosition = new Vector3(trans.localPosition.x, trans.localPosition.y, val);
+					}
+					else if (tweenAction == TweenAction.MOVE_CURVED)
+					{
+						if (tween.path.orientToPath)
+						{
+							if (tween.path.orientToPath2d)
+							{
+								tween.path.place2d(trans, val);
+							}
+							else
+							{
+								tween.path.place(trans, val);
+							}
+						}
+						else
+						{
+							trans.position = tween.path.point(val);
+						}
+					}
+					else if (tweenAction == TweenAction.MOVE_CURVED_LOCAL)
+					{
+						if (tween.path.orientToPath)
+						{
+							if (tween.path.orientToPath2d)
+							{
+								tween.path.placeLocal2d(trans, val);
+							}
+							else
+							{
+								tween.path.placeLocal(trans, val);
+							}
+						}
+						else
+						{
+							trans.localPosition = tween.path.point(val);
+						}
+					}
+					else if (tweenAction == TweenAction.MOVE_SPLINE)
+					{
+						if (tween.spline.orientToPath)
+						{
+							if (tween.spline.orientToPath2d)
+							{
+								tween.spline.place2d(trans, val);
+							}
+							else
+							{
+								tween.spline.place(trans, val);
+							}
+						}
+						else
+						{
+							trans.position = tween.spline.point(val);
+						}
+					}
+					else if (tweenAction == TweenAction.MOVE_SPLINE_LOCAL)
+					{
+						if (tween.spline.orientToPath)
+						{
+							if (tween.spline.orientToPath2d)
+							{
+								tween.spline.placeLocal2d(trans, val);
+							}
+							else
+							{
+								tween.spline.placeLocal(trans, val);
+							}
+						}
+						else
+						{
+							trans.localPosition = tween.spline.point(val);
+						}
+					}
+					else if (tweenAction == TweenAction.SCALE_X)
+					{
+						trans.localScale = new Vector3(val, trans.localScale.y, trans.localScale.z);
+					}
+					else if (tweenAction == TweenAction.SCALE_Y)
+					{
+						trans.localScale = new Vector3(trans.localScale.x, val, trans.localScale.z);
+					}
+					else if (tweenAction == TweenAction.SCALE_Z)
+					{
+						trans.localScale = new Vector3(trans.localScale.x, trans.localScale.y, val);
+					}
+					else if (tweenAction == TweenAction.ROTATE_X)
+					{
+						trans.eulerAngles = new Vector3(val, trans.eulerAngles.y, trans.eulerAngles.z);
+					}
+					else if (tweenAction == TweenAction.ROTATE_Y)
+					{
+						trans.eulerAngles = new Vector3(trans.eulerAngles.x, val, trans.eulerAngles.z);
+					}
+					else if (tweenAction == TweenAction.ROTATE_Z)
+					{
+						trans.eulerAngles = new Vector3(trans.eulerAngles.x, trans.eulerAngles.y, val);
+					}
+					else if (tweenAction == TweenAction.ROTATE_AROUND)
+					{
+						Vector3 localPosition = trans.localPosition;
+						Vector3 point = trans.TransformPoint(tween.point);
+						trans.RotateAround(point, tween.axis, 0f - val);
+						Vector3 vector = localPosition - trans.localPosition;
+						trans.localPosition = localPosition - vector;
+						trans.rotation = tween.origRotation;
+						point = trans.TransformPoint(tween.point);
+						trans.RotateAround(point, tween.axis, val);
+					}
+					else if (tweenAction == TweenAction.ROTATE_AROUND_LOCAL)
+					{
+						Vector3 localPosition2 = trans.localPosition;
+						trans.RotateAround(trans.TransformPoint(tween.point), trans.TransformDirection(tween.axis), 0f - val);
+						Vector3 vector2 = localPosition2 - trans.localPosition;
+						trans.localPosition = localPosition2 - vector2;
+						trans.localRotation = tween.origRotation;
+						Vector3 point2 = trans.TransformPoint(tween.point);
+						trans.RotateAround(point2, trans.TransformDirection(tween.axis), val);
+					}
+					else if (tweenAction == TweenAction.ALPHA)
+					{
+						if (tween.spriteRen != null)
+						{
+							tween.spriteRen.color = new Color(tween.spriteRen.color.r, tween.spriteRen.color.g, tween.spriteRen.color.b, val);
+							alphaRecursiveSprite(tween.trans, val);
+						}
+						else
+						{
+							alphaRecursive(tween.trans, val, tween.useRecursion);
+						}
+					}
+					else if (tweenAction == TweenAction.ALPHA_VERTEX)
+					{
+						Mesh mesh = trans.GetComponent<MeshFilter>().mesh;
+						Vector3[] vertices = mesh.vertices;
+						Color32[] array = new Color32[vertices.Length];
+						Color32 color = mesh.colors32[0];
+						color = new Color((int)color.r, (int)color.g, (int)color.b, val);
+						for (int j = 0; j < vertices.Length; j++)
+						{
+							array[j] = color;
+						}
+						mesh.colors32 = array;
+					}
+					else if (tweenAction == TweenAction.COLOR || tweenAction == TweenAction.CALLBACK_COLOR)
+					{
+						Color color2 = tweenColor(tween, val);
+						if (tween.spriteRen != null)
+						{
+							tween.spriteRen.color = color2;
+							colorRecursiveSprite(trans, color2);
+						}
+						else if (tweenAction == TweenAction.COLOR)
+						{
+							colorRecursive(trans, color2, tween.useRecursion);
+						}
+						if (dt != 0f && tween.onUpdateColor != null)
+						{
+							tween.onUpdateColor(color2);
+						}
+						else if (dt != 0f && tween.onUpdateColorObject != null)
+						{
+							tween.onUpdateColorObject(color2, tween.onUpdateParam);
+						}
+					}
+					else if (tweenAction == TweenAction.CANVAS_ALPHA)
+					{
+						if (tween.uiImage != null)
+						{
+							Color color3 = tween.uiImage.color;
+							color3.a = val;
+							tween.uiImage.color = color3;
+						}
+						if (tween.useRecursion)
+						{
+							alphaRecursive(tween.rectTransform, val);
+							textAlphaRecursive(tween.rectTransform, val);
+						}
+					}
+					else if (tweenAction == TweenAction.CANVAS_COLOR)
+					{
+						Color color4 = tweenColor(tween, val);
+						tween.uiImage.color = color4;
+						if (dt != 0f && tween.onUpdateColor != null)
+						{
+							tween.onUpdateColor(color4);
+						}
+						if (tween.useRecursion)
+						{
+							colorRecursive(tween.rectTransform, color4);
+						}
+					}
+					else if (tweenAction == TweenAction.CANVASGROUP_ALPHA)
+					{
+						tween.trans.GetComponent<CanvasGroup>().alpha = val;
+					}
+					else if (tweenAction == TweenAction.TEXT_ALPHA)
+					{
+						textAlphaRecursive(trans, val, tween.useRecursion);
+					}
+					else if (tweenAction == TweenAction.TEXT_COLOR)
+					{
+						Color color5 = tweenColor(tween, val);
+						tween.uiText.color = color5;
+						if (dt != 0f && tween.onUpdateColor != null)
+						{
+							tween.onUpdateColor(color5);
+						}
+						if (tween.useRecursion && trans.childCount > 0)
+						{
+							textColorRecursive(tween.trans, color5);
+						}
+					}
+					else if (tweenAction == TweenAction.CANVAS_ROTATEAROUND)
+					{
+						RectTransform rectTransform = tween.rectTransform;
+						Vector3 localPosition3 = rectTransform.localPosition;
+						rectTransform.RotateAround(rectTransform.TransformPoint(tween.point), tween.axis, 0f - val);
+						Vector3 vector3 = localPosition3 - rectTransform.localPosition;
+						rectTransform.localPosition = localPosition3 - vector3;
+						rectTransform.rotation = tween.origRotation;
+						rectTransform.RotateAround(rectTransform.TransformPoint(tween.point), tween.axis, val);
+					}
+					else if (tweenAction == TweenAction.CANVAS_ROTATEAROUND_LOCAL)
+					{
+						RectTransform rectTransform2 = tween.rectTransform;
+						Vector3 localPosition4 = rectTransform2.localPosition;
+						rectTransform2.RotateAround(rectTransform2.TransformPoint(tween.point), rectTransform2.TransformDirection(tween.axis), 0f - val);
+						Vector3 vector4 = localPosition4 - rectTransform2.localPosition;
+						rectTransform2.localPosition = localPosition4 - vector4;
+						rectTransform2.rotation = tween.origRotation;
+						rectTransform2.RotateAround(rectTransform2.TransformPoint(tween.point), rectTransform2.TransformDirection(tween.axis), val);
+					}
+					else if (tweenAction == TweenAction.CANVAS_PLAYSPRITE)
+					{
+						int num = (int)Mathf.Round(val);
+						tween.uiImage.sprite = tween.sprites[num];
+					}
+					else if (tweenAction == TweenAction.CANVAS_MOVE_X)
+					{
+						Vector3 anchoredPosition3D = tween.rectTransform.anchoredPosition3D;
+						tween.rectTransform.anchoredPosition3D = new Vector3(val, anchoredPosition3D.y, anchoredPosition3D.z);
+					}
+					else if (tweenAction == TweenAction.CANVAS_MOVE_Y)
+					{
+						Vector3 anchoredPosition3D2 = tween.rectTransform.anchoredPosition3D;
+						tween.rectTransform.anchoredPosition3D = new Vector3(anchoredPosition3D2.x, val, anchoredPosition3D2.z);
+					}
+					else if (tweenAction == TweenAction.CANVAS_MOVE_Z)
+					{
+						Vector3 anchoredPosition3D3 = tween.rectTransform.anchoredPosition3D;
+						tween.rectTransform.anchoredPosition3D = new Vector3(anchoredPosition3D3.x, anchoredPosition3D3.y, val);
+					}
+				}
+				else if (tweenAction >= TweenAction.MOVE)
+				{
+					if (tween.animationCurve != null)
+					{
+						newVect = tweenOnCurveVector(tween, ratioPassed);
+					}
+					else if (tween.tweenType == LeanTweenType.linear)
+					{
+						newVect = new Vector3(tween.from.x + tween.diff.x * ratioPassed, tween.from.y + tween.diff.y * ratioPassed, tween.from.z + tween.diff.z * ratioPassed);
+					}
+					else if (tween.tweenType >= LeanTweenType.linear)
+					{
+						switch (tween.tweenType)
+						{
+						case LeanTweenType.easeOutQuad:
+							newVect = new Vector3(easeOutQuadOpt(tween.from.x, tween.diff.x, ratioPassed), easeOutQuadOpt(tween.from.y, tween.diff.y, ratioPassed), easeOutQuadOpt(tween.from.z, tween.diff.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInQuad:
+							newVect = new Vector3(easeInQuadOpt(tween.from.x, tween.diff.x, ratioPassed), easeInQuadOpt(tween.from.y, tween.diff.y, ratioPassed), easeInQuadOpt(tween.from.z, tween.diff.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutQuad:
+							newVect = new Vector3(easeInOutQuadOpt(tween.from.x, tween.diff.x, ratioPassed), easeInOutQuadOpt(tween.from.y, tween.diff.y, ratioPassed), easeInOutQuadOpt(tween.from.z, tween.diff.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInCubic:
+							newVect = new Vector3(easeInCubic(tween.from.x, tween.to.x, ratioPassed), easeInCubic(tween.from.y, tween.to.y, ratioPassed), easeInCubic(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutCubic:
+							newVect = new Vector3(easeOutCubic(tween.from.x, tween.to.x, ratioPassed), easeOutCubic(tween.from.y, tween.to.y, ratioPassed), easeOutCubic(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutCubic:
+							newVect = new Vector3(easeInOutCubic(tween.from.x, tween.to.x, ratioPassed), easeInOutCubic(tween.from.y, tween.to.y, ratioPassed), easeInOutCubic(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInQuart:
+							newVect = new Vector3(easeInQuart(tween.from.x, tween.to.x, ratioPassed), easeInQuart(tween.from.y, tween.to.y, ratioPassed), easeInQuart(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutQuart:
+							newVect = new Vector3(easeOutQuart(tween.from.x, tween.to.x, ratioPassed), easeOutQuart(tween.from.y, tween.to.y, ratioPassed), easeOutQuart(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutQuart:
+							newVect = new Vector3(easeInOutQuart(tween.from.x, tween.to.x, ratioPassed), easeInOutQuart(tween.from.y, tween.to.y, ratioPassed), easeInOutQuart(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInQuint:
+							newVect = new Vector3(easeInQuint(tween.from.x, tween.to.x, ratioPassed), easeInQuint(tween.from.y, tween.to.y, ratioPassed), easeInQuint(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutQuint:
+							newVect = new Vector3(easeOutQuint(tween.from.x, tween.to.x, ratioPassed), easeOutQuint(tween.from.y, tween.to.y, ratioPassed), easeOutQuint(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutQuint:
+							newVect = new Vector3(easeInOutQuint(tween.from.x, tween.to.x, ratioPassed), easeInOutQuint(tween.from.y, tween.to.y, ratioPassed), easeInOutQuint(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInSine:
+							newVect = new Vector3(easeInSine(tween.from.x, tween.to.x, ratioPassed), easeInSine(tween.from.y, tween.to.y, ratioPassed), easeInSine(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutSine:
+							newVect = new Vector3(easeOutSine(tween.from.x, tween.to.x, ratioPassed), easeOutSine(tween.from.y, tween.to.y, ratioPassed), easeOutSine(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutSine:
+							newVect = new Vector3(easeInOutSine(tween.from.x, tween.to.x, ratioPassed), easeInOutSine(tween.from.y, tween.to.y, ratioPassed), easeInOutSine(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInExpo:
+							newVect = new Vector3(easeInExpo(tween.from.x, tween.to.x, ratioPassed), easeInExpo(tween.from.y, tween.to.y, ratioPassed), easeInExpo(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutExpo:
+							newVect = new Vector3(easeOutExpo(tween.from.x, tween.to.x, ratioPassed), easeOutExpo(tween.from.y, tween.to.y, ratioPassed), easeOutExpo(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutExpo:
+							newVect = new Vector3(easeInOutExpo(tween.from.x, tween.to.x, ratioPassed), easeInOutExpo(tween.from.y, tween.to.y, ratioPassed), easeInOutExpo(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInCirc:
+							newVect = new Vector3(easeInCirc(tween.from.x, tween.to.x, ratioPassed), easeInCirc(tween.from.y, tween.to.y, ratioPassed), easeInCirc(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutCirc:
+							newVect = new Vector3(easeOutCirc(tween.from.x, tween.to.x, ratioPassed), easeOutCirc(tween.from.y, tween.to.y, ratioPassed), easeOutCirc(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutCirc:
+							newVect = new Vector3(easeInOutCirc(tween.from.x, tween.to.x, ratioPassed), easeInOutCirc(tween.from.y, tween.to.y, ratioPassed), easeInOutCirc(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInBounce:
+							newVect = new Vector3(easeInBounce(tween.from.x, tween.to.x, ratioPassed), easeInBounce(tween.from.y, tween.to.y, ratioPassed), easeInBounce(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeOutBounce:
+							newVect = new Vector3(easeOutBounce(tween.from.x, tween.to.x, ratioPassed), easeOutBounce(tween.from.y, tween.to.y, ratioPassed), easeOutBounce(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInOutBounce:
+							newVect = new Vector3(easeInOutBounce(tween.from.x, tween.to.x, ratioPassed), easeInOutBounce(tween.from.y, tween.to.y, ratioPassed), easeInOutBounce(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						case LeanTweenType.easeInBack:
+							newVect = new Vector3(easeInBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot), easeInBack(tween.from.y, tween.to.y, ratioPassed, tween.overshoot), easeInBack(tween.from.z, tween.to.z, ratioPassed, tween.overshoot));
+							break;
+						case LeanTweenType.easeOutBack:
+							newVect = new Vector3(easeOutBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot), easeOutBack(tween.from.y, tween.to.y, ratioPassed, tween.overshoot), easeOutBack(tween.from.z, tween.to.z, ratioPassed, tween.overshoot));
+							break;
+						case LeanTweenType.easeInOutBack:
+							newVect = new Vector3(easeInOutBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot), easeInOutBack(tween.from.y, tween.to.y, ratioPassed, tween.overshoot), easeInOutBack(tween.from.z, tween.to.z, ratioPassed, tween.overshoot));
+							break;
+						case LeanTweenType.easeInElastic:
+							newVect = new Vector3(easeInElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period), easeInElastic(tween.from.y, tween.to.y, ratioPassed, tween.overshoot, tween.period), easeInElastic(tween.from.z, tween.to.z, ratioPassed, tween.overshoot, tween.period));
+							break;
+						case LeanTweenType.easeOutElastic:
+							newVect = new Vector3(easeOutElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period), easeOutElastic(tween.from.y, tween.to.y, ratioPassed, tween.overshoot, tween.period), easeOutElastic(tween.from.z, tween.to.z, ratioPassed, tween.overshoot, tween.period));
+							break;
+						case LeanTweenType.easeInOutElastic:
+							newVect = new Vector3(easeInOutElastic(tween.from.x, tween.to.x, ratioPassed, tween.overshoot, tween.period), easeInOutElastic(tween.from.y, tween.to.y, ratioPassed, tween.overshoot, tween.period), easeInOutElastic(tween.from.z, tween.to.z, ratioPassed, tween.overshoot, tween.period));
+							break;
+						case LeanTweenType.easeShake:
+						case LeanTweenType.punch:
+							if (tween.tweenType == LeanTweenType.punch)
+							{
+								tween.animationCurve = punch;
+							}
+							else if (tween.tweenType == LeanTweenType.easeShake)
+							{
+								tween.animationCurve = shake;
+							}
+							tween.toInternal = tween.from + tween.to;
+							tween.diff = tween.to - tween.from;
+							if (tweenAction == TweenAction.ROTATE || tweenAction == TweenAction.ROTATE_LOCAL)
+							{
+								tween.to = new Vector3(closestRot(tween.from.x, tween.to.x), closestRot(tween.from.y, tween.to.y), closestRot(tween.from.z, tween.to.z));
+							}
+							newVect = tweenOnCurveVector(tween, ratioPassed);
+							break;
+						case LeanTweenType.easeSpring:
+							newVect = new Vector3(spring(tween.from.x, tween.to.x, ratioPassed), spring(tween.from.y, tween.to.y, ratioPassed), spring(tween.from.z, tween.to.z, ratioPassed));
+							break;
+						}
+					}
+					else
+					{
+						newVect = new Vector3(tween.from.x + tween.diff.x * ratioPassed, tween.from.y + tween.diff.y * ratioPassed, tween.from.z + tween.diff.z * ratioPassed);
+					}
+					if (tweenAction == TweenAction.MOVE)
+					{
+						trans.position = newVect;
+					}
+					else if (tweenAction == TweenAction.MOVE_LOCAL)
+					{
+						trans.localPosition = newVect;
+					}
+					else if (tweenAction == TweenAction.MOVE_TO_TRANSFORM)
+					{
+						trans.position = newVect;
+					}
+					else if (tweenAction == TweenAction.ROTATE)
+					{
+						trans.eulerAngles = newVect;
+					}
+					else if (tweenAction == TweenAction.ROTATE_LOCAL)
+					{
+						trans.localEulerAngles = newVect;
+					}
+					else if (tweenAction == TweenAction.SCALE)
+					{
+						trans.localScale = newVect;
+					}
+					else if (tweenAction == TweenAction.GUI_MOVE)
+					{
+						tween.ltRect.rect = new Rect(newVect.x, newVect.y, tween.ltRect.rect.width, tween.ltRect.rect.height);
+					}
+					else if (tweenAction == TweenAction.GUI_MOVE_MARGIN)
+					{
+						tween.ltRect.margin = new Vector2(newVect.x, newVect.y);
+					}
+					else if (tweenAction == TweenAction.GUI_SCALE)
+					{
+						tween.ltRect.rect = new Rect(tween.ltRect.rect.x, tween.ltRect.rect.y, newVect.x, newVect.y);
+					}
+					else if (tweenAction == TweenAction.GUI_ALPHA)
+					{
+						tween.ltRect.alpha = newVect.x;
+					}
+					else if (tweenAction == TweenAction.GUI_ROTATE)
+					{
+						tween.ltRect.rotation = newVect.x;
+					}
+					else if (tweenAction == TweenAction.CANVAS_MOVE)
+					{
+						tween.rectTransform.anchoredPosition3D = newVect;
+					}
+					else if (tweenAction == TweenAction.CANVAS_SCALE)
+					{
+						tween.rectTransform.localScale = newVect;
+					}
+				}
+				if (dt != 0f && tween.hasUpdateCallback)
+				{
+					if (tween.onUpdateFloat != null)
+					{
+						tween.onUpdateFloat(val);
+					}
+					if (tween.onUpdateFloatRatio != null)
+					{
+						tween.onUpdateFloatRatio(val, ratioPassed);
+					}
+					else if (tween.onUpdateFloatObject != null)
+					{
+						tween.onUpdateFloatObject(val, tween.onUpdateParam);
+					}
+					else if (tween.onUpdateVector3Object != null)
+					{
+						tween.onUpdateVector3Object(newVect, tween.onUpdateParam);
+					}
+					else if (tween.onUpdateVector3 != null)
+					{
+						tween.onUpdateVector3(newVect);
+					}
+					else if (tween.onUpdateVector2 != null)
+					{
+						tween.onUpdateVector2(new Vector2(newVect.x, newVect.y));
+					}
+				}
+			}
+			if (isTweenFinished)
+			{
+				if (tween.loopType == LeanTweenType.once || tween.loopCount == 1)
+				{
+					tweensFinished[finishedCnt] = i;
+					finishedCnt++;
+					if (tweenAction == TweenAction.GUI_ROTATE)
+					{
+						tween.ltRect.rotateFinished = true;
+					}
+					if (tweenAction == TweenAction.DELAYED_SOUND)
+					{
+						AudioSource.PlayClipAtPoint((AudioClip)tween.onCompleteParam, tween.to, tween.from.x);
+					}
+					continue;
+				}
+				if ((tween.loopCount < 0 && tween.type == TweenAction.CALLBACK) || tween.onCompleteOnRepeat)
+				{
+					if (tweenAction == TweenAction.DELAYED_SOUND)
+					{
+						AudioSource.PlayClipAtPoint((AudioClip)tween.onCompleteParam, tween.to, tween.from.x);
+					}
+					if (tween.onComplete != null)
+					{
+						tween.onComplete();
+					}
+					else if (tween.onCompleteObject != null)
+					{
+						tween.onCompleteObject(tween.onCompleteParam);
+					}
+				}
+				if (tween.loopCount >= 1)
+				{
+					tween.loopCount--;
+				}
+				if (tween.loopType == LeanTweenType.pingPong)
+				{
+					tween.direction = 0f - tween.direction;
+				}
+				else
+				{
+					tween.passed = Mathf.Epsilon;
+				}
+			}
+			else if (tween.delay <= 0f)
+			{
+				tween.passed += dt * tween.direction;
+			}
+			else
+			{
+				tween.delay -= dt;
+				if (tween.delay < 0f)
+				{
+					tween.passed = 0f;
+					tween.delay = 0f;
+				}
+			}
+		}
+		tweenMaxSearch = maxTweenReached;
+		frameRendered = Time.frameCount;
+		for (int k = 0; k < finishedCnt; k++)
+		{
+			LeanTween.j = tweensFinished[k];
+			tween = tweens[LeanTween.j];
+			if (tween.onComplete != null)
+			{
+				Action onComplete = tween.onComplete;
+				removeTween(LeanTween.j);
+				onComplete();
+			}
+			else if (tween.onCompleteObject != null)
+			{
+				Action<object> onCompleteObject = tween.onCompleteObject;
+				object onCompleteParam = tween.onCompleteParam;
+				removeTween(LeanTween.j);
+				onCompleteObject(onCompleteParam);
+			}
+			else
+			{
+				removeTween(LeanTween.j);
+			}
+		}
+	}
+
+	private static void alphaRecursive(Transform transform, float val, bool useRecursion = true)
+	{
+		Renderer component = transform.gameObject.GetComponent<Renderer>();
+		if (component != null)
+		{
+			Material[] materials = component.materials;
+			foreach (Material material in materials)
+			{
+				if (material.HasProperty("_Color"))
+				{
+					material.color = new Color(material.color.r, material.color.g, material.color.b, val);
+				}
+				else if (material.HasProperty("_TintColor"))
+				{
+					Color color = material.GetColor("_TintColor");
+					material.SetColor("_TintColor", new Color(color.r, color.g, color.b, val));
+				}
+			}
+		}
+		if (!useRecursion || transform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform item in transform)
+		{
+			alphaRecursive(item, val);
+		}
+	}
+
+	private static void colorRecursive(Transform transform, Color toColor, bool useRecursion = true)
+	{
+		Renderer component = transform.gameObject.GetComponent<Renderer>();
+		if (component != null)
+		{
+			Material[] materials = component.materials;
+			for (int i = 0; i < materials.Length; i++)
+			{
+				materials[i].color = toColor;
+			}
+		}
+		if (!useRecursion || transform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform item in transform)
+		{
+			colorRecursive(item, toColor);
+		}
+	}
+
+	private static void alphaRecursive(RectTransform rectTransform, float val, int recursiveLevel = 0)
+	{
+		if (rectTransform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (RectTransform item in rectTransform)
+		{
+			Image component = item.GetComponent<Image>();
+			if (component != null)
+			{
+				Color color = component.color;
+				color.a = val;
+				component.color = color;
+			}
+			alphaRecursive(item, val, recursiveLevel + 1);
+		}
+	}
+
+	private static void alphaRecursiveSprite(Transform transform, float val)
+	{
+		if (transform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform item in transform)
+		{
+			SpriteRenderer component = item.GetComponent<SpriteRenderer>();
+			if (component != null)
+			{
+				component.color = new Color(component.color.r, component.color.g, component.color.b, val);
+			}
+			alphaRecursiveSprite(item, val);
+		}
+	}
+
+	private static void colorRecursiveSprite(Transform transform, Color toColor)
+	{
+		if (transform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform item in transform)
+		{
+			SpriteRenderer component = trans.gameObject.GetComponent<SpriteRenderer>();
+			if (component != null)
+			{
+				component.color = toColor;
+			}
+			colorRecursiveSprite(item, toColor);
+		}
+	}
+
+	private static void colorRecursive(RectTransform rectTransform, Color toColor)
+	{
+		if (rectTransform.childCount <= 0)
+		{
+			return;
+		}
+		foreach (RectTransform item in rectTransform)
+		{
+			Image component = item.GetComponent<Image>();
+			if (component != null)
+			{
+				component.color = toColor;
+			}
+			colorRecursive(item, toColor);
+		}
+	}
+
+	private static void textAlphaRecursive(Transform trans, float val, bool useRecursion = true)
+	{
+		Text component = trans.gameObject.GetComponent<Text>();
+		if (component != null)
+		{
+			Color color = component.color;
+			color.a = val;
+			component.color = color;
+		}
+		if (!useRecursion || trans.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform tran in trans)
+		{
+			textAlphaRecursive(tran, val);
+		}
+	}
+
+	private static void textColorRecursive(Transform trans, Color toColor)
+	{
+		if (trans.childCount <= 0)
+		{
+			return;
+		}
+		foreach (Transform tran in trans)
+		{
+			Text component = tran.gameObject.GetComponent<Text>();
+			if (component != null)
+			{
+				component.color = toColor;
+			}
+			textColorRecursive(tran, toColor);
+		}
+	}
+
+	private static Color tweenColor(LTDescrImpl tween, float val)
+	{
+		Vector3 vector = tween.point - tween.axis;
+		float num = tween.to.y - tween.from.y;
+		return new Color(tween.axis.x + vector.x * val, tween.axis.y + vector.y * val, tween.axis.z + vector.z * val, tween.from.y + num * val);
+	}
+
+	public static void removeTween(int i, int uniqueId)
+	{
+		if (tweens[i].uniqueId == uniqueId)
+		{
+			removeTween(i);
+		}
+	}
+
+	public static void removeTween(int i)
+	{
+		if (!tweens[i].toggle)
+		{
+			return;
+		}
+		tweens[i].toggle = false;
+		if (tweens[i].destroyOnComplete)
+		{
+			if (tweens[i].ltRect != null)
+			{
+				LTGUI.destroy(tweens[i].ltRect.id);
+			}
+			else if (tweens[i].trans != null && tweens[i].trans.gameObject != _tweenEmpty)
+			{
+				UnityEngine.Object.Destroy(tweens[i].trans.gameObject);
+			}
+		}
+		tweens[i].cleanup();
+		startSearch = i;
+		if (i + 1 >= tweenMaxSearch)
+		{
+			startSearch = 0;
+		}
+	}
+
+	public static Vector3[] add(Vector3[] a, Vector3 b)
+	{
+		Vector3[] array = new Vector3[a.Length];
+		for (i = 0; i < a.Length; i++)
+		{
+			array[i] = a[i] + b;
+		}
+		return array;
+	}
+
+	public static float closestRot(float from, float to)
+	{
+		float num = 0f - (360f - to);
+		float num2 = 360f + to;
+		float num3 = Mathf.Abs(to - from);
+		float num4 = Mathf.Abs(num - from);
+		float num5 = Mathf.Abs(num2 - from);
+		if (num3 < num4 && num3 < num5)
+		{
+			return to;
+		}
+		if (num4 < num5)
+		{
+			return num;
+		}
+		return num2;
+	}
+
+	public static void cancelAll()
+	{
+		cancelAll(callComplete: false);
+	}
+
+	public static void cancelAll(bool callComplete)
+	{
+		init();
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].trans != null)
+			{
+				if (callComplete && tweens[i].onComplete != null)
+				{
+					tweens[i].onComplete();
+				}
+				removeTween(i);
+			}
+		}
+	}
+
+	public static void cancel(GameObject gameObject)
+	{
+		cancel(gameObject, callOnComplete: false);
+	}
+
+	public static void cancel(GameObject gameObject, bool callOnComplete)
+	{
+		init();
+		Transform transform = gameObject.transform;
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].toggle && tweens[i].trans == transform)
+			{
+				if (callOnComplete && tweens[i].onComplete != null)
+				{
+					tweens[i].onComplete();
+				}
+				removeTween(i);
+			}
+		}
+	}
+
+	public static void cancel(GameObject gameObject, int uniqueId)
+	{
+		if (uniqueId >= 0)
+		{
+			init();
+			int num = uniqueId & 0xFFFF;
+			int num2 = uniqueId >> 16;
+			if (tweens[num].trans == null || (tweens[num].trans.gameObject == gameObject && tweens[num].counter == num2))
+			{
+				removeTween(num);
+			}
+		}
+	}
+
+	public static void cancel(LTRect ltRect, int uniqueId)
+	{
+		if (uniqueId >= 0)
+		{
+			init();
+			int num = uniqueId & 0xFFFF;
+			int num2 = uniqueId >> 16;
+			if (tweens[num].ltRect == ltRect && tweens[num].counter == num2)
+			{
+				removeTween(num);
+			}
+		}
+	}
+
+	public static void cancel(int uniqueId)
+	{
+		cancel(uniqueId, callOnComplete: false);
+	}
+
+	public static void cancel(int uniqueId, bool callOnComplete)
+	{
+		if (uniqueId < 0)
+		{
+			return;
+		}
+		init();
+		int num = uniqueId & 0xFFFF;
+		int num2 = uniqueId >> 16;
+		if (tweens[num].counter == num2)
+		{
+			if (callOnComplete && tweens[num].onComplete != null)
+			{
+				tweens[num].onComplete();
+			}
+			removeTween(num);
+		}
+	}
+
+	public static LTDescr descr(int uniqueId)
+	{
+		int num = uniqueId & 0xFFFF;
+		int num2 = uniqueId >> 16;
+		if (tweens[num] != null && tweens[num].uniqueId == uniqueId && tweens[num].counter == num2)
+		{
+			return tweens[num];
+		}
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].uniqueId == uniqueId && tweens[i].counter == num2)
+			{
+				return tweens[i];
+			}
+		}
+		return null;
+	}
+
+	public static LTDescr description(int uniqueId)
+	{
+		return descr(uniqueId);
+	}
+
+	public static LTDescr[] descriptions(GameObject gameObject = null)
+	{
+		if (gameObject == null)
+		{
+			return null;
+		}
+		List<LTDescr> list = new List<LTDescr>();
+		Transform transform = gameObject.transform;
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].toggle && tweens[i].trans == transform)
+			{
+				list.Add(tweens[i]);
+			}
+		}
+		return list.ToArray();
+	}
+
+	[Obsolete("Use 'pause( id )' instead")]
+	public static void pause(GameObject gameObject, int uniqueId)
+	{
+		pause(uniqueId);
+	}
+
+	public static void pause(int uniqueId)
+	{
+		int num = uniqueId & 0xFFFF;
+		int num2 = uniqueId >> 16;
+		if (tweens[num].counter == num2)
+		{
+			tweens[num].pause();
+		}
+	}
+
+	public static void pause(GameObject gameObject)
+	{
+		Transform transform = gameObject.transform;
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].trans == transform)
+			{
+				tweens[i].pause();
+			}
+		}
+	}
+
+	public static void pauseAll()
+	{
+		init();
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			tweens[i].pause();
+		}
+	}
+
+	public static void resumeAll()
+	{
+		init();
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			tweens[i].resume();
+		}
+	}
+
+	[Obsolete("Use 'resume( id )' instead")]
+	public static void resume(GameObject gameObject, int uniqueId)
+	{
+		resume(uniqueId);
+	}
+
+	public static void resume(int uniqueId)
+	{
+		int num = uniqueId & 0xFFFF;
+		int num2 = uniqueId >> 16;
+		if (tweens[num].counter == num2)
+		{
+			tweens[num].resume();
+		}
+	}
+
+	public static void resume(GameObject gameObject)
+	{
+		Transform transform = gameObject.transform;
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].trans == transform)
+			{
+				tweens[i].resume();
+			}
+		}
+	}
+
+	public static bool isTweening(GameObject gameObject = null)
+	{
+		if (gameObject == null)
+		{
+			for (int i = 0; i <= tweenMaxSearch; i++)
+			{
+				if (tweens[i].toggle)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		Transform transform = gameObject.transform;
+		for (int j = 0; j <= tweenMaxSearch; j++)
+		{
+			if (tweens[j].toggle && tweens[j].trans == transform)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static bool isTweening(int uniqueId)
+	{
+		int num = uniqueId & 0xFFFF;
+		int num2 = uniqueId >> 16;
+		if (num < 0 || num >= maxTweens)
+		{
+			return false;
+		}
+		if (tweens[num].counter == num2 && tweens[num].toggle)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public static bool isTweening(LTRect ltRect)
+	{
+		for (int i = 0; i <= tweenMaxSearch; i++)
+		{
+			if (tweens[i].toggle && tweens[i].ltRect == ltRect)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void drawBezierPath(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float arrowSize = 0f, Transform arrowTransform = null)
+	{
+		Vector3 vector = a;
+		Vector3 vector2 = -a + 3f * (b - c) + d;
+		Vector3 vector3 = 3f * (a + c) - 6f * b;
+		Vector3 vector4 = 3f * (b - a);
+		if (arrowSize > 0f)
+		{
+			Vector3 position = arrowTransform.position;
+			Quaternion rotation = arrowTransform.rotation;
+			float num = 0f;
+			for (float num2 = 1f; num2 <= 120f; num2++)
+			{
+				float num3 = num2 / 120f;
+				Vector3 vector5 = ((vector2 * num3 + vector3) * num3 + vector4) * num3 + a;
+				Gizmos.DrawLine(vector, vector5);
+				num += (vector5 - vector).magnitude;
+				if (num > 1f)
+				{
+					num--;
+					arrowTransform.position = vector5;
+					arrowTransform.LookAt(vector, Vector3.forward);
+					Vector3 vector6 = arrowTransform.TransformDirection(Vector3.right);
+					Vector3 normalized = (vector - vector5).normalized;
+					Gizmos.DrawLine(vector5, vector5 + (vector6 + normalized) * arrowSize);
+					vector6 = arrowTransform.TransformDirection(-Vector3.right);
+					Gizmos.DrawLine(vector5, vector5 + (vector6 + normalized) * arrowSize);
+				}
+				vector = vector5;
+			}
+			arrowTransform.position = position;
+			arrowTransform.rotation = rotation;
+		}
+		else
+		{
+			for (float num4 = 1f; num4 <= 30f; num4++)
+			{
+				float num3 = num4 / 30f;
+				Vector3 vector5 = ((vector2 * num3 + vector3) * num3 + vector4) * num3 + a;
+				Gizmos.DrawLine(vector, vector5);
+				vector = vector5;
+			}
+		}
+	}
+
+	public static object logError(string error)
+	{
+		if (throwErrors)
+		{
+			Debug.LogError(error);
+		}
+		else
+		{
+			Debug.Log(error);
+		}
+		return null;
+	}
+
+	public static LTDescr options(LTDescr seed)
+	{
+		Debug.LogError("error this function is no longer used");
+		return null;
+	}
+
+	public static LTDescr options()
+	{
+		init();
+		bool flag = false;
+		j = 0;
+		i = startSearch;
+		while (j < maxTweens)
+		{
+			if (i >= maxTweens - 1)
+			{
+				i = 0;
+			}
+			if (!tweens[i].toggle)
+			{
+				if (i + 1 > tweenMaxSearch)
+				{
+					tweenMaxSearch = i + 1;
+				}
+				startSearch = i + 1;
+				flag = true;
+				break;
+			}
+			j++;
+			if (j >= maxTweens)
+			{
+				return logError("LeanTween - You have run out of available spaces for tweening. To avoid this error increase the number of spaces to available for tweening when you initialize the LeanTween class ex: LeanTween.init( " + maxTweens * 2 + " );") as LTDescr;
+			}
+			i++;
+		}
+		if (!flag)
+		{
+			logError("no available tween found!");
+		}
+		tweens[i].reset();
+		tweens[i].setId((uint)i);
+		return tweens[i];
+	}
+
+	private static LTDescr pushNewTween(GameObject gameObject, Vector3 to, float time, TweenAction tweenAction, LTDescr tween)
+	{
+		init(maxTweens);
+		if (gameObject == null || tween == null)
+		{
+			return null;
+		}
+		tween.trans = gameObject.transform;
+		tween.to = to;
+		tween.time = time;
+		tween.type = tweenAction;
+		return tween;
+	}
+
+	public static LTDescr play(RectTransform rectTransform, Sprite[] sprites)
+	{
+		float time = 0.25f * (float)sprites.Length;
+		return pushNewTween(rectTransform.gameObject, new Vector3((float)sprites.Length - 1f, 0f, 0f), time, TweenAction.CANVAS_PLAYSPRITE, options().setSprites(sprites).setRepeat(-1));
+	}
+
+	public static LTDescr alpha(GameObject gameObject, float to, float time)
+	{
+		LTDescr lTDescr = pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.ALPHA, options());
+		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
+		lTDescr.spriteRen = component;
+		return lTDescr;
+	}
+
+	public static LTDescr alpha(LTRect ltRect, float to, float time)
+	{
+		ltRect.alphaEnabled = true;
+		return pushNewTween(tweenEmpty, new Vector3(to, 0f, 0f), time, TweenAction.GUI_ALPHA, options().setRect(ltRect));
+	}
+
+	public static LTDescr textAlpha(RectTransform rectTransform, float to, float time)
+	{
+		return pushNewTween(rectTransform.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.TEXT_ALPHA, options());
+	}
+
+	public static LTDescr alphaText(RectTransform rectTransform, float to, float time)
+	{
+		return pushNewTween(rectTransform.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.TEXT_ALPHA, options());
+	}
+
+	public static LTDescr alphaCanvas(CanvasGroup canvasGroup, float to, float time)
+	{
+		return pushNewTween(canvasGroup.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVASGROUP_ALPHA, options());
+	}
+
+	public static LTDescr alphaVertex(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.ALPHA_VERTEX, options());
+	}
+
+	public static LTDescr color(GameObject gameObject, Color to, float time)
+	{
+		LTDescr lTDescr = pushNewTween(gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)));
+		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
+		lTDescr.spriteRen = component;
+		return lTDescr;
+	}
+
+	public static LTDescr textColor(RectTransform rectTransform, Color to, float time)
+	{
+		return pushNewTween(rectTransform.gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.TEXT_COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)));
+	}
+
+	public static LTDescr colorText(RectTransform rectTransform, Color to, float time)
+	{
+		return pushNewTween(rectTransform.gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.TEXT_COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)));
+	}
+
+	public static LTDescr delayedCall(float delayTime, Action callback)
+	{
+		return pushNewTween(tweenEmpty, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setOnComplete(callback));
+	}
+
+	public static LTDescr delayedCall(float delayTime, Action<object> callback)
+	{
+		return pushNewTween(tweenEmpty, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setOnComplete(callback));
+	}
+
+	public static LTDescr delayedCall(GameObject gameObject, float delayTime, Action callback)
+	{
+		return pushNewTween(gameObject, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setOnComplete(callback));
+	}
+
+	public static LTDescr delayedCall(GameObject gameObject, float delayTime, Action<object> callback)
+	{
+		return pushNewTween(gameObject, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setOnComplete(callback));
+	}
+
+	public static LTDescr destroyAfter(LTRect rect, float delayTime)
+	{
+		return pushNewTween(tweenEmpty, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setRect(rect).setDestroyOnComplete(doesDestroy: true));
+	}
+
+	public static LTDescr move(GameObject gameObject, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.MOVE, options());
+	}
+
+	public static LTDescr move(GameObject gameObject, Vector2 to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to.x, to.y, gameObject.transform.position.z), time, TweenAction.MOVE, options());
+	}
+
+	public static LTDescr move(GameObject gameObject, Vector3[] to, float time)
+	{
+		d = options();
+		if (d.path == null)
+		{
+			d.path = new LTBezierPath(to);
+		}
+		else
+		{
+			d.path.setPoints(to);
+		}
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_CURVED, d);
+	}
+
+	public static LTDescr move(GameObject gameObject, LTBezierPath to, float time)
+	{
+		d = options();
+		d.path = to;
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_CURVED, d);
+	}
+
+	public static LTDescr move(GameObject gameObject, LTSpline to, float time)
+	{
+		d = options();
+		d.spline = to;
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_SPLINE, d);
+	}
+
+	public static LTDescr moveSpline(GameObject gameObject, Vector3[] to, float time)
+	{
+		d = options();
+		d.spline = new LTSpline(to);
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_SPLINE, d);
+	}
+
+	public static LTDescr moveSpline(GameObject gameObject, LTSpline to, float time)
+	{
+		d = options();
+		d.spline = to;
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_SPLINE, d);
+	}
+
+	public static LTDescr moveSplineLocal(GameObject gameObject, Vector3[] to, float time)
+	{
+		d = options();
+		d.spline = new LTSpline(to);
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_SPLINE_LOCAL, d);
+	}
+
+	public static LTDescr move(LTRect ltRect, Vector2 to, float time)
+	{
+		return pushNewTween(tweenEmpty, to, time, TweenAction.GUI_MOVE, options().setRect(ltRect));
+	}
+
+	public static LTDescr moveMargin(LTRect ltRect, Vector2 to, float time)
+	{
+		return pushNewTween(tweenEmpty, to, time, TweenAction.GUI_MOVE_MARGIN, options().setRect(ltRect));
+	}
+
+	public static LTDescr moveX(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_X, options());
+	}
+
+	public static LTDescr moveY(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_Y, options());
+	}
+
+	public static LTDescr moveZ(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_Z, options());
+	}
+
+	public static LTDescr moveLocal(GameObject gameObject, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.MOVE_LOCAL, options());
+	}
+
+	public static LTDescr moveLocal(GameObject gameObject, Vector3[] to, float time)
+	{
+		d = options();
+		if (d.path == null)
+		{
+			d.path = new LTBezierPath(to);
+		}
+		else
+		{
+			d.path.setPoints(to);
+		}
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_CURVED_LOCAL, d);
+	}
+
+	public static LTDescr moveLocalX(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_LOCAL_X, options());
+	}
+
+	public static LTDescr moveLocalY(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_LOCAL_Y, options());
+	}
+
+	public static LTDescr moveLocalZ(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.MOVE_LOCAL_Z, options());
+	}
+
+	public static LTDescr moveLocal(GameObject gameObject, LTBezierPath to, float time)
+	{
+		d = options();
+		d.path = to;
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_CURVED_LOCAL, d);
+	}
+
+	public static LTDescr moveLocal(GameObject gameObject, LTSpline to, float time)
+	{
+		d = options();
+		d.spline = to;
+		return pushNewTween(gameObject, new Vector3(1f, 0f, 0f), time, TweenAction.MOVE_SPLINE_LOCAL, d);
+	}
+
+	public static LTDescr move(GameObject gameObject, Transform to, float time)
+	{
+		return pushNewTween(gameObject, Vector3.zero, time, TweenAction.MOVE_TO_TRANSFORM, options().setTo(to));
+	}
+
+	public static LTDescr rotate(GameObject gameObject, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.ROTATE, options());
+	}
+
+	public static LTDescr rotate(LTRect ltRect, float to, float time)
+	{
+		return pushNewTween(tweenEmpty, new Vector3(to, 0f, 0f), time, TweenAction.GUI_ROTATE, options().setRect(ltRect));
+	}
+
+	public static LTDescr rotateLocal(GameObject gameObject, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.ROTATE_LOCAL, options());
+	}
+
+	public static LTDescr rotateX(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.ROTATE_X, options());
+	}
+
+	public static LTDescr rotateY(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.ROTATE_Y, options());
+	}
+
+	public static LTDescr rotateZ(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.ROTATE_Z, options());
+	}
+
+	public static LTDescr rotateAround(GameObject gameObject, Vector3 axis, float add, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(add, 0f, 0f), time, TweenAction.ROTATE_AROUND, options().setAxis(axis));
+	}
+
+	public static LTDescr rotateAroundLocal(GameObject gameObject, Vector3 axis, float add, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(add, 0f, 0f), time, TweenAction.ROTATE_AROUND_LOCAL, options().setAxis(axis));
+	}
+
+	public static LTDescr scale(GameObject gameObject, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.SCALE, options());
+	}
+
+	public static LTDescr scale(LTRect ltRect, Vector2 to, float time)
+	{
+		return pushNewTween(tweenEmpty, to, time, TweenAction.GUI_SCALE, options().setRect(ltRect));
+	}
+
+	public static LTDescr scaleX(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.SCALE_X, options());
+	}
+
+	public static LTDescr scaleY(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.SCALE_Y, options());
+	}
+
+	public static LTDescr scaleZ(GameObject gameObject, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.SCALE_Z, options());
+	}
+
+	public static LTDescr value(GameObject gameObject, float from, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CALLBACK, options().setFrom(new Vector3(from, 0f, 0f)));
+	}
+
+	public static LTDescr value(GameObject gameObject, Vector2 from, Vector2 to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to.x, to.y, 0f), time, TweenAction.VALUE3, options().setTo(new Vector3(to.x, to.y, 0f)).setFrom(new Vector3(from.x, from.y, 0f)));
+	}
+
+	public static LTDescr value(GameObject gameObject, Vector3 from, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.VALUE3, options().setFrom(from));
+	}
+
+	public static LTDescr value(GameObject gameObject, Color from, Color to, float time)
+	{
+		LTDescr lTDescr = pushNewTween(gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.CALLBACK_COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)).setFromColor(from).setHasInitialized(has: false));
+		SpriteRenderer component = gameObject.GetComponent<SpriteRenderer>();
+		lTDescr.spriteRen = component;
+		return lTDescr;
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<float> callOnUpdate, float from, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CALLBACK, options().setTo(new Vector3(to, 0f, 0f)).setFrom(new Vector3(from, 0f, 0f)).setOnUpdate(callOnUpdate));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<float, float> callOnUpdateRatio, float from, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CALLBACK, options().setTo(new Vector3(to, 0f, 0f)).setFrom(new Vector3(from, 0f, 0f)).setOnUpdateRatio(callOnUpdateRatio));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<Color> callOnUpdate, Color from, Color to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.CALLBACK_COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)).setAxis(new Vector3(from.r, from.g, from.b)).setFrom(new Vector3(0f, from.a, 0f))
+			.setHasInitialized(has: false)
+			.setOnUpdateColor(callOnUpdate));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<Color, object> callOnUpdate, Color from, Color to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.CALLBACK_COLOR, options().setPoint(new Vector3(to.r, to.g, to.b)).setAxis(new Vector3(from.r, from.g, from.b)).setFrom(new Vector3(0f, from.a, 0f))
+			.setHasInitialized(has: false)
+			.setOnUpdateColor(callOnUpdate));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<Vector2> callOnUpdate, Vector2 from, Vector2 to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to.x, to.y, 0f), time, TweenAction.VALUE3, options().setTo(new Vector3(to.x, to.y, 0f)).setFrom(new Vector3(from.x, from.y, 0f)).setOnUpdateVector2(callOnUpdate));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<Vector3> callOnUpdate, Vector3 from, Vector3 to, float time)
+	{
+		return pushNewTween(gameObject, to, time, TweenAction.VALUE3, options().setTo(to).setFrom(from).setOnUpdateVector3(callOnUpdate));
+	}
+
+	public static LTDescr value(GameObject gameObject, Action<float, object> callOnUpdate, float from, float to, float time)
+	{
+		return pushNewTween(gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CALLBACK, options().setTo(new Vector3(to, 0f, 0f)).setFrom(new Vector3(from, 0f, 0f)).setOnUpdate(callOnUpdate, gameObject));
+	}
+
+	public static LTDescr delayedSound(AudioClip audio, Vector3 pos, float volume)
+	{
+		return pushNewTween(tweenEmpty, pos, 0f, TweenAction.DELAYED_SOUND, options().setTo(pos).setFrom(new Vector3(volume, 0f, 0f)).setAudio(audio));
+	}
+
+	public static LTDescr delayedSound(GameObject gameObject, AudioClip audio, Vector3 pos, float volume)
+	{
+		return pushNewTween(gameObject, pos, 0f, TweenAction.DELAYED_SOUND, options().setTo(pos).setFrom(new Vector3(volume, 0f, 0f)).setAudio(audio));
+	}
+
+	public static LTDescr move(RectTransform rectTrans, Vector3 to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, to, time, TweenAction.CANVAS_MOVE, options().setRect(rectTrans));
+	}
+
+	public static LTDescr moveX(RectTransform rectTrans, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_MOVE_X, options().setRect(rectTrans));
+	}
+
+	public static LTDescr moveY(RectTransform rectTrans, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_MOVE_Y, options().setRect(rectTrans));
+	}
+
+	public static LTDescr moveZ(RectTransform rectTrans, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_MOVE_Z, options().setRect(rectTrans));
+	}
+
+	public static LTDescr rotate(RectTransform rectTrans, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_ROTATEAROUND, options().setRect(rectTrans).setAxis(Vector3.forward));
+	}
+
+	public static LTDescr rotateAround(RectTransform rectTrans, Vector3 axis, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_ROTATEAROUND, options().setRect(rectTrans).setAxis(axis));
+	}
+
+	public static LTDescr rotateAroundLocal(RectTransform rectTrans, Vector3 axis, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_ROTATEAROUND_LOCAL, options().setRect(rectTrans).setAxis(axis));
+	}
+
+	public static LTDescr scale(RectTransform rectTrans, Vector3 to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, to, time, TweenAction.CANVAS_SCALE, options().setRect(rectTrans));
+	}
+
+	public static LTDescr alpha(RectTransform rectTrans, float to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(to, 0f, 0f), time, TweenAction.CANVAS_ALPHA, options().setRect(rectTrans));
+	}
+
+	public static LTDescr color(RectTransform rectTrans, Color to, float time)
+	{
+		return pushNewTween(rectTrans.gameObject, new Vector3(1f, to.a, 0f), time, TweenAction.CANVAS_COLOR, options().setRect(rectTrans).setPoint(new Vector3(to.r, to.g, to.b)));
+	}
+
+	private static float tweenOnCurve(LTDescrImpl tweenDescr, float ratioPassed)
+	{
+		return tweenDescr.from.x + tweenDescr.diff.x * tweenDescr.animationCurve.Evaluate(ratioPassed);
+	}
+
+	private static Vector3 tweenOnCurveVector(LTDescrImpl tweenDescr, float ratioPassed)
+	{
+		return new Vector3(tweenDescr.from.x + tweenDescr.diff.x * tweenDescr.animationCurve.Evaluate(ratioPassed), tweenDescr.from.y + tweenDescr.diff.y * tweenDescr.animationCurve.Evaluate(ratioPassed), tweenDescr.from.z + tweenDescr.diff.z * tweenDescr.animationCurve.Evaluate(ratioPassed));
+	}
+
+	private static float easeOutQuadOpt(float start, float diff, float ratioPassed)
+	{
+		return (0f - diff) * ratioPassed * (ratioPassed - 2f) + start;
+	}
+
+	private static float easeInQuadOpt(float start, float diff, float ratioPassed)
+	{
+		return diff * ratioPassed * ratioPassed + start;
+	}
+
+	private static float easeInOutQuadOpt(float start, float diff, float ratioPassed)
+	{
+		ratioPassed /= 0.5f;
+		if (ratioPassed < 1f)
+		{
+			return diff / 2f * ratioPassed * ratioPassed + start;
+		}
+		ratioPassed--;
+		return (0f - diff) / 2f * (ratioPassed * (ratioPassed - 2f) - 1f) + start;
+	}
+
+	private static float linear(float start, float end, float val)
+	{
+		return Mathf.Lerp(start, end, val);
+	}
+
+	private static float clerp(float start, float end, float val)
+	{
+		float num = 0f;
+		float num2 = 360f;
+		float num3 = Mathf.Abs((num2 - num) / 2f);
+		float num4 = 0f;
+		float num5 = 0f;
+		if (end - start < 0f - num3)
+		{
+			num5 = (num2 - start + end) * val;
+			return start + num5;
+		}
+		if (end - start > num3)
+		{
+			num5 = (0f - (num2 - end + start)) * val;
+			return start + num5;
+		}
+		return start + (end - start) * val;
+	}
+
+	private static float spring(float start, float end, float val)
+	{
+		val = Mathf.Clamp01(val);
+		val = (Mathf.Sin(val * MathF.PI * (0.2f + 2.5f * val * val * val)) * Mathf.Pow(1f - val, 2.2f) + val) * (1f + 1.2f * (1f - val));
+		return start + (end - start) * val;
+	}
+
+	private static float easeInQuad(float start, float end, float val)
+	{
+		end -= start;
+		return end * val * val + start;
+	}
+
+	private static float easeOutQuad(float start, float end, float val)
+	{
+		end -= start;
+		return (0f - end) * val * (val - 2f) + start;
+	}
+
+	private static float easeInOutQuad(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return end / 2f * val * val + start;
+		}
+		val--;
+		return (0f - end) / 2f * (val * (val - 2f) - 1f) + start;
+	}
+
+	private static float easeInCubic(float start, float end, float val)
+	{
+		end -= start;
+		return end * val * val * val + start;
+	}
+
+	private static float easeOutCubic(float start, float end, float val)
+	{
+		val--;
+		end -= start;
+		return end * (val * val * val + 1f) + start;
+	}
+
+	private static float easeInOutCubic(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return end / 2f * val * val * val + start;
+		}
+		val -= 2f;
+		return end / 2f * (val * val * val + 2f) + start;
+	}
+
+	private static float easeInQuart(float start, float end, float val)
+	{
+		end -= start;
+		return end * val * val * val * val + start;
+	}
+
+	private static float easeOutQuart(float start, float end, float val)
+	{
+		val--;
+		end -= start;
+		return (0f - end) * (val * val * val * val - 1f) + start;
+	}
+
+	private static float easeInOutQuart(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return end / 2f * val * val * val * val + start;
+		}
+		val -= 2f;
+		return (0f - end) / 2f * (val * val * val * val - 2f) + start;
+	}
+
+	private static float easeInQuint(float start, float end, float val)
+	{
+		end -= start;
+		return end * val * val * val * val * val + start;
+	}
+
+	private static float easeOutQuint(float start, float end, float val)
+	{
+		val--;
+		end -= start;
+		return end * (val * val * val * val * val + 1f) + start;
+	}
+
+	private static float easeInOutQuint(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return end / 2f * val * val * val * val * val + start;
+		}
+		val -= 2f;
+		return end / 2f * (val * val * val * val * val + 2f) + start;
+	}
+
+	private static float easeInSine(float start, float end, float val)
+	{
+		end -= start;
+		return (0f - end) * Mathf.Cos(val / 1f * (MathF.PI / 2f)) + end + start;
+	}
+
+	private static float easeOutSine(float start, float end, float val)
+	{
+		end -= start;
+		return end * Mathf.Sin(val / 1f * (MathF.PI / 2f)) + start;
+	}
+
+	private static float easeInOutSine(float start, float end, float val)
+	{
+		end -= start;
+		return (0f - end) / 2f * (Mathf.Cos(MathF.PI * val / 1f) - 1f) + start;
+	}
+
+	private static float easeInExpo(float start, float end, float val)
+	{
+		end -= start;
+		return end * Mathf.Pow(2f, 10f * (val / 1f - 1f)) + start;
+	}
+
+	private static float easeOutExpo(float start, float end, float val)
+	{
+		end -= start;
+		return end * (0f - Mathf.Pow(2f, -10f * val / 1f) + 1f) + start;
+	}
+
+	private static float easeInOutExpo(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return end / 2f * Mathf.Pow(2f, 10f * (val - 1f)) + start;
+		}
+		val--;
+		return end / 2f * (0f - Mathf.Pow(2f, -10f * val) + 2f) + start;
+	}
+
+	private static float easeInCirc(float start, float end, float val)
+	{
+		end -= start;
+		return (0f - end) * (Mathf.Sqrt(1f - val * val) - 1f) + start;
+	}
+
+	private static float easeOutCirc(float start, float end, float val)
+	{
+		val--;
+		end -= start;
+		return end * Mathf.Sqrt(1f - val * val) + start;
+	}
+
+	private static float easeInOutCirc(float start, float end, float val)
+	{
+		val /= 0.5f;
+		end -= start;
+		if (val < 1f)
+		{
+			return (0f - end) / 2f * (Mathf.Sqrt(1f - val * val) - 1f) + start;
+		}
+		val -= 2f;
+		return end / 2f * (Mathf.Sqrt(1f - val * val) + 1f) + start;
+	}
+
+	private static float easeInBounce(float start, float end, float val)
+	{
+		end -= start;
+		float num = 1f;
+		return end - easeOutBounce(0f, end, num - val) + start;
+	}
+
+	private static float easeOutBounce(float start, float end, float val)
+	{
+		val /= 1f;
+		end -= start;
+		if (val < 372f / 1023f)
+		{
+			return end * (7.5625f * val * val) + start;
+		}
+		if (val < 744f / 1023f)
+		{
+			val -= 558f / 1023f;
+			return end * (7.5625f * val * val + 0.75f) + start;
+		}
+		if ((double)val < 930.0 / 1023.0)
+		{
+			val -= 837f / 1023f;
+			return end * (7.5625f * val * val + 0.9375f) + start;
+		}
+		val -= 21f / 22f;
+		return end * (7.5625f * val * val + 63f / 64f) + start;
+	}
+
+	private static float easeInOutBounce(float start, float end, float val)
+	{
+		end -= start;
+		float num = 1f;
+		if (val < num / 2f)
+		{
+			return easeInBounce(0f, end, val * 2f) * 0.5f + start;
+		}
+		return easeOutBounce(0f, end, val * 2f - num) * 0.5f + end * 0.5f + start;
+	}
+
+	private static float easeInBack(float start, float end, float val, float overshoot = 1f)
+	{
+		end -= start;
+		val /= 1f;
+		float num = 1.70158f * overshoot;
+		return end * val * val * ((num + 1f) * val - num) + start;
+	}
+
+	private static float easeOutBack(float start, float end, float val, float overshoot = 1f)
+	{
+		float num = 1.70158f * overshoot;
+		end -= start;
+		val = val / 1f - 1f;
+		return end * (val * val * ((num + 1f) * val + num) + 1f) + start;
+	}
+
+	private static float easeInOutBack(float start, float end, float val, float overshoot = 1f)
+	{
+		float num = 1.70158f * overshoot;
+		end -= start;
+		val /= 0.5f;
+		if (val < 1f)
+		{
+			num *= 1.525f * overshoot;
+			return end / 2f * (val * val * ((num + 1f) * val - num)) + start;
+		}
+		val -= 2f;
+		num *= 1.525f * overshoot;
+		return end / 2f * (val * val * ((num + 1f) * val + num) + 2f) + start;
+	}
+
+	private static float easeInElastic(float start, float end, float val, float overshoot = 1f, float period = 0.3f)
+	{
+		end -= start;
+		float num = 0f;
+		float num2 = 0f;
+		if (val == 0f)
+		{
+			return start;
+		}
+		if (val == 1f)
+		{
+			return start + end;
+		}
+		if (num2 == 0f || num2 < Mathf.Abs(end))
+		{
+			num2 = end;
+			num = period / 4f;
+		}
+		else
+		{
+			num = period / (MathF.PI * 2f) * Mathf.Asin(end / num2);
+		}
+		if (overshoot > 1f && val > 0.6f)
+		{
+			overshoot = 1f + (1f - val) / 0.4f * (overshoot - 1f);
+		}
+		val--;
+		return start - num2 * Mathf.Pow(2f, 10f * val) * Mathf.Sin((val - num) * (MathF.PI * 2f) / period) * overshoot;
+	}
+
+	private static float easeOutElastic(float start, float end, float val, float overshoot = 1f, float period = 0.3f)
+	{
+		end -= start;
+		float num = 0f;
+		float num2 = 0f;
+		if (val == 0f)
+		{
+			return start;
+		}
+		if (val == 1f)
+		{
+			return start + end;
+		}
+		if (num2 == 0f || num2 < Mathf.Abs(end))
+		{
+			num2 = end;
+			num = period / 4f;
+		}
+		else
+		{
+			num = period / (MathF.PI * 2f) * Mathf.Asin(end / num2);
+		}
+		if (overshoot > 1f && val < 0.4f)
+		{
+			overshoot = 1f + val / 0.4f * (overshoot - 1f);
+		}
+		return start + end + num2 * Mathf.Pow(2f, -10f * val) * Mathf.Sin((val - num) * (MathF.PI * 2f) / period) * overshoot;
+	}
+
+	private static float easeInOutElastic(float start, float end, float val, float overshoot = 1f, float period = 0.3f)
+	{
+		end -= start;
+		float num = 0f;
+		float num2 = 0f;
+		if (val == 0f)
+		{
+			return start;
+		}
+		val /= 0.5f;
+		if (val == 2f)
+		{
+			return start + end;
+		}
+		if (num2 == 0f || num2 < Mathf.Abs(end))
+		{
+			num2 = end;
+			num = period / 4f;
+		}
+		else
+		{
+			num = period / (MathF.PI * 2f) * Mathf.Asin(end / num2);
+		}
+		if (overshoot > 1f)
+		{
+			if (val < 0.2f)
+			{
+				overshoot = 1f + val / 0.2f * (overshoot - 1f);
+			}
+			else if (val > 0.8f)
+			{
+				overshoot = 1f + (1f - val) / 0.2f * (overshoot - 1f);
+			}
+		}
+		if (val < 1f)
+		{
+			val--;
+			return start - 0.5f * (num2 * Mathf.Pow(2f, 10f * val) * Mathf.Sin((val - num) * (MathF.PI * 2f) / period)) * overshoot;
+		}
+		val--;
+		return end + start + num2 * Mathf.Pow(2f, -10f * val) * Mathf.Sin((val - num) * (MathF.PI * 2f) / period) * 0.5f * overshoot;
+	}
+
+	public static void addListener(int eventId, Action<LTEvent> callback)
+	{
+		addListener(tweenEmpty, eventId, callback);
+	}
+
+	public static void addListener(GameObject caller, int eventId, Action<LTEvent> callback)
+	{
+		if (eventListeners == null)
+		{
+			INIT_LISTENERS_MAX = LISTENERS_MAX;
+			eventListeners = new Action<LTEvent>[EVENTS_MAX * LISTENERS_MAX];
+			goListeners = new GameObject[EVENTS_MAX * LISTENERS_MAX];
+		}
+		for (i = 0; i < INIT_LISTENERS_MAX; i++)
+		{
+			int num = eventId * INIT_LISTENERS_MAX + i;
+			if (goListeners[num] == null || eventListeners[num] == null)
+			{
+				eventListeners[num] = callback;
+				goListeners[num] = caller;
+				if (i >= eventsMaxSearch)
+				{
+					eventsMaxSearch = i + 1;
+				}
+				return;
+			}
+			if (goListeners[num] == caller && object.Equals(eventListeners[num], callback))
+			{
+				return;
+			}
+		}
+		Debug.LogError("You ran out of areas to add listeners, consider increasing LISTENERS_MAX, ex: LeanTween.LISTENERS_MAX = " + LISTENERS_MAX * 2);
+	}
+
+	public static bool removeListener(int eventId, Action<LTEvent> callback)
+	{
+		return removeListener(tweenEmpty, eventId, callback);
+	}
+
+	public static bool removeListener(GameObject caller, int eventId, Action<LTEvent> callback)
+	{
+		for (i = 0; i < eventsMaxSearch; i++)
+		{
+			int num = eventId * INIT_LISTENERS_MAX + i;
+			if (goListeners[num] == caller && object.Equals(eventListeners[num], callback))
+			{
+				eventListeners[num] = null;
+				goListeners[num] = null;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void dispatchEvent(int eventId)
+	{
+		dispatchEvent(eventId, null);
+	}
+
+	public static void dispatchEvent(int eventId, object data)
+	{
+		for (int i = 0; i < eventsMaxSearch; i++)
+		{
+			int num = eventId * INIT_LISTENERS_MAX + i;
+			if (eventListeners[num] != null)
+			{
+				if ((bool)goListeners[num])
+				{
+					eventListeners[num](new LTEvent(eventId, data));
+				}
+				else
+				{
+					eventListeners[num] = null;
+				}
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 008
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__AimBoxing.cs
+SIZE: 292 bytes
+SHA256: 9ee772abf8b4957ea8f658a9d7827102ccca9b6f0bd4039438158a7cd6055c98
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class AimBoxing : MonoBehaviour
+{
+	public AimIK aimIK;
+
+	public Transform pin;
+
+	private void LateUpdate()
+	{
+		aimIK.solver.transform.LookAt(pin.position);
+		aimIK.solver.IKPosition = transform.position;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 009
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__AimSwing.cs
+SIZE: 466 bytes
+SHA256: 0b0e70c332eb81fea57495fe1b4146d8f4c8ab43276f1ebc46feac3b8eed31b2
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class AimSwing : MonoBehaviour
+{
+	public AimIK ik;
+
+	[Tooltip("The direction in which the weapon is aimed in animation (in character space). Tweak this value to adjust the aiming.")]
+	public Vector3 animatedAimDirection = Vector3.forward;
+
+	private void LateUpdate()
+	{
+		ik.solver.axis = ik.solver.transform.InverseTransformVector(ik.transform.rotation * animatedAimDirection);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 010
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__AnimationWarping.cs
+SIZE: 3357 bytes
+SHA256: 4dfec5d7990f29f174c0c29c20d98dd657a08bf6118870480dd710b6f0a6e40c
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class AnimationWarping : OffsetModifier
+{
+	[Serializable]
+	public struct Warp
+	{
+		[Tooltip("Layer of the 'Animation State' in the Animator.")]
+		public int animationLayer;
+
+		[Tooltip("Name of the state in the Animator to warp.")]
+		public string animationState;
+
+		[Tooltip("Warping weight by normalized time of the animation state.")]
+		public AnimationCurve weightCurve;
+
+		[Tooltip("Animated point to warp from. This should be in character space so keep this Transform parented to the root of the character.")]
+		public Transform warpFrom;
+
+		[Tooltip("World space point to warp to.")]
+		public Transform warpTo;
+
+		[Tooltip("Which FBBIK effector to use?")]
+		public FullBodyBipedEffector effector;
+	}
+
+	[Serializable]
+	public enum EffectorMode
+	{
+		PositionOffset,
+		Position
+	}
+
+	[Tooltip("Reference to the Animator component to use")]
+	public Animator animator;
+
+	[Tooltip("Using effector.positionOffset or effector.position with effector.positionWeight? The former will enable you to use effector.position for other things, the latter will weigh in the effectors, hence using Reach and Pull in the process.")]
+	public EffectorMode effectorMode;
+
+	[Space(10f)]
+	[Tooltip("The array of warps, can have multiple simultaneous warps.")]
+	public Warp[] warps;
+
+	private EffectorMode lastMode;
+
+	protected override void Start()
+	{
+		base.Start();
+		lastMode = effectorMode;
+	}
+
+	public float GetWarpWeight(int warpIndex)
+	{
+		if (warpIndex < 0)
+		{
+			Debug.LogError("Warp index out of range.");
+			return 0f;
+		}
+		if (warpIndex >= warps.Length)
+		{
+			Debug.LogError("Warp index out of range.");
+			return 0f;
+		}
+		if (animator == null)
+		{
+			Debug.LogError("Animator unassigned in AnimationWarping");
+			return 0f;
+		}
+		AnimatorStateInfo currentAnimatorStateInfo = animator.GetCurrentAnimatorStateInfo(warps[warpIndex].animationLayer);
+		if (!currentAnimatorStateInfo.IsName(warps[warpIndex].animationState))
+		{
+			return 0f;
+		}
+		return warps[warpIndex].weightCurve.Evaluate(currentAnimatorStateInfo.normalizedTime - (float)(int)currentAnimatorStateInfo.normalizedTime);
+	}
+
+	protected override void OnModifyOffset()
+	{
+		for (int i = 0; i < warps.Length; i++)
+		{
+			float warpWeight = GetWarpWeight(i);
+			Vector3 vector = warps[i].warpTo.position - warps[i].warpFrom.position;
+			switch (effectorMode)
+			{
+			case EffectorMode.PositionOffset:
+				ik.solver.GetEffector(warps[i].effector).positionOffset += vector * warpWeight * weight;
+				break;
+			case EffectorMode.Position:
+				ik.solver.GetEffector(warps[i].effector).position = ik.solver.GetEffector(warps[i].effector).bone.position + vector;
+				ik.solver.GetEffector(warps[i].effector).positionWeight = weight * warpWeight;
+				break;
+			}
+		}
+		if (lastMode == EffectorMode.Position && effectorMode == EffectorMode.PositionOffset)
+		{
+			Warp[] array = warps;
+			for (int j = 0; j < array.Length; j++)
+			{
+				Warp warp = array[j];
+				ik.solver.GetEffector(warp.effector).positionWeight = 0f;
+			}
+		}
+		lastMode = effectorMode;
+	}
+
+	private void OnDisable()
+	{
+		if (effectorMode == EffectorMode.Position)
+		{
+			Warp[] array = warps;
+			for (int i = 0; i < array.Length; i++)
+			{
+				Warp warp = array[i];
+				ik.solver.GetEffector(warp.effector).positionWeight = 0f;
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 011
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__AnimatorController3rdPerson.cs
+SIZE: 1480 bytes
+SHA256: 465555dce7b161417c56343da637789bd01a2c0cd3f7cb1b7d21138e2a3ae2a1
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class AnimatorController3rdPerson : MonoBehaviour
+{
+	public float rotateSpeed = 7f;
+
+	public float blendSpeed = 10f;
+
+	public float maxAngle = 90f;
+
+	public float moveSpeed = 1.5f;
+
+	public float rootMotionWeight;
+
+	protected Animator animator;
+
+	protected Vector3 moveBlend;
+
+	protected Vector3 moveInput;
+
+	protected Vector3 velocity;
+
+	protected virtual void Start()
+	{
+		animator = GetComponent<Animator>();
+	}
+
+	private void OnAnimatorMove()
+	{
+		velocity = Vector3.Lerp(velocity, transform.rotation * Vector3.ClampMagnitude(moveInput, 1f) * moveSpeed, Time.deltaTime * blendSpeed);
+		transform.position += Vector3.Lerp(velocity * Time.deltaTime, animator.deltaPosition, rootMotionWeight);
+	}
+
+	public virtual void Move(Vector3 moveInput, bool isMoving, Vector3 faceDirection, Vector3 aimTarget)
+	{
+		this.moveInput = moveInput;
+		Vector3 vector = transform.InverseTransformDirection(faceDirection);
+		float num = Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+		float num2 = num * Time.deltaTime * rotateSpeed;
+		if (num > maxAngle)
+		{
+			num2 = Mathf.Clamp(num2, num - maxAngle, num2);
+		}
+		if (num < 0f - maxAngle)
+		{
+			num2 = Mathf.Clamp(num2, num2, num + maxAngle);
+		}
+		transform.Rotate(Vector3.up, num2);
+		moveBlend = Vector3.Lerp(moveBlend, moveInput, Time.deltaTime * blendSpeed);
+		animator.SetFloat("X", moveBlend.x);
+		animator.SetFloat("Z", moveBlend.z);
+		animator.SetBool("IsMoving", isMoving);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 012
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__AnimatorController3rdPersonIK.cs
+SIZE: 3334 bytes
+SHA256: 245c7bfc9a759622e91c408dad1224bebe5389f4d2f7e6fe52dd9610e1f58769
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class AnimatorController3rdPersonIK : AnimatorController3rdPerson
+{
+	[Range(0f, 1f)]
+	public float headLookWeight = 1f;
+
+	public Vector3 gunHoldOffset;
+
+	public Vector3 leftHandOffset;
+
+	public Recoil recoil;
+
+	private AimIK aim;
+
+	private FullBodyBipedIK ik;
+
+	private Vector3 headLookAxis;
+
+	private Vector3 leftHandPosRelToRightHand;
+
+	private Quaternion leftHandRotRelToRightHand;
+
+	private Vector3 aimTarget;
+
+	private Quaternion rightHandRotation;
+
+	protected override void Start()
+	{
+		base.Start();
+		aim = GetComponent<AimIK>();
+		ik = GetComponent<FullBodyBipedIK>();
+		IKSolverFullBodyBiped solver = ik.solver;
+		solver.OnPreRead = (IKSolver.UpdateDelegate)Delegate.Combine(solver.OnPreRead, new IKSolver.UpdateDelegate(OnPreRead));
+		aim.enabled = false;
+		ik.enabled = false;
+		headLookAxis = ik.references.head.InverseTransformVector(ik.references.root.forward);
+		animator.SetLayerWeight(1, 1f);
+	}
+
+	public override void Move(Vector3 moveInput, bool isMoving, Vector3 faceDirection, Vector3 aimTarget)
+	{
+		base.Move(moveInput, isMoving, faceDirection, aimTarget);
+		this.aimTarget = aimTarget;
+		Read();
+		AimIK();
+		FBBIK();
+		AimIK();
+		HeadLookAt(aimTarget);
+	}
+
+	private void Read()
+	{
+		leftHandPosRelToRightHand = ik.references.rightHand.InverseTransformPoint(ik.references.leftHand.position);
+		leftHandRotRelToRightHand = Quaternion.Inverse(ik.references.rightHand.rotation) * ik.references.leftHand.rotation;
+	}
+
+	private void AimIK()
+	{
+		aim.solver.IKPosition = aimTarget;
+		aim.solver.Update();
+	}
+
+	private void FBBIK()
+	{
+		rightHandRotation = ik.references.rightHand.rotation;
+		Vector3 vector = ik.references.rightHand.rotation * gunHoldOffset;
+		ik.solver.rightHandEffector.positionOffset += vector;
+		if (recoil != null)
+		{
+			recoil.SetHandRotations(rightHandRotation * leftHandRotRelToRightHand, rightHandRotation);
+		}
+		ik.solver.Update();
+		if (recoil != null)
+		{
+			ik.references.rightHand.rotation = recoil.rotationOffset * rightHandRotation;
+			ik.references.leftHand.rotation = recoil.rotationOffset * rightHandRotation * leftHandRotRelToRightHand;
+		}
+		else
+		{
+			ik.references.rightHand.rotation = rightHandRotation;
+			ik.references.leftHand.rotation = rightHandRotation * leftHandRotRelToRightHand;
+		}
+	}
+
+	private void OnPreRead()
+	{
+		Quaternion quaternion = ((recoil != null) ? (recoil.rotationOffset * rightHandRotation) : rightHandRotation);
+		Vector3 vector = ik.references.rightHand.position + ik.solver.rightHandEffector.positionOffset + quaternion * leftHandPosRelToRightHand;
+		ik.solver.leftHandEffector.positionOffset += vector - ik.references.leftHand.position - ik.solver.leftHandEffector.positionOffset + quaternion * leftHandOffset;
+	}
+
+	private void HeadLookAt(Vector3 lookAtTarget)
+	{
+		Quaternion b = Quaternion.FromToRotation(ik.references.head.rotation * headLookAxis, lookAtTarget - ik.references.head.position);
+		ik.references.head.rotation = Quaternion.Lerp(Quaternion.identity, b, headLookWeight) * ik.references.head.rotation;
+	}
+
+	private void OnDestroy()
+	{
+		if (ik != null)
+		{
+			IKSolverFullBodyBiped solver = ik.solver;
+			solver.OnPreRead = (IKSolver.UpdateDelegate)Delegate.Remove(solver.OnPreRead, new IKSolver.UpdateDelegate(OnPreRead));
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 013
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__BipedIKvsAnimatorIK.cs
+SIZE: 3217 bytes
+SHA256: 7980a1ffb961391e3720837fac1f4343c6a3bc257a64835bef00b691f12c3c7f
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class BipedIKvsAnimatorIK : MonoBehaviour
+{
+	[LargeHeader("References")]
+	public Animator animator;
+
+	public BipedIK bipedIK;
+
+	[LargeHeader("Look At")]
+	public Transform lookAtTargetBiped;
+
+	public Transform lookAtTargetAnimator;
+
+	[Range(0f, 1f)]
+	public float lookAtWeight = 1f;
+
+	[Range(0f, 1f)]
+	public float lookAtBodyWeight = 1f;
+
+	[Range(0f, 1f)]
+	public float lookAtHeadWeight = 1f;
+
+	[Range(0f, 1f)]
+	public float lookAtEyesWeight = 1f;
+
+	[Range(0f, 1f)]
+	public float lookAtClampWeight = 0.5f;
+
+	[Range(0f, 1f)]
+	public float lookAtClampWeightHead = 0.5f;
+
+	[Range(0f, 1f)]
+	public float lookAtClampWeightEyes = 0.5f;
+
+	[LargeHeader("Foot")]
+	public Transform footTargetBiped;
+
+	public Transform footTargetAnimator;
+
+	[Range(0f, 1f)]
+	public float footPositionWeight;
+
+	[Range(0f, 1f)]
+	public float footRotationWeight;
+
+	[LargeHeader("Hand")]
+	public Transform handTargetBiped;
+
+	public Transform handTargetAnimator;
+
+	[Range(0f, 1f)]
+	public float handPositionWeight;
+
+	[Range(0f, 1f)]
+	public float handRotationWeight;
+
+	private void OnAnimatorIK(int layer)
+	{
+		animator.transform.rotation = bipedIK.transform.rotation;
+		Vector3 vector = animator.transform.position - bipedIK.transform.position;
+		lookAtTargetAnimator.position = lookAtTargetBiped.position + vector;
+		bipedIK.SetLookAtPosition(lookAtTargetBiped.position);
+		bipedIK.SetLookAtWeight(lookAtWeight, lookAtBodyWeight, lookAtHeadWeight, lookAtEyesWeight, lookAtClampWeight, lookAtClampWeightHead, lookAtClampWeightEyes);
+		animator.SetLookAtPosition(lookAtTargetAnimator.position);
+		animator.SetLookAtWeight(lookAtWeight, lookAtBodyWeight, lookAtHeadWeight, lookAtEyesWeight, lookAtClampWeight);
+		footTargetAnimator.position = footTargetBiped.position + vector;
+		footTargetAnimator.rotation = footTargetBiped.rotation;
+		bipedIK.SetIKPosition(AvatarIKGoal.LeftFoot, footTargetBiped.position);
+		bipedIK.SetIKRotation(AvatarIKGoal.LeftFoot, footTargetBiped.rotation);
+		bipedIK.SetIKPositionWeight(AvatarIKGoal.LeftFoot, footPositionWeight);
+		bipedIK.SetIKRotationWeight(AvatarIKGoal.LeftFoot, footRotationWeight);
+		animator.SetIKPosition(AvatarIKGoal.LeftFoot, footTargetAnimator.position);
+		animator.SetIKRotation(AvatarIKGoal.LeftFoot, footTargetAnimator.rotation);
+		animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, footPositionWeight);
+		animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, footRotationWeight);
+		handTargetAnimator.position = handTargetBiped.position + vector;
+		handTargetAnimator.rotation = handTargetBiped.rotation;
+		bipedIK.SetIKPosition(AvatarIKGoal.LeftHand, handTargetBiped.position);
+		bipedIK.SetIKRotation(AvatarIKGoal.LeftHand, handTargetBiped.rotation);
+		bipedIK.SetIKPositionWeight(AvatarIKGoal.LeftHand, handPositionWeight);
+		bipedIK.SetIKRotationWeight(AvatarIKGoal.LeftHand, handRotationWeight);
+		animator.SetIKPosition(AvatarIKGoal.LeftHand, handTargetAnimator.position);
+		animator.SetIKRotation(AvatarIKGoal.LeftHand, handTargetAnimator.rotation);
+		animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, handPositionWeight);
+		animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, handRotationWeight);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 014
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__CharacterAnimationBase.cs
+SIZE: 1743 bytes
+SHA256: 789791a9f3334cc519c529649a880118162837016f00dbee6626e82ae89bf30f
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public abstract class CharacterAnimationBase : MonoBehaviour
+{
+	public bool smoothFollow = true;
+
+	public float smoothFollowSpeed = 20f;
+
+	protected bool animatePhysics;
+
+	private Vector3 lastPosition;
+
+	private Vector3 localPosition;
+
+	private Quaternion localRotation;
+
+	private Quaternion lastRotation;
+
+	public virtual bool animationGrounded => true;
+
+	public virtual Vector3 GetPivotPoint()
+	{
+		return transform.position;
+	}
+
+	public float GetAngleFromForward(Vector3 worldDirection)
+	{
+		Vector3 vector = transform.InverseTransformDirection(worldDirection);
+		return Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+	}
+
+	protected virtual void Start()
+	{
+		if (transform.parent.GetComponent<CharacterBase>() == null)
+		{
+			Debug.LogWarning("Animation controllers should be parented to character controllers!", transform);
+		}
+		lastPosition = transform.position;
+		localPosition = transform.localPosition;
+		lastRotation = transform.rotation;
+		localRotation = transform.localRotation;
+	}
+
+	protected virtual void LateUpdate()
+	{
+		if (!animatePhysics)
+		{
+			SmoothFollow();
+		}
+	}
+
+	protected virtual void FixedUpdate()
+	{
+		if (animatePhysics)
+		{
+			SmoothFollow();
+		}
+	}
+
+	private void SmoothFollow()
+	{
+		if (smoothFollow)
+		{
+			transform.position = Vector3.Lerp(lastPosition, transform.parent.TransformPoint(localPosition), Time.deltaTime * smoothFollowSpeed);
+			transform.rotation = Quaternion.Lerp(lastRotation, transform.parent.rotation * localRotation, Time.deltaTime * smoothFollowSpeed);
+		}
+		else
+		{
+			transform.localPosition = localPosition;
+			transform.localRotation = localRotation;
+		}
+		lastPosition = transform.position;
+		lastRotation = transform.rotation;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 015
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__CharacterBase.cs
+SIZE: 3484 bytes
+SHA256: 8fcdcb408f84a2ca63c6bec0a13da4b46c658db481bbed333fefa335f5446e4d
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public abstract class CharacterBase : MonoBehaviour
+{
+	[Header("Base Parameters")]
+	[Tooltip("If specified, will use the direction from the character to this Transform as the gravity vector instead of Physics.gravity. Physics.gravity.magnitude will be used as the magnitude of the gravity vector.")]
+	public Transform gravityTarget;
+
+	[Tooltip("Multiplies gravity applied to the character even if 'Individual Gravity' is unchecked.")]
+	public float gravityMultiplier = 2f;
+
+	public float airborneThreshold = 0.6f;
+
+	public float slopeStartAngle = 50f;
+
+	public float slopeEndAngle = 85f;
+
+	public float spherecastRadius = 0.1f;
+
+	public LayerMask groundLayers;
+
+	private PhysicMaterial zeroFrictionMaterial;
+
+	private PhysicMaterial highFrictionMaterial;
+
+	protected Rigidbody r;
+
+	protected const float half = 0.5f;
+
+	protected float originalHeight;
+
+	protected Vector3 originalCenter;
+
+	protected CapsuleCollider capsule;
+
+	public abstract void Move(Vector3 deltaPosition, Quaternion deltaRotation);
+
+	protected Vector3 GetGravity()
+	{
+		if (gravityTarget != null)
+		{
+			return (gravityTarget.position - transform.position).normalized * Physics.gravity.magnitude;
+		}
+		return Physics.gravity;
+	}
+
+	protected virtual void Start()
+	{
+		capsule = GetComponent<Collider>() as CapsuleCollider;
+		r = GetComponent<Rigidbody>();
+		originalHeight = capsule.height;
+		originalCenter = capsule.center;
+		zeroFrictionMaterial = new PhysicMaterial();
+		zeroFrictionMaterial.dynamicFriction = 0f;
+		zeroFrictionMaterial.staticFriction = 0f;
+		zeroFrictionMaterial.frictionCombine = PhysicMaterialCombine.Minimum;
+		zeroFrictionMaterial.bounciness = 0f;
+		zeroFrictionMaterial.bounceCombine = PhysicMaterialCombine.Minimum;
+		highFrictionMaterial = new PhysicMaterial();
+		r.constraints = RigidbodyConstraints.FreezeRotation;
+	}
+
+	protected virtual RaycastHit GetSpherecastHit()
+	{
+		Vector3 up = transform.up;
+		Ray ray = new Ray(r.position + up * airborneThreshold, -up);
+		RaycastHit hitInfo = new RaycastHit
+		{
+			point = transform.position - transform.transform.up * airborneThreshold,
+			normal = transform.up
+		};
+		Physics.SphereCast(ray, spherecastRadius, out hitInfo, airborneThreshold * 2f, groundLayers);
+		return hitInfo;
+	}
+
+	public float GetAngleFromForward(Vector3 worldDirection)
+	{
+		Vector3 vector = transform.InverseTransformDirection(worldDirection);
+		return Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+	}
+
+	protected void RigidbodyRotateAround(Vector3 point, Vector3 axis, float angle)
+	{
+		Quaternion quaternion = Quaternion.AngleAxis(angle, axis);
+		Vector3 vector = transform.position - point;
+		r.MovePosition(point + quaternion * vector);
+		r.MoveRotation(quaternion * transform.rotation);
+	}
+
+	protected void ScaleCapsule(float mlp)
+	{
+		if (capsule.height != originalHeight * mlp)
+		{
+			capsule.height = Mathf.MoveTowards(capsule.height, originalHeight * mlp, Time.deltaTime * 4f);
+			capsule.center = Vector3.MoveTowards(capsule.center, originalCenter * mlp, Time.deltaTime * 2f);
+		}
+	}
+
+	protected void HighFriction()
+	{
+		capsule.material = highFrictionMaterial;
+	}
+
+	protected void ZeroFriction()
+	{
+		capsule.material = zeroFrictionMaterial;
+	}
+
+	protected float GetSlopeDamper(Vector3 velocity, Vector3 groundNormal)
+	{
+		float num = 90f - Vector3.Angle(velocity, groundNormal);
+		num -= slopeStartAngle;
+		float num2 = slopeEndAngle - slopeStartAngle;
+		return 1f - Mathf.Clamp(num / num2, 0f, 1f);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 016
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__CharacterController3rdPerson.cs
+SIZE: 923 bytes
+SHA256: 91a66ae0195cd8664c4e15e5d54adc3f1284063eafee2074e5966d15dc4d132e
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class CharacterController3rdPerson : MonoBehaviour
+{
+	public CameraController cam;
+
+	private AnimatorController3rdPerson animatorController;
+
+	private static Vector3 inputVector => new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+
+	private static Vector3 inputVectorRaw => new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+
+	private void Start()
+	{
+		animatorController = GetComponent<AnimatorController3rdPerson>();
+		cam.enabled = false;
+	}
+
+	private void LateUpdate()
+	{
+		cam.UpdateInput();
+		cam.UpdateTransform();
+		Vector3 moveInput = inputVector;
+		bool isMoving = inputVector != Vector3.zero || inputVectorRaw != Vector3.zero;
+		Vector3 forward = cam.transform.forward;
+		Vector3 aimTarget = cam.transform.position + forward * 10f;
+		animatorController.Move(moveInput, isMoving, forward, aimTarget);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 017
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__CharacterThirdPerson.cs
+SIZE: 12804 bytes
+SHA256: 6c89985947bc66ebab8c86c62a1853dc35a17d2efc6f5051b8304ba1604a8d21
+====================================================================================================
+
+using System;
+using System.Collections;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class CharacterThirdPerson : CharacterBase
+{
+	[Serializable]
+	public enum MoveMode
+	{
+		Directional,
+		Strafe
+	}
+
+	public struct AnimState
+	{
+		public Vector3 moveDirection;
+
+		public bool jump;
+
+		public bool crouch;
+
+		public bool onGround;
+
+		public bool isStrafing;
+
+		public float yVelocity;
+
+		public bool doubleJump;
+	}
+
+	[Header("References")]
+	public CharacterAnimationBase characterAnimation;
+
+	public UserControlThirdPerson userControl;
+
+	public CameraController cam;
+
+	[Header("Movement")]
+	public MoveMode moveMode;
+
+	public bool smoothPhysics = true;
+
+	public float smoothAccelerationTime = 0.2f;
+
+	public float linearAccelerationSpeed = 3f;
+
+	public float platformFriction = 7f;
+
+	public float groundStickyEffect = 4f;
+
+	public float maxVerticalVelocityOnGround = 3f;
+
+	public float velocityToGroundTangentWeight;
+
+	[Header("Rotation")]
+	public bool lookInCameraDirection;
+
+	public float turnSpeed = 5f;
+
+	public float stationaryTurnSpeedMlp = 1f;
+
+	[Header("Jumping and Falling")]
+	public bool smoothJump = true;
+
+	public float airSpeed = 6f;
+
+	public float airControl = 2f;
+
+	public float jumpPower = 12f;
+
+	public float jumpRepeatDelayTime;
+
+	public bool doubleJumpEnabled;
+
+	public float doubleJumpPowerMlp = 1f;
+
+	[Header("Wall Running")]
+	public LayerMask wallRunLayers;
+
+	public float wallRunMaxLength = 1f;
+
+	public float wallRunMinMoveMag = 0.6f;
+
+	public float wallRunMinVelocityY = -1f;
+
+	public float wallRunRotationSpeed = 1.5f;
+
+	public float wallRunMaxRotationAngle = 70f;
+
+	public float wallRunWeightSpeed = 5f;
+
+	[Header("Crouching")]
+	public float crouchCapsuleScaleMlp = 0.6f;
+
+	public AnimState animState;
+
+	protected Vector3 moveDirection;
+
+	private Animator animator;
+
+	private Vector3 normal;
+
+	private Vector3 platformVelocity;
+
+	private Vector3 platformAngularVelocity;
+
+	private RaycastHit hit;
+
+	private float jumpLeg;
+
+	private float jumpEndTime;
+
+	private float forwardMlp;
+
+	private float groundDistance;
+
+	private float lastAirTime;
+
+	private float stickyForce;
+
+	private Vector3 wallNormal = Vector3.up;
+
+	private Vector3 moveDirectionVelocity;
+
+	private float wallRunWeight;
+
+	private float lastWallRunWeight;
+
+	private float fixedDeltaTime;
+
+	private Vector3 fixedDeltaPosition;
+
+	private Quaternion fixedDeltaRotation = Quaternion.identity;
+
+	private bool fixedFrame;
+
+	private float wallRunEndTime;
+
+	private Vector3 gravity;
+
+	private Vector3 verticalVelocity;
+
+	private float velocityY;
+
+	private bool doubleJumped;
+
+	private bool jumpReleased;
+
+	public bool fullRootMotion { get; set; }
+
+	public bool onGround { get; private set; }
+
+	protected override void Start()
+	{
+		base.Start();
+		animator = GetComponent<Animator>();
+		if (animator == null)
+		{
+			animator = characterAnimation.GetComponent<Animator>();
+		}
+		wallNormal = -gravity.normalized;
+		onGround = true;
+		animState.onGround = true;
+		if (cam != null)
+		{
+			cam.enabled = false;
+		}
+	}
+
+	private void OnAnimatorMove()
+	{
+		Move(animator.deltaPosition, animator.deltaRotation);
+	}
+
+	public override void Move(Vector3 deltaPosition, Quaternion deltaRotation)
+	{
+		fixedDeltaTime += Time.deltaTime;
+		fixedDeltaPosition += deltaPosition;
+		fixedDeltaRotation *= deltaRotation;
+	}
+
+	private void FixedUpdate()
+	{
+		gravity = (fullRootMotion ? Vector3.zero : GetGravity());
+		verticalVelocity = V3Tools.ExtractVertical(r.velocity, gravity, 1f);
+		velocityY = verticalVelocity.magnitude;
+		if (Vector3.Dot(verticalVelocity, gravity) > 0f)
+		{
+			velocityY = 0f - velocityY;
+		}
+		r.interpolation = (smoothPhysics ? RigidbodyInterpolation.Interpolate : RigidbodyInterpolation.None);
+		characterAnimation.smoothFollow = smoothPhysics;
+		MoveFixed(fixedDeltaPosition);
+		fixedDeltaTime = 0f;
+		fixedDeltaPosition = Vector3.zero;
+		r.MoveRotation(transform.rotation * fixedDeltaRotation);
+		fixedDeltaRotation = Quaternion.identity;
+		Rotate();
+		GroundCheck();
+		if (userControl.state.move == Vector3.zero && groundDistance < airborneThreshold * 0.5f)
+		{
+			HighFriction();
+		}
+		else
+		{
+			ZeroFriction();
+		}
+		bool flag = !fullRootMotion && onGround && userControl.state.move == Vector3.zero && r.velocity.magnitude < 0.5f && groundDistance < airborneThreshold * 0.5f;
+		if (gravityTarget != null)
+		{
+			r.useGravity = false;
+			if (!flag)
+			{
+				r.AddForce(gravity);
+			}
+		}
+		if (flag)
+		{
+			r.useGravity = false;
+			r.velocity = Vector3.zero;
+		}
+		else if (gravityTarget == null)
+		{
+			r.useGravity = true;
+		}
+		if (onGround)
+		{
+			animState.jump = Jump();
+			jumpReleased = false;
+			doubleJumped = false;
+		}
+		else
+		{
+			if (!userControl.state.jump)
+			{
+				jumpReleased = true;
+			}
+			if (jumpReleased && userControl.state.jump && !doubleJumped && doubleJumpEnabled)
+			{
+				jumpEndTime = Time.time + 0.1f;
+				animState.doubleJump = true;
+				Vector3 velocity = userControl.state.move * airSpeed;
+				r.velocity = velocity;
+				r.velocity += transform.up * jumpPower * doubleJumpPowerMlp;
+				doubleJumped = true;
+			}
+		}
+		ScaleCapsule(userControl.state.crouch ? crouchCapsuleScaleMlp : 1f);
+		fixedFrame = true;
+	}
+
+	protected virtual void Update()
+	{
+		animState.onGround = onGround;
+		animState.moveDirection = GetMoveDirection();
+		animState.yVelocity = Mathf.Lerp(animState.yVelocity, velocityY, Time.deltaTime * 10f);
+		animState.crouch = userControl.state.crouch;
+		animState.isStrafing = moveMode == MoveMode.Strafe;
+	}
+
+	protected virtual void LateUpdate()
+	{
+		if (!(cam == null))
+		{
+			cam.UpdateInput();
+			if (fixedFrame || r.interpolation != RigidbodyInterpolation.None)
+			{
+				cam.UpdateTransform((r.interpolation == RigidbodyInterpolation.None) ? Time.fixedDeltaTime : Time.deltaTime);
+				fixedFrame = false;
+			}
+		}
+	}
+
+	private void MoveFixed(Vector3 deltaPosition)
+	{
+		WallRun();
+		Vector3 vector = ((fixedDeltaTime > 0f) ? (deltaPosition / fixedDeltaTime) : Vector3.zero);
+		if (!fullRootMotion)
+		{
+			vector += V3Tools.ExtractHorizontal(platformVelocity, gravity, 1f);
+			if (onGround)
+			{
+				if (velocityToGroundTangentWeight > 0f)
+				{
+					Quaternion b = Quaternion.FromToRotation(transform.up, normal);
+					vector = Quaternion.Lerp(Quaternion.identity, b, velocityToGroundTangentWeight) * vector;
+				}
+			}
+			else
+			{
+				Vector3 b2 = V3Tools.ExtractHorizontal(userControl.state.move * airSpeed, gravity, 1f);
+				vector = Vector3.Lerp(r.velocity, b2, Time.deltaTime * airControl);
+			}
+			if (onGround && Time.time > jumpEndTime)
+			{
+				r.velocity -= transform.up * stickyForce * Time.deltaTime;
+			}
+			Vector3 vector2 = V3Tools.ExtractVertical(r.velocity, gravity, 1f);
+			Vector3 vector3 = V3Tools.ExtractHorizontal(vector, gravity, 1f);
+			if (onGround && Vector3.Dot(vector2, gravity) < 0f)
+			{
+				vector2 = Vector3.ClampMagnitude(vector2, maxVerticalVelocityOnGround);
+			}
+			r.velocity = vector3 + vector2;
+		}
+		else
+		{
+			r.velocity = vector;
+		}
+		forwardMlp = 1f;
+	}
+
+	private void WallRun()
+	{
+		bool flag = CanWallRun();
+		if (wallRunWeight > 0f && !flag)
+		{
+			wallRunEndTime = Time.time;
+		}
+		if (Time.time < wallRunEndTime + 0.5f)
+		{
+			flag = false;
+		}
+		wallRunWeight = Mathf.MoveTowards(wallRunWeight, flag ? 1f : 0f, Time.deltaTime * wallRunWeightSpeed);
+		if (wallRunWeight <= 0f && lastWallRunWeight > 0f)
+		{
+			Vector3 forward = V3Tools.ExtractHorizontal(transform.forward, gravity, 1f);
+			transform.rotation = Quaternion.LookRotation(forward, -gravity);
+			wallNormal = -gravity.normalized;
+		}
+		lastWallRunWeight = wallRunWeight;
+		if (!(wallRunWeight <= 0f))
+		{
+			if (onGround && velocityY < 0f)
+			{
+				r.velocity = V3Tools.ExtractHorizontal(r.velocity, gravity, 1f);
+			}
+			Vector3 vector = V3Tools.ExtractHorizontal(transform.forward, gravity, 1f);
+			RaycastHit hitInfo = new RaycastHit
+			{
+				normal = -gravity.normalized
+			};
+			Physics.Raycast(onGround ? transform.position : capsule.bounds.center, vector, out hitInfo, 3f, wallRunLayers);
+			wallNormal = Vector3.Lerp(wallNormal, hitInfo.normal, Time.deltaTime * wallRunRotationSpeed);
+			wallNormal = Vector3.RotateTowards(-gravity.normalized, wallNormal, wallRunMaxRotationAngle * (MathF.PI / 180f), 0f);
+			Vector3 tangent = transform.forward;
+			Vector3 vector2 = wallNormal;
+			Vector3.OrthoNormalize(ref vector2, ref tangent);
+			transform.rotation = Quaternion.Slerp(Quaternion.LookRotation(vector, -gravity), Quaternion.LookRotation(tangent, wallNormal), wallRunWeight);
+		}
+	}
+
+	private bool CanWallRun()
+	{
+		if (fullRootMotion)
+		{
+			return false;
+		}
+		if (Time.time < jumpEndTime - 0.1f)
+		{
+			return false;
+		}
+		if (Time.time > jumpEndTime - 0.1f + wallRunMaxLength)
+		{
+			return false;
+		}
+		if (velocityY < wallRunMinVelocityY)
+		{
+			return false;
+		}
+		if (userControl.state.move.magnitude < wallRunMinMoveMag)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private Vector3 GetMoveDirection()
+	{
+		switch (moveMode)
+		{
+		case MoveMode.Directional:
+			moveDirection = Vector3.SmoothDamp(moveDirection, new Vector3(0f, 0f, userControl.state.move.magnitude), ref moveDirectionVelocity, smoothAccelerationTime);
+			moveDirection = Vector3.MoveTowards(moveDirection, new Vector3(0f, 0f, userControl.state.move.magnitude), Time.deltaTime * linearAccelerationSpeed);
+			return moveDirection * forwardMlp;
+		case MoveMode.Strafe:
+			moveDirection = Vector3.SmoothDamp(moveDirection, userControl.state.move, ref moveDirectionVelocity, smoothAccelerationTime);
+			moveDirection = Vector3.MoveTowards(moveDirection, userControl.state.move, Time.deltaTime * linearAccelerationSpeed);
+			return transform.InverseTransformDirection(moveDirection);
+		default:
+			return Vector3.zero;
+		}
+	}
+
+	protected virtual void Rotate()
+	{
+		if (gravityTarget != null)
+		{
+			r.MoveRotation(Quaternion.FromToRotation(transform.up, transform.position - gravityTarget.position) * transform.rotation);
+		}
+		if (platformAngularVelocity != Vector3.zero)
+		{
+			r.MoveRotation(Quaternion.Euler(platformAngularVelocity) * transform.rotation);
+		}
+		float num = GetAngleFromForward(GetForwardDirection());
+		if (userControl.state.move == Vector3.zero)
+		{
+			num *= (1.01f - Mathf.Abs(num) / 180f) * stationaryTurnSpeedMlp;
+		}
+		r.MoveRotation(Quaternion.AngleAxis(num * Time.deltaTime * turnSpeed, transform.up) * r.rotation);
+	}
+
+	private Vector3 GetForwardDirection()
+	{
+		bool flag = userControl.state.move != Vector3.zero;
+		switch (moveMode)
+		{
+		case MoveMode.Directional:
+			if (flag)
+			{
+				return userControl.state.move;
+			}
+			if (!lookInCameraDirection)
+			{
+				return transform.forward;
+			}
+			return userControl.state.lookPos - r.position;
+		case MoveMode.Strafe:
+			if (flag)
+			{
+				return userControl.state.lookPos - r.position;
+			}
+			if (!lookInCameraDirection)
+			{
+				return transform.forward;
+			}
+			return userControl.state.lookPos - r.position;
+		default:
+			return Vector3.zero;
+		}
+	}
+
+	protected virtual bool Jump()
+	{
+		if (!userControl.state.jump)
+		{
+			return false;
+		}
+		if (userControl.state.crouch)
+		{
+			return false;
+		}
+		if (!characterAnimation.animationGrounded)
+		{
+			return false;
+		}
+		if (Time.time < lastAirTime + jumpRepeatDelayTime)
+		{
+			return false;
+		}
+		onGround = false;
+		jumpEndTime = Time.time + 0.1f;
+		Vector3 vector = userControl.state.move * airSpeed;
+		vector += transform.up * jumpPower;
+		if (smoothJump)
+		{
+			StopAllCoroutines();
+			StartCoroutine(JumpSmooth(vector - r.velocity));
+		}
+		else
+		{
+			r.velocity = vector;
+		}
+		return true;
+	}
+
+	private IEnumerator JumpSmooth(Vector3 jumpVelocity)
+	{
+		int steps = 0;
+		int stepsToTake = 3;
+		while (steps < stepsToTake)
+		{
+			r.AddForce(jumpVelocity / stepsToTake, ForceMode.VelocityChange);
+			steps++;
+			yield return new WaitForFixedUpdate();
+		}
+	}
+
+	private void GroundCheck()
+	{
+		Vector3 b = Vector3.zero;
+		platformAngularVelocity = Vector3.zero;
+		float num = 0f;
+		hit = GetSpherecastHit();
+		normal = transform.up;
+		groundDistance = Vector3.Project(r.position - hit.point, transform.up).magnitude;
+		if (Time.time > jumpEndTime && velocityY < jumpPower * 0.5f)
+		{
+			bool flag = onGround;
+			onGround = false;
+			float num2 = ((!flag) ? (airborneThreshold * 0.5f) : airborneThreshold);
+			float magnitude = V3Tools.ExtractHorizontal(r.velocity, gravity, 1f).magnitude;
+			if (groundDistance < num2)
+			{
+				num = groundStickyEffect * magnitude * num2;
+				if (hit.rigidbody != null)
+				{
+					b = hit.rigidbody.GetPointVelocity(hit.point);
+					platformAngularVelocity = Vector3.Project(hit.rigidbody.angularVelocity, transform.up);
+				}
+				onGround = true;
+			}
+		}
+		platformVelocity = Vector3.Lerp(platformVelocity, b, Time.deltaTime * platformFriction);
+		if (fullRootMotion)
+		{
+			stickyForce = 0f;
+		}
+		stickyForce = num;
+		if (!onGround)
+		{
+			lastAirTime = Time.time;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 018
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__FBIKBoxing.cs
+SIZE: 1740 bytes
+SHA256: ae0a5682788a8ebf7ea517fd058344648310a94943d8230b33e74c55108b342f
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class FBIKBoxing : MonoBehaviour
+{
+	[Tooltip("The target we want to hit")]
+	public Transform target;
+
+	[Tooltip("The pin Transform is used to reference the exact hit point in the animation (used by AimIK to aim the upper body to follow the target).In Legacy and Generic modes you can just create and position a reference point in your animating software and include it in the FBX. Then in Unity if you added a GameObject with the exact same name under the character's root, it would be animated to the required position.In Humanoid mode however, Mecanim loses track of any Transform that does not belong to the avatar, so in this case the pin point has to be manually set inside the Unity Editor.")]
+	public Transform pin;
+
+	[Tooltip("The Full Body Biped IK component")]
+	public FullBodyBipedIK ik;
+
+	[Tooltip("The Aim IK component. Aim IK is ust used for following the target slightly with the body.")]
+	public AimIK aim;
+
+	[Tooltip("The master weight")]
+	public float weight;
+
+	[Tooltip("The effector type of the punching hand")]
+	public FullBodyBipedEffector effector;
+
+	[Tooltip("Weight of aiming the body to follow the target")]
+	public AnimationCurve aimWeight;
+
+	private Animator animator;
+
+	private void Start()
+	{
+		animator = GetComponent<Animator>();
+	}
+
+	private void LateUpdate()
+	{
+		float num = animator.GetFloat("HitWeight");
+		ik.solver.GetEffector(effector).position = target.position;
+		ik.solver.GetEffector(effector).positionWeight = num * weight;
+		if (aim != null)
+		{
+			aim.solver.transform.LookAt(pin.position);
+			aim.solver.IKPosition = target.position;
+			aim.solver.IKPositionWeight = aimWeight.Evaluate(num) * weight;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 019
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__FKOffset.cs
+SIZE: 895 bytes
+SHA256: a4ce37ec7fc4235c0c14f8a980eba3d1867d496217c0a63634779dacccb59a0f
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class FKOffset : MonoBehaviour
+{
+	[Serializable]
+	public class Offset
+	{
+		[HideInInspector]
+		public string name;
+
+		public HumanBodyBones bone;
+
+		public Vector3 rotationOffset;
+
+		private Transform t;
+
+		public void Apply(Animator animator)
+		{
+			if (t == null)
+			{
+				t = animator.GetBoneTransform(bone);
+			}
+			if (!(t == null))
+			{
+				t.localRotation *= Quaternion.Euler(rotationOffset);
+			}
+		}
+	}
+
+	public Offset[] offsets;
+
+	private Animator animator;
+
+	private void Start()
+	{
+		animator = GetComponent<Animator>();
+	}
+
+	private void LateUpdate()
+	{
+		Offset[] array = offsets;
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Apply(animator);
+		}
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		Offset[] array = offsets;
+		foreach (Offset obj in array)
+		{
+			obj.name = obj.bone.ToString();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 020
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__FPSAiming.cs
+SIZE: 4757 bytes
+SHA256: e41a22b597b5af4c5333b515d4ccd2577b3bc859fe6f61264cf1b407b5493309
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class FPSAiming : MonoBehaviour
+{
+	[Range(0f, 1f)]
+	public float aimWeight = 1f;
+
+	[Range(0f, 1f)]
+	public float sightWeight = 1f;
+
+	[Range(0f, 180f)]
+	public float maxAngle = 80f;
+
+	public Vector3 aimOffset;
+
+	public bool animatePhysics;
+
+	public Transform gun;
+
+	public Transform gunTarget;
+
+	public FullBodyBipedIK ik;
+
+	public AimIK gunAim;
+
+	public AimIK headAim;
+
+	public CameraControllerFPS cam;
+
+	public Recoil recoil;
+
+	[Range(0f, 1f)]
+	public float cameraRecoilWeight = 0.5f;
+
+	private Vector3 gunTargetDefaultLocalPosition;
+
+	private Vector3 gunTargetDefaultLocalRotation;
+
+	private Vector3 camDefaultLocalPosition;
+
+	private Vector3 camRelativeToGunTarget;
+
+	private bool updateFrame;
+
+	private void Start()
+	{
+		gunTargetDefaultLocalPosition = gunTarget.localPosition;
+		gunTargetDefaultLocalRotation = gunTarget.localEulerAngles;
+		camDefaultLocalPosition = cam.transform.localPosition;
+		cam.enabled = false;
+		gunAim.enabled = false;
+		if (headAim != null)
+		{
+			headAim.enabled = false;
+		}
+		ik.enabled = false;
+		if (recoil != null && ik.solver.iterations == 0)
+		{
+			Debug.LogWarning("FPSAiming with Recoil needs FBBIK solver iteration count to be at least 1 to maintain accuracy.");
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		updateFrame = true;
+	}
+
+	private void LateUpdate()
+	{
+		if (!animatePhysics)
+		{
+			updateFrame = true;
+		}
+		if (updateFrame)
+		{
+			updateFrame = false;
+			cam.transform.localPosition = camDefaultLocalPosition;
+			camRelativeToGunTarget = gunTarget.InverseTransformPoint(cam.transform.position);
+			cam.LateUpdate();
+			RotateCharacter();
+			Aiming();
+			LookDownTheSight();
+		}
+	}
+
+	private void Aiming()
+	{
+		if (!(aimWeight <= 0f))
+		{
+			Quaternion rotation = cam.transform.rotation;
+			if (headAim != null)
+			{
+				headAim.solver.IKPosition = cam.transform.position + cam.transform.forward * 10f;
+				headAim.solver.IKPositionWeight = 1f - aimWeight;
+				headAim.solver.Update();
+			}
+			gunAim.solver.IKPosition = cam.transform.position + cam.transform.forward * 10f + cam.transform.rotation * aimOffset;
+			gunAim.solver.IKPositionWeight = aimWeight;
+			gunAim.solver.Update();
+			cam.transform.rotation = rotation;
+		}
+	}
+
+	private void LookDownTheSight()
+	{
+		float t = aimWeight * sightWeight;
+		gunTarget.position = Vector3.Lerp(gun.position, gunTarget.parent.TransformPoint(gunTargetDefaultLocalPosition), t);
+		gunTarget.rotation = Quaternion.Lerp(gun.rotation, gunTarget.parent.rotation * Quaternion.Euler(gunTargetDefaultLocalRotation), t);
+		Vector3 position = gun.InverseTransformPoint(ik.solver.leftHandEffector.bone.position);
+		Vector3 position2 = gun.InverseTransformPoint(ik.solver.rightHandEffector.bone.position);
+		Quaternion quaternion = Quaternion.Inverse(gun.rotation) * ik.solver.leftHandEffector.bone.rotation;
+		Quaternion quaternion2 = Quaternion.Inverse(gun.rotation) * ik.solver.rightHandEffector.bone.rotation;
+		float num = 1f;
+		ik.solver.leftHandEffector.positionOffset += (gunTarget.TransformPoint(position) - (ik.solver.leftHandEffector.bone.position + ik.solver.leftHandEffector.positionOffset)) * num;
+		ik.solver.rightHandEffector.positionOffset += (gunTarget.TransformPoint(position2) - (ik.solver.rightHandEffector.bone.position + ik.solver.rightHandEffector.positionOffset)) * num;
+		ik.solver.headMapping.maintainRotationWeight = 1f;
+		if (recoil != null)
+		{
+			recoil.SetHandRotations(gunTarget.rotation * quaternion, gunTarget.rotation * quaternion2);
+		}
+		ik.solver.Update();
+		if (recoil != null)
+		{
+			ik.references.leftHand.rotation = recoil.rotationOffset * (gunTarget.rotation * quaternion);
+			ik.references.rightHand.rotation = recoil.rotationOffset * (gunTarget.rotation * quaternion2);
+		}
+		else
+		{
+			ik.references.leftHand.rotation = gunTarget.rotation * quaternion;
+			ik.references.rightHand.rotation = gunTarget.rotation * quaternion2;
+		}
+		cam.transform.position = Vector3.Lerp(cam.transform.position, Vector3.Lerp(gunTarget.TransformPoint(camRelativeToGunTarget), gun.transform.TransformPoint(camRelativeToGunTarget), cameraRecoilWeight), t);
+	}
+
+	private void RotateCharacter()
+	{
+		if (maxAngle >= 180f)
+		{
+			return;
+		}
+		if (maxAngle <= 0f)
+		{
+			transform.rotation = Quaternion.LookRotation(new Vector3(cam.transform.forward.x, 0f, cam.transform.forward.z));
+			return;
+		}
+		Vector3 vector = transform.InverseTransformDirection(cam.transform.forward);
+		float num = Mathf.Atan2(vector.x, vector.z) * 57.29578f;
+		if (Mathf.Abs(num) > Mathf.Abs(maxAngle))
+		{
+			float angle = num - maxAngle;
+			if (num < 0f)
+			{
+				angle = num + maxAngle;
+			}
+			transform.rotation = Quaternion.AngleAxis(angle, transform.up) * transform.rotation;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 021
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__HoldingHands.cs
+SIZE: 1429 bytes
+SHA256: dbc45295852add0657208fd20e057d8ab06501f01ce93ad79b6261b25b77b329
+====================================================================================================
+
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class HoldingHands : MonoBehaviour
+{
+	public FullBodyBipedIK rightHandChar;
+
+	public FullBodyBipedIK leftHandChar;
+
+	public Transform rightHandTarget;
+
+	public Transform leftHandTarget;
+
+	public float crossFade;
+
+	public float speed = 10f;
+
+	private Quaternion rightHandRotation;
+
+	private Quaternion leftHandRotation;
+
+	private void Start()
+	{
+		rightHandRotation = Quaternion.Inverse(rightHandChar.solver.rightHandEffector.bone.rotation) * transform.rotation;
+		leftHandRotation = Quaternion.Inverse(leftHandChar.solver.leftHandEffector.bone.rotation) * transform.rotation;
+	}
+
+	private void LateUpdate()
+	{
+		Vector3 b = Vector3.Lerp(rightHandChar.solver.rightHandEffector.bone.position, leftHandChar.solver.leftHandEffector.bone.position, crossFade);
+		transform.position = Vector3.Lerp(transform.position, b, Time.deltaTime * speed);
+		transform.rotation = Quaternion.Slerp(rightHandChar.solver.rightHandEffector.bone.rotation * rightHandRotation, leftHandChar.solver.leftHandEffector.bone.rotation * leftHandRotation, crossFade);
+		rightHandChar.solver.rightHandEffector.position = rightHandTarget.position;
+		rightHandChar.solver.rightHandEffector.rotation = rightHandTarget.rotation;
+		leftHandChar.solver.leftHandEffector.position = leftHandTarget.position;
+		leftHandChar.solver.leftHandEffector.rotation = leftHandTarget.rotation;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 022
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__KissingRig.cs
+SIZE: 3216 bytes
+SHA256: 0cf1f8cce75a43c7f5557296bdc7b7e52c4a5b057b580d0068946593f2ad7b9a
+====================================================================================================
+
+using System;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class KissingRig : MonoBehaviour
+{
+	[Serializable]
+	public class Partner
+	{
+		public FullBodyBipedIK ik;
+
+		public Transform mouth;
+
+		public Transform mouthTarget;
+
+		public Transform touchTargetLeftHand;
+
+		public Transform touchTargetRightHand;
+
+		public float bodyWeightHorizontal = 0.4f;
+
+		public float bodyWeightVertical = 1f;
+
+		public float neckRotationWeight = 0.3f;
+
+		public float headTiltAngle = 10f;
+
+		public Vector3 headTiltAxis;
+
+		private Quaternion neckRotation;
+
+		private Transform neck => ik.solver.spineMapping.spineBones[ik.solver.spineMapping.spineBones.Length - 1];
+
+		public void Initiate()
+		{
+			ik.enabled = false;
+		}
+
+		public void Update(float weight)
+		{
+			ik.solver.leftShoulderEffector.positionWeight = weight;
+			ik.solver.rightShoulderEffector.positionWeight = weight;
+			ik.solver.leftHandEffector.positionWeight = weight;
+			ik.solver.rightHandEffector.positionWeight = weight;
+			ik.solver.leftHandEffector.rotationWeight = weight;
+			ik.solver.rightHandEffector.rotationWeight = weight;
+			ik.solver.bodyEffector.positionWeight = weight;
+			InverseTransformEffector(FullBodyBipedEffector.LeftShoulder, mouth, mouthTarget.position, weight);
+			InverseTransformEffector(FullBodyBipedEffector.RightShoulder, mouth, mouthTarget.position, weight);
+			InverseTransformEffector(FullBodyBipedEffector.Body, mouth, mouthTarget.position, weight);
+			ik.solver.bodyEffector.position = Vector3.Lerp(new Vector3(ik.solver.bodyEffector.position.x, ik.solver.bodyEffector.bone.position.y, ik.solver.bodyEffector.position.z), ik.solver.bodyEffector.position, bodyWeightVertical * weight);
+			ik.solver.bodyEffector.position = Vector3.Lerp(new Vector3(ik.solver.bodyEffector.bone.position.x, ik.solver.bodyEffector.position.y, ik.solver.bodyEffector.bone.position.z), ik.solver.bodyEffector.position, bodyWeightHorizontal * weight);
+			ik.solver.leftHandEffector.position = touchTargetLeftHand.position;
+			ik.solver.rightHandEffector.position = touchTargetRightHand.position;
+			ik.solver.leftHandEffector.rotation = touchTargetLeftHand.rotation;
+			ik.solver.rightHandEffector.rotation = touchTargetRightHand.rotation;
+			neckRotation = neck.rotation;
+			ik.solver.Update();
+			neck.rotation = Quaternion.Slerp(neck.rotation, neckRotation, neckRotationWeight * weight);
+			ik.references.head.localRotation = Quaternion.AngleAxis(headTiltAngle * weight, headTiltAxis) * ik.references.head.localRotation;
+		}
+
+		private void InverseTransformEffector(FullBodyBipedEffector effector, Transform target, Vector3 targetPosition, float weight)
+		{
+			Vector3 vector = ik.solver.GetEffector(effector).bone.position - target.position;
+			ik.solver.GetEffector(effector).position = Vector3.Lerp(ik.solver.GetEffector(effector).bone.position, targetPosition + vector, weight);
+		}
+	}
+
+	public Partner partner1;
+
+	public Partner partner2;
+
+	public float weight;
+
+	public int iterations = 3;
+
+	private void Start()
+	{
+		partner1.Initiate();
+		partner2.Initiate();
+	}
+
+	private void LateUpdate()
+	{
+		for (int i = 0; i < iterations; i++)
+		{
+			partner1.Update(weight);
+			partner2.Update(weight);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 023
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__MechSpider.cs
+SIZE: 2935 bytes
+SHA256: 0655e468b0578c1fb3f74f07933a63200c0286f529122c54af9f74a3fed868ad
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class MechSpider : MonoBehaviour
+{
+	public LayerMask raycastLayers;
+
+	public float scale = 1f;
+
+	public Transform body;
+
+	public MechSpiderLeg[] legs;
+
+	public float legRotationWeight = 1f;
+
+	public float rootPositionSpeed = 5f;
+
+	public float rootRotationSpeed = 30f;
+
+	public float breatheSpeed = 2f;
+
+	public float breatheMagnitude = 0.2f;
+
+	public float height = 3.5f;
+
+	public float minHeight = 2f;
+
+	public float raycastHeight = 10f;
+
+	public float raycastDistance = 5f;
+
+	private Vector3 lastPosition;
+
+	private Vector3 defaultBodyLocalPosition;
+
+	private float sine;
+
+	private RaycastHit rootHit;
+
+	public Vector3 velocity { get; private set; }
+
+	private void Start()
+	{
+		lastPosition = transform.position;
+	}
+
+	private void Update()
+	{
+		velocity = (transform.position - lastPosition) / Time.deltaTime;
+		lastPosition = transform.position;
+		Vector3 legsPlaneNormal = GetLegsPlaneNormal();
+		Quaternion quaternion = Quaternion.FromToRotation(transform.up, legsPlaneNormal);
+		transform.rotation = Quaternion.Slerp(transform.rotation, quaternion * transform.rotation, Time.deltaTime * rootRotationSpeed);
+		Vector3 vector = Vector3.Project(GetLegCentroid() + transform.up * height * scale - transform.position, transform.up);
+		transform.position += vector * Time.deltaTime * (rootPositionSpeed * scale);
+		if (Physics.Raycast(transform.position + transform.up * raycastHeight * scale, -transform.up, out rootHit, raycastHeight * scale + raycastDistance * scale, raycastLayers))
+		{
+			rootHit.distance -= raycastHeight * scale + minHeight * scale;
+			if (rootHit.distance < 0f)
+			{
+				Vector3 b = transform.position - transform.up * rootHit.distance;
+				transform.position = Vector3.Lerp(transform.position, b, Time.deltaTime * rootPositionSpeed * scale);
+			}
+		}
+		sine += Time.deltaTime * breatheSpeed;
+		if (sine >= MathF.PI * 2f)
+		{
+			sine -= MathF.PI * 2f;
+		}
+		float num = Mathf.Sin(sine) * breatheMagnitude * scale;
+		Vector3 vector2 = transform.up * num;
+		body.transform.position = transform.position + vector2;
+	}
+
+	private Vector3 GetLegCentroid()
+	{
+		Vector3 zero = Vector3.zero;
+		float num = 1f / (float)legs.Length;
+		for (int i = 0; i < legs.Length; i++)
+		{
+			zero += legs[i].position * num;
+		}
+		return zero;
+	}
+
+	private Vector3 GetLegsPlaneNormal()
+	{
+		Vector3 vector = transform.up;
+		if (legRotationWeight <= 0f)
+		{
+			return vector;
+		}
+		float t = 1f / Mathf.Lerp(legs.Length, 1f, legRotationWeight);
+		for (int i = 0; i < legs.Length; i++)
+		{
+			Vector3 vector2 = legs[i].position - (transform.position - transform.up * height * scale);
+			Vector3 normal = transform.up;
+			Vector3 tangent = vector2;
+			Vector3.OrthoNormalize(ref normal, ref tangent);
+			Quaternion b = Quaternion.FromToRotation(tangent, vector2);
+			b = Quaternion.Lerp(Quaternion.identity, b, t);
+			vector = b * vector;
+		}
+		return vector;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 024
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__MechSpiderController.cs
+SIZE: 793 bytes
+SHA256: 0c9ea6bab314c4e3ebd9b8d42d629f07fe70c4e161aeee7790d66606ad754520
+====================================================================================================
+
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class MechSpiderController : MonoBehaviour
+{
+	public MechSpider mechSpider;
+
+	public Transform cameraTransform;
+
+	public float speed = 6f;
+
+	public float turnSpeed = 30f;
+
+	public Vector3 inputVector => new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+
+	private void Update()
+	{
+		Vector3 tangent = cameraTransform.forward;
+		Vector3 normal = transform.up;
+		Vector3.OrthoNormalize(ref normal, ref tangent);
+		Quaternion quaternion = Quaternion.LookRotation(tangent, transform.up);
+		transform.Translate(quaternion * inputVector.normalized * Time.deltaTime * speed * mechSpider.scale, Space.World);
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, quaternion, Time.deltaTime * turnSpeed);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 025
+PATH: Assembly-CSharp-firstpass__RootMotion.Demos__MechSpiderLeg.cs
+SIZE: 4571 bytes
+SHA256: 36e920d2593af8ddab7a8fd7dde511a0ea587926482eb1e6fbff53555e83c8b7
+====================================================================================================
+
+using System;
+using System.Collections;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+namespace RootMotion.Demos;
+
+public class MechSpiderLeg : MonoBehaviour
+{
+	public MechSpider mechSpider;
+
+	public MechSpiderLeg unSync;
+
+	public Vector3 offset;
+
+	public float minDelay = 0.2f;
+
+	public float maxOffset = 1f;
+
+	public float stepSpeed = 5f;
+
+	public float footHeight = 0.15f;
+
+	public float velocityPrediction = 0.2f;
+
+	public float raycastFocus = 0.1f;
+
+	public AnimationCurve yOffset;
+
+	public Transform foot;
+
+	public Vector3 footUpAxis;
+
+	public float footRotationSpeed = 10f;
+
+	public ParticleSystem sand;
+
+	private IK ik;
+
+	private float stepProgress = 1f;
+
+	private float lastStepTime;
+
+	private Vector3 defaultPosition;
+
+	private RaycastHit hit;
+
+	private Quaternion lastFootLocalRotation;
+
+	private Vector3 smoothHitNormal = Vector3.up;
+
+	private Vector3 lastStepPosition;
+
+	public bool isStepping => stepProgress < 1f;
+
+	public Vector3 position
+	{
+		get
+		{
+			return ik.GetIKSolver().GetIKPosition();
+		}
+		set
+		{
+			ik.GetIKSolver().SetIKPosition(value);
+		}
+	}
+
+	private void Awake()
+	{
+		ik = GetComponent<IK>();
+		if (foot != null)
+		{
+			if (footUpAxis == Vector3.zero)
+			{
+				footUpAxis = Quaternion.Inverse(foot.rotation) * Vector3.up;
+			}
+			lastFootLocalRotation = foot.localRotation;
+			IKSolver iKSolver = ik.GetIKSolver();
+			iKSolver.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(iKSolver.OnPostUpdate, new IKSolver.UpdateDelegate(AfterIK));
+		}
+	}
+
+	private void AfterIK()
+	{
+		if (!(foot == null))
+		{
+			foot.localRotation = lastFootLocalRotation;
+			smoothHitNormal = Vector3.Slerp(smoothHitNormal, hit.normal, Time.deltaTime * footRotationSpeed);
+			Quaternion quaternion = Quaternion.FromToRotation(foot.rotation * footUpAxis, smoothHitNormal);
+			foot.rotation = quaternion * foot.rotation;
+		}
+	}
+
+	private void Start()
+	{
+		stepProgress = 1f;
+		hit = default;
+		position = ik.GetIKSolver().GetPoints()[^1].transform.position;
+		lastStepPosition = position;
+		hit.point = position;
+		defaultPosition = mechSpider.transform.InverseTransformPoint(position + offset * mechSpider.scale);
+		StartCoroutine(Step(position, position));
+	}
+
+	private Vector3 GetStepTarget(out bool stepFound, float focus, float distance)
+	{
+		stepFound = false;
+		Vector3 vector = mechSpider.transform.TransformPoint(defaultPosition) + mechSpider.velocity * velocityPrediction;
+		Vector3 up = mechSpider.transform.up;
+		Vector3 rhs = mechSpider.body.position - position;
+		Vector3 axis = Vector3.Cross(up, rhs);
+		up = Quaternion.AngleAxis(focus, axis) * up;
+		if (Physics.Raycast(vector + up * mechSpider.raycastHeight * mechSpider.scale, -up, out hit, mechSpider.raycastHeight * mechSpider.scale + distance, mechSpider.raycastLayers))
+		{
+			stepFound = true;
+		}
+		return hit.point + hit.normal * footHeight * mechSpider.scale;
+	}
+
+	private void UpdatePosition(float distance)
+	{
+		Vector3 up = mechSpider.transform.up;
+		if (Physics.Raycast(lastStepPosition + up * mechSpider.raycastHeight * mechSpider.scale, -up, out hit, mechSpider.raycastHeight * mechSpider.scale + distance, mechSpider.raycastLayers))
+		{
+			position = hit.point + hit.normal * footHeight * mechSpider.scale;
+		}
+	}
+
+	private void Update()
+	{
+		UpdatePosition(mechSpider.raycastDistance * mechSpider.scale);
+		if (!isStepping && !(Time.time < lastStepTime + minDelay) && (!(unSync != null) || !unSync.isStepping))
+		{
+			bool stepFound = false;
+			Vector3 stepTarget = GetStepTarget(out stepFound, raycastFocus, mechSpider.raycastDistance * mechSpider.scale);
+			if (!stepFound)
+			{
+				stepTarget = GetStepTarget(out stepFound, 0f - raycastFocus, mechSpider.raycastDistance * 3f * mechSpider.scale);
+			}
+			if (stepFound && !(Vector3.Distance(position, stepTarget) < maxOffset * mechSpider.scale * UnityEngine.Random.Range(0.9f, 1.2f)))
+			{
+				StopAllCoroutines();
+				StartCoroutine(Step(position, stepTarget));
+			}
+		}
+	}
+
+	private IEnumerator Step(Vector3 stepStartPosition, Vector3 targetPosition)
+	{
+		stepProgress = 0f;
+		while (stepProgress < 1f)
+		{
+			stepProgress += Time.deltaTime * stepSpeed;
+			position = Vector3.Lerp(stepStartPosition, targetPosition, stepProgress);
+			position += mechSpider.transform.up * yOffset.Evaluate(stepProgress) * mechSpider.scale;
+			lastStepPosition = position;
+			yield return null;
+		}
+		position = targetPosition;
+		lastStepPosition = position;
+		if (sand != null)
+		{
+			sand.transform.position = position - mechSpider.transform.up * footHeight * mechSpider.scale;
+			sand.Emit(20);
+		}
+		lastStepTime = Time.time;
+	}
+}
+
+

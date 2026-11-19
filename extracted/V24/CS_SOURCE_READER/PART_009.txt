@@ -1,0 +1,3277 @@
+
+====================================================================================================
+SOURCE FILE 201
+PATH: Assembly-CSharp__Beam.UI__IOptionsPanelView.cs
+SIZE: 134 bytes
+SHA256: 2e45002453c5ac047be8ce71c3ccc19c0006e7cfa265b0de9e6ce810f0d854db
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IOptionsPanelView : IViewAdapter
+{
+	Transform CategoriesContainer { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 202
+PATH: Assembly-CSharp__Beam.UI__IRadialMenuElement.cs
+SIZE: 340 bytes
+SHA256: 6d08d81b102fa6a95f4e1c7d7f7d2ccf702848c20f6950c1bee53c7af0e6feab
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IRadialMenuElement<TModel> where TModel : class, IRadialMenuModel
+{
+	Transform transform { get; }
+
+	TModel SelectedValue { get; }
+
+	void Initialize(IList<TModel> data);
+
+	void Enter();
+
+	void Exit();
+
+	bool NavigateLeft();
+
+	bool NavigateRight();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 203
+PATH: Assembly-CSharp__Beam.UI__IScrollviewViewAdapter.cs
+SIZE: 219 bytes
+SHA256: af6e23d95ba9db11dbc1b804f1d574be1952426b79c83a466e4b0f557d309d18
+====================================================================================================
+
+namespace Beam.UI;
+
+public interface IScrollviewViewAdapter : IViewAdapter
+{
+	ITransformViewAdapter Content { get; }
+
+	float NormalizedHorizontalPosition { get; set; }
+
+	float NormalizedVerticalPosition { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 204
+PATH: Assembly-CSharp__Beam.UI__ITransformViewAdapter.cs
+SIZE: 337 bytes
+SHA256: 1d475d52e15042b540c030a3489ad4214226f92fa14a56f5dcffd056afdc994d
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface ITransformViewAdapter
+{
+	Transform Transform { get; }
+
+	Vector3 Position { get; set; }
+
+	Quaternion Rotation { get; set; }
+
+	Vector3 LocalPosition { get; set; }
+
+	Quaternion LocalRotation { get; set; }
+
+	void SetParent(ITransformViewAdapter transform, bool worldPositionStays);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 205
+PATH: Assembly-CSharp__Beam.UI__IViewAdapter.cs
+SIZE: 259 bytes
+SHA256: d6684af3531176f74e5b73d0c40504df510c6fdbc99aff01f295d5019e7725f7
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IViewAdapter
+{
+	Transform transform { get; }
+
+	bool Visible { get; }
+
+	bool Enabled { get; set; }
+
+	event EmptyEventHandler ShowView;
+
+	event EmptyEventHandler HideView;
+
+	void Show();
+
+	void Hide();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 206
+PATH: Assembly-CSharp__Beam.UI__IndicatorPresenter.cs
+SIZE: 2985 bytes
+SHA256: e08f6c9d4e8d0b17e8bf05493267d678233a6198c8ab97a014e63dd539007d19
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class IndicatorPresenter : ControllerBase, INeedPlayerComponent
+{
+	[SerializeField]
+	private IndicatorViewBase _view;
+
+	private List<IndicatorElementBase> _indicators = new List<IndicatorElementBase>();
+
+	private IPlayer _player;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	private void Start()
+	{
+		if (_view == null)
+		{
+			Debug.LogError("IndicatorPresenter:: No view component assigned!");
+			_view = NullIndicatorViewBase.Instance;
+		}
+	}
+
+	public override void SetView(ViewAdapterBase view)
+	{
+		_view = view as IndicatorViewBase;
+		if (_view == null)
+		{
+			Debug.LogError("IndicatorPresenter:: No view component assigned!");
+			_view = NullIndicatorViewBase.Instance;
+		}
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_player.Statistics.DirectionalDamage += PlayerStatistics_DirectionalDamage;
+	}
+
+	private void OnDestroy()
+	{
+		if (_player != null && _player.Statistics != null)
+		{
+			_player.Statistics.DirectionalDamage -= PlayerStatistics_DirectionalDamage;
+		}
+	}
+
+	public void NewIndicator(IndicatorDataBase data)
+	{
+		if (data != null)
+		{
+			IndicatorElementBase indicatorElementBase = Object.Instantiate(_view.IndicatorPrefab);
+			indicatorElementBase.Initialize(data);
+			AddIndicator(indicatorElementBase);
+		}
+	}
+
+	private void Update()
+	{
+		if (_player == null)
+		{
+			return;
+		}
+		for (int i = 0; i < _indicators.Count; i++)
+		{
+			IndicatorElementBase indicatorElementBase = _indicators[i];
+			if (indicatorElementBase.IsNullOrDestroyed())
+			{
+				_indicators.Remove(indicatorElementBase);
+				break;
+			}
+			Vector3 forward = _player.transform.forward;
+			Vector3 vector = indicatorElementBase.Data.Direction - _player.transform.position;
+			vector.y = 0f;
+			vector.Normalize();
+			float dot = 0f - Vector3.Dot(Vector3.Cross(forward, vector), _player.transform.up);
+			float angle = Vector3.Angle(vector, forward);
+			angle = AngleCircumference(dot, angle);
+			indicatorElementBase.transform.localRotation = Quaternion.Slerp(indicatorElementBase.transform.localRotation, Quaternion.AngleAxis(angle, new Vector3(0f, 0f, 1f)), 10f * Time.deltaTime);
+		}
+	}
+
+	public void AddIndicator(IndicatorElementBase indicator)
+	{
+		if (!_indicators.Contains(indicator))
+		{
+			indicator.transform.SetParent(_view.IndicatorContainer.Transform, worldPositionStays: false);
+			_indicators.Add(indicator);
+		}
+	}
+
+	public void RemoveIndicator(IndicatorElementBase indicator)
+	{
+		_indicators.Remove(indicator);
+	}
+
+	public void DestroyIndicator(IndicatorElementBase indicator)
+	{
+		RemoveIndicator(indicator);
+		BeamTeam.Destroy(indicator.gameObject);
+	}
+
+	private void PlayerStatistics_DirectionalDamage(IndicatorDataBase data)
+	{
+		NewIndicator(data);
+	}
+
+	public float AngleCircumference(float dot, float angle)
+	{
+		float num = angle;
+		float num2 = 360f;
+		num = angle;
+		if (dot < 0f)
+		{
+			num = num2 - angle;
+		}
+		return num;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 207
+PATH: Assembly-CSharp__Beam.UI__IndicatorViewBase.cs
+SIZE: 215 bytes
+SHA256: 098e4fd6dd7085267b97fc92e5943a1301befcf1a2d09fe5f4a104d6d178ff5e
+====================================================================================================
+
+namespace Beam.UI;
+
+public abstract class IndicatorViewBase : ViewAdapterBase
+{
+	public abstract DamageIndicatorElement IndicatorPrefab { get; }
+
+	public abstract ITransformViewAdapter IndicatorContainer { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 208
+PATH: Assembly-CSharp__Beam.UI__InputMenuPresenter.cs
+SIZE: 30310 bytes
+SHA256: e370203a1690189e1038a6b60cb87b6815bc2baf90b06b5f86f96767dcc42a12
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Language;
+using Beam.Utilities;
+using Beam.Utilities.Reflection;
+using MEC;
+using Rewired;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class InputMenuPresenter : MonoBehaviour, IOptionPanel
+{
+	private enum AssignedPlayer
+	{
+		[Description("ASSIGNED_PLAYER_NONE", "")]
+		None,
+		[Description("ASSIGNED_PLAYER_P1", "")]
+		P1,
+		[Description("ASSIGNED_PLAYER_P2", "")]
+		P2
+	}
+
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
+
+	private IInputMenuViewAdapter _view;
+
+	private IInputFieldButtonViewAdapter _currentButton;
+
+	private DialogueBoxViewAdapter _dialogue;
+
+	private CoroutineHandle _timeoutSequence;
+
+	private bool _initialized;
+
+	private List<IOptionCategoryHeader> _optionCategories = new List<IOptionCategoryHeader>();
+
+	private IOptionButtonViewAdapter _toggleRadialMenusButton;
+
+	private IOptionButtonViewAdapter _crouchToggleButton;
+
+	private IOptionButtonViewAdapter _sprintToggleButton;
+
+	private IOptionButtonViewAdapter _autowalkButton;
+
+	private IOptionSliderViewAdapter _smoothnessSlider;
+
+	private IOptionSliderViewAdapter _sensitivitySlider;
+
+	private IOptionButtonViewAdapter _invertYButton;
+
+	private Dictionary<string, ControllerAssignment> _controllerAssignments = new Dictionary<string, ControllerAssignment>();
+
+	private bool _dirtyMappings;
+
+	public void Initialize(IInputMenuViewAdapter view)
+	{
+		if (!_initialized)
+		{
+			_view = view;
+			SetControlEvents();
+			InputMapper.Default.options.timeout = 5f;
+			InputMapper.Default.options.allowKeyboardKeysWithModifiers = false;
+			InputMapper.Default.options.allowKeyboardModifierKeyAsPrimary = true;
+			InputMapper.Default.InputMappedEvent += InputMapper_InputMapped;
+			InputMapper.Default.ConflictFoundEvent += InputMapper_ConflictFound;
+			InputMapper.Default.StartedEvent += InputMapper_Started;
+			InputMapper.Default.StoppedEvent += InputMapper_Stopped;
+			InputMapper.Default.CanceledEvent += InputMapper_Cancelled;
+			InputMapper.Default.ErrorEvent += InputMapper_Error;
+			InputMapper.Default.TimedOutEvent += InputMapper_TimedOut;
+			_initialized = true;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (_initialized)
+		{
+			InputMapper.Default.InputMappedEvent -= InputMapper_InputMapped;
+			InputMapper.Default.ConflictFoundEvent -= InputMapper_ConflictFound;
+			InputMapper.Default.StartedEvent -= InputMapper_Started;
+			InputMapper.Default.StoppedEvent -= InputMapper_Stopped;
+			InputMapper.Default.CanceledEvent -= InputMapper_Cancelled;
+			InputMapper.Default.ErrorEvent -= InputMapper_Error;
+			InputMapper.Default.TimedOutEvent -= InputMapper_TimedOut;
+		}
+	}
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	public void Show()
+	{
+		if (!_view.Visible)
+		{
+			_view.Show();
+			_view.DefaultButton.Show();
+			_optionsMenuPresenter.SetApplyButtonEvent(ApplyButton_Click);
+			PopulateControls();
+			_optionsMenuPresenter.ResetDirtySettings();
+			ReInput.ControllerConnectedEvent += Rewired_OnControllerConnected;
+			ReInput.ControllerPreDisconnectEvent += Rewired_OnControllerPreDisconnect;
+		}
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			if (_dirtyMappings)
+			{
+				Options.Load();
+				_dirtyMappings = false;
+			}
+			_view.DefaultButton.Hide();
+			_view.Hide();
+			ReInput.ControllerConnectedEvent -= Rewired_OnControllerConnected;
+			ReInput.ControllerPreDisconnectEvent -= Rewired_OnControllerPreDisconnect;
+		}
+	}
+
+	void IOptionPanel.Apply()
+	{
+		ApplyButton_Click(null);
+	}
+
+	private void SetControlEvents()
+	{
+		_view.DefaultButton.Click += DefaultButton_Click;
+	}
+
+	private void PopulateControls()
+	{
+		_controllerAssignments.Clear();
+		foreach (KeyValuePair<string, ControllerAssignment> controllerAssignment in Options.InputSettings.ControllerAssignments)
+		{
+			if (!_controllerAssignments.ContainsKey(controllerAssignment.Key))
+			{
+				_controllerAssignments.Add(controllerAssignment.Key, null);
+			}
+			_controllerAssignments[controllerAssignment.Key] = controllerAssignment.Value;
+		}
+		CreateOptionCategories();
+	}
+
+	private void RefreshControls()
+	{
+	}
+
+	private void CreateOptionCategories()
+	{
+		_optionCategories.Clear();
+		_optionsMenuPresenter.DestroyOptionCategoryHeaders();
+		_view.DestroyInputOptionButtons();
+		_view.DestroyInputOptionSliders();
+		_view.DestroyInputFields();
+		CreateInputOptionButtons();
+		CreateControllerCategory();
+		CreateInputFieldButtons();
+		_view.SetNavigation(_optionCategories);
+	}
+
+	private void CreateInputOptionButtons()
+	{
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_GENERAL");
+		_toggleRadialMenusButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_TOGGLE_RADIAL_MENUS", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_toggleRadialMenusButton.SelectedIndex = Options.InputSettings.ToggleRadialMenus.GetIndex();
+		_optionsMenuPresenter.UpdateNavigation(_toggleRadialMenusButton.transform.GetComponent<Button>());
+		_crouchToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_CROUCH_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_crouchToggleButton.SelectedIndex = Options.InputSettings.CrouchToggle.GetIndex();
+		_sprintToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_SPRINT_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_sprintToggleButton.SelectedIndex = Options.InputSettings.SprintToggle.GetIndex();
+		_autowalkButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_AUTO_WALK", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_autowalkButton.SelectedIndex = Options.InputSettings.AutoWalk.GetIndex();
+		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CAMERA");
+		_smoothnessSlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SMOOTHNESS");
+		_smoothnessSlider.Value = Options.InputSettings.MouseSmoothness;
+		_smoothnessSlider.Refresh();
+		_sensitivitySlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SENSITIVITY");
+		_sensitivitySlider.Value = Options.InputSettings.MouseSensitivity;
+		_sensitivitySlider.Refresh();
+		_invertYButton = CreateInputButton(header2, "OPTIONS_INPUT_MENU_BUTTON_INVERT_Y", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_invertYButton.SelectedIndex = Options.InputSettings.InvertY.GetIndex();
+	}
+
+	private IOptionButtonViewAdapter CreateInputButton(IOptionCategoryHeader header, string name, IEnumerable<IOptionElementData> values)
+	{
+		IOptionButtonViewAdapter optionButtonViewAdapter = _view.CreateInputOptionButton(header);
+		optionButtonViewAdapter.Text = name;
+		optionButtonViewAdapter.Initialize(values);
+		optionButtonViewAdapter.Selected += OptionWidget_Selected;
+		optionButtonViewAdapter.SelectionChanged += OptionWidget_SelectionChanged;
+		return optionButtonViewAdapter;
+	}
+
+	private IOptionSliderViewAdapter CreateInputSlider(IOptionCategoryHeader header, string name)
+	{
+		IOptionSliderViewAdapter optionSliderViewAdapter = _view.CreateInputOptionSlider(header);
+		((IOptionWidgetViewAdapter)optionSliderViewAdapter).Text = name;
+		optionSliderViewAdapter.Selected += OptionWidget_Selected;
+		optionSliderViewAdapter.ValueChanged += OptionSlider_ValueChanged;
+		return optionSliderViewAdapter;
+	}
+
+	private void CreateInputFieldButtons()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROL_MAPPING");
+		foreach (InputMapCategory userAssignableMapCategory in ReInput.mapping.UserAssignableMapCategories)
+		{
+			InputCategory actionCategory = ReInput.mapping.GetActionCategory(userAssignableMapCategory.name);
+			if (actionCategory == null)
+			{
+				continue;
+			}
+			CreateInputCategorySubheader(header, LocalizationTerms.GetActionCategoryTerm(userAssignableMapCategory.name));
+			ControllerMap firstMapInCategory = player.controllers.maps.GetFirstMapInCategory(ControllerType.Mouse, 0, userAssignableMapCategory.id);
+			ControllerMap firstMapInCategory2 = player.controllers.maps.GetFirstMapInCategory(ControllerType.Keyboard, 0, userAssignableMapCategory.id);
+			foreach (InputAction item in ReInput.mapping.UserAssignableActionsInCategory(actionCategory.id, sort: true))
+			{
+				string actionName = (string.IsNullOrEmpty(item.descriptiveName) ? item.name : item.descriptiveName);
+				if (item.type == InputActionType.Button)
+				{
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
+					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory2, item.id, ActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory, item.id, ActionElementPredicate);
+					optionInputFieldButtonViewAdapter.SetNavigation();
+					Navigation navigation = _view.DefaultButton.transform.GetComponent<Button>().navigation;
+					navigation.mode = Navigation.Mode.Explicit;
+					navigation.selectOnUp = optionInputFieldButtonViewAdapter.transform.GetComponent<Selectable>();
+					_view.DefaultButton.transform.GetComponent<Button>().navigation = navigation;
+				}
+				else if (item.type == InputActionType.Axis)
+				{
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter2 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
+					CreateInputButton(optionInputFieldButtonViewAdapter2, null, item.id, AxisRange.Full, AxisActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter2, firstMapInCategory, item.id, AxisRange.Full, AxisActionElementPredicate, onlyAxes: true);
+					optionInputFieldButtonViewAdapter2.SetNavigation();
+					string actionName2 = (string.IsNullOrEmpty(item.positiveDescriptiveName) ? (item.descriptiveName + " +") : item.positiveDescriptiveName);
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter3 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName2));
+					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory2, item.id, AxisRange.Positive, PositiveActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory, item.id, AxisRange.Positive, PositiveActionElementPredicate);
+					optionInputFieldButtonViewAdapter3.SetNavigation();
+					string actionName3 = (string.IsNullOrEmpty(item.negativeDescriptiveName) ? (item.descriptiveName + " -") : item.negativeDescriptiveName);
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter4 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName3));
+					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory2, item.id, AxisRange.Negative, NegativeActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory, item.id, AxisRange.Negative, NegativeActionElementPredicate);
+					optionInputFieldButtonViewAdapter4.SetNavigation();
+				}
+			}
+		}
+	}
+
+	private IOptionCategoryHeader CreateInputCategoryHeader(string name)
+	{
+		IOptionCategoryHeader optionCategoryHeader = _optionsMenuPresenter.CreateOptionCategoryHeader();
+		optionCategoryHeader.Label.Text = name;
+		optionCategoryHeader.Id = name.GetHashCode();
+		_optionCategories.Add(optionCategoryHeader);
+		return optionCategoryHeader;
+	}
+
+	private IInputMapCategoryHeader CreateInputCategorySubheader(IOptionCategoryHeader header, string name)
+	{
+		IInputMapCategoryHeader inputMapCategoryHeader = _view.CreateInputCategorySubheader(header);
+		inputMapCategoryHeader.Label.Text = name;
+		return inputMapCategoryHeader;
+	}
+
+	private IOptionInputFieldButtonViewAdapter CreateInputFieldControl(IOptionCategoryHeader header, string name)
+	{
+		IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = _view.CreateInputField(header);
+		optionInputFieldButtonViewAdapter.Text = name;
+		optionInputFieldButtonViewAdapter.Selected += OptionWidget_Selected;
+		return optionInputFieldButtonViewAdapter;
+	}
+
+	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, Func<ActionElementMap, int, bool> predicate)
+	{
+		return CreateInputButton(inputFieldOptionButton, controllerMap, actionId, AxisRange.Full, predicate);
+	}
+
+	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, AxisRange axisRange, Func<ActionElementMap, int, bool> predicate, bool onlyAxes = false)
+	{
+		ActionElementMap actionElementMap = null;
+		bool flag = controllerMap != null;
+		if (flag)
+		{
+			foreach (ActionElementMap allMap in controllerMap.AllMaps)
+			{
+				if (predicate(allMap, actionId))
+				{
+					actionElementMap = allMap;
+					break;
+				}
+			}
+		}
+		IInputFieldButtonViewAdapter inputFieldButtonViewAdapter;
+		if (actionElementMap != null)
+		{
+			bool flag2 = actionElementMap.elementIdentifierId > -1 && !actionElementMap.elementIdentifierName.Equals("NONE", StringComparison.InvariantCultureIgnoreCase);
+			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
+			inputFieldButtonViewAdapter.Text = (flag2 ? actionElementMap.elementIdentifierName : "...");
+			inputFieldButtonViewAdapter.Type = (flag2 ? InputFieldButtonType.ReassignOrRemove : InputFieldButtonType.Add);
+			inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
+			{
+				ControllerMap = controllerMap,
+				ActionId = actionId,
+				ActionRange = axisRange,
+				ActionElementMapId = actionElementMap.id,
+				AllowOnlyAxesMapping = onlyAxes
+			};
+		}
+		else
+		{
+			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
+			if (flag)
+			{
+				inputFieldButtonViewAdapter.Text = "...";
+				inputFieldButtonViewAdapter.Type = InputFieldButtonType.Add;
+				inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
+				{
+					ControllerMap = controllerMap,
+					ActionId = actionId,
+					ActionRange = axisRange,
+					AllowOnlyAxesMapping = onlyAxes
+				};
+			}
+			else
+			{
+				inputFieldButtonViewAdapter.Text = string.Empty;
+				inputFieldButtonViewAdapter.Enabled = false;
+			}
+		}
+		inputFieldButtonViewAdapter.Click += InputFieldButton_Click;
+		return inputFieldButtonViewAdapter;
+	}
+
+	private void CreateControllerCategory()
+	{
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLERS");
+		IEnumerable<IOptionElementData> attributes = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
+		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_KEYBOARD_MOUSE", attributes);
+		optionButtonViewAdapter.SelectedIndex = AssignedPlayer.P1.GetIndex();
+		optionButtonViewAdapter.Enabled = false;
+		Joystick[] joysticks = ReInput.controllers.GetJoysticks();
+		Joystick[] array = joysticks;
+		foreach (Joystick joystick in array)
+		{
+			JoystickOptionButton joystickOptionButton = CreateJoystickOptionButton(joystick);
+			if (joysticks.Length == 1 && _optionsMenuPresenter.CurrentPlayerInput.id == 1)
+			{
+				joystickOptionButton.Enabled = false;
+			}
+		}
+		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLER_MAPPING");
+		_view.CreateControllerLayoutImage(header2).Selected += OptionWidget_Selected;
+	}
+
+	private JoystickOptionButton CreateJoystickOptionButton(Joystick joystick)
+	{
+		IOptionCategoryHeader header = _optionCategories.First((IOptionCategoryHeader x) => x.Id == "OPTIONS_INPUT_MENU_LABEL_CONTROLLERS".GetHashCode());
+		IEnumerable<IOptionElementData> enumerable = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
+		if (_optionsMenuPresenter.CurrentPlayerInput.id == 1 && ReInput.controllers.joystickCount > 1)
+		{
+			enumerable = enumerable.Where((IOptionElementData x) => x.Text != "ASSIGNED_PLAYER_NONE");
+		}
+		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, joystick.name, enumerable);
+		string text = joystick.deviceInstanceGuid.ToString();
+		JoystickOptionButton joystickOptionButton = new JoystickOptionButton(optionButtonViewAdapter, text);
+		joystickOptionButton.SelectionChanged += JoystickOptionButton_SelectionChanged;
+		AssignedPlayer assignedPlayer = AssignedPlayer.None;
+		if (_controllerAssignments.TryGetValue(text, out var value))
+		{
+			assignedPlayer = (AssignedPlayer)(value.PlayerId + 1);
+		}
+		joystickOptionButton.SelectedIndex = assignedPlayer.GetIndex();
+		_view.Buttons.Remove(optionButtonViewAdapter);
+		_view.Buttons.Add(joystickOptionButton);
+		return joystickOptionButton;
+	}
+
+	private void Rewired_OnControllerConnected(ControllerStatusChangedEventArgs args)
+	{
+		if (args.controllerType == ControllerType.Joystick)
+		{
+			Joystick joystick = args.controller as Joystick;
+			CreateJoystickOptionButton(joystick);
+		}
+	}
+
+	private void Rewired_OnControllerPreDisconnect(ControllerStatusChangedEventArgs args)
+	{
+		if (args.controllerType != ControllerType.Joystick)
+		{
+			return;
+		}
+		string value = args.controller.deviceInstanceGuid.ToString();
+		foreach (IOptionButtonViewAdapter button in _view.Buttons)
+		{
+			if (button is JoystickOptionButton joystickOptionButton && joystickOptionButton.DeviceInstanceId.Equals(value))
+			{
+				_view.RemoveButton(joystickOptionButton);
+				break;
+			}
+		}
+	}
+
+	private void ApplyButton_Click(object sender)
+	{
+		Options.InputSettings.ToggleRadialMenus = (Quality_OFF_ON)_toggleRadialMenusButton.SelectedIndex;
+		Options.InputSettings.CrouchToggle = (Quality_OFF_ON)_crouchToggleButton.SelectedIndex;
+		Options.InputSettings.SprintToggle = (Quality_OFF_ON)_sprintToggleButton.SelectedIndex;
+		Options.InputSettings.AutoWalk = (Quality_OFF_ON)_autowalkButton.SelectedIndex;
+		Options.InputSettings.MouseSmoothness = _smoothnessSlider.Value;
+		Options.InputSettings.MouseSensitivity = _sensitivitySlider.Value;
+		Options.InputSettings.InvertY = (Quality_OFF_ON)_invertYButton.SelectedIndex;
+		Options.InputSettings.ControllerAssignments = new Dictionary<string, ControllerAssignment>(_controllerAssignments);
+		_optionsMenuPresenter.Save();
+	}
+
+	private void DefaultButton_Click(object sender)
+	{
+		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_RESET_TITLE", "OPTIONS_INPUT_MENU_DB_RESET_DESC", DialogueButton.YesNo).Accept += () =>
+		{
+			LoadDefaults();
+			PopulateControls();
+			_optionsMenuPresenter.SetDirtySettings();
+			_optionsMenuPresenter.ResetDirtySettings();
+		};
+	}
+
+	private void OptionWidget_Selected(ISelectableViewAdapter widget)
+	{
+		_view.Scrollview.FocusElement(widget.transform);
+	}
+
+	private void OptionWidget_SelectionChanged(IOptionWidgetViewAdapter widget)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void OptionSlider_ValueChanged(float value)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void JoystickOptionButton_SelectionChanged(IOptionButtonViewAdapter button)
+	{
+		if (!(button is JoystickOptionButton joystickOptionButton))
+		{
+			return;
+		}
+		Joystick joystick = ReInput.controllers.Joysticks.FirstOrDefault_NonAlloc((Joystick joy, string arg) => joy.isConnected && joy.deviceInstanceGuid.ToString() == arg, joystickOptionButton.DeviceInstanceId);
+		if (joystick == null)
+		{
+			Debug.LogError("JoystickOptionButton_SelectionChanged:: No matching joystick found for [" + joystickOptionButton.Text + "].");
+			return;
+		}
+		AssignedPlayer selectedIndex = (AssignedPlayer)button.SelectedIndex;
+		if (selectedIndex == AssignedPlayer.None)
+		{
+			UnassignController(joystick.id);
+			return;
+		}
+		int playerId = (int)(selectedIndex - 1);
+		AssignController(playerId, joystick.id);
+	}
+
+	private void InputFieldButton_Click(object sender)
+	{
+		IInputFieldButtonViewAdapter inputFieldButton = sender as IInputFieldButtonViewAdapter;
+		if (inputFieldButton == null || _dialogue != null)
+		{
+			return;
+		}
+		InputMapper.Context context = new InputMapper.Context();
+		context.controllerMap = inputFieldButton.Info.ControllerMap;
+		context.actionId = inputFieldButton.Info.ActionId;
+		context.actionRange = inputFieldButton.Info.ActionRange;
+		context.actionElementMapToReplace = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
+		bool allowOnlyAxes = inputFieldButton.Info.AllowOnlyAxesMapping;
+		InputMapper.Default.options.allowButtons = !allowOnlyAxes;
+		_currentButton = inputFieldButton;
+		switch (_currentButton.Type)
+		{
+		case InputFieldButtonType.Add:
+			StartMapping(context, allowOnlyAxes);
+			break;
+		case InputFieldButtonType.ReassignOrRemove:
+		{
+			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_REASSIGN_TITLE", "OPTIONS_INPUT_MENU_DB_REASSIGN_DESC", "OPTIONS_INPUT_MENU_DB_BUTTON_REASSIGN", "OPTIONS_INPUT_MENU_DB_BUTTON_REMOVE", "OPTIONS_INPUT_MENU_DB_BUTTON_CANCEL");
+			dialogueBoxViewAdapter.Accept += () =>
+			{
+				StartMapping(context, allowOnlyAxes);
+			};
+			dialogueBoxViewAdapter.Decline += () =>
+			{
+				ClearMapping(inputFieldButton);
+				_currentButton.Select();
+				_currentButton = null;
+			};
+			break;
+		}
+		}
+	}
+
+	private void StartMapping(InputMapper.Context context, bool allowOnlyAxes)
+	{
+		string remappingDialogueMessage = GetRemappingDialogueMessage(context.controllerMap.controllerType, allowOnlyAxes);
+		_dialogue = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_ASSIGN_TITLE", remappingDialogueMessage, DialogueButton.None);
+		InputMapper.Default.Start(context);
+	}
+
+	private void ClearMapping(IInputFieldButtonViewAdapter inputFieldButton)
+	{
+		ActionElementMap elementMap = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
+		if (ClearElementMapAssignment(elementMap))
+		{
+			inputFieldButton.Text = "...";
+			inputFieldButton.Type = InputFieldButtonType.Add;
+			ClearMatchingElementMapsFromControllers(elementMap);
+			_optionsMenuPresenter.SetDirtySettings();
+		}
+	}
+
+	private void BeginRemapping()
+	{
+		_timeoutSequence = Timing.RunCoroutine(InputMapper_TimeoutSequence());
+		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: false, 8);
+	}
+
+	private void EndMapping()
+	{
+		if (_timeoutSequence.IsRunning)
+		{
+			Timing.KillCoroutines(_timeoutSequence);
+		}
+		if (_dialogue != null)
+		{
+			_dialogue.Destroy();
+			_dialogue = null;
+		}
+		if (_currentButton != null)
+		{
+			_currentButton.Select();
+			_currentButton = null;
+		}
+		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: true, 8);
+	}
+
+	private void InputMapper_Started(InputMapper.StartedEventData eventData)
+	{
+		BeginRemapping();
+	}
+
+	private void InputMapper_Stopped(InputMapper.StoppedEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_Cancelled(InputMapper.CanceledEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_Error(InputMapper.ErrorEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_TimedOut(InputMapper.TimedOutEventData eventData)
+	{
+	}
+
+	private void InputMapper_InputMapped(InputMapper.InputMappedEventData eventData)
+	{
+		_currentButton.Text = eventData.actionElementMap.elementIdentifierName;
+		_currentButton.Type = InputFieldButtonType.ReassignOrRemove;
+		_currentButton.Info.ActionElementMapId = eventData.actionElementMap.id;
+		_dirtyMappings = true;
+		_optionsMenuPresenter.SetDirtySettings();
+		RemapMatchingElementMapsInControllers(eventData.actionElementMap);
+	}
+
+	private void RemapMatchingElementMapsInControllers(ActionElementMap newActionElementMap)
+	{
+		ElementAssignment elementAssignment = new ElementAssignment(newActionElementMap.controllerMap.controllerType, newActionElementMap.elementType, newActionElementMap.elementIdentifierId, newActionElementMap.axisRange, newActionElementMap.keyCode, newActionElementMap.modifierKeyFlags, newActionElementMap.actionId, newActionElementMap.axisContribution, invert: false);
+		foreach (ControllerMap allMap in newActionElementMap.controllerMap.player.controllers.maps.GetAllMaps(newActionElementMap.controllerMap.controllerType))
+		{
+			foreach (ActionElementMap item in from aem in allMap.GetElementMapsWithAction(newActionElementMap.actionId)
+				where aem.elementIdentifierId != newActionElementMap.elementIdentifierId && aem.axisContribution == newActionElementMap.axisContribution
+				select aem)
+			{
+				elementAssignment.elementMapId = item.id;
+				_ = item.elementIdentifierName;
+				allMap.ReplaceElementMap(elementAssignment, out var _);
+			}
+		}
+	}
+
+	private void ClearMatchingElementMapsFromControllers(ActionElementMap removedActionElementMap)
+	{
+		foreach (ControllerMap item in from map in removedActionElementMap.controllerMap.player.controllers.maps.GetAllMaps()
+			where map.controllerType == removedActionElementMap.controllerMap.controllerType
+			select map)
+		{
+			foreach (ActionElementMap item2 in from aem in item.GetElementMapsWithAction(removedActionElementMap.actionId)
+				where aem.elementIdentifierId != 0 && aem.axisContribution == removedActionElementMap.axisContribution
+				select aem)
+			{
+				ClearElementMapAssignment(item2);
+			}
+		}
+	}
+
+	private bool ClearElementMapAssignment(ActionElementMap actionElementMap)
+	{
+		_ = ReInput.mapping.GetAction(actionElementMap.actionId).descriptiveName;
+		_ = actionElementMap.elementIdentifierName;
+		_ = ReInput.mapping.GetMapCategory(actionElementMap.controllerMap.categoryId).name;
+		ElementAssignment elementAssignment = new ElementAssignment(actionElementMap.controllerMap.controllerType, actionElementMap.elementType, -1, actionElementMap.axisRange, KeyCode.None, ModifierKeyFlags.None, actionElementMap.actionId, actionElementMap.axisContribution, invert: false);
+		elementAssignment.elementMapId = actionElementMap.id;
+		if (!actionElementMap.controllerMap.ReplaceElementMap(elementAssignment, out var _))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private void InputMapper_ConflictFound(InputMapper.ConflictFoundEventData eventData)
+	{
+		Debug.LogError("InputMenu::InputMapper_ConflictFound::");
+		eventData.responseCallback(InputMapper.ConflictResponse.Cancel);
+		eventData.inputMapper.Stop();
+		string text = Localization.GetLanguageHandler().Localize("OPTIONS_INPUT_MENU_DB_CONFLICT_DESC", eventData.assignment.elementDisplayName, eventData.assignment.action.descriptiveName);
+		ElementAssignmentConflictInfo elementAssignmentConflictInfo = eventData.conflicts.FirstOrDefault_NonAlloc();
+		text = text + "[" + elementAssignmentConflictInfo.elementDisplayName + " - " + elementAssignmentConflictInfo.action.descriptiveName + "]";
+		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_CONFLICT_TITLE", text, DialogueButton.Ok);
+	}
+
+	private void LoadDefaults()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		player.controllers.maps.LoadDefaultMaps(ControllerType.Mouse);
+		player.controllers.maps.LoadDefaultMaps(ControllerType.Keyboard);
+		Options.InputSettings = new InputSettings();
+		Options.Save();
+		Options.Load();
+	}
+
+	private void AssignController(int playerId, int controllerId)
+	{
+		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
+		if (joystick == null)
+		{
+			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
+			return;
+		}
+		ControllerAssignment controllerAssignment = new ControllerAssignment();
+		controllerAssignment.ControllerName = joystick.name;
+		controllerAssignment.ControllerGuid = joystick.deviceInstanceGuid.ToString();
+		controllerAssignment.PlayerId = playerId;
+		if (!_controllerAssignments.ContainsKey(controllerAssignment.ControllerGuid))
+		{
+			_controllerAssignments.Add(controllerAssignment.ControllerGuid, null);
+		}
+		_controllerAssignments[controllerAssignment.ControllerGuid] = controllerAssignment;
+	}
+
+	private void UnassignController(int controllerId)
+	{
+		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
+		if (joystick == null)
+		{
+			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
+		}
+		else
+		{
+			_controllerAssignments.Remove(joystick.deviceInstanceGuid.ToString());
+		}
+	}
+
+	public bool ActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null)
+		{
+			return actionElementMap.actionId == actionId;
+		}
+		return false;
+	}
+
+	public bool AxisActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.elementType != ControllerElementType.Button)
+		{
+			return actionElementMap.axisType != AxisType.Split;
+		}
+		return false;
+	}
+
+	public bool PositiveActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
+		{
+			return actionElementMap.axisContribution == Pole.Positive;
+		}
+		return false;
+	}
+
+	public bool NegativeActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
+		{
+			return actionElementMap.axisContribution == Pole.Negative;
+		}
+		return false;
+	}
+
+	private string GetRemappingDialogueMessage(ControllerType controllerType, bool onlyAxesAllowed)
+	{
+		switch (controllerType)
+		{
+		default:
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_BUTTON_OR_AXIS";
+		case ControllerType.Mouse:
+			if (!onlyAxesAllowed)
+			{
+				return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_MOUSE_BUTTON_OR_AXIS";
+			}
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_AXIS";
+		case ControllerType.Keyboard:
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_ANY_KEY";
+		}
+	}
+
+	private IEnumerator<float> InputMapper_TimeoutSequence()
+	{
+		string message = _dialogue.Message.Text;
+		while (true)
+		{
+			_dialogue.Message.Text = $"{message} ({Mathf.CeilToInt(InputMapper.Default.timeRemaining)})";
+			yield return 0f;
+		}
+	}
+
+	private Rewired.Player GetPlayer(AssignedPlayer value)
+	{
+		try
+		{
+			switch (value)
+			{
+			case AssignedPlayer.P1:
+				return RewiredUtilities.Players[0];
+			case AssignedPlayer.P2:
+				return RewiredUtilities.Players[1];
+			}
+		}
+		catch (IndexOutOfRangeException exception)
+		{
+			Debug.LogException(exception);
+			return null;
+		}
+		return null;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 209
+PATH: Assembly-CSharp__Beam.UI__InventoryRadialMenuViewAdapterBase.cs
+SIZE: 1510 bytes
+SHA256: d6763a09d9e1db5300eda5157c4d07d766e0254984924accd7b25b5fbbb6fb34
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class InventoryRadialMenuViewAdapterBase : RadialMenuViewAdapterBase<InventoryData, InventoryRadialMenuElement>
+{
+	[SerializeField]
+	private GameObject _menuGameObject;
+
+	public abstract override ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract override ICanvasGroupViewAdapter DetailsCanvasGroup { get; }
+
+	public abstract override ITransformViewAdapter ElementContainer { get; }
+
+	public abstract override InventoryRadialMenuElement ElementPrefab { get; }
+
+	public abstract override ITransformViewAdapter ElementPlaceholderPrefab { get; }
+
+	public abstract InventoryRadialMenuElement EmptyHandElementPrefab { get; }
+
+	public abstract InventoryRadialMenuElement StorageElementPrefab { get; }
+
+	public abstract override ITransformViewAdapter PooledElementContainer { get; }
+
+	public abstract override IImageViewAdapter SelectorImage { get; }
+
+	public abstract override ILabelViewAdapter TitleLabel { get; }
+
+	public abstract override ILabelViewAdapter DescriptionLabel { get; }
+
+	public abstract ILabelViewAdapter ClassificationLabel { get; }
+
+	public abstract ILabelViewAdapter HealthLabel { get; }
+
+	public abstract override Texture2D BlurMaskTexture { get; }
+
+	public override void Show()
+	{
+		if (!_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: true);
+			base.Show();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: false);
+			base.Hide();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 210
+PATH: Assembly-CSharp__Beam.UI__MainMenuPresenter.cs
+SIZE: 40327 bytes
+SHA256: 1e30cf042868e153a5fb5c61b5d3917a1a746e1ac8a7e53f2bc60b86720ad12f
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Beam.AccountServices;
+using Beam.Events;
+using Beam.Language;
+using Beam.Obfuscated.Users;
+using Beam.Serialization;
+using Beam.Terrain;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using Rewired;
+using Steamworks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace Beam.UI;
+
+public class MainMenuPresenter : MonoBehaviour
+{
+	private enum MainMenuScreen
+	{
+		MAIN,
+		PLAY,
+		PLAY_ONLINE,
+		HOST,
+		HOST_NEW_GAME,
+		HOST_CONTINUE_GAME,
+		JOIN
+	}
+
+	public delegate void QuittingToMenuHandler();
+
+	private class ReplicateStartGame : MultiplayerMessage
+	{
+		[Replicate]
+		public int Mode;
+
+		[Replicate]
+		public int State;
+
+		[Replicate]
+		public int Scene;
+
+		public override void OnPeer()
+		{
+			Instance.StartGame((GameMode)Mode, (GameState)State, Scene);
+		}
+	}
+
+	private class ReplicateQuitToMenu : MultiplayerMessage
+	{
+		public override void OnPeer()
+		{
+			string title = "TEXT_ERROR";
+			string message = Localization.GetLanguageHandler().Localize("DISCONNECTED_INTERNAL", "HOST_QUIT");
+			DialogueBox.Show(ReInput.players.GetPlayer(0), title, message, DialogueButton.None, DialogueIcon.Information);
+			Instance.QuitToMenu(8f);
+		}
+	}
+
+	private static MainMenuPresenter _Instance;
+
+	private static bool NEW_RANDOM_WORLD_CREATED;
+
+	[SerializeField]
+	private LoadingScreenPresenter _loadingScreenPresenter;
+
+	[SerializeField]
+	private NewGameMenuPresenter _newGameMenuPresenter;
+
+	[SerializeField]
+	private ChangeSaveSlotMenuPresenter _changeSaveSlotPresenter;
+
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
+
+	[SerializeField]
+	private CartographerMenuPresenter _cartographerMenuPresenter;
+
+	[SerializeField]
+	private LeaderboardsMenuPresenter _leaderboardsMenuPresenter;
+
+	[SerializeField]
+	private CreateSessionMenuPresenter _createSessionMenuPresenter;
+
+	[SerializeField]
+	private LobbyMenuPresenter _lobbyMenuPresenter;
+
+	[SerializeField]
+	private AudioSource _mainMenuTrack;
+
+	[SerializeField]
+	private AudioSource _pauseMenuTrack;
+
+	private MainMenuScreen _currentSubScreen;
+
+	[SerializeField]
+	private MainMenuViewAdapterBase _view;
+
+	private Rewired.Player _currentPlayerInput;
+
+	private bool _suspend;
+
+	private bool _childPanelOpen;
+
+	private bool _customBgd;
+
+	private int _mapBeforePaused;
+
+	private const float SESSION_TIMEOUT = 30f;
+
+	private bool _isGamePaused;
+
+	[HideInInspector]
+	public bool ContinuingMultiplayerGame;
+
+	private DialogueBoxViewAdapter _joinSessionDialog;
+
+	private CoroutineHandle _joinSessionDialogTimeout;
+
+	public static MainMenuPresenter Instance
+	{
+		get
+		{
+			if (_Instance == null)
+			{
+				_Instance = new MainMenuPresenter();
+			}
+			return _Instance;
+		}
+		set
+		{
+			_Instance = value;
+		}
+	}
+
+	public LoadingScreenPresenter LoadingScreenPresenter => _loadingScreenPresenter;
+
+	public bool IsGamePaused => _isGamePaused;
+
+	public event QuittingToMenuHandler QuittingToMenu;
+
+	private void Awake()
+	{
+		Debug.Log("Stranded Deep Version: " + BuildInformation.GetPrettyString());
+		Game.State = GameState.MAIN_MENU;
+		Application.targetFrameRate = 60;
+		QualitySettings.SetQualityLevel(QualitySettings.names.Length);
+		_view.Hide();
+		_newGameMenuPresenter.Initialize(_view);
+		_changeSaveSlotPresenter.Initialize(_view);
+		_optionsMenuPresenter.Initialize(_view);
+		_cartographerMenuPresenter.Initialize(_view);
+		_createSessionMenuPresenter.Initialize(_view);
+		_newGameMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_newGameMenuPresenter.HideView += MenuPresenter_HideView;
+		NewGameMenuPresenter newGameMenuPresenter = _newGameMenuPresenter;
+		newGameMenuPresenter.StartCallback = (Action<GameSettings>)Delegate.Combine(newGameMenuPresenter.StartCallback, new Action<GameSettings>(StartNewGame));
+		NewGameMenuPresenter newGameMenuPresenter2 = _newGameMenuPresenter;
+		newGameMenuPresenter2.StartMultiplayerContinueCallback = (Action)Delegate.Combine(newGameMenuPresenter2.StartMultiplayerContinueCallback, new Action(StartContinueGame));
+		_changeSaveSlotPresenter.ShowView += MenuPresenter_ShowView;
+		_changeSaveSlotPresenter.HideView += MenuPresenter_HideView;
+		_changeSaveSlotPresenter.SlotChanged += ChangeSaveSlotMenuPresenter_SlotChanged;
+		_optionsMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_optionsMenuPresenter.HideView += MenuPresenter_HideView;
+		_cartographerMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_cartographerMenuPresenter.HideView += MenuPresenter_HideView;
+		_cartographerMenuPresenter.CreatedNewWorld += CartographerMenuPresenter_CreatedNewWorld;
+		_leaderboardsMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_leaderboardsMenuPresenter.HideView += MenuPresenter_HideView;
+		_createSessionMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_createSessionMenuPresenter.HideView += MenuPresenter_HideView;
+		_lobbyMenuPresenter.ShowView += MenuPresenter_ShowView;
+		_lobbyMenuPresenter.HideView += MenuPresenter_HideView;
+		ReInput.ControllerDisconnectedEvent += Rewired_OnControllerDisconnected;
+		SaveManager.DeletedSaveFile += SaveManager_DeletedSaveFile;
+		CheckBuildVersion();
+		SetControlEvents();
+		SubscribeToInputEvents();
+		Game.Mode = GameMode.SinglePlayer;
+		Timing.RunCoroutine(Initialize_Sequence());
+		_currentSubScreen = MainMenuScreen.MAIN;
+	}
+
+	private void Start()
+	{
+		ControllerFocus.Instance?.Subscribe(_view);
+	}
+
+	private IEnumerator<float> Initialize_Sequence()
+	{
+		_view.CanvasGroup.Interactable = false;
+		if (Game.PreviousState == GameState.MAIN_MENU)
+		{
+			Singleton<Fader>.Instance.SetFadeColor(Color.black);
+		}
+		Singleton<Fader>.Instance.FadeOut(0f);
+		_view.Hide();
+		_loadingScreenPresenter.Show();
+		Rewired.Player input = (_currentPlayerInput = ReInput.players.GetPlayer(0));
+		bool checkFilePermissions = FilePath.CheckFilePermissions() && FilePath.CreateDirectories();
+		if (!checkFilePermissions)
+		{
+			_loadingScreenPresenter.Hide();
+			string message = Localization.GetLanguageHandler().Localize("MAIN_MENU_DB_FILE_PERMISSIONS_DESC", FilePath.SAVE_FOLDER);
+			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_WARNING_TITLE", message, "MAIN_MENU_DB_BUTTON_VISIT", "MAIN_MENU_BUTTON_QUIT", "", DialogueIcon.Warning);
+			dialogueBoxViewAdapter.Accept += () =>
+			{
+				Application.OpenURL("https://forums.strandeddeepgame.com");
+				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+			};
+			dialogueBoxViewAdapter.Decline += () =>
+			{
+				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+			};
+		}
+		while (!checkFilePermissions)
+		{
+			yield return 0f;
+		}
+		IAccountService accountService = GAccountService.Get();
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_INITIALIZING " + accountService.Name));
+		yield return 0f;
+		CheckAccountServicesInitialized();
+		while (!accountService.Initialized)
+		{
+			yield return 0f;
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_AUTHENTICATING " + accountService.Name));
+		yield return 0f;
+		IAuthenticationHandler authentication = accountService.GetAuthenticationHandler();
+		authentication.Login(Authentication_OnLoginCallback);
+		while (!authentication.LoggedIn)
+		{
+			yield return 0f;
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_RETRIEVING_USER_INFO"));
+		yield return 0f;
+		AccountUser localUser = accountService.LocalUser;
+		while (localUser.UserInfo == null)
+		{
+			yield return 0f;
+		}
+		UpdateUserName(localUser.UserInfo.DisplayName);
+		Options.Load();
+		GraphicsUtilities.SetFixedFrameRate(Options.GraphicsSettings.FixedFrameRate);
+		GraphicsUtilities.SetVSync(Options.GraphicsSettings.VerticalSync);
+		yield return Timing.WaitUntilDone(Timing.RunCoroutine(Load_Sequence()));
+		input.SetCursorEnabled(enabled: true);
+	}
+
+	private IEnumerator<float> Reload_Sequence()
+	{
+		_view.CanvasGroup.Interactable = false;
+		yield return Singleton<Fader>.Instance.FadeOut_Async(0f);
+		_view.Hide();
+		_loadingScreenPresenter.Show();
+		yield return Timing.WaitUntilDone(Timing.RunCoroutine(Load_Sequence()));
+	}
+
+	private IEnumerator<float> Load_Sequence()
+	{
+		SaveManager.ChangeCurrentSlot(Options.GeneralSettings.LastSaveSlotUsed);
+		yield return Timing.WaitUntilDone(Timing.RunCoroutine(Migrate_Sequence()));
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_WORLD"));
+		yield return 0f;
+		Prefabs.LoadPrefabMap();
+		yield return Timing.WaitUntilDone(Timing.RunCoroutine(LoadWorld()));
+		_loadingScreenPresenter.Hide();
+		Show(_currentPlayerInput);
+		if (Game.PreviousState == GameState.MAP_EDITOR)
+		{
+			Singleton<Fader>.Instance.ResetFade(FadeMode.Solid, FadeDirection.Out);
+			CartographerButton_Click(null);
+		}
+		else
+		{
+			LeanTween.value(gameObject, 0f, 1f, 1f).setOnUpdate((float value) =>
+			{
+				AudioListener.volume = Mathf.Clamp01(value);
+			}).setIgnoreTimeScale(useUnScaledTime: true);
+			yield return Singleton<Fader>.Instance.FadeIn_Async(1f);
+			Singleton<Fader>.Instance.ResetColor();
+		}
+		_view.CanvasGroup.Interactable = true;
+		if (Game.PreviousState != GameState.MAP_EDITOR)
+		{
+			_view.SelectFirstButton();
+		}
+	}
+
+	private IEnumerator<float> Migrate_Sequence()
+	{
+		if (Options.GeneralSettings.LastSaveSlotUsed != 0 || Directory.Exists(PathTools.Combine(SaveManager.GetSaveFolderPath(), "World", "0")))
+		{
+			yield break;
+		}
+		string filePath = string.Empty;
+		if (!LegacyUtilities.HasSaveFilePre_74_00(GameMode.SinglePlayer, out filePath) && !LegacyUtilities.HasSaveFilePre_74_00(GameMode.Coop_2, out filePath))
+		{
+			yield break;
+		}
+		bool import = false;
+		DialogueBox.Show(_currentPlayerInput, "IMPORT", "Save data location has changed for game versions 0.75.00 and above.\n\nNo save data was found in the new location, but save data was found in the old location at:\n\n" + filePath + "\n\nDo you want to import?", DialogueButton.YesNo, DialogueIcon.Information).Accept += () =>
+		{
+			import = true;
+		};
+		while (DialogueBox.Notifying)
+		{
+			yield return 0f;
+		}
+		if (!import)
+		{
+			yield break;
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("IMPORTING LEGACY SAVE DATA"));
+		yield return 0f;
+		string text = string.Empty;
+		bool flag;
+		try
+		{
+			LegacyUtilities.MigrateSaveDataPre_74_00();
+			flag = true;
+		}
+		catch (Exception ex)
+		{
+			flag = false;
+			text = ex.Message;
+			Debug.LogException(ex);
+		}
+		if (!flag)
+		{
+			DialogueBox.Show(_currentPlayerInput, "TEXT_ERROR", "There was an error importing:\n" + text + "\n\nPlease visit the Stranded Deep Steam forum below for more information on how to migrate your old save data manually.", "MAIN_MENU_DB_BUTTON_VISIT", "MAIN_MENU_DB_BUTTON_CLOSE", "", DialogueIcon.Warning).Accept += () =>
+			{
+				Application.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=2265407307");
+			};
+			while (DialogueBox.Notifying)
+			{
+				yield return 0f;
+			}
+		}
+		else
+		{
+			Options.Load();
+			UnityEngine.Object.FindObjectOfType<AudioMenuPresenter>()?.LoadMixerValues();
+		}
+	}
+
+	private IEnumerator<float> LoadWorld()
+	{
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("UPGRADING LEGACY WORLD"));
+		yield return 0f;
+		LegacyUtilities.UpgradeLegacyGame();
+		bool flag = World.CheckWorldSeedFileExists();
+		if (!SaveManager.ValidateSaveFile(GameMode.SinglePlayer) && !SaveManager.ValidateSaveFile(GameMode.Coop_2) && !SaveManager.ValidateSaveFile(GameMode.Coop_Server) && !flag)
+		{
+			EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_CREATING_WORLD"));
+			yield return 0f;
+			_cartographerMenuPresenter.CreateRandomWorld();
+			yield break;
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_WORLD"));
+		yield return 0f;
+		if (!World.LoadWorld().Succeeded)
+		{
+			DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_ERROR_TITLE", "MAIN_MENU_DB_ERROR_LOAD_WORLD_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				_view.NewGameButton.Enabled = false;
+				_cartographerMenuPresenter.Show();
+			};
+		}
+	}
+
+	private bool CheckAccountServicesInitialized()
+	{
+		IAccountService accountService = GAccountService.Get();
+		bool initialized = accountService.Initialized;
+		if (!initialized)
+		{
+			_loadingScreenPresenter.Hide();
+			string message = Localization.GetLanguageHandler().Localize("MAIN_MENU_DB_ERROR_INITIALIZE_DRM_DESC", accountService.Name);
+			DialogueBox.Show(_currentPlayerInput, "TEXT_ERROR", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+			};
+		}
+		return initialized;
+	}
+
+	private void Authentication_OnLoginCallback(AuthCallbackInfo callbackInfo)
+	{
+		if (callbackInfo.Result != 0)
+		{
+			_loadingScreenPresenter.Hide();
+			string message = Localization.GetLanguageHandler().Localize("MAIN_MENU_DB_ERROR_AUTHENTICATE_DESC", GAccountService.Get().Name, callbackInfo.Result.ToString("X8"));
+			DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, QuitToDesktop);
+			};
+		}
+	}
+
+	private void CheckSystemSpecs()
+	{
+	}
+
+	private void CheckBuildVersion()
+	{
+		_view.VersionNumberLabel.Text = BuildInformation.GetPrettyString();
+	}
+
+	private void OnDestroy()
+	{
+		QuittingToMenu = null;
+		if ((bool)ControllerFocus.Instance)
+		{
+			ControllerFocus.Instance.Unsubscribe(_view);
+		}
+		_view.HideView -= _newGameMenuPresenter.Hide;
+		_view.HideView -= _changeSaveSlotPresenter.Hide;
+		_view.HideView -= _optionsMenuPresenter.Hide;
+		_view.HideView -= _cartographerMenuPresenter.Hide;
+		_view.HideView -= _createSessionMenuPresenter.Hide;
+		_newGameMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_newGameMenuPresenter.HideView -= MenuPresenter_HideView;
+		_changeSaveSlotPresenter.ShowView -= MenuPresenter_ShowView;
+		_changeSaveSlotPresenter.HideView -= MenuPresenter_HideView;
+		_changeSaveSlotPresenter.SlotChanged -= ChangeSaveSlotMenuPresenter_SlotChanged;
+		_optionsMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_optionsMenuPresenter.HideView -= MenuPresenter_HideView;
+		_cartographerMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_cartographerMenuPresenter.HideView -= MenuPresenter_HideView;
+		_leaderboardsMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_leaderboardsMenuPresenter.HideView -= MenuPresenter_HideView;
+		_createSessionMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_createSessionMenuPresenter.HideView -= MenuPresenter_HideView;
+		_lobbyMenuPresenter.ShowView -= MenuPresenter_ShowView;
+		_lobbyMenuPresenter.HideView -= MenuPresenter_HideView;
+		_cartographerMenuPresenter.CreatedNewWorld -= CartographerMenuPresenter_CreatedNewWorld;
+		ReInput.ControllerDisconnectedEvent -= Rewired_OnControllerDisconnected;
+		SaveManager.DeletedSaveFile -= SaveManager_DeletedSaveFile;
+		UnsubscribeFromInputEvents();
+		EventManager.RemoveListener<PlayerConnectedEvent>(OnPlayerConnected);
+	}
+
+	private void SetControlEvents()
+	{
+		_view.PlayButton.Click += PlayButton_Click;
+		_view.PlaySubMenuBackButton.Click += PlayBackButton_Click;
+		_view.PlayOnlineButton.Click += PlayOnlineButton_Click;
+		_view.PlayOnlineContinueButton.Click += PlayOnlineContinueButton_Click;
+		_view.PlayOnlineNewGameButton.Click += PlayOnlineNewGameButton_Click;
+		_view.PlayOnlineHostButton.Click += PlayOnlineHostButton_Click;
+		_view.PlayOnlineJoinButton.Click += PlayOnlineJoinButton_Click;
+		_view.PlayOnlineBackButton.Click += PlayOnlineBackButton_Click;
+		_view.PlayOnlineHostBackButton.Click += PlayOnlineHostBackButton_Click;
+		_view.NewGameButton.Click += NewGameButton_Click;
+		_view.ContinueButton.Click += ContinueButton_Click;
+		_view.ContinueCoopButton.Click += ContinueCoopButton_Click;
+		_view.ChangeSaveSlotButton.Click += ChangeSaveSlotButton_Click;
+		_view.CartographerButton.Click += CartographerButton_Click;
+		_view.LeaderboardsButton.Click += LeaderboardsButton_Click;
+		_view.OptionsButton.Click += OptionsButton_Click;
+		_view.QuitToDesktopButton.Click += QuitToDesktopButton_Click;
+		_view.ResumePauseButton.Click += ResumePauseButton_Click;
+		_view.OptionsPauseButton.Click += OptionsButton_Click;
+		_view.QuitGamePauseButton.Click += QuitGamePauseButton_Click;
+		_view.QuitToDesktopPauseButton.Click += QuitToDesktopPauseButton_Click;
+		_view.CopyLobbyCodeButton.Click += CopyLobbyCodeButton_Click;
+	}
+
+	private void CopyLobbyCodeButton_Click(object sender)
+	{
+		_view.LobbyCodeLabel.Text.CopyToClipboard();
+	}
+
+	private void SubscribeToInputEvents()
+	{
+		for (int i = 0; i < RewiredUtilities.Players.Count; i++)
+		{
+			RewiredUtilities.Players[i].AddInputEventDelegate(RewiredPlayer_EscapeButtonDown, UpdateLoopType.Update, InputActionEventType.ButtonJustPressed, 39);
+		}
+	}
+
+	private void UnsubscribeFromInputEvents()
+	{
+		if (ReInput.isReady)
+		{
+			for (int i = 0; i < RewiredUtilities.Players.Count; i++)
+			{
+				RewiredUtilities.Players[i].RemoveInputEventDelegate(RewiredPlayer_EscapeButtonDown, UpdateLoopType.Update, InputActionEventType.ButtonJustPressed, 39);
+			}
+		}
+	}
+
+	private void Update()
+	{
+		Shader.SetGlobalVector("_UnscaledTime", new Vector4(Time.realtimeSinceStartup / 20f, Time.realtimeSinceStartup, Time.realtimeSinceStartup * 2f, Time.realtimeSinceStartup * 3f));
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		if ((player.GetButtonDown(39) || player.GetButtonDown(31)) && _view.Visible)
+		{
+			AttemptToGoToPreviousScreen();
+		}
+	}
+
+	public void Show(Rewired.Player input)
+	{
+		Instance = this;
+		if (!_view.Visible)
+		{
+			if ((bool)Singleton<SoundtrackManager>.Instance)
+			{
+				Singleton<SoundtrackManager>.Instance.PauseTracks();
+			}
+			AudioSource audioSource = ((Game.State == GameState.MAIN_MENU) ? _mainMenuTrack : _pauseMenuTrack);
+			if (!audioSource.isPlaying)
+			{
+				audioSource.Play();
+			}
+			IAudioPlayer audioPlayer = AudioManager.GetAudioPlayer();
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.Environment).Mute = true;
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.FX).Mute = true;
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.Voice).Mute = true;
+			Time.timeScale = 0f;
+			_currentPlayerInput = input;
+			if (Game.State != GameState.MAIN_MENU)
+			{
+				_isGamePaused = true;
+				_mapBeforePaused = _currentPlayerInput.GetCurrentMapId();
+				_currentPlayerInput.SetAndCacheMapsEnabled(state: false, _mapBeforePaused);
+				_currentPlayerInput.AddInputEventDelegate(RewiredPlayer_EscapeButtonDown, UpdateLoopType.Update, InputActionEventType.ButtonJustPressed, 31);
+			}
+			else
+			{
+				_currentPlayerInput.SetAndCacheMapsEnabled(state: false, 0);
+			}
+			_currentPlayerInput.GetOtherPlayers().DisableMaps();
+			_currentPlayerInput.SetAndCacheMapsEnabled(state: true, 8);
+			_currentPlayerInput.SetCursorEnabled(enabled: true);
+			EventManager.RaiseEvent(new MainMenuOpenedEvent(RewiredUtilities.GetPlayerFromInput(input)?.Id ?? input.id, opened: true));
+			IPlayer playerFromInput = RewiredUtilities.GetPlayerFromInput(_currentPlayerInput);
+			if (!playerFromInput.IsNullOrDestroyed())
+			{
+				playerFromInput.IsBusy = true;
+				++playerFromInput.Movement.IsBusy;
+				playerFromInput.Interacter.IsInPauseMenu = true;
+				playerFromInput.PlayerCamera.MouseLook.enabled = false;
+			}
+			Refresh();
+			_view.LobbyCodeGroup.transform.gameObject.SetActive(_isGamePaused && Game.Mode.IsServer());
+			if (Game.Mode.IsMultiplayer())
+			{
+				_view.LobbyCodeLabel.Text = Game.MultiplayerSessionName.ToCode(MultiplayerMng.GetCloudRegionIndex());
+			}
+			_view.SetInput(_currentPlayerInput);
+			_view.Show();
+			_view.SelectFirstButton();
+			if (Game.Mode.IsServer())
+			{
+				EventManager.AddListener<PlayerConnectedEvent>(OnPlayerConnected);
+			}
+		}
+	}
+
+	private void OnPlayerConnected(PlayerConnectedEvent @event)
+	{
+		Hide();
+	}
+
+	private void Refresh()
+	{
+		InitializeControls();
+		InitializeStats();
+	}
+
+	private void Hide()
+	{
+		EventManager.RemoveListener<PlayerConnectedEvent>(OnPlayerConnected);
+		if (_view.Visible)
+		{
+			_mainMenuTrack.Stop();
+			_pauseMenuTrack.Stop();
+			if ((bool)Singleton<SoundtrackManager>.Instance)
+			{
+				Singleton<SoundtrackManager>.Instance.ResumeTracks();
+			}
+			IAudioPlayer audioPlayer = AudioManager.GetAudioPlayer();
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.Environment).Mute = false;
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.FX).Mute = false;
+			audioPlayer.GetAudioMixer().GetChannel(AudioMixerChannels.Voice).Mute = false;
+			Time.timeScale = 1f;
+			EventManager.RaiseEvent(new MainMenuOpenedEvent(RewiredUtilities.GetPlayerFromInput(_currentPlayerInput)?.Id ?? _currentPlayerInput.id, opened: false));
+			IPlayer playerFromInput = RewiredUtilities.GetPlayerFromInput(_currentPlayerInput);
+			if (!playerFromInput.IsNullOrDestroyed())
+			{
+				playerFromInput.IsBusy = false;
+				--playerFromInput.Movement.IsBusy;
+				playerFromInput.Interacter.IsInPauseMenu = false;
+				playerFromInput.PlayerCamera.MouseLook.enabled = true;
+			}
+			if (Game.State != GameState.MAIN_MENU)
+			{
+				_isGamePaused = false;
+				_currentPlayerInput.SetAndCacheMapsEnabled(state: true, _mapBeforePaused);
+				_currentPlayerInput.RemoveInputEventDelegate(RewiredPlayer_EscapeButtonDown, UpdateLoopType.Update, InputActionEventType.ButtonJustPressed, 31);
+			}
+			else
+			{
+				_currentPlayerInput.SetAndCacheMapsEnabled(state: true, 0);
+			}
+			_currentPlayerInput.GetOtherPlayers().RestoreMapsEnabled();
+			_currentPlayerInput.SetAndCacheMapsEnabled(state: false, 8);
+			_currentPlayerInput.SetCursorEnabled(enabled: false);
+			_currentPlayerInput = null;
+			_view.Hide();
+		}
+	}
+
+	private void InitializeControls()
+	{
+		_view.PlaySubMenu.SetActive(value: false);
+		_view.PlayOnlineSubMenu.SetActive(value: false);
+		_view.UserDetailsGroup.SetActive(value: true);
+		if (Game.State == GameState.MAIN_MENU)
+		{
+			_view.MainMenuControlGroup.SetActive(value: true);
+			_view.PauseMenuControlGroup.SetActive(value: false);
+			ValidateContinueButtons();
+		}
+		else
+		{
+			_view.MainMenuControlGroup.SetActive(value: false);
+			_view.PauseMenuControlGroup.SetActive(value: true);
+		}
+		_view.SetNavigation();
+	}
+
+	private void InitializeStats()
+	{
+		if (Game.State == GameState.MAIN_MENU)
+		{
+			if (IsContinueButtonAvailable())
+			{
+				LoadStats(GameMode.SinglePlayer);
+				UpdateUserStats(GAccountService.Get().LocalUser.UserStats.SessionStats);
+			}
+			else
+			{
+				UpdateUserStats("---", "---");
+			}
+		}
+		else if (Game.State == GameState.NEW_GAME || Game.State == GameState.LOAD_GAME)
+		{
+			UpdateUserStats(Singleton<GameCalendar>.Instance.DaysAlive, Mathf.FloorToInt(Singleton<GameTime>.Instance.SessionDuration));
+		}
+	}
+
+	private void LoadStats(GameMode mode)
+	{
+		GAccountService.Get().LocalUser.UserStats.Load(mode);
+	}
+
+	private void ResetStats()
+	{
+		GAccountService.Get().LocalUser.UserStats.Reset();
+	}
+
+	private void ValidateContinueButtons()
+	{
+		if (SaveManager.ValidateSaveFile(GameMode.SinglePlayer))
+		{
+			_view.ContinueButton.Show();
+		}
+		else
+		{
+			_view.ContinueButton.Hide();
+		}
+		if (SaveManager.ValidateSaveFile(GameMode.Coop_2))
+		{
+			_view.ContinueCoopButton.Show();
+			_view.ContinueCoopButton.Enabled = ReInput.players.playerCount == 2;
+		}
+		else
+		{
+			_view.ContinueCoopButton.Hide();
+		}
+	}
+
+	private void UpdateUserName(string name)
+	{
+		_view.UserNameLabel.Text = name;
+	}
+
+	private void UpdateUserStats(Stats stats)
+	{
+		UpdateUserStats(stats.DaysSurvived + 1, stats.TimePlayed);
+	}
+
+	private void UpdateUserStats(int days, int seconds)
+	{
+		TimeSpan timeSpan = TimeSpan.FromSeconds(seconds);
+		UpdateUserStats(days.ToString(), $"{timeSpan.Days:0}d {timeSpan.Hours:00}h {timeSpan.Minutes:00}m");
+	}
+
+	private void UpdateUserStats(string days, string seconds)
+	{
+		_view.UserDetailsDaysLabel.Text = days;
+		_view.UserDetailsHoursLabel.Text = seconds;
+	}
+
+	private void RewiredPlayer_EscapeButtonDown(InputActionEventData eventData)
+	{
+		if (!_suspend && !_childPanelOpen && Game.State != GameState.MAIN_MENU && Game.State != GameState.INTRO && !Singleton<Fader>.Instance.IsFading && !LevelLoader.IsLoading() && !LevelLoader.IsServerJoinInProgress && !SaveManager.IsSaving && !DialogueBox.Notifying && !RewiredUtilities.GetPlayerFromInput(eventData.player).IsNullOrDestroyed() && !RewiredUtilities.GetPlayerFromInput(eventData.player).Lighter.IsLightingFire && !RewiredUtilities.GetPlayerFromInput(eventData.player).Movement.IsInEndGameScene)
+		{
+			if (_view.Visible && _currentPlayerInput == eventData.player)
+			{
+				Hide();
+			}
+			else if (!_view.Visible && _currentPlayerInput == null)
+			{
+				Show(eventData.player);
+			}
+		}
+	}
+
+	private void MenuPresenter_ShowView()
+	{
+		_childPanelOpen = true;
+		_view.MainMenuGameObject.SetActive(value: false);
+	}
+
+	private void MenuPresenter_HideView()
+	{
+		_childPanelOpen = false;
+		_view.MainMenuGameObject.SetActive(value: true);
+		_view.SelectFirstButton();
+	}
+
+	private void ChangeSaveSlotMenuPresenter_SlotChanged()
+	{
+		Timing.RunCoroutine(Reload_Sequence());
+	}
+
+	private void CartographerMenuPresenter_CreatedNewWorld()
+	{
+		NEW_RANDOM_WORLD_CREATED = true;
+		_view.NewGameButton.Enabled = true;
+	}
+
+	private void SaveManager_DeletedSaveFile(GameMode mode)
+	{
+		ValidateContinueButtons();
+		InitializeStats();
+	}
+
+	private void PlayButton_Click(object sender)
+	{
+		Game.Mode = GameMode.SinglePlayer;
+		ContinuingMultiplayerGame = false;
+		if (!IsContinueButtonAvailable())
+		{
+			NewGameButton_Click(null);
+			return;
+		}
+		_view.MainMenuControlGroup.SetActive(value: false);
+		_view.PlaySubMenu.SetActive(value: true);
+		_view.UserDetailsGroup.SetActive(value: false);
+		_currentSubScreen = MainMenuScreen.PLAY;
+		_view.SelectFirstButton();
+	}
+
+	private void PlayBackButton_Click(object sender)
+	{
+		_view.PlaySubMenu.SetActive(value: false);
+		_view.MainMenuControlGroup.SetActive(value: true);
+		_view.UserDetailsGroup.SetActive(value: true);
+		_currentSubScreen = MainMenuScreen.MAIN;
+		_view.SelectFirstButton();
+	}
+
+	private void PlayOnlineButton_Click(object sender)
+	{
+		CheckOnlineAvailable(() =>
+		{
+			_view.MainMenuControlGroup.SetActive(value: false);
+			_view.PlayOnlineSubMenu.SetActive(value: true);
+			_view.UserDetailsGroup.SetActive(value: false);
+			_currentSubScreen = MainMenuScreen.PLAY_ONLINE;
+			_view.SelectFirstButton();
+		}, () =>
+		{
+			_view.SelectFirstButton();
+		});
+	}
+
+	private void PlayOnlineContinueButton_Click(object sender)
+	{
+		CheckOnlineAvailable(() =>
+		{
+			ContinuingMultiplayerGame = true;
+			_currentSubScreen = MainMenuScreen.HOST_CONTINUE_GAME;
+			_createSessionMenuPresenter.Show(_currentPlayerInput);
+		}, () =>
+		{
+			_view.SelectFirstButton();
+		});
+	}
+
+	private void PlayOnlineNewGameButton_Click(object sender)
+	{
+		CheckOnlineAvailable(() =>
+		{
+			_currentSubScreen = MainMenuScreen.HOST_NEW_GAME;
+			ContinuingMultiplayerGame = false;
+			_createSessionMenuPresenter.Show(_currentPlayerInput);
+		}, () =>
+		{
+			_view.SelectFirstButton();
+		});
+	}
+
+	private void PlayOnlineHostButton_Click(object sender)
+	{
+		CheckOnlineAvailable(() =>
+		{
+			_currentSubScreen = MainMenuScreen.HOST;
+			if (SaveManager.ValidateSaveFile(GameMode.Coop_Server))
+			{
+				_view.PlayOnlineSubMenu.SetActive(value: false);
+				_view.PlayOnlineHostSubMenu.SetActive(value: true);
+				_view.SelectFirstButton();
+			}
+			else
+			{
+				PlayOnlineNewGameButton_Click(null);
+			}
+		}, () =>
+		{
+			_view.SelectFirstButton();
+		});
+	}
+
+	private void PlayOnlineJoinButton_Click(object sender)
+	{
+		CheckOnlineAvailable(() =>
+		{
+			_currentSubScreen = MainMenuScreen.JOIN;
+			_lobbyMenuPresenter.Show(_currentPlayerInput);
+		}, () =>
+		{
+			_view.SelectFirstButton();
+		});
+	}
+
+	private void PlayOnlineBackButton_Click(object sender)
+	{
+		_view.PlayOnlineSubMenu.SetActive(value: false);
+		_view.MainMenuControlGroup.SetActive(value: true);
+		_view.UserDetailsGroup.SetActive(value: true);
+		_currentSubScreen = MainMenuScreen.MAIN;
+		_view.SelectFirstButton();
+	}
+
+	private void PlayOnlineHostBackButton_Click(object sender)
+	{
+		_view.PlayOnlineSubMenu.SetActive(value: true);
+		_view.PlayOnlineHostSubMenu.SetActive(value: false);
+		_currentSubScreen = MainMenuScreen.PLAY_ONLINE;
+		_view.SelectFirstButton();
+	}
+
+	private void NewGameButton_Click(object sender)
+	{
+		_newGameMenuPresenter.Show();
+	}
+
+	private void ContinueButton_Click(object sender)
+	{
+		StartGame(GameMode.SinglePlayer, GameState.LOAD_GAME, 3);
+	}
+
+	private void ContinueCoopButton_Click(object sender)
+	{
+		if (RewiredUtilities.ConnectedPlayers.Count() < 2)
+		{
+			DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_WARNING_TITLE", "MAIN_MENU_DB_WARNING_DESC_NO_CONTROLLERS_ASSIGNED", DialogueButton.Ok, DialogueIcon.Warning);
+		}
+		else
+		{
+			StartGame(GameMode.Coop_2, GameState.LOAD_GAME, 3);
+		}
+	}
+
+	private void Rewired_OnControllerDisconnected(ControllerStatusChangedEventArgs args)
+	{
+		if (Game.Mode != GameMode.Coop_2 || _currentPlayerInput == null || _currentPlayerInput.id != 1 || !_view.Visible)
+		{
+			return;
+		}
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: true, 0);
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: false, 8);
+		_currentPlayerInput.DisableMaps();
+		_currentPlayerInput = ReInput.players.GetPlayer(0);
+		_currentPlayerInput.RestoreMapsEnabled();
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (allPlayer.Input.IsNullOrDestroyed())
+			{
+				return;
+			}
+			allPlayer.PlayerUI.UserInterface.EventSystem.Suspend(allPlayer.Input.id != _currentPlayerInput.id);
+			allPlayer.PlayerUI.UserInterface.EventSystem.SetSelectedGameObject(null);
+		}
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: false, 0);
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: true, 8);
+		_currentPlayerInput.SetCursorEnabled(enabled: true);
+		_view.SetInput(_currentPlayerInput);
+		if (_optionsMenuPresenter.CurrentPanel == null)
+		{
+			_view.SelectFirstButton();
+		}
+		else
+		{
+			_optionsMenuPresenter.ResetControls(_currentPlayerInput);
+		}
+	}
+
+	private void ChangeSaveSlotButton_Click(object sender)
+	{
+		Game.Mode = GameMode.SinglePlayer;
+		_changeSaveSlotPresenter.Show();
+	}
+
+	private void CartographerButton_Click(object sender)
+	{
+		Game.Mode = GameMode.SinglePlayer;
+		_cartographerMenuPresenter.Show();
+	}
+
+	private void LeaderboardsButton_Click(object sender)
+	{
+		if (!DialogueBox.Notifying)
+		{
+			Game.Mode = GameMode.SinglePlayer;
+			if (SteamUser.BLoggedOn())
+			{
+				_leaderboardsMenuPresenter.Show(_currentPlayerInput);
+				return;
+			}
+			string title = "TEXT_ERROR";
+			string message = Localization.GetLanguageHandler().Localize("LEADERBOARDS_MENU_DB_NO_INTERNET_DESC");
+			DialogueBox.Show(ReInput.players.GetPlayer(0), title, message, DialogueButton.Ok, DialogueIcon.Information);
+		}
+	}
+
+	private void OptionsButton_Click(object sender)
+	{
+		_optionsMenuPresenter.Show(_currentPlayerInput);
+	}
+
+	private void QuitToDesktopButton_Click(object sender)
+	{
+		DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_QUIT_TO_DESKTOP_TITLE", "MAIN_MENU_DB_QUIT_TO_DESKTOP_DESC", DialogueButton.YesNo);
+		dialogueBoxViewAdapter.Accept += QuitToDesktop;
+		dialogueBoxViewAdapter.Decline += _view.SelectFirstButton;
+	}
+
+	private void QuitGamePauseButton_Click(object sender)
+	{
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+		DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_QUIT_TITLE", "MAIN_MENU_DB_QUIT_DESC", DialogueButton.YesNo);
+		dialogueBoxViewAdapter.Accept += MPFriendlyQuit;
+		dialogueBoxViewAdapter.Decline += () =>
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+		};
+		dialogueBoxViewAdapter.Cancel += () =>
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+		};
+	}
+
+	private void QuitToDesktopPauseButton_Click(object sender)
+	{
+		DialogueBox.Show(_currentPlayerInput, "MAIN_MENU_DB_QUIT_TO_DESKTOP_TITLE", "MAIN_MENU_DB_QUIT_TO_DESKTOP_DESC", DialogueButton.YesNo).Accept += QuitToDesktop;
+	}
+
+	private void AttemptToGoToPreviousScreen()
+	{
+		if (_view.Visible && !DialogueBox.Notifying && Game.State == GameState.MAIN_MENU)
+		{
+			switch (_currentSubScreen)
+			{
+			case MainMenuScreen.PLAY:
+				PlayBackButton_Click(null);
+				break;
+			case MainMenuScreen.PLAY_ONLINE:
+				PlayOnlineBackButton_Click(null);
+				break;
+			case MainMenuScreen.HOST:
+				PlayOnlineHostBackButton_Click(null);
+				break;
+			case MainMenuScreen.HOST_CONTINUE_GAME:
+				_currentSubScreen = MainMenuScreen.HOST;
+				break;
+			case MainMenuScreen.HOST_NEW_GAME:
+				_currentSubScreen = MainMenuScreen.HOST;
+				break;
+			case MainMenuScreen.JOIN:
+				_currentSubScreen = MainMenuScreen.PLAY_ONLINE;
+				break;
+			}
+		}
+	}
+
+	private void ResumePauseButton_Click(object sender)
+	{
+		Hide();
+	}
+
+	private void StartNewGame(GameSettings settings)
+	{
+		AccountUserStats userStats = GAccountService.Get().LocalUser.UserStats;
+		userStats.SessionStats.Reset();
+		userStats.Rebase();
+		GameMode mode = Game.Mode;
+		if (settings.Mode == EGameMode.Cooperative)
+		{
+			mode = GameMode.Coop_2;
+		}
+		GameState state = GameState.INTRO;
+		int scene = 2;
+		Options.CustomSettings = settings;
+		if (settings.World == EGameWorldMode.Existing || (settings.World == EGameWorldMode.Random && NEW_RANDOM_WORLD_CREATED))
+		{
+			ReplicatedStartGame(mode, state, scene);
+		}
+		else if (settings.World == EGameWorldMode.Random)
+		{
+			Timing.RunCoroutine(CreateRandomWorld_Sequence(mode, state, scene));
+		}
+	}
+
+	private IEnumerator<float> CreateRandomWorld_Sequence(GameMode mode, GameState state, int scene)
+	{
+		if (mode.IsServer())
+		{
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		_cartographerMenuPresenter.ShowRandomizeWorldDialogue_NoInput(() =>
+		{
+			if (mode.IsServer())
+			{
+				PlayerRegistry.LocalPeer.WorldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+			}
+			ReplicatedStartGame(mode, state, scene);
+			_newGameMenuPresenter.Suspend = false;
+		}, () =>
+		{
+			_newGameMenuPresenter.Suspend = false;
+		});
+	}
+
+	private void StartContinueGame()
+	{
+		ReplicatedStartGame(Game.Mode, GameState.LOAD_GAME, 3);
+	}
+
+	public void StartGame(GameMode mode, GameState state, int scene)
+	{
+		Time.timeScale = 1f;
+		if ((bool)_view)
+		{
+			_view.CanvasGroup.Interactable = false;
+		}
+		else
+		{
+			Debug.LogError("No _view");
+		}
+		Game.Mode = mode;
+		Game.State = state;
+		ResetStats();
+		if (Game.Mode.IsMaster() && Game.State == GameState.LOAD_GAME)
+		{
+			LoadStats(Game.Mode);
+		}
+		if (!Game.Mode.IsMultiplayer())
+		{
+			MultiplayerMng.ConnectToLocal(() =>
+			{
+				_newGameMenuPresenter.Hide();
+				StartScene(scene);
+			});
+		}
+		else
+		{
+			_newGameMenuPresenter.Hide();
+			StartScene(scene);
+		}
+		_view.PlayOnlineHostSubMenu.SetActive(value: false);
+	}
+
+	private void StartScene(int scene)
+	{
+		FadeMode mode = FadeMode.Custom;
+		if (Game.State != GameState.LOAD_GAME || !_customBgd)
+		{
+			mode = FadeMode.Solid;
+		}
+		Singleton<Fader>.Instance.FadeOut(3f, mode, () =>
+		{
+			LoadLevel(scene);
+		});
+	}
+
+	private void CloseSession(DisconnectDetail detail)
+	{
+		if (Game.Mode.IsClient())
+		{
+			World.PopWorld();
+		}
+		SetSceneRootsActive(3, value: false);
+		PlayerUtilities.SetPlayerBundlesActive(active: false);
+		PlayerRegistry.LocalPeer.ReplicatedDisconnect(detail, null, forceLocalShutdown: true);
+		if (!MultiplayerMng.Instance.IsNullOrDestroyed())
+		{
+			UnityEngine.Object.DestroyImmediate(MultiplayerMng.Instance.gameObject);
+		}
+	}
+
+	public static void SetSceneRootsActive(int sceneBuildIndex, bool value)
+	{
+		for (int i = 0; i < SceneManager.sceneCount; i++)
+		{
+			Scene sceneAt = SceneManager.GetSceneAt(i);
+			if (sceneAt.IsNullOrDestroyed() || sceneAt.buildIndex != sceneBuildIndex)
+			{
+				continue;
+			}
+			GameObject[] rootGameObjects = sceneAt.GetRootGameObjects();
+			foreach (GameObject gameObject in rootGameObjects)
+			{
+				if (gameObject != null)
+				{
+					gameObject.SetActive(value);
+				}
+			}
+		}
+	}
+
+	public void QuitToMenu(float fadeOutTime = 3f)
+	{
+		NEW_RANDOM_WORLD_CREATED = false;
+		_view.CanvasGroup.Interactable = false;
+		_suspend = true;
+		QuittingToMenu?.Invoke();
+		CloseSession(DisconnectDetail.Intended);
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 15);
+		Singleton<Fader>.Instance.FadeOut(fadeOutTime, FadeMode.Solid, Game.QuitToMenu);
+	}
+
+	private void QuitToDesktop()
+	{
+		Game.QuitToDesktop();
+	}
+
+	public void LoadLevel(int level, LoadSceneMode mode = LoadSceneMode.Additive)
+	{
+		CursorUtils.LockState = CursorLockMode.Locked;
+		CursorUtils.Visible = false;
+		LevelLoader.LoadLevel(level, mode, SceneLoad_Started, SceneLoad_Finished);
+	}
+
+	private void SceneLoad_Started()
+	{
+		Hide();
+		_loadingScreenPresenter.Show();
+	}
+
+	private void SceneLoad_Finished()
+	{
+		_loadingScreenPresenter.Hide();
+		_view.BackgroundTexture.Enabled = false;
+		_view.BackgroundTexture.transform.gameObject.SetActive(value: false);
+	}
+
+	public void ShowJoinSessionDialog(Action onTimeout = null, EmptyEventHandler onSkip = null)
+	{
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: false, 8);
+		_joinSessionDialog = DialogueBox.Show(_currentPlayerInput, "NEW_GAME_MENU_LABEL_TITLE", "PLAY_ONLINE_MENU_CREATE_SESSION_CREATING", DialogueButton.None);
+		if (onSkip != null)
+		{
+			_joinSessionDialog.Decline += onSkip;
+		}
+		_joinSessionDialogTimeout = Timing.RunCoroutine(TimeOut_Sequence(onTimeout));
+	}
+
+	private IEnumerator<float> TimeOut_Sequence(Action onTimeout)
+	{
+		yield return Timing.WaitForSeconds(30f);
+		onTimeout?.Invoke();
+	}
+
+	public void HideJoinSessionDialog()
+	{
+		_currentPlayerInput.SetAndCacheMapsEnabled(state: true, 8);
+		if ((bool)_joinSessionDialog)
+		{
+			_joinSessionDialog.Destroy();
+		}
+		if (_joinSessionDialogTimeout.IsValid && _joinSessionDialogTimeout.IsRunning)
+		{
+			_joinSessionDialogTimeout.IsRunning = false;
+		}
+	}
+
+	public void ShowNewGameMenuPresenter()
+	{
+		_newGameMenuPresenter.Show();
+	}
+
+	private void MPFriendlyQuit()
+	{
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+		if (Game.Mode.IsServer())
+		{
+			new ReplicateQuitToMenu().Post();
+			BeamTiming.WaitAnd(0.33f, () =>
+			{
+				QuitToMenu();
+			});
+		}
+		else
+		{
+			QuitToMenu();
+		}
+	}
+
+	public void ReplicatedStartGame(GameMode mode, GameState state, int scene)
+	{
+		if (mode.IsServer())
+		{
+			ReplicateStartGame replicateStartGame = new ReplicateStartGame();
+			replicateStartGame.Mode = ((mode == GameMode.Coop_Server) ? 5 : 4);
+			replicateStartGame.State = (int)state;
+			replicateStartGame.Scene = scene;
+			replicateStartGame.Post();
+		}
+		StartGame(mode, state, scene);
+	}
+
+	private void SetBackgroundTexture(Texture2D texture)
+	{
+		if (!_view.BackgroundTexture.transform.gameObject.activeSelf)
+		{
+			_view.BackgroundTexture.Enabled = true;
+			_view.BackgroundTexture.transform.gameObject.SetActive(value: true);
+		}
+		_view.BackgroundTexture.Texture = texture;
+		Singleton<Fader>.Instance.SetCustomTexture(texture);
+	}
+
+	private Texture2D LoadTextureBytes(string path)
+	{
+		if (!File.Exists(path))
+		{
+			return null;
+		}
+		byte[] array;
+		using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+		{
+			array = new byte[fileStream.Length];
+			fileStream.Read(array, 0, (int)fileStream.Length);
+		}
+		return LoadTextureBytes(array);
+	}
+
+	private Texture2D LoadTextureBytes(byte[] bytes)
+	{
+		if (bytes == null)
+		{
+			return null;
+		}
+		Texture2D texture2D = new Texture2D(1, 1);
+		if (texture2D.LoadImage(bytes))
+		{
+			return texture2D;
+		}
+		return null;
+	}
+
+	protected bool IsContinueButtonAvailable()
+	{
+		if (!_view.ContinueButton.Visible)
+		{
+			return _view.ContinueCoopButton.Visible;
+		}
+		return true;
+	}
+
+	public async void CheckOnlineAvailable(Action onAvailable, Action onNotAvailableDialogueDismissed, Action onNotAvailable = null)
+	{
+		_view.CanvasGroup.Interactable = false;
+		if (await NetworkConnectivity.CheckHttpConnectivityAsync() != 0)
+		{
+			_view.CanvasGroup.Interactable = true;
+			onNotAvailable?.Invoke();
+			DialogueBox.Show(_currentPlayerInput, "TEXT_ERROR", "PLAY_ONLINE_MENU_CREATE_SESSION_CREATING_ERROR_CONNECTING", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				onNotAvailableDialogueDismissed?.Invoke();
+			};
+		}
+		else
+		{
+			_view.CanvasGroup.Interactable = true;
+			onAvailable?.Invoke();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 211
+PATH: Assembly-CSharp__Beam.UI__MenuBackgroundScaler.cs
+SIZE: 1428 bytes
+SHA256: fd180618960e449a766002338265ba63212fbb554aabac384e936496d9a2bb82
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+[ExecuteInEditMode]
+[RequireComponent(typeof(RawImage))]
+public class MenuBackgroundScaler : MonoBehaviour
+{
+	[SerializeField]
+	private float _width;
+
+	[SerializeField]
+	private float _height;
+
+	[SerializeField]
+	private RectTransform _fillRect;
+
+	[SerializeField]
+	private RectTransform _fadeRect;
+
+	[SerializeField]
+	private float _maxFadeWidth;
+
+	private Canvas _canvas;
+
+	private RawImage _image;
+
+	private void OnEnable()
+	{
+		if (_image == null)
+		{
+			_image = GetComponent<RawImage>();
+		}
+		_image.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+		_image.rectTransform.anchorMax = new Vector2(0f, 0.5f);
+		_image.rectTransform.pivot = new Vector2(0f, 0.5f);
+	}
+
+	private void Update()
+	{
+		if (_canvas == null)
+		{
+			_canvas = GetComponentInParent<Canvas>();
+		}
+		Vector2 sizeDelta = ((RectTransform)_canvas.transform).sizeDelta;
+		if (sizeDelta.x / sizeDelta.y < 1.7777778f)
+		{
+			_image.rectTransform.sizeDelta = new Vector3(sizeDelta.y * 1.7777778f, sizeDelta.y, 1f);
+		}
+		else
+		{
+			_image.rectTransform.sizeDelta = new Vector3(1920f, sizeDelta.y, 1f);
+			_fillRect.sizeDelta = new Vector2(sizeDelta.x - _image.rectTransform.sizeDelta.x, _fillRect.sizeDelta.y);
+			_fadeRect.sizeDelta = new Vector2(Mathf.Clamp(_fillRect.rect.width * 4f, 0f, _maxFadeWidth), _fadeRect.sizeDelta.y);
+		}
+		_image.rectTransform.anchoredPosition = Vector2.zero;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 212
+PATH: Assembly-CSharp__Beam.UI__MissionRewardElement.cs
+SIZE: 867 bytes
+SHA256: 8bd97802434acbf80a7e1f94b672db65905d76b3fadcd316187b61bb0b42a11a
+====================================================================================================
+
+using Beam.Language;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class MissionRewardElement : MonoBehaviour, IMissionRewardElement
+{
+	[SerializeField]
+	private MissionRewardElementViewAdapterBase _view;
+
+	[SerializeField]
+	private TransformViewAdapter _transform;
+
+	public ITransformViewAdapter Transform => _transform;
+
+	private void Awake()
+	{
+		if (_view == null)
+		{
+			_view = NullMissionRewardElementViewAdapter.Instance;
+			Debug.LogError("MissionRewardElement::Awake:: No view component!");
+		}
+	}
+
+	public void Initialize(IMissionReward missionReward)
+	{
+		_view.RewardQuantityLabel.Text = string_safemethods.Format(Localization.GetLanguageHandler().Localize("MISSIONS_MISSION_REWARD_QUANTITY_LABEL"), missionReward.Quantity);
+		_view.RewardLabel.Text = missionReward.Name;
+		_view.RewardImage.Sprite = missionReward.GetIcon();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 213
+PATH: Assembly-CSharp__Beam.UI__NotificationsPresenterBase.cs
+SIZE: 4211 bytes
+SHA256: 52bc821ecb1b593f9fa3786b289bc663942f32c02fc133c8aaa052736ac654a0
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Events;
+using Beam.Utilities;
+using MEC;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class NotificationsPresenterBase<TNotification, TNotificationEvent, TNotificationPresenter> : ControllerBase, INeedPlayerComponent where TNotification : NotificationBase where TNotificationEvent : NewNotificationEvent<TNotification> where TNotificationPresenter : MonoBehaviour, INotificationPresenter<TNotification>
+{
+	[SerializeField]
+	private NotificationsViewAdapterBase _view;
+
+	[SerializeField]
+	private TNotificationPresenter _notificationPrefab;
+
+	private TNotificationPresenter _notificationPresenter;
+
+	private Stack<TNotification> _notifications = new Stack<TNotification>();
+
+	private CoroutineHandle _notifyingSequence;
+
+	private TNotification _currentNotification;
+
+	private bool _notifying;
+
+	private bool _suspended;
+
+	private IPlayer _player;
+
+	public IPlayer Player => _player;
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+	}
+
+	private void Start()
+	{
+		SetView(_view);
+		CreateNotificationPresenter();
+		EventManager.AddListener<TNotificationEvent>(EventManager_NewNotificationEvent);
+		EventManager.AddListener<FreezeNotificationsEvent>(EventManager_FreezeNotifications);
+	}
+
+	public override void SetView(ViewAdapterBase view)
+	{
+		_view = view as NotificationsViewAdapterBase;
+		if (_view == null)
+		{
+			Debug.LogError($"{GetType()}:: No view component assigned!");
+			_view = NullNotificationsViewAdapter.Instance;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		EventManager.RemoveListener<TNotificationEvent>(EventManager_NewNotificationEvent);
+		EventManager.RemoveListener<FreezeNotificationsEvent>(EventManager_FreezeNotifications);
+	}
+
+	private void CreateNotificationPresenter()
+	{
+		if (!(_notificationPresenter != null))
+		{
+			_notificationPresenter = Object.Instantiate(_notificationPrefab);
+			_notificationPresenter.transform.SetParent(_view.NotificationsContainer.Transform, worldPositionStays: false);
+		}
+	}
+
+	private void EventManager_NewNotificationEvent(TNotificationEvent e)
+	{
+		int num = ((!_player.IsNullOrDestroyed()) ? _player.Id : 0);
+		if (e.Notification.PlayerId == num)
+		{
+			NewNotification(e.Notification);
+		}
+	}
+
+	private void EventManager_FreezeNotifications(FreezeNotificationsEvent e)
+	{
+		if (e.Freeze)
+		{
+			SuspendNotifications();
+		}
+		else
+		{
+			ResumeNotifications();
+		}
+	}
+
+	public void NewNotification(TNotification notification)
+	{
+		if ((_suspended && !notification.SurviveSuspension) || ((_suspended || _currentNotification != null) && notification.Priority == NotificationPriority.Low))
+		{
+			return;
+		}
+		if (_currentNotification != null)
+		{
+			if (_currentNotification.Priority > notification.Priority)
+			{
+				_notifications.Push(notification);
+			}
+			else
+			{
+				if (_currentNotification.Priority > NotificationPriority.Normal)
+				{
+					_currentNotification.Interrupted = true;
+					_notifications.Push(_currentNotification);
+				}
+				else
+				{
+					_currentNotification.Dispose();
+				}
+				_notifications.Push(notification);
+			}
+		}
+		else
+		{
+			_notifications.Push(notification);
+		}
+		Notify();
+	}
+
+	private void SuspendNotifications()
+	{
+		_suspended = true;
+		Timing.KillCoroutines(_notifyingSequence);
+		if (_currentNotification != null)
+		{
+			_currentNotification = null;
+			_notificationPresenter.ForceHide();
+		}
+		_notifying = false;
+	}
+
+	public void ResumeNotifications()
+	{
+		_suspended = false;
+		Notify();
+	}
+
+	private void Notify()
+	{
+		if (_notifications.Count > 0 && !_notifying && !_suspended)
+		{
+			_notifyingSequence = Timing.RunCoroutine(Notify_Sequence());
+		}
+	}
+
+	private IEnumerator<float> Notify_Sequence()
+	{
+		_notifying = true;
+		while (_notifications.Count > 0)
+		{
+			_currentNotification = _notifications.Pop();
+			_currentNotification.Interrupted = false;
+			if (!_currentNotification.Disposed)
+			{
+				_notificationPresenter.Initialize(_currentNotification);
+				yield return _notificationPresenter.Show_Yieldable();
+				yield return _notificationPresenter.Hide_Yieldable();
+			}
+			if (!_currentNotification.Interrupted)
+			{
+				_currentNotification.Finish();
+			}
+		}
+		_currentNotification = null;
+		_notifying = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 214
+PATH: Assembly-CSharp__Beam.UI__NotificationsViewAdapterBase.cs
+SIZE: 164 bytes
+SHA256: 7a4d6e9c765cc0b639588d7ccb44f5e046d08f1ee46f7c6a27ccac982c299cac
+====================================================================================================
+
+namespace Beam.UI;
+
+public abstract class NotificationsViewAdapterBase : ViewAdapterBase
+{
+	public abstract ITransformViewAdapter NotificationsContainer { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 215
+PATH: Assembly-CSharp__Beam.UI__NullHudViewAdapter.cs
+SIZE: 1040 bytes
+SHA256: 5b55e77eac1bae0ba24a10181adc984c4f21f6e841284a4320848925ed966eb4
+====================================================================================================
+
+namespace Beam.UI;
+
+public class NullHudViewAdapter : HudViewAdapterBase
+{
+	public static NullHudViewAdapter Instance { get; } = new NullHudViewAdapter();
+
+	public override IImageViewAdapter DefaultCursor => NullViewAdapter<NullImageViewAdapter>.Instance;
+
+	public override IImageViewAdapter InteractingCursor => NullViewAdapter<NullImageViewAdapter>.Instance;
+
+	public override ILabelViewAdapter ItemNameLabel => NullViewAdapter<NullLabelViewAdapter>.Instance;
+
+	public override ActionHudElementViewAdapterBase ClimbUI => NullActionHudElementViewAdapter.Instance;
+
+	public override ActionHudElementViewAdapterBase ActionHudElementPrefab => NullActionHudElementViewAdapter.Instance;
+
+	public override ITransformViewAdapter ActionHudElementsContainer => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override ITransformViewAdapter PooledActionHudElementsContainer => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override ICanvasGroupViewAdapter ItemActionGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 216
+PATH: Assembly-CSharp__Beam.UI__NullIndicatorViewBase.cs
+SIZE: 394 bytes
+SHA256: 5a4a25421f8915eca27091cb85e6e264e6e10b3198cfed6d275589f0aa547a4e
+====================================================================================================
+
+namespace Beam.UI;
+
+public class NullIndicatorViewBase : IndicatorViewBase
+{
+	private static NullIndicatorViewBase _Instance = new NullIndicatorViewBase();
+
+	public static NullIndicatorViewBase Instance => _Instance;
+
+	public override DamageIndicatorElement IndicatorPrefab { get; }
+
+	public override ITransformViewAdapter IndicatorContainer => NullObject<NullTransformViewAdapter>.Instance;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 217
+PATH: Assembly-CSharp__Beam.UI__NullMissionRewardElement.cs
+SIZE: 268 bytes
+SHA256: 32197287c5560788b7e31127f1a1743d4ca0129eac5f619cc03918e02a867c95
+====================================================================================================
+
+namespace Beam.UI;
+
+public class NullMissionRewardElement : NullObject<NullMissionRewardElement>, IMissionRewardElement
+{
+	public ITransformViewAdapter Transform => NullObject<NullTransformViewAdapter>.Instance;
+
+	public void Initialize(IMissionReward reward)
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 218
+PATH: Assembly-CSharp__Beam.UI__NullNotificationsViewAdapter.cs
+SIZE: 512 bytes
+SHA256: 4a439a98706332ff2040cfd70bb479e94f805ed9497358264e4c3ed253affee8
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullNotificationsViewAdapter : NotificationsViewAdapterBase
+{
+	private static NullNotificationsViewAdapter _Instance = new NullNotificationsViewAdapter();
+
+	public static NullNotificationsViewAdapter Instance => _Instance;
+
+	public override ITransformViewAdapter NotificationsContainer
+	{
+		get
+		{
+			Debug.LogError("NullNotificationsViewAdapter::NotificationsContainer:: Not implemented.");
+			return NullObject<NullTransformViewAdapter>.Instance;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 219
+PATH: Assembly-CSharp__Beam.UI__NullRadialMenuElement.cs
+SIZE: 919 bytes
+SHA256: b3c2602709856efb3b9476294a29ab0e2f4e9da17a8d87164ff2728c4b049c3d
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullRadialMenuElement : NullObject<NullRadialMenuElement>, IRadialMenuElement<NullRadialMenuModel>
+{
+	public Transform transform => NullTransform.Instance;
+
+	public NullRadialMenuModel SelectedValue => NullObject<NullRadialMenuModel>.Instance;
+
+	public void Initialize(IList<NullRadialMenuModel> data)
+	{
+		Debug.LogError("NullRadialMenuElement::Initialize:: Not implemented!");
+	}
+
+	public void Enter()
+	{
+		Debug.LogError("NullRadialMenuElement::Enter:: Not implemented!");
+	}
+
+	public void Exit()
+	{
+		Debug.LogError("NullRadialMenuElement::Exit:: Not implemented!");
+	}
+
+	public bool NavigateLeft()
+	{
+		Debug.LogError("NullRadialMenuElement::NavigateLeft:: Not implemented!");
+		return false;
+	}
+
+	public bool NavigateRight()
+	{
+		Debug.LogError("NullRadialMenuElement::NavigateRight:: Not implemented!");
+		return false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 220
+PATH: Assembly-CSharp__Beam.UI__NullRadialMenuViewAdapterBase.cs
+SIZE: 1371 bytes
+SHA256: 46c497006b5fd8c8a97733dbfd5901627e16c0b4e13d9aec2f038aab96b8a935
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullRadialMenuViewAdapterBase : RadialMenuViewAdapterBase<NullRadialMenuModel, NullRadialMenuElement>
+{
+	private static readonly NullRadialMenuViewAdapterBase _Instance = new NullRadialMenuViewAdapterBase();
+
+	public static NullRadialMenuViewAdapterBase Instance => _Instance;
+
+	public override ITransformViewAdapter ElementPlaceholderPrefab => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override ITransformViewAdapter ElementContainer => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override NullRadialMenuElement ElementPrefab => NullObject<NullRadialMenuElement>.Instance;
+
+	public override ITransformViewAdapter PooledElementContainer => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override IImageViewAdapter SelectorImage => NullViewAdapter<NullImageViewAdapter>.Instance;
+
+	public override ILabelViewAdapter TitleLabel => NullViewAdapter<NullLabelViewAdapter>.Instance;
+
+	public override ILabelViewAdapter DescriptionLabel => NullViewAdapter<NullLabelViewAdapter>.Instance;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+
+	public override ICanvasGroupViewAdapter DetailsCanvasGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+
+	public override Texture2D BlurMaskTexture => Texture2D.blackTexture;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 221
+PATH: Assembly-CSharp__Beam.UI__NullScrollviewViewAdapter.cs
+SIZE: 483 bytes
+SHA256: 232b1e1b8ccd1951a0bf47c78dd2f6190a208d509a99d354cb8e97d42b7d3b89
+====================================================================================================
+
+namespace Beam.UI;
+
+public class NullScrollviewViewAdapter : ViewAdapterBase, IScrollviewViewAdapter, IViewAdapter
+{
+	private static readonly NullScrollviewViewAdapter _Instance = new NullScrollviewViewAdapter();
+
+	public static NullScrollviewViewAdapter Instance => _Instance;
+
+	public ITransformViewAdapter Content => NullObject<NullTransformViewAdapter>.Instance;
+
+	public float NormalizedHorizontalPosition { get; set; }
+
+	public float NormalizedVerticalPosition { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 222
+PATH: Assembly-CSharp__Beam.UI__NullTransform.cs
+SIZE: 429 bytes
+SHA256: 17ce8477637911c96a1f5c2195d962e18ffd557bfe0e4a2c9d5e54df2dbd4c57
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullTransform : MonoBehaviour
+{
+	private static Transform _Instance;
+
+	public static Transform Instance
+	{
+		get
+		{
+			if (_Instance == null)
+			{
+				_Instance = NullGameObject.Instance.transform;
+			}
+			_Instance.transform.position = Vector3.zero;
+			_Instance.transform.rotation = Quaternion.identity;
+			Debug.LogError("NullTransform:: ");
+			return _Instance;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 223
+PATH: Assembly-CSharp__Beam.UI__NullTransformViewAdapter.cs
+SIZE: 463 bytes
+SHA256: fef8ccf2839bcd0f3744b7694ccc62e51c1f161aa001f8945faf25245c1f0ca8
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullTransformViewAdapter : NullObject<NullTransformViewAdapter>, ITransformViewAdapter
+{
+	public Transform Transform => NullTransform.Instance;
+
+	public Vector3 Position { get; set; }
+
+	public Quaternion Rotation { get; set; }
+
+	public Vector3 LocalPosition { get; set; }
+
+	public Quaternion LocalRotation { get; set; }
+
+	public void SetParent(ITransformViewAdapter transform, bool worldPositionStays)
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 224
+PATH: Assembly-CSharp__Beam.UI__NullViewAdapter.cs
+SIZE: 641 bytes
+SHA256: 3fd9f99d3431f9c5f9780ae212d57f7644370bc2a3d70821270c2270cd82219a
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class NullViewAdapter<TViewAdapter> : IViewAdapter where TViewAdapter : IViewAdapter
+{
+	private static readonly TViewAdapter _Instance = Activator.CreateInstance<TViewAdapter>();
+
+	public static TViewAdapter Instance => _Instance;
+
+	public Transform transform => NullTransform.Instance;
+
+	public bool Visible { get; }
+
+	public bool Enabled { get; set; }
+
+	event EmptyEventHandler IViewAdapter.ShowView
+	{
+		add
+		{
+		}
+		remove
+		{
+		}
+	}
+
+	event EmptyEventHandler IViewAdapter.HideView
+	{
+		add
+		{
+		}
+		remove
+		{
+		}
+	}
+
+	public void Show()
+	{
+	}
+
+	public void Hide()
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 225
+PATH: Assembly-CSharp__Beam.UI__OptionButtonDecoratorBase.cs
+SIZE: 2816 bytes
+SHA256: 1d1f086e21fca09b7ddf6ac4095f937f267b9b0a68b039b29a2f4d759577f395
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class OptionButtonDecoratorBase : IOptionButtonViewAdapter, IOptionWidgetViewAdapter, ISelectableViewAdapter, IViewAdapter, IButtonViewAdapter
+{
+	private readonly IOptionButtonViewAdapter _button;
+
+	public Transform transform => _button.transform;
+
+	public bool Visible => _button.Visible;
+
+	public bool Enabled
+	{
+		get
+		{
+			return _button.Enabled;
+		}
+		set
+		{
+			_button.Enabled = value;
+		}
+	}
+
+	public bool Interactable
+	{
+		get
+		{
+			return _button.Interactable;
+		}
+		set
+		{
+			_button.Interactable = value;
+		}
+	}
+
+	public string Text
+	{
+		get
+		{
+			return _button.Text;
+		}
+		set
+		{
+			_button.Text = value;
+		}
+	}
+
+	public Color Color => _button.Color;
+
+	public string SelectedText
+	{
+		get
+		{
+			return _button.SelectedText;
+		}
+		set
+		{
+			_button.SelectedText = value;
+		}
+	}
+
+	public int SelectedIndex
+	{
+		get
+		{
+			return _button.SelectedIndex;
+		}
+		set
+		{
+			_button.SelectedIndex = value;
+		}
+	}
+
+	public IOptionElementData SelectedElement => _button.SelectedElement;
+
+	public IReadOnlyList<IOptionElementData> Elements => _button.Elements;
+
+	public event EmptyEventHandler ShowView;
+
+	public event EmptyEventHandler HideView;
+
+	public event Action<object> Click;
+
+	public event Action<ISelectableViewAdapter> Selected;
+
+	public event Action<IOptionButtonViewAdapter> SelectionChanged;
+
+	public event Action<ISelectableViewAdapter> MouseEnter;
+
+	public event Action<ISelectableViewAdapter> MouseLeave;
+
+	protected OptionButtonDecoratorBase(IOptionButtonViewAdapter button)
+	{
+		_button = button;
+		_button.ShowView += () =>
+		{
+			ShowView?.Invoke();
+		};
+		_button.HideView += () =>
+		{
+			HideView?.Invoke();
+		};
+		_button.Click += (object sender) =>
+		{
+			Click?.Invoke(this);
+		};
+		_button.Selected += (ISelectableViewAdapter sender) =>
+		{
+			Selected?.Invoke(this);
+		};
+		_button.SelectionChanged += (IOptionButtonViewAdapter sender) =>
+		{
+			SelectionChanged?.Invoke(this);
+		};
+		_button.MouseEnter += (ISelectableViewAdapter sender) =>
+		{
+			MouseEnter?.Invoke(this);
+		};
+		_button.MouseLeave += (ISelectableViewAdapter sender) =>
+		{
+			MouseLeave?.Invoke(this);
+		};
+	}
+
+	public string GetTooltip()
+	{
+		return _button.GetTooltip();
+	}
+
+	public void Initialize(IEnumerable<IOptionElementData> elements)
+	{
+		_button.Initialize(elements);
+	}
+
+	public void Show()
+	{
+		_button.Show();
+	}
+
+	public void Hide()
+	{
+		_button.Hide();
+	}
+
+	public void PerformClick()
+	{
+		_button.PerformClick();
+	}
+
+	public void Select()
+	{
+		_button.Select();
+	}
+
+	public void ClearEventSubscribers()
+	{
+		_button.ClearEventSubscribers();
+		ShowView = null;
+		HideView = null;
+		Click = null;
+		Selected = null;
+		SelectionChanged = null;
+		MouseEnter = null;
+		MouseLeave = null;
+	}
+}
+
+

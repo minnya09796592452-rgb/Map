@@ -1,0 +1,4403 @@
+
+====================================================================================================
+SOURCE FILE 176
+PATH: Assembly-CSharp__Beam.Terrain__ZoneLoader.cs
+SIZE: 25252 bytes
+SHA256: 4e3a59b52d0645f6ab951cd432f74169b011d5375b50b4c4b0885f418bcc5273
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Beam.Rendering;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using SharpNeatLib.Maths;
+using Sirenix.Utilities;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class ZoneLoader : ILoader
+{
+	public delegate void GenerationCallback(IGenerationObject obj, Vector3 position, Quaternion rotation, Zone zone);
+
+	public delegate void ProcessCollectionCallback<in T>(T obj, Zone zone);
+
+	public enum EObjectProcessingMode
+	{
+		Stepped,
+		Faster
+	}
+
+	private const int MIN_PROCESSING_STEPS_PER_FRAME = 4;
+
+	private const int MAX_PROCESSING_STEPS_PER_FRAME = 200;
+
+	private const int INDEX_SIZE = 256;
+
+	[SerializeField]
+	private bool _simulateSlowLoad;
+
+	private List<Action> _internalDeferredLoading = new List<Action>();
+
+	private List<Action> _deferredLoading = new List<Action>();
+
+	private List<Action> _postLoading = new List<Action>();
+
+	private List<Action> _physicalLoading = new List<Action>();
+
+	private bool _isGenerating;
+
+	private FastRandom _random = new FastRandom();
+
+	private Vector3 _position;
+
+	private int _processes;
+
+	private Stopwatch _timer = new Stopwatch();
+
+	private float _timeout;
+
+	public IList<Action> DeferredLoading => _deferredLoading;
+
+	public IList<Action> PostLoading => _postLoading;
+
+	public IList<Action> PhysicalLoading => _physicalLoading;
+
+	public bool IsGenerating => _isGenerating;
+
+	public bool IsLoading { get; set; }
+
+	public FastRandom Random => _random;
+
+	public EObjectProcessingMode ObjectProcessingMode { get; set; }
+
+	public event Action<Zone> CreatedZone;
+
+	public event Action<Zone> LoadedZone;
+
+	private void OnDestroy()
+	{
+		CreatedZone = null;
+		LoadedZone = null;
+	}
+
+	public float LoadZone_Async(Zone zone, JObject data)
+	{
+		return Timing.WaitUntilDone(LoadZone(zone, data));
+	}
+
+	public CoroutineHandle LoadZone(Zone zone, JObject data)
+	{
+		return Timing.RunCoroutine(LoadZone_Sequence(zone, data), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> LoadZone_Sequence(Zone zone, JObject data)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		LevelLoader.Instance.LoadingZones.Add(zone);
+		LevelLoader.Instance.HashCodes.Clear();
+		LevelLoader.CurrentLoader = this;
+		LevelLoader.CurrentLoader.IsLoading = true;
+		ResetTemporaryLoadingPosition();
+		zone.Loading = true;
+		zone.Enter();
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		JObject field = data.GetField("Attributes");
+		if (field != null)
+		{
+			SavingUtilities.Load(zone.Attributes, field);
+		}
+		_processes = 4;
+		JObject field2 = data.GetField("Objects");
+		if (field2 != null && !field2.IsNull())
+		{
+			yield return ProcessCollection_Async(field2.Children, CreateLoadedPrefab, zone);
+			if (Game.Mode.IsClient())
+			{
+				yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+			}
+		}
+		else
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Zone [" + zone.ZoneName + "] [Objects] field is null or empty.");
+		}
+		yield return 0f;
+		yield return 0f;
+		yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.ProcessLoading));
+		yield return ProcessCollection_Async(_internalDeferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_deferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_postLoading, InvokeCallback, zone);
+		if (AssetBundleManager.IsLoading)
+		{
+			UnityEngine.Debug.Log("ZoneLoader::LoadZoneAsync:: [" + zone.ZoneName + "] waiting for bundles to load...");
+		}
+		while (AssetBundleManager.IsLoading)
+		{
+			yield return 0f;
+		}
+		yield return 0f;
+		for (int i = 0; i < _physicalLoading.Count; i++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(_physicalLoading[i]);
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		LoadedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		if (Game.Mode.IsMaster())
+		{
+			Singleton<StrandedWorld>.Instance.HandleOutOfGameBounds(zone, handleNmlContainer: true);
+		}
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public void AbortLoadingZone(Zone zone)
+	{
+		Timing.KillCoroutines(100);
+		BeamTeam.DestroyAllChildrenImmediate(zone.SaveContainer);
+		Transform parent = Singleton<StrandedWorld>.Instance.GetParent();
+		for (int num = parent.childCount - 1; num >= 0; num--)
+		{
+			Transform child = parent.GetChild(num);
+			if (Singleton<StrandedWorld>.Instance.InBounds(child.position))
+			{
+				BeamTeam.DestroyImmediate(child.gameObject);
+			}
+		}
+		zone.Exit();
+		zone.Loading = false;
+		zone.Loaded = false;
+		_ = _isGenerating;
+		CleanUp(zone);
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void CleanUp(Zone zone)
+	{
+		_timer.Stop();
+		_isGenerating = false;
+		if (!LevelLoader.CurrentLoader.IsNullOrDestroyed())
+		{
+			_internalDeferredLoading.Clear();
+			_deferredLoading.Clear();
+			_postLoading.Clear();
+			_physicalLoading.Clear();
+			LevelLoader.CurrentLoader.IsLoading = false;
+			LevelLoader.CurrentLoader = null;
+			LevelLoader.Instance.HashCodes.Clear();
+			LevelLoader.Instance.LoadingZones.Remove(zone);
+		}
+	}
+
+	public bool CreateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		CreateZoneObjects(zone);
+		return true;
+	}
+
+	public float CreateZoneObjects_Async(Zone zone, int seed)
+	{
+		return Timing.WaitUntilDone(CreateZoneObjects(zone));
+	}
+
+	private CoroutineHandle CreateZoneObjects(Zone zone)
+	{
+		return Timing.RunCoroutine(CreateZoneObjects_Sequence(zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> CreateZoneObjects_Sequence(Zone zone)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		_isGenerating = true;
+		zone.Loading = true;
+		zone.Enter();
+		_processes = 1;
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		yield return ProcessCollection_Async(zone.GeneratedObjects, CreateGeneratedPrefab, zone);
+		if (Game.Mode.IsClient())
+		{
+			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		CreatedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		_isGenerating = false;
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public bool GenerateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		GenerateObjects(zone, GenerateObject);
+		return true;
+	}
+
+	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
+	{
+		_isGenerating = true;
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		zone.GenerateGridData();
+		zone.GeneratedObjects.Clear();
+		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
+		if (zone.HasShelter)
+		{
+			GenerateShelter(sheltersGeneration, zone, generationCallback);
+		}
+		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
+		{
+			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
+			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
+			{
+				continue;
+			}
+			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
+			{
+				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
+				switch (zoneObjects.generationType)
+				{
+				case ZoneGenerationType.Position:
+					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
+					break;
+				case ZoneGenerationType.Procedural:
+					GenerateProceduralObjectsProcedural(zoneObjects, zone, generationCallback);
+					break;
+				}
+			}
+		}
+		if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL)
+		{
+			for (int k = 0; k < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration.Count; k++)
+			{
+				ObjectCategory objectCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration[k];
+				for (int l = 0; l < objectCategory.ProceduralObjects.Count; l++)
+				{
+					ZoneObjects zoneObjects2 = objectCategory.ProceduralObjects[l];
+					switch (zoneObjects2.generationType)
+					{
+					case ZoneGenerationType.Position:
+						GenerateProceduralObjectsPosition(zoneObjects2, zone, generationCallback);
+						break;
+					case ZoneGenerationType.Procedural:
+						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
+						break;
+					}
+				}
+			}
+		}
+		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+		_isGenerating = false;
+	}
+
+	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+		{
+			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			int num2 = 0;
+			if (zoneObjects.Objects.Length != 0)
+			{
+				float num3 = (float)_random.NextDouble() * num;
+				for (int k = 0; k < zoneObjects.Objects.Length; k++)
+				{
+					if (num3 < zoneObjects.Objects[k].Rarity)
+					{
+						num2 = k;
+						break;
+					}
+					num3 -= zoneObjects.Objects[k].Rarity;
+				}
+			}
+			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+			Quaternion identity = Quaternion.identity;
+			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+			generationCallback(obj, position, identity, zone);
+		}
+	}
+
+	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num2 = 0;
+		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
+		{
+			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
+			{
+				if (num2 >= zoneObjects.maxObjectCount)
+				{
+					return;
+				}
+				GenerationPoints generationPoints = zone.GenerationPoints[j, k];
+				if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f) || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+				{
+					continue;
+				}
+				int num3 = 0;
+				if (zoneObjects.Objects.Length != 0)
+				{
+					float num4 = (float)_random.NextDouble() * num;
+					for (int l = 0; l < zoneObjects.Objects.Length; l++)
+					{
+						if (num4 < zoneObjects.Objects[l].Rarity)
+						{
+							num3 = l;
+							break;
+						}
+						num4 -= zoneObjects.Objects[l].Rarity;
+					}
+				}
+				Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+				Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+				Quaternion quaternion = Quaternion.identity;
+				if (zoneObjects.terrainSnap)
+				{
+					quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+				}
+				int num5 = _random.Next(0, 360);
+				if (zoneObjects.randomRotation)
+				{
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num5)) : Quaternion.Euler(Vector3.up * num5));
+				}
+				else if (zoneObjects.randomFullRotation)
+				{
+					int num6 = _random.Next(0, 360);
+					int num7 = _random.Next(0, 360);
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num6, num5, num7))) : Quaternion.Euler(new Vector3(num6, num5, num7)));
+				}
+				if (zoneObjects.occupyPoint)
+				{
+					generationPoints.Occupied = true;
+				}
+				IGenerationObject obj = zoneObjects.Objects[num3].Obj;
+				generationCallback(obj, position, quaternion, zone);
+				if (zoneObjects.maxObjectCount != 0)
+				{
+					num2++;
+				}
+			}
+		}
+	}
+
+	private void GenerateShelter(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (!zone.HasShelter)
+		{
+			return;
+		}
+		int shelterType = zone.ShelterType;
+		UnityEngine.Debug.Log(">>Generating shelter type : " + zoneObjects.Objects[shelterType].Obj.gameObject.name + ", on Zone :" + zone.ZoneName);
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num = 0;
+		int num2 = ((shelterType == 7) ? 8 : ((int)Mathf.Sqrt(zoneObjects.detailAmountFactor)));
+		int num3 = 257;
+		int num4 = 100;
+		int num5 = num3 * num3 % num4;
+		int num6 = 0;
+		int num7 = 0;
+		_ = num3 * num3 / num4;
+		if (num3 * num3 % num4 <= 0)
+		{
+		}
+		while (num6 < num3 * num3 && num < 1)
+		{
+			num7 = 0;
+			int num8 = num6 % num4;
+			int num9 = num6 / num4;
+			num6++;
+			for (int i = 0; i < num8; i++)
+			{
+				num7 = ((i >= num5) ? (num7 + num3 * num3 / detailAmountFactor) : (num7 + (num3 * num3 / num4 + 1)));
+			}
+			num7 += num9;
+			if (num7 >= num3 * num3)
+			{
+				continue;
+			}
+			int num10 = num7 / num3;
+			int num11 = num7 % num3;
+			if (num10 >= num3 - 1 || num11 >= num3 - 1 || !((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			GenerationPoints generationPoints = zone.GenerationPoints[num10, num11];
+			bool flag = false;
+			for (int j = num10 - num2; j <= num10 + num2; j++)
+			{
+				if (j < 0 || j >= num3 - 1)
+				{
+					continue;
+				}
+				for (int k = num11 - num2; k <= num11 + num2; k++)
+				{
+					if (k >= 0 && k < num3 - 1 && zone.GenerationPoints[j, k].Occupied)
+					{
+						flag = true;
+					}
+				}
+			}
+			if (flag || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+			{
+				continue;
+			}
+			Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+			Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+			Quaternion quaternion = Quaternion.identity;
+			if (zoneObjects.terrainSnap)
+			{
+				quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+			}
+			int num12 = _random.Next(0, 360);
+			if (zoneObjects.randomRotation)
+			{
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num12)) : Quaternion.Euler(Vector3.up * num12));
+			}
+			else if (zoneObjects.randomFullRotation)
+			{
+				int num13 = _random.Next(0, 360);
+				int num14 = _random.Next(0, 360);
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num13, num12, num14))) : Quaternion.Euler(new Vector3(num13, num12, num14)));
+			}
+			if (zoneObjects.occupyPoint)
+			{
+				generationPoints.Occupied = true;
+				for (int l = num10 - num2; l <= num10 + num2; l++)
+				{
+					if (l < 0 || l >= num3 - 1)
+					{
+						continue;
+					}
+					for (int m = num11 - num2; m <= num11 + num2; m++)
+					{
+						if (m >= 0 && m < num3 - 1)
+						{
+							zone.GenerationPoints[l, m].Occupied = true;
+						}
+					}
+				}
+			}
+			IGenerationObject obj = zoneObjects.Objects[shelterType].Obj;
+			generationCallback(obj, position, quaternion, zone);
+			num++;
+		}
+	}
+
+	private void GenerateObject(IGenerationObject generationObject, Vector3 position, Quaternion rotation, Zone zone)
+	{
+		GeneratedObject generatedObject = new GeneratedObject();
+		generatedObject.Prefab = generationObject.gameObject;
+		generatedObject.Position = position;
+		generatedObject.Rotation = rotation;
+		generatedObject.ImpostorParentPrefab = generationObject.gameObject.GetInterface<IImpostorParent>();
+		zone.OnObjectGenerated(generatedObject);
+	}
+
+	private void CreateGeneratedPrefab(GeneratedObject objectData, Zone zone)
+	{
+		SaveablePrefab component = objectData.Prefab.GetComponent<SaveablePrefab>();
+		GameObject gameObject;
+		if (component != null)
+		{
+			uint prefabId = component.PrefabId;
+			MiniGuid referenceId = MiniGuid.NewFrom(objectData.Position, prefabId, 48879);
+			if (Game.Mode.IsClient() && component.IsMultiplayerEntity)
+			{
+				MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneGeneration, referenceId, ClientSetParent, null, zone);
+				return;
+			}
+			gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, objectData.Position, objectData.Rotation, referenceId).gameObject;
+		}
+		else
+		{
+			gameObject = UnityEngine.Object.Instantiate(objectData.Prefab, objectData.Position, objectData.Rotation);
+		}
+		gameObject.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		gameObject.transform.position = objectData.Position;
+		gameObject.transform.rotation = objectData.Rotation;
+		zone.OnObjectCreated(gameObject);
+	}
+
+	private void CreateLoadedPrefab(JObject data, Zone zone)
+	{
+		JObject field = data.GetField("prefab");
+		if (field == null)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading. No prefab id field found for object data.");
+			return;
+		}
+		uint num = Prefabs.ConvertLegacyPrefabId(field);
+		if (num == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading instantiated object with empty prefab id.");
+			return;
+		}
+		bool flag = Prefabs.TryGetMultiplayerPrefabName(num, out var _);
+		if (Game.Mode.IsClient() & flag)
+		{
+			MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneLoading, Prefabs.GetReferenceId(data), ClientLoad, data, zone);
+		}
+		else
+		{
+			Load(data, _position, zone, MultiplayerMng.Instantiate<SaveablePrefab>(num, Prefabs.GetReferenceId(data)));
+		}
+		_position += new Vector3(0f, 0f, 50f);
+	}
+
+	private void Load(JObject data, Vector3 position, Zone zone, SaveablePrefab instance)
+	{
+		LevelLoader.Instance.HashCodes.Add(instance.gameObject.GetHashCode());
+		instance.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		instance.transform.position = position;
+		string prefabName = instance.name;
+		_internalDeferredLoading.Add(() =>
+		{
+			if (instance.gameObject == null)
+			{
+				UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading prefab [" + prefabName + "]->Object was modified before loading began.\nCheck the object's Awake, Start, Update and FixedUpdate methods for missing [LevelLoader.IsLoading] checks.");
+			}
+			else
+			{
+				if (zone.IsMapEditor && !zone.HasVisited)
+				{
+					try
+					{
+						JSerializer.DeserializeInto(data.GetField("Transform"), instance.gameObject.transform);
+						instance.CompleteTransformSerialization();
+						instance.OnCustomMapLoaded();
+					}
+					catch (Exception ex)
+					{
+						UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading editor object [" + instance.name + "] Object has now been destroyed.\n\n" + ex);
+						MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+					}
+				}
+				else if (!SavingUtilities.Load(instance, data))
+				{
+					UnityEngine.Debug.LogError($"ZoneLoader::LoadZoneAsync:: Error loading [{instance.name}] [{instance.ReferenceId}]->Object has now been destroyed.");
+					MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+				}
+				if (instance.gameObject != null)
+				{
+					zone.OnObjectLoaded(instance.gameObject);
+				}
+			}
+		});
+	}
+
+	private void ClientLoad(MultiplayerZoneSync.Command command)
+	{
+		Load(command.Data, Vector3.zero, command.Zone, command.Instance);
+	}
+
+	private void ClientSetParent(MultiplayerZoneSync.Command command)
+	{
+		command.Instance.transform.SetParent(command.Zone.SaveContainer);
+	}
+
+	private void InvokeCallback(Action action, Zone zone)
+	{
+		LoadingActionUtilities.ExecuteDeferredAction(action);
+	}
+
+	private void ResetTemporaryLoadingPosition()
+	{
+		_position = new Vector3(0f, 5000f, 0f);
+	}
+
+	private float ProcessCollection_Async<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.WaitUntilDone(ProcessCollection(collection, callback, zone));
+	}
+
+	private CoroutineHandle ProcessCollection<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.RunCoroutine(ProcessCollection_Sequence(collection, callback, zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> ProcessCollection_Sequence<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		IEnumerator<T> enumerator = collection.GetEnumerator();
+		int index = 0;
+		bool stop = false;
+		while (!stop)
+		{
+			_ = collection.Count;
+			_ = index;
+			int processingSteps = GetProcessingSteps(collection.Count, zone.transform.position);
+			for (int i = 0; i < processingSteps; i++)
+			{
+				if (!enumerator.MoveNext())
+				{
+					stop = true;
+					break;
+				}
+				callback?.Invoke(enumerator.Current, zone);
+				index++;
+			}
+			yield return float.NegativeInfinity;
+		}
+		enumerator.Dispose();
+	}
+
+	private int GetProcessingSteps(int quantity, Vector3 position)
+	{
+		int b = ((ObjectProcessingMode == EObjectProcessingMode.Faster) ? 200 : 4);
+		Transform closestPlayer = GetClosestPlayer(position);
+		if (closestPlayer.IsNullOrDestroyed())
+		{
+			return 1;
+		}
+		float num = (position - closestPlayer.position).magnitude - 125f;
+		num /= (float)_processes;
+		return Mathf.Max(Mathf.CeilToInt((float)quantity / Mathf.Max(1f, num)), b);
+	}
+
+	private Transform GetClosestPlayer(Vector3 position)
+	{
+		if (PlayerRegistry.AllPlayers.IsNullOrDestroyed() || PlayerRegistry.AllPlayers.Count == 0)
+		{
+			return null;
+		}
+		IPlayer player = PlayerRegistry.AllPlayers[0];
+		if (Game.Mode.GetPlayersCount() == 1)
+		{
+			return player.transform;
+		}
+		float num = float.PositiveInfinity;
+		for (int i = 1; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			IPlayer player2 = PlayerRegistry.AllPlayers[i];
+			float magnitude = (position - player2.transform.position).magnitude;
+			if (magnitude < num)
+			{
+				num = magnitude;
+				player = player2;
+			}
+		}
+		return player.transform;
+	}
+
+	private void UpdateSessionToken_IsBusy(bool isBusy)
+	{
+		if (Game.Mode.IsServer())
+		{
+			if (isBusy && !MultiplayerMng.GetSessionToken().IsBusy)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+			}
+			else if (!isBusy && !LevelLoader.IsCreatingOrLoading)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			}
+		}
+	}
+
+	private IEnumerator<float> ClientLinking()
+	{
+		float startTime = Time.unscaledTime;
+		bool shutdown = false;
+		do
+		{
+			if (Time.unscaledTime - startTime > MultiplayerZoneSync.CLIENT_LINK_TIME && !shutdown)
+			{
+				shutdown = true;
+				PlayerRegistry.LocalPeer.ReplicatedDisconnect(DisconnectDetail.Timeout_Linking, null, forceLocalShutdown: true);
+				MultiplayerZoneSync.Instance.DumpNotCompleted();
+			}
+			yield return 0f;
+		}
+		while (!MultiplayerZoneSync.Instance.IsLinked());
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 177
+PATH: Assembly-CSharp__Beam.Terrain__ZoneObjectGenerator.cs
+SIZE: 1952 bytes
+SHA256: d03e9589b3ce2676ba18e3ae33e8472684c53a4f201c7c001a763551377d1b78
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public static class ZoneObjectGenerator
+{
+	private const int INDEX_SIZE = 256;
+
+	public static GenerationPoints[,] GenerateGridData(Zone zone, int seed)
+	{
+		float num = 125f / 128f;
+		GenerationPoints[,] array = new GenerationPoints[256, 256];
+		UnityEngine.Terrain terrain = zone.Terrain;
+		TerrainData terrainData = zone.Terrain.terrainData;
+		float[,] heights = terrainData.GetHeights(0, 0, 257, 257);
+		float[,] array2 = WorldTools.GENERATE_ISLAND_HEIGHTMAP(StrandedWorld.WORLD_SEED - seed, zone.Biome, soilMapGeneration: true);
+		for (int i = 0; i < 256; i++)
+		{
+			for (int j = 0; j < 256; j++)
+			{
+				float y = 150f * heights[i, j] + -100f;
+				Vector3 pos = new Vector3(terrain.transform.position.x + num * (float)j, y, terrain.transform.position.z + num * (float)i);
+				float x = (pos.x - terrain.transform.position.x) / 250f;
+				float y2 = (pos.z - terrain.transform.position.z) / 250f;
+				Quaternion rot = Quaternion.LookRotation(Vector3.forward, terrainData.GetInterpolatedNormal(x, y2));
+				float steepness = terrainData.GetSteepness(x, y2);
+				array[i, j] = new GenerationPoints(pos, rot, occupied: false, steepness, array2[i, j]);
+			}
+		}
+		array2 = null;
+		heights = null;
+		return array;
+	}
+
+	private static void DebugSoilMap(Zone zone, float[,] soilMap)
+	{
+		GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Plane);
+		gameObject.gameObject.name = "Debug_SoilMap";
+		gameObject.transform.parent = zone.transform;
+		gameObject.transform.position = zone.transform.position + Vector3.up * 50f;
+		gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -90f, 0f));
+		gameObject.transform.localScale = new Vector3(-25f, 1f, 25f);
+		Texture2D texture2D = IslandDebugTexture.RenderSoilMapImageIcon(soilMap, 257);
+		texture2D.wrapMode = TextureWrapMode.Clamp;
+		texture2D.Apply();
+		gameObject.GetComponent<Renderer>().material.mainTexture = texture2D;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 178
+PATH: Assembly-CSharp__Beam.Testing__Lighting.cs
+SIZE: 8576 bytes
+SHA256: 946712ff61684b098a9da1757d0a98f8a9869161caa1791c99c5119bdbe388bc
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam.Testing;
+
+public class Lighting : MonoBehaviour
+{
+	[SerializeField]
+	private Light _sunIlluminary;
+
+	[SerializeField]
+	private Light _moonIlluminary;
+
+	[SerializeField]
+	private float _sunLightIntensity;
+
+	[SerializeField]
+	private float _moonLightIntensity;
+
+	[SerializeField]
+	private Gradient _sunLightColorGradient;
+
+	[SerializeField]
+	private Gradient _moonLightColorGradient;
+
+	[SerializeField]
+	[HideInInspector]
+	private float _timeOfDay = 12f;
+
+	private float _latitude;
+
+	private float _longitude;
+
+	private float _date = 180f;
+
+	private float _sunOrbitRadius;
+
+	private float _altitude;
+
+	[SerializeField]
+	private Gradient _ambientGroundColorGradient;
+
+	[SerializeField]
+	private ReflectionProbe _environmentReflectionProbe;
+
+	private Material _skydomeMaterial;
+
+	[SerializeField]
+	private Texture2D _transmittance;
+
+	[SerializeField]
+	private Texture2D _inscatter;
+
+	private Texture3D _inscatterEncoded;
+
+	[SerializeField]
+	private Texture2D _irradiance;
+
+	[SerializeField]
+	private Texture2D _ambientLUT;
+
+	private Color _ambientLightColor;
+
+	private Transform _transform;
+
+	private Transform _mainCameraTransform;
+
+	public Light SunIlluminary => _sunIlluminary;
+
+	public Light MoonIlluminary => _moonIlluminary;
+
+	public float TimeOfDay
+	{
+		get
+		{
+			return _timeOfDay;
+		}
+		set
+		{
+			_timeOfDay = value;
+		}
+	}
+
+	public Gradient AmbientGroundColorGradient
+	{
+		get
+		{
+			return _ambientGroundColorGradient;
+		}
+		set
+		{
+			_ambientGroundColorGradient = value;
+		}
+	}
+
+	public Texture2D Transmittance
+	{
+		get
+		{
+			return _transmittance;
+		}
+		set
+		{
+			_transmittance = value;
+		}
+	}
+
+	public Texture2D Inscatter
+	{
+		get
+		{
+			return _inscatter;
+		}
+		set
+		{
+			_inscatter = value;
+		}
+	}
+
+	public Texture2D Irradiance
+	{
+		get
+		{
+			return _irradiance;
+		}
+		set
+		{
+			_irradiance = value;
+		}
+	}
+
+	private void Awake()
+	{
+		_transform = GetComponent<Transform>();
+		_mainCameraTransform = Camera.main.GetComponent<Transform>();
+		_sunOrbitRadius = _transform.localScale.x * 0.999f;
+		ConvertLookUpTable(_inscatter);
+		InitializeShaders();
+		_sunIlluminary.shadowStrength = 0.98f;
+		_moonIlluminary.shadowStrength = 0.98f;
+		RenderSettings.ambientIntensity = 1f;
+		if (SystemInfo.graphicsDeviceVersion.StartsWith("Direct3D 11"))
+		{
+			_environmentReflectionProbe.gameObject.SetActive(value: true);
+		}
+		_skydomeMaterial = GetComponent<Renderer>().sharedMaterial;
+		InitializeMaterial(_skydomeMaterial);
+	}
+
+	private void ConvertLookUpTable(Texture2D texture)
+	{
+		if ((bool)texture)
+		{
+			if (texture.height != Mathf.FloorToInt(Mathf.Sqrt(texture.width)))
+			{
+				Debug.LogWarning("Atmosphere::ConvertLookUpTable(): The given 2D texture " + texture.name + " cannot be used as a 3D LUT.");
+				return;
+			}
+			int num = 16;
+			int height = texture.height;
+			int num2 = 16;
+			Color[] pixels = texture.GetPixels();
+			Color[] array = new Color[pixels.Length];
+			for (int i = 0; i < num; i++)
+			{
+				for (int j = 0; j < height; j++)
+				{
+					for (int k = 0; k < num2; k++)
+					{
+						array[i + j * num + k * num * height] = pixels[i + j * num * num2 + k * num];
+					}
+				}
+			}
+			if ((bool)_inscatterEncoded)
+			{
+				UnityEngine.Object.DestroyImmediate(_inscatterEncoded);
+			}
+			_inscatterEncoded = new Texture3D(num, height, num2, TextureFormat.ARGB32, mipChain: false);
+			_inscatterEncoded.wrapMode = TextureWrapMode.Clamp;
+			_inscatterEncoded.filterMode = FilterMode.Bilinear;
+			_inscatterEncoded.SetPixels(array);
+			_inscatterEncoded.Apply();
+		}
+		else
+		{
+			Debug.LogError("Atmosphere::ConvertLookUpTable(): Couldn't load 3D LUT texture. Texture3D will be disabled.");
+		}
+	}
+
+	private void InitializeShaders()
+	{
+		Shader.SetGlobalFloat("_SkyFade", 0f);
+		Shader.SetGlobalFloat("_StormFade", 0f);
+	}
+
+	public void InitializeMaterial(Material material)
+	{
+		if ((bool)material)
+		{
+			material.SetTexture("_Transmittance", _transmittance);
+			material.SetTexture("_Inscatter", _inscatterEncoded);
+			material.SetTexture("_Irradiance", _irradiance);
+			material.SetFloat("_MieG", 0.8f);
+			material.SetFloat("Rg", 6360000f);
+			material.SetFloat("Rt", 6420000f);
+			material.SetFloat("Rl", 6421000f);
+			material.SetFloat("RES_R", 16f);
+			material.SetFloat("RES_MU", 16f);
+			material.SetFloat("RES_MU_S", 16f);
+			material.SetFloat("RES_NU", 1f);
+		}
+	}
+
+	private void Update()
+	{
+		ClampSkyPosition();
+		AdvanceTimeOfDay();
+		CalculateAmbientColor();
+		CalculateSunAndMoonPosition();
+		InitializeMaterial(_skydomeMaterial);
+		Shader.SetGlobalColor("_SunColor", _sunIlluminary.color.linear);
+		Shader.SetGlobalFloat("_SunIntensity", _sunIlluminary.intensity);
+		Shader.SetGlobalVector("_SunPosition", _sunIlluminary.transform.position);
+		Shader.SetGlobalVector("_SunDirection", _sunIlluminary.transform.forward * -1f);
+		Shader.SetGlobalVector("_MoonDirection", _moonIlluminary.transform.forward * -1f);
+	}
+
+	private void AdvanceTimeOfDay()
+	{
+		if (Input.GetKey(KeyCode.KeypadPlus))
+		{
+			_timeOfDay += Time.deltaTime;
+			if (_timeOfDay > 24f)
+			{
+				_timeOfDay = 0f;
+			}
+		}
+		else if (Input.GetKey(KeyCode.KeypadMinus))
+		{
+			_timeOfDay -= Time.deltaTime;
+			if (_timeOfDay < 0f)
+			{
+				_timeOfDay = 24f;
+			}
+		}
+	}
+
+	private void ClampSkyPosition()
+	{
+		Vector3 position = _mainCameraTransform.position;
+		position.y = 0f;
+		_transform.position = position;
+	}
+
+	private void CalculateSunAndMoonPosition()
+	{
+		float f = MathF.PI / 180f * _latitude;
+		float num = Mathf.Sin(f);
+		float num2 = Mathf.Cos(f);
+		float num3 = MathF.PI / 180f * _longitude;
+		float f2 = 0.4093f * Mathf.Sin(MathF.PI / 184f * (_date - 81f));
+		float num4 = Mathf.Sin(f2);
+		float num5 = Mathf.Cos(f2);
+		float num6 = (int)(_longitude / 15f);
+		float num7 = MathF.PI / 12f * num6;
+		float num8 = _timeOfDay + 0.17f * Mathf.Sin(0.03369f * (_date - 80f)) - 0.129f * Mathf.Sin(MathF.PI * 2f / 355f * (_date - 8f)) + 12f / MathF.PI * (num7 - num3);
+		float f3 = MathF.PI / 12f * num8;
+		float num9 = Mathf.Sin(f3);
+		float num10 = Mathf.Cos(f3);
+		float num11 = Mathf.Asin(num * num4 - num2 * num5 * num10);
+		float y = (0f - num5) * num9;
+		float x = num2 * num4 - num * num5 * num10;
+		float num12 = Mathf.Atan2(y, x);
+		float num13 = MathF.PI / 2f - num11;
+		float phi = num12;
+		_sunIlluminary.transform.position = _transform.position + _transform.rotation * SphericalToCartesian(_sunOrbitRadius, num13, phi);
+		_sunIlluminary.transform.LookAt(_transform.position);
+		_moonIlluminary.transform.position = _transform.position + _transform.rotation * SphericalToCartesian(_sunOrbitRadius, num13 + MathF.PI, phi);
+		_moonIlluminary.transform.LookAt(_transform.position);
+		CalculateSunAndMoonColor(num13);
+	}
+
+	private void CalculateSunAndMoonColor(float theta)
+	{
+		_altitude = MathF.PI / 2f - theta;
+		float num = Mathf.Abs(_altitude);
+		float num2 = MathF.PI / 180f;
+		float num3 = MathF.PI / 15f;
+		if (_altitude > 0f)
+		{
+			_moonIlluminary.enabled = false;
+			_sunIlluminary.enabled = true;
+			float num4 = Mathf.Lerp(0f, _sunLightIntensity, num / num2);
+			_sunIlluminary.intensity = ((num < num2) ? num4 : _sunLightIntensity);
+		}
+		else
+		{
+			_moonIlluminary.enabled = true;
+			_sunIlluminary.enabled = false;
+			float num5 = Mathf.Lerp(0f, _moonLightIntensity, num / num3);
+			_moonIlluminary.intensity = ((num < num3) ? num5 : _moonLightIntensity);
+		}
+		float time = 1f / 24f * _timeOfDay;
+		Color color = _sunLightColorGradient.Evaluate(time);
+		Color color2 = _moonLightColorGradient.Evaluate(time);
+		_sunIlluminary.color = color;
+		_moonIlluminary.color = color2;
+		Color color3 = _ambientGroundColorGradient.Evaluate(time);
+		RenderSettings.ambientLight = _ambientLightColor;
+		RenderSettings.ambientEquatorColor = Color.Lerp(color3, _ambientLightColor, 0.6f);
+		RenderSettings.ambientGroundColor = color3;
+		if (_environmentReflectionProbe.gameObject.activeSelf)
+		{
+			_environmentReflectionProbe.backgroundColor = color3;
+		}
+	}
+
+	private void CalculateAmbientColor()
+	{
+		int num = (int)_timeOfDay;
+		int x = num + 1;
+		float t = _timeOfDay - (float)(int)_timeOfDay;
+		Color pixel = _ambientLUT.GetPixel(num, 0);
+		Color pixel2 = _ambientLUT.GetPixel(x, 0);
+		_ambientLightColor = Color.Lerp(pixel, pixel2, t);
+	}
+
+	private Vector3 SphericalToCartesian(float radius, float theta, float phi)
+	{
+		float num = Mathf.Sin(theta);
+		float num2 = Mathf.Cos(theta);
+		float num3 = Mathf.Sin(phi);
+		float num4 = Mathf.Cos(phi);
+		Vector3 zero = Vector3.zero;
+		zero.x = radius * num * num4;
+		zero.y = radius * num2;
+		zero.z = radius * num * num3;
+		return zero;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 179
+PATH: Assembly-CSharp__Beam.UI.Crafting__CrafterMenuViewAdapterBase.cs
+SIZE: 1478 bytes
+SHA256: 2221ed00ba52ef2270bc7277beff81f7c6c802affb802c4a684f0c5e024bb4b3
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Crafting;
+using UnityEngine;
+
+namespace Beam.UI.Crafting;
+
+public abstract class CrafterMenuViewAdapterBase : ViewAdapterBase
+{
+	public abstract ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract ICanvasGroupViewAdapter CategoryCanvasGroup { get; }
+
+	public abstract ICanvasGroupViewAdapter CombinationsCanvasGroup { get; }
+
+	public abstract IScrollviewViewAdapter Scrollview { get; }
+
+	public abstract IScrollviewViewAdapter SubcategoriesScrollview { get; }
+
+	public abstract ILabelViewAdapter CategoryLabel { get; }
+
+	public abstract IGameObjectViewAdapter InfoContainer { get; }
+
+	public abstract ILabelViewAdapter InfoLabel { get; }
+
+	public abstract ITransformViewAdapter CategoryButtonContainer { get; }
+
+	public abstract ILabelButtonViewAdapter NextCategoryButton { get; }
+
+	public abstract ILabelButtonViewAdapter PreviousCategoryButton { get; }
+
+	public abstract Texture2D BlurMaskTexture { get; }
+
+	public abstract IList<TMPCraftingSubcategoryButtonViewAdapter> SubcategoryButtons { get; }
+
+	public abstract IList<CombinationButtonPresenter> CombinationButtons { get; }
+
+	public abstract TMPCraftingSubcategoryButtonViewAdapter CreateSubcategoryButton();
+
+	public abstract CombinationButtonPresenter CreateCombinationButton();
+
+	public abstract void DestroySubcategoryButtons();
+
+	public abstract void DestroyCombinationButtons();
+
+	public abstract void SetNavigation(CraftingSubcategory currentSubcategory);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 180
+PATH: Assembly-CSharp__Beam.UI.Crafting__NullCrafterMenuViewAdapter.cs
+SIZE: 2618 bytes
+SHA256: 08afd553aff98ccb984f3e3413cd6c6d4aa0a45074ddc8512c8e60e83b7ea22b
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Crafting;
+using UnityEngine;
+
+namespace Beam.UI.Crafting;
+
+public class NullCrafterMenuViewAdapter : CrafterMenuViewAdapterBase
+{
+	public static NullCrafterMenuViewAdapter Instance { get; } = new NullCrafterMenuViewAdapter();
+
+	public override ICanvasGroupViewAdapter CanvasGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+
+	public override ICanvasGroupViewAdapter CategoryCanvasGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+
+	public override ICanvasGroupViewAdapter CombinationsCanvasGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
+
+	public override IScrollviewViewAdapter Scrollview => NullScrollviewViewAdapter.Instance;
+
+	public override IScrollviewViewAdapter SubcategoriesScrollview => NullScrollviewViewAdapter.Instance;
+
+	public override ILabelViewAdapter CategoryLabel => NullViewAdapter<NullLabelViewAdapter>.Instance;
+
+	public override IGameObjectViewAdapter InfoContainer => NullObject<NullGameObjectViewAdapter>.Instance;
+
+	public override ILabelViewAdapter InfoLabel => NullViewAdapter<NullLabelViewAdapter>.Instance;
+
+	public override ITransformViewAdapter CategoryButtonContainer => NullObject<NullTransformViewAdapter>.Instance;
+
+	public override ILabelButtonViewAdapter NextCategoryButton => NullLabelButtonViewAdapter.Instance;
+
+	public override ILabelButtonViewAdapter PreviousCategoryButton => NullLabelButtonViewAdapter.Instance;
+
+	public override Texture2D BlurMaskTexture => Texture2D.blackTexture;
+
+	public override IList<TMPCraftingSubcategoryButtonViewAdapter> SubcategoryButtons => new List<TMPCraftingSubcategoryButtonViewAdapter>();
+
+	public override IList<CombinationButtonPresenter> CombinationButtons => new List<CombinationButtonPresenter>();
+
+	public override void SetNavigation(CraftingSubcategory currentSubcategory)
+	{
+		Debug.LogError("NullCrafterMenuViewAdapter::SetNavigation:: Not implemented.");
+	}
+
+	public override TMPCraftingSubcategoryButtonViewAdapter CreateSubcategoryButton()
+	{
+		Debug.LogError("NullCrafterMenuViewAdapter::CreateSubcategoryButton:: Not implemented.");
+		return null;
+	}
+
+	public override CombinationButtonPresenter CreateCombinationButton()
+	{
+		Debug.LogError("NullCrafterMenuViewAdapter::CreateCombinationButton:: Not implemented.");
+		return null;
+	}
+
+	public override void DestroySubcategoryButtons()
+	{
+		Debug.LogError("NullCrafterMenuViewAdapter::DestroySubcategoryButtons:: Not implemented.");
+	}
+
+	public override void DestroyCombinationButtons()
+	{
+		Debug.LogError("NullCrafterMenuViewAdapter::DestroyCombinationButtons:: Not implemented.");
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 181
+PATH: Assembly-CSharp__Beam.UI.Crafting__TMPCrafterMenuViewAdapter.cs
+SIZE: 7471 bytes
+SHA256: 41e11947d8e0032912993752e81518c9b8a4255c089e556a0d1c917f6113f1af
+====================================================================================================
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Crafting;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI.Crafting;
+
+public class TMPCrafterMenuViewAdapter : CrafterMenuViewAdapterBase
+{
+	[SerializeField]
+	private GameObject _crafterPanel;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _categoryCanvasGroup;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _combinationsCanvasGroup;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _scrollview;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _subcategoriesScrollview;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _categoryLabel;
+
+	[SerializeField]
+	private GameObjectViewAdapter _infoContainer;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _infoLabel;
+
+	[SerializeField]
+	private TransformViewAdapter _categoryButtonContainer;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _nextCategoryButton;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _previousCategoryButton;
+
+	[SerializeField]
+	private TMPCraftingSubcategoryButtonViewAdapter _subcategoryButtonPrefab;
+
+	[SerializeField]
+	private Transform _subcategoriesContainer;
+
+	[SerializeField]
+	private CombinationButtonPresenter _combinationButtonPrefab;
+
+	[SerializeField]
+	private Transform _combinationsContainer;
+
+	[SerializeField]
+	private Texture2D _blurMaskTexture;
+
+	private List<TMPCraftingSubcategoryButtonViewAdapter> _subcategoryButtons = new List<TMPCraftingSubcategoryButtonViewAdapter>();
+
+	private List<CombinationButtonPresenter> _combinationButtons = new List<CombinationButtonPresenter>();
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override ICanvasGroupViewAdapter CategoryCanvasGroup => _categoryCanvasGroup;
+
+	public override ICanvasGroupViewAdapter CombinationsCanvasGroup => _combinationsCanvasGroup;
+
+	public override IScrollviewViewAdapter Scrollview => _scrollview;
+
+	public override IScrollviewViewAdapter SubcategoriesScrollview => _subcategoriesScrollview;
+
+	public override ILabelViewAdapter CategoryLabel => _categoryLabel;
+
+	public override IGameObjectViewAdapter InfoContainer => _infoContainer;
+
+	public override ILabelViewAdapter InfoLabel => _infoLabel;
+
+	public override ITransformViewAdapter CategoryButtonContainer => _categoryButtonContainer;
+
+	public override ILabelButtonViewAdapter NextCategoryButton => _nextCategoryButton;
+
+	public override ILabelButtonViewAdapter PreviousCategoryButton => _previousCategoryButton;
+
+	public override Texture2D BlurMaskTexture => _blurMaskTexture;
+
+	public override IList<TMPCraftingSubcategoryButtonViewAdapter> SubcategoryButtons => _subcategoryButtons;
+
+	public override IList<CombinationButtonPresenter> CombinationButtons => _combinationButtons;
+
+	public override void Show()
+	{
+		_crafterPanel.SetActive(value: true);
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		_crafterPanel.SetActive(value: false);
+		DestroySubcategoryButtons();
+		DestroyCombinationButtons();
+		base.Hide();
+	}
+
+	public override TMPCraftingSubcategoryButtonViewAdapter CreateSubcategoryButton()
+	{
+		TMPCraftingSubcategoryButtonViewAdapter tMPCraftingSubcategoryButtonViewAdapter = Object.Instantiate(_subcategoryButtonPrefab);
+		tMPCraftingSubcategoryButtonViewAdapter.transform.SetParent(_subcategoriesContainer.transform, worldPositionStays: false);
+		tMPCraftingSubcategoryButtonViewAdapter.transform.SetAsFirstSibling();
+		_subcategoryButtons.Add(tMPCraftingSubcategoryButtonViewAdapter);
+		return tMPCraftingSubcategoryButtonViewAdapter;
+	}
+
+	public override CombinationButtonPresenter CreateCombinationButton()
+	{
+		CombinationButtonPresenter combinationButtonPresenter = Object.Instantiate(_combinationButtonPrefab);
+		combinationButtonPresenter.transform.SetParent(_combinationsContainer.transform, worldPositionStays: false);
+		_combinationButtons.Add(combinationButtonPresenter);
+		return combinationButtonPresenter;
+	}
+
+	public override void DestroySubcategoryButtons()
+	{
+		BeamTeam.DestroyAllChildrenImmediate(_subcategoriesContainer.transform);
+		_subcategoryButtons.Clear();
+	}
+
+	public override void DestroyCombinationButtons()
+	{
+		BeamTeam.DestroyAllChildren(_combinationsContainer.transform);
+		_combinationButtons.Clear();
+	}
+
+	public override void SetNavigation(CraftingSubcategory currentSubcategory)
+	{
+		Transform transform = _subcategoryButtons.FirstOrDefault((TMPCraftingSubcategoryButtonViewAdapter subcategoryButton) => subcategoryButton.Subcategory.Name == currentSubcategory?.Name)?.transform;
+		Transform transform2 = _combinationButtons.FirstOrDefault((CombinationButtonPresenter combinationButton) => combinationButton.Combination.Unlocked)?.transform;
+		for (int num = 0; num < _subcategoryButtons.Count; num++)
+		{
+			TMPCraftingSubcategoryButtonViewAdapter tMPCraftingSubcategoryButtonViewAdapter = _subcategoryButtons[num];
+			tMPCraftingSubcategoryButtonViewAdapter.transform.SetNavigation(NavigationDirection.Up, _nextCategoryButton.transform);
+			tMPCraftingSubcategoryButtonViewAdapter.transform.SetNavigation(NavigationDirection.Down, (CombinationsCanvasGroup.Interactable && transform2 != null) ? transform2 : null);
+			int num2 = num + 1;
+			TMPCraftingSubcategoryButtonViewAdapter element = ((num2 < _subcategoryButtons.Count) ? _subcategoryButtons[num2] : null);
+			tMPCraftingSubcategoryButtonViewAdapter.SetNavigation(NavigationDirection.Left, element);
+			int num3 = num - 1;
+			TMPCraftingSubcategoryButtonViewAdapter element2 = ((num3 >= 0) ? _subcategoryButtons[num3] : null);
+			tMPCraftingSubcategoryButtonViewAdapter.SetNavigation(NavigationDirection.Right, element2);
+		}
+		for (int num4 = 0; num4 < _combinationButtons.Count; num4++)
+		{
+			CombinationButtonPresenter combinationButtonPresenter = _combinationButtons[num4];
+			int previousCombination = GetPreviousCombination(_combinationButtons, num4);
+			global::ExtensionMethods.SetNavigation(element: (previousCombination != -1) ? _combinationButtons[previousCombination].transform : transform, component: combinationButtonPresenter.transform, direction: NavigationDirection.Up);
+			int nextCombination = GetNextCombination(_combinationButtons, num4);
+			global::ExtensionMethods.SetNavigation(element: (nextCombination != -1) ? _combinationButtons[nextCombination].transform : null, component: combinationButtonPresenter.transform, direction: NavigationDirection.Down);
+		}
+		_nextCategoryButton.transform.SetNavigation(NavigationDirection.Left, _previousCategoryButton.transform);
+		_nextCategoryButton.transform.SetNavigation(NavigationDirection.Down, transform);
+		_previousCategoryButton.transform.SetNavigation(NavigationDirection.Right, _nextCategoryButton.transform);
+		_previousCategoryButton.transform.SetNavigation(NavigationDirection.Down, transform);
+	}
+
+	private int GetNextCombination(IList<CombinationButtonPresenter> combinationButtons, int startingIndex)
+	{
+		int num = startingIndex + 1;
+		if (num < combinationButtons.Count)
+		{
+			if (!combinationButtons[num].Combination.Unlocked)
+			{
+				return GetNextCombination(combinationButtons, num);
+			}
+			return num;
+		}
+		return -1;
+	}
+
+	private int GetPreviousCombination(IList<CombinationButtonPresenter> combinationButtons, int startingIndex)
+	{
+		int num = startingIndex - 1;
+		if (num >= 0)
+		{
+			if (!combinationButtons[num].Combination.Unlocked)
+			{
+				return GetPreviousCombination(combinationButtons, num);
+			}
+			return num;
+		}
+		return -1;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 182
+PATH: Assembly-CSharp__Beam.UI.MapEditor__MapEditorSaveMenuPresenter.cs
+SIZE: 6067 bytes
+SHA256: 642fd10074b6f3d4c327f2b0cdda3e42d971d08fa5521e3a0d4aa78291140eaa
+====================================================================================================
+
+using System;
+using System.Linq;
+using Beam.AccountServices;
+using Beam.Language;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Terrain;
+using Funlabs;
+using LE_LevelEditor;
+using LE_LevelEditor.Core;
+using Rewired;
+using UnityEngine;
+
+namespace Beam.UI.MapEditor;
+
+public class MapEditorSaveMenuPresenter : MonoBehaviour
+{
+	private IMapEditorSaveMenuViewAdapter _view;
+
+	private bool _initialized;
+
+	public Map CurrentMap { get; set; }
+
+	public event EmptyEventHandler ShowView;
+
+	public event EmptyEventHandler HideView;
+
+	public event EmptyEventHandler Saved;
+
+	private void View_ShowView()
+	{
+		ShowView?.Invoke();
+	}
+
+	private void View_HideView()
+	{
+		HideView?.Invoke();
+	}
+
+	protected virtual void OnSaved()
+	{
+		Saved?.Invoke();
+	}
+
+	public void Initialize(IMapEditorSaveMenuViewAdapter view)
+	{
+		_view = view;
+		_view.ShowView += View_ShowView;
+		_view.HideView += View_HideView;
+		SetControlEvents();
+		Hide();
+		_initialized = true;
+	}
+
+	private void OnDestroy()
+	{
+		if (_initialized)
+		{
+			_view.ShowView -= View_ShowView;
+			_view.HideView -= View_HideView;
+			Saved = null;
+			ShowView = null;
+			HideView = null;
+			ClearControlEvents();
+		}
+	}
+
+	private void SetControlEvents()
+	{
+		_view.SaveButton.Click += SaveButton_Click;
+		_view.BackButton.Click += BackButton_Click;
+		_view.NameInputField.ValueChanged += NameInputField_Changed;
+	}
+
+	private void ClearControlEvents()
+	{
+		_view.SaveButton.Click -= SaveButton_Click;
+		_view.BackButton.Click -= BackButton_Click;
+		_view.NameInputField.ValueChanged -= NameInputField_Changed;
+	}
+
+	public void Show()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		player.SetAndCacheMapsEnabled(state: false, 11);
+		player.SetAndCacheMapsEnabled(state: true, 8);
+		if (!string.IsNullOrWhiteSpace(CurrentMap.EditorData.Name))
+		{
+			_view.NameInputField.Text = CurrentMap.EditorData.Name;
+		}
+		if (!string.IsNullOrWhiteSpace(CurrentMap.EditorData.Description))
+		{
+			_view.DescriptionInputField.Text = CurrentMap.EditorData.Description;
+		}
+		UpdatePreviewImage();
+		_view.Show();
+	}
+
+	public void Hide()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		player.SetAndCacheMapsEnabled(state: true, 11);
+		player.SetAndCacheMapsEnabled(state: false, 8);
+		_view.Hide();
+	}
+
+	private void UpdatePreviewImage()
+	{
+	}
+
+	private void SaveButton_Click(object sender)
+	{
+		_view.CanvasGroup.Interactable = false;
+		if (string.IsNullOrWhiteSpace(_view.NameInputField.Text))
+		{
+			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SORRY_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_NAME_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				_view.CanvasGroup.Interactable = true;
+			};
+		}
+		else if (string.IsNullOrWhiteSpace(_view.DescriptionInputField.Text))
+		{
+			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SORRY_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_DESCRIPTION_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				_view.CanvasGroup.Interactable = true;
+			};
+		}
+		else if (Maps.DefaultMapList.FirstOrDefault((Map map) => map.EditorData.Id == CurrentMap.EditorData.Id) != null)
+		{
+			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SAVE_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_RESERVED_DESC", DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				_view.CanvasGroup.Interactable = true;
+			};
+		}
+		else
+		{
+			OnValidateTextsSucceeded();
+		}
+	}
+
+	private void OnValidateTextsSucceeded()
+	{
+		if (Maps.UserMapList.FirstOrDefault((Map map) => map.EditorData.Id == CurrentMap.EditorData.Id) != null)
+		{
+			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_SAVE_TITLE", "MAP_EDITOR_SAVE_MENU_DB_SAVE_EXISTING_DESC", DialogueButton.YesNo);
+			dialogueBoxViewAdapter.Accept += () =>
+			{
+				SaveMap();
+				_view.CanvasGroup.Interactable = true;
+			};
+			dialogueBoxViewAdapter.Decline += () =>
+			{
+				_view.CanvasGroup.Interactable = true;
+			};
+		}
+		else
+		{
+			SaveMap();
+			_view.CanvasGroup.Interactable = true;
+		}
+	}
+
+	private void OnValidateTextsFailed(string message)
+	{
+		DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+		{
+			_view.CanvasGroup.Interactable = true;
+		};
+	}
+
+	private void BackButton_Click(object sender)
+	{
+		Hide();
+	}
+
+	private void NameInputField_Changed(string value)
+	{
+	}
+
+	private void SaveMap()
+	{
+		CurrentMap.HeightmapData = Singleton<LE_ZoneTileGenerator>.Instance.terrain.terrainData.GetHeights(0, 0, 257, 257);
+		JObject jObject = new JObject();
+		LE_Object[] componentsInChildren = Singleton<LE_LevelEditorMain>.Instance.ObjectDumpContainer.GetComponentsInChildren<LE_Object>(includeInactive: true);
+		foreach (LE_Object lE_Object in componentsInChildren)
+		{
+			JObject jObject2 = new JObject();
+			jObject2.AddField("prefab", Prefabs.ConvertPrefabIdToLegacy(lE_Object.Id));
+			jObject2.AddField("reference", MiniGuid.New().ToString());
+			JObject data = JSerializer.Serialize(lE_Object.transform);
+			jObject2.AddField("Transform", data);
+			jObject.Add(jObject2);
+		}
+		CurrentMap.ObjectData = jObject;
+		CurrentMap.EditorData.Author = GAccountService.Get().LocalUser.UserInfo.DisplayName;
+		CurrentMap.EditorData.Name = _view.NameInputField.Text.Trim();
+		CurrentMap.EditorData.Description = _view.DescriptionInputField.Text.Trim();
+		CurrentMap.EditorData.VersionNumber++;
+		bool flag = false;
+		string text = "";
+		try
+		{
+			Maps.SaveMap(CurrentMap, FilePath.LOCAL_MAPS_FOLDER);
+			flag = true;
+		}
+		catch (Exception ex)
+		{
+			flag = false;
+			text = ex.Message;
+		}
+		if (flag)
+		{
+			OnSaved();
+		}
+		else
+		{
+			Maps.DeleteMap(CurrentMap);
+			string message = Localization.GetLanguageHandler().Localize("MAP_EDITOR_SAVE_MENU_DB_ERROR_SAVING_MAP_DESC", text);
+			DialogueBox.Show(ReInput.players.GetPlayer(0), "MAP_EDITOR_SAVE_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning);
+		}
+		Hide();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 183
+PATH: Assembly-CSharp__Beam.UI.MapEditor__UMapHandle.cs
+SIZE: 1178 bytes
+SHA256: ea7efd9a2b7ec529d66601ec36192ef9fb1041b4368db6122e00f7f3d89e6395
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI.MapEditor;
+
+public class UMapHandle : ViewAdapterBase, IMapHandle, IViewAdapter
+{
+	[SerializeField]
+	private RectTransform _handle;
+
+	[SerializeField]
+	private UTextureViewAdapter _handleSprite;
+
+	public Vector3 Position => transform.position;
+
+	public ITextureViewAdapter HandleSprite => _handleSprite;
+
+	public override void Show()
+	{
+		if (!gameObject.activeSelf)
+		{
+			gameObject.SetActive(value: true);
+			base.Show();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (gameObject.activeSelf)
+		{
+			gameObject.SetActive(value: false);
+			base.Hide();
+		}
+	}
+
+	public void SetSize(Vector2 size)
+	{
+		_handle.sizeDelta = size;
+	}
+
+	public void SetScale(Vector2 scale)
+	{
+		_handle.localScale = new Vector3(scale.x, scale.y, 1f);
+	}
+
+	public void SetPosition(Vector2 screenPosition)
+	{
+		RectTransform rectTransform = (RectTransform)transform.parent;
+		float num = rectTransform.sizeDelta.x / (float)Screen.width;
+		float num2 = rectTransform.sizeDelta.y / (float)Screen.height;
+		Vector2 anchoredPosition = new Vector2(screenPosition.x * num, screenPosition.y * num2);
+		((RectTransform)transform).anchoredPosition = anchoredPosition;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 184
+PATH: Assembly-CSharp__Beam.UI__AboutMenuPresenter.cs
+SIZE: 575 bytes
+SHA256: 80272c3dbb2c6f957bc39260b6000905d79f2216632c1c18e4674ff2c3bb3c6a
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class AboutMenuPresenter : MonoBehaviour, IOptionPanel
+{
+	[SerializeField]
+	private AboutMenuView _view;
+
+	[SerializeField]
+	private CreditsAsset _creditsAsset;
+
+	private void Awake()
+	{
+		_view.SetCreditsText(_creditsAsset.CreditsText);
+		_view.SetCopyrightText(_creditsAsset.CopyrightText);
+	}
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	public void Show()
+	{
+		_view.Show();
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			_view.Hide();
+		}
+	}
+
+	public void Apply()
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 185
+PATH: Assembly-CSharp__Beam.UI__AboutMenuView.cs
+SIZE: 260 bytes
+SHA256: 02a255ec9b816d9fb56969264a171b05f8cb32da9d01c02e91453246af0cc6ba
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class AboutMenuView : ViewAdapterBase
+{
+	public abstract Transform CategoriesContainer { get; }
+
+	public abstract void SetCopyrightText(string text);
+
+	public abstract void SetCreditsText(string text);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 186
+PATH: Assembly-CSharp__Beam.UI__AudioMenuPresenter.cs
+SIZE: 5754 bytes
+SHA256: 26c84126d6b429d54650714263dbccf489cacd913ceb4166ac481a527ca56e53
+====================================================================================================
+
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using UnityEngine;
+using UnityEngine.Audio;
+
+namespace Beam.UI;
+
+public class AudioMenuPresenter : MonoBehaviour, IOptionPanel
+{
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
+
+	[SerializeField]
+	private AudioMixer _audioMixer;
+
+	private IAudioMenuViewAdapter _view;
+
+	private bool _initialized;
+
+	private void Awake()
+	{
+		Options.Loaded += OnOptionsOnLoaded;
+	}
+
+	private void OnOptionsOnLoaded(JObject obj)
+	{
+		LoadMixerValues();
+	}
+
+	private void Start()
+	{
+		LoadMixerValues();
+	}
+
+	public void Initialize(IAudioMenuViewAdapter view)
+	{
+		_view = view;
+		SetControlsSelections();
+		SetControlEvents();
+		_initialized = true;
+	}
+
+	private void OnDestroy()
+	{
+		if (_initialized)
+		{
+			ClearControlEvents();
+			Options.Loaded -= OnOptionsOnLoaded;
+		}
+	}
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	public void Show()
+	{
+		_view.Show();
+		_optionsMenuPresenter.SetApplyButtonEvent(AudioMenuApplyButton_Click);
+		SetControlsSelections();
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			LoadMixerValues();
+			_view.Hide();
+		}
+	}
+
+	public void Apply()
+	{
+		AudioMenuApplyButton_Click(null);
+	}
+
+	private void SetControlEvents()
+	{
+		_view.MasterVolumeSlider.ValueChanged += MasterVolume_Change;
+		_view.MusicVolumeSlider.ValueChanged += MusicVolume_Change;
+		_view.EnvironmentVolumeSlider.ValueChanged += EnvironmentVolume_Change;
+		_view.EffectsVolumeSlider.ValueChanged += EffectsVolume_Change;
+		_view.VoiceVolumeSlider.ValueChanged += VoiceVolume_Change;
+		_view.UiVolumeSlider.ValueChanged += UIVolume_Change;
+	}
+
+	private void SetControlsSelections()
+	{
+		_view.MasterVolumeSlider.Value = Options.AudioSettings.MasterVolume;
+		_view.MusicVolumeSlider.Value = Options.AudioSettings.MusicVolume;
+		_view.EnvironmentVolumeSlider.Value = Options.AudioSettings.EnvironmentVolume;
+		_view.EffectsVolumeSlider.Value = Options.AudioSettings.EffectsVolume;
+		_view.VoiceVolumeSlider.Value = Options.AudioSettings.VoiceVolume;
+		_view.UiVolumeSlider.Value = Options.AudioSettings.UIVolume;
+		CheckVolumeSlider(_view.MasterVolumeSlider, _view.MasterVolumeSlider.Value);
+		CheckVolumeSlider(_view.MusicVolumeSlider, _view.MusicVolumeSlider.Value);
+		CheckVolumeSlider(_view.EnvironmentVolumeSlider, _view.EnvironmentVolumeSlider.Value);
+		CheckVolumeSlider(_view.EffectsVolumeSlider, _view.EffectsVolumeSlider.Value);
+		CheckVolumeSlider(_view.VoiceVolumeSlider, _view.VoiceVolumeSlider.Value);
+		CheckVolumeSlider(_view.UiVolumeSlider, _view.UiVolumeSlider.Value);
+		LoadMixerValues();
+	}
+
+	public void LoadMixerValues()
+	{
+		SetVolume(AudioMixerChannels.Master, Options.AudioSettings.MasterVolume);
+		SetVolume(AudioMixerChannels.Music, Options.AudioSettings.MusicVolume);
+		SetVolume(AudioMixerChannels.Environment, Options.AudioSettings.EnvironmentVolume);
+		SetVolume(AudioMixerChannels.FX, Options.AudioSettings.EffectsVolume);
+		SetVolume(AudioMixerChannels.Voice, Options.AudioSettings.VoiceVolume);
+		SetVolume(AudioMixerChannels.UI, Options.AudioSettings.UIVolume);
+	}
+
+	public void SetVolume(AudioMixerChannels channel, float normalizedVolume)
+	{
+		if (Game.State == GameState.MAIN_MENU)
+		{
+			string text = channel.ToString() + "Volume";
+			_audioMixer.SetFloat(text, BeamTeam.LinearToDecibel(normalizedVolume));
+		}
+		else
+		{
+			AudioManager.GetAudioPlayer().GetAudioMixer().GetChannel(channel)
+				.Volume = normalizedVolume;
+		}
+	}
+
+	private void ClearControlEvents()
+	{
+		_view.MasterVolumeSlider.ValueChanged -= MasterVolume_Change;
+		_view.MusicVolumeSlider.ValueChanged -= MusicVolume_Change;
+		_view.EnvironmentVolumeSlider.ValueChanged -= EnvironmentVolume_Change;
+		_view.EffectsVolumeSlider.ValueChanged -= EffectsVolume_Change;
+		_view.VoiceVolumeSlider.ValueChanged -= VoiceVolume_Change;
+		_view.UiVolumeSlider.ValueChanged -= UIVolume_Change;
+	}
+
+	private void AudioMenuApplyButton_Click(object sender)
+	{
+		Options.AudioSettings.MasterVolume = _view.MasterVolumeSlider.Value;
+		Options.AudioSettings.MusicVolume = _view.MusicVolumeSlider.Value;
+		Options.AudioSettings.EnvironmentVolume = _view.EnvironmentVolumeSlider.Value;
+		Options.AudioSettings.EffectsVolume = _view.EffectsVolumeSlider.Value;
+		Options.AudioSettings.VoiceVolume = _view.VoiceVolumeSlider.Value;
+		Options.AudioSettings.UIVolume = _view.UiVolumeSlider.Value;
+		_optionsMenuPresenter.Save();
+	}
+
+	private void CheckVolumeSlider(ISliderViewAdapter slider, float value)
+	{
+		float num = value * 100f;
+		slider.ValueText = $"{num:f0}%";
+	}
+
+	private void MasterVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.MasterVolumeSlider, value);
+		SetVolume(AudioMixerChannels.Master, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void MusicVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.MusicVolumeSlider, value);
+		SetVolume(AudioMixerChannels.Music, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void EnvironmentVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.EnvironmentVolumeSlider, value);
+		SetVolume(AudioMixerChannels.Environment, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void EffectsVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.EffectsVolumeSlider, value);
+		SetVolume(AudioMixerChannels.FX, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void VoiceVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.VoiceVolumeSlider, value);
+		SetVolume(AudioMixerChannels.Voice, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void UIVolume_Change(float value)
+	{
+		CheckVolumeSlider(_view.UiVolumeSlider, value);
+		SetVolume(AudioMixerChannels.UI, value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 187
+PATH: Assembly-CSharp__Beam.UI__ButtonMarker.cs
+SIZE: 889 bytes
+SHA256: 3061622833a4aa1f71df671cb886836bef4b904bee3d505d88c3f79f2878c1c8
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class ButtonMarker : MonoBehaviour
+{
+	[SerializeField]
+	private Image _marker;
+
+	private GameObject _previous;
+
+	private void Update()
+	{
+		GameObject currentSelectedGameObject = EventSystem.main.currentSelectedGameObject;
+		if (currentSelectedGameObject == null)
+		{
+			_marker.enabled = false;
+			_marker.transform.SetParent(null, worldPositionStays: false);
+		}
+		else if (currentSelectedGameObject != _previous)
+		{
+			SetPosition(currentSelectedGameObject.transform as RectTransform);
+			_previous = currentSelectedGameObject;
+		}
+	}
+
+	public void SetPosition(RectTransform rect)
+	{
+		if (!(rect == null))
+		{
+			_marker.transform.SetParent(rect, worldPositionStays: false);
+			_marker.rectTransform.anchoredPosition3D = new Vector3(16f, 0f, 0f);
+			_marker.enabled = true;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 188
+PATH: Assembly-CSharp__Beam.UI__CartographerMenuPresenter.cs
+SIZE: 26046 bytes
+SHA256: 949a16c31f92b5a9d1ed6b6545eb3654df4fb8486695ec39b9ebdeeacf979e58
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using Beam.AccountServices;
+using Beam.Language;
+using Beam.Terrain;
+using Beam.UI.MapEditor;
+using Beam.Utilities;
+using Beam.Utilities.Reflection;
+using Newtonsoft.Json.Linq;
+using Rewired;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+
+namespace Beam.UI;
+
+public class CartographerMenuPresenter : MonoBehaviour
+{
+	[SerializeField]
+	private MainMenuPresenter _mainMenuPresenter;
+
+	[SerializeField]
+	private CartographerWorldMapTooltipPresenter _tooltipPresenter;
+
+	[SerializeField]
+	private CartographerMenuViewAdapterBase _view;
+
+	private IViewAdapter _parent;
+
+	private bool _validSave;
+
+	private bool _dirty;
+
+	private bool _suspend;
+
+	private IMapListElement _currentDraggingMapListElement;
+
+	private IWorldMapSlot _currentMapSlot;
+
+	private List<IMapListElement> _currentMapElements = new List<IMapListElement>();
+
+	private List<string> _reservedZoneIds = new List<string>();
+
+	private int _mapsInserted;
+
+	private IEnumerable<string> _remoteMapPaths;
+
+	private bool _retrievedUGC;
+
+	private bool _loadedUGC;
+
+	private LoadingResult _loadingUGCResult;
+
+	public event Action<CartographerMenuPresenter, CartographerEventArgs> WorldApplied;
+
+	public event EmptyEventHandler ShowView;
+
+	public event EmptyEventHandler HideView;
+
+	public event EmptyEventHandler CreatedNewWorld;
+
+	private Rewired.Player GetPlayerInput()
+	{
+		return ReInput.players.GetPlayer(0);
+	}
+
+	protected virtual void OnWorldApplied()
+	{
+		WorldApplied?.Invoke(this, new CartographerEventArgs
+		{
+			MapsInserted = _mapsInserted
+		});
+	}
+
+	private void View_ShowView()
+	{
+		ShowView?.Invoke();
+	}
+
+	private void View_HideView()
+	{
+		HideView?.Invoke();
+	}
+
+	protected virtual void OnCreatedNewWorld()
+	{
+		CreatedNewWorld?.Invoke();
+	}
+
+	private void Awake()
+	{
+		SceneManager.sceneLoaded += SceneManager_SceneLoaded;
+		_view.ShowView += View_ShowView;
+		_view.HideView += View_HideView;
+		_view.LocalMapsButton.Click += LocalMapsButton_Click;
+		_view.RemoteMapsButton.Click += RemoteMapsButton_Click;
+		SetControlEvents();
+	}
+
+	public void Initialize(IViewAdapter parent)
+	{
+		_parent = parent;
+		if (!_parent.IsNullOrDestroyed())
+		{
+			_parent.HideView += Hide;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		SceneManager.sceneLoaded -= SceneManager_SceneLoaded;
+		if (!_parent.IsNullOrDestroyed())
+		{
+			_parent.HideView -= Hide;
+		}
+		_view.ShowView -= View_ShowView;
+		_view.HideView -= View_HideView;
+		_view.LocalMapsButton.Click -= LocalMapsButton_Click;
+		_view.RemoteMapsButton.Click -= RemoteMapsButton_Click;
+		ShowView = null;
+		HideView = null;
+		WorldApplied = null;
+		ClearControlEvents();
+	}
+
+	private void SceneManager_SceneLoaded(Scene scene, LoadSceneMode mode)
+	{
+		if (scene.buildIndex != 1)
+		{
+			BeamTeam.Destroy(gameObject);
+		}
+	}
+
+	public void Show()
+	{
+		ControllerFocus.Instance?.Subscribe(_view);
+		GUserContentProvider.Get().LoadedUserContent += UserContentProvider_LoadedUserContent;
+		GUserContentProvider.Get().RequestUserContent();
+		_view.Show();
+		_view.ApplyButton.Enabled = false;
+		_mapsInserted = 0;
+		_currentMapSlot = null;
+		_currentDraggingMapListElement = null;
+		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_LOADING_TITLE", "CARTOGRAPHER_MENU_DB_LOADING_WORLD_DESC", DialogueButton.None);
+		InvokeDelayed(0.3f, () =>
+		{
+			Load(dialogue.Destroy);
+		});
+	}
+
+	public void Hide()
+	{
+		ControllerFocus.Instance?.Unsubscribe(_view);
+		GUserContentProvider.Get().LoadedUserContent -= UserContentProvider_LoadedUserContent;
+		_tooltipPresenter.Hide();
+		_view.Hide();
+	}
+
+	private void SetControlEvents()
+	{
+		_view.SearchInputField.ValueChanged += SearchInputField_ValueChanged;
+		_view.RandomizeButton.Click += RandomizeButton_Click;
+		_view.ApplyButton.Click += ApplyButton_Click;
+		_view.CreateIslandButton.Click += CreateIslandButton_Click;
+		_view.CancelButton.Click += CancelButton_Click;
+	}
+
+	private void ClearControlEvents()
+	{
+		_view.SearchInputField.ValueChanged -= SearchInputField_ValueChanged;
+		_view.RandomizeButton.Click -= RandomizeButton_Click;
+		_view.ApplyButton.Click -= ApplyButton_Click;
+		_view.CreateIslandButton.Click -= CreateIslandButton_Click;
+		_view.CancelButton.Click -= CancelButton_Click;
+	}
+
+	private void SearchInputField_ValueChanged(string input)
+	{
+		string text = _view.SearchInputField.Text.ToUpper();
+		if (_view.SearchInputField.Text != text)
+		{
+			_view.SearchInputField.Text = text;
+		}
+		List<IMapListElement> currentMapElements = _currentMapElements;
+		if (currentMapElements != null && currentMapElements.Count == 0)
+		{
+			return;
+		}
+		List<IMapListElement> list = (from element in _currentMapElements
+			where element.NameLabel.Text.StartsWith(input, ignoreCase: true, CultureInfo.InvariantCulture)
+			orderby element.NameLabel.Text.Length
+			select element).ToList();
+		foreach (IMapListElement currentMapElement in _currentMapElements)
+		{
+			bool active = list.Contains(currentMapElement);
+			currentMapElement.gameObject.SetActive(active);
+		}
+	}
+
+	private void RandomizeButton_Click(object sender)
+	{
+		ShowRandomizeWorldDialogue();
+	}
+
+	private void CreateIslandButton_Click(object sender)
+	{
+		if (_dirty)
+		{
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_DISCARD_CHANGES_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += CreateIsland;
+		}
+		else
+		{
+			CreateIsland();
+		}
+	}
+
+	private void ApplyButton_Click(object sender)
+	{
+		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_SAVING_TITLE", "CARTOGRAPHER_MENU_DB_SAVING_WORLD_DESC", DialogueButton.None);
+		InvokeDelayed(0.3f, () =>
+		{
+			SaveWorld(OnWorldApplied);
+			dialogue.Destroy();
+		});
+	}
+
+	private void CancelButton_Click(object sender)
+	{
+		if (_dirty)
+		{
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_DISCARD_CHANGES_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += Hide;
+		}
+		else
+		{
+			Hide();
+		}
+		Game.State = GameState.MAIN_MENU;
+	}
+
+	private void Update()
+	{
+		if (!_suspend && !DialogueBox.Notifying)
+		{
+			Rewired.Player playerInput = GetPlayerInput();
+			if (playerInput.GetButtonDown(31) && _view.Visible)
+			{
+				CancelButton_Click(null);
+			}
+			if (_currentMapSlot != null && playerInput.GetButtonDown(41))
+			{
+				RemoveWorldMap(_currentMapSlot);
+			}
+		}
+	}
+
+	private void UpdateWorldMap(IWorldMapSlot slot)
+	{
+		Map editorMap = Maps.AllMapList.FirstOrDefault((Map map) => map.EditorData.Id == slot.Map.EditorData.Id && map.EditorData.Source == slot.Map.EditorData.Source);
+		if (editorMap != null)
+		{
+			string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_UPDATE_ZONE_DESC", slot.Map.EditorData.VersionNumber.ToString("F1"), editorMap.EditorData.VersionNumber.ToString("F1"));
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_UPDATE_TITLE", message, DialogueButton.YesNo).Accept += () =>
+			{
+				World.ReplaceMap(slot.Map, editorMap);
+				UpdateWorldMapSlot(slot, editorMap);
+				SetDirty();
+			};
+		}
+	}
+
+	private void ReplaceWorldMap(IWorldMapSlot slot, Map map)
+	{
+		string text = slot.Map.EditorData.Source.GetAttribute<DescriptionAttribute>().Text;
+		string text2 = map.EditorData.Source.GetAttribute<DescriptionAttribute>().Text;
+		string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_REPLACE_MAP_DESC", slot.Map.EditorData.Name, text, map.EditorData.Name, text2);
+		DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_REPLACE_TITLE", message, DialogueButton.YesNo).Accept += () =>
+		{
+			World.ReplaceMap(slot.Map, map);
+			UpdateWorldMapSlot(slot, map);
+			SetDirty();
+		};
+	}
+
+	private void RemoveWorldMap(IWorldMapSlot slot)
+	{
+		if (slot.Map.EditorData.Id.Contains("INTERNAL_PROCEDURAL") || !slot.Map.EditorData.Valid)
+		{
+			return;
+		}
+		string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_REMOVE_DESC", slot.Map.EditorData.Name);
+		DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_REMOVE_TITLE", message, DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_REMOVING_TITLE", "CARTOGRAPHER_MENU_DB_REMOVING_DESC", DialogueButton.None);
+			InvokeDelayed(0.3f, () =>
+			{
+				if (World.ReplaceMapWithProceduralMap(slot.Map, out var proceduralMap))
+				{
+					UpdateWorldMapSlot(slot, proceduralMap);
+					SetDirty();
+				}
+				d.Destroy();
+			});
+		};
+	}
+
+	private void CreateWorldMapSlots()
+	{
+		BeamTeam.DestroyAllChildren(_view.MapSlotsContainer.transform);
+		ZoomComponent componentInParent = _view.MapSlotsContainer.GetComponentInParent<ZoomComponent>();
+		componentInParent.Reset();
+		for (int i = 0; i < 49; i++)
+		{
+			Map map = World.MapList[i];
+			UWorldMapSlot uWorldMapSlot = UnityEngine.Object.Instantiate(_view.MapSlotPrefab);
+			uWorldMapSlot.transform.SetParent(_view.MapSlotsContainer.transform, worldPositionStays: false);
+			uWorldMapSlot.SetMap(map);
+			uWorldMapSlot.Click += WorldMapSlot_Click;
+			uWorldMapSlot.Enter += WorldMapSlot_Enter;
+			uWorldMapSlot.Leave += WorldMapSlot_Leave;
+			uWorldMapSlot.Drop += WorldMapSlot_Drop;
+			if ((_reservedZoneIds.Count == 0 && i == 0) || _reservedZoneIds.Contains(map.EditorData.Id) || map.EditorData.Id.Contains("INTERNAL_MISSION"))
+			{
+				uWorldMapSlot.Map.EditorData.Valid = false;
+				uWorldMapSlot.Button.Enabled = false;
+			}
+			else
+			{
+				uWorldMapSlot.Map.EditorData.Valid = true;
+				uWorldMapSlot.Button.Enabled = true;
+			}
+			Vector2 vector = World.GenerationZonePositons[i];
+			RectTransform rectTransform = (RectTransform)uWorldMapSlot.transform;
+			rectTransform.localPosition = new Vector3(vector.x, vector.y, 0f);
+			rectTransform.sizeDelta = new Vector2(257f, 257f);
+		}
+		componentInParent.ScaleToFitContent();
+		componentInParent.SetScale(0.5f);
+		_currentMapSlot = null;
+	}
+
+	private void RefreshWorldMapSlots()
+	{
+		UWorldMapSlot[] componentsInChildren = _view.MapSlotsContainer.GetComponentsInChildren<UWorldMapSlot>();
+		foreach (UWorldMapSlot obj in componentsInChildren)
+		{
+			obj.SetState(obj.Map.EditorData.State);
+		}
+	}
+
+	public void UpdateWorldMapSlot(IWorldMapSlot slot, Map map)
+	{
+		slot.SetMap(map);
+		WorldMapSlot_Click(slot, null);
+		slot.Button.Select();
+		_mapsInserted++;
+	}
+
+	private void CreateMapListElements(IEnumerable<Map> maps, Transform container)
+	{
+		_currentMapElements.Clear();
+		BeamTeam.DestroyAllChildren(container);
+		foreach (Map map in maps)
+		{
+			IMapListElement mapListElement = _view.CreateMapListElement(container);
+			mapListElement.BeginDrag += MapListElement_BeginDrag;
+			mapListElement.Drag += MapListElement_Drag;
+			mapListElement.EndDrag += MapListElement_EndDrag;
+			mapListElement.EditClick += MapListElement_EditClick;
+			mapListElement.DeleteClick += MapListElement_DeleteClick;
+			mapListElement.EditButton.transform.gameObject.SetActive(_view.LocalMapListContainer.activeSelf);
+			mapListElement.DeleteButton.transform.gameObject.SetActive(_view.LocalMapListContainer.activeSelf);
+			PopulateMapListElement(mapListElement, map);
+			_currentMapElements.Add(mapListElement);
+		}
+	}
+
+	private void PopulateMapListElement(IMapListElement element, Map map)
+	{
+		element.Map = map;
+		element.NameLabel.Text = element.Map.EditorData.Name;
+		element.AuthorLabel.Text = element.Map.EditorData.Author;
+		element.VersionLabel.Text = element.Map.EditorData.VersionNumber.ToString("F1");
+		element.DescriptionLabel.Text = element.Map.EditorData.Description;
+		element.PreviewImage.Texture = element.Map.EditorData.SmallPreviewImage;
+	}
+
+	private void MapListElement_EditClick(IMapListElement sender, PointerEventData eventData)
+	{
+		Map map = sender.Map;
+		if (_dirty)
+		{
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_DISCARD_CHANGES_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+			{
+				EditIsland(map);
+			};
+		}
+		else
+		{
+			EditIsland(map);
+		}
+	}
+
+	private void MapListElement_DeleteClick(IMapListElement sender, PointerEventData eventData)
+	{
+		Map map = sender.Map;
+		string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_WARNING_DELETE_MAP_DESC", map.EditorData.Name);
+		DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", message, DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			MapListElement_OnDelete(sender);
+		};
+	}
+
+	private void MapListElement_OnDelete(IMapListElement mapListElement)
+	{
+		Maps.DeleteUserMap(mapListElement.Map);
+		_currentMapElements.Remove(mapListElement);
+		BeamTeam.Destroy(mapListElement.gameObject);
+		UpdateMapsStatus();
+		RefreshWorldMapSlots();
+	}
+
+	private void MapListElement_BeginDrag(IMapListElement sender, PointerEventData eventData)
+	{
+		_currentDraggingMapListElement = sender;
+		_view.MapHandle.HandleSprite.Texture = _currentDraggingMapListElement.PreviewImage.Texture;
+		_view.MapHandle.SetSize(Vector2.one * 257f);
+		_view.MapHandle.SetScale(_view.MapSlotsContainer.transform.localScale);
+		_view.MapHandle.Show();
+	}
+
+	private void MapListElement_Drag(IMapListElement sender, PointerEventData eventData)
+	{
+		_view.MapHandle.SetPosition(eventData.pointerCurrentRaycast.screenPosition);
+	}
+
+	private void MapListElement_EndDrag(IMapListElement sender, PointerEventData eventData)
+	{
+		_currentDraggingMapListElement = null;
+		_view.MapHandle.Hide();
+	}
+
+	private void WorldMapSlot_Click(IWorldMapSlot sender, PointerEventData eventData)
+	{
+		_currentMapSlot = sender;
+	}
+
+	private void WorldMapSlot_Enter(IWorldMapSlot sender, PointerEventData eventData)
+	{
+		_view.InfoLabel.Text = "CARTOGRAPHER_MENU_LABEL_SELECT_AND_PRESS_TO_REMOVE_DESC";
+		_tooltipPresenter.Show(sender, eventData);
+	}
+
+	private void WorldMapSlot_Leave(IWorldMapSlot sender, PointerEventData eventData)
+	{
+		_view.InfoLabel.Text = "CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC";
+		_tooltipPresenter.Hide();
+	}
+
+	private void WorldMapSlot_Drop(IWorldMapSlot sender, PointerEventData eventData)
+	{
+		if (!sender.Map.EditorData.Valid || _currentDraggingMapListElement.IsNullOrDestroyed())
+		{
+			return;
+		}
+		Map map = _currentDraggingMapListElement.Map;
+		if (sender.Map.EditorData.Id != map.EditorData.Id && !sender.Map.EditorData.Id.Contains("INTERNAL_PROCEDURAL"))
+		{
+			if (!ValidateDuplicateMap(map))
+			{
+				string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_SORRY_MAP_EXISTS_DESC", map.EditorData.Name);
+				DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_SORRY_TITLE", message, DialogueButton.Ok);
+			}
+			else
+			{
+				ReplaceWorldMap(sender, map);
+			}
+		}
+		else if (sender.Map.EditorData.VersionNumber != map.EditorData.VersionNumber && !sender.Map.EditorData.Id.Contains("INTERNAL_PROCEDURAL"))
+		{
+			if (sender.Map.EditorData.Source == map.EditorData.Source)
+			{
+				_currentMapSlot = sender;
+				UpdateWorldMap(_currentMapSlot);
+			}
+			else
+			{
+				ReplaceWorldMap(sender, map);
+			}
+		}
+		else if (!ValidateDuplicateMap(map))
+		{
+			string message2 = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_SORRY_MAP_EXISTS_DESC", map.EditorData.Name);
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_SORRY_TITLE", message2, DialogueButton.Ok);
+		}
+		else
+		{
+			World.ReplaceMap(sender.Map, map);
+			UpdateWorldMapSlot(sender, map);
+			SetDirty();
+		}
+		_tooltipPresenter.Hide();
+	}
+
+	private void Load(Action onComplete)
+	{
+		_validSave = SaveManager.ValidateSaveFile(GameMode.SinglePlayer) || SaveManager.ValidateSaveFile(GameMode.Coop_2) || SaveManager.ValidateSaveFile(GameMode.Coop_Server);
+		LoadingResult loadingResult = LoadMaps();
+		if (!loadingResult.Succeeded)
+		{
+			string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_LOADING_MAPS_DESC", loadingResult.Message.Truncate());
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				InvokeDelayed(0.3f, () =>
+				{
+					LoadWorld();
+					onComplete?.Invoke();
+				});
+			};
+		}
+		else
+		{
+			LoadWorld();
+			onComplete?.Invoke();
+		}
+	}
+
+	private LoadingResult LoadMaps()
+	{
+		LoadingResult loadingResult = new LoadingResult
+		{
+			Succeeded = true
+		};
+		Maps.LoadDefaultMaps(out var result);
+		if (!result.Succeeded)
+		{
+			loadingResult.Succeeded = false;
+			loadingResult.Message = result.Message;
+		}
+		Maps.LoadLocalMaps(out var result2);
+		if (!result2.Succeeded)
+		{
+			loadingResult.Succeeded = false;
+			loadingResult.Message += result2.Message;
+		}
+		LoadRemoteMaps();
+		return loadingResult;
+	}
+
+	private void LoadWorld()
+	{
+		if (!World.CheckWorldSeedFileExists())
+		{
+			ShowCreateNewWorldDialogue();
+			return;
+		}
+		LoadingResult loadingResult = World.LoadWorld();
+		if (!loadingResult.Succeeded)
+		{
+			string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_LOADING_WORLD_DESC", loadingResult.Message.Truncate());
+			DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning).Accept += ShowCreateNewWorldDialogue;
+		}
+		else
+		{
+			ResetWorldView();
+		}
+	}
+
+	private void CreateWorld(string seedValue)
+	{
+		StrandedWorld.SetWorldSeed(seedValue);
+		World.CreateWorld();
+		SaveWorld();
+		OnCreatedNewWorld();
+	}
+
+	public void CreateRandomWorld()
+	{
+		CreateWorld(string.Empty);
+	}
+
+	private void SaveWorld(Action onSuccess = null)
+	{
+		World.SaveWorld((LoadingResult result) =>
+		{
+			if (result.Succeeded)
+			{
+				UpdateMapsStatus();
+				onSuccess?.Invoke();
+				_mapsInserted = 0;
+				ResetDirty();
+			}
+			else
+			{
+				string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC", result.Message.Truncate());
+				DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning);
+			}
+		});
+	}
+
+	private void ResetWorldView()
+	{
+		_view.InfoLabel.Text = "CARTOGRAPHER_MENU_LABEL_DRAG_AND_DROP_DESC";
+		_view.WorldSeedLabel.Text = "#" + StrandedWorld.WORLD_SEED;
+		LoadPlayerMaps();
+		UpdateMapsStatus();
+		CreateWorldMapSlots();
+		_view.LocalMapsButton.PerformClick();
+		_view.SelectFirstButton();
+	}
+
+	private void LocalMapsButton_Click(object sender)
+	{
+		_view.LocalMapListContainer.gameObject.SetActive(value: true);
+		_view.RemoteMapListContainer.gameObject.SetActive(value: false);
+		_view.RetrievingLabel.transform.gameObject.SetActive(value: false);
+		_view.NoMapsLabel.transform.gameObject.SetActive(value: false);
+		CreateMapListElements(Maps.UserMapList, _view.LocalMapListContainer.transform);
+	}
+
+	private void RemoteMapsButton_Click(object sender)
+	{
+		_view.LocalMapListContainer.gameObject.SetActive(value: false);
+		_view.RemoteMapListContainer.gameObject.SetActive(value: true);
+		_view.RetrievingLabel.transform.gameObject.SetActive(value: true);
+		ShowRemoteMaps();
+	}
+
+	private void UserContentProvider_LoadedUserContent(LoadedContentArgs args)
+	{
+		if (_retrievedUGC)
+		{
+			return;
+		}
+		_remoteMapPaths = args.LoadedContent.Where((LoadedContent c) => c.Tags.Any_NonAlloc((string tag) => tag.Equals(UgcTags.MAPS))).SelectMany((LoadedContent c) => Directory.GetDirectories(c.Path));
+		_retrievedUGC = true;
+	}
+
+	private void LoadRemoteMaps()
+	{
+		if (_retrievedUGC && !_loadedUGC)
+		{
+			Maps.LoadRemoteMaps(_remoteMapPaths, out _loadingUGCResult);
+			_loadedUGC = _loadingUGCResult.Succeeded || (Maps.RemoteMaps != null && Maps.RemoteMaps.Count() > 0);
+		}
+	}
+
+	private void ShowRemoteMaps()
+	{
+		LoadRemoteMaps();
+		if (_loadedUGC)
+		{
+			if (!_loadingUGCResult.Succeeded)
+			{
+				string message = Localization.GetLanguageHandler().Localize("CARTOGRAPHER_MENU_DB_ERROR_LOADING_MAPS_DESC", _loadingUGCResult.Message.Truncate());
+				DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_ERROR_TITLE", message, DialogueButton.Ok, DialogueIcon.Warning);
+			}
+			CreateMapListElements(Maps.RemoteMaps, _view.RemoteMapListContainer.transform);
+			UpdateMapsStatus();
+			_view.RetrievingLabel.transform.gameObject.SetActive(value: false);
+			_view.NoMapsLabel.transform.gameObject.SetActive(_view.RemoteMapListContainer.transform.childCount == 0);
+		}
+	}
+
+	private void SetDirty()
+	{
+		_dirty = true;
+		_view.ApplyButton.Enabled = true;
+	}
+
+	private void ResetDirty()
+	{
+		_dirty = false;
+		_view.ApplyButton.Enabled = false;
+	}
+
+	private void ShowCreateNewWorldDialogue()
+	{
+		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_TITLE", "CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_DESC", DialogueButton.OkCancel, DialogueIcon.Information, DialogueType.Input);
+		dialogue.InputField.CharacterLimit = 8;
+		dialogue.InputField.Text = StrandedWorld.GetRandowWorldSeed().ToString();
+		dialogue.Decline += Hide;
+		dialogue.Accept += () =>
+		{
+			string seed = dialogue.InputField.Text;
+			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+			InvokeDelayed(0.3f, () =>
+			{
+				CreateWorld(seed);
+				ResetWorldView();
+				d.Destroy();
+			});
+		};
+	}
+
+	private void ShowRandomizeWorldDialogue()
+	{
+		DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_SEED_DESC", DialogueButton.OkCancel, DialogueIcon.Warning, DialogueType.Input);
+		dialogue.InputField.CharacterLimit = 8;
+		dialogue.InputField.Text = StrandedWorld.GetRandowWorldSeed().ToString();
+		dialogue.Accept += () =>
+		{
+			string seed = dialogue.InputField.Text;
+			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+			InvokeDelayed(0.3f, () =>
+			{
+				DeleteSave();
+				CreateWorld(seed);
+				ResetWorldView();
+				d.Destroy();
+			});
+		};
+	}
+
+	public void ShowRandomizeWorldDialogue_NoInput(Action success, Action cancel)
+	{
+		DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_WARNING_TITLE", "CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_DESC", DialogueButton.OkCancel, DialogueIcon.Warning);
+		dialogueBoxViewAdapter.Accept += () =>
+		{
+			DialogueBoxViewAdapter d = DialogueBox.Show(GetPlayerInput(), "CARTOGRAPHER_MENU_DB_CREATING_TITLE", "CARTOGRAPHER_MENU_DB_CREATING_DESC", DialogueButton.None);
+			InvokeDelayed(0.3f, () =>
+			{
+				DeleteSave();
+				CreateRandomWorld();
+				d.Destroy();
+				success?.Invoke();
+			});
+		};
+		dialogueBoxViewAdapter.Cancel += () =>
+		{
+			cancel();
+		};
+		dialogueBoxViewAdapter.Decline += () =>
+		{
+			cancel();
+		};
+	}
+
+	private void CreateIsland()
+	{
+		MapEditorMenuPresenter.MAP_TO_EDIT = null;
+		_view.CanvasGroup.Interactable = false;
+		_suspend = true;
+		Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, () =>
+		{
+			_mainMenuPresenter.LoadLevel(4, LoadSceneMode.Single);
+		});
+	}
+
+	private void EditIsland(Map map)
+	{
+		MapEditorMenuPresenter.MAP_TO_EDIT = map;
+		_view.CanvasGroup.Interactable = false;
+		_suspend = true;
+		Singleton<Fader>.Instance.FadeOut(3f, FadeMode.Solid, () =>
+		{
+			_mainMenuPresenter.LoadLevel(4, LoadSceneMode.Single);
+		});
+	}
+
+	private void LoadPlayerMaps()
+	{
+		_reservedZoneIds.Clear();
+		if (_validSave)
+		{
+			LoadPlayerMap(GameMode.SinglePlayer);
+			LoadPlayerMap(GameMode.Coop_2);
+			LoadPlayerMap(GameMode.Coop_Server);
+		}
+	}
+
+	private void LoadPlayerMap(GameMode mode)
+	{
+		if (!SaveManager.TryGetSaveFilePath(mode, out var saveFilePath))
+		{
+			return;
+		}
+		JToken jToken = SaveManager.LoadSaveFileFast(saveFilePath)["Persistent"]["StrandedWorld"];
+		JToken jToken2 = jToken["PlayersData"];
+		if (jToken2 != null && jToken2.HasValues)
+		{
+			IJEnumerable<JToken> iJEnumerable = jToken2.Children();
+			if (jToken2.Type == JTokenType.Object)
+			{
+				iJEnumerable = jToken2.Children().Children();
+			}
+			{
+				foreach (JToken item2 in iJEnumerable)
+				{
+					string item = item2["ZoneId"].ToObject<string>();
+					_reservedZoneIds.Add(item);
+				}
+				return;
+			}
+		}
+		if (LegacyUtilities.LoadStrandedWorldPlayerZoneId_PreCoop(jToken, out var zoneId))
+		{
+			_reservedZoneIds.Add(zoneId);
+		}
+		else
+		{
+			Debug.LogError("LoadPlayerMap:: Could not load player data.");
+		}
+	}
+
+	private void UpdateMapsStatus()
+	{
+		Map[] mapList = World.MapList;
+		foreach (Map map in mapList)
+		{
+			UpdateMapStatus(map);
+		}
+	}
+
+	private void UpdateMapStatus(Map map)
+	{
+		if (map == null || map.EditorData.Id.Contains("INTERNAL_PROCEDURAL"))
+		{
+			return;
+		}
+		Map map2 = Maps.AllMapList.FirstOrDefault((Map m) => m.EditorData.Id == map.EditorData.Id && m.EditorData.Source == map.EditorData.Source);
+		if (map2 != null)
+		{
+			if (map.EditorData.VersionNumber < map2.EditorData.VersionNumber)
+			{
+				map.EditorData.State = MapEditorData.EMapState.Older;
+			}
+			else
+			{
+				map.EditorData.State = MapEditorData.EMapState.Current;
+			}
+		}
+		else
+		{
+			map.EditorData.State = MapEditorData.EMapState.Unavailable;
+		}
+	}
+
+	private bool ValidateDuplicateMap(Map newMap, bool checkSource = true)
+	{
+		for (int i = 0; i < 49; i++)
+		{
+			Map map = World.MapList[i];
+			if (map.EditorData.Id == newMap.EditorData.Id && (!checkSource || map.EditorData.Source == newMap.EditorData.Source))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void DeleteSave()
+	{
+		SaveManager.BackupSaveFiles();
+		SaveManager.DeleteSaveFiles();
+		_validSave = false;
+	}
+
+	private void InvokeDelayed(float delay, Action callback)
+	{
+		if (callback != null)
+		{
+			StartCoroutine(InvokeDelayed_Sequence(delay, callback));
+		}
+	}
+
+	private IEnumerator InvokeDelayed_Sequence(float delay, Action callback)
+	{
+		yield return new WaitForEndOfFrame();
+		float timer = 0f;
+		while (timer < delay)
+		{
+			timer += Time.unscaledDeltaTime;
+			yield return null;
+		}
+		callback?.Invoke();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 189
+PATH: Assembly-CSharp__Beam.UI__CartographerMenuViewAdapterBase.cs
+SIZE: 1253 bytes
+SHA256: 053b26f282b25a1112a9c37e138befb28c21eb35f149861cfb7720e4335bbdad
+====================================================================================================
+
+using Beam.UI.MapEditor;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class CartographerMenuViewAdapterBase : MenuViewAdapterBase
+{
+	public abstract ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract IMapHandle MapHandle { get; }
+
+	public abstract UWorldMapSlot MapSlotPrefab { get; }
+
+	public abstract GameObject MapSlotsContainer { get; }
+
+	public abstract GameObject LocalMapListContainer { get; }
+
+	public abstract GameObject RemoteMapListContainer { get; }
+
+	public abstract IInputFieldViewAdapter SearchInputField { get; }
+
+	public abstract ILabelViewAdapter RetrievingLabel { get; }
+
+	public abstract ILabelViewAdapter NoMapsLabel { get; }
+
+	public abstract IButtonViewAdapter LocalMapsButton { get; }
+
+	public abstract IButtonViewAdapter RemoteMapsButton { get; }
+
+	public abstract ILabelButtonViewAdapter RandomizeButton { get; }
+
+	public abstract ILabelButtonViewAdapter ApplyButton { get; }
+
+	public abstract ILabelButtonViewAdapter CreateIslandButton { get; }
+
+	public abstract ILabelButtonViewAdapter CancelButton { get; }
+
+	public abstract ILabelViewAdapter WorldSeedLabel { get; }
+
+	public abstract ILabelViewAdapter InfoLabel { get; }
+
+	public abstract IMapListElement CreateMapListElement(Transform container);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 190
+PATH: Assembly-CSharp__Beam.UI__ChecklistView.cs
+SIZE: 2389 bytes
+SHA256: 6a7d9ec221d25ebe6c6076499ee11380df094d6c3a3fd7069d62a6aca5e402a4
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using MEC;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class ChecklistView : NotificationViewAdapterBase
+{
+	[SerializeField]
+	private TMPLabelViewAdapter _titleLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _messageLabel;
+
+	[SerializeField]
+	private ChecklistElementController _checklistElementPrefab;
+
+	[SerializeField]
+	private Transform _checklistElementContainer;
+
+	[SerializeField]
+	private Animator _animator;
+
+	private CoroutineHandle _hideSequence;
+
+	public override ILabelViewAdapter TitleLabel => _titleLabel;
+
+	public override ILabelViewAdapter MessageLabel => _messageLabel;
+
+	private void OnDestroy()
+	{
+		Timing.KillCoroutines(_hideSequence);
+	}
+
+	public ChecklistElementController CreateChecklistElement()
+	{
+		ChecklistElementController checklistElementController = Object.Instantiate(_checklistElementPrefab);
+		checklistElementController.transform.SetParent(_checklistElementContainer, worldPositionStays: false);
+		return checklistElementController;
+	}
+
+	private void DestroyChecklistElements()
+	{
+		for (int i = 0; i < _checklistElementContainer.childCount; i++)
+		{
+			BeamTeam.Destroy(_checklistElementContainer.GetChild(i).gameObject);
+		}
+	}
+
+	public override void Show()
+	{
+		_messageLabel.gameObject.SetActive(!string.IsNullOrEmpty(_messageLabel.Text));
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		DestroyChecklistElements();
+	}
+
+	public override float Hide_Coroutine()
+	{
+		_hideSequence = Timing.RunCoroutine(Hide_Sequence());
+		return Timing.WaitUntilDone(_hideSequence);
+	}
+
+	private IEnumerator<float> Hide_Sequence()
+	{
+		ChecklistElementController[] checklistElementControllers = _checklistElementContainer.GetComponentsInChildren<ChecklistElementController>();
+		while (ChecklistElementViewIsBusyPredicate(checklistElementControllers))
+		{
+			yield return float.NegativeInfinity;
+		}
+		int stateNameHash = Animator.StringToHash("Close");
+		_animator.Play(stateNameHash);
+		float waitTime = Mathf.Abs(_animator.GetCurrentAnimatorStateInfo(0).length);
+		yield return Timing.WaitForSeconds(waitTime);
+		Hide();
+	}
+
+	private bool ChecklistElementViewIsBusyPredicate(ChecklistElementController[] checklistElements)
+	{
+		for (int i = 0; i < checklistElements?.Length; i++)
+		{
+			if (checklistElements[i].View.IsBusy)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 191
+PATH: Assembly-CSharp__Beam.UI__GameObjectViewAdapter.cs
+SIZE: 456 bytes
+SHA256: bc81a20e11c8b06243e782ecf366ab91473c6c17d437db692ceb5b240fac3940
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam.UI;
+
+[Serializable]
+public class GameObjectViewAdapter : IGameObjectViewAdapter
+{
+	[SerializeField]
+	private GameObject _gameObject;
+
+	public Transform Transform => _gameObject.transform;
+
+	public bool Active
+	{
+		get
+		{
+			if (_gameObject != null)
+			{
+				return _gameObject.activeSelf;
+			}
+			return false;
+		}
+		set
+		{
+			if (_gameObject != null)
+			{
+				_gameObject.SetActive(value);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 192
+PATH: Assembly-CSharp__Beam.UI__GeneralMenuPresenter.cs
+SIZE: 6427 bytes
+SHA256: 738207b93c348140d7d12d77070a228cc6af20235af6f85d2b2ac3e269252444
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam.AccountServices;
+using Beam.Language;
+using Beam.Utilities;
+using Beam.Utilities.Reflection;
+using Rewired;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class GeneralMenuPresenter : MonoBehaviour, IOptionPanel
+{
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
+
+	private IGeneralMenuViewAdapter _view;
+
+	private IEnumerable<IOptionElementData> _languages;
+
+	private bool _loadedUGC;
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	private void Awake()
+	{
+		GUserContentProvider.Get().LoadedUserContent += UserContentProvider_LoadedUserContent;
+	}
+
+	public void Initialize(IGeneralMenuViewAdapter view)
+	{
+		_view = view;
+		PopulateControls();
+		SetControlsSelections();
+		SetControlEvents();
+	}
+
+	private void OnDestroy()
+	{
+		GUserContentProvider.Get().LoadedUserContent -= UserContentProvider_LoadedUserContent;
+	}
+
+	private void UserContentProvider_LoadedUserContent(LoadedContentArgs args)
+	{
+		if (!_loadedUGC)
+		{
+			PopulateLanguageControl();
+			_loadedUGC = true;
+		}
+	}
+
+	public void Show()
+	{
+		if (!_view.Visible)
+		{
+			_view.Show();
+			_optionsMenuPresenter.SetApplyButtonEvent(GeneralMenuApplyButton_Click);
+			SetControlsSelections();
+		}
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			_view.Hide();
+		}
+	}
+
+	public void Apply()
+	{
+		GeneralMenuApplyButton_Click(null);
+	}
+
+	private void SetControlEvents()
+	{
+		WireButtonEvents(_view.HudInformationButton);
+		WireButtonEvents(_view.TemperatureUnitsButton);
+		WireButtonEvents(_view.CrosshairButton);
+		WireButtonEvents(_view.HighlightingButton);
+		WireButtonEvents(_view.TutorialButton);
+		WireButtonEvents(_view.CameraViewModeButton);
+		WireSliderEvents(_view.OceanRotationSlider);
+		_view.LanguageButton.SelectionChanged += (IOptionButtonViewAdapter sender) =>
+		{
+			_optionsMenuPresenter.SetDirtySettings();
+		};
+	}
+
+	private void OptionWidget_MouseEnter(ISelectableViewAdapter sender)
+	{
+		IOptionWidgetViewAdapter optionWidgetViewAdapter = sender as IOptionWidgetViewAdapter;
+		if (!optionWidgetViewAdapter.IsNullOrDestroyed())
+		{
+			_optionsMenuPresenter.SetTooltip(optionWidgetViewAdapter.GetTooltip());
+		}
+	}
+
+	private void OptionWidget_MouseLeave(ISelectableViewAdapter sender)
+	{
+		_optionsMenuPresenter.SetTooltip(string.Empty);
+	}
+
+	private void OptionButton_SelectionChanged(IOptionButtonViewAdapter button)
+	{
+		_optionsMenuPresenter.SetTooltip(button.GetTooltip());
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void OptionSlider_ValueChanged(float value)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void PopulateControls()
+	{
+		_view.HudInformationButton.Initialize(typeof(Quality_HUDInformation).GetAttributes<DescriptionAttribute>());
+		_view.TemperatureUnitsButton.Initialize(typeof(Temperature).GetAttributes<DescriptionAttribute>());
+		_view.CrosshairButton.Initialize(typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_view.HighlightingButton.Initialize(typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_view.CameraViewModeButton.Initialize(typeof(CameraViewMode).GetAttributes<DescriptionAttribute>());
+		_view.TutorialButton.Initialize(typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		PopulateLanguageControl();
+	}
+
+	private void PopulateLanguageControl()
+	{
+		_languages = from lang in Localization.GetLanguageHandler().GetLanguages()
+			select new OptionElementData(lang.Name, lang.Path);
+		_view.LanguageButton.Initialize(_languages);
+	}
+
+	private void SetControlsSelections()
+	{
+		_view.HudInformationButton.SelectedIndex = Options.GeneralSettings.HudInformation.GetIndex();
+		_view.TemperatureUnitsButton.SelectedIndex = Options.GeneralSettings.Temperature.GetIndex();
+		_view.CrosshairButton.SelectedIndex = Options.GeneralSettings.ShowCrosshair.GetIndex();
+		_view.HighlightingButton.SelectedIndex = Options.GeneralSettings.ShowHighlighting.GetIndex();
+		_view.TutorialButton.SelectedIndex = Options.GeneralSettings.Tutorial.GetIndex();
+		_view.CameraViewModeButton.SelectedIndex = Options.GeneralSettings.CameraViewMode.GetIndex();
+		_view.OceanRotationSlider.Value = Options.GeneralSettings.OceanRotationIntensity;
+		_view.OceanRotationSlider.Refresh();
+		SetLanguageControlSelection();
+	}
+
+	private void SetLanguageControlSelection()
+	{
+		int num = _view.LanguageButton.Elements.FindIndex((IOptionElementData r) => r.Tooltip.Equals(Options.GeneralSettings.LangPath, StringComparison.InvariantCultureIgnoreCase));
+		if (num != -1)
+		{
+			_view.LanguageButton.SelectedIndex = num;
+		}
+		_view.LanguageButton.Enabled = Game.State == GameState.MAIN_MENU;
+	}
+
+	private void GeneralMenuApplyButton_Click(object sender)
+	{
+		Options.GeneralSettings.HudInformation = (Quality_HUDInformation)_view.HudInformationButton.SelectedIndex;
+		Options.GeneralSettings.Temperature = (Temperature)_view.TemperatureUnitsButton.SelectedIndex;
+		Options.GeneralSettings.ShowCrosshair = (Quality_OFF_ON)_view.CrosshairButton.SelectedIndex;
+		Options.GeneralSettings.ShowHighlighting = (Quality_OFF_ON)_view.HighlightingButton.SelectedIndex;
+		Options.GeneralSettings.Tutorial = (Quality_OFF_ON)_view.TutorialButton.SelectedIndex;
+		Options.GeneralSettings.CameraViewMode = (CameraViewMode)_view.CameraViewModeButton.SelectedIndex;
+		Options.GeneralSettings.OceanRotationIntensity = _view.OceanRotationSlider.Value;
+		Beam.Language.Language language = Localization.GetLanguageHandler().GetLanguages().ElementAt(_view.LanguageButton.SelectedIndex);
+		string langPath = Options.GeneralSettings.LangPath;
+		string path = language.Path;
+		Options.GeneralSettings.LangPath = language.Path;
+		_optionsMenuPresenter.Save();
+		if (!string.IsNullOrWhiteSpace(langPath) && langPath != path)
+		{
+			DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_GENERAL_MENU_DB_LANGUAGE_TITLE", "OPTIONS_GENERAL_MENU_DB_LANGUAGE_DESC", DialogueButton.Ok);
+		}
+	}
+
+	private void WireWidgetEvents(IOptionWidgetViewAdapter widget)
+	{
+		widget.MouseEnter += OptionWidget_MouseEnter;
+		widget.MouseLeave += OptionWidget_MouseLeave;
+	}
+
+	private void WireButtonEvents(IOptionButtonViewAdapter button)
+	{
+		button.SelectionChanged += OptionButton_SelectionChanged;
+		WireWidgetEvents(button);
+	}
+
+	private void WireSliderEvents(IOptionSliderViewAdapter slider)
+	{
+		slider.ValueChanged += OptionSlider_ValueChanged;
+		WireWidgetEvents(slider);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 193
+PATH: Assembly-CSharp__Beam.UI__GraphicsMenuPresenter.cs
+SIZE: 17600 bytes
+SHA256: c40857589afe2301cb7d9ceb026b225fe14b9e2bfa15812f42fff928cb5295ae
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Utilities;
+using Beam.Utilities.Reflection;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class GraphicsMenuPresenter : MonoBehaviour, IOptionPanel
+{
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
+
+	private IGraphicsMenuViewAdapter _view;
+
+	private GraphicsSettings _settings;
+
+	private bool _presetChange;
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	public void Initialize(IGraphicsMenuViewAdapter view)
+	{
+		_view = view;
+		PopulateControls();
+	}
+
+	public void Show()
+	{
+		if (!_view.Visible)
+		{
+			_view.Show();
+			_optionsMenuPresenter.SetApplyButtonEvent(GraphicsMenuApplyButton_Click);
+			_settings = Options.GraphicsSettings.ShallowCopy();
+			SetPresetControlSelection();
+			SetResolutionControlSelection();
+			SetControlsSelections(_settings);
+			WireControlEvents();
+		}
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			_view.Hide();
+			UnwireControlEvents();
+		}
+	}
+
+	public void Apply()
+	{
+		GraphicsMenuApplyButton_Click(null);
+	}
+
+	private void WireControlEvents()
+	{
+		_view.PresetButton.Click += PresetButton_Click;
+		_view.PresetButton.SelectionChanged += PresetButton_SelectionChanged;
+		WireWidgetEvents(_view.ResolutionButton);
+		WireWidgetEvents(_view.FixedFrameRateButton);
+		WireWidgetEvents(_view.VerticalSyncButton);
+		WireWidgetEvents(_view.FullScreenButton);
+		WireWidgetEvents(_view.DrawDistanceButton);
+		WireWidgetEvents(_view.TextureQualityButton);
+		WireWidgetEvents(_view.ShadowQualityButton);
+		WireWidgetEvents(_view.BillboardDensityButton);
+		_view.ResolutionButton.SelectionChanged += ResolutionButton_Changed;
+		_view.FixedFrameRateButton.SelectionChanged += FixedFrameRateButton_Changed;
+		_view.VerticalSyncButton.SelectionChanged += VerticalSyncButton_Changed;
+		_view.FullScreenButton.SelectionChanged += FullScreenButton_Changed;
+		_view.ColorModeButton.SelectionChanged += OptionButton_Changed;
+		_view.FieldOfViewSlider.ValueChanged += FieldOfViewSlider_Changed;
+		_view.DrawDistanceButton.SelectionChanged += OptionButton_Changed;
+		_view.TextureQualityButton.SelectionChanged += OptionButton_Changed;
+		_view.ShadowQualityButton.SelectionChanged += OptionButton_Changed;
+		_view.BillboardDensityButton.SelectionChanged += OptionButton_Changed;
+		WireWidgetEvents(_view.GrassButton);
+		WireWidgetEvents(_view.CloudsButton);
+		_view.GrassButton.SelectionChanged += OptionButton_Changed;
+		_view.CloudsButton.SelectionChanged += OptionButton_Changed;
+		WireWidgetEvents(_view.WaterQualityButton);
+		WireWidgetEvents(_view.CausticsButton);
+		_view.WaterQualityButton.SelectionChanged += OptionButton_Changed;
+		_view.CausticsButton.SelectionChanged += OptionButton_Changed;
+		WireWidgetEvents(_view.AmbientOcclusionButton);
+		WireWidgetEvents(_view.AntialiasingButton);
+		WireWidgetEvents(_view.BloomButton);
+		WireWidgetEvents(_view.LensEffectsButton);
+		WireWidgetEvents(_view.MotionBlurButton);
+		_view.AmbientOcclusionButton.SelectionChanged += OptionButton_Changed;
+		_view.AntialiasingButton.SelectionChanged += OptionButton_Changed;
+		_view.BloomButton.SelectionChanged += OptionButton_Changed;
+		_view.LensEffectsButton.SelectionChanged += OptionButton_Changed;
+		_view.MotionBlurButton.SelectionChanged += OptionButton_Changed;
+	}
+
+	private void UnwireControlEvents()
+	{
+		_view.PresetButton.Click -= PresetButton_Click;
+		_view.PresetButton.SelectionChanged -= PresetButton_SelectionChanged;
+		UnwireWidgetEvents(_view.ResolutionButton);
+		UnwireWidgetEvents(_view.FixedFrameRateButton);
+		UnwireWidgetEvents(_view.VerticalSyncButton);
+		UnwireWidgetEvents(_view.FullScreenButton);
+		UnwireWidgetEvents(_view.DrawDistanceButton);
+		UnwireWidgetEvents(_view.TextureQualityButton);
+		UnwireWidgetEvents(_view.ShadowQualityButton);
+		UnwireWidgetEvents(_view.BillboardDensityButton);
+		_view.ResolutionButton.SelectionChanged -= ResolutionButton_Changed;
+		_view.FixedFrameRateButton.SelectionChanged -= FixedFrameRateButton_Changed;
+		_view.VerticalSyncButton.SelectionChanged -= VerticalSyncButton_Changed;
+		_view.FullScreenButton.SelectionChanged -= FullScreenButton_Changed;
+		_view.ColorModeButton.SelectionChanged -= OptionButton_Changed;
+		_view.FieldOfViewSlider.ValueChanged -= FieldOfViewSlider_Changed;
+		_view.DrawDistanceButton.SelectionChanged -= OptionButton_Changed;
+		_view.TextureQualityButton.SelectionChanged -= OptionButton_Changed;
+		_view.ShadowQualityButton.SelectionChanged -= OptionButton_Changed;
+		_view.BillboardDensityButton.SelectionChanged -= OptionButton_Changed;
+		UnwireWidgetEvents(_view.GrassButton);
+		UnwireWidgetEvents(_view.CloudsButton);
+		_view.GrassButton.SelectionChanged -= OptionButton_Changed;
+		_view.CloudsButton.SelectionChanged -= OptionButton_Changed;
+		UnwireWidgetEvents(_view.WaterQualityButton);
+		UnwireWidgetEvents(_view.CausticsButton);
+		_view.WaterQualityButton.SelectionChanged -= OptionButton_Changed;
+		_view.CausticsButton.SelectionChanged -= OptionButton_Changed;
+		UnwireWidgetEvents(_view.AmbientOcclusionButton);
+		UnwireWidgetEvents(_view.AntialiasingButton);
+		UnwireWidgetEvents(_view.BloomButton);
+		UnwireWidgetEvents(_view.LensEffectsButton);
+		UnwireWidgetEvents(_view.MotionBlurButton);
+		_view.AmbientOcclusionButton.SelectionChanged -= OptionButton_Changed;
+		_view.AntialiasingButton.SelectionChanged -= OptionButton_Changed;
+		_view.BloomButton.SelectionChanged -= OptionButton_Changed;
+		_view.LensEffectsButton.SelectionChanged -= OptionButton_Changed;
+		_view.MotionBlurButton.SelectionChanged -= OptionButton_Changed;
+	}
+
+	private void PopulateControls()
+	{
+		IEnumerable<DescriptionAttribute> attributes = typeof(Quality_Preset).GetAttributes<DescriptionAttribute>();
+		_view.PresetButton.Initialize(attributes);
+		IEnumerable<IOptionElementData> items = (from res in new[]
+			{
+				new
+				{
+					Width = Screen.width,
+					Height = Screen.height
+				}
+			}.Union(Screen.resolutions.Select((Resolution r) => new
+			{
+				Width = r.width,
+				Height = r.height
+			})).Distinct()
+			orderby res.Width, res.Height
+			select new OptionElementData($"{res.Width} x {res.Height}")).ToList();
+		_view.ResolutionButton.Initialize(items);
+		_view.FixedFrameRateButton.Initialize(typeof(Quality_FixedFrameRate).GetAttributes<DescriptionAttribute>());
+		_view.VerticalSyncButton.Initialize(typeof(Quality_VerticalSync).GetAttributes<DescriptionAttribute>());
+		_view.FullScreenButton.Initialize(typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_view.ColorModeButton.Initialize(typeof(Quality_ColorMode).GetAttributes<DescriptionAttribute>());
+		_view.DrawDistanceButton.Initialize(typeof(Quality_DrawDistance).GetAttributes<DescriptionAttribute>());
+		_view.TextureQualityButton.Initialize(typeof(Quality_Textures).GetAttributes<DescriptionAttribute>());
+		_view.ShadowQualityButton.Initialize(typeof(Quality_Shadows).GetAttributes<DescriptionAttribute>());
+		_view.BillboardDensityButton.Initialize(typeof(Quality_BillboardDensity).GetAttributes<DescriptionAttribute>());
+		_view.GrassButton.Initialize(typeof(Quality_Grass).GetAttributes<DescriptionAttribute>());
+		_view.CloudsButton.Initialize(typeof(Quality_VolumetricClouds).GetAttributes<DescriptionAttribute>());
+		_view.WaterQualityButton.Initialize(typeof(Quality_LAPTOP_ULTRA).GetAttributes<DescriptionAttribute>());
+		_view.WaterReflectionsButton.Initialize(typeof(Quality_OFF_HIGH).GetAttributes<DescriptionAttribute>());
+		_view.CausticsButton.Initialize(typeof(Quality_Caustics).GetAttributes<DescriptionAttribute>());
+		_view.AmbientOcclusionButton.Initialize(typeof(Quality_AmbientOcclusion).GetAttributes<DescriptionAttribute>());
+		_view.AntialiasingButton.Initialize(typeof(Quality_Antialiasing).GetAttributes<DescriptionAttribute>());
+		_view.BloomButton.Initialize(typeof(Quality_Bloom).GetAttributes<DescriptionAttribute>());
+		_view.LensEffectsButton.Initialize(typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_view.MotionBlurButton.Initialize(typeof(Quality_MotionBlur).GetAttributes<DescriptionAttribute>());
+	}
+
+	private void SetPresetControlSelection()
+	{
+		_view.PresetButton.SelectedIndex = _settings.Preset.GetIndex();
+	}
+
+	private void SetResolutionControlSelection()
+	{
+		string resolution = _settings.Resolution;
+		if (string.IsNullOrEmpty(resolution))
+		{
+			resolution = Screen.width + " x " + Screen.height;
+		}
+		int num = _view.ResolutionButton.Elements.FindIndex((IOptionElementData r) => r.Text.Equals(resolution, StringComparison.InvariantCultureIgnoreCase));
+		if (num != -1)
+		{
+			_view.ResolutionButton.SelectedIndex = num;
+		}
+	}
+
+	private void SetControlsSelections(GraphicsSettings settings)
+	{
+		_view.FixedFrameRateButton.SelectedIndex = settings.FixedFrameRate.GetIndex();
+		_view.VerticalSyncButton.SelectedIndex = settings.VerticalSync.GetIndex();
+		_view.FullScreenButton.SelectedIndex = ((!Screen.fullScreen) ? Quality_OFF_ON.OFF : Quality_OFF_ON.ON).GetIndex();
+		_view.ColorModeButton.SelectedIndex = settings.ColorMode.GetIndex();
+		_view.DrawDistanceButton.SelectedIndex = settings.DrawDistance.GetIndex();
+		_view.TextureQualityButton.SelectedIndex = settings.TextureQuality.GetIndex();
+		_view.ShadowQualityButton.SelectedIndex = settings.ShadowQuality.GetIndex();
+		_view.BillboardDensityButton.SelectedIndex = settings.BillboardDensity.GetIndex();
+		_view.FieldOfViewSlider.Value = settings.FieldOfView;
+		_view.GrassButton.SelectedIndex = settings.Grass.GetIndex();
+		_view.CloudsButton.SelectedIndex = settings.Clouds.GetIndex();
+		_view.WaterQualityButton.SelectedIndex = settings.WaterQuality.GetIndex();
+		_view.WaterReflectionsButton.SelectedIndex = settings.WaterReflections.GetIndex();
+		_view.CausticsButton.SelectedIndex = settings.Caustics.GetIndex();
+		_view.AntialiasingButton.SelectedIndex = settings.Antialiasing.GetIndex();
+		_view.AmbientOcclusionButton.SelectedIndex = settings.AmbientOcclusion.GetIndex();
+		_view.BloomButton.SelectedIndex = settings.Bloom.GetIndex();
+		_view.LensEffectsButton.SelectedIndex = settings.LensEffects.GetIndex();
+		_view.MotionBlurButton.SelectedIndex = settings.MotionBlur.GetIndex();
+		CheckFixedFrameRate();
+		CheckVerticalSync();
+		CheckFullScreen();
+		CheckFieldOfView(_view.FieldOfViewSlider.Value);
+		CheckMotionBlur();
+	}
+
+	private void GraphicsMenuApplyButton_Click(object sender)
+	{
+		_settings.Preset = (Quality_Preset)_view.PresetButton.SelectedIndex;
+		_settings.FixedFrameRate = (Quality_FixedFrameRate)_view.FixedFrameRateButton.SelectedIndex;
+		_settings.VerticalSync = (Quality_VerticalSync)_view.VerticalSyncButton.SelectedIndex;
+		_settings.FullScreen = (Quality_OFF_ON)_view.FullScreenButton.SelectedIndex;
+		_settings.ColorMode = (Quality_ColorMode)_view.ColorModeButton.SelectedIndex;
+		_settings.DrawDistance = (Quality_DrawDistance)_view.DrawDistanceButton.SelectedIndex;
+		_settings.TextureQuality = (Quality_Textures)_view.TextureQualityButton.SelectedIndex;
+		_settings.ShadowQuality = (Quality_Shadows)_view.ShadowQualityButton.SelectedIndex;
+		_settings.BillboardDensity = (Quality_BillboardDensity)_view.BillboardDensityButton.SelectedIndex;
+		_settings.FieldOfView = _view.FieldOfViewSlider.Value;
+		_settings.Grass = (Quality_Grass)_view.GrassButton.SelectedIndex;
+		_settings.Clouds = (Quality_VolumetricClouds)_view.CloudsButton.SelectedIndex;
+		_settings.WaterQuality = (Quality_LAPTOP_ULTRA)_view.WaterQualityButton.SelectedIndex;
+		_settings.WaterReflections = (Quality_OFF_HIGH)_view.WaterReflectionsButton.SelectedIndex;
+		_settings.Caustics = (Quality_Caustics)_view.CausticsButton.SelectedIndex;
+		_settings.AmbientOcclusion = (Quality_AmbientOcclusion)_view.AmbientOcclusionButton.SelectedIndex;
+		_settings.Antialiasing = (Quality_Antialiasing)_view.AntialiasingButton.SelectedIndex;
+		_settings.Bloom = (Quality_Bloom)_view.BloomButton.SelectedIndex;
+		_settings.LensEffects = (Quality_OFF_ON)_view.LensEffectsButton.SelectedIndex;
+		_settings.Resolution = _view.ResolutionButton.SelectedElement.Text;
+		if (!Game.Mode.IsLocalCoop())
+		{
+			_settings.MotionBlur = (Quality_MotionBlur)_view.MotionBlurButton.SelectedIndex;
+		}
+		GraphicsUtilities.SetFixedFrameRate(_settings.FixedFrameRate);
+		GraphicsUtilities.SetVSync(_settings.VerticalSync);
+		SetResolution();
+		Options.GraphicsSettings = _settings.ShallowCopy();
+		_optionsMenuPresenter.Save();
+	}
+
+	private void PresetButton_Click(object sender)
+	{
+		if (_view.PresetButton.SelectedIndex == 5)
+		{
+			_view.PresetButton.SelectedIndex = Quality_Preset.LAPTOP.GetIndex();
+		}
+	}
+
+	private void PresetButton_SelectionChanged(IButtonViewAdapter sender)
+	{
+		if (!_presetChange)
+		{
+			switch ((Quality_Preset)_view.PresetButton.SelectedIndex)
+			{
+			case Quality_Preset.LAPTOP:
+				_settings = GraphicsPreset.LAPTOP;
+				break;
+			case Quality_Preset.LOW:
+				_settings = GraphicsPreset.LOW;
+				break;
+			default:
+				_settings = GraphicsPreset.MEDIUM;
+				break;
+			case Quality_Preset.HIGH:
+				_settings = GraphicsPreset.HIGH;
+				break;
+			case Quality_Preset.ULTRA:
+				_settings = GraphicsPreset.ULTRA;
+				break;
+			case Quality_Preset.CUSTOM:
+				_settings.Preset = Quality_Preset.CUSTOM;
+				_view.PresetButton.SelectedIndex = Quality_Preset.CUSTOM.GetIndex();
+				return;
+			}
+			_presetChange = true;
+			SetControlsSelections(_settings);
+			_optionsMenuPresenter.SetDirtySettings();
+			_presetChange = false;
+		}
+	}
+
+	private void ResolutionButton_Changed(IOptionWidgetViewAdapter sender)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void FixedFrameRateButton_Changed(IOptionButtonViewAdapter sender)
+	{
+		CheckFixedFrameRate();
+		OptionButton_Changed(sender);
+	}
+
+	private void CheckFixedFrameRate()
+	{
+		if (_view.FixedFrameRateButton.SelectedIndex == 0)
+		{
+			_view.VerticalSyncButton.Enabled = true;
+			return;
+		}
+		_view.VerticalSyncButton.SelectedIndex = 0;
+		_view.VerticalSyncButton.Enabled = false;
+	}
+
+	private void VerticalSyncButton_Changed(IOptionButtonViewAdapter sender)
+	{
+		CheckVerticalSync();
+		OptionButton_Changed(sender);
+	}
+
+	private void CheckVerticalSync()
+	{
+		if (_view.VerticalSyncButton.SelectedIndex == 0)
+		{
+			_view.FixedFrameRateButton.Enabled = true;
+			return;
+		}
+		_view.FixedFrameRateButton.SelectedIndex = 0;
+		_view.FixedFrameRateButton.Enabled = false;
+	}
+
+	private void FullScreenButton_Changed(IOptionButtonViewAdapter sender)
+	{
+		if (Game.State == GameState.MAIN_MENU)
+		{
+			Quality_OFF_ON selectedIndex = (Quality_OFF_ON)_view.FullScreenButton.SelectedIndex;
+			StartCoroutine(WaitForScreenChange(selectedIndex == Quality_OFF_ON.ON));
+		}
+	}
+
+	private void CheckFullScreen()
+	{
+		if (Game.State != GameState.MAIN_MENU)
+		{
+			_view.FullScreenButton.Enabled = false;
+		}
+	}
+
+	private void CheckMotionBlur()
+	{
+		if (Game.Mode.IsLocalCoop())
+		{
+			_view.MotionBlurButton.SelectedIndex = 1;
+			_view.MotionBlurButton.Enabled = false;
+		}
+	}
+
+	private void FieldOfViewSlider_Changed(float value)
+	{
+		CheckFieldOfView(value);
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void CheckFieldOfView(float value)
+	{
+		int num = 60 + (int)(value * 30f);
+		_view.FieldOfViewSlider.ValueText = $"{num:f1}";
+	}
+
+	private void OptionButton_Changed(IOptionButtonViewAdapter sender)
+	{
+		if (!_presetChange)
+		{
+			_optionsMenuPresenter.SetTooltip(sender.GetTooltip());
+			SetPresetToCustom();
+		}
+	}
+
+	private void OptionWidget_MouseEnter(ISelectableViewAdapter sender)
+	{
+		IOptionWidgetViewAdapter optionWidgetViewAdapter = sender as IOptionWidgetViewAdapter;
+		if (!optionWidgetViewAdapter.IsNullOrDestroyed())
+		{
+			_optionsMenuPresenter.SetTooltip(optionWidgetViewAdapter.GetTooltip());
+		}
+	}
+
+	private void OptionWidget_MouseLeave(ISelectableViewAdapter sender)
+	{
+		_optionsMenuPresenter.SetTooltip(string.Empty);
+	}
+
+	private void OptionWidget_Selected(ISelectableViewAdapter sender)
+	{
+		_view.Scrollview.FocusElement(sender.transform);
+		IOptionWidgetViewAdapter optionWidgetViewAdapter = sender as IOptionWidgetViewAdapter;
+		if (!optionWidgetViewAdapter.IsNullOrDestroyed())
+		{
+			_optionsMenuPresenter.SetTooltip(optionWidgetViewAdapter.GetTooltip());
+		}
+	}
+
+	private void SetPresetToCustom()
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+		_view.PresetButton.SelectedIndex = Quality_Preset.CUSTOM.GetIndex();
+	}
+
+	private void WireWidgetEvents(IOptionWidgetViewAdapter widget)
+	{
+		widget.MouseEnter += OptionWidget_MouseEnter;
+		widget.MouseLeave += OptionWidget_MouseLeave;
+		widget.Selected += OptionWidget_Selected;
+	}
+
+	private void UnwireWidgetEvents(IOptionWidgetViewAdapter widget)
+	{
+		widget.MouseEnter -= OptionWidget_MouseEnter;
+		widget.MouseLeave -= OptionWidget_MouseLeave;
+		widget.Selected -= OptionWidget_Selected;
+	}
+
+	private bool TryParseResolution(string resolution, out int width, out int height)
+	{
+		string[] array = resolution.Split('x');
+		if (!int.TryParse(array[0].Trim(), out width))
+		{
+			width = 0;
+			height = 0;
+			return false;
+		}
+		if (!int.TryParse(array[1].Trim(), out height))
+		{
+			width = 0;
+			height = 0;
+			return false;
+		}
+		return true;
+	}
+
+	private void SetResolution()
+	{
+		if (TryParseResolution(_view.ResolutionButton.SelectedElement.Text, out var width, out var height))
+		{
+			Screen.SetResolution(width, height, Screen.fullScreen);
+		}
+	}
+
+	private IEnumerator WaitForScreenChange(bool fullscreen)
+	{
+		int width = Screen.width;
+		int height = Screen.height;
+		Screen.fullScreen = fullscreen;
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+		Screen.SetResolution(width, height, Screen.fullScreen);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 194
+PATH: Assembly-CSharp__Beam.UI__HudPresenter.cs
+SIZE: 9356 bytes
+SHA256: 4f9569f322cca799f7b2dfa7bb3dea96db80c061b8e0a63146a003b27aebd399
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Crafting;
+using Beam.Events;
+using Beam.Language;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class HudPresenter : ControllerBase, INeedPlayerComponent, IRefresh
+{
+	private const float DEFAULT_CROSSHAIR_SCALE = 0.3f;
+
+	[SerializeField]
+	private HudViewAdapterBase _view;
+
+	private IPlayer _player;
+
+	private Raycaster _raycaster;
+
+	private Interacter _interacter;
+
+	private Crafter _crafter;
+
+	private List<IGameActionProvider> _gameActionProviders = new List<IGameActionProvider>();
+
+	private Stack<ActionHudElementViewAdapterBase> _actionElementStack = new Stack<ActionHudElementViewAdapterBase>();
+
+	private List<ActionHudElementViewAdapterBase> _activeActionElements = new List<ActionHudElementViewAdapterBase>();
+
+	private bool _showCursor;
+
+	private bool _showAction;
+
+	private bool _suspended;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public void Start()
+	{
+		if (_view == null)
+		{
+			Debug.LogError("HudPresenter:: No view component assigned!");
+			_view = NullHudViewAdapter.Instance;
+		}
+		EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsAppliedEvent);
+		EventManager.AddListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+		LoadOptions();
+		Reset();
+	}
+
+	public override void SetView(ViewAdapterBase view)
+	{
+		_view = view as HudViewAdapterBase;
+		if (_view == null)
+		{
+			Debug.LogError("HudPresenter:: No view component assigned!");
+			_view = NullHudViewAdapter.Instance;
+		}
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_player.Movement.ClimbChanged += PlayerMovement_ClimbChanged;
+		_raycaster = _player.GameInput.Raycaster;
+		_raycaster.EnterObject += Raycaster_EnterObject;
+		_raycaster.LeaveObject += Raycaster_LeaveObject;
+		_interacter = _player.GameInput.Interacter;
+		_interacter.InteractingEnabled += Interacter_InteractingEnabled;
+		_interacter.InteractingUpdated += Interacter_InteractingUpdated;
+		_interacter.InteractingFinished += Interacter_InteractingFinished;
+		_crafter = _player.Crafter;
+		_crafter.StartedPlacing += Crafter_StartedPlacing;
+		_gameActionProviders.Add(_player.Holder);
+		_gameActionProviders.Add(_interacter);
+		_gameActionProviders.Add(_player.PlayerUI.Canvas.GetComponentInChildren<StorageMenuPresenter>());
+	}
+
+	private void OnDestroy()
+	{
+		if (!_player.IsNullOrDestroyed() && _player.Movement != null)
+		{
+			_player.Movement.ClimbChanged -= PlayerMovement_ClimbChanged;
+		}
+		if (_interacter != null)
+		{
+			_interacter.InteractingEnabled -= Interacter_InteractingEnabled;
+			_interacter.InteractingUpdated -= Interacter_InteractingUpdated;
+			_interacter.InteractingFinished -= Interacter_InteractingFinished;
+		}
+		if (_raycaster != null)
+		{
+			_raycaster.EnterObject -= Raycaster_EnterObject;
+			_raycaster.LeaveObject -= Raycaster_LeaveObject;
+		}
+		if (_crafter != null)
+		{
+			_crafter.StartedPlacing -= Crafter_StartedPlacing;
+		}
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsAppliedEvent);
+		EventManager.RemoveListener<EndGameSequenceEvent>(EventManager_EndGameSequenceEvent);
+	}
+
+	public void LoadOptions()
+	{
+		_showAction = Options.GeneralSettings.HudInformation == Quality_HUDInformation.ITEM_NAMES;
+		_showCursor = Options.GeneralSettings.ShowCrosshair == Quality_OFF_ON.ON;
+		Refresh(RefreshUIMode.Refresh);
+		Debug.Log("HudPresenter::LoadOptions:: Loaded options.");
+	}
+
+	private void EventManager_OptionsAppliedEvent(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	private void EventManager_EndGameSequenceEvent(EndGameSequenceEvent e)
+	{
+		if (Game.Mode == GameMode.Coop_2 && _player.Id == 1)
+		{
+			Suspend(suspend: true);
+		}
+	}
+
+	private ActionHudElementViewAdapterBase PopActionElement()
+	{
+		ActionHudElementViewAdapterBase actionHudElementViewAdapterBase = ((_actionElementStack.Count <= 0) ? Object.Instantiate(_view.ActionHudElementPrefab) : _actionElementStack.Pop());
+		actionHudElementViewAdapterBase.transform.SetParent(_view.ActionHudElementsContainer.Transform, worldPositionStays: false);
+		_activeActionElements.Add(actionHudElementViewAdapterBase);
+		return actionHudElementViewAdapterBase;
+	}
+
+	private void PushActionElement(ActionHudElementViewAdapterBase element)
+	{
+		element.transform.SetParent(_view.PooledActionHudElementsContainer.Transform, worldPositionStays: false);
+		_actionElementStack.Push(element);
+	}
+
+	private void PoolActionElements()
+	{
+		for (int i = 0; i < _activeActionElements.Count; i++)
+		{
+			ActionHudElementViewAdapterBase element = _activeActionElements[i];
+			PushActionElement(element);
+		}
+		_activeActionElements.Clear();
+	}
+
+	private void Interacter_InteractingEnabled(bool enabled)
+	{
+		_view.DefaultCursor.Color = Color.white;
+		_view.DefaultCursor.Enabled = enabled || _showCursor;
+		_view.InteractingCursor.Color = Color.white;
+		_view.InteractingCursor.Enabled = enabled;
+	}
+
+	private void Interacter_InteractingUpdated(float time)
+	{
+		float num = Mathf.Clamp(0.3f + 0.6f * (4f * time), 0f, 0.9f);
+		_view.DefaultCursor.transform.localScale = Vector3.one * num;
+	}
+
+	private void Interacter_InteractingFinished()
+	{
+		_view.DefaultCursor.transform.localScale = Vector3.one * 0.3f;
+		Refresh(RefreshUIMode.Refresh);
+	}
+
+	private void Raycaster_EnterObject(IBase obj)
+	{
+		Select(obj);
+		_view.ClimbUI.gameObject.SetActive(_player.Movement.ClimbAvailable && CurrentObjectIsActiveLadder());
+	}
+
+	private void Raycaster_LeaveObject(IBase obj)
+	{
+		FadeOutAndReset();
+	}
+
+	private void Crafter_StartedPlacing()
+	{
+		FadeOutAndReset();
+	}
+
+	private void Select(IBase obj)
+	{
+		if (_suspended || _player.Statistics.IsKnockedOut)
+		{
+			return;
+		}
+		ISelectable selectable = obj as ISelectable;
+		if (selectable.IsNullOrDestroyed())
+		{
+			FadeOutAndReset();
+			return;
+		}
+		LeanTween.cancel(gameObject);
+		_view.DefaultCursor.Enabled = _showCursor;
+		_view.ItemNameLabel.Text = obj.DisplayName;
+		_view.ItemActionGroup.Alpha = 1f;
+		_view.ItemActionGroup.transform.gameObject.SetActive(_showAction);
+		PoolActionElements();
+		for (int i = 0; i < _gameActionProviders.Count; i++)
+		{
+			IEnumerable<IGameAction> gameActions = _gameActionProviders[i].GetGameActions();
+			if (gameActions == null)
+			{
+				continue;
+			}
+			IPickupable pickupable = selectable as IPickupable;
+			bool flag = false;
+			if (!pickupable.IsNullOrDestroyed())
+			{
+				flag = pickupable.CanPickUp && (!_player.Holder.CanPickup(pickupable, notification: false) || _player.Movement.Vehicle != null);
+			}
+			foreach (IGameAction item in gameActions)
+			{
+				if (RewiredUtilities.IsActionEnabled(_player.Input?.id ?? 0, item.ElementRequiredId) && (!flag || item.ElementRequiredId != 9))
+				{
+					ActionHudElementViewAdapterBase element = PopActionElement();
+					FormatActionElement(element, item.PlayerActionRequiredDescription, item.ElementRequiredId, item.ResultingActionDescription);
+				}
+			}
+		}
+		_view.ActionHudElementsContainer.Transform.gameObject.SetActive(_activeActionElements.Count > 0);
+	}
+
+	private void FormatActionElement(ActionHudElementViewAdapterBase element, string playerActionTerm, int elementRequired, string resultActionTerm)
+	{
+		string text = Localization.GetLanguageHandler().Localize("PLAYER_ACTION_SENTENCE", playerActionTerm, "PLAYER_ACTION_PREPOSITION", resultActionTerm);
+		text = PlatformLocalization.GetHandler().SubstituteControllerGlyphs(text, _player.Id, elementRequired);
+		element.PressLabel.Text = text;
+	}
+
+	private void FadeOutAndReset()
+	{
+		if (_view.ItemActionGroup.Alpha == 0f)
+		{
+			Reset();
+		}
+		else
+		{
+			LeanTween.value(gameObject, FadeCallback, 1f, 0f, 0.2f).setOnComplete(Reset);
+		}
+	}
+
+	private void Reset()
+	{
+		LeanTween.cancel(gameObject);
+		Color white = Color.white;
+		white.a = 0.5f;
+		_view.DefaultCursor.Color = white;
+		_view.DefaultCursor.Enabled = !_suspended && _showCursor;
+		_view.InteractingCursor.Enabled = false;
+		_view.ItemNameLabel.Text = "";
+		_view.ItemActionGroup.Alpha = 1f;
+		_view.ItemActionGroup.transform.gameObject.SetActive(value: false);
+	}
+
+	public void Suspend(bool suspend)
+	{
+		_suspended = suspend;
+		Refresh((!_suspended) ? RefreshUIMode.Refresh : RefreshUIMode.Clear);
+	}
+
+	public void Refresh(RefreshUIMode mode)
+	{
+		switch (mode)
+		{
+		case RefreshUIMode.Clear:
+			Reset();
+			break;
+		case RefreshUIMode.Refresh:
+			Select(_raycaster.CurrentObject);
+			break;
+		}
+	}
+
+	private void PlayerMovement_ClimbChanged(bool value)
+	{
+		if (CurrentObjectIsActiveLadder())
+		{
+			_view.ClimbUI.gameObject.SetActive(value);
+		}
+		if (_player.Movement.activeLadder.IsNullOrDestroyed())
+		{
+			_view.ClimbUI.gameObject.SetActive(value: false);
+		}
+		if (_view.ClimbUI.gameObject.activeSelf)
+		{
+			FormatActionElement(_view.ClimbUI, "PLAYER_ACTION_HOLD", 4, "PLAYER_ACTION_CLIMB");
+		}
+	}
+
+	private void FadeCallback(float value)
+	{
+		_view.ItemActionGroup.Alpha = value;
+		Color white = Color.white;
+		white.a = value;
+		_view.InteractingCursor.Color = white;
+		white.a = Mathf.Clamp(white.a, 0.5f, 1f);
+		_view.DefaultCursor.Color = white;
+	}
+
+	private bool CurrentObjectIsActiveLadder()
+	{
+		if (_player.Movement.activeLadder.IsNullOrDestroyed())
+		{
+			return false;
+		}
+		if (_raycaster.CurrentObject.IsNullOrDestroyed())
+		{
+			return false;
+		}
+		return _player.Movement.activeLadder.transform.parent.gameObject.GetInstanceID() == _raycaster.CurrentObject.gameObject.GetInstanceID();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 195
+PATH: Assembly-CSharp__Beam.UI__HudViewAdapterBase.cs
+SIZE: 637 bytes
+SHA256: 536dedbd1a49d551dc63a9a7c6ada1526e9fb1c94477120fcdac7e18221a0647
+====================================================================================================
+
+namespace Beam.UI;
+
+public abstract class HudViewAdapterBase : ViewAdapterBase
+{
+	public abstract IImageViewAdapter DefaultCursor { get; }
+
+	public abstract IImageViewAdapter InteractingCursor { get; }
+
+	public abstract ILabelViewAdapter ItemNameLabel { get; }
+
+	public abstract ActionHudElementViewAdapterBase ClimbUI { get; }
+
+	public abstract ActionHudElementViewAdapterBase ActionHudElementPrefab { get; }
+
+	public abstract ITransformViewAdapter ActionHudElementsContainer { get; }
+
+	public abstract ITransformViewAdapter PooledActionHudElementsContainer { get; }
+
+	public abstract ICanvasGroupViewAdapter ItemActionGroup { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 196
+PATH: Assembly-CSharp__Beam.UI__ICanvasGroupViewAdapter.cs
+SIZE: 177 bytes
+SHA256: deed5e5f74bb87ca40db64a6f21d4184b4dcf212858b22b84a3b8dae1355ae95
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface ICanvasGroupViewAdapter
+{
+	Transform transform { get; }
+
+	bool Interactable { get; set; }
+
+	float Alpha { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 197
+PATH: Assembly-CSharp__Beam.UI__IInputMapCategoryHeader.cs
+SIZE: 205 bytes
+SHA256: c26b24cb2f2a78aa695461df7bef0fafcee95ac1076c193f6dd9db3fc6a1f0a8
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IInputMapCategoryHeader
+{
+	Transform transform { get; }
+
+	ILabelViewAdapter Label { get; }
+
+	IGameObjectViewAdapter SubheadingsContainer { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 198
+PATH: Assembly-CSharp__Beam.UI__IMissionRewardElement.cs
+SIZE: 147 bytes
+SHA256: 9e6d31ecf2e76401c08ffd4e2af8ed68224dea580dec24e0bb9931b4c6d98b7b
+====================================================================================================
+
+namespace Beam.UI;
+
+public interface IMissionRewardElement
+{
+	ITransformViewAdapter Transform { get; }
+
+	void Initialize(IMissionReward reward);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 199
+PATH: Assembly-CSharp__Beam.UI__IOptionCategoryHeader.cs
+SIZE: 210 bytes
+SHA256: 0d8f672dfd7ae978a6dea9f20fd905fa08e68a9fadb8b78ec51f1f33672988fb
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IOptionCategoryHeader
+{
+	Transform transform { get; }
+
+	ILabelViewAdapter Label { get; }
+
+	Transform ElementsContainer { get; }
+
+	int Id { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 200
+PATH: Assembly-CSharp__Beam.UI__IOptionPanel.cs
+SIZE: 157 bytes
+SHA256: 81a8151c92fa890c4989db9de6400820c15a2fadf8643c8179b3b4ff953a4052
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IOptionPanel
+{
+	Transform GetCategoriesContainer();
+
+	void Show();
+
+	void Hide();
+
+	void Apply();
+}
+
+

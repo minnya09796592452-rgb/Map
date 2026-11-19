@@ -1,0 +1,2806 @@
+
+====================================================================================================
+SOURCE FILE 226
+PATH: Assembly-CSharp__Beam.UI__QuickCrafterRadialMenuViewAdapterBase.cs
+SIZE: 1244 bytes
+SHA256: 76e0e7bfaa8d13c6f382ff936948677c54bc0e98643f1da8e0faca9f9662c367
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class QuickCrafterRadialMenuViewAdapterBase : RadialMenuViewAdapterBase<CraftingData, QuickCrafterRadialMenuElement>
+{
+	[SerializeField]
+	private GameObject _menuGameObject;
+
+	public abstract override ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract override ICanvasGroupViewAdapter DetailsCanvasGroup { get; }
+
+	public abstract override ITransformViewAdapter ElementContainer { get; }
+
+	public abstract override QuickCrafterRadialMenuElement ElementPrefab { get; }
+
+	public abstract override ITransformViewAdapter ElementPlaceholderPrefab { get; }
+
+	public abstract override ITransformViewAdapter PooledElementContainer { get; }
+
+	public abstract override IImageViewAdapter SelectorImage { get; }
+
+	public abstract override ILabelViewAdapter TitleLabel { get; }
+
+	public abstract override ILabelViewAdapter DescriptionLabel { get; }
+
+	public abstract override Texture2D BlurMaskTexture { get; }
+
+	public override void Show()
+	{
+		if (!_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: true);
+			base.Show();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: false);
+			base.Hide();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 227
+PATH: Assembly-CSharp__Beam.UI__RadialMenuPresenterBase.cs
+SIZE: 15282 bytes
+SHA256: e416301238d150042321454b016ae5d8eaace175302b518fbe65402be04f04b4
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Utilities;
+using Rewired;
+using SharpNeatLib.Maths;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Beam.UI;
+
+public abstract class RadialMenuPresenterBase<TModel, TElement, TView> : ControllerBase where TModel : class, IRadialMenuModel where TElement : MonoBehaviour, IRadialMenuElement<TModel> where TView : RadialMenuViewAdapterBase<TModel, TElement>
+{
+	public enum EElementDistributionType
+	{
+		None,
+		Even,
+		FanAroundNorth
+	}
+
+	[SerializeField]
+	private TView _view;
+
+	protected Rewired.Player Input;
+
+	[SerializeField]
+	private float _sensitivity = 7f;
+
+	[SerializeField]
+	private int _elementLayoutCount = 8;
+
+	[SerializeField]
+	private EElementDistributionType _elementsDistributionType = EElementDistributionType.Even;
+
+	[SerializeField]
+	private float _angleSteps;
+
+	[SerializeField]
+	private float _elementRadius = 240f;
+
+	[SerializeField]
+	private float _selectorRadius;
+
+	[SerializeField]
+	private float _rotationAngle;
+
+	[Range(1f, 100f)]
+	[SerializeField]
+	private float _angleThreshold = 100f;
+
+	[Range(0f, 1f)]
+	[SerializeField]
+	private float _activationPercentage = 0.7f;
+
+	[SerializeField]
+	private float _easeTime = 0.15f;
+
+	[SerializeField]
+	private LeanTweenType _easeInType = LeanTweenType.easeOutCubic;
+
+	[SerializeField]
+	private LeanTweenType _easeOutType = LeanTweenType.easeInCubic;
+
+	private IList<IList<TModel>> _models;
+
+	private Stack<TElement> _elementsStack = new Stack<TElement>();
+
+	private List<TElement> _activeElements = new List<TElement>();
+
+	private List<TElement> _extraElements = new List<TElement>();
+
+	private TElement _currentElement;
+
+	private HashSet<int> _reservedIndexes = new HashSet<int>();
+
+	private Vector3 _selectorMove;
+
+	private Vector3 _selectingPosition;
+
+	private bool _animating;
+
+	private bool _active;
+
+	private int _fadeInTweenId;
+
+	private int _fadeOutTweenId;
+
+	private bool _secondaryPressTime;
+
+	private float _secondaryPressTimer;
+
+	private FastRandom _random = new FastRandom();
+
+	[SerializeField]
+	private UnityEvent _opened;
+
+	[SerializeField]
+	private UnityEvent _closed;
+
+	public TView View => _view;
+
+	public virtual string Title { get; set; } = string.Empty;
+
+	public int ElementLayoutCount
+	{
+		get
+		{
+			return _elementLayoutCount;
+		}
+		set
+		{
+			_elementLayoutCount = value;
+		}
+	}
+
+	protected List<TElement> ActiveElements => _activeElements;
+
+	protected TElement CurrentElement => _currentElement;
+
+	public event Action<IRadialMenuElement<TModel>> SelectionChanged;
+
+	public event Action<IRadialMenuElement<TModel>> ElementClick;
+
+	public event Action<IRadialMenuElement<TModel>> ElementSecondaryClick;
+
+	public event Action<IRadialMenuElement<TModel>> ElementSecondaryShortPress;
+
+	protected virtual void OnSelectionChanged(IRadialMenuElement<TModel> element)
+	{
+		SelectionChanged?.Invoke(element);
+	}
+
+	protected virtual void OnElementClick(IRadialMenuElement<TModel> element)
+	{
+		ElementClick?.Invoke(element);
+	}
+
+	protected virtual void OnElementSecondaryClick(IRadialMenuElement<TModel> element)
+	{
+		ElementSecondaryClick?.Invoke(element);
+	}
+
+	protected virtual void OnElementSecondaryShortPress(IRadialMenuElement<TModel> element)
+	{
+		ElementSecondaryShortPress?.Invoke(element);
+	}
+
+	protected virtual void Start()
+	{
+		if (_view == null)
+		{
+			Debug.LogError(GetType()?.ToString() + ":: No view component assigned!");
+			_view = NullRadialMenuViewAdapterBase.Instance as TView;
+		}
+		CreateElements();
+		Hide();
+	}
+
+	protected virtual void OnDestroy()
+	{
+		SelectionChanged = null;
+		ElementClick = null;
+		ElementSecondaryClick = null;
+		ElementSecondaryShortPress = null;
+	}
+
+	public override void SetView(ViewAdapterBase view)
+	{
+		_view = view as TView;
+		if (_view == null)
+		{
+			Debug.LogError(GetType()?.ToString() + ":: No view component assigned!");
+			_view = NullRadialMenuViewAdapterBase.Instance as TView;
+		}
+	}
+
+	public void Initialize(IList<IList<TModel>> models)
+	{
+		_models = models;
+	}
+
+	private void Update()
+	{
+		if (Input.GetButtonDown(30))
+		{
+			Element_Click(_currentElement);
+		}
+		else if (_secondaryPressTime)
+		{
+			float buttonShortPressTime = Input.controllers.maps.GetInputBehavior(0).buttonShortPressTime;
+			_secondaryPressTimer += Time.deltaTime;
+			if (_secondaryPressTimer > buttonShortPressTime || !Input.GetButton(31))
+			{
+				_secondaryPressTime = false;
+				if (_secondaryPressTimer < buttonShortPressTime)
+				{
+					Element_SecondaryClick(_currentElement);
+				}
+				else
+				{
+					Element_SecondaryShortPress(_currentElement);
+				}
+			}
+		}
+		else if (Input.GetButtonDown(31))
+		{
+			_secondaryPressTimer = 0f;
+			_secondaryPressTime = true;
+		}
+	}
+
+	public virtual void Show()
+	{
+		LeanTween.cancel(gameObject, callOnComplete: true);
+		_selectingPosition = Vector3.zero;
+		Refresh();
+		FadeInCanvas_OnBegin();
+		LeanTween.value(gameObject, FadeInCanvas_OnUpdate, _view.CanvasGroup.transform.localScale.x, 1f, _easeTime).setOnComplete(FadeInCanvas_OnComplete).setEase(_easeInType)
+			.setIgnoreTimeScale(useUnScaledTime: true);
+		_opened?.Invoke();
+		_view.Show();
+	}
+
+	public virtual void Hide()
+	{
+		LeanTween.cancel(gameObject, callOnComplete: true);
+		_currentElement = null;
+		_animating = true;
+		LeanTween.value(gameObject, FadeInCanvas_OnUpdate, _view.CanvasGroup.transform.localScale.x, 0f, _easeTime).setOnComplete(() =>
+		{
+			FadeInCanvas_OnComplete();
+			_closed?.Invoke();
+			_view.Hide();
+		}).setEase(_easeOutType)
+			.setIgnoreTimeScale(useUnScaledTime: true);
+	}
+
+	public void Refresh()
+	{
+		LeanTween.cancel(gameObject, callOnComplete: true);
+		Element_Exit(_currentElement);
+		_currentElement = null;
+		PoolElements();
+		Layout();
+	}
+
+	private TElement CreateElement()
+	{
+		return UnityEngine.Object.Instantiate(_view.ElementPrefab);
+	}
+
+	private void CreateElements()
+	{
+		for (int i = 0; i < _elementLayoutCount; i++)
+		{
+			TElement element = CreateElement();
+			PushElement(element);
+		}
+	}
+
+	private void PoolElements()
+	{
+		foreach (TElement activeElement in _activeElements)
+		{
+			PushElement(activeElement);
+		}
+		foreach (TElement extraElement in _extraElements)
+		{
+			extraElement.transform.SetParent(_view.PooledElementContainer.Transform, worldPositionStays: false);
+		}
+		_activeElements.Clear();
+		_extraElements.Clear();
+		_reservedIndexes.Clear();
+		BeamTeam.DestroyAllChildren(_view.ElementContainer);
+	}
+
+	protected TElement PopElement()
+	{
+		TElement val = ((_elementsStack.Count > 0) ? _elementsStack.Pop() : CreateElement());
+		val.transform.SetParent(_view.ElementContainer.Transform, worldPositionStays: false);
+		return val;
+	}
+
+	private void PushElement(TElement element)
+	{
+		_elementsStack.Push(element);
+		element.transform.SetParent(_view.PooledElementContainer.Transform, worldPositionStays: false);
+	}
+
+	public void UpdateSelector()
+	{
+		float value = Input.GetAxis(24) / (50f / _sensitivity);
+		float value2 = Input.GetAxis(25) / (50f / _sensitivity);
+		float x = Mathf.Clamp(value, -1f, 1f);
+		float y = Mathf.Clamp(value2, -1f, 1f);
+		Vector3 selectingPosition = _selectingPosition;
+		_selectorMove = selectingPosition + new Vector3(x, y, 0f) * _elementRadius;
+		_view.SelectorImage.transform.localPosition = GetConstrainedPosition(transform.localPosition, _selectorMove);
+		_selectingPosition = GetConstrainedPosition(transform.localPosition, _selectorMove);
+		Vector2 vector = _view.SelectorImage.transform.position - transform.position;
+		float num = Mathf.Atan2(vector.y, vector.x) * 57.29578f;
+		_view.SelectorImage.transform.rotation = Quaternion.AngleAxis(num - 90f, Vector3.forward);
+		CheckSelectorPosition(_selectingPosition);
+	}
+
+	private void CheckSelectorPosition(Vector3 position)
+	{
+		CheckElements(_activeElements, position);
+		CheckElements(_extraElements, position);
+	}
+
+	private void CheckElements(IList<TElement> elements, Vector3 position)
+	{
+		float current = Angle(new Vector2(position.x, position.y));
+		float angleStep = GetAngleStep();
+		foreach (TElement element in elements)
+		{
+			float target = Angle(element.transform.position - transform.position);
+			if (Mathf.Abs(Mathf.DeltaAngle(current, target)) < angleStep / 2f * _angleThreshold / 100f && _active && !_animating)
+			{
+				if (_currentElement != element)
+				{
+					if (!_currentElement.IsNullOrDestroyed())
+					{
+						Element_Exit(_currentElement);
+					}
+					_currentElement = element;
+					Element_Enter(element);
+				}
+			}
+			else if (_currentElement == element)
+			{
+				Element_Exit(element);
+				_currentElement = null;
+			}
+		}
+	}
+
+	private void LayoutElementPlaceholders()
+	{
+		_random.Reinitialise(1);
+		int num = Mathf.Min(_reservedIndexes.Count + (_models?.Count ?? 0), _elementLayoutCount);
+		for (int i = 0; i < num; i++)
+		{
+			Transform transform = UnityEngine.Object.Instantiate(_view.ElementPlaceholderPrefab.Transform);
+			transform.transform.SetParent(_view.ElementContainer.Transform, worldPositionStays: false);
+			transform.transform.SetAsFirstSibling();
+			float angleForIndex = GetAngleForIndex(i);
+			float x = Mathf.Sin(angleForIndex);
+			float y = Mathf.Cos(angleForIndex);
+			transform.transform.localPosition = new Vector3(x, y, 0f) * _elementRadius;
+			transform.transform.localEulerAngles = new Vector3(0f, 0f, (float)_random.Next() * 360f);
+		}
+	}
+
+	protected virtual void Layout()
+	{
+		LayoutElementPlaceholders();
+		if (_models == null || _models.Count == 0)
+		{
+			return;
+		}
+		float rotationOffsetDeg = GetRotationOffsetDeg();
+		int i = 0;
+		int num = 0;
+		for (; i < _elementLayoutCount; i++)
+		{
+			if (!_reservedIndexes.Contains(i))
+			{
+				TElement val = PopElement();
+				float angleForIndex = GetAngleForIndex(i);
+				float x = Mathf.Sin(angleForIndex);
+				float y = Mathf.Cos(angleForIndex);
+				val.transform.localPosition = new Vector3(x, y, 0f) * _elementRadius;
+				val.transform.localEulerAngles = new Vector3(0f, 0f, 0f - rotationOffsetDeg);
+				val.Initialize(_models[num]);
+				_activeElements.Add(val);
+				num++;
+				if (num > _models.Count - 1)
+				{
+					break;
+				}
+			}
+		}
+		_view.ElementContainer.Transform.localEulerAngles = new Vector3(0f, 0f, rotationOffsetDeg);
+	}
+
+	public void SelectCurrentElement()
+	{
+		Element_Select(_currentElement);
+	}
+
+	protected virtual void InsertElement(TElement element, int index)
+	{
+		if (!_reservedIndexes.Contains(index))
+		{
+			element.transform.SetParent(_view.ElementContainer.Transform, worldPositionStays: false);
+			float rotationOffsetDeg = GetRotationOffsetDeg();
+			float f = MathF.PI * 2f / (float)_elementLayoutCount * (float)index;
+			float x = Mathf.Sin(f);
+			float y = Mathf.Cos(f);
+			element.transform.localPosition = new Vector3(x, y, 0f) * _elementRadius;
+			element.transform.localEulerAngles = new Vector3(0f, 0f, 0f - rotationOffsetDeg);
+			_extraElements.Add(element);
+			_reservedIndexes.Add(index);
+		}
+	}
+
+	protected virtual void InsertElementAtAngle(TElement element, float ang, bool respectOffset = false)
+	{
+		element.transform.SetParent(_view.ElementContainer.Transform, worldPositionStays: false);
+		float rotationOffsetDeg = GetRotationOffsetDeg();
+		float f = (respectOffset ? ang : (ang + rotationOffsetDeg)) * (MathF.PI / 180f);
+		float x = Mathf.Sin(f);
+		float y = Mathf.Cos(f);
+		element.transform.localPosition = new Vector3(x, y, 0f) * _elementRadius;
+		element.transform.localEulerAngles = new Vector3(0f, 0f, 0f - rotationOffsetDeg);
+		_extraElements.Add(element);
+	}
+
+	private void Element_Select(TElement element)
+	{
+		if (element != null)
+		{
+			OnSelectionChanged(element);
+		}
+	}
+
+	protected virtual void Element_Enter(TElement element)
+	{
+		LeanTween.cancel(gameObject, _fadeOutTweenId);
+		element.Enter();
+		TModel selectedValue = element.SelectedValue;
+		if (selectedValue == null)
+		{
+			Clear();
+		}
+		else
+		{
+			_view.TitleLabel.Text = selectedValue.GetDisplayName();
+			_view.DescriptionLabel.Text = selectedValue.GetDescription();
+		}
+		FadeDetailsCanvasGroup_OnUpdate(1f);
+	}
+
+	private void Element_Exit(TElement element)
+	{
+		if (!(element == null))
+		{
+			element.Exit();
+			if (element.SelectedValue == null)
+			{
+				FadeDetailsCanvasGroup_OnUpdate(1f);
+			}
+			else
+			{
+				_fadeOutTweenId = LeanTween.value(gameObject, FadeDetailsCanvasGroup_OnUpdate, _view.DetailsCanvasGroup.Alpha, 0f, 0.2f).setOnComplete(FadeDetailsCanvasGroup_OnComplete).setEase(LeanTweenType.easeOutCubic)
+					.setIgnoreTimeScale(useUnScaledTime: true)
+					.id;
+			}
+		}
+	}
+
+	private void Element_Click(TElement element)
+	{
+		if (element != null)
+		{
+			OnElementClick(element);
+		}
+	}
+
+	private void Element_SecondaryClick(TElement element)
+	{
+		if (element != null)
+		{
+			OnElementSecondaryClick(element);
+		}
+	}
+
+	private void Element_SecondaryShortPress(TElement element)
+	{
+		if (element != null)
+		{
+			OnElementSecondaryShortPress(element);
+		}
+	}
+
+	public void NavigateLeft()
+	{
+		if (_currentElement != null)
+		{
+			_currentElement.NavigateLeft();
+			Element_Enter(_currentElement);
+		}
+	}
+
+	public void NavigateRight()
+	{
+		if (_currentElement != null)
+		{
+			_currentElement.NavigateRight();
+			Element_Enter(_currentElement);
+		}
+	}
+
+	private void FadeInCanvas_OnBegin()
+	{
+		_animating = true;
+		_view.CanvasGroup.Alpha = 0f;
+		_view.CanvasGroup.transform.localScale = 0.6f * Vector3.one;
+		_view.DetailsCanvasGroup.Alpha = 1f;
+		Clear();
+	}
+
+	private void FadeInCanvas_OnUpdate(float value)
+	{
+		_view.CanvasGroup.Alpha = value;
+		_view.CanvasGroup.transform.localScale = (0.6f + 0.4f * value) * Vector3.one;
+	}
+
+	private void FadeInCanvas_OnComplete()
+	{
+		_animating = false;
+		_view.CanvasGroup.Alpha = 1f;
+		_view.CanvasGroup.transform.localScale = Vector3.one;
+	}
+
+	private void FadeDetailsCanvasGroup_OnUpdate(float value)
+	{
+		_view.DetailsCanvasGroup.Alpha = value;
+	}
+
+	private void FadeDetailsCanvasGroup_OnComplete()
+	{
+		Clear();
+		LeanTween.value(gameObject, FadeDetailsCanvasGroup_OnUpdate, _view.DetailsCanvasGroup.Alpha, 1f, 0.2f).setEase(LeanTweenType.easeOutCubic).setIgnoreTimeScale(useUnScaledTime: true);
+	}
+
+	protected virtual void Clear()
+	{
+		_view.TitleLabel.Text = Title;
+		_view.DescriptionLabel.Text = "";
+	}
+
+	private float GetAngleStep()
+	{
+		if (_elementsDistributionType == EElementDistributionType.Even)
+		{
+			return 360f / (float)_elementLayoutCount;
+		}
+		return _angleSteps;
+	}
+
+	private float GetAngleForIndex(int index)
+	{
+		if (_elementsDistributionType == EElementDistributionType.Even)
+		{
+			return MathF.PI * 2f / (float)_elementLayoutCount * (float)index;
+		}
+		return GetAngleStep() * (MathF.PI / 180f) * (float)index;
+	}
+
+	private float GetRotationOffsetDeg()
+	{
+		return _elementsDistributionType switch
+		{
+			EElementDistributionType.Even => 0f, 
+			EElementDistributionType.FanAroundNorth => (float)(_elementLayoutCount - 1) * GetAngleStep() / 2f, 
+			_ => _rotationAngle, 
+		};
+	}
+
+	private Vector3 GetConstrainedPosition(Vector3 midPoint, Vector3 endPoint)
+	{
+		float magnitude = (midPoint - endPoint).magnitude;
+		_active = magnitude > _selectorRadius * _activationPercentage;
+		if (magnitude > _selectorRadius)
+		{
+			return (endPoint - midPoint).normalized * _selectorRadius + midPoint;
+		}
+		return endPoint;
+	}
+
+	private float Angle(Vector2 angle)
+	{
+		if (angle.x < 0f)
+		{
+			return 360f - Mathf.Atan2(angle.x, angle.y) * 57.29578f * -1f;
+		}
+		return Mathf.Atan2(angle.x, angle.y) * 57.29578f;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 228
+PATH: Assembly-CSharp__Beam.UI__RadialMenuViewAdapterBase.cs
+SIZE: 842 bytes
+SHA256: afeb7fefae7c5dbf756ae9678d0a9c44ed3a2c8d393893ccf27a34f35741796a
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class RadialMenuViewAdapterBase<TModel, TElement> : ViewAdapterBase where TModel : class, IRadialMenuModel where TElement : class, IRadialMenuElement<TModel>
+{
+	public abstract ITransformViewAdapter ElementPlaceholderPrefab { get; }
+
+	public abstract ITransformViewAdapter ElementContainer { get; }
+
+	public abstract TElement ElementPrefab { get; }
+
+	public abstract ITransformViewAdapter PooledElementContainer { get; }
+
+	public abstract IImageViewAdapter SelectorImage { get; }
+
+	public abstract ILabelViewAdapter TitleLabel { get; }
+
+	public abstract ILabelViewAdapter DescriptionLabel { get; }
+
+	public abstract ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract ICanvasGroupViewAdapter DetailsCanvasGroup { get; }
+
+	public abstract Texture2D BlurMaskTexture { get; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 229
+PATH: Assembly-CSharp__Beam.UI__ScrollviewViewAdapterBase.cs
+SIZE: 581 bytes
+SHA256: 1270cbc1deb1989ff9f190d13720551a2ddcd1ab2e5809741e03738c95a57f1e
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class ScrollviewViewAdapterBase<TScrollview> : ViewAdapterBase, IScrollviewViewAdapter, IViewAdapter where TScrollview : MonoBehaviour
+{
+	private TScrollview _scrollview;
+
+	protected TScrollview Scrollview
+	{
+		get
+		{
+			if (_scrollview == null)
+			{
+				_scrollview = GetComponent<TScrollview>();
+			}
+			return _scrollview;
+		}
+	}
+
+	public abstract ITransformViewAdapter Content { get; }
+
+	public abstract float NormalizedHorizontalPosition { get; set; }
+
+	public abstract float NormalizedVerticalPosition { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 230
+PATH: Assembly-CSharp__Beam.UI__TMPBeepiWatchViewAdapter.cs
+SIZE: 9353 bytes
+SHA256: 2bba841aca4bbe2bb9f8b97f36fe13d34060d2f2e5a5adbf8d0870b53773b415
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Language;
+using Beam.Obfuscated.Users;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class TMPBeepiWatchViewAdapter : WatchViewAdapterBase
+{
+	[SerializeField]
+	private Camera _camera;
+
+	[SerializeField]
+	private GameObjectViewAdapter[] _watchModes;
+
+	[SerializeField]
+	private TransformViewAdapter _statusLabelsContainer;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _statusLabelPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _statisticsNamesLabelsContainer;
+
+	[SerializeField]
+	private TransformViewAdapter _statisticsValuesLabelsContainer;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _statisticsValuesLabelPrefab;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _statisticsNamesLabelPrefab;
+
+	private List<string> statisticsNames = new List<string>();
+
+	private List<TMPLabelViewAdapter> statisticsLabels = new List<TMPLabelViewAdapter>();
+
+	[SerializeField]
+	private UImageViewAdapter _healthIcon;
+
+	[SerializeField]
+	private UImageViewAdapter _hungerIcon;
+
+	[SerializeField]
+	private UImageViewAdapter _thirstIcon;
+
+	[SerializeField]
+	private UImageViewAdapter _sleepIcon;
+
+	[SerializeField]
+	private USliderViewAdapter _healthBar;
+
+	[SerializeField]
+	private USliderViewAdapter _hungerBar;
+
+	[SerializeField]
+	private USliderViewAdapter _thirstBar;
+
+	[SerializeField]
+	private USliderViewAdapter _sleepBar;
+
+	[SerializeField]
+	private USliderViewAdapter _huntingBar;
+
+	[SerializeField]
+	private USliderViewAdapter _cookingBar;
+
+	[SerializeField]
+	private USliderViewAdapter _harvestingBar;
+
+	[SerializeField]
+	private USliderViewAdapter _physicalBar;
+
+	[SerializeField]
+	private USliderViewAdapter _craftsmanshipBar;
+
+	[Space]
+	[SerializeField]
+	private TMPLabelViewAdapter _huntingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _cookingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _harvestingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _physicalLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _craftsmanshipLabel;
+
+	[Space]
+	[SerializeField]
+	private TMPLabelViewAdapter _clockLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _dateLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _temperatureLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _daysLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _uvIndexLabel;
+
+	[SerializeField]
+	private UImageViewAdapter _temperatureImage;
+
+	[SerializeField]
+	private Sprite _temperatureSprite;
+
+	[SerializeField]
+	private Sprite _heatwaveSprite;
+
+	private bool _celsius;
+
+	private int _currentMode = -1;
+
+	private WatchController _controller;
+
+	private int[] _lastStatsValues = new int[10];
+
+	public override Camera Camera => _camera;
+
+	private void Start()
+	{
+		statisticsNames.Add("STATS_DAYS_SURVIVED");
+		statisticsNames.Add("STATS_ITEMS_CRAFTED");
+		statisticsNames.Add("STATS_ANIMALS_KILLED");
+		statisticsNames.Add("STATS_ISLANDS_EXPLORED");
+		statisticsNames.Add("STATS_SHIPS_SCAVENGED");
+		foreach (string statisticsName in statisticsNames)
+		{
+			_ = statisticsName;
+			TMPLabelViewAdapter tMPLabelViewAdapter = Object.Instantiate(_statisticsValuesLabelPrefab);
+			statisticsLabels.Add(tMPLabelViewAdapter);
+			tMPLabelViewAdapter.transform.SetParent(_statisticsValuesLabelsContainer.Transform, worldPositionStays: false);
+			tMPLabelViewAdapter.Text = "0";
+		}
+		if ((Localization.GetLanguageHandler() as LocalizationHandler).GetCurrentLanguage() == SystemLanguage.Russian)
+		{
+			_statisticsValuesLabelsContainer.Transform.GetComponent<VerticalLayoutGroup>().spacing = 11f;
+		}
+		RenderTexture renderTexture = new RenderTexture(256, 256, 0, RenderTextureFormat.ARGB32);
+		renderTexture.filterMode = FilterMode.Bilinear;
+		renderTexture.anisoLevel = 7;
+		renderTexture.useMipMap = false;
+		renderTexture.wrapMode = TextureWrapMode.Clamp;
+		_camera.targetTexture = renderTexture;
+	}
+
+	public override void SetController(WatchController controller)
+	{
+		_controller = controller;
+	}
+
+	private void OnDestroy()
+	{
+		BeamTeam.Destroy(_camera.targetTexture);
+		_camera.targetTexture = null;
+	}
+
+	public override void Show()
+	{
+		_camera.enabled = true;
+		SetWatchMode(_currentMode);
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		_camera.enabled = false;
+		base.Hide();
+	}
+
+	public override void SetTemperature(float temperature)
+	{
+		float num = (_celsius ? temperature.ToCelsius() : temperature);
+		_temperatureLabel.Text = num.ToString("F1").PadLeft(5, ' ') + (_celsius ? "C" : "F");
+	}
+
+	public override void SetTemperatureUnits(Temperature temperature)
+	{
+		_celsius = temperature == Temperature.CELSIUS;
+	}
+
+	public override void SetHeatwave(bool heatwave)
+	{
+		_temperatureImage.Sprite = (heatwave ? _heatwaveSprite : _temperatureSprite);
+	}
+
+	public override void SetUVIndex(string uvIndex)
+	{
+		_uvIndexLabel.Text = uvIndex;
+	}
+
+	public override void SetClock(string clock)
+	{
+		_clockLabel.Text = clock;
+	}
+
+	public override void SetDate(string date)
+	{
+		_dateLabel.Text = date;
+	}
+
+	public override void SetDays(string days)
+	{
+		_daysLabel.Text = days + " DAYS SURVIVED";
+	}
+
+	public override void SetStatistics(Stats stats)
+	{
+		_lastStatsValues[0] = stats.DaysSurvived;
+		_lastStatsValues[1] = stats.ItemsCrafted;
+		_lastStatsValues[2] = stats.AnimalsKilled;
+		_lastStatsValues[3] = stats.IslandsExplored;
+		_lastStatsValues[4] = stats.ShipsScavenged;
+		for (int i = 0; i < statisticsLabels.Count; i++)
+		{
+			statisticsLabels[i].Text = _lastStatsValues[i].ToString().ToUpper();
+		}
+	}
+
+	public override void SetHealth(float health)
+	{
+		_healthBar.NormalizedValue = health;
+	}
+
+	public override void SetHunger(float hunger)
+	{
+		_hungerBar.NormalizedValue = hunger;
+	}
+
+	public override void SetThirst(float thirst)
+	{
+		_thirstBar.NormalizedValue = thirst;
+	}
+
+	public override void SetSleep(float sleep)
+	{
+		_sleepBar.NormalizedValue = sleep;
+	}
+
+	public override void SetHunting(float hunting)
+	{
+		_huntingLabel.Enabled = hunting <= 0f;
+		_huntingBar.NormalizedValue = hunting;
+	}
+
+	public override void SetCooking(float cooking)
+	{
+		_cookingLabel.Enabled = cooking <= 0f;
+		_cookingBar.NormalizedValue = cooking;
+	}
+
+	public override void SetHarvesting(float harvesting)
+	{
+		_harvestingLabel.Enabled = harvesting <= 0f;
+		_harvestingBar.NormalizedValue = harvesting;
+	}
+
+	public override void SetPhysical(float physical)
+	{
+		_physicalLabel.Enabled = physical <= 0f;
+		_physicalBar.NormalizedValue = physical;
+	}
+
+	public override void SetCraftsmanship(float craftsmanship)
+	{
+		_craftsmanshipLabel.Enabled = craftsmanship <= 0f;
+		_craftsmanshipBar.NormalizedValue = craftsmanship;
+	}
+
+	public override void SetWatchMode(int mode)
+	{
+		if (_currentMode == mode && _currentMode != 3 && _currentMode != 2)
+		{
+			return;
+		}
+		_currentMode = mode;
+		for (int i = 0; i < _watchModes.Length; i++)
+		{
+			bool active = i == _currentMode;
+			_watchModes[i].Active = active;
+		}
+		if (_currentMode == 3)
+		{
+			int num = 0;
+			Zone[] zones = Singleton<StrandedWorld>.Instance.Zones;
+			foreach (Zone zone in zones)
+			{
+				if ((Game.Mode.IsMaster() && zone.HasVisited) || (Game.Mode.IsClient() && zone.HasVisited))
+				{
+					num++;
+				}
+			}
+			CreateStatusLabels(statisticsNames, _statisticsNamesLabelsContainer, _statisticsNamesLabelPrefab, tryUpdate: true);
+		}
+		else if (_currentMode == 2)
+		{
+			IList<string> statusEffectsWatch = _controller.Player.Statistics.GetStatusEffectsWatch();
+			if (statusEffectsWatch != null)
+			{
+				CreateStatusLabels(statusEffectsWatch, _statusLabelsContainer, _statusLabelPrefab, tryUpdate: true);
+			}
+		}
+	}
+
+	public override void CycleWatchModeForward()
+	{
+		int num = _currentMode + 1;
+		if ((Game.Mode.IsClient() || (Game.Mode.IsLocalCoop() && _controller.Player.Id > 0)) && num == 3)
+		{
+			num++;
+		}
+		if (num > _watchModes.Length - 1)
+		{
+			num = 0;
+		}
+		SetWatchMode(num);
+	}
+
+	public override void CycleWatchModeBackward()
+	{
+		int num = _currentMode - 1;
+		if (num < 0)
+		{
+			num = _watchModes.Length - 1;
+		}
+		if ((Game.Mode.IsClient() || (Game.Mode.IsLocalCoop() && _controller.Player.Id > 0)) && num == 3)
+		{
+			num--;
+		}
+		SetWatchMode(num);
+	}
+
+	public void CreateStatusLabels<T>(IList<T> labels, TransformViewAdapter container, TMPLabelViewAdapter prefab, bool tryUpdate = false)
+	{
+		if (tryUpdate && labels.Count == container.Transform.childCount)
+		{
+			int num = 0;
+			for (num = 0; num < container.Transform.childCount; num++)
+			{
+				TMPLabelViewAdapter component = container.Transform.GetChild(num).gameObject.GetComponent<TMPLabelViewAdapter>();
+				if (component == null)
+				{
+					break;
+				}
+				component.Text = labels[num].ToString().ToUpper();
+			}
+			if (num == container.Transform.childCount)
+			{
+				return;
+			}
+		}
+		BeamTeam.DestroyAllChildren(container);
+		foreach (T label in labels)
+		{
+			TMPLabelViewAdapter tMPLabelViewAdapter = Object.Instantiate(prefab);
+			tMPLabelViewAdapter.transform.SetParent(container.Transform, worldPositionStays: false);
+			tMPLabelViewAdapter.Text = label.ToString().ToUpper();
+			FormatLabelAutoSizing(tMPLabelViewAdapter, 17f, 8f);
+		}
+	}
+
+	private void FormatLabelAutoSizing(TMPLabelViewAdapter label, float maxSize, float minSize)
+	{
+		label.EnableAutoSizing = true;
+		label.FontSizeMax = maxSize;
+		label.FontSizeMin = minSize;
+		label.EnableWordWrapping = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 231
+PATH: Assembly-CSharp__Beam.UI__TMPChangeSaveSlotView.cs
+SIZE: 2263 bytes
+SHA256: e37268ac14bfe0a8e6cdee6dec9eadb3f58f888223d7a9a5d82807018bb554aa
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class TMPChangeSaveSlotView : ChangeSaveSlotViewBase
+{
+	[SerializeField]
+	private GameObject _changeSaveSlotViewGameObject;
+
+	[SerializeField]
+	private GameObject _slotButtonsGroup;
+
+	[SerializeField]
+	private UButtonViewAdapter _applyButton;
+
+	[SerializeField]
+	private UButtonViewAdapter _cancelButton;
+
+	private TMPLabelButtonViewAdapter[] _slotButtons;
+
+	[SerializeField]
+	private ButtonMarker _slotButtonMarker;
+
+	public override IButtonViewAdapter ApplyButton => _applyButton;
+
+	public override IButtonViewAdapter CancelButton => _cancelButton;
+
+	public override IButtonViewAdapter[] SlotButtons
+	{
+		get
+		{
+			if (_slotButtons == null)
+			{
+				_slotButtons = _slotButtonsGroup.GetComponentsInChildren<TMPLabelButtonViewAdapter>(includeInactive: true);
+			}
+			return _slotButtons;
+		}
+	}
+
+	private void Awake()
+	{
+		Visible = _changeSaveSlotViewGameObject.activeSelf;
+		IButtonViewAdapter[] slotButtons = SlotButtons;
+		for (int i = 0; i < slotButtons.Length; i++)
+		{
+			TMPLabelButtonViewAdapter tMPLabelButtonViewAdapter = (TMPLabelButtonViewAdapter)slotButtons[i];
+			tMPLabelButtonViewAdapter.Text = string.Format("{0} {1}", "CHANGE_SAVE_SLOT_MENU_BUTTON_SLOT", tMPLabelButtonViewAdapter.transform.GetSiblingIndex() + 1);
+			tMPLabelButtonViewAdapter.Click += SlotButton_Click;
+		}
+	}
+
+	private void SlotButton_Click(object sender)
+	{
+		TMPLabelButtonViewAdapter button = (TMPLabelButtonViewAdapter)sender;
+		MarkButton(button);
+	}
+
+	private void MarkButton(IButtonViewAdapter button)
+	{
+		_slotButtonMarker?.SetPosition(button.transform as RectTransform);
+	}
+
+	public override void Show()
+	{
+		if (!_changeSaveSlotViewGameObject.activeSelf)
+		{
+			_changeSaveSlotViewGameObject.SetActive(value: true);
+			MarkButton(GetFirstButton());
+			Visible = true;
+			OnViewShow();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (_changeSaveSlotViewGameObject.activeSelf)
+		{
+			Visible = false;
+			OnViewHide();
+			_changeSaveSlotViewGameObject.SetActive(value: false);
+		}
+	}
+
+	public override IButtonViewAdapter GetFirstButton()
+	{
+		int lastSaveSlotUsed = Options.GeneralSettings.LastSaveSlotUsed;
+		return _slotButtonsGroup.transform.GetChild(lastSaveSlotUsed).GetComponent<TMPLabelButtonViewAdapter>();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 232
+PATH: Assembly-CSharp__Beam.UI__TMPHudViewAdapter.cs
+SIZE: 1348 bytes
+SHA256: 186dba6fc8a28d988c6ad12efe4072eba74214d5bcc90c46c1d5ce2ac2d55cb6
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class TMPHudViewAdapter : HudViewAdapterBase
+{
+	[SerializeField]
+	private UImageViewAdapter _defaultCursor;
+
+	[SerializeField]
+	private UImageViewAdapter _interactingCursor;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _itemNameLabel;
+
+	[SerializeField]
+	private TMPActionHudElementViewAdapter _climbUI;
+
+	[SerializeField]
+	private TMPActionHudElementViewAdapter _actionHudElementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _actionHudElementsContainer;
+
+	[SerializeField]
+	private TransformViewAdapter _pooledActionHudElementsContainer;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _itemActionGroup;
+
+	public override IImageViewAdapter DefaultCursor => _defaultCursor;
+
+	public override IImageViewAdapter InteractingCursor => _interactingCursor;
+
+	public override ILabelViewAdapter ItemNameLabel => _itemNameLabel;
+
+	public override ActionHudElementViewAdapterBase ClimbUI => _climbUI;
+
+	public override ActionHudElementViewAdapterBase ActionHudElementPrefab => _actionHudElementPrefab;
+
+	public override ITransformViewAdapter ActionHudElementsContainer => _actionHudElementsContainer;
+
+	public override ITransformViewAdapter PooledActionHudElementsContainer => _pooledActionHudElementsContainer;
+
+	public override ICanvasGroupViewAdapter ItemActionGroup => _itemActionGroup;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 233
+PATH: Assembly-CSharp__Beam.UI__TMPMissionCompletedViewAdapter.cs
+SIZE: 1556 bytes
+SHA256: 2f3d1fcd17005af4a4851e61a91cde1c3a733a33f8d17fe850f4454db0ba4295
+====================================================================================================
+
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class TMPMissionCompletedViewAdapter : MissionCompletedViewAdapterBase
+{
+	[SerializeField]
+	private GameObjectViewAdapter _panel;
+
+	[SerializeField]
+	private Transform _rewardElementContainer;
+
+	[SerializeField]
+	private MissionRewardElement _rewardElementPrefab;
+
+	[SerializeField]
+	private TMPActionHudElementViewAdapter _actionLabelPrefab;
+
+	[SerializeField]
+	private Transform _actionLabelContainer;
+
+	public override IGameObjectViewAdapter Panel => _panel;
+
+	public override IMissionRewardElement CreateRewardElement()
+	{
+		if (_rewardElementPrefab != null)
+		{
+			MissionRewardElement missionRewardElement = Object.Instantiate(_rewardElementPrefab);
+			missionRewardElement.transform.SetParent(_rewardElementContainer, worldPositionStays: false);
+			return missionRewardElement;
+		}
+		return NullObject<NullMissionRewardElement>.Instance;
+	}
+
+	public override ActionHudElementViewAdapterBase CreateActionLabel()
+	{
+		if (_actionLabelPrefab != null)
+		{
+			TMPActionHudElementViewAdapter tMPActionHudElementViewAdapter = Object.Instantiate(_actionLabelPrefab);
+			tMPActionHudElementViewAdapter.transform.SetParent(_actionLabelContainer, worldPositionStays: false);
+			return tMPActionHudElementViewAdapter;
+		}
+		return NullActionHudElementViewAdapter.Instance;
+	}
+
+	public override void DestroyRewardElements()
+	{
+		BeamTeam.DestroyAllChildren(_rewardElementContainer);
+	}
+
+	public override void DestroyActionLabels()
+	{
+		BeamTeam.DestroyAllChildren(_actionLabelContainer);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 234
+PATH: Assembly-CSharp__Beam.UI__TMPOptionCategoryHeader.cs
+SIZE: 369 bytes
+SHA256: 07c536d66677c2e07a4f4bd56956dc489a743c56679c7501362d34f6628bdec1
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class TMPOptionCategoryHeader : ViewAdapterBase, IOptionCategoryHeader
+{
+	[SerializeField]
+	private TMPLabelViewAdapter _label;
+
+	[SerializeField]
+	private Transform _elementsContainer;
+
+	public ILabelViewAdapter Label => _label;
+
+	public Transform ElementsContainer => _elementsContainer;
+
+	public int Id { get; set; }
+}
+
+
+
+====================================================================================================
+SOURCE FILE 235
+PATH: Assembly-CSharp__Beam.UI__TMPOptionInputFieldButtonViewAdapter.cs
+SIZE: 2743 bytes
+SHA256: 107c61ae53e524aa141bf0e00f1a583c2f2f54d90d6bd7316d4f1c035eaa28f4
+====================================================================================================
+
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Beam.UI;
+
+public class TMPOptionInputFieldButtonViewAdapter : USelectableViewAdapter, IOptionInputFieldButtonViewAdapter, IOptionWidgetViewAdapter, ISelectableViewAdapter, IViewAdapter, IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler, ISelectHandler
+{
+	[SerializeField]
+	private TMPLabelViewAdapter _label;
+
+	[SerializeField]
+	private TMPInputFieldButtonViewAdapter _inputFieldButtonPrefab;
+
+	[SerializeField]
+	private Transform _inputFieldButtonContainer;
+
+	private List<IInputFieldButtonViewAdapter> _buttons = new List<IInputFieldButtonViewAdapter>();
+
+	protected ILabelViewAdapter Label
+	{
+		get
+		{
+			if (!_label)
+			{
+				_label = GetComponent<TMPLabelViewAdapter>();
+			}
+			return _label;
+		}
+	}
+
+	public string Text
+	{
+		get
+		{
+			return Label.Text;
+		}
+		set
+		{
+			Label.Text = value;
+		}
+	}
+
+	public IList<IInputFieldButtonViewAdapter> Buttons => _buttons;
+
+	public string GetTooltip()
+	{
+		return string.Empty;
+	}
+
+	protected override void OnDestroy()
+	{
+		_buttons.Clear();
+		base.OnDestroy();
+	}
+
+	public IInputFieldButtonViewAdapter CreateButton()
+	{
+		TMPInputFieldButtonViewAdapter tMPInputFieldButtonViewAdapter = Object.Instantiate(_inputFieldButtonPrefab);
+		tMPInputFieldButtonViewAdapter.transform.SetParent(_inputFieldButtonContainer, worldPositionStays: false);
+		_buttons.Add(tMPInputFieldButtonViewAdapter);
+		return tMPInputFieldButtonViewAdapter;
+	}
+
+	public void SetNavigation()
+	{
+		IInputFieldButtonViewAdapter inputFieldButtonViewAdapter = _buttons[0];
+		IInputFieldButtonViewAdapter inputFieldButtonViewAdapter2 = _buttons[1];
+		if (inputFieldButtonViewAdapter.Enabled)
+		{
+			transform.SetNavigation(NavigationDirection.Right, inputFieldButtonViewAdapter.transform);
+			inputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Left, transform);
+			if (inputFieldButtonViewAdapter2.Enabled)
+			{
+				inputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Right, inputFieldButtonViewAdapter2.transform);
+				inputFieldButtonViewAdapter2.transform.SetNavigation(NavigationDirection.Left, inputFieldButtonViewAdapter.transform);
+			}
+		}
+		else if (inputFieldButtonViewAdapter2.Enabled)
+		{
+			transform.SetNavigation(NavigationDirection.Right, inputFieldButtonViewAdapter2.transform);
+			inputFieldButtonViewAdapter2.transform.SetNavigation(NavigationDirection.Left, transform);
+		}
+	}
+
+	void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+	{
+		OnMouseEnter(this);
+	}
+
+	void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
+	{
+		OnMouseLeave(this);
+	}
+
+	void ISelectHandler.OnSelect(BaseEventData eventData)
+	{
+		OnSelected(this);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 236
+PATH: Assembly-CSharp__Beam.UI__TransformViewAdapter.cs
+SIZE: 1352 bytes
+SHA256: 5a40e0458eab39e811132bc023954912b289b8656115a88d56efe2256f1efcfe
+====================================================================================================
+
+using System;
+using UnityEngine;
+
+namespace Beam.UI;
+
+[Serializable]
+public class TransformViewAdapter : ITransformViewAdapter
+{
+	[SerializeField]
+	private Transform _transform;
+
+	public Transform Transform => _transform;
+
+	public Vector3 Position
+	{
+		get
+		{
+			if (_transform != null)
+			{
+				return _transform.position;
+			}
+			return default;
+		}
+		set
+		{
+			if (_transform != null)
+			{
+				_transform.position = value;
+			}
+		}
+	}
+
+	public Quaternion Rotation
+	{
+		get
+		{
+			if (_transform != null)
+			{
+				return _transform.rotation;
+			}
+			return default;
+		}
+		set
+		{
+			if (_transform != null)
+			{
+				_transform.rotation = value;
+			}
+		}
+	}
+
+	public Vector3 LocalPosition
+	{
+		get
+		{
+			if (_transform != null)
+			{
+				return _transform.localPosition;
+			}
+			return default;
+		}
+		set
+		{
+			if (_transform != null)
+			{
+				_transform.localPosition = value;
+			}
+		}
+	}
+
+	public Quaternion LocalRotation
+	{
+		get
+		{
+			if (_transform != null)
+			{
+				return _transform.localRotation;
+			}
+			return default;
+		}
+		set
+		{
+			if (_transform != null)
+			{
+				_transform.localRotation = value;
+			}
+		}
+	}
+
+	public TransformViewAdapter(Transform t)
+	{
+		_transform = t;
+	}
+
+	public void SetParent(ITransformViewAdapter transform, bool worldPositionStays)
+	{
+		_transform.SetParent(transform.Transform, worldPositionStays);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 237
+PATH: Assembly-CSharp__Beam.UI__UAboutView.cs
+SIZE: 783 bytes
+SHA256: b191956c3c2fdee219ebebd83249db01d1f73a8715c8e9e9a97076a82dcbdaf7
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UAboutView : AboutMenuView
+{
+	[SerializeField]
+	private GameObject _panel;
+
+	[SerializeField]
+	private Transform _categoriesContainer;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _copyrightText;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _creditsText;
+
+	public override Transform CategoriesContainer => _categoriesContainer;
+
+	private void Awake()
+	{
+		Visible = _panel.activeSelf;
+	}
+
+	public override void SetCreditsText(string text)
+	{
+		_creditsText.Text = text;
+	}
+
+	public override void SetCopyrightText(string text)
+	{
+		_copyrightText.Text = text;
+	}
+
+	public override void Show()
+	{
+		base.Show();
+		_panel.SetActive(Visible);
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		_panel.SetActive(Visible);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 238
+PATH: Assembly-CSharp__Beam.UI__UAudioMenuViewAdapter.cs
+SIZE: 1511 bytes
+SHA256: f7ac57cda5444f52d64245ffdc44fc56ba70a56d997d535ff2a8b3b95d9d8e52
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UAudioMenuViewAdapter : ViewAdapterBase, IAudioMenuViewAdapter, IOptionsPanelView, IViewAdapter
+{
+	[SerializeField]
+	private GameObject _audioMenuGameObject;
+
+	[SerializeField]
+	private Transform _categoriesContainer;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _masterVolumeSlider;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _musicVolumeSlider;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _environmentVolumeSlider;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _effectsVolumeSlider;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _voiceVolumeSlider;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _uiVolumeSlider;
+
+	public Transform CategoriesContainer => _categoriesContainer;
+
+	public ISliderViewAdapter MasterVolumeSlider => _masterVolumeSlider;
+
+	public ISliderViewAdapter MusicVolumeSlider => _musicVolumeSlider;
+
+	public ISliderViewAdapter EnvironmentVolumeSlider => _environmentVolumeSlider;
+
+	public ISliderViewAdapter EffectsVolumeSlider => _effectsVolumeSlider;
+
+	public ISliderViewAdapter VoiceVolumeSlider => _voiceVolumeSlider;
+
+	public ISliderViewAdapter UiVolumeSlider => _uiVolumeSlider;
+
+	private void Awake()
+	{
+		Object.FindObjectOfType<AudioMenuPresenter>().Initialize(this);
+		Visible = _audioMenuGameObject.activeSelf;
+	}
+
+	public override void Show()
+	{
+		base.Show();
+		_audioMenuGameObject.SetActive(Visible);
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		_audioMenuGameObject.SetActive(Visible);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 239
+PATH: Assembly-CSharp__Beam.UI__UCartographerMenuViewAdapter.cs
+SIZE: 3711 bytes
+SHA256: 440f7294b8f094651038c8341757089c829fc000b32e3833f251a10c57a78696
+====================================================================================================
+
+using Beam.UI.MapEditor;
+using Beam.Utilities;
+using Rewired;
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+
+namespace Beam.UI;
+
+public class UCartographerMenuViewAdapter : CartographerMenuViewAdapterBase
+{
+	[SerializeField]
+	private GameObject _cartographerPanelGameObject;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private UMapHandle _mapHandle;
+
+	[SerializeField]
+	private UWorldMapSlot _mapSlotPrefab;
+
+	[SerializeField]
+	private GameObject _mapSlotsContainer;
+
+	[SerializeField]
+	private UMapListElement _mapListElementPrefab;
+
+	[SerializeField]
+	[FormerlySerializedAs("_regularMapListContainer")]
+	private GameObject _localMapListContainer;
+
+	[SerializeField]
+	private GameObject _remoteMapListContainer;
+
+	[SerializeField]
+	private TMPInputFieldViewAdapter _searchInputField;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _retrievingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _noMapsLabel;
+
+	[SerializeField]
+	private GameObject _mapsSourceGroup;
+
+	[SerializeField]
+	private UButtonViewAdapter _localMapsButton;
+
+	[SerializeField]
+	private UButtonViewAdapter _remoteMapsButton;
+
+	[SerializeField]
+	private ULabelButtonViewAdapter _randomizeButton;
+
+	[SerializeField]
+	private ULabelButtonViewAdapter _applyButton;
+
+	[SerializeField]
+	private ULabelButtonViewAdapter _createIslandButton;
+
+	[SerializeField]
+	private ULabelButtonViewAdapter _cancelButton;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _worldSeedLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _infoLabel;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override IMapHandle MapHandle => _mapHandle;
+
+	public override UWorldMapSlot MapSlotPrefab => _mapSlotPrefab;
+
+	public override GameObject MapSlotsContainer => _mapSlotsContainer;
+
+	public override GameObject LocalMapListContainer => _localMapListContainer;
+
+	public override GameObject RemoteMapListContainer => _remoteMapListContainer;
+
+	public override IInputFieldViewAdapter SearchInputField => _searchInputField;
+
+	public override ILabelViewAdapter RetrievingLabel => _retrievingLabel;
+
+	public override ILabelViewAdapter NoMapsLabel => _noMapsLabel;
+
+	public override IButtonViewAdapter LocalMapsButton => _localMapsButton;
+
+	public override IButtonViewAdapter RemoteMapsButton => _remoteMapsButton;
+
+	public override ILabelButtonViewAdapter RandomizeButton => _randomizeButton;
+
+	public override ILabelButtonViewAdapter ApplyButton => _applyButton;
+
+	public override ILabelButtonViewAdapter CreateIslandButton => _createIslandButton;
+
+	public override ILabelButtonViewAdapter CancelButton => _cancelButton;
+
+	public override ILabelViewAdapter WorldSeedLabel => _worldSeedLabel;
+
+	public override ILabelViewAdapter InfoLabel => _infoLabel;
+
+	public override void SetInput(Rewired.Player input)
+	{
+		base.SetInput(input);
+		if (Input != null)
+		{
+			RewiredUtilities.SetUserInterfaceFromInput(transform.GetInterfacesInChildren<Selectable>(includeInactive: true), Input);
+		}
+	}
+
+	public override void Show()
+	{
+		if (!_cartographerPanelGameObject.activeSelf)
+		{
+			_cartographerPanelGameObject.SetActive(value: true);
+		}
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		if (_cartographerPanelGameObject.activeSelf)
+		{
+			_cartographerPanelGameObject.SetActive(value: false);
+		}
+		base.Hide();
+	}
+
+	public override IMapListElement CreateMapListElement(Transform container)
+	{
+		UMapListElement uMapListElement = Object.Instantiate(_mapListElementPrefab);
+		uMapListElement.transform.SetParent(container, worldPositionStays: false);
+		return uMapListElement;
+	}
+
+	public override IButtonViewAdapter GetFirstButton()
+	{
+		return _cancelButton;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 240
+PATH: Assembly-CSharp__Beam.UI__UCartographerWorldMapTooltipViewAdapter.cs
+SIZE: 3028 bytes
+SHA256: 6002b729e49273af88a518ac6a22f73cbb36cfc05fb6275d64ac8075606a0e0e
+====================================================================================================
+
+using Beam.Terrain;
+using Beam.Utilities.Reflection;
+using Beam.Utilities.UGUI;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UCartographerWorldMapTooltipViewAdapter : ViewAdapterBase, ICartographerWorldMapTooltipViewAdapter, IViewAdapter
+{
+	[SerializeField]
+	private GameObject _tooltipGameObject;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _nameLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _authorLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _descriptionLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _versionNumberLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _statusLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _sourceLabel;
+
+	public GameObject TooltipGameObject => _tooltipGameObject;
+
+	public ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public ILabelViewAdapter NameLabel => _nameLabel;
+
+	public ILabelViewAdapter AuthorLabel => _authorLabel;
+
+	public ILabelViewAdapter DescriptionLabel => _descriptionLabel;
+
+	public ILabelViewAdapter VersionNumberLabel => _versionNumberLabel;
+
+	public ILabelViewAdapter StatusLabel => _statusLabel;
+
+	private void Awake()
+	{
+		Object.FindObjectOfType<CartographerWorldMapTooltipPresenter>().Initialize(this);
+	}
+
+	public override void Show()
+	{
+		if (!_tooltipGameObject.activeSelf)
+		{
+			_tooltipGameObject.SetActive(value: true);
+			base.Show();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (_tooltipGameObject.activeSelf)
+		{
+			_tooltipGameObject.SetActive(value: false);
+			base.Hide();
+		}
+	}
+
+	public void SetPosition(Vector2 screenPosition)
+	{
+		RectTransform rectTransform = (RectTransform)transform.parent;
+		float num = rectTransform.sizeDelta.x / (float)Screen.width;
+		float num2 = rectTransform.sizeDelta.y / (float)Screen.height;
+		Vector2 anchoredPosition = new Vector2(screenPosition.x * num, screenPosition.y * num2);
+		RectTransform rectTransform2 = (RectTransform)_canvasGroup.transform;
+		if (anchoredPosition.x + rectTransform2.rect.width > (float)Screen.width)
+		{
+			anchoredPosition.x -= rectTransform2.rect.width;
+		}
+		if (anchoredPosition.y - rectTransform2.rect.height < 0f)
+		{
+			anchoredPosition.y += rectTransform2.rect.height;
+		}
+		((RectTransform)transform).anchoredPosition = anchoredPosition;
+	}
+
+	public void SetSource(MapEditorData.EMapSource source)
+	{
+		Color color = ((source == MapEditorData.EMapSource.Local || source != MapEditorData.EMapSource.Community) ? ((Color)UGUIColor.TEXT_BRIGHT) : ((Color)UGUIColor.TEXT_CYAN));
+		_sourceLabel.Text = source.GetAttribute<DescriptionAttribute>().Text;
+		_sourceLabel.Color = color;
+	}
+
+	public void SetState(MapEditorData.EMapState state)
+	{
+		Color color = state switch
+		{
+			MapEditorData.EMapState.Older => (Color)UGUIColor.TEXT_YELLOW, 
+			MapEditorData.EMapState.Unavailable => (Color)UGUIColor.TEXT_RED, 
+			_ => (Color)UGUIColor.TEXT_GREEN, 
+		};
+		_statusLabel.Text = state.GetAttribute<DescriptionAttribute>().Text;
+		_statusLabel.Color = color;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 241
+PATH: Assembly-CSharp__Beam.UI__UChecklistNotificationsViewAdapter.cs
+SIZE: 287 bytes
+SHA256: 7227a1df1b4e6ae4790e932e723bf6f6513fcc4657735a9655da7358e214b0e5
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UChecklistNotificationsViewAdapter : NotificationsViewAdapterBase
+{
+	[SerializeField]
+	private TransformViewAdapter _notificationsContainer;
+
+	public override ITransformViewAdapter NotificationsContainer => _notificationsContainer;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 242
+PATH: Assembly-CSharp__Beam.UI__UCraftingMaterialTooltipViewAdapter.cs
+SIZE: 1603 bytes
+SHA256: 5c1f617c849990c9c2c3da4f72daf9030becbfb9738c611d4b290b99ce009553
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UCraftingMaterialTooltipViewAdapter : CraftingMaterialTooltipViewAdapterBase
+{
+	[SerializeField]
+	private GameObjectViewAdapter _tooltipGameObject;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _descriptionLabel;
+
+	public override void Show()
+	{
+		ResetFade();
+		_tooltipGameObject.Active = true;
+		base.Show();
+		LeanTween.cancel(gameObject);
+		LeanTween.value(gameObject, Fade_OnUpdate, _canvasGroup.Alpha, 1f, (1f - _canvasGroup.Alpha) * 0.2f).setDelay(0.7f).setIgnoreTimeScale(useUnScaledTime: true);
+	}
+
+	public override void Hide()
+	{
+		LeanTween.cancel(gameObject);
+		LeanTween.value(gameObject, Fade_OnUpdate, _canvasGroup.Alpha, 0f, 0.2f).setOnComplete(FadeOut_OnComplete).setIgnoreTimeScale(useUnScaledTime: true);
+	}
+
+	public override void SetPosition(Vector2 screenPosition)
+	{
+		RectTransform rectTransform = (RectTransform)transform.parent;
+		float num = rectTransform.sizeDelta.x / (float)Screen.width;
+		float num2 = rectTransform.sizeDelta.y / (float)Screen.height;
+		Vector2 anchoredPosition = new Vector2(screenPosition.x * num, screenPosition.y * num2);
+		((RectTransform)transform).anchoredPosition = anchoredPosition;
+	}
+
+	public override void SetDescription(string text)
+	{
+		_descriptionLabel.Text = text;
+	}
+
+	private void Fade_OnUpdate(float value)
+	{
+		_canvasGroup.Alpha = value;
+	}
+
+	private void FadeOut_OnComplete()
+	{
+		ResetFade();
+		_tooltipGameObject.Active = false;
+		base.Hide();
+	}
+
+	private void ResetFade()
+	{
+		_canvasGroup.Alpha = 0f;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 243
+PATH: Assembly-CSharp__Beam.UI__UDayNotificationsViewAdapter.cs
+SIZE: 281 bytes
+SHA256: d3a2d82fb11cc755294e4f191849ab936b6fd909310f4751f997265343462ea3
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UDayNotificationsViewAdapter : NotificationsViewAdapterBase
+{
+	[SerializeField]
+	private TransformViewAdapter _notificationsContainer;
+
+	public override ITransformViewAdapter NotificationsContainer => _notificationsContainer;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 244
+PATH: Assembly-CSharp__Beam.UI__UGeneralMenuViewAdapter.cs
+SIZE: 1877 bytes
+SHA256: fbbfc95ab5a6e94a70b031d0428c71549d3004e709e456718892d7447ce60e40
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UGeneralMenuViewAdapter : ViewAdapterBase, IGeneralMenuViewAdapter, IOptionsPanelView, IViewAdapter
+{
+	[SerializeField]
+	private GameObject _generalMenuPanel;
+
+	[SerializeField]
+	private Transform _categoriesContainer;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _hudInformationButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _crosshairButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _highlightingButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _temperatureUnitsButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _tutorialButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _cameraViewModeButton;
+
+	[SerializeField]
+	private TMPOptionSliderViewAdapter _oceanRotationSlider;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _languageButton;
+
+	public Transform CategoriesContainer => _categoriesContainer;
+
+	public IOptionButtonViewAdapter HudInformationButton => _hudInformationButton;
+
+	public IOptionButtonViewAdapter CrosshairButton => _crosshairButton;
+
+	public IOptionButtonViewAdapter HighlightingButton => _highlightingButton;
+
+	public IOptionButtonViewAdapter TemperatureUnitsButton => _temperatureUnitsButton;
+
+	public IOptionButtonViewAdapter TutorialButton => _tutorialButton;
+
+	public IOptionButtonViewAdapter CameraViewModeButton => _cameraViewModeButton;
+
+	public IOptionSliderViewAdapter OceanRotationSlider => _oceanRotationSlider;
+
+	public IOptionButtonViewAdapter LanguageButton => _languageButton;
+
+	private void Awake()
+	{
+		Object.FindObjectOfType<GeneralMenuPresenter>().Initialize(this);
+		Visible = _generalMenuPanel.activeSelf;
+	}
+
+	public override void Show()
+	{
+		base.Show();
+		_generalMenuPanel.SetActive(Visible);
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		_generalMenuPanel.SetActive(Visible);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 245
+PATH: Assembly-CSharp__Beam.UI__UGeneralNotificationsViewAdapter.cs
+SIZE: 285 bytes
+SHA256: 927f5d822152a316806be2d0213efb3737109537b994badb69b8806a43277a7b
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UGeneralNotificationsViewAdapter : NotificationsViewAdapterBase
+{
+	[SerializeField]
+	private TransformViewAdapter _notificationsContainer;
+
+	public override ITransformViewAdapter NotificationsContainer => _notificationsContainer;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 246
+PATH: Assembly-CSharp__Beam.UI__UGraphicsMenuViewAdapter.cs
+SIZE: 4100 bytes
+SHA256: 803e0f9b2ca1d7d13b51fb5a5d5b424c98e7cd10bd2fc3be81e67128de359f7a
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UGraphicsMenuViewAdapter : ViewAdapterBase, IGraphicsMenuViewAdapter, IOptionsPanelView, IViewAdapter
+{
+	[SerializeField]
+	private GameObject _graphicsMenuGameObject;
+
+	[SerializeField]
+	private Transform _categoriesContainer;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _scrollview;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _presetButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _resolutionButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _colorModeButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _fullScreenButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _fixedFrameRateButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _verticalSyncButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _drawDistanceButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _textureQualityButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _shadowQualityButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _billboardDensityButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _grassButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _cloudsButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _cloudsOcclusionButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _waterQualityButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _waterReflectionsButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _causticsButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _antialiasingButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _ambientOcclusionButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _bloomButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _lensEffectsButton;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _motionBlurButton;
+
+	[SerializeField]
+	private TMPSliderViewAdapter _fieldOfViewSlider;
+
+	public Transform CategoriesContainer => _categoriesContainer;
+
+	public IScrollviewViewAdapter Scrollview => _scrollview;
+
+	public IOptionButtonViewAdapter PresetButton => _presetButton;
+
+	public IOptionButtonViewAdapter ResolutionButton => _resolutionButton;
+
+	public IOptionButtonViewAdapter ColorModeButton => _colorModeButton;
+
+	public IOptionButtonViewAdapter FullScreenButton => _fullScreenButton;
+
+	public IOptionButtonViewAdapter FixedFrameRateButton => _fixedFrameRateButton;
+
+	public IOptionButtonViewAdapter VerticalSyncButton => _verticalSyncButton;
+
+	public IOptionButtonViewAdapter DrawDistanceButton => _drawDistanceButton;
+
+	public IOptionButtonViewAdapter TextureQualityButton => _textureQualityButton;
+
+	public IOptionButtonViewAdapter ShadowQualityButton => _shadowQualityButton;
+
+	public IOptionButtonViewAdapter BillboardDensityButton => _billboardDensityButton;
+
+	public IOptionButtonViewAdapter GrassButton => _grassButton;
+
+	public IOptionButtonViewAdapter CloudsButton => _cloudsButton;
+
+	public IOptionButtonViewAdapter CloudsOcclusionButton => _cloudsOcclusionButton;
+
+	public IOptionButtonViewAdapter WaterQualityButton => _waterQualityButton;
+
+	public IOptionButtonViewAdapter WaterReflectionsButton => _waterReflectionsButton;
+
+	public IOptionButtonViewAdapter CausticsButton => _causticsButton;
+
+	public IOptionButtonViewAdapter AntialiasingButton => _antialiasingButton;
+
+	public IOptionButtonViewAdapter AmbientOcclusionButton => _ambientOcclusionButton;
+
+	public IOptionButtonViewAdapter BloomButton => _bloomButton;
+
+	public IOptionButtonViewAdapter LensEffectsButton => _lensEffectsButton;
+
+	public IOptionButtonViewAdapter MotionBlurButton => _motionBlurButton;
+
+	public ISliderViewAdapter FieldOfViewSlider => _fieldOfViewSlider;
+
+	private void Awake()
+	{
+		Object.FindObjectOfType<GraphicsMenuPresenter>().Initialize(this);
+		Visible = _graphicsMenuGameObject.activeSelf;
+	}
+
+	public override void Show()
+	{
+		base.Show();
+		_graphicsMenuGameObject.SetActive(Visible);
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		_graphicsMenuGameObject.SetActive(Visible);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 247
+PATH: Assembly-CSharp__Beam.UI__UIndicatorView.cs
+SIZE: 391 bytes
+SHA256: 49ec47f452c961b43007e47bc004b1b5cfe2c527a58bbdc4528fa7547db64098
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UIndicatorView : IndicatorViewBase
+{
+	[SerializeField]
+	private DamageIndicatorElement _indicatorPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _indicatorContainer;
+
+	public override DamageIndicatorElement IndicatorPrefab => _indicatorPrefab;
+
+	public override ITransformViewAdapter IndicatorContainer => _indicatorContainer;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 248
+PATH: Assembly-CSharp__Beam.UI__UInputMenuViewAdapter.cs
+SIZE: 6301 bytes
+SHA256: 3cefe7933cd110582b59ab2e2806982c0587a050808be58af20ba03b98d7c6b0
+====================================================================================================
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UInputMenuViewAdapter : ViewAdapterBase, IInputMenuViewAdapter, IOptionsPanelView, IViewAdapter
+{
+	[SerializeField]
+	private GameObject _inputMenuGameObject;
+
+	[SerializeField]
+	private GameObject _inputMenuButton;
+
+	[SerializeField]
+	private Transform _categoriesContainer;
+
+	[SerializeField]
+	private TMPLabelButtonViewAdapter _defaultButton;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _scrollview;
+
+	[SerializeField]
+	private TMPOptionButtonViewAdapter _inputOptionButtonPrefab;
+
+	[SerializeField]
+	private TMPOptionSliderViewAdapter _inputOptionSliderPrefab;
+
+	[SerializeField]
+	private TMPInputMapCategoryHeader _inputMapCategorySubheaderPrefab;
+
+	[SerializeField]
+	private TMPOptionInputFieldButtonViewAdapter _inputFieldPrefab;
+
+	[SerializeField]
+	private USelectableViewAdapter _controllerLayoutImagePrefab;
+
+	private List<IOptionButtonViewAdapter> _inputOptionButtons = new List<IOptionButtonViewAdapter>();
+
+	private List<IOptionSliderViewAdapter> _inputOptionSliders = new List<IOptionSliderViewAdapter>();
+
+	private List<IOptionInputFieldButtonViewAdapter> _inputFieldButtons = new List<IOptionInputFieldButtonViewAdapter>();
+
+	public Transform CategoriesContainer => _categoriesContainer;
+
+	public ILabelButtonViewAdapter DefaultButton => _defaultButton;
+
+	public IScrollviewViewAdapter Scrollview => _scrollview;
+
+	public IList<IOptionButtonViewAdapter> Buttons => _inputOptionButtons;
+
+	private void Awake()
+	{
+		Object.FindObjectOfType<InputMenuPresenter>().Initialize(this);
+		Visible = _inputMenuGameObject.activeSelf;
+	}
+
+	public override void Show()
+	{
+		base.Show();
+		_inputMenuGameObject.SetActive(Visible);
+	}
+
+	public override void Hide()
+	{
+		base.Hide();
+		_inputMenuGameObject.SetActive(Visible);
+	}
+
+	public IInputMapCategoryHeader CreateInputCategorySubheader(IOptionCategoryHeader header)
+	{
+		return Object.Instantiate(_inputMapCategorySubheaderPrefab, header.ElementsContainer, worldPositionStays: false);
+	}
+
+	public IOptionButtonViewAdapter CreateInputOptionButton(IOptionCategoryHeader header)
+	{
+		IOptionButtonViewAdapter optionButtonViewAdapter = Object.Instantiate(_inputOptionButtonPrefab, header.ElementsContainer, worldPositionStays: false);
+		_inputOptionButtons.Add(optionButtonViewAdapter);
+		return optionButtonViewAdapter;
+	}
+
+	public IOptionSliderViewAdapter CreateInputOptionSlider(IOptionCategoryHeader header)
+	{
+		IOptionSliderViewAdapter optionSliderViewAdapter = Object.Instantiate(_inputOptionSliderPrefab, header.ElementsContainer, worldPositionStays: false);
+		_inputOptionSliders.Add(optionSliderViewAdapter);
+		return optionSliderViewAdapter;
+	}
+
+	public IOptionInputFieldButtonViewAdapter CreateInputField(IOptionCategoryHeader header)
+	{
+		IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = Object.Instantiate(_inputFieldPrefab, header.ElementsContainer, worldPositionStays: false);
+		optionInputFieldButtonViewAdapter.transform.SetAsLastSibling();
+		_inputFieldButtons.Add(optionInputFieldButtonViewAdapter);
+		return optionInputFieldButtonViewAdapter;
+	}
+
+	public ISelectableViewAdapter CreateControllerLayoutImage(IOptionCategoryHeader header)
+	{
+		USelectableViewAdapter uSelectableViewAdapter = Object.Instantiate(_controllerLayoutImagePrefab);
+		uSelectableViewAdapter.transform.SetParent(header.ElementsContainer, worldPositionStays: false);
+		return uSelectableViewAdapter;
+	}
+
+	public void RemoveButton(IOptionButtonViewAdapter button)
+	{
+		BeamTeam.Destroy(button.transform.gameObject);
+		_inputOptionButtons.Remove(button);
+	}
+
+	public void DestroyInputOptionButtons()
+	{
+		for (int i = 0; i < _inputOptionButtons.Count; i++)
+		{
+			BeamTeam.Destroy(_inputOptionButtons[i].transform.gameObject);
+		}
+		_inputOptionButtons.Clear();
+	}
+
+	public void DestroyInputOptionSliders()
+	{
+		for (int i = 0; i < _inputOptionSliders.Count; i++)
+		{
+			BeamTeam.Destroy(_inputOptionSliders[i].transform.gameObject);
+		}
+		_inputOptionSliders.Clear();
+	}
+
+	public void DestroyInputFields()
+	{
+		for (int i = 0; i < _inputFieldButtons.Count; i++)
+		{
+			BeamTeam.Destroy(_inputFieldButtons[i].transform.gameObject);
+		}
+		_inputFieldButtons.Clear();
+	}
+
+	public void SetNavigation(IList<IOptionCategoryHeader> categories)
+	{
+		IOptionCategoryHeader item = categories.FirstOrDefault((IOptionCategoryHeader category) => category.Id == "OPTIONS_INPUT_MENU_LABEL_CONTROL_MAPPING".GetHashCode());
+		IOptionCategoryHeader optionCategoryHeader = null;
+		int num = categories.IndexOf(item) - 1;
+		if (num >= 0)
+		{
+			optionCategoryHeader = categories[num];
+		}
+		Transform transform = null;
+		if (optionCategoryHeader != null && optionCategoryHeader.ElementsContainer.childCount > 0)
+		{
+			transform = optionCategoryHeader.ElementsContainer.GetChild(optionCategoryHeader.ElementsContainer.childCount - 1);
+		}
+		for (int num2 = 0; num2 < _inputFieldButtons.Count; num2++)
+		{
+			TMPOptionInputFieldButtonViewAdapter tMPOptionInputFieldButtonViewAdapter = (TMPOptionInputFieldButtonViewAdapter)_inputFieldButtons[num2];
+			tMPOptionInputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Left, _inputMenuButton.transform);
+			int num3 = num2 - 1;
+			Transform element = ((num3 >= 0) ? _inputFieldButtons[num3].transform : transform);
+			tMPOptionInputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Up, element);
+			int num4 = num2 + 1;
+			Transform element2 = ((num4 < _inputFieldButtons.Count) ? _inputFieldButtons[num4].transform : _defaultButton.transform);
+			tMPOptionInputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Down, element2);
+			IInputFieldButtonViewAdapter inputFieldButtonViewAdapter = tMPOptionInputFieldButtonViewAdapter.Buttons[0];
+			IInputFieldButtonViewAdapter inputFieldButtonViewAdapter2 = tMPOptionInputFieldButtonViewAdapter.Buttons[1];
+			inputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Up, element);
+			inputFieldButtonViewAdapter.transform.SetNavigation(NavigationDirection.Down, element2);
+			inputFieldButtonViewAdapter2.transform.SetNavigation(NavigationDirection.Up, element);
+			inputFieldButtonViewAdapter2.transform.SetNavigation(NavigationDirection.Down, element2);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 249
+PATH: Assembly-CSharp__Beam.UI__UInventoryRadialMenuViewAdapter.cs
+SIZE: 2184 bytes
+SHA256: 2d94998fdde1258d64de6e003c9efca08dd0ac4c891a35981b7f8d3679586369
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class UInventoryRadialMenuViewAdapter : InventoryRadialMenuViewAdapterBase
+{
+	[SerializeField]
+	private InventoryRadialMenuElement _elementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementPlaceholderPrefab;
+
+	[SerializeField]
+	private InventoryRadialMenuElement _emptyHandElementPrefab;
+
+	[SerializeField]
+	private InventoryRadialMenuElement _storageElementPrefab;
+
+	[SerializeField]
+	private TransformViewAdapter _elementContainer;
+
+	[SerializeField]
+	private TransformViewAdapter _pooledElementContainer;
+
+	[SerializeField]
+	private UImageViewAdapter _selector;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _titleLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _descriptionLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _classificationLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _healthLabel;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _canvasGroup;
+
+	[SerializeField]
+	private UCanvasGroupViewAdapter _detailsCanvasGroup;
+
+	[SerializeField]
+	private Texture2D _blurMaskTexture;
+
+	public override InventoryRadialMenuElement ElementPrefab => _elementPrefab;
+
+	public override ITransformViewAdapter ElementPlaceholderPrefab => _elementPlaceholderPrefab;
+
+	public override InventoryRadialMenuElement EmptyHandElementPrefab => _emptyHandElementPrefab;
+
+	public override InventoryRadialMenuElement StorageElementPrefab => _storageElementPrefab;
+
+	public override ITransformViewAdapter ElementContainer => _elementContainer;
+
+	public override ITransformViewAdapter PooledElementContainer => _pooledElementContainer;
+
+	public override IImageViewAdapter SelectorImage => _selector;
+
+	public override ILabelViewAdapter TitleLabel => _titleLabel;
+
+	public override ILabelViewAdapter DescriptionLabel => _descriptionLabel;
+
+	public override ILabelViewAdapter ClassificationLabel => _classificationLabel;
+
+	public override ILabelViewAdapter HealthLabel => _healthLabel;
+
+	public override ICanvasGroupViewAdapter CanvasGroup => _canvasGroup;
+
+	public override ICanvasGroupViewAdapter DetailsCanvasGroup => _detailsCanvasGroup;
+
+	public override Texture2D BlurMaskTexture => _blurMaskTexture;
+}
+
+
+
+====================================================================================================
+SOURCE FILE 250
+PATH: Assembly-CSharp__Beam.UI__ULeaderboardsMenuViewAdapter.cs
+SIZE: 4508 bytes
+SHA256: 9c7af51ad4ada417d71f6c52a1544d79224200d241cddc88b3659d007db74f2a
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public class ULeaderboardsMenuViewAdapter : LeaderboardsMenuViewAdapterBase
+{
+	[SerializeField]
+	private GameObject _panel;
+
+	[SerializeField]
+	private ULeaderboardElement _leaderboardButtonPrefab;
+
+	[SerializeField]
+	private LeaderboardEntryElement _leaderboardEntryElementPrefab;
+
+	[SerializeField]
+	private Transform _leaderboardButtonContainer;
+
+	[SerializeField]
+	private UScrollviewViewAdapter _scrollView;
+
+	[SerializeField]
+	private Transform _leaderboardEntryElementContainer;
+
+	[SerializeField]
+	private LeaderboardEntryElement _userLeaderboardEntryElement;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _retrievingLabel;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _noLeaderboardEntriesLabel;
+
+	[SerializeField]
+	private UButtonViewAdapter _backButton;
+
+	private HashSet<ILeaderboardElement> _leaderboardButtons = new HashSet<ILeaderboardElement>();
+
+	private ELeaderboardDisplayType _leaderboardDisplayType;
+
+	public override IButtonViewAdapter BackButton => _backButton;
+
+	public override IEnumerable<ILeaderboardElement> LeaderboardButtons => _leaderboardButtons;
+
+	private void Awake()
+	{
+		Visible = _panel.activeSelf;
+	}
+
+	public override void Show()
+	{
+		if (!_panel.activeSelf)
+		{
+			_panel.SetActive(value: true);
+		}
+		base.Show();
+	}
+
+	public override void Hide()
+	{
+		if (_panel.activeSelf)
+		{
+			BeamTeam.DestroyAllChildren(_leaderboardButtonContainer);
+			BeamTeam.DestroyAllChildren(_leaderboardEntryElementContainer);
+			_leaderboardButtons.Clear();
+			_panel.SetActive(value: false);
+		}
+		base.Hide();
+	}
+
+	public override ILeaderboardElement CreateLeaderboardButton(LeaderboardData leaderboardData)
+	{
+		ULeaderboardElement uLeaderboardElement = Object.Instantiate(_leaderboardButtonPrefab);
+		uLeaderboardElement.transform.SetParent(_leaderboardButtonContainer, worldPositionStays: false);
+		uLeaderboardElement.SetLeaderboardData(leaderboardData);
+		uLeaderboardElement.Selected += LeaderboardButton_Selected;
+		_leaderboardButtons.Add(uLeaderboardElement);
+		return uLeaderboardElement;
+	}
+
+	private LeaderboardEntryElement CreateLeaderboardEntryElement()
+	{
+		LeaderboardEntryElement leaderboardEntryElement = Object.Instantiate(_leaderboardEntryElementPrefab);
+		leaderboardEntryElement.transform.SetParent(_leaderboardEntryElementContainer, worldPositionStays: false);
+		return leaderboardEntryElement;
+	}
+
+	public override void CreateLeaderboardEntries(IEnumerable<LeaderboardEntryData> leaderboardEntries)
+	{
+		BeamTeam.DestroyAllChildrenImmediate(_leaderboardEntryElementContainer);
+		int num = 1;
+		foreach (LeaderboardEntryData leaderboardEntry in leaderboardEntries)
+		{
+			LeaderboardEntryElement leaderboardEntryElement = CreateLeaderboardEntryElement();
+			PopulateLeaderboardEntryElement(leaderboardEntryElement, leaderboardEntry);
+			leaderboardEntryElement.SetRank(num++);
+		}
+		bool flag = _leaderboardEntryElementContainer.childCount > 0;
+		_leaderboardEntryElementContainer.gameObject.SetActive(flag);
+		_noLeaderboardEntriesLabel.transform.gameObject.SetActive(!flag);
+		_retrievingLabel.transform.gameObject.SetActive(value: false);
+	}
+
+	public override void SetLeaderboard(LeaderboardData leaderboardData)
+	{
+		_leaderboardDisplayType = leaderboardData.DisplayType;
+		_leaderboardEntryElementContainer.gameObject.SetActive(value: false);
+		_noLeaderboardEntriesLabel.transform.gameObject.SetActive(value: false);
+		_retrievingLabel.transform.gameObject.SetActive(value: true);
+	}
+
+	public override void SetUserLeaderboardEntry(LeaderboardEntryData leaderboardEntryData)
+	{
+		PopulateLeaderboardEntryElement(_userLeaderboardEntryElement, leaderboardEntryData);
+	}
+
+	private void PopulateLeaderboardEntryElement(LeaderboardEntryElement leaderboardEntryElement, LeaderboardEntryData leaderboardEntryData)
+	{
+		leaderboardEntryElement.SetDisplayType(_leaderboardDisplayType);
+		leaderboardEntryElement.SetUsername(leaderboardEntryData.Username);
+		leaderboardEntryElement.SetRank(leaderboardEntryData.Rank);
+		leaderboardEntryElement.SetValue(leaderboardEntryData.Value);
+	}
+
+	public override IButtonViewAdapter GetFirstButton()
+	{
+		IButtonViewAdapter buttonViewAdapter = _leaderboardButtons.FirstOrDefault_NonAlloc();
+		if (buttonViewAdapter.IsNullOrDestroyed())
+		{
+			return _backButton;
+		}
+		return buttonViewAdapter;
+	}
+
+	private void LeaderboardButton_Selected(ISelectableViewAdapter widget)
+	{
+		_scrollView.FocusElement(widget.transform);
+	}
+}
+
+

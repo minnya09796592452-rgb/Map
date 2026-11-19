@@ -1,0 +1,7627 @@
+
+====================================================================================================
+SOURCE FILE 351
+PATH: Assembly-CSharp__DynamicBoneCollider.cs
+SIZE: 5590 bytes
+SHA256: 57a747f7189138310a63edaf9f7e87a5b5d27bf95245f26b16b291eb01982488
+====================================================================================================
+
+using UnityEngine;
+
+[AddComponentMenu("Dynamic Bone/Dynamic Bone Collider")]
+public class DynamicBoneCollider : DynamicBoneColliderBase
+{
+	public float m_Radius = 0.5f;
+
+	public float m_Height;
+
+	private void OnValidate()
+	{
+		m_Radius = Mathf.Max(m_Radius, 0f);
+		m_Height = Mathf.Max(m_Height, 0f);
+	}
+
+	public override void Collide(ref Vector3 particlePosition, float particleRadius)
+	{
+		float num = m_Radius * Mathf.Abs(transform.lossyScale.x);
+		float num2 = m_Height * 0.5f - m_Radius;
+		if (num2 <= 0f)
+		{
+			if (m_Bound == Bound.Outside)
+			{
+				OutsideSphere(ref particlePosition, particleRadius, transform.TransformPoint(m_Center), num);
+			}
+			else
+			{
+				InsideSphere(ref particlePosition, particleRadius, transform.TransformPoint(m_Center), num);
+			}
+			return;
+		}
+		Vector3 center = m_Center;
+		Vector3 center2 = m_Center;
+		switch (m_Direction)
+		{
+		case Direction.X:
+			center.x -= num2;
+			center2.x += num2;
+			break;
+		case Direction.Y:
+			center.y -= num2;
+			center2.y += num2;
+			break;
+		case Direction.Z:
+			center.z -= num2;
+			center2.z += num2;
+			break;
+		}
+		if (m_Bound == Bound.Outside)
+		{
+			OutsideCapsule(ref particlePosition, particleRadius, transform.TransformPoint(center), transform.TransformPoint(center2), num);
+		}
+		else
+		{
+			InsideCapsule(ref particlePosition, particleRadius, transform.TransformPoint(center), transform.TransformPoint(center2), num);
+		}
+	}
+
+	private static void OutsideSphere(ref Vector3 particlePosition, float particleRadius, Vector3 sphereCenter, float sphereRadius)
+	{
+		float num = sphereRadius + particleRadius;
+		float num2 = num * num;
+		Vector3 vector = particlePosition - sphereCenter;
+		float sqrMagnitude = vector.sqrMagnitude;
+		if (sqrMagnitude > 0f && sqrMagnitude < num2)
+		{
+			float num3 = Mathf.Sqrt(sqrMagnitude);
+			particlePosition = sphereCenter + vector * (num / num3);
+		}
+	}
+
+	private static void InsideSphere(ref Vector3 particlePosition, float particleRadius, Vector3 sphereCenter, float sphereRadius)
+	{
+		float num = sphereRadius - particleRadius;
+		float num2 = num * num;
+		Vector3 vector = particlePosition - sphereCenter;
+		float sqrMagnitude = vector.sqrMagnitude;
+		if (sqrMagnitude > num2)
+		{
+			float num3 = Mathf.Sqrt(sqrMagnitude);
+			particlePosition = sphereCenter + vector * (num / num3);
+		}
+	}
+
+	private static void OutsideCapsule(ref Vector3 particlePosition, float particleRadius, Vector3 capsuleP0, Vector3 capsuleP1, float capsuleRadius)
+	{
+		float num = capsuleRadius + particleRadius;
+		float num2 = num * num;
+		Vector3 vector = capsuleP1 - capsuleP0;
+		Vector3 vector2 = particlePosition - capsuleP0;
+		float num3 = Vector3.Dot(vector2, vector);
+		if (num3 <= 0f)
+		{
+			float sqrMagnitude = vector2.sqrMagnitude;
+			if (sqrMagnitude > 0f && sqrMagnitude < num2)
+			{
+				float num4 = Mathf.Sqrt(sqrMagnitude);
+				particlePosition = capsuleP0 + vector2 * (num / num4);
+			}
+			return;
+		}
+		float sqrMagnitude2 = vector.sqrMagnitude;
+		if (num3 >= sqrMagnitude2)
+		{
+			vector2 = particlePosition - capsuleP1;
+			float sqrMagnitude3 = vector2.sqrMagnitude;
+			if (sqrMagnitude3 > 0f && sqrMagnitude3 < num2)
+			{
+				float num5 = Mathf.Sqrt(sqrMagnitude3);
+				particlePosition = capsuleP1 + vector2 * (num / num5);
+			}
+		}
+		else if (sqrMagnitude2 > 0f)
+		{
+			num3 /= sqrMagnitude2;
+			vector2 -= vector * num3;
+			float sqrMagnitude4 = vector2.sqrMagnitude;
+			if (sqrMagnitude4 > 0f && sqrMagnitude4 < num2)
+			{
+				float num6 = Mathf.Sqrt(sqrMagnitude4);
+				particlePosition += vector2 * ((num - num6) / num6);
+			}
+		}
+	}
+
+	private static void InsideCapsule(ref Vector3 particlePosition, float particleRadius, Vector3 capsuleP0, Vector3 capsuleP1, float capsuleRadius)
+	{
+		float num = capsuleRadius - particleRadius;
+		float num2 = num * num;
+		Vector3 vector = capsuleP1 - capsuleP0;
+		Vector3 vector2 = particlePosition - capsuleP0;
+		float num3 = Vector3.Dot(vector2, vector);
+		if (num3 <= 0f)
+		{
+			float sqrMagnitude = vector2.sqrMagnitude;
+			if (sqrMagnitude > num2)
+			{
+				float num4 = Mathf.Sqrt(sqrMagnitude);
+				particlePosition = capsuleP0 + vector2 * (num / num4);
+			}
+			return;
+		}
+		float sqrMagnitude2 = vector.sqrMagnitude;
+		if (num3 >= sqrMagnitude2)
+		{
+			vector2 = particlePosition - capsuleP1;
+			float sqrMagnitude3 = vector2.sqrMagnitude;
+			if (sqrMagnitude3 > num2)
+			{
+				float num5 = Mathf.Sqrt(sqrMagnitude3);
+				particlePosition = capsuleP1 + vector2 * (num / num5);
+			}
+		}
+		else if (sqrMagnitude2 > 0f)
+		{
+			num3 /= sqrMagnitude2;
+			vector2 -= vector * num3;
+			float sqrMagnitude4 = vector2.sqrMagnitude;
+			if (sqrMagnitude4 > num2)
+			{
+				float num6 = Mathf.Sqrt(sqrMagnitude4);
+				particlePosition += vector2 * ((num - num6) / num6);
+			}
+		}
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		if (!enabled)
+		{
+			return;
+		}
+		if (m_Bound == Bound.Outside)
+		{
+			Gizmos.color = Color.yellow;
+		}
+		else
+		{
+			Gizmos.color = Color.magenta;
+		}
+		float radius = m_Radius * Mathf.Abs(transform.lossyScale.x);
+		float num = m_Height * 0.5f - m_Radius;
+		if (num <= 0f)
+		{
+			Gizmos.DrawWireSphere(transform.TransformPoint(m_Center), radius);
+			return;
+		}
+		Vector3 center = m_Center;
+		Vector3 center2 = m_Center;
+		switch (m_Direction)
+		{
+		case Direction.X:
+			center.x -= num;
+			center2.x += num;
+			break;
+		case Direction.Y:
+			center.y -= num;
+			center2.y += num;
+			break;
+		case Direction.Z:
+			center.z -= num;
+			center2.z += num;
+			break;
+		}
+		Gizmos.DrawWireSphere(transform.TransformPoint(center), radius);
+		Gizmos.DrawWireSphere(transform.TransformPoint(center2), radius);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 352
+PATH: Assembly-CSharp__DynamicBonePlaneCollider.cs
+SIZE: 1427 bytes
+SHA256: 584822c450927939c2a4ec6f3d075b1b513f7b1123ce9c20f2d33fabc79a0452
+====================================================================================================
+
+using UnityEngine;
+
+[AddComponentMenu("Dynamic Bone/Dynamic Bone Plane Collider")]
+public class DynamicBonePlaneCollider : DynamicBoneColliderBase
+{
+	private void OnValidate()
+	{
+	}
+
+	public override void Collide(ref Vector3 particlePosition, float particleRadius)
+	{
+		Vector3 vector = Vector3.up;
+		switch (m_Direction)
+		{
+		case Direction.X:
+			vector = transform.right;
+			break;
+		case Direction.Y:
+			vector = transform.up;
+			break;
+		case Direction.Z:
+			vector = transform.forward;
+			break;
+		}
+		Vector3 inPoint = transform.TransformPoint(m_Center);
+		float distanceToPoint = new Plane(vector, inPoint).GetDistanceToPoint(particlePosition);
+		if (m_Bound == Bound.Outside)
+		{
+			if (distanceToPoint < 0f)
+			{
+				particlePosition -= vector * distanceToPoint;
+			}
+		}
+		else if (distanceToPoint > 0f)
+		{
+			particlePosition -= vector * distanceToPoint;
+		}
+	}
+
+	private void OnDrawGizmosSelected()
+	{
+		if (enabled)
+		{
+			if (m_Bound == Bound.Outside)
+			{
+				Gizmos.color = Color.yellow;
+			}
+			else
+			{
+				Gizmos.color = Color.magenta;
+			}
+			Vector3 vector = Vector3.up;
+			switch (m_Direction)
+			{
+			case Direction.X:
+				vector = transform.right;
+				break;
+			case Direction.Y:
+				vector = transform.up;
+				break;
+			case Direction.Z:
+				vector = transform.forward;
+				break;
+			}
+			Vector3 vector2 = transform.TransformPoint(m_Center);
+			Gizmos.DrawLine(vector2, vector2 + vector);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 353
+PATH: Assembly-CSharp__EndGameCreditsView.cs
+SIZE: 1826 bytes
+SHA256: 11469c08d878f84f8ad1537515e0ddb762206af6e5323e958b8ff83f794466bb
+====================================================================================================
+
+using System;
+using System.Collections;
+using Beam.UI;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EndGameCreditsView : MonoBehaviour
+{
+	[SerializeField]
+	private GameObject _container;
+
+	[SerializeField]
+	private RectTransform _credits;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _copyrightText;
+
+	[SerializeField]
+	private TMPLabelViewAdapter _creditsText;
+
+	[SerializeField]
+	private GameObject _headerGroup;
+
+	[SerializeField]
+	private GameObject _footerGroup;
+
+	[SerializeField]
+	private RectTransform _footer;
+
+	[SerializeField]
+	private float _speed = 1f;
+
+	private RectTransform _canvas;
+
+	public event Action Finished;
+
+	private void OnDestroy()
+	{
+		Finished = null;
+	}
+
+	public void SetCreditsText(string text)
+	{
+		_creditsText.Text = text;
+	}
+
+	public void SetCopyrightText(string text)
+	{
+		_copyrightText.Text = text;
+	}
+
+	public void Show()
+	{
+		if (!_container.activeInHierarchy)
+		{
+			_container.SetActive(value: true);
+		}
+		_canvas = (RectTransform)GetComponentInParent<Canvas>().transform;
+		Vector3 vector = _credits.anchoredPosition;
+		vector.y = 0f;
+		_credits.anchoredPosition = vector;
+		_footerGroup.GetComponent<LayoutElement>().minHeight = _canvas.rect.height * 1.1f;
+		StartCoroutine(Scroll_Sequence());
+	}
+
+	public void Hide()
+	{
+		if (_container.activeInHierarchy)
+		{
+			_container.SetActive(value: false);
+		}
+	}
+
+	private IEnumerator Scroll_Sequence()
+	{
+		yield return new WaitForSeconds(3f);
+		bool stop = false;
+		while (!stop)
+		{
+			Vector3 vector = _credits.anchoredPosition;
+			vector.y += _speed * Time.deltaTime;
+			_credits.anchoredPosition = vector;
+			if (vector.y > _canvas.rect.height / 2f + _credits.rect.height - _footer.rect.height / 2f)
+			{
+				stop = true;
+			}
+			yield return null;
+		}
+		yield return new WaitForSeconds(3f);
+		Finished?.Invoke();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 354
+PATH: Assembly-CSharp__ExtensionMethods.cs
+SIZE: 9493 bytes
+SHA256: 6d478104aff3371c74de3c84e59fb78da724ecac3bbdcdeb6533054b49144170
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Crafting;
+using Beam.Language;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using Photon.Bolt;
+using Rewired.Utils;
+using UnityEngine;
+using UnityEngine.UI;
+
+public static class ExtensionMethods
+{
+	private class ReplicateCopyProjectilesTo : I_MultiplayerMessage
+	{
+		[Replicate]
+		public SaveablePrefab Source;
+
+		[I_Replicate]
+		public IBase Destination;
+
+		public override void OnPeer()
+		{
+			Source.CopyProjectilesTo(Destination);
+		}
+	}
+
+	private class ReplicateCopyTransformTo : I_MultiplayerMessage
+	{
+		[Replicate]
+		public SaveablePrefab Source;
+
+		[I_Replicate]
+		public IBase Destination;
+
+		[Replicate]
+		public bool Broad;
+
+		public override void OnPeer()
+		{
+			Source.CopyTransformsTo(Destination, Broad);
+		}
+	}
+
+	public static float ToCelsius(this float fahrenheit)
+	{
+		return (fahrenheit - 32f) * 0.555555f;
+	}
+
+	public static void EnableColliders(this Collider[] colliders, bool enabled, bool isTrigger)
+	{
+		for (int i = 0; i < colliders.Length; i++)
+		{
+			colliders[i].enabled = enabled;
+			colliders[i].isTrigger = isTrigger;
+		}
+	}
+
+	public static Transform FindInChildren(this Transform transform, string name)
+	{
+		int childCount = transform.childCount;
+		for (int i = 0; i < childCount; i++)
+		{
+			Transform child = transform.GetChild(i);
+			if (child.name == name)
+			{
+				return child;
+			}
+			Transform transform2 = child.FindInChildren(name);
+			if (transform2 != null)
+			{
+				return transform2;
+			}
+		}
+		return null;
+	}
+
+	public static void CopyTransformsToRecursive(this Transform source, Transform destination)
+	{
+		destination.position = source.position;
+		destination.rotation = source.rotation;
+		foreach (Transform item in destination)
+		{
+			Transform transform2 = source.Find(item.name);
+			if ((bool)transform2)
+			{
+				transform2.CopyTransformsToRecursive(item);
+			}
+		}
+	}
+
+	private static void BroadCopyTransformToRecursive(this Transform source, Transform destination)
+	{
+		foreach (Transform item in source)
+		{
+			Transform transform2 = destination.transform.FindInChildren(item.name);
+			if (!transform2.IsNullOrDestroyed())
+			{
+				transform2.position = item.position;
+				transform2.rotation = item.rotation;
+			}
+			item.BroadCopyTransformToRecursive(destination);
+		}
+	}
+
+	public static void CopyTransformsTo(this SaveablePrefab source, IBase destination, bool broad = false)
+	{
+		if (broad)
+		{
+			destination.transform.position = source.transform.position;
+			destination.transform.rotation = source.transform.rotation;
+			source.transform.BroadCopyTransformToRecursive(destination.transform);
+		}
+		else
+		{
+			source.transform.CopyTransformsToRecursive(destination.transform);
+		}
+	}
+
+	public static ProjectileObject[] GetProjectiles(this Transform transform)
+	{
+		return transform.GetComponentsInChildren<ProjectileObject>();
+	}
+
+	public static Vector3[] GetPositions(this ProjectileObject[] projectiles, bool local)
+	{
+		Vector3[] array = new Vector3[projectiles.Length];
+		for (int i = 0; i < projectiles.Length; i++)
+		{
+			array[i] = (local ? projectiles[i].transform.localPosition : projectiles[i].transform.position);
+		}
+		return array;
+	}
+
+	public static Quaternion[] GetRotations(this ProjectileObject[] projectiles, bool local)
+	{
+		Quaternion[] array = new Quaternion[projectiles.Length];
+		for (int i = 0; i < projectiles.Length; i++)
+		{
+			array[i] = (local ? projectiles[i].transform.localRotation : projectiles[i].transform.rotation);
+		}
+		return array;
+	}
+
+	public static void SetPositions(this ProjectileObject[] projectiles, Vector3[] positions, bool local)
+	{
+		if (projectiles.Length != positions.Length)
+		{
+			throw new Exception("SetPositions projecitles and positions have different lenghts");
+		}
+		for (int i = 0; i < projectiles.Length; i++)
+		{
+			if (local)
+			{
+				projectiles[i].transform.localPosition = positions[i];
+			}
+			else
+			{
+				projectiles[i].transform.position = positions[i];
+			}
+		}
+	}
+
+	public static void SetRotation(this ProjectileObject[] projectiles, Quaternion[] rotations, bool local)
+	{
+		if (projectiles.Length != rotations.Length)
+		{
+			throw new Exception("SetPositions projecitles and rotations have different lenghts");
+		}
+		for (int i = 0; i < projectiles.Length; i++)
+		{
+			if (local)
+			{
+				projectiles[i].transform.localRotation = rotations[i];
+			}
+			else
+			{
+				projectiles[i].transform.rotation = rotations[i];
+			}
+		}
+	}
+
+	public static void AttachTo(this ProjectileObject[] projectiles, IBase destination)
+	{
+		foreach (ProjectileObject obj in projectiles)
+		{
+			obj.transform.parent = null;
+			obj.TransformParent = destination.transform;
+			obj.Parent();
+			obj.ProjectileMovement.AttachedBase = destination;
+		}
+	}
+
+	public static void CopyProjectilesTo(this SaveablePrefab source, IBase destination)
+	{
+		source.transform.GetProjectiles().AttachTo(destination);
+	}
+
+	public static void ReplicatedCopyProjectilesTo(this SaveablePrefab source, IBase destination)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateCopyProjectilesTo replicateCopyProjectilesTo = new ReplicateCopyProjectilesTo();
+			replicateCopyProjectilesTo.Source = source;
+			replicateCopyProjectilesTo.Destination = destination;
+			replicateCopyProjectilesTo.Post();
+		}
+		source.CopyProjectilesTo(destination);
+	}
+
+	public static void ReplicatedCopyTransformsTo(this SaveablePrefab source, IBase destination, bool broad = false)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateCopyTransformTo replicateCopyTransformTo = new ReplicateCopyTransformTo();
+			replicateCopyTransformTo.Source = source;
+			replicateCopyTransformTo.Destination = destination;
+			replicateCopyTransformTo.Broad = broad;
+			replicateCopyTransformTo.Post();
+		}
+		source.CopyTransformsTo(destination, broad);
+	}
+
+	public static bool HasConstraint(this UsingConstraint value, UsingConstraint flag)
+	{
+		return (value & flag) != 0;
+	}
+
+	public static string ToPaddedString(this Version version)
+	{
+		return $"{version.Major}.{version.Minor:00}.{version.Build:00}";
+	}
+
+	public static string ToPaddedString2(this Version version)
+	{
+		string text = $"{version.Major}{version.Minor:000}";
+		if (Application.isPlaying && BoltNetwork.IsDebugMode)
+		{
+			text += "d";
+		}
+		return text;
+	}
+
+	public static bool IsTransient(this int resultCode)
+	{
+		if (!Enum.IsDefined(typeof(EResultCode), resultCode))
+		{
+			return false;
+		}
+		if (resultCode == 48879 || resultCode == 51966 || resultCode == 57005)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public static string ToPrettyString(this int resultCode)
+	{
+		string text = $"hr=0x{resultCode:X8}";
+		if (Enum.IsDefined(typeof(EResultCode), resultCode))
+		{
+			return $"{(EResultCode)resultCode} ({text})";
+		}
+		return "E_UNHANDLED (" + text + ")";
+	}
+
+	public static string GetPrettyResultMsg(this int resultCode, string term)
+	{
+		string text = Localization.GetLanguageHandler().Localize(term, resultCode.ToPrettyString());
+		if (resultCode.IsTransient())
+		{
+			text = text + "\n" + Localization.GetLanguageHandler().Localize("TRANSIENT_RESULT_CODE_TRY_AGAIN_MSG");
+		}
+		return text;
+	}
+
+	public static void SetNavigation<T>(this T component, NavigationDirection direction, T element) where T : Component
+	{
+		Selectable selectable = component?.GetComponent<Selectable>();
+		if (selectable == null)
+		{
+			return;
+		}
+		Selectable selectable2 = element?.GetComponent<Selectable>();
+		if (!(selectable2 == null))
+		{
+			Navigation navigation = selectable.navigation;
+			navigation.mode = Navigation.Mode.Explicit;
+			switch (direction)
+			{
+			case NavigationDirection.Left:
+				navigation.selectOnLeft = selectable2;
+				break;
+			case NavigationDirection.Right:
+				navigation.selectOnRight = selectable2;
+				break;
+			case NavigationDirection.Up:
+				navigation.selectOnUp = selectable2;
+				break;
+			case NavigationDirection.Down:
+				navigation.selectOnDown = selectable2;
+				break;
+			}
+			selectable.navigation = navigation;
+		}
+	}
+
+	public static void FocusElement(this IScrollviewViewAdapter scrollview, Transform selectable)
+	{
+		RectTransform rectTransform = (RectTransform)scrollview.transform;
+		RectTransform rectTransform2 = (RectTransform)selectable;
+		Rect child = MathTools.TransformRect(rectTransform2.rect, rectTransform2, rectTransform);
+		Rect rect = rectTransform.rect;
+		Rect rect2 = rectTransform.rect;
+		if (!MathTools.RectContains(rect2, child) && GetOffsetToContainRect(rect2, child, out var offset))
+		{
+			RectTransform rectTransform3 = (RectTransform)scrollview.Content.Transform;
+			Vector2 anchoredPosition = rectTransform3.anchoredPosition;
+			anchoredPosition.x = Mathf.Clamp(anchoredPosition.x + offset.x, 0f, Mathf.Abs(rect.width - rectTransform3.sizeDelta.x));
+			anchoredPosition.y = Mathf.Clamp(anchoredPosition.y + offset.y, 0f, Mathf.Abs(rect.height - rectTransform3.sizeDelta.y));
+			rectTransform3.anchoredPosition = anchoredPosition;
+		}
+	}
+
+	public static bool GetOffsetToContainRect(Rect container, Rect child, out Vector2 offset)
+	{
+		offset = Vector2.zero;
+		if (container.width < child.width)
+		{
+			return false;
+		}
+		if (container.height < child.height)
+		{
+			return false;
+		}
+		if (child.xMin < container.xMin)
+		{
+			offset.x += container.xMin - child.xMin;
+		}
+		if (child.yMin < container.yMin)
+		{
+			offset.y += container.yMin - child.yMin;
+		}
+		if (child.xMax > container.xMax)
+		{
+			offset.x += container.xMax - child.xMax;
+		}
+		if (child.yMax > container.yMax)
+		{
+			offset.y += container.yMax - child.yMax;
+		}
+		return true;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 355
+PATH: Assembly-CSharp__FollowSpawn.cs
+SIZE: 12589 bytes
+SHA256: 14165e60d0f796b2050626d36161c3c7e75e22fa887449a1fea9296e61589d3d
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Events;
+using MEC;
+using SharpNeatLib.Maths;
+using UnityEngine;
+
+public class FollowSpawn : CellObjectSpawner, IHashCollection
+{
+	private class SpawnGrid
+	{
+		public Transform Transform;
+
+		public Transform Objects;
+
+		public bool CanGenerate = true;
+
+		public SpawnGrid(Transform transform)
+		{
+			Transform = transform;
+		}
+	}
+
+	[Serializable]
+	public class BiomeGrid
+	{
+		public string name;
+
+		public bool allBiomes;
+
+		public Zone.BiomeType _biome;
+
+		public GridObject[] biomeParameters;
+	}
+
+	[Serializable]
+	public class GridObject
+	{
+		public GameObject[] objectsToSpawn;
+
+		public LayerMask rayCastMasks;
+
+		public bool cycleGrid;
+
+		public int gridCheckDensity = 1;
+
+		public int maxObjects = 1;
+
+		public int rarity;
+
+		public float align = 0.5f;
+
+		public float minslope;
+
+		public float maxslope = 90f;
+
+		public float minHeight;
+
+		public float maxHeight = 50f;
+
+		public bool randomYRotation;
+
+		public bool grass;
+	}
+
+	public static int GRID_DIMENSION = 20;
+
+	private const int GRID_SIZE = 3;
+
+	private const int MAX_SAMPLES_PER_FRAME = 400;
+
+	private SpawnGrid[][,] _spawnGridsBuffers;
+
+	[SerializeField]
+	private BiomeGrid[] GridObjects2;
+
+	private IPointSampler _sampler;
+
+	private FastRandom _random = new FastRandom();
+
+	private CoroutineHandle _masterUpdateCoroutine;
+
+	private CoroutineHandle _gridUpdateCoroutine;
+
+	private int _samplesCounter;
+
+	private bool _grass = true;
+
+	private SpawnGrid[,] _spawnGrids
+	{
+		get
+		{
+			return _spawnGridsBuffers[0];
+		}
+		set
+		{
+			_spawnGridsBuffers[0] = value;
+		}
+	}
+
+	public bool IsGenerating
+	{
+		get
+		{
+			if (_masterUpdateCoroutine.IsValid)
+			{
+				return _masterUpdateCoroutine.IsRunning;
+			}
+			return false;
+		}
+	}
+
+	private void Awake()
+	{
+		_sampler = new ZoneTerrainPointSampler();
+		EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		LoadOptions();
+	}
+
+	public override void Initialize(Transform follow)
+	{
+		base.Initialize(follow);
+		CreateGrid();
+	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		HashCollectionCache.Remove(this);
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsApplied);
+		Timing.KillCoroutines(_gridUpdateCoroutine);
+		Timing.KillCoroutines(_masterUpdateCoroutine);
+	}
+
+	private void EventManager_OptionsApplied(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	private void LoadOptions()
+	{
+		_grass = Options.GraphicsSettings.Grass == Quality_Grass.ON;
+	}
+
+	private void CreateGrid()
+	{
+		_spawnGridsBuffers = new SpawnGrid[2][,];
+		_spawnGridsBuffers[0] = new SpawnGrid[3, 3];
+		_spawnGridsBuffers[1] = new SpawnGrid[3, 3];
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Transform transform = new GameObject("Spawn_Grid_" + i + "_" + j).transform;
+				transform.gameObject.layer = gameObject.layer;
+				transform.transform.parent = base.transform;
+				_spawnGrids[i, j] = new SpawnGrid(transform);
+				new GameObject(transform.name + "_Combined").transform.parent = transform.transform;
+				Transform transform2 = new GameObject(transform.name + "_Objects").transform;
+				transform2.parent = transform.transform;
+				_spawnGrids[i, j].Objects = transform2;
+				_spawnGrids[i, j].CanGenerate = true;
+			}
+		}
+		Vector3 position = new Vector3(Mathf.RoundToInt(Following.position.x / (float)GRID_DIMENSION) * GRID_DIMENSION, 0f, Mathf.RoundToInt(Following.position.z / (float)GRID_DIMENSION) * GRID_DIMENSION);
+		_spawnGrids[1, 1].Transform.position = position;
+		UpdateGridPositions();
+		UpdateGridObjects();
+		InvokeRepeating("CheckFollowingPosition", 1f, 0.5f);
+		HashCollectionCache.Add(this);
+	}
+
+	private void CheckFollowingPosition()
+	{
+		if (IsGenerating || Following == null || LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		SpawnGrid spawnGrid = null;
+		int num = 0;
+		int num2 = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Vector3 position = _spawnGrids[i, j].Transform.position;
+				if (Following.position.x >= position.x - (float)(GRID_DIMENSION / 2) && Following.position.x <= position.x + (float)(GRID_DIMENSION / 2) && Following.position.z >= position.z - (float)(GRID_DIMENSION / 2) && Following.position.z <= position.z + (float)(GRID_DIMENSION / 2))
+				{
+					spawnGrid = _spawnGrids[i, j];
+					num = 1 - i;
+					num2 = 1 - j;
+					break;
+				}
+			}
+		}
+		if (spawnGrid != _spawnGrids[1, 1])
+		{
+			if (spawnGrid == null)
+			{
+				Vector3 position2 = new Vector3(Mathf.Round(Following.position.x / (float)GRID_DIMENSION) * (float)GRID_DIMENSION, 0f, Mathf.Round(Following.position.z / (float)GRID_DIMENSION) * (float)GRID_DIMENSION);
+				_spawnGrids[1, 1].Transform.position = position2;
+				num = 3;
+				num2 = 3;
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					int num3 = k + num;
+					int num4 = l + num2;
+					if (num3 < 0 || num3 > 2 || num4 < 0 || num4 > 2)
+					{
+						int childCount = _spawnGrids[k, l].Objects.childCount;
+						for (int m = 0; m < childCount; m++)
+						{
+							ObjectPoolManager.DestroyPooled(_spawnGrids[k, l].Objects.GetChild(0).gameObject);
+						}
+						_spawnGrids[k, l].CanGenerate = true;
+					}
+					num3 = (3 + num3) % 3;
+					num4 = (3 + num4) % 3;
+					_spawnGridsBuffers[1][num3, num4] = _spawnGrids[k, l];
+				}
+			}
+			SpawnGrid[,] array = _spawnGridsBuffers[0];
+			_spawnGridsBuffers[0] = _spawnGridsBuffers[1];
+			_spawnGridsBuffers[1] = array;
+			UpdateGridPositions();
+		}
+		UpdateGridObjects();
+	}
+
+	private void UpdateGridPositions()
+	{
+		_spawnGrids[0, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[0, 1].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z);
+		_spawnGrids[0, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x - (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+		_spawnGrids[1, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[1, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+		_spawnGrids[2, 0].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z + (float)GRID_DIMENSION);
+		_spawnGrids[2, 1].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z);
+		_spawnGrids[2, 2].Transform.position = new Vector3(_spawnGrids[1, 1].Transform.position.x + (float)GRID_DIMENSION, transform.position.y, _spawnGrids[1, 1].Transform.position.z - (float)GRID_DIMENSION);
+	}
+
+	private void UpdateGridObjects()
+	{
+		_masterUpdateCoroutine = Timing.RunCoroutine(UpdateGridObjects_Sequence(distributed: true));
+	}
+
+	private IEnumerator<float> UpdateGridObjects_Sequence(bool distributed)
+	{
+		_samplesCounter = 0;
+		for (int x = 0; x < 3; x++)
+		{
+			for (int y = 0; y < 3; y++)
+			{
+				SpawnGrid spawnGrid = _spawnGrids[x, y];
+				if (spawnGrid.CanGenerate && !HashCollectionCache.HasHash(this, spawnGrid.Transform.position.Hash()))
+				{
+					_gridUpdateCoroutine = Timing.RunCoroutine(CreateGridObjects_Sequence(spawnGrid, 400));
+					yield return Timing.WaitUntilDone(_gridUpdateCoroutine);
+				}
+			}
+		}
+	}
+
+	private IEnumerator<float> CreateGridObjects_Sequence(SpawnGrid grid, int samplesPerStep)
+	{
+		if (Following == null)
+		{
+			yield break;
+		}
+		grid.CanGenerate = false;
+		_random.Reinitialise((int)(grid.Transform.position.x + grid.Transform.position.z));
+		Zone.BiomeType currentBiome = StrandedWorld.GetBiome(Following.position);
+		if (currentBiome == Zone.BiomeType.DEEP_SEA)
+		{
+			yield break;
+		}
+		_sampler.Init(grid.Transform.position);
+		BiomeGrid[] gridObjects = GridObjects2;
+		foreach (BiomeGrid biomeGrid in gridObjects)
+		{
+			GridObject[] biomeParameters = biomeGrid.biomeParameters;
+			foreach (GridObject gridObject in biomeParameters)
+			{
+				if ((!_grass && gridObject.grass) || (currentBiome == Zone.BiomeType.MISSION && biomeGrid._biome != Zone.BiomeType.MISSION))
+				{
+					continue;
+				}
+				if (gridObject.cycleGrid)
+				{
+					int curObjectCount = 0;
+					for (int x = 0; x < GRID_DIMENSION; x += gridObject.gridCheckDensity)
+					{
+						for (int y = 0; y < GRID_DIMENSION; y += gridObject.gridCheckDensity)
+						{
+							if (curObjectCount >= gridObject.maxObjects)
+							{
+								continue;
+							}
+							Vector3 pos = grid.Transform.position + new Vector3(x - GRID_DIMENSION / 2, 50f, y - GRID_DIMENSION / 2);
+							int randRot = _random.Next(360);
+							if (_random.Next(100) > gridObject.rarity)
+							{
+								continue;
+							}
+							_samplesCounter++;
+							if (_samplesCounter % samplesPerStep == 0)
+							{
+								yield return 0f;
+							}
+							if (!_sampler.TryGetSample(pos, out var sample))
+							{
+								continue;
+							}
+							float num = Mathf.Acos(Vector3.Dot(sample.Normal, Vector3.up)) * 57.29578f;
+							Vector3 point = sample.Point;
+							if (num >= gridObject.minslope && num <= gridObject.maxslope && point.y >= gridObject.minHeight && point.y <= gridObject.maxHeight)
+							{
+								point = transform.worldToLocalMatrix.MultiplyPoint3x4(point);
+								Vector3 b = transform.worldToLocalMatrix.MultiplyVector(sample.Normal);
+								Vector3 normalized = Vector3.Lerp(Vector3.up, b, gridObject.align).normalized;
+								Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normalized);
+								GameObject gameObject = ObjectPoolManager.CreatePooled(gridObject.objectsToSpawn[_random.Next(gridObject.objectsToSpawn.Length)], point, rotation);
+								if (gridObject.randomYRotation)
+								{
+									gameObject.transform.Rotate(Vector3.up * randRot);
+								}
+								gameObject.transform.parent = grid.Objects;
+								curObjectCount++;
+							}
+						}
+					}
+					continue;
+				}
+				for (int curObjectCount = 0; curObjectCount < gridObject.maxObjects; curObjectCount++)
+				{
+					Vector3 pos = grid.Transform.position + new Vector3(_random.Next(-GRID_DIMENSION / 2, GRID_DIMENSION / 2), 50f, _random.Next(-GRID_DIMENSION / 2, GRID_DIMENSION / 2));
+					int x = _random.Next(360);
+					if (_random.Next(100) > gridObject.rarity)
+					{
+						continue;
+					}
+					_samplesCounter++;
+					if (_samplesCounter % samplesPerStep == 0)
+					{
+						yield return 0f;
+					}
+					if (!_sampler.TryGetSample(pos, out var sample2))
+					{
+						continue;
+					}
+					float num2 = Mathf.Acos(Vector3.Dot(sample2.Normal, Vector3.up)) * 57.29578f;
+					Vector3 point2 = sample2.Point;
+					if (num2 >= gridObject.minslope && num2 <= gridObject.maxslope && point2.y >= gridObject.minHeight && point2.y <= gridObject.maxHeight)
+					{
+						point2 = transform.worldToLocalMatrix.MultiplyPoint3x4(point2);
+						Vector3 b2 = transform.worldToLocalMatrix.MultiplyVector(sample2.Normal);
+						Vector3 normalized2 = Vector3.Lerp(Vector3.up, b2, gridObject.align).normalized;
+						Quaternion rotation2 = Quaternion.FromToRotation(Vector3.up, normalized2);
+						GameObject gameObject2 = ObjectPoolManager.CreatePooled(gridObject.objectsToSpawn[_random.Next(gridObject.objectsToSpawn.Length)], point2, rotation2);
+						if (gridObject.randomYRotation)
+						{
+							gameObject2.transform.Rotate(Vector3.up * x);
+						}
+						gameObject2.transform.parent = grid.Objects;
+					}
+				}
+			}
+		}
+	}
+
+	public void ClearPatch(Vector3 position, float radius)
+	{
+		SpawnGrid[,] spawnGrids = _spawnGrids;
+		int upperBound = spawnGrids.GetUpperBound(0);
+		int upperBound2 = spawnGrids.GetUpperBound(1);
+		for (int i = spawnGrids.GetLowerBound(0); i <= upperBound; i++)
+		{
+			for (int j = spawnGrids.GetLowerBound(1); j <= upperBound2; j++)
+			{
+				foreach (Transform item in spawnGrids[i, j].Transform)
+				{
+					if (Vector3.Distance(item.position, position) <= radius)
+					{
+						ObjectPoolManager.DestroyPooled(item.gameObject);
+					}
+				}
+			}
+		}
+	}
+
+	bool IHashCollection.HasHash(int hash)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				if (_spawnGrids[i, j].Transform.position.Hash() == hash)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 356
+PATH: Assembly-CSharp__Funlabs__MPExtensions.cs
+SIZE: 25790 bytes
+SHA256: c4426c95d1c4a0d47c88dfb88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf
+====================================================================================================
+
+using System;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+using Beam;
+using Beam.Serialization.Json;
+using Beam.Terrain;
+using Beam.Utilities;
+using Photon.Bolt.Utils;
+using UdpKit;
+using UdpKit.Platform;
+using UnityEngine;
+
+namespace Funlabs;
+
+public static class MPExtensions
+{
+	public static char[] _sessionCodeBase = null;
+
+	private static ushort[] _toCompressStable = new ushort[65536];
+
+	public static void SetTransformCloseTo(this IPlayer player, IPlayer other)
+	{
+		player.transform.position = other.transform.position + other.transform.right * 0.7f;
+		player.transform.rotation = other.transform.rotation;
+	}
+
+	public static MultiplayerTokens.Session GetToken(this UdpSession session)
+	{
+		if (session.Source != UdpSessionSource.Photon)
+		{
+			return null;
+		}
+		try
+		{
+			if (!(session.GetProtocolToken() is MultiplayerTokens.Session session2) || session2.Version != BuildInformation.MultiplayerVersion || session2.Platform != MultiplayerTokens.Session.GetPlatform())
+			{
+				return null;
+			}
+			return session2;
+		}
+		catch (Exception)
+		{
+			return null;
+		}
+	}
+
+	public static string ToStringSafe(this object o)
+	{
+		if (!o.IsNullOrDestroyed())
+		{
+			return o.ToString();
+		}
+		return "null";
+	}
+
+	public static string GetDisplayNameSafe(this IDisplayableStorable b)
+	{
+		if (!b.IsNullOrDestroyed())
+		{
+			return b.GetDisplayName();
+		}
+		return "null";
+	}
+
+	public static bool IsMultiplayer(this GameMode mode)
+	{
+		if (mode != GameMode.Coop_Server)
+		{
+			return mode == GameMode.Coop_Client;
+		}
+		return true;
+	}
+
+	public static bool IsClient(this GameMode mode)
+	{
+		return mode == GameMode.Coop_Client;
+	}
+
+	public static bool IsMaster(this GameMode mode)
+	{
+		return !mode.IsClient();
+	}
+
+	public static bool IsServer(this GameMode mode)
+	{
+		return mode == GameMode.Coop_Server;
+	}
+
+	public static bool IsCoop(this GameMode mode)
+	{
+		return mode != GameMode.SinglePlayer;
+	}
+
+	public static bool IsLocalCoop(this GameMode mode)
+	{
+		if ((uint)(mode - 1) <= 2u)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public static bool IsSinglePlayer(this GameMode mode)
+	{
+		return mode == GameMode.SinglePlayer;
+	}
+
+	public static int GetPlayersCount(this GameMode mode)
+	{
+		switch (mode)
+		{
+		case GameMode.Coop_2:
+		case GameMode.Coop_Server:
+		case GameMode.Coop_Client:
+			return 2;
+		case GameMode.Coop_3:
+			return 3;
+		case GameMode.Coop_4:
+			return 4;
+		default:
+			return 1;
+		}
+	}
+
+	public static int GetLocalPlayersCount(this GameMode mode)
+	{
+		return mode switch
+		{
+			GameMode.Coop_2 => 2, 
+			GameMode.Coop_3 => 3, 
+			GameMode.Coop_4 => 4, 
+			_ => 1, 
+		};
+	}
+
+	public static bool IsGame(this GameState state)
+	{
+		if (state != GameState.NEW_GAME)
+		{
+			return state == GameState.LOAD_GAME;
+		}
+		return true;
+	}
+
+	public static bool IsMenu(this GameState state)
+	{
+		if (state != GameState.MAIN_MENU)
+		{
+			return state == GameState.MAP_EDITOR;
+		}
+		return true;
+	}
+
+	public static TransformId GetTransfromId(this Transform transform)
+	{
+		if (transform.IsNullOrDestroyed())
+		{
+			return TransformId.Null;
+		}
+		if (transform == MultiplayerMng.ReceivedEntities)
+		{
+			return TransformId.ReceivedEntities;
+		}
+		if (transform == Beam.Singleton<StrandedWorld>.Instance?.NmlZone.SaveContainer)
+		{
+			return TransformId.SaveContainer;
+		}
+		if (transform == Beam.Singleton<PiscusInspectionManager>.Instance?.transform)
+		{
+			return TransformId.PiscusManager;
+		}
+		if (transform == FlockController.Instance?.ActiveContainer)
+		{
+			return TransformId.FlockControllerActive;
+		}
+		if (transform == FlockController.Instance?.DeactivatedContainer)
+		{
+			return TransformId.FlockControllerDeactivated;
+		}
+		if (!Beam.Singleton<StrandedWorld>.Instance.IsNullOrDestroyed() && !Beam.Singleton<StrandedWorld>.Instance.Zones.IsNullOrDestroyed())
+		{
+			for (byte b = 0; b < Beam.Singleton<StrandedWorld>.Instance.Zones.Length; b++)
+			{
+				if (transform == Beam.Singleton<StrandedWorld>.Instance.Zones[b].SaveContainer)
+				{
+					return (TransformId)(7 + b);
+				}
+			}
+		}
+		return TransformId.Unknown;
+	}
+
+	public static Transform GetTransfrom(this TransformId containerId)
+	{
+		return containerId switch
+		{
+			TransformId.Unknown => null, 
+			TransformId.Null => null, 
+			TransformId.ReceivedEntities => MultiplayerMng.ReceivedEntities, 
+			TransformId.SaveContainer => Beam.Singleton<StrandedWorld>.Instance.NmlZone.SaveContainer, 
+			TransformId.PiscusManager => Beam.Singleton<PiscusInspectionManager>.Instance.transform, 
+			TransformId.FlockControllerActive => FlockController.Instance.ActiveContainer, 
+			TransformId.FlockControllerDeactivated => FlockController.Instance.DeactivatedContainer, 
+			_ => Beam.Singleton<StrandedWorld>.Instance.Zones[(int)(containerId - 7)].SaveContainer, 
+		};
+	}
+
+	public static bool IsValid(this TransformId transformId)
+	{
+		return transformId != TransformId.Unknown;
+	}
+
+	public static bool IsUnknown(this TransformId transformId)
+	{
+		return transformId == TransformId.Unknown;
+	}
+
+	public static string GetPath(this Transform transform)
+	{
+		if (transform.IsNullOrDestroyed())
+		{
+			return string.Empty;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.Append(transform.gameObject.name);
+		Transform parent = transform.parent;
+		while (!parent.IsNullOrDestroyed())
+		{
+			stringBuilder.Insert(0, "/");
+			stringBuilder.Insert(0, parent.gameObject.name);
+			parent = parent.parent;
+		}
+		return stringBuilder.ToString();
+	}
+
+	public static Quaternion ExtractRotation(this Matrix4x4 matrix)
+	{
+		Vector3 forward = default;
+		forward.x = matrix.m02;
+		forward.y = matrix.m12;
+		forward.z = matrix.m22;
+		Vector3 upwards = default;
+		upwards.x = matrix.m01;
+		upwards.y = matrix.m11;
+		upwards.z = matrix.m21;
+		return Quaternion.LookRotation(forward, upwards);
+	}
+
+	public static Vector3 ExtractPosition(this Matrix4x4 matrix)
+	{
+		Vector3 result = default;
+		result.x = matrix.m03;
+		result.y = matrix.m13;
+		result.z = matrix.m23;
+		return result;
+	}
+
+	public static Vector3 ExtractScale(this Matrix4x4 matrix)
+	{
+		Vector3 result = default;
+		result.x = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
+		result.y = new Vector4(matrix.m01, matrix.m11, matrix.m21, matrix.m31).magnitude;
+		result.z = new Vector4(matrix.m02, matrix.m12, matrix.m22, matrix.m32).magnitude;
+		return result;
+	}
+
+	public static void FromMatrix(this Transform transform, Matrix4x4 matrix)
+	{
+		transform.localScale = matrix.ExtractScale();
+		transform.rotation = matrix.ExtractRotation();
+		transform.position = matrix.ExtractPosition();
+	}
+
+	public static int Range(this System.Random random, int min, int max)
+	{
+		double num = random.NextDouble();
+		return min + (int)num * (max - min);
+	}
+
+	public static Rect Inflate(this Rect rect, Vector2 value)
+	{
+		return new Rect(rect.x - value.x, rect.y - value.y, rect.width + 2f * value.x, rect.height + 2f * value.y);
+	}
+
+	public static byte[] ToArray(this JObject data, byte[] header = null)
+	{
+		using MemoryStream memoryStream = new MemoryStream();
+		using GZipStream gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, leaveOpen: true);
+		if (header != null && header.Length != 0)
+		{
+			gZipStream.Write(header, 0, header.Length);
+		}
+		using (StreamWriter streamWriter = new StreamWriter(gZipStream))
+		{
+			streamWriter.Write(data.ToString());
+		}
+		return memoryStream.ToArray();
+	}
+
+	public static JObject ToJObject(this byte[] data, byte[] header = null)
+	{
+		using MemoryStream stream = new MemoryStream(data);
+		using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+		if (header != null && header.Length != 0)
+		{
+			gZipStream.Read(header, 0, header.Length);
+		}
+		using StreamReader streamReader = new StreamReader(gZipStream);
+		return new JObject(streamReader.ReadToEnd());
+	}
+
+	public static void Write(this BinaryWriter bw, Vector2 p)
+	{
+		bw.Write(p.x);
+		bw.Write(p.y);
+	}
+
+	public static Vector2 ReadVector2(this BinaryReader br)
+	{
+		return new Vector2(br.ReadSingle(), br.ReadSingle());
+	}
+
+	public static byte[] ToArray(this World.Bundle world, byte[] header = null)
+	{
+		using MemoryStream memoryStream = new MemoryStream();
+		world.Save(memoryStream, header);
+		return memoryStream.ToArray();
+	}
+
+	public static World.Bundle ToWorld(this byte[] data, bool createTextures, byte[] header = null)
+	{
+		World.Bundle result = default;
+		using MemoryStream stream = new MemoryStream(data);
+		result.Load(stream, createTextures, header);
+		return result;
+	}
+
+	public static byte[] ToArray(this Map[] maps, byte[] header = null)
+	{
+		using MemoryStream memoryStream = new MemoryStream();
+		using (GZipStream gZipStream = new GZipStream(memoryStream, CompressionMode.Compress, leaveOpen: true))
+		{
+			if (header != null && header.Length != 0)
+			{
+				gZipStream.Write(header, 0, header.Length);
+			}
+			using BinaryWriter binaryWriter = new BinaryWriter(gZipStream);
+			for (int i = 0; i < 7; i++)
+			{
+				Map map = maps[i];
+				using MemoryStream memoryStream2 = new MemoryStream();
+				using MemoryStream memoryStream3 = new MemoryStream();
+				using MemoryStream memoryStream4 = new MemoryStream();
+				map.Save(memoryStream2, memoryStream3, memoryStream4);
+				byte[] array = memoryStream2.ToArray();
+				byte[] array2 = memoryStream3.ToArray();
+				byte[] array3 = memoryStream4.ToArray();
+				binaryWriter.Write(array.Length);
+				binaryWriter.Write(array2.Length);
+				binaryWriter.Write(array3.Length);
+				binaryWriter.Write(array);
+				binaryWriter.Write(array2);
+				binaryWriter.Write(array3);
+			}
+		}
+		return memoryStream.ToArray();
+	}
+
+	public static Map[] ToMaps(this byte[] data, bool createTextures, byte[] header = null)
+	{
+		Map[] array = new Map[7];
+		using MemoryStream stream = new MemoryStream(data);
+		using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+		if (header != null && header.Length != 0)
+		{
+			gZipStream.Read(header, 0, header.Length);
+		}
+		using BinaryReader binaryReader = new BinaryReader(gZipStream);
+		for (int i = 0; i < 7; i++)
+		{
+			Map map = new Map();
+			int num = binaryReader.ReadInt32();
+			int num2 = binaryReader.ReadInt32();
+			int num3 = binaryReader.ReadInt32();
+			byte[] buffer = new byte[num];
+			byte[] buffer2 = new byte[num2];
+			byte[] buffer3 = new byte[num3];
+			binaryReader.Read(buffer, 0, num);
+			binaryReader.Read(buffer2, 0, num2);
+			binaryReader.Read(buffer3, 0, num3);
+			using (MemoryStream editorStream = new MemoryStream(buffer, 0, num))
+			{
+				using MemoryStream objectStream = new MemoryStream(buffer2, 0, num2);
+				using MemoryStream heightStream = new MemoryStream(buffer3, 0, num3);
+				map.Load(editorStream, objectStream, heightStream, checkVersion: false, createTextures);
+			}
+			array[i] = map;
+		}
+		return array;
+	}
+
+	public static void CopyToClipboard(this string value)
+	{
+		GUIUtility.systemCopyBuffer = value;
+	}
+
+	public static int RegionIndexToCloudRegionEnumIndex(this int regionIndex)
+	{
+		int num = regionIndex;
+		if (num > 3)
+		{
+			num--;
+		}
+		if (num > 12)
+		{
+			num--;
+		}
+		return num;
+	}
+
+	public static int CloudRegionEnumIndexToRegionIndex(this int regionIndex)
+	{
+		int num = regionIndex;
+		if (num > 3)
+		{
+			num++;
+		}
+		if (num > 12)
+		{
+			num++;
+		}
+		return num;
+	}
+
+	private static void CreateSessionCodeBase()
+	{
+		if (_sessionCodeBase.IsNullOrDestroyed())
+		{
+			_sessionCodeBase = "0123456789qwertyuiopasdfghjklzxcvbnm".ToCharArray();
+		}
+	}
+
+	public static string ToCode(this string value, int realRegionIndex)
+	{
+		if (string.IsNullOrEmpty(value))
+		{
+			return "null";
+		}
+		CreateSessionCodeBase();
+		int num = Mathf.Abs(value.GetHashCode());
+		string text = string.Empty;
+		int num2 = _sessionCodeBase.Length;
+		do
+		{
+			text = _sessionCodeBase[num % num2] + text;
+			num /= num2;
+		}
+		while (num > 0);
+		return _sessionCodeBase[realRegionIndex] + text;
+	}
+
+	public static int GetRegionIndex(this string code)
+	{
+		if (string.IsNullOrEmpty(code))
+		{
+			return -1;
+		}
+		CreateSessionCodeBase();
+		char firstChar = code.ToLower().ToCharArray().FirstOrDefault_NonAlloc();
+		return Array.FindIndex(_sessionCodeBase, (char c) => c == firstChar);
+	}
+
+	public static int GetNodeIndex(this string node)
+	{
+		if (string.IsNullOrEmpty(node))
+		{
+			return -1;
+		}
+		if (node[0] != '#')
+		{
+			return -1;
+		}
+		if (!int.TryParse(node.Substring(1), NumberStyles.Number, Beam.Serialization.Json.ExtensionMethods.EnglishCulture, out var result))
+		{
+			return -1;
+		}
+		return result;
+	}
+
+	public static JObject GetZoneData(this JObject zonesData, string id)
+	{
+		if (string.IsNullOrEmpty(id))
+		{
+			return null;
+		}
+		return zonesData?.Children?.FirstOrDefault_NonAlloc((JObject data, int arg) =>
+		{
+			JObject field = data.GetField("Id");
+			return string.Equals((field != null) ? field.GetValue<string>() : null, id);
+		}, 0);
+	}
+
+	public static JObject GetNode(this JObject data, string node)
+	{
+		if (data.IsNullOrDestroyed())
+		{
+			return null;
+		}
+		switch (data.Type)
+		{
+		case JObject.EToken.ARRAY:
+		{
+			int nodeIndex = node.GetNodeIndex();
+			if (data.Children.IsNullOrDestroyed() || nodeIndex < 0 || nodeIndex >= data.Children.Count)
+			{
+				return null;
+			}
+			return data.Children[nodeIndex];
+		}
+		case JObject.EToken.OBJECT:
+			return data[node];
+		default:
+			return null;
+		}
+	}
+
+	public static JObject Get(this JObject data, string[] nodes, int numNodes = -1)
+	{
+		if (data.IsNullOrDestroyed())
+		{
+			return null;
+		}
+		if (-1 == numNodes)
+		{
+			numNodes = nodes.Length;
+		}
+		for (int i = 0; i < numNodes; i++)
+		{
+			data = data.GetNode(nodes[i]);
+			if (data.IsNullOrDestroyed())
+			{
+				return null;
+			}
+		}
+		return data;
+	}
+
+	public static JObject Get(this JObject data, string path)
+	{
+		if (data.IsNullOrDestroyed())
+		{
+			return null;
+		}
+		string[] nodes = path.Split('/');
+		return data.Get(nodes);
+	}
+
+	public static JObject Set(this JObject data, string path, JObject field)
+	{
+		if (data.IsNullOrDestroyed() || field.IsNullOrDestroyed())
+		{
+			return data;
+		}
+		string[] array = path.Split('/');
+		JObject jObject = data;
+		for (int i = 0; i < array.Length - 1; i++)
+		{
+			string text = array[i];
+			int nodeIndex = text.GetNodeIndex();
+			if (nodeIndex != -1)
+			{
+				if (jObject.Type != JObject.EToken.NULL && jObject.Type != JObject.EToken.ARRAY)
+				{
+					return data;
+				}
+				int num = jObject.Children?.Count ?? 0;
+				int num2 = nodeIndex + 1 - num;
+				for (int j = 0; j < num2; j++)
+				{
+					jObject.Add(new JObject());
+				}
+				jObject = jObject.Children[nodeIndex];
+			}
+			else
+			{
+				JObject jObject2 = jObject[text];
+				if (jObject2.IsNullOrDestroyed())
+				{
+					jObject.AddField(text, jObject2 = new JObject());
+				}
+				jObject = jObject2;
+			}
+		}
+		string text2 = array[^1];
+		int nodeIndex2 = text2.GetNodeIndex();
+		if (nodeIndex2 != -1)
+		{
+			if (jObject.Type != JObject.EToken.NULL && jObject.Type != JObject.EToken.ARRAY)
+			{
+				return data;
+			}
+			int num3 = jObject.Children?.Count ?? 0;
+			int num4 = nodeIndex2 + 1 - num3;
+			for (int k = 0; k < num4; k++)
+			{
+				jObject.Add(new JObject());
+			}
+			jObject.Children[nodeIndex2] = field;
+		}
+		else
+		{
+			jObject.SetField(text2, field);
+		}
+		return data;
+	}
+
+	public static JObject Clear(this JObject data, string path)
+	{
+		if (data.IsNullOrDestroyed())
+		{
+			return data;
+		}
+		string[] array = path.Split('/');
+		JObject jObject = data.Get(array, array.Length - 1);
+		if (jObject.IsNullOrDestroyed())
+		{
+			return data;
+		}
+		string text = array[^1];
+		int nodeIndex = text.GetNodeIndex();
+		if (nodeIndex != -1)
+		{
+			if (nodeIndex >= (jObject.Children?.Count ?? 0))
+			{
+				return data;
+			}
+			jObject.Children[nodeIndex] = new JObject();
+		}
+		else
+		{
+			nodeIndex = jObject.Keys?.IndexOf(text) ?? (-1);
+			if (nodeIndex == -1)
+			{
+				return data;
+			}
+			jObject.Keys.RemoveAt(nodeIndex);
+			jObject.Children.RemoveAt(nodeIndex);
+		}
+		return data;
+	}
+
+	public static JObject Clear(this JObject data, string[] paths)
+	{
+		foreach (string path in paths)
+		{
+			data.Clear(path);
+		}
+		return data;
+	}
+
+	public static JObject CopyFrom(this JObject dst, JObject src, string[] srcPaths, string[] dstPaths)
+	{
+		if (src == null || dst == null)
+		{
+			return dst;
+		}
+		int num = Mathf.Min(srcPaths.Length, dstPaths.Length);
+		for (int i = 0; i < num; i++)
+		{
+			dst.Set(dstPaths[i], src.Get(srcPaths[i]));
+		}
+		return dst;
+	}
+
+	public static JObject ApplyPatch(this JObject data, JObject patch)
+	{
+		if (data.IsNullOrDestroyed() || patch.IsNullOrDestroyed())
+		{
+			return data;
+		}
+		if (data.Type != patch.Type && data.Type != JObject.EToken.NULL)
+		{
+			return data;
+		}
+		switch (patch.Type)
+		{
+		case JObject.EToken.OBJECT:
+		{
+			if (patch.Keys.IsNullOrDestroyed() || patch.Children.IsNullOrDestroyed())
+			{
+				return data;
+			}
+			int count2 = patch.Children.Count;
+			for (int k = 0; k < count2; k++)
+			{
+				JObject jObject = data[patch.Keys[k]];
+				if (jObject.IsNullOrDestroyed())
+				{
+					data.AddField(patch.Keys[k], patch.Children[k]);
+				}
+				else
+				{
+					jObject.ApplyPatch(patch.Children[k]);
+				}
+			}
+			break;
+		}
+		case JObject.EToken.ARRAY:
+		{
+			if (patch.Children.IsNullOrDestroyed())
+			{
+				return data;
+			}
+			int count = patch.Children.Count;
+			int num = data.Children?.Count ?? 0;
+			int num2 = count - num;
+			for (int i = 0; i < num2; i++)
+			{
+				data.Add(new JObject());
+			}
+			for (int j = 0; j < count; j++)
+			{
+				if (patch.Children[j].Type != JObject.EToken.NULL)
+				{
+					if (data.Children[j].Type == JObject.EToken.NULL)
+					{
+						data.Children[j] = patch.Children[j];
+					}
+					else
+					{
+						data.Children[j].ApplyPatch(patch.Children[j]);
+					}
+				}
+			}
+			break;
+		}
+		case JObject.EToken.NULL:
+			return data;
+		default:
+			data.Data = patch.Data;
+			break;
+		}
+		return data;
+	}
+
+	public static JObject MakeNewRefenceIds(this JObject data)
+	{
+		if (data == null)
+		{
+			return data;
+		}
+		if (data.Type == JObject.EToken.STRING)
+		{
+			if (MiniGuid.IsMiniGuid(data.GetValue<string>()))
+			{
+				data.Data = MiniGuid.New().ToString();
+			}
+			return data;
+		}
+		if (data.Children == null)
+		{
+			return data;
+		}
+		int count = data.Children.Count;
+		for (int i = 0; i < count; i++)
+		{
+			data.Children[i].MakeNewRefenceIds();
+		}
+		return data;
+	}
+
+	public static string[] RemoveEmpty(this string[] tokens)
+	{
+		int num = 0;
+		string[] array = tokens;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].Length != 0)
+			{
+				num++;
+			}
+		}
+		string[] array2 = new string[num];
+		num = 0;
+		array = tokens;
+		foreach (string text in array)
+		{
+			if (text.Length != 0)
+			{
+				array2[num++] = text;
+			}
+		}
+		return array2;
+	}
+
+	public static PhotonPlatformConfig Copy(this PhotonPlatformConfig config)
+	{
+		return new PhotonPlatformConfig
+		{
+			Region = config.Region,
+			UsePunchThrough = config.UsePunchThrough,
+			AppId = config.AppId,
+			AuthenticationValues = config.AuthenticationValues,
+			ConnectionProtocol = config.ConnectionProtocol,
+			SerializationProtocol = config.SerializationProtocol,
+			ForceExternalEndPoint = config.ForceExternalEndPoint,
+			RoomCreateTimeout = config.RoomCreateTimeout,
+			RoomJoinTimeout = config.RoomJoinTimeout
+		};
+	}
+
+	public static ushort Compress(this float value)
+	{
+		if ((double)value > 1.0)
+		{
+			value = 1f;
+		}
+		if ((double)value < 0.0)
+		{
+			value = 0f;
+		}
+		return (ushort)(value * 65535f);
+	}
+
+	public static float Decompress(this ushort value)
+	{
+		return (float)(int)value / 65535f;
+	}
+
+	public static bool IsCompressStable(this ushort value)
+	{
+		return value == value.Decompress().Compress();
+	}
+
+	private static ushort GetCompressStable(this ushort value)
+	{
+		if (value.IsCompressStable())
+		{
+			return value;
+		}
+		int num = 1;
+		while (true)
+		{
+			if (value - num >= 0 && ((ushort)(value - num)).IsCompressStable())
+			{
+				return (ushort)(value - num);
+			}
+			if (value + num <= 65535 && ((ushort)(value + num)).IsCompressStable())
+			{
+				break;
+			}
+			num++;
+		}
+		return (ushort)(value + num);
+	}
+
+	public static ushort ToCompressStable(this ushort value)
+	{
+		return _toCompressStable[value];
+	}
+
+	public static void InitializeCompressStableValues()
+	{
+		for (int i = 0; i <= 65535; i++)
+		{
+			_toCompressStable[i] = ((ushort)i).GetCompressStable();
+		}
+	}
+
+	public static bool IsCompressStableValuesInitialized()
+	{
+		return _toCompressStable[32768] != 0;
+	}
+
+	public static T GetInParent<T>(this Transform transform) where T : ISaveablePrefab
+	{
+		if (transform.IsNullOrDestroyed())
+		{
+			return default;
+		}
+		T component = transform.GetComponent<T>();
+		if (!component.IsNullOrDestroyed() && component.IsValidPrefab)
+		{
+			return component;
+		}
+		return transform.parent.GetInParent<T>();
+	}
+
+	public static bool IsReplicable(this Rigidbody component)
+	{
+		if (null == component)
+		{
+			return true;
+		}
+		return !component.transform.GetInParent<ISaveablePrefab>().IsNullOrDestroyed();
+	}
+
+	public static bool IsReplicable(this Collider component)
+	{
+		if (null == component)
+		{
+			return true;
+		}
+		if (component is TerrainCollider)
+		{
+			return component.transform.GetComponentInParent<Zone>() != null;
+		}
+		return !component.transform.GetInParent<ISaveablePrefab>().IsNullOrDestroyed();
+	}
+
+	public static T GetFirstComponentInParent<T>(this Transform transform) where T : Component
+	{
+		if (null == transform)
+		{
+			return null;
+		}
+		T component = transform.GetComponent<T>();
+		if (component != null)
+		{
+			return component;
+		}
+		return transform.parent.GetComponentInParent<T>();
+	}
+
+	public static Vector3 ReadVector3(this UdpPacket packet)
+	{
+		return new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+	}
+
+	public static Quaternion ReadQuaternion(this UdpPacket packet)
+	{
+		return new Quaternion(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+	}
+
+	public static MiniGuid ReadMiniGuid(this UdpPacket packet)
+	{
+		return new MiniGuid(packet.ReadByte(), packet.ReadByte(), packet.ReadByte(), packet.ReadByte(), packet.ReadByte(), packet.ReadByte(), packet.ReadByte(), packet.ReadByte());
+	}
+
+	public static T ReadSaveablePrefab<T>(this UdpPacket packet) where T : ISaveablePrefab
+	{
+		if (packet.ReadBool())
+		{
+			return MultiplayerMng.FindObject<T>(packet.ReadULong());
+		}
+		return MultiplayerMng.FindObject<T>(packet.ReadMiniGuid());
+	}
+
+	public static Rigidbody ReadRigidbody(this UdpPacket packet)
+	{
+		ISaveablePrefab saveablePrefab = packet.ReadSaveablePrefab<ISaveablePrefab>();
+		int num = packet.ReadByte() - 1;
+		if (num != -1)
+		{
+			if (saveablePrefab == null)
+			{
+				return null;
+			}
+			return saveablePrefab.AllRigidbodies[num];
+		}
+		return null;
+	}
+
+	public static Collider ReadCollider(this UdpPacket packet)
+	{
+		if (packet.ReadBool())
+		{
+			int num = packet.ReadByte() - 1;
+			if (num != -1)
+			{
+				StrandedWorld instance = Beam.Singleton<StrandedWorld>.Instance;
+				if ((object)instance == null)
+				{
+					return null;
+				}
+				return instance.Zones[num].GetComponentInChildren<TerrainCollider>();
+			}
+			return null;
+		}
+		ISaveablePrefab saveablePrefab = packet.ReadSaveablePrefab<ISaveablePrefab>();
+		int num2 = packet.ReadByte() - 1;
+		if (num2 != -1)
+		{
+			if (saveablePrefab == null)
+			{
+				return null;
+			}
+			return saveablePrefab.AllColliders[num2];
+		}
+		return null;
+	}
+
+	public static void WriteVector3(this UdpPacket packet, Vector3 value)
+	{
+		packet.WriteFloat(value.x);
+		packet.WriteFloat(value.y);
+		packet.WriteFloat(value.z);
+	}
+
+	public static void WriteQuaternion(this UdpPacket packet, Quaternion value)
+	{
+		packet.WriteFloat(value.x);
+		packet.WriteFloat(value.y);
+		packet.WriteFloat(value.z);
+		packet.WriteFloat(value.w);
+	}
+
+	public static void WriteMiniGuid(this UdpPacket packet, MiniGuid value)
+	{
+		packet.WriteByte(value._d0);
+		packet.WriteByte(value._d1);
+		packet.WriteByte(value._d2);
+		packet.WriteByte(value._d3);
+		packet.WriteByte(value._d4);
+		packet.WriteByte(value._d5);
+		packet.WriteByte(value._d6);
+		packet.WriteByte(value._d7);
+	}
+
+	public static void WriteSaveablePrefab(this UdpPacket packet, ISaveablePrefab value)
+	{
+		if (value == null)
+		{
+			packet.WriteBool(value: false);
+			packet.WriteMiniGuid(default);
+		}
+		else if (value.IsMultiplayerEntity)
+		{
+			packet.WriteBool(value: true);
+			packet.WriteULong(value.Entity.NetworkId.PackedValue);
+		}
+		else
+		{
+			packet.WriteBool(value: false);
+			packet.WriteMiniGuid(value.ReferenceId);
+		}
+	}
+
+	public static void WriteRigidbody(this UdpPacket packet, Rigidbody rigidbody)
+	{
+		ISaveablePrefab saveablePrefab = (((object)rigidbody != null) ? rigidbody.transform.GetInParent<ISaveablePrefab>() : null);
+		if (null == rigidbody || saveablePrefab == null)
+		{
+			packet.WriteSaveablePrefab(null);
+			packet.WriteByte(0);
+		}
+		else
+		{
+			packet.WriteSaveablePrefab(saveablePrefab);
+			packet.WriteByte((byte)(saveablePrefab.GetRigidbodyId(rigidbody) + 1));
+		}
+	}
+
+	public static void WriteCollider(this UdpPacket packet, Collider collider)
+	{
+		if (null == collider)
+		{
+			packet.WriteBool(value: true);
+			packet.WriteByte(0);
+			return;
+		}
+		if (collider is TerrainCollider)
+		{
+			packet.WriteBool(value: true);
+			packet.WriteByte((byte)(Beam.Singleton<StrandedWorld>.Instance.GetZoneId(collider.transform.GetComponentInParent<Zone>()) + 1));
+			return;
+		}
+		ISaveablePrefab inParent = collider.transform.GetInParent<ISaveablePrefab>();
+		if (inParent == null)
+		{
+			packet.WriteBool(value: true);
+			packet.WriteByte(0);
+		}
+		else
+		{
+			packet.WriteBool(value: false);
+			packet.WriteSaveablePrefab(inParent);
+			packet.WriteByte((byte)(inParent.GetColliderId(collider) + 1));
+		}
+	}
+
+	public static float XZSqr(this Vector3 v)
+	{
+		return v.x * v.x + v.z * v.z;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 357
+PATH: Assembly-CSharp__Funlabs__MultiplayerMng.cs
+SIZE: 35459 bytes
+SHA256: 7a62f146a9b2b19b3cfd9ff2c2093b50a17760473aa050b65b4d98ebab690886
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using Beam;
+using Beam.AccountServices;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using MEC;
+using Photon.Bolt;
+using Photon.Bolt.Matchmaking;
+using Photon.Bolt.Utils;
+using UdpKit;
+using UdpKit.Platform;
+using UdpKit.Platform.Photon;
+using UnityEngine;
+
+namespace Funlabs;
+
+public class MultiplayerMng : GlobalEventListener
+{
+	public delegate void Listener<T>(T evnt) where T : Photon.Bolt.Event;
+
+	private delegate void Listener(Photon.Bolt.Event evnt);
+
+	public enum AuthenticationService
+	{
+		AUTH_SERVICE_UNKNOWN = -1,
+		AUTH_SERVICE_GAMESPARKS,
+		AUTH_SERVICE_XBOX_XSTS
+	}
+
+	private struct SearchContainer(Transform container, bool includeInactive = false)
+	{
+		public Transform Container = container;
+
+		public bool IncludeInactive = includeInactive;
+	}
+
+	private struct BoltDestroyCommand
+	{
+		private GameObject _gameObject;
+
+		private float _destroyTime;
+
+		public BoltDestroyCommand(GameObject gameObject, float destroyTime)
+		{
+			Log($"Schedule {gameObject} for destruction", "create/destroy", "magenta");
+			_gameObject = gameObject;
+			_destroyTime = destroyTime;
+		}
+
+		public void Destroy(float time, Action onDestroy = null, bool force = false)
+		{
+			if (!((time >= _destroyTime) | force))
+			{
+				return;
+			}
+			Log("Destroying " + _gameObject.ToStringSafe(), "create/destroy", "magenta");
+			onDestroy?.Invoke();
+			if (_gameObject.IsValid())
+			{
+				try
+				{
+					BoltNetwork.Destroy(_gameObject);
+				}
+				catch (Exception ex)
+				{
+					LogError("Error while delay destroying multiplayer game object: " + ex.Message + "\n" + ex.StackTrace);
+				}
+			}
+		}
+	}
+
+	public static bool SHOW_UI = false;
+
+	public static string DEFAULT_SESSION_ID = "BlueGold_" + Environment.UserName;
+
+	private static MultiplayerTokens.Join _joinToken;
+
+	private const byte SUCCESSFUL_CONNECTION = 1;
+
+	private const float SUCCESSFUL_CONNECTION_TIMEOUT = 5f;
+
+	private const float WAIT_TIME_CONNECTION_REQUEST = 30f;
+
+	private const int MAX_INGAME_CONNECTION_REQUESTS = 3;
+
+	[SerializeField]
+	private Transform _receivedEntities;
+
+	[SerializeField]
+	private PermissionPromptPresenter _permisionPrompt;
+
+	private MultiplayerPrefabPool _prefabPool;
+
+	private Action _onSuccess;
+
+	private Action<string> _onError;
+
+	private string _sessionToJoin;
+
+	private static MultiplayerMng _instance = null;
+
+	public static DisconnectPayLoad DisconnectPayload = new DisconnectPayLoad();
+
+	private Dictionary<Type, Listener> _listeners = new Dictionary<Type, Listener>();
+
+	private Dictionary<Delegate, Listener> _internalListeners = new Dictionary<Delegate, Listener>();
+
+	private Dictionary<string, PrefabId> _prefabs = new Dictionary<string, PrefabId>();
+
+	private static HashSet<string> _enabledLogTags = new HashSet<string> { "default", "messages", "attach/detach", "create/destroy", "zone_sync", "world_sync" };
+
+	private ushort _messageOutId;
+
+	private ushort _messageInId;
+
+	private float _connectTime;
+
+	private List<MultiplayerMessage> _messages = new List<MultiplayerMessage>();
+
+	private UdpChannelName _zoneStreamChannel;
+
+	private UdpChannelName _worldStreamChannel;
+
+	private static List<string> _blockedClientList = new List<string>();
+
+	private static Dictionary<string, ClientOnHold> _clientsOnHold = new Dictionary<string, ClientOnHold>();
+
+	private static string _connectedClientId = null;
+
+	private static PhotonPlatformConfig _defaultPhotonPlatformConfig;
+
+	private static bool _shuttingDown = false;
+
+	private bool _shutdownDisconnectInProgress;
+
+	private static List<BoltDestroyCommand> _destroyCommands = new List<BoltDestroyCommand>();
+
+	private float _sessionOccupiedLastUpdateTime;
+
+	public static MultiplayerTokens.Join JoinToken
+	{
+		get
+		{
+			if (_joinToken == null)
+			{
+				string displayName = GAccountService.Get().LocalUser.UserInfo.DisplayName;
+				_joinToken = new MultiplayerTokens.Join
+				{
+					Id = SystemInfo.deviceUniqueIdentifier,
+					Name = displayName
+				};
+			}
+			return _joinToken;
+		}
+	}
+
+	public static bool IsLocalPrefab
+	{
+		set
+		{
+			if (_instance != null && _instance._prefabPool != null)
+			{
+				_instance._prefabPool.IsLocal = value;
+			}
+		}
+	}
+
+	public static bool ReceivedEntitiesActive
+	{
+		get
+		{
+			return _instance._receivedEntities.gameObject.activeInHierarchy;
+		}
+		set
+		{
+			_instance._receivedEntities.gameObject.SetActive(value);
+		}
+	}
+
+	public static Transform ReceivedEntities => _instance?._receivedEntities;
+
+	public static MultiplayerPrefabPool PrefabPool => _instance._prefabPool;
+
+	public static GameState ServerGameState { get; set; }
+
+	public static MultiplayerMng Instance => _instance;
+
+	public static UdpChannelName ZoneStreamChannel => _instance._zoneStreamChannel;
+
+	public static UdpChannelName WorldStreamChannel => _instance._worldStreamChannel;
+
+	public static PhotonPlatformConfig DefaultPhotonPlatformConfig
+	{
+		get
+		{
+			if (_defaultPhotonPlatformConfig.IsNullOrDestroyed())
+			{
+				_defaultPhotonPlatformConfig = new PhotonPlatformConfig
+				{
+					AppId = "412f65d8-32e8-449b-91a0-64a7cd0669c3",
+					Region = PhotonRegion.GetRegion(PhotonRegion.Regions.BEST_REGION),
+					RoomCreateTimeout = 20f,
+					RoomJoinTimeout = 20f
+				};
+			}
+			return _defaultPhotonPlatformConfig;
+		}
+	}
+
+	public static void AuthenticateUser(Action onSuccess = null, Action onError = null, float timeout = 10f)
+	{
+		onSuccess?.Invoke();
+	}
+
+	public static float GetRoundTrip()
+	{
+		using (IEnumerator<BoltConnection> enumerator = BoltNetwork.Connections.GetEnumerator())
+		{
+			if (enumerator.MoveNext())
+			{
+				return enumerator.Current.PingAliased;
+			}
+		}
+		return 0f;
+	}
+
+	public static void ConnectToLocal(Action onSuccess = null)
+	{
+		ConnectToCloud(0, onSuccess);
+	}
+
+	public static void ConnectToCloud(int cloudRegionIndex = 0, Action onSuccess = null, Action<string> onError = null)
+	{
+		string text = Game.Mode.ToString();
+		CloudRegion cloudRegion = (CloudRegion)cloudRegionIndex;
+		Log("Connect " + text + " Region " + cloudRegion);
+		if (BoltNetwork.IsRunning)
+		{
+			LogError("Bolt still running - shutting down");
+			BoltNetwork.ShutdownImmediate();
+			BeamTiming.WaitAnd(3f, () =>
+			{
+				ConnectTo(cloudRegionIndex, onSuccess, onError);
+			});
+		}
+		else
+		{
+			ConnectTo(cloudRegionIndex, onSuccess, onError);
+		}
+	}
+
+	private static void ConnectTo(int cloudRegionIndex = 0, Action onSuccess = null, Action<string> onError = null)
+	{
+		if (BoltNetwork.IsRunning)
+		{
+			throw new Exception($"Bolt: Unable to start game mode {Game.Mode.ToString()} IsRunning {BoltNetwork.IsRunning} IsServer {BoltNetwork.IsServer} IsClient {BoltNetwork.IsClient} IsSinglePlayer {BoltNetwork.IsSinglePlayer}");
+		}
+		string text = Game.Mode.ToString();
+		CloudRegion cloudRegion = (CloudRegion)cloudRegionIndex;
+		Log("Connect " + text + " Region " + cloudRegion);
+		DisconnectPayload = new DisconnectPayLoad();
+		_instance._shutdownDisconnectInProgress = false;
+		_instance._onSuccess = onSuccess;
+		_instance._onError = onError;
+		PhotonPlatformConfig photonPlatformConfig = DefaultPhotonPlatformConfig.Copy();
+		photonPlatformConfig.Region = PhotonRegion.GetRegion((PhotonRegion.Regions)cloudRegionIndex);
+		BoltLauncher.SetUdpPlatform(new PhotonPlatform(photonPlatformConfig));
+		BoltConfig configCopy = BoltRuntimeSettings.instance.GetConfigCopy();
+		configCopy.disableAutoSceneLoading = true;
+		configCopy.serverConnectionAcceptMode = BoltConnectionAcceptMode.Manual;
+		switch (Game.Mode)
+		{
+		case GameMode.SinglePlayer:
+		case GameMode.Coop_2:
+		case GameMode.Coop_3:
+		case GameMode.Coop_4:
+			BoltLauncher.StartSinglePlayer(configCopy);
+			break;
+		case GameMode.Coop_Server:
+			BoltLauncher.StartServer(configCopy);
+			break;
+		case GameMode.Coop_Client:
+			BoltLauncher.StartClient(configCopy);
+			break;
+		}
+	}
+
+	public override void BoltStartBegin()
+	{
+		BoltRuntimeSettings.instance.overrideTimeScale = Game.Mode.IsMultiplayer();
+		_zoneStreamChannel = BoltNetwork.CreateStreamChannel("zone", UdpChannelMode.Reliable, 1);
+		_worldStreamChannel = BoltNetwork.CreateStreamChannel("world", UdpChannelMode.Reliable, 1);
+		MultiplayerTokens.Register();
+	}
+
+	public override void BoltStartDone()
+	{
+		Log("BoltStartDone");
+		_prefabPool = new MultiplayerPrefabPool(_receivedEntities);
+		BoltNetwork.SetPrefabPool(_prefabPool);
+		if (!Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.CreateLocalPeers();
+		}
+		PostSuccess();
+	}
+
+	public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
+	{
+		LogError("BoltStartFailed" + disconnectReason);
+		PostError(disconnectReason.ToString());
+	}
+
+	public static void ConnectToSession(string sessionId = null, MultiplayerTokens.Session token = null, Action onSuccess = null, Action<string> onError = null)
+	{
+		if (!Game.Mode.IsMultiplayer())
+		{
+			onSuccess?.Invoke();
+			return;
+		}
+		sessionId = (string.IsNullOrEmpty(sessionId) ? DEFAULT_SESSION_ID : sessionId);
+		token = token ?? new MultiplayerTokens.Session
+		{
+			SessionId = sessionId,
+			RegionIndex = GetCloudRegionIndex(),
+			Name = sessionId,
+			IsPrivate = true,
+			HasUgc = true
+		};
+		_instance._onSuccess = onSuccess;
+		_instance._onError = onError;
+		if (Game.Mode.IsServer())
+		{
+			BoltMatchmaking.CreateSession(sessionId, token);
+		}
+		else
+		{
+			_instance._sessionToJoin = sessionId;
+		}
+	}
+
+	public override void SessionCreatedOrUpdated(UdpSession session)
+	{
+		Log("Server connected to " + session.HostName);
+		PlayerRegistry.CreateLocalPeers();
+		PostSuccess();
+	}
+
+	public override void SessionCreationFailed(UdpSession session, UdpSessionError errorReason)
+	{
+		LogError("SessionCreationFailed");
+		PostError(errorReason.ToString());
+	}
+
+	public override void SessionListUpdated(Map<Guid, UdpSession> sessionList)
+	{
+		Log($"SessionListUpdated {sessionList?.Count ?? 0}");
+		if (string.IsNullOrEmpty(_sessionToJoin))
+		{
+			return;
+		}
+		foreach (KeyValuePair<Guid, UdpSession> session in sessionList)
+		{
+			MultiplayerTokens.Session token = session.Value.GetToken();
+			if (token != null && _sessionToJoin.Equals(token.Name))
+			{
+				BoltMatchmaking.JoinSession(_sessionToJoin, JoinToken);
+				_sessionToJoin = null;
+				break;
+			}
+		}
+	}
+
+	public override void SessionConnected(UdpSession session, IProtocolToken token)
+	{
+		Log("SessionConnected");
+		PlayerRegistry.CreateLocalPeers();
+		PostSuccess();
+	}
+
+	public override void SessionConnectFailed(UdpSession session, IProtocolToken token, UdpSessionError errorReason)
+	{
+		LogError("SessionConnectFailed");
+		PostError(errorReason.ToString());
+	}
+
+	public static void BlockCurrentClientId()
+	{
+		if (!string.IsNullOrEmpty(_connectedClientId) && !_blockedClientList.Contains(_connectedClientId))
+		{
+			_blockedClientList.Add(_connectedClientId);
+		}
+	}
+
+	public static void BlockCurrentClientId(string requestClientId)
+	{
+		if (!string.IsNullOrEmpty(requestClientId) && !_blockedClientList.Contains(requestClientId))
+		{
+			_blockedClientList.Add(requestClientId);
+		}
+	}
+
+	public static void ClearBlockedClientList()
+	{
+		_blockedClientList.Clear();
+	}
+
+	public static void ListenForSuccesfulClientConnection()
+	{
+		if (BoltNetwork.IsServer)
+		{
+			BeamTiming.RunCoroutine(CheckForAvailableEndpoint());
+		}
+	}
+
+	private static IEnumerator<float> CheckForAvailableEndpoint()
+	{
+		bool listening = true;
+		bool success = false;
+		float time = Time.time;
+		while (listening && !(Time.time - time > 5f))
+		{
+			foreach (BoltConnection connection in BoltNetwork.Connections)
+			{
+				connection.ReceiveData(out var data);
+				if (data != null && data[0] == 1)
+				{
+					listening = false;
+					success = true;
+					break;
+				}
+			}
+			yield return float.NegativeInfinity;
+		}
+		if (success)
+		{
+			yield break;
+		}
+		LogError("client invalid for connection, disconnecting clients");
+		foreach (BoltConnection client in BoltNetwork.Clients)
+		{
+			client.Disconnect();
+		}
+	}
+
+	public override void ConnectRequest(UdpEndPoint endpoint, IProtocolToken joinToken)
+	{
+		Log("ConnectRequest " + joinToken.ToStringSafe());
+		if (!Game.Mode.IsServer())
+		{
+			return;
+		}
+		MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+		string id = ((MultiplayerTokens.Join)joinToken).Id;
+		string nameClient = ((MultiplayerTokens.Join)joinToken).Name;
+		if (Game.State.IsGame())
+		{
+			if (token == null || !token.IsJoinable() || _blockedClientList.Contains(id) || IsClientOnWaitTime(id))
+			{
+				if (_permisionPrompt.gameObject.activeSelf)
+				{
+					_permisionPrompt.Hide();
+				}
+				BoltNetwork.Refuse(endpoint);
+			}
+			else
+			{
+				_permisionPrompt.endpoint = endpoint;
+				_permisionPrompt.joinToken = joinToken;
+				_permisionPrompt.Show(nameClient, id);
+			}
+		}
+		else if (token == null || !token.IsJoinable() || _blockedClientList.Contains(id))
+		{
+			BoltNetwork.Refuse(endpoint);
+		}
+		else
+		{
+			_connectedClientId = id;
+			BoltNetwork.Accept(endpoint, new MultiplayerTokens.Accept
+			{
+				ServerGameState = Game.State
+			});
+		}
+	}
+
+	public static void UpdateClientOnHold(string requestClientId)
+	{
+		if (string.IsNullOrEmpty(requestClientId))
+		{
+			return;
+		}
+		if (_clientsOnHold.TryGetValue(requestClientId, out var value))
+		{
+			value.Requests++;
+			value.LastRequestTime = Time.unscaledTime;
+			_clientsOnHold[requestClientId] = value;
+			if (value.Requests > 3)
+			{
+				BlockCurrentClientId(requestClientId);
+				RemoveClientOnHold(requestClientId);
+			}
+		}
+		else
+		{
+			ClientOnHold value2 = new ClientOnHold(requestClientId);
+			_clientsOnHold.Add(requestClientId, value2);
+		}
+	}
+
+	public static void RemoveClientOnHold(string requestClientId)
+	{
+		if (!string.IsNullOrEmpty(requestClientId) && _clientsOnHold.ContainsKey(requestClientId))
+		{
+			_clientsOnHold.Remove(requestClientId);
+		}
+	}
+
+	public static bool IsClientOnWaitTime(string requestClientId)
+	{
+		if (string.IsNullOrEmpty(requestClientId))
+		{
+			return false;
+		}
+		if (_clientsOnHold.TryGetValue(requestClientId, out var value) && Time.unscaledTime - value.LastRequestTime < 30f)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public override void Connected(BoltConnection connection)
+	{
+		Log(string.Format("{0}:: Connection type: {1}, Accept Token: {2}, Connect Token: {3}", "Connected", connection.ConnectionType, connection.AcceptToken, connection.ConnectToken));
+		_messageInId = 0;
+		_messageOutId = 0;
+		_messages.Clear();
+		_connectTime = Time.unscaledTime;
+		MultiplayerTokens.Accept accept = connection.AcceptToken as MultiplayerTokens.Accept;
+		if (BoltNetwork.IsClient && accept == null)
+		{
+			LogError("Disconnected due to bad token");
+			connection.Disconnect();
+			return;
+		}
+		ServerGameState = (BoltNetwork.IsServer ? Game.State : accept.ServerGameState);
+		Log($"ServerGameState {ServerGameState}");
+		if (!BoltNetwork.IsServer)
+		{
+			BoltNetwork.Server.SendData(new byte[1] { 1 });
+		}
+		EventManager.RaiseEvent(new PlayerConnectedEvent(BoltNetwork.IsServer ? 1 : 0));
+		if (BoltNetwork.IsServer)
+		{
+			UpdateSessionToken_IsOccupied(isOccupied: true);
+		}
+	}
+
+	public override void Disconnected(BoltConnection connection)
+	{
+		if (_shutdownDisconnectInProgress)
+		{
+			return;
+		}
+		Log("Disconnected");
+		_messageInId = 0;
+		_messageOutId = 0;
+		_messages.Clear();
+		_connectTime = 0f;
+		_connectedClientId = null;
+		int num = ((BoltNetwork.IsServer && connection != null) ? 1 : 0);
+		_shutdownDisconnectInProgress = num == 0 || (BoltNetwork.IsClient && num == 1);
+		EventManager.RaiseEvent(new PlayerDisconnectedEvent(num, DisconnectPayload));
+		if (BoltNetwork.IsServer && num == 1)
+		{
+			if (Game.State == GameState.LOAD_GAME || Game.State == GameState.NEW_GAME)
+			{
+				UpdateToken();
+			}
+			else
+			{
+				UpdateSessionToken_IsOccupied(isOccupied: false);
+			}
+		}
+	}
+
+	private void UpdateToken()
+	{
+		try
+		{
+			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+			token.IsOccupied = false;
+			Zone zone = StrandedWorld.GetZone(PlayerRegistry.LocalPlayer.transform.position);
+			if (zone.Biome == Zone.BiomeType.MISSION && !zone.Equals(Beam.Singleton<StrandedWorld>.Instance.FindEndGameZone()))
+			{
+				token.IsBusy = true;
+			}
+			else if (GetSessionToken().IsBusy)
+			{
+				token.IsBusy = false;
+			}
+			BoltMatchmaking.UpdateSession(token);
+		}
+		catch (Exception ex)
+		{
+			LogError("Error updating session token " + ex.Message);
+		}
+	}
+
+	public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)
+	{
+		Log($"BoltShutdownBegin {disconnectReason} isRunning {BoltNetwork.IsRunning}");
+		if (BoltNetwork.IsRunning)
+		{
+			Disconnected(null);
+		}
+	}
+
+	public static void Shutdown()
+	{
+		if (BoltNetwork.IsRunning && !_shuttingDown)
+		{
+			_shuttingDown = true;
+			PlayerRegistry.Clear();
+			try
+			{
+				BoltNetwork.ShutdownImmediate();
+			}
+			catch (Exception)
+			{
+			}
+			_shuttingDown = false;
+		}
+	}
+
+	private void PostSuccess()
+	{
+		Action onSuccess = _onSuccess;
+		_onSuccess = null;
+		_onError = null;
+		onSuccess?.Invoke();
+	}
+
+	private void PostError(string reason)
+	{
+		Action<string> onError = _onError;
+		_onSuccess = null;
+		_onError = null;
+		onError?.Invoke(reason);
+	}
+
+	public static IEnumerator<float> FindObject_Sequence<T>(DisconnectDetail disconnectDetail, MiniGuid referenceId, Action<T> onSuccess, Action onTimeout = null, float retryPeriod = 0.5f) where T : ISaveableReference
+	{
+		T obj = default;
+		float startTime = Time.unscaledTime;
+		while (obj.IsNullOrDestroyed() && !(Time.unscaledTime > startTime + Peer.DEFAULT_TIMEOUT))
+		{
+			obj = FindObject<T>(referenceId);
+			if (obj.IsNullOrDestroyed())
+			{
+				yield return Timing.WaitForSeconds(retryPeriod);
+			}
+		}
+		if (obj.IsNullOrDestroyed())
+		{
+			onTimeout?.Invoke();
+			PlayerRegistry.LocalPeer.ReplicatedDisconnect(disconnectDetail);
+		}
+		else
+		{
+			onSuccess?.Invoke(obj);
+		}
+	}
+
+	public static int GetLocalPeerId()
+	{
+		if (!Game.Mode.IsServer())
+		{
+			return 1;
+		}
+		return 0;
+	}
+
+	public static int GetEntityId(BoltEntity entity)
+	{
+		if (BoltNetwork.IsServer != entity.IsOwner)
+		{
+			return 1;
+		}
+		return 0;
+	}
+
+	public static string GetCloudRegion()
+	{
+		string value = "NONE";
+		if (!BoltNetwork.IsRunning)
+		{
+			return value;
+		}
+		try
+		{
+			Dictionary<string, object> currentMetadata = BoltMatchmaking.CurrentMetadata;
+			if (currentMetadata != null)
+			{
+				currentMetadata.TryGetValue<string>("Region", out value);
+			}
+		}
+		catch (Exception)
+		{
+		}
+		if (!string.IsNullOrEmpty(value))
+		{
+			return value.ToUpper();
+		}
+		return "NONE";
+	}
+
+	public static int GetCloudRegionIndex()
+	{
+		int result = 0;
+		string cloudRegion = GetCloudRegion();
+		for (int i = 0; i < BoltRuntimeSettings.photonCloudRegions.Length; i++)
+		{
+			if (BoltRuntimeSettings.photonCloudRegionsId[i].Equals(cloudRegion.ToLower()))
+			{
+				result = i;
+				break;
+			}
+		}
+		return result;
+	}
+
+	private static IEnumerator<SearchContainer> AllSearchContainers()
+	{
+		if (_instance.IsNullOrDestroyed())
+		{
+			yield break;
+		}
+		yield return new SearchContainer(_instance._receivedEntities, includeInactive: true);
+		if ((bool)LevelLoader.Instance)
+		{
+			foreach (Zone loadingZone in LevelLoader.Instance.LoadingZones)
+			{
+				if (loadingZone.Id != Beam.Singleton<StrandedWorld>.Instance.NmlZone.Id)
+				{
+					yield return new SearchContainer(loadingZone.SaveContainer);
+				}
+			}
+		}
+		Zone[] zones = Beam.Singleton<StrandedWorld>.Instance.Zones;
+		foreach (Zone zone in zones)
+		{
+			if (!LevelLoader.Instance || !LevelLoader.Instance.LoadingZones.Contains(zone))
+			{
+				yield return new SearchContainer(zone.SaveContainer);
+			}
+		}
+		yield return new SearchContainer(Beam.Singleton<StrandedWorld>.Instance.NmlZone.SaveContainer);
+	}
+
+	public static T FindObject<T>(MiniGuid referenceId, bool includeInactive = false) where T : ISaveableReference
+	{
+		try
+		{
+			if (referenceId.IsDefault() || _instance.IsNullOrDestroyed())
+			{
+				return default;
+			}
+			IEnumerator<SearchContainer> enumerator = AllSearchContainers();
+			while (enumerator.MoveNext())
+			{
+				T val = enumerator.Current.Container.FindObject<T>(referenceId, includeInactive & enumerator.Current.IncludeInactive);
+				if (val != null)
+				{
+					return val;
+				}
+			}
+			foreach (BoltEntity entity in BoltNetwork.Entities)
+			{
+				if (entity.gameObject.TryGetComponent<T>(out var component) && component.ReferenceId.Equals(referenceId))
+				{
+					return component;
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			LogError($"Error while finding entity {referenceId}: {ex.Message}\n{ex.StackTrace}");
+		}
+		return default;
+	}
+
+	public static T FindObject<T>(ulong networkId) where T : ISaveableReference
+	{
+		try
+		{
+			BoltEntity boltEntity = BoltNetwork.FindEntity(new NetworkId(networkId));
+			if (null == boltEntity)
+			{
+				return default;
+			}
+			return boltEntity.GetComponent<T>();
+		}
+		catch (Exception ex)
+		{
+			LogError($"Error while finding entity {networkId}: {ex.Message}\n{ex.StackTrace}");
+			return default;
+		}
+	}
+
+	public void RegisterPrefabs()
+	{
+		FieldInfo[] fields = typeof(BoltPrefabs).GetFields(BindingFlags.Static | BindingFlags.Public);
+		FieldInfo[] array = fields;
+		foreach (FieldInfo fieldInfo in array)
+		{
+			_prefabs[fieldInfo.Name] = (PrefabId)fieldInfo.GetValue(null);
+		}
+		Log($"Multiplayer prefabs {fields.Length}");
+		Prefabs.LinkMPPrefabs();
+	}
+
+	public static string GetBoltPrefabName(string prefabPath)
+	{
+		return Path.GetFileName(prefabPath).Split(' ', '-').RemoveEmpty()
+			.Join("_");
+	}
+
+	public static bool TryGetPrefabName(string prefabPath, out string multiplayerPrefabName)
+	{
+		multiplayerPrefabName = GetBoltPrefabName(prefabPath);
+		PrefabId value;
+		return _instance?._prefabs.TryGetValue(multiplayerPrefabName, out value) ?? false;
+	}
+
+	public static T Instantiate<T>(PrefabId multiplayerPrefab, IProtocolToken token = null) where T : MonoBehaviour
+	{
+		return BoltNetwork.Instantiate(multiplayerPrefab, token).GetComponent<T>();
+	}
+
+	public static T Instantiate<T>(string prefabPath, MiniGuid referenceId) where T : SaveablePrefab
+	{
+		if (string.IsNullOrEmpty(prefabPath))
+		{
+			return null;
+		}
+		T val = (_instance._prefabs.TryGetValue(GetBoltPrefabName(prefabPath), out var value) ? Instantiate<T>(value, new MultiplayerTokens.SaveablePrefab(referenceId)) : UnityEngine.Object.Instantiate(Resources.Load<T>(prefabPath)));
+		val.ReferenceId = referenceId;
+		return val;
+	}
+
+	public static T Instantiate<T>(uint prefabId, MiniGuid referenceId, Transform parent = null) where T : SaveablePrefab
+	{
+		T val = null;
+		if (!_instance.IsNullOrDestroyed() && Prefabs.TryGetMultiplayerPrefabName(prefabId, out var multiplayerPrefabName))
+		{
+			Log($"Instantiate Bolt Pref for {prefabId} -> {_instance._prefabs[multiplayerPrefabName].Value}", "create/destroy");
+			val = Instantiate<T>(_instance._prefabs[multiplayerPrefabName], new MultiplayerTokens.SaveablePrefab(referenceId));
+			val.gameObject.transform.parent = parent;
+		}
+		else
+		{
+			val = (T)Prefabs.CreatePrefabFromId(prefabId, parent);
+		}
+		val.ReferenceId = referenceId;
+		return val;
+	}
+
+	public static T Instantiate<T>(uint prefabId, Vector3 position, Quaternion rotation, MiniGuid referenceId, Transform parent = null) where T : SaveablePrefab
+	{
+		T val = Instantiate<T>(prefabId, referenceId);
+		val.transform.position = position;
+		val.transform.rotation = rotation;
+		val.gameObject.transform.parent = parent;
+		return val;
+	}
+
+	public static void DestroyMultiplayerEntity(GameObject gameObject, DestroyDelay destroyDelay = DestroyDelay.SAFE)
+	{
+		if (gameObject.IsNullOrDestroyed())
+		{
+			Log($"Destroying {gameObject} - redundant destroy", "create/destroy", "magenta");
+			return;
+		}
+		if (Game.Mode.IsMultiplayer() && destroyDelay != DestroyDelay.NOW)
+		{
+			_destroyCommands.Add(new BoltDestroyCommand(gameObject, Time.unscaledTime + (float)destroyDelay / 30f));
+			gameObject.SetActive(value: false);
+			return;
+		}
+		Log($"Destroying {gameObject} -  no delay", "create/destroy", "magenta");
+		try
+		{
+			BoltNetwork.Destroy(gameObject);
+		}
+		catch (Exception ex)
+		{
+			LogError("Error while destroying multiplayer game object: " + ex.Message + "\n" + ex.StackTrace);
+		}
+	}
+
+	public static void Destroy(SaveablePrefab saveablePrefab, DestroyDelay destroyDelay = DestroyDelay.SAFE)
+	{
+		if (saveablePrefab.IsNullOrDestroyed())
+		{
+			return;
+		}
+		if (saveablePrefab.IsMultiplayerEntity)
+		{
+			if (saveablePrefab.IsOwner)
+			{
+				DestroyMultiplayerEntity(saveablePrefab.gameObject, destroyDelay);
+			}
+			else
+			{
+				saveablePrefab.gameObject.SetActive(value: false);
+			}
+		}
+		else
+		{
+			BeamTeam.Destroy(saveablePrefab.gameObject);
+		}
+	}
+
+	private void UpdateDestroyCommands()
+	{
+		int count = _destroyCommands.Count;
+		float unscaledTime = Time.unscaledTime;
+		int i = count - 1;
+		while (i >= 0)
+		{
+			_destroyCommands[i].Destroy(unscaledTime, () =>
+			{
+				_destroyCommands.RemoveAt(i);
+			});
+			int num = i - 1;
+			i = num;
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		UpdateDestroyCommands();
+		UpdateMessages();
+		if (BoltNetwork.IsServer && !BoltNetwork.IsSinglePlayer)
+		{
+			UpdateSessionOccupied();
+		}
+	}
+
+	private void UpdateSessionOccupied()
+	{
+		if (PlayerRegistry.AllPlayers.Count != 0 && Math.Abs(Time.unscaledTime - _sessionOccupiedLastUpdateTime) > 3f)
+		{
+			bool flag = PlayerRegistry.AllPlayers.Count == 2;
+			if (flag != GetSessionToken().IsOccupied)
+			{
+				UpdateSessionToken_IsOccupied(flag);
+			}
+			_sessionOccupiedLastUpdateTime = Time.unscaledTime;
+		}
+	}
+
+	public static void AddListener<T>(Listener<T> listener) where T : Photon.Bolt.Event
+	{
+		if (_instance._internalListeners.TryGetValue(listener, out var _))
+		{
+			LogError("Listener for " + typeof(T).Name + " already added");
+			return;
+		}
+		Listener listener2 = (Photon.Bolt.Event e) =>
+		{
+			listener((T)e);
+		};
+		_instance._internalListeners[listener] = listener2;
+		Type typeFromHandle = typeof(T);
+		_instance._listeners.TryGetValue(typeFromHandle, out var value2);
+		value2 = (Listener)Delegate.Combine(value2, listener2);
+		_instance._listeners[typeFromHandle] = value2;
+	}
+
+	public static void RemoveListener<T>(Listener<T> listener) where T : Photon.Bolt.Event
+	{
+		if (!_instance.IsNullOrDestroyed())
+		{
+			Type typeFromHandle = typeof(T);
+			if (_instance._internalListeners.TryGetValue(listener, out var value) && _instance._listeners.TryGetValue(typeFromHandle, out var value2))
+			{
+				value2 = (Listener)Delegate.Remove(value2, value);
+				_instance._listeners[typeFromHandle] = value2;
+				_instance._internalListeners.Remove(listener);
+			}
+		}
+	}
+
+	public override bool PersistBetweenStartupAndShutdown()
+	{
+		return true;
+	}
+
+	public static void SendGameStateChangeGlobalEvent(GameState fromState, GameState toState)
+	{
+		GameStateChangeGlobalEvent gameStateChangeGlobalEvent = GameStateChangeGlobalEvent.Create();
+		gameStateChangeGlobalEvent.FromState = (int)fromState;
+		gameStateChangeGlobalEvent.ToState = (int)toState;
+		SendGlobalEvent_Core(gameStateChangeGlobalEvent);
+	}
+
+	public override void OnEvent(GameStateChangeGlobalEvent evnt)
+	{
+		OnGlobalEventReceived_Core(evnt);
+	}
+
+	public static ushort GetMessageOutId()
+	{
+		return _instance._messageOutId++;
+	}
+
+	public static void MessageSyncFenceAllocate()
+	{
+		Log($"Allocate {_instance._messageOutId} - Sync Fence", "messages");
+		_instance._messageOutId++;
+	}
+
+	public static void MessageSyncFenceConsume()
+	{
+		Log($"Consume {_instance._messageInId} - Sync Fence", "messages");
+		_instance._messageInId++;
+	}
+
+	public override void OnEvent(MessageGlobalEvent evnt)
+	{
+		if (!evnt.FromSelf)
+		{
+			MultiplayerMessage multiplayerMessage = ((MultiplayerTokens.MessageEnvelope)evnt.Envelope).Get<MultiplayerMessage>();
+			multiplayerMessage.ReceivedTime = Time.unscaledTime;
+			multiplayerMessage.Ping = ((evnt.RaisedBy == null) ? 0f : evnt.RaisedBy.PingAliased);
+			if (BoltNetwork.IsClient && Math.Abs(Time.unscaledTime - _connectTime) < 0.5f && multiplayerMessage.Id > 50)
+			{
+				Log($"Reject message {multiplayerMessage.GetType().Name} with ID {multiplayerMessage.Id} as it looks as a message posted before the connection was made");
+				return;
+			}
+			Log($"Received message {multiplayerMessage.GetType().Name} with index {multiplayerMessage.Id}");
+			_messages.Add(multiplayerMessage);
+		}
+	}
+
+	public override void OnEvent(I_MessageGlobalEvent evnt)
+	{
+		if (!evnt.FromSelf)
+		{
+			I_MultiplayerMessage i_MultiplayerMessage = ((MultiplayerTokens.MessageEnvelope)evnt.Envelope).Get<I_MultiplayerMessage>();
+			i_MultiplayerMessage.SetTransportEntity(evnt.Instantiated);
+			i_MultiplayerMessage.ReceivedTime = Time.unscaledTime;
+			i_MultiplayerMessage.Ping = ((evnt.RaisedBy == null) ? 0f : evnt.RaisedBy.PingAliased);
+			if (BoltNetwork.IsClient && Math.Abs(Time.unscaledTime - _connectTime) < 0.5f && i_MultiplayerMessage.Id > 50)
+			{
+				Log($"Reject message {i_MultiplayerMessage.GetType().Name} with ID {i_MultiplayerMessage.Id} as it looks as a message posted before the connection was made");
+				return;
+			}
+			Log($"Received message  {i_MultiplayerMessage.GetType().Name} with index {i_MultiplayerMessage.Id}");
+			_messages.Add(i_MultiplayerMessage);
+		}
+	}
+
+	private void UpdateMessages()
+	{
+		bool flag = _messages.Count != 0;
+		while (flag)
+		{
+			int messageIndex = GetMessageIndex(_messageInId, out var oldestMessageTime);
+			if (messageIndex != -1)
+			{
+				MultiplayerMessage multiplayerMessage = _messages[messageIndex];
+				_messages.RemoveAt(messageIndex);
+				_messageInId++;
+				multiplayerMessage.Log("Executing " + multiplayerMessage.ToString());
+				try
+				{
+					multiplayerMessage.OnPeer();
+				}
+				catch (Exception ex)
+				{
+					LogError("Error executing " + multiplayerMessage.ToString() + " " + ex.Message + "\n" + ex.StackTrace);
+				}
+				flag = _messages.Count != 0;
+			}
+			else
+			{
+				flag = false;
+				if (Time.unscaledTime - oldestMessageTime > Peer.DEFAULT_TIMEOUT)
+				{
+					PlayerRegistry.LocalPeer.ReplicatedDisconnect(DisconnectDetail.Timeout_Messages, null, forceLocalShutdown: true);
+				}
+			}
+		}
+		if (_messages.Count != 0)
+		{
+			Log($"Queued {_messages.Count} with cursor {_messageInId}", "messages");
+		}
+	}
+
+	private int GetMessageIndex(ushort id, out float oldestMessageTime)
+	{
+		oldestMessageTime = float.MaxValue;
+		int count = _messages.Count;
+		for (int i = 0; i < count; i++)
+		{
+			MultiplayerMessage multiplayerMessage = _messages[i];
+			if (multiplayerMessage.Id == id)
+			{
+				oldestMessageTime = multiplayerMessage.ReceivedTime;
+				return i;
+			}
+			if (multiplayerMessage.ReceivedTime < oldestMessageTime)
+			{
+				oldestMessageTime = multiplayerMessage.ReceivedTime;
+			}
+		}
+		return -1;
+	}
+
+	private static void SendGlobalEvent_Core(Photon.Bolt.Event evnt)
+	{
+		Log($"Send global event {evnt}", "messages");
+		evnt.Send();
+	}
+
+	private void OnGlobalEventReceived_Core<T>(T evnt) where T : Photon.Bolt.Event
+	{
+		Log($"Received global event {evnt}", "messages");
+		Type typeFromHandle = typeof(T);
+		if (_listeners.TryGetValue(typeFromHandle, out var value))
+		{
+			value?.Invoke(evnt);
+		}
+	}
+
+	private void Awake()
+	{
+		if (_instance != null)
+		{
+			UnityEngine.Object.Destroy(gameObject);
+			return;
+		}
+		_instance = this;
+		UnityEngine.Object.DontDestroyOnLoad(gameObject);
+		RegisterPrefabs();
+		MultiplayerFence.Register();
+		MultiplayerMessageManager.Register();
+		SaveManager.BeforeWrite += UpdateSessionToken_BeforeWriteSave;
+	}
+
+	private void OnDestroy()
+	{
+		Log("Shuting down connection");
+		_joinToken = null;
+		foreach (BoltDestroyCommand destroyCommand in _destroyCommands)
+		{
+			destroyCommand.Destroy(Time.frameCount, null, force: true);
+		}
+		_destroyCommands.Clear();
+		if (_instance == this)
+		{
+			_instance = null;
+		}
+		SaveManager.BeforeWrite -= UpdateSessionToken_BeforeWriteSave;
+	}
+
+	private static void UpdateSessionToken_BeforeWriteSave(JObject rootData)
+	{
+		UpdateSessionToken_Player(rootData);
+	}
+
+	public static void UpdateSessionToken_Player(JObject data)
+	{
+		if (!BoltNetwork.IsServer || data.IsNullOrDestroyed() || data.IsNull() || BoltMatchmaking.CurrentSession.IsNullOrDestroyed() || BoltMatchmaking.CurrentSession.GetToken().IsNullOrDestroyed())
+		{
+			return;
+		}
+		try
+		{
+			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+			JObject field = data.GetField("Persistent").GetField(typeof(GameTime).Name);
+			if ((bool)field)
+			{
+				JObject field2 = field.GetField("SessionDuration");
+				if (field2 != null)
+				{
+					token.TimePlayed = Mathf.FloorToInt(field2.GetValue<float>());
+				}
+			}
+			Stats totalStats = GAccountService.Get().LocalUser.UserStats.TotalStats;
+			token.DaysSurvived = totalStats.DaysSurvived;
+			token.IslandsHopped = totalStats.IslandsHopped;
+			token.IslandsExplored = totalStats.IslandsExplored;
+			token.FishFished = totalStats.FishFished;
+			token.EnemiesKilled = totalStats.AnimalsKilled;
+			token.ItemsCrafted = totalStats.ItemsCrafted;
+			token.ShipsScavenged = totalStats.ShipsScavenged;
+			token.AnimalsTrapped = totalStats.AnimalsTrapped;
+			BoltMatchmaking.UpdateSession(token);
+		}
+		catch (Exception ex)
+		{
+			LogError("Error updating session token " + ex.Message);
+		}
+	}
+
+	public static void UpdateSessionToken_IsBusy(bool isBusy)
+	{
+		if (!BoltNetwork.IsServer || BoltMatchmaking.CurrentSession.IsNullOrDestroyed() || BoltMatchmaking.CurrentSession.GetToken().IsNullOrDestroyed())
+		{
+			return;
+		}
+		try
+		{
+			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+			token.IsBusy = isBusy;
+			BoltMatchmaking.UpdateSession(token);
+		}
+		catch (Exception ex)
+		{
+			LogError("Error updating session token " + ex.Message);
+		}
+	}
+
+	public static void UpdateSessionToken_IsOccupied(bool isOccupied)
+	{
+		if (!BoltNetwork.IsServer || BoltMatchmaking.CurrentSession.IsNullOrDestroyed() || BoltMatchmaking.CurrentSession.GetToken().IsNullOrDestroyed())
+		{
+			return;
+		}
+		try
+		{
+			MultiplayerTokens.Session token = BoltMatchmaking.CurrentSession.GetToken();
+			token.IsOccupied = isOccupied;
+			BoltMatchmaking.UpdateSession(token);
+		}
+		catch (Exception ex)
+		{
+			LogError("Error updating session token " + ex.Message);
+		}
+	}
+
+	public static MultiplayerTokens.Session GetSessionToken()
+	{
+		return BoltMatchmaking.CurrentSession.GetToken();
+	}
+
+	private static string GetTimeStampCosmeticText(string value, string color = "yellow")
+	{
+		float unscaledTime = Time.unscaledTime;
+		float num = Mathf.Floor(unscaledTime);
+		double num2 = Math.Floor((unscaledTime - num) * 1000f);
+		return $"[{num}:{num2:0.###}] {value}";
+	}
+
+	private static string GetCosmeticText(string value, string color = "yellow")
+	{
+		string[] array = GetTimeStampCosmeticText(value).Split(new char[1] { '\n' });
+		string text = "";
+		for (int i = 0; i < array.Length; i++)
+		{
+			string text2 = array[i];
+			text = ((i != 0) ? (text + "\n<color=" + color + ">" + text2 + "</color>") : (text + "<color=" + color + ">" + text2 + "</color>"));
+		}
+		return text;
+	}
+
+	public static void Log(string value, string tag = "default", string color = "yellow")
+	{
+	}
+
+	public static void LogError(string value, UnityEngine.Object context = null)
+	{
+		string cosmeticText = GetCosmeticText(value, "red");
+		BoltConsole.Write(cosmeticText);
+		Debug.LogError(cosmeticText, context);
+	}
+
+	public static void Log2Reports(string value)
+	{
+	}
+
+	public static void Log2Screen(string value, float duration = 5f)
+	{
+		Log(value);
+	}
+
+	private void DrawLog2Screen(Rect window)
+	{
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 358
+PATH: Assembly-CSharp__Funlabs__MultiplayerPrefabPool.cs
+SIZE: 890 bytes
+SHA256: 9bd399df8458cdc56caafecfc8d67d239964f0d79503de8fba1a3e553ee56a63
+====================================================================================================
+
+using Beam;
+using Photon.Bolt;
+using UnityEngine;
+
+namespace Funlabs;
+
+public class MultiplayerPrefabPool : IPrefabPool
+{
+	private Transform _receivedEntities;
+
+	public bool IsLocal { get; set; }
+
+	public MultiplayerPrefabPool(Transform receivedEntities)
+	{
+		_receivedEntities = receivedEntities;
+	}
+
+	public GameObject Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation)
+	{
+		GameObject original = LoadPrefab(prefabId);
+		Transform parent = null;
+		if (Game.State.IsGame() && Game.Mode.IsClient() && !IsLocal && !(prefabId == BoltPrefabs.Peer) && !(prefabId == BoltPrefabs.Player))
+		{
+			parent = _receivedEntities;
+		}
+		return Object.Instantiate(original, position, rotation, parent);
+	}
+
+	public void Destroy(GameObject gameObject)
+	{
+		Object.Destroy(gameObject);
+	}
+
+	public GameObject LoadPrefab(PrefabId prefabId)
+	{
+		return PrefabDatabase.Find(prefabId);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 359
+PATH: Assembly-CSharp__Funlabs__Peer.cs
+SIZE: 12365 bytes
+SHA256: e9b77dfc48b3b14a93233f1df6a5e2a9cfbc256949e6f13521ba720f124d7bb7
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.AccountServices;
+using MEC;
+using Photon.Bolt;
+using UdpKit;
+using UnityEngine;
+
+namespace Funlabs;
+
+public class Peer : MultiplayerBehaviour, IMultiplayerState<IPeerState>
+{
+	public enum Params
+	{
+		Gender,
+		Gender2,
+		GameDifficulty,
+		World,
+		Permadeath,
+		Wildlife,
+		GameStartingCrate,
+		WorldSeed,
+		Continuing
+	}
+
+	public enum StringParams
+	{
+		OnlineName
+	}
+
+	private class StayAliveMessage : MultiplayerMessage
+	{
+		[Replicate]
+		public byte PeerId;
+
+		[Replicate]
+		public int AliveId;
+
+		protected override bool IsLogEnabled()
+		{
+			return false;
+		}
+
+		public override void OnPeer()
+		{
+			PlayerUtilities.GetPeerFromId(PeerId)?.StayAlive(AliveId);
+		}
+	}
+
+	private class ReplicateSetTimeout : MultiplayerMessage
+	{
+		[Replicate]
+		public byte PeerId;
+
+		[Replicate]
+		public float TimeOut;
+
+		public override void OnPeer()
+		{
+			PlayerUtilities.GetPeerFromId(PeerId)?.SetTimeout_Core(TimeOut);
+		}
+	}
+
+	private class ReplicateParam : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public Peer Peer;
+
+		public Params Param;
+
+		[Replicate]
+		public int Value;
+
+		public override void Write(UdpPacket packet)
+		{
+			base.Write(packet);
+			packet.WriteByte((byte)Param);
+		}
+
+		public override void Read(UdpPacket packet)
+		{
+			base.Read(packet);
+			Param = (Params)packet.ReadByte();
+		}
+
+		public override void OnPeer()
+		{
+			Peer.Set(Param, Value, informObserver: true, replicate: false, bidirectionalReplication: false);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + $" Param: {Param}";
+		}
+	}
+
+	private class ReplicateStringParam : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public Peer Peer;
+
+		public StringParams Param;
+
+		[Replicate]
+		public string Value;
+
+		public override void Write(UdpPacket packet)
+		{
+			base.Write(packet);
+			packet.WriteByte((byte)Param);
+		}
+
+		public override void Read(UdpPacket packet)
+		{
+			base.Read(packet);
+			Param = (StringParams)packet.ReadByte();
+		}
+
+		public override void OnPeer()
+		{
+			Peer.Set(Param, Value, replicate: false, bidirectionalReplication: false);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + $" Param: {Param}";
+		}
+	}
+
+	private class ReplicateAllParams : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public Peer Peer;
+
+		public override void OnPeer()
+		{
+			foreach (object value in Enum.GetValues(typeof(Params)))
+			{
+				ReplicateParam replicateParam = new ReplicateParam();
+				replicateParam.Peer = Peer;
+				replicateParam.Param = (Params)value;
+				replicateParam.Value = Peer.Get((Params)value);
+				replicateParam.Post();
+			}
+			foreach (object value2 in Enum.GetValues(typeof(StringParams)))
+			{
+				ReplicateStringParam replicateStringParam = new ReplicateStringParam();
+				replicateStringParam.Peer = Peer;
+				replicateStringParam.Param = (StringParams)value2;
+				replicateStringParam.Value = Peer.Get((StringParams)value2);
+				replicateStringParam.Post();
+			}
+		}
+	}
+
+	public static readonly float ALIVE_INTERVAL = 2f;
+
+	public static readonly float DEFAULT_TIMEOUT = 8f;
+
+	private int _id;
+
+	private EGameGenderMode _gender;
+
+	private EGameGenderMode _gender2;
+
+	private EGameDifficultyMode _gameDifficulty;
+
+	private EGameWorldMode _world;
+
+	private EGamePermadeathMode _permadeath;
+
+	private EGameWildlifeMode _wildlife;
+
+	private EGameStartingCrate _gameStartingCrate;
+
+	private int _worldSeed;
+
+	private int _continuing;
+
+	private string _onlineName;
+
+	private Action<Params, int> OnParamChange;
+
+	private float _timeout = DEFAULT_TIMEOUT;
+
+	public bool _disconnect;
+
+	private float _lastSentTime;
+
+	private float _aliveTime;
+
+	private int _aliveId;
+
+	public int Id => _id;
+
+	public IPlayer Player { get; set; }
+
+	public EGameGenderMode Gender
+	{
+		get
+		{
+			return _gender;
+		}
+		set
+		{
+			Set(Params.Gender, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public EGameGenderMode Gender2
+	{
+		get
+		{
+			return _gender2;
+		}
+		set
+		{
+			Set(Params.Gender2, (int)value, informObserver: true, replicate: true, bidirectionalReplication: true);
+		}
+	}
+
+	public EGameDifficultyMode GameDifficulty
+	{
+		get
+		{
+			return _gameDifficulty;
+		}
+		set
+		{
+			Set(Params.GameDifficulty, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public EGameWorldMode World
+	{
+		get
+		{
+			return _world;
+		}
+		set
+		{
+			Set(Params.World, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public EGamePermadeathMode Permadeath
+	{
+		get
+		{
+			return _permadeath;
+		}
+		set
+		{
+			Set(Params.Permadeath, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public EGameWildlifeMode Wildlife
+	{
+		get
+		{
+			return _wildlife;
+		}
+		set
+		{
+			Set(Params.Wildlife, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public EGameStartingCrate StartingCrate
+	{
+		get
+		{
+			return _gameStartingCrate;
+		}
+		set
+		{
+			Set(Params.GameStartingCrate, (int)value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public int WorldSeed
+	{
+		get
+		{
+			return _worldSeed;
+		}
+		set
+		{
+			Set(Params.WorldSeed, value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public int Continuing
+	{
+		get
+		{
+			return _continuing;
+		}
+		set
+		{
+			Set(Params.Continuing, value, informObserver: true, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public string OnlineName
+	{
+		get
+		{
+			return _onlineName;
+		}
+		set
+		{
+			Set(StringParams.OnlineName, value, replicate: true, bidirectionalReplication: false);
+		}
+	}
+
+	public IPeerState MultiplayerState => GetMultiplayerState<IPeerState>();
+
+	public float Timeout => _timeout;
+
+	public float GlobalTimeout
+	{
+		get
+		{
+			if (PlayerRegistry.AllPeers.Count < 2)
+			{
+				return _timeout;
+			}
+			return Mathf.Max(PlayerRegistry.AllPeers[0]._timeout, PlayerRegistry.AllPeers[1]._timeout);
+		}
+	}
+
+	public bool IsTimeout
+	{
+		get
+		{
+			if (_id != 0)
+			{
+				if (!(Time.unscaledTime - _aliveTime > GlobalTimeout))
+				{
+					return _disconnect;
+				}
+				return true;
+			}
+			return false;
+		}
+	}
+
+	public void AddListner(Action<Params, int> listener)
+	{
+		if (listener != null)
+		{
+			listener(Params.Gender, (int)_gender);
+			listener(Params.Gender2, (int)_gender2);
+			listener(Params.GameDifficulty, (int)_gameDifficulty);
+			listener(Params.World, (int)_world);
+			listener(Params.Permadeath, (int)_permadeath);
+			listener(Params.Wildlife, (int)_wildlife);
+			listener(Params.GameStartingCrate, (int)_gameStartingCrate);
+			listener(Params.WorldSeed, _worldSeed);
+			listener(Params.Continuing, _continuing);
+			OnParamChange = (Action<Params, int>)Delegate.Combine(OnParamChange, listener);
+		}
+	}
+
+	public void RemoveListener(Action<Params, int> listener)
+	{
+		OnParamChange = (Action<Params, int>)Delegate.Remove(OnParamChange, listener);
+	}
+
+	private int Get(Params param)
+	{
+		return param switch
+		{
+			Params.Gender => (int)_gender, 
+			Params.Gender2 => (int)_gender2, 
+			Params.GameDifficulty => (int)_gameDifficulty, 
+			Params.World => (int)_world, 
+			Params.Permadeath => (int)_permadeath, 
+			Params.Wildlife => (int)_wildlife, 
+			Params.GameStartingCrate => (int)_gameStartingCrate, 
+			Params.WorldSeed => _worldSeed, 
+			Params.Continuing => _continuing, 
+			_ => 0, 
+		};
+	}
+
+	private void Set(Params param, int value, bool informObserver, bool replicate, bool bidirectionalReplication)
+	{
+		if (value != Get(param))
+		{
+			switch (param)
+			{
+			case Params.Gender:
+				_gender = (EGameGenderMode)value;
+				break;
+			case Params.Gender2:
+				_gender2 = (EGameGenderMode)value;
+				break;
+			case Params.GameDifficulty:
+				_gameDifficulty = (EGameDifficultyMode)value;
+				break;
+			case Params.World:
+				_world = (EGameWorldMode)value;
+				break;
+			case Params.Permadeath:
+				_permadeath = (EGamePermadeathMode)value;
+				break;
+			case Params.Wildlife:
+				_wildlife = (EGameWildlifeMode)value;
+				break;
+			case Params.GameStartingCrate:
+				_gameStartingCrate = (EGameStartingCrate)value;
+				break;
+			case Params.WorldSeed:
+				_worldSeed = value;
+				break;
+			case Params.Continuing:
+				_continuing = value;
+				break;
+			}
+			if (informObserver)
+			{
+				OnParamChange?.Invoke(param, value);
+			}
+			if ((Game.Mode.IsMultiplayer() & replicate) && (bidirectionalReplication || entity.IsOwner))
+			{
+				ReplicateParam replicateParam = new ReplicateParam();
+				replicateParam.Peer = this;
+				replicateParam.Param = param;
+				replicateParam.Value = value;
+				replicateParam.Post();
+			}
+		}
+	}
+
+	private string Get(StringParams param)
+	{
+		if (param == StringParams.OnlineName)
+		{
+			return _onlineName;
+		}
+		return "";
+	}
+
+	private void Set(StringParams param, string value, bool replicate, bool bidirectionalReplication)
+	{
+		if (!string.Equals(value, Get(param)))
+		{
+			if (param == StringParams.OnlineName)
+			{
+				_onlineName = value;
+			}
+			if ((Game.Mode.IsMultiplayer() & replicate) && (bidirectionalReplication || entity.IsOwner))
+			{
+				ReplicateStringParam replicateStringParam = new ReplicateStringParam();
+				replicateStringParam.Peer = this;
+				replicateStringParam.Param = param;
+				replicateStringParam.Value = value;
+				replicateStringParam.Post();
+			}
+		}
+	}
+
+	public EGameGenderMode GetGenderById(int id)
+	{
+		return id switch
+		{
+			0 => Gender, 
+			1 => Gender2, 
+			_ => (EGameGenderMode)(id % 2), 
+		};
+	}
+
+	public override void Attached()
+	{
+		base.Attached();
+		_id = MultiplayerMng.GetEntityId(entity);
+		gameObject.name = $"Peer {_id}";
+		PlayerRegistry.Link(this);
+		StayAlive(_aliveId);
+		if (entity.IsOwner)
+		{
+			_gender = Options.CustomSettings.Gender;
+			_gender2 = Options.CustomSettings.Gender2;
+			_gameDifficulty = Options.CustomSettings.Difficulty;
+			_permadeath = Options.CustomSettings.Permadeath;
+			_wildlife = Options.CustomSettings.Wildlife;
+			_gameStartingCrate = Options.CustomSettings.StartingCrate;
+			_worldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+			_onlineName = GAccountService.Get().LocalUser.UserInfo.DisplayName;
+		}
+		else
+		{
+			ReplicateAllParams replicateAllParams = new ReplicateAllParams();
+			replicateAllParams.Peer = this;
+			replicateAllParams.Post();
+		}
+	}
+
+	public override void Detached()
+	{
+		base.Detached();
+		PlayerRegistry.Unlink(this);
+	}
+
+	private void OnDestroy()
+	{
+		PlayerRegistry.Unlink(this);
+	}
+
+	private void Update()
+	{
+		UpdateStayAlive();
+	}
+
+	private void UpdateStayAlive()
+	{
+		if (Game.Mode.IsMultiplayer() && _id != 0)
+		{
+			if (entity.IsOwner && Time.unscaledTime - _lastSentTime > ALIVE_INTERVAL)
+			{
+				_lastSentTime = Time.unscaledTime;
+				StayAliveMessage stayAliveMessage = new StayAliveMessage();
+				stayAliveMessage.PeerId = (byte)Id;
+				stayAliveMessage.AliveId = ++_aliveId;
+				stayAliveMessage.Post();
+			}
+			if (IsTimeout)
+			{
+				this.ReplicatedDisconnect(DisconnectDetail.Timeout_StayAlive);
+			}
+		}
+	}
+
+	private void StayAlive(int aliveId)
+	{
+		_aliveTime = Time.unscaledTime;
+		if (aliveId > _aliveId)
+		{
+			_aliveId = aliveId;
+			StayAliveMessage stayAliveMessage = new StayAliveMessage();
+			stayAliveMessage.PeerId = (byte)Id;
+			stayAliveMessage.AliveId = aliveId;
+			stayAliveMessage.Post();
+		}
+	}
+
+	public static float GetDefaultTimeout()
+	{
+		return DEFAULT_TIMEOUT;
+	}
+
+	public static float GetSessionTimeout()
+	{
+		return (float)BoltRuntimeSettings.instance.GetConfigCopy().connectionTimeout / 1000f;
+	}
+
+	public float SetTimeout_Async(float timeout)
+	{
+		return Timing.WaitUntilDone(Timing.RunCoroutine(SetTimout_Sequence(timeout)));
+	}
+
+	private IEnumerator<float> SetTimout_Sequence(float timeout)
+	{
+		_ = _timeout;
+		_ = timeout;
+		ReplicatedSetTimeout(timeout);
+		yield return Timing.WaitForSeconds(1f);
+	}
+
+	public void SetTimeout(float timeout)
+	{
+		if (_timeout != timeout)
+		{
+			ReplicatedSetTimeout(timeout);
+		}
+	}
+
+	private void SetTimeout_Core(float timeout)
+	{
+		_timeout = timeout;
+		StayAlive(_aliveId);
+	}
+
+	private void ReplicatedSetTimeout(float timeout)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSetTimeout replicateSetTimeout = new ReplicateSetTimeout();
+			replicateSetTimeout.PeerId = (byte)Id;
+			replicateSetTimeout.TimeOut = timeout;
+			replicateSetTimeout.Post();
+		}
+		SetTimeout_Core(timeout);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 360
+PATH: Assembly-CSharp__Funlabs__TransformId.cs
+SIZE: 176 bytes
+SHA256: 8d830f278dd71614a0943adaa72f26cee9b9fd2891e58a87de9cef87fb68e98e
+====================================================================================================
+
+namespace Funlabs;
+
+public enum TransformId
+{
+	Null,
+	Unknown,
+	ReceivedEntities,
+	SaveContainer,
+	PiscusManager,
+	FlockControllerActive,
+	FlockControllerDeactivated,
+	Zones
+}
+
+
+
+====================================================================================================
+SOURCE FILE 361
+PATH: Assembly-CSharp__HighlightingSystem__Highlighter.cs
+SIZE: 10403 bytes
+SHA256: c16e48b29d796a766efce18d41807efa2ab6d2bd58de9b126e45aa12b84157e1
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Rendering;
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace HighlightingSystem;
+
+[DisallowMultipleComponent]
+public class Highlighter : MonoBehaviour
+{
+	private enum Mode
+	{
+		None,
+		Highlighter,
+		HighlighterSeeThrough,
+		OccluderSeeThrough
+	}
+
+	public static readonly List<Type> types = new List<Type>
+	{
+		typeof(MeshRenderer),
+		typeof(SkinnedMeshRenderer),
+		typeof(SpriteRenderer),
+		typeof(ParticleSystemRenderer),
+		typeof(InstancedMeshRenderer)
+	};
+
+	public const string keywordSeeThrough = "SEE_THROUGH";
+
+	private const float doublePI = MathF.PI * 2f;
+
+	private readonly Color occluderColor = new Color(0f, 0f, 0f, 0f);
+
+	private static readonly Mode[] renderingOrder = new Mode[3]
+	{
+		Mode.Highlighter,
+		Mode.HighlighterSeeThrough,
+		Mode.OccluderSeeThrough
+	};
+
+	private static HashSet<Highlighter> highlighters = new HashSet<Highlighter>();
+
+	[HideInInspector]
+	public bool seeThrough;
+
+	[HideInInspector]
+	public bool occluder;
+
+	[HideInInspector]
+	public bool forceRender;
+
+	private Transform tr;
+
+	private List<HighlighterRenderer> highlightableRenderers = new List<HighlighterRenderer>();
+
+	private bool renderersDirty;
+
+	private static List<Component> sComponents = new List<Component>(4);
+
+	private Mode mode;
+
+	private bool cachedSeeThrough;
+
+	private int cachedOnce = -1;
+
+	private bool flashing;
+
+	private Color currentColor;
+
+	private float transitionValue;
+
+	private float transitionTarget;
+
+	private float transitionTime;
+
+	private Color onceColor;
+
+	private float flashingFreq;
+
+	private Color flashingColorMin;
+
+	private Color flashingColorMax;
+
+	private Color constantColor;
+
+	private static Shader _opaqueShader;
+
+	private static Shader _transparentShader;
+
+	private Material _opaqueMaterial;
+
+	private static ShaderPropertyID shaderPropertyID => HighlightingBase.shaderPropertyID;
+
+	private bool once
+	{
+		get
+		{
+			return cachedOnce == Time.frameCount;
+		}
+		set
+		{
+			cachedOnce = (value ? Time.frameCount : (-1));
+		}
+	}
+
+	public static Shader opaqueShader
+	{
+		get
+		{
+			if (_opaqueShader == null)
+			{
+				_opaqueShader = Shader.Find("Hidden/Highlighted/Opaque");
+			}
+			return _opaqueShader;
+		}
+	}
+
+	public static Shader transparentShader
+	{
+		get
+		{
+			if (_transparentShader == null)
+			{
+				_transparentShader = Shader.Find("Hidden/Highlighted/Transparent");
+			}
+			return _transparentShader;
+		}
+	}
+
+	private Material opaqueMaterial
+	{
+		get
+		{
+			if (_opaqueMaterial == null)
+			{
+				_opaqueMaterial = new Material(opaqueShader);
+				_opaqueMaterial.enableInstancing = true;
+				if (cachedSeeThrough)
+				{
+					_opaqueMaterial.EnableKeyword("SEE_THROUGH");
+				}
+				else
+				{
+					_opaqueMaterial.DisableKeyword("SEE_THROUGH");
+				}
+			}
+			return _opaqueMaterial;
+		}
+	}
+
+	public void ReinitMaterials()
+	{
+		renderersDirty = true;
+	}
+
+	public void OnParams(Color color)
+	{
+		onceColor = color;
+	}
+
+	public void On()
+	{
+		once = true;
+	}
+
+	public void On(Color color)
+	{
+		onceColor = color;
+		once = true;
+	}
+
+	public void FlashingParams(Color color1, Color color2, float freq)
+	{
+		flashingColorMin = color1;
+		flashingColorMax = color2;
+		flashingFreq = freq;
+	}
+
+	public void FlashingOn()
+	{
+		flashing = true;
+	}
+
+	public void FlashingOn(Color color1, Color color2)
+	{
+		flashingColorMin = color1;
+		flashingColorMax = color2;
+		flashing = true;
+	}
+
+	public void FlashingOn(Color color1, Color color2, float freq)
+	{
+		flashingColorMin = color1;
+		flashingColorMax = color2;
+		flashingFreq = freq;
+		flashing = true;
+	}
+
+	public void FlashingOn(float freq)
+	{
+		flashingFreq = freq;
+		flashing = true;
+	}
+
+	public void FlashingOff()
+	{
+		flashing = false;
+	}
+
+	public void FlashingSwitch()
+	{
+		flashing = !flashing;
+	}
+
+	public void ConstantParams(Color color)
+	{
+		constantColor = color;
+	}
+
+	public void ConstantOn(float time = 0.25f)
+	{
+		transitionTime = ((time >= 0f) ? time : 0f);
+		transitionTarget = 1f;
+	}
+
+	public void ConstantOn(Color color, float time = 0.25f)
+	{
+		constantColor = color;
+		transitionTime = ((time >= 0f) ? time : 0f);
+		transitionTarget = 1f;
+	}
+
+	public void ConstantOff(float time = 0.25f)
+	{
+		transitionTime = ((time >= 0f) ? time : 0f);
+		transitionTarget = 0f;
+	}
+
+	public void ConstantSwitch(float time = 0.25f)
+	{
+		transitionTime = ((time >= 0f) ? time : 0f);
+		transitionTarget = ((transitionTarget > 0f) ? 0f : 1f);
+	}
+
+	public void ConstantOnImmediate()
+	{
+		transitionValue = (transitionTarget = 1f);
+	}
+
+	public void ConstantOnImmediate(Color color)
+	{
+		constantColor = color;
+		transitionValue = (transitionTarget = 1f);
+	}
+
+	public void ConstantOffImmediate()
+	{
+		transitionValue = (transitionTarget = 0f);
+	}
+
+	public void ConstantSwitchImmediate()
+	{
+		transitionValue = (transitionTarget = ((transitionTarget > 0f) ? 0f : 1f));
+	}
+
+	public void Off()
+	{
+		once = false;
+		flashing = false;
+		transitionValue = (transitionTarget = 0f);
+	}
+
+	public void Die()
+	{
+		UnityEngine.Object.Destroy(this);
+	}
+
+	public void SeeThrough(bool state)
+	{
+		seeThrough = state;
+	}
+
+	public void SeeThroughOn()
+	{
+		seeThrough = true;
+	}
+
+	public void SeeThroughOff()
+	{
+		seeThrough = false;
+	}
+
+	public void SeeThroughSwitch()
+	{
+		seeThrough = !seeThrough;
+	}
+
+	public void OccluderOn()
+	{
+		occluder = true;
+	}
+
+	public void OccluderOff()
+	{
+		occluder = false;
+	}
+
+	public void OccluderSwitch()
+	{
+		occluder = !occluder;
+	}
+
+	private void Awake()
+	{
+		tr = GetComponent<Transform>();
+		renderersDirty = true;
+		cachedSeeThrough = (seeThrough = true);
+		mode = Mode.None;
+		once = false;
+		flashing = false;
+		occluder = false;
+		transitionValue = (transitionTarget = 0f);
+		onceColor = Color.red;
+		flashingFreq = 2f;
+		flashingColorMin = new Color(0f, 1f, 1f, 0f);
+		flashingColorMax = new Color(0f, 1f, 1f, 1f);
+		constantColor = Color.yellow;
+	}
+
+	private void OnEnable()
+	{
+		highlighters.Add(this);
+	}
+
+	private void OnDisable()
+	{
+		highlighters.Remove(this);
+		ClearRenderers();
+		renderersDirty = true;
+		once = false;
+		flashing = false;
+		transitionValue = (transitionTarget = 0f);
+	}
+
+	private void Update()
+	{
+		UpdateTransition();
+	}
+
+	private void OnDestroy()
+	{
+		if (_opaqueMaterial != null)
+		{
+			UnityEngine.Object.Destroy(_opaqueMaterial);
+		}
+	}
+
+	private void ClearRenderers()
+	{
+		for (int num = highlightableRenderers.Count - 1; num >= 0; num--)
+		{
+			UnityEngine.Object.Destroy(highlightableRenderers[num]);
+		}
+		highlightableRenderers.Clear();
+	}
+
+	private void UpdateRenderers()
+	{
+		if (LevelLoader.IsLoading() || !renderersDirty)
+		{
+			return;
+		}
+		ClearRenderers();
+		List<Component> list = new List<Component>();
+		GrabRenderers(tr, list);
+		int i = 0;
+		for (int count = list.Count; i < count; i++)
+		{
+			GameObject gameObject = list[i].gameObject;
+			HighlighterRenderer highlighterRenderer = gameObject.GetComponent<HighlighterRenderer>();
+			if (highlighterRenderer == null)
+			{
+				highlighterRenderer = gameObject.AddComponent<HighlighterRenderer>();
+			}
+			highlighterRenderer.Initialize(opaqueMaterial, transparentShader, cachedSeeThrough);
+			highlightableRenderers.Add(highlighterRenderer);
+		}
+		renderersDirty = false;
+	}
+
+	private void GrabRenderers(Transform t, List<Component> renderers)
+	{
+		GameObject gameObject = t.gameObject;
+		if (gameObject.CompareTag("DontHighlight"))
+		{
+			return;
+		}
+		int i = 0;
+		for (int count = types.Count; i < count; i++)
+		{
+			gameObject.GetComponents(types[i], sComponents);
+			int j = 0;
+			for (int count2 = sComponents.Count; j < count2; j++)
+			{
+				renderers.Add(sComponents[j]);
+			}
+		}
+		sComponents.Clear();
+		int childCount = t.childCount;
+		if (childCount == 0)
+		{
+			return;
+		}
+		for (int k = 0; k < childCount; k++)
+		{
+			Transform child = t.GetChild(k);
+			if (!(child.GetComponent<Highlighter>() != null) && !(child.GetComponent<HighlighterBlocker>() != null))
+			{
+				GrabRenderers(child, renderers);
+			}
+		}
+	}
+
+	private void UpdateColors()
+	{
+		if (once)
+		{
+			currentColor = onceColor;
+		}
+		else if (flashing)
+		{
+			currentColor = Color.Lerp(flashingColorMin, flashingColorMax, 0.5f * Mathf.Sin(Time.realtimeSinceStartup * flashingFreq * (MathF.PI * 2f)) + 0.5f);
+		}
+		else if (transitionValue > 0f)
+		{
+			currentColor = constantColor;
+			currentColor.a *= transitionValue;
+		}
+		else
+		{
+			if (!occluder)
+			{
+				return;
+			}
+			currentColor = occluderColor;
+		}
+		opaqueMaterial.SetColor(shaderPropertyID._Color, currentColor);
+		for (int i = 0; i < highlightableRenderers.Count; i++)
+		{
+			highlightableRenderers[i].SetColorForTransparent(currentColor);
+		}
+	}
+
+	private void UpdateTransition()
+	{
+		if (transitionValue != transitionTarget)
+		{
+			if (transitionTime <= 0f)
+			{
+				transitionValue = transitionTarget;
+				return;
+			}
+			float num = ((transitionTarget > 0f) ? 1f : (-1f));
+			transitionValue = Mathf.Clamp01(transitionValue + num * Time.unscaledDeltaTime / transitionTime);
+		}
+	}
+
+	private void FillBufferInternal(CommandBuffer buffer, Mode m)
+	{
+		UpdateRenderers();
+		mode = Mode.None;
+		if (once || flashing || transitionValue > 0f)
+		{
+			mode = ((!seeThrough) ? Mode.Highlighter : Mode.HighlighterSeeThrough);
+		}
+		else if (occluder && seeThrough)
+		{
+			mode = Mode.OccluderSeeThrough;
+		}
+		if (mode == Mode.None || mode != m)
+		{
+			return;
+		}
+		if (cachedSeeThrough != seeThrough)
+		{
+			cachedSeeThrough = seeThrough;
+			if (cachedSeeThrough)
+			{
+				_opaqueMaterial.EnableKeyword("SEE_THROUGH");
+			}
+			else
+			{
+				_opaqueMaterial.DisableKeyword("SEE_THROUGH");
+			}
+			for (int i = 0; i < highlightableRenderers.Count; i++)
+			{
+				highlightableRenderers[i].SetSeeThroughForTransparent(seeThrough);
+			}
+		}
+		UpdateColors();
+		for (int num = highlightableRenderers.Count - 1; num >= 0; num--)
+		{
+			HighlighterRenderer highlighterRenderer = highlightableRenderers[num];
+			if (highlighterRenderer == null)
+			{
+				highlightableRenderers.RemoveAt(num);
+			}
+			else if (!highlighterRenderer.FillBuffer(buffer, forceRender))
+			{
+				highlightableRenderers.RemoveAt(num);
+				UnityEngine.Object.Destroy(highlighterRenderer);
+			}
+		}
+	}
+
+	public static void FillBuffer(CommandBuffer buffer)
+	{
+		for (int i = 0; i < renderingOrder.Length; i++)
+		{
+			Mode m = renderingOrder[i];
+			HashSet<Highlighter>.Enumerator enumerator = highlighters.GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				enumerator.Current.FillBufferInternal(buffer, m);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 362
+PATH: Assembly-CSharp__IAudioPlayer.cs
+SIZE: 877 bytes
+SHA256: e3de6317698cca23f91820dff602ff0041572a0badbef62bd44f1e17b81f86c9
+====================================================================================================
+
+using Beam;
+using UnityEngine;
+
+public interface IAudioPlayer
+{
+	AudioActorHandle Play2D(AudioClip clip, AudioMixerChannels channel, AudioPlayMode mode = AudioPlayMode.Single);
+
+	AudioActorHandle Play3D(AudioClip clip, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single);
+
+	AudioActorHandle Play3D(AudioClip[] clips, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single);
+
+	AudioActorHandle Play3D(AudioClip clip, Transform target, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single);
+
+	void Stop(AudioActorHandle handle);
+
+	IAudioSource GetAudioSource(AudioActorHandle handle);
+
+	IAudioMixer GetAudioMixer();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 363
+PATH: Assembly-CSharp__IDynamicParentProvider.cs
+SIZE: 88 bytes
+SHA256: ba08f25f3bfa4d40a2304e3e19a78ba51be6ef2bd78912190d4072fe7b32758d
+====================================================================================================
+
+using UnityEngine;
+
+public interface IDynamicParentProvider
+{
+	Transform GetParent();
+}
+
+
+
+====================================================================================================
+SOURCE FILE 364
+PATH: Assembly-CSharp__Interacting_FISHINGROD.cs
+SIZE: 23446 bytes
+SHA256: d64ea8edfca43e7ccb7a8a730ba8c56378beffeddd8b64fde91222892504828a
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Crafting;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Rendering;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using RootMotion.FinalIK;
+using UnityEngine;
+
+public class Interacting_FISHINGROD : ConstructionObject, IChargeable, IUseable, IAnimatablePrimary, IBase, IHasCraftingType, IReloadable, IAnimatableSecondary, IGameInputHandler
+{
+	public class ReplicateCatchFish : MultiplayerMessage
+	{
+		[Replicate]
+		public Interacting_FISHINGROD FishingRod;
+
+		[Replicate]
+		public short FishPrefabId;
+
+		public override void OnPeer()
+		{
+			FishingRod.CatchFish(GetFishPrefab((uint)FishPrefabId));
+		}
+	}
+
+	public class ReplicateFishEscape : MultiplayerMessage
+	{
+		[Replicate]
+		public Interacting_FISHINGROD FishingRod;
+
+		public override void OnPeer()
+		{
+			FishingRod.FishEscape();
+		}
+	}
+
+	public class ReplicateLineSnap : MultiplayerMessage
+	{
+		[Replicate]
+		public Interacting_FISHINGROD FishingRod;
+
+		public override void OnPeer()
+		{
+			if (!FishingRod.Owner.IsOwner)
+			{
+				FishingRod.LineSnap();
+			}
+		}
+	}
+
+	public class ReplicateCollectBobber : MultiplayerMessage
+	{
+		[Replicate]
+		public Interacting_FISHINGROD FishingRod;
+
+		public override void OnPeer()
+		{
+			FishingRod.CollectBobber();
+		}
+	}
+
+	private static readonly Vector3 FISH_PROXY_BOBBER_Y_OFFSET = Vector3.down * 0.5f;
+
+	[SerializeField]
+	private bool _canUseSecondary;
+
+	private bool _reloaded;
+
+	[Header("SECONDARY ANIMATIONS")]
+	[SerializeField]
+	private AnimationType _secondaryIdle;
+
+	[SerializeField]
+	private AnimationType _secondary;
+
+	[SerializeField]
+	private AnimationType _reloadAnimation;
+
+	[SerializeField]
+	private RenderableProxy _bobberProxy;
+
+	[SerializeField]
+	private RenderableProxy _fishProxyPrefab;
+
+	[SerializeField]
+	private CCDIK _fishingRodIK;
+
+	[SerializeField]
+	private Transform _fishingRodIKTarget;
+
+	[SerializeField]
+	private VerletLine _fishingLine;
+
+	[SerializeField]
+	private Transform _fishingReel;
+
+	[SerializeField]
+	private Transform _fishingReelRope;
+
+	[SerializeField]
+	private float _bobberCastSpeed = 1.5f;
+
+	[SerializeField]
+	private float MaxLineLength = 15f;
+
+	[SerializeField]
+	private GameObject _fishParticle;
+
+	private Interacting_FISHING_BOBBER _activeBobber;
+
+	private RenderableProxy _fishProxy;
+
+	private float _fishEndurance = 1f;
+
+	private float _fishResistTimer;
+
+	private float _fishRecoverTimer;
+
+	private float _castingTimer;
+
+	private float _bobberStuckTimer;
+
+	private float _lastCaughtTimer;
+
+	private bool _isHolding;
+
+	private float _animLerp;
+
+	private float _fishAvoidTimer = 10f;
+
+	private Vector3 _previousBobberPos;
+
+	private Vector3 _fishRandomDir;
+
+	private Vector3 _springPos;
+
+	private IFishable _currentFishable;
+
+	private bool _casting;
+
+	private bool _reelingIn;
+
+	private bool _reelingOut;
+
+	private float _lineTension;
+
+	private float _bobberMovingSpeed;
+
+	private bool _fishPulling;
+
+	private bool _subscribed;
+
+	[SerializeField]
+	[HideInInspector]
+	private BaseActionUnityEvent _charged;
+
+	[SerializeField]
+	[HideInInspector]
+	private BaseActionUnityEvent _usedSecondary;
+
+	public bool CanUseSecondary
+	{
+		get
+		{
+			return _canUseSecondary;
+		}
+		set
+		{
+			_canUseSecondary = value;
+		}
+	}
+
+	public bool Reloaded => _reloaded;
+
+	public AnimationType SecondaryIdle => _secondaryIdle;
+
+	public AnimationType Secondary => _secondary;
+
+	public AnimationType ReloadAnimation => _reloadAnimation;
+
+	public Interacting_FISHING_BOBBER ActiveBobber => _activeBobber;
+
+	public bool Casting => _casting;
+
+	public bool ReelingIn => _reelingIn;
+
+	public bool ReelingOut => _reelingOut;
+
+	public float LineTension => _lineTension;
+
+	public float BobberMovingSpeed => _bobberMovingSpeed;
+
+	public bool FishPulling => _fishPulling;
+
+	public bool HasFish => _currentFishable != null;
+
+	public BaseActionUnityEvent Charged => _charged;
+
+	public BaseActionUnityEvent UsedSecondary => _usedSecondary;
+
+	public event Action LineSnapped;
+
+	public event Action FishCaught;
+
+	public event Action FishEscaped;
+
+	public event Action BobberReset;
+
+	public override void OnDestroy()
+	{
+		LineSnapped = null;
+		FishCaught = null;
+		FishEscaped = null;
+		BobberReset = null;
+		base.OnDestroy();
+	}
+
+	void IGameInputHandler.Initialize(IGameInputController controller)
+	{
+	}
+
+	void IGameInputHandler.CheckInput()
+	{
+	}
+
+	public override void Hold(bool holding)
+	{
+		base.Hold(holding);
+		_isHolding = holding;
+		if (_isHolding)
+		{
+			_fishingRodIK.solver.target = _fishingRodIKTarget;
+			if (PreviousOwnerId != -1 && !_subscribed)
+			{
+				IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(PreviousOwnerId);
+				playerFromId.Holder.Storage.Popped += Storage_Popped;
+				playerFromId.Holder.Storage.Pushed += Storage_Pushed;
+				_subscribed = true;
+			}
+			return;
+		}
+		ResetBobber();
+		_fishingRodIK.gameObject.SetActive(value: false);
+		_fishingLine.gameObject.SetActive(value: false);
+		_bobberProxy.gameObject.SetActive(value: false);
+		_fishParticle.gameObject.SetActive(value: false);
+		_reloaded = false;
+		if (PreviousOwnerId != -1 && _subscribed)
+		{
+			IPlayer playerFromId2 = PlayerUtilities.GetPlayerFromId(PreviousOwnerId);
+			playerFromId2.Holder.Storage.Popped -= Storage_Popped;
+			playerFromId2.Holder.Storage.Pushed -= Storage_Pushed;
+			_subscribed = false;
+		}
+	}
+
+	private void Storage_Pushed(IPickupable obj, bool success)
+	{
+		if (success)
+		{
+			OnStorageChanged(obj);
+		}
+	}
+
+	private void Storage_Popped(IPickupable obj)
+	{
+		OnStorageChanged(obj);
+	}
+
+	private void OnStorageChanged(IPickupable obj)
+	{
+		if (CanReloadWith(obj))
+		{
+			Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = Owner.Holder.Storage.Get<Interacting_FISHING_BOBBER>();
+			if (interacting_FISHING_BOBBER != null)
+			{
+				CreateBobberProxy(interacting_FISHING_BOBBER);
+				return;
+			}
+			ResetBobber();
+			_reloaded = false;
+			_bobberProxy.gameObject.SetActive(value: false);
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		if (LevelLoader.IsLoading() || Owner == null)
+		{
+			return;
+		}
+		Owner.Character.SetFloat("FishingTension", -1f);
+		_fishParticle.gameObject.SetActive(_fishProxy != null);
+		if (!_isHolding)
+		{
+			return;
+		}
+		if (_activeBobber == null)
+		{
+			Vector3 to = transform.position + transform.up * 1.5f;
+			_springPos = SpringVector(_springPos, to, 0.1f);
+			if (!_fishingRodIK.gameObject.activeSelf)
+			{
+				_fishingRodIK.gameObject.SetActive(value: true);
+			}
+			_fishingRodIKTarget.transform.position = _springPos;
+			_fishingRodIK.solver.IKPositionWeight = 0.2f;
+			if (_fishingLine.gameObject.activeSelf)
+			{
+				_fishingLine.gameObject.SetActive(value: false);
+			}
+			return;
+		}
+		if (Owner.IsOwner && _activeBobber != null)
+		{
+			Owner.GameInput.CurrentHandler = this;
+		}
+		if (_lastCaughtTimer > 5f)
+		{
+			if (_currentFishable == null && !_casting && !Owner.Movement.InWater && (_activeBobber.transform.position - Owner.transform.position).sqrMagnitude > BeamMath.Sqr(5f) && Owner.IsOwner)
+			{
+				IFishable fishable = FishingManager.Instance?.GetInterestedFishableAt(_activeBobber.transform.position);
+				FishBase fish = fishable as FishBase;
+				if (fishable != null)
+				{
+					ReplicatedCatchFish(fish);
+				}
+			}
+		}
+		else if (_currentFishable == null)
+		{
+			_lastCaughtTimer += Time.deltaTime;
+		}
+		if (_fishingLine.gameObject.activeSelf)
+		{
+			_fishingLine.gameObject.SetActive(value: false);
+		}
+		if (!_fishingLine.gameObject.activeSelf)
+		{
+			_fishingLine.gameObject.SetActive(value: true);
+		}
+		DoReel();
+	}
+
+	private void ReplicatedCatchFish(FishBase fish)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateCatchFish replicateCatchFish = new ReplicateCatchFish();
+			replicateCatchFish.FishingRod = this;
+			replicateCatchFish.FishPrefabId = (short)fish.FishingData.FishPrefab.PrefabId;
+			replicateCatchFish.Post();
+		}
+		CatchFish(fish);
+	}
+
+	private void CatchFish(FishBase fish)
+	{
+		if (!(fish == null))
+		{
+			_currentFishable = fish;
+			_currentFishable.Hook(hooked: true);
+			_fishProxy = CreateFishProxy(((IFishRenderer)fish).FishTemplate.Renderable);
+			_fishProxy.transform.position = ((IFishRenderer)fish).FishRenderer.transform.position;
+			_fishProxy.transform.rotation = ((IFishRenderer)fish).FishRenderer.transform.rotation;
+			_lineTension = 0.5f;
+			_lastCaughtTimer = 0f;
+			_fishRecoverTimer = _currentFishable.FishingData.RecoverTime;
+			_fishEndurance = _currentFishable.FishingData.Strength;
+			_activeBobber?.rigidbody.AddForce(new Vector3(0f, -5f, 0f), ForceMode.VelocityChange);
+			FishCaught?.Invoke();
+		}
+	}
+
+	private static FishBase GetFishPrefab(uint prefabID)
+	{
+		FishSpawner fishSpawner = UnityEngine.Object.FindObjectOfType<PlayerDetailSpawnerManager>().Fish_Spawner as FishSpawner;
+		if (fishSpawner == null)
+		{
+			Debug.LogError("Interacting_FISHINGROD :: Load : Error Finding FishSpawners");
+			return null;
+		}
+		foreach (CellObjectSettings<FishBase> cellObjectsSetting in fishSpawner.CellObjectsSettings)
+		{
+			Interactive_FISH fishPrefab = cellObjectsSetting.Prefab.FishingData.FishPrefab;
+			if (fishPrefab != null && fishPrefab.PrefabId == prefabID)
+			{
+				return cellObjectsSetting.Prefab;
+			}
+		}
+		return null;
+	}
+
+	private RenderableProxy CreateFishProxy(Renderable template)
+	{
+		RenderableProxy renderableProxy = UnityEngine.Object.Instantiate(_fishProxyPrefab);
+		renderableProxy.MeshFilter.sharedMesh = template.Mesh;
+		renderableProxy.Renderer.sharedMaterial = template.Material;
+		return renderableProxy;
+	}
+
+	private void DoReel()
+	{
+		Vector3 vector = new Vector3(_fishingLine.CableStart.position.x, Owner.transform.position.y, _fishingLine.CableStart.position.z);
+		float magnitude = (_activeBobber.transform.position - vector).magnitude;
+		float num = 10f;
+		_bobberMovingSpeed = (_activeBobber.transform.position - _previousBobberPos).magnitude / Time.deltaTime;
+		_previousBobberPos = _activeBobber.transform.position;
+		float x = Mathf.Clamp01(1f - magnitude / MaxLineLength * 0.9f);
+		_fishingReelRope.localScale = new Vector3(x, 1f, 1f);
+		Vector3 rotationAngle = new Vector3(_activeBobber.transform.position.x, _activeBobber.transform.position.y, _activeBobber.transform.position.z) - Owner.PlayerCamera.transform.position;
+		rotationAngle.Normalize();
+		if ((_activeBobber.transform.position - Owner.transform.position).sqrMagnitude > BeamMath.Sqr(0.5f))
+		{
+			Owner.PlayerCamera.MouseLook.ClampViewToPosUpdate(rotationAngle, 90f, 0f);
+		}
+		if (_casting)
+		{
+			_fishingReel.transform.Rotate(Time.deltaTime * -3600f, 0f, 0f);
+			_fishingLine.CableEnd = _activeBobber.transform;
+			_fishingRodIK.solver.IKPositionWeight = 0f;
+			_fishingLine.CableLength = magnitude;
+			if (magnitude >= MaxLineLength)
+			{
+				_fishingLine.CableLength = 1f;
+				_activeBobber.rigidbody.velocity = Vector3.zero;
+				_casting = false;
+			}
+			else if (_bobberMovingSpeed < 3f)
+			{
+				_casting = false;
+			}
+			_castingTimer += Time.deltaTime;
+			if (_castingTimer > 5f)
+			{
+				_castingTimer = 0f;
+				_casting = false;
+			}
+			return;
+		}
+		_reelingIn = (Owner.IsOwner ? Owner.Input.GetButton(7) : Owner.MultiplayerState.ReelingIn);
+		if (Owner.IsOwner)
+		{
+			Owner.MultiplayerState.ReelingIn = _reelingIn;
+		}
+		_reelingOut = false;
+		if (magnitude > MaxLineLength * 1.5f || (!_fishPulling && _reelingIn && _bobberMovingSpeed < 0.2f))
+		{
+			_bobberStuckTimer += Time.deltaTime;
+		}
+		else
+		{
+			_bobberStuckTimer = 0f;
+		}
+		if (_bobberStuckTimer > 2f)
+		{
+			_lineTension += 10f * Time.deltaTime;
+			if (_lineTension >= 1f)
+			{
+				if (Owner.IsOwner)
+				{
+					ReplicatedLineSnap();
+				}
+				return;
+			}
+		}
+		if (Owner.IsOwner && _reelingIn && !_casting && (Vector3Tools.SqrDistanceOnAxis(_activeBobber.transform.position, Owner.transform.position, Vector3Tools.xz) < BeamMath.Sqr(2f) || magnitude < 1f))
+		{
+			ReplicatedCollectBobber();
+			return;
+		}
+		if (Owner.IsOwner && Owner.Movement.InWater)
+		{
+			ReplicatedFishEscape();
+			ReplicatedCollectBobber();
+			return;
+		}
+		Owner.Character.SetFloat("FishingTension", _animLerp);
+		if (_currentFishable == null)
+		{
+			_animLerp = Mathf.Lerp(_animLerp, _reelingIn ? 0.5f : 0f, Time.deltaTime);
+			_fishingRodIKTarget.transform.position = Vector3.Lerp(_fishingRodIKTarget.transform.position, _activeBobber.transform.position, Time.deltaTime * 10f);
+			if (_reelingIn)
+			{
+				Vector3 normalized = (vector - _activeBobber.transform.position).normalized;
+				_activeBobber.rigidbody.AddForce(normalized * num, ForceMode.Acceleration);
+				_fishingRodIK.solver.IKPositionWeight = Mathf.Lerp(_fishingRodIK.solver.IKPositionWeight, 0.02f, Time.deltaTime);
+				_fishingLine.CableLength = magnitude - 1f;
+			}
+			else
+			{
+				_fishingRodIK.solver.IKPositionWeight = Mathf.Lerp(_fishingRodIK.solver.IKPositionWeight, 0.001f, Time.deltaTime * 2f);
+			}
+		}
+		else
+		{
+			_fishingLine.CableLength = 1f;
+			_fishingRodIK.solver.IKPositionWeight = Mathf.Lerp(_fishingRodIK.solver.IKPositionWeight, 0.02f + 0.2f * _lineTension, Time.deltaTime);
+			_fishingRodIKTarget.transform.position = Vector3.Lerp(_fishingRodIKTarget.transform.position, _activeBobber.transform.position + (_reelingIn ? (UnityEngine.Random.insideUnitSphere * (_lineTension * 1f)) : Vector3.zero), Time.deltaTime * 10f);
+			_animLerp = Mathf.Lerp(_animLerp, _lineTension, Time.deltaTime);
+			float num2 = 0.3f;
+			if (_fishPulling)
+			{
+				_fishResistTimer += Time.deltaTime;
+				if (_fishEndurance <= 0f || _fishResistTimer > _currentFishable.FishingData.ResistTime)
+				{
+					_fishResistTimer = 0f;
+					_fishPulling = false;
+				}
+				if (_reelingIn)
+				{
+					_fishEndurance -= Time.deltaTime * 0.1f;
+					_lineTension += Time.deltaTime * num2;
+				}
+				else
+				{
+					_reelingOut = true;
+				}
+			}
+			else if (!_fishPulling)
+			{
+				_fishRecoverTimer += Time.deltaTime;
+				if (_fishEndurance > 0f && _fishRecoverTimer > _currentFishable.FishingData.RecoverTime)
+				{
+					_fishRecoverTimer = 0f;
+					_fishPulling = true;
+				}
+				if (_reelingIn)
+				{
+					Vector3 normalized2 = (vector - _activeBobber.transform.position).normalized;
+					_activeBobber.rigidbody.AddForce(normalized2 * num, ForceMode.Acceleration);
+				}
+				else
+				{
+					_reelingOut = true;
+				}
+			}
+			if (_reelingOut)
+			{
+				float num3 = 0.3f;
+				if (_fishPulling)
+				{
+					num3 = 1f;
+					ZigZagWaypoint(_currentFishable.FishingData.DodgeRate);
+				}
+				_activeBobber.rigidbody.AddForce(num3 * _currentFishable.FishingData.DodgeSpeed * _fishRandomDir, ForceMode.Acceleration);
+				_activeBobber.rigidbody.AddForce(num3 * _currentFishable.FishingData.Strength * Owner.transform.forward, ForceMode.Acceleration);
+				_lineTension -= Time.deltaTime * num2;
+				if (magnitude > MaxLineLength)
+				{
+					_lineTension += Time.deltaTime * (num2 * 2f);
+				}
+			}
+			_fishEndurance = Mathf.Clamp(_fishEndurance, 0f, _currentFishable.FishingData.Strength);
+			if (_fishProxy != null)
+			{
+				Vector3 velocity = _activeBobber.rigidbody.velocity;
+				velocity.y = 0f;
+				velocity.Normalize();
+				Vector3 b = _activeBobber.transform.position + FISH_PROXY_BOBBER_Y_OFFSET;
+				Vector3 forward = velocity;
+				_fishProxy.transform.position = Vector3.Lerp(_fishProxy.transform.position, b, Time.deltaTime * 7f);
+				_fishProxy.transform.rotation = Quaternion.Lerp(_fishProxy.transform.rotation, Quaternion.LookRotation(forward), Time.deltaTime * 10f);
+				_fishParticle.transform.position = new Vector3(_fishProxy.transform.position.x, _activeBobber.transform.position.y + 0.3f, _fishProxy.transform.position.z);
+			}
+		}
+		_lineTension = Mathf.Clamp01(_lineTension);
+		if (_lineTension >= 1f)
+		{
+			_fishingLine.CableLength = magnitude;
+			_fishingRodIK.solver.IKPositionWeight = 0f;
+			if (_reelingIn)
+			{
+				if (Owner.IsOwner)
+				{
+					ReplicatedLineSnap();
+				}
+			}
+			else if (Owner.IsOwner)
+			{
+				ReplicatedFishEscape();
+			}
+		}
+		float num4 = Mathf.Clamp(_bobberMovingSpeed * 0.5f, 0f, 1f);
+		if (_reelingOut)
+		{
+			_fishingReel.transform.Rotate(0f - num4 * 10f, 0f, 0f);
+		}
+		else if (_reelingIn && !_fishPulling)
+		{
+			_fishingReel.transform.Rotate(num4 * 5f, 0f, 0f);
+		}
+	}
+
+	private void ReplicatedFishEscape()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateFishEscape replicateFishEscape = new ReplicateFishEscape();
+			replicateFishEscape.FishingRod = this;
+			replicateFishEscape.Post();
+		}
+		FishEscape();
+	}
+
+	private void FishEscape()
+	{
+		FishEscaped?.Invoke();
+		_activeBobber?.rigidbody.AddForce(new Vector3(0f, -7f, 0f), ForceMode.VelocityChange);
+		if (_currentFishable != null)
+		{
+			_currentFishable.Hook(hooked: false);
+			_currentFishable = null;
+		}
+		ResetBobber(detachBobber: false);
+		LocalizedNotification.Post(Owner, NotificationPriority.Immediate, 4f, "FISHING_ROD_NTF_FISH_GOT_AWAY_DESC");
+	}
+
+	private void ReplicatedLineSnap()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateLineSnap replicateLineSnap = new ReplicateLineSnap();
+			replicateLineSnap.FishingRod = this;
+			replicateLineSnap.Post();
+		}
+		LineSnap();
+	}
+
+	private void LineSnap()
+	{
+		LineSnapped?.Invoke();
+		_activeBobber?.rigidbody.AddForce(new Vector3(0f, -7f, 0f), ForceMode.VelocityChange);
+		if (_currentFishable != null)
+		{
+			_currentFishable.Hook(hooked: false);
+			_currentFishable = null;
+		}
+		ResetBobber();
+		LocalizedNotification.Post(Owner, NotificationPriority.Immediate, 4f, "FISHING_ROD_NTF_LINE_SNAPPED_DESC");
+	}
+
+	private void ReplicatedCollectBobber()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateCollectBobber replicateCollectBobber = new ReplicateCollectBobber();
+			replicateCollectBobber.FishingRod = this;
+			replicateCollectBobber.Post();
+		}
+		CollectBobber();
+	}
+
+	private void CollectBobber()
+	{
+		if (!(_activeBobber == null))
+		{
+			_activeBobber.CanCollect = true;
+			Owner.Holder.Storage.Push(_activeBobber);
+			CheckBobber();
+			ResetBobber();
+			Reload(null);
+		}
+	}
+
+	private void CheckBobber()
+	{
+		if (_currentFishable == null || Owner.Movement.InWater)
+		{
+			return;
+		}
+		if (Owner.IsOwner)
+		{
+			_currentFishable.Catch();
+		}
+		EventManager.RaiseEvent(new ExperienceEvent(Owner.Id, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SMALL_KILL));
+		EventManager.RaiseEvent(new AddStatsEvent(Owner.Id, new Stats
+		{
+			FishFished = 1
+		}));
+		if (Game.Mode.IsMaster())
+		{
+			Interactive_FISH interactive_FISH = MultiplayerMng.Instantiate<Interactive_FISH>(_currentFishable.FishingData.FishPrefab.PrefabId, MiniGuid.New());
+			if (Owner.Holder.Storage.CanPush(interactive_FISH))
+			{
+				Owner.Holder.Storage.ReplicatedPush(interactive_FISH);
+			}
+			else
+			{
+				interactive_FISH.transform.position = Owner.transform.position;
+			}
+		}
+		LocalizedNotification.Post(Owner, NotificationPriority.Immediate, 4f, "FISHING_ROD_NTF_CAUGHT_FISH_DESC", _currentFishable.FishingData.FishPrefab.DisplayName);
+	}
+
+	private void ResetBobber(bool detachBobber = true)
+	{
+		if (detachBobber)
+		{
+			if (_activeBobber != null)
+			{
+				_activeBobber.AttachedFishingRod = null;
+			}
+			_activeBobber = null;
+		}
+		if (_fishProxy != null)
+		{
+			BeamTeam.Destroy(_fishProxy.gameObject);
+			_fishProxy = null;
+		}
+		_currentFishable = null;
+		_fishingReelRope.localScale = Vector3.one;
+		_bobberStuckTimer = 0f;
+		_bobberMovingSpeed = 0f;
+		_lineTension = 0.5f;
+		_fishPulling = false;
+		if (Owner?.GameInput.CurrentHandler == this)
+		{
+			Owner.GameInput.CurrentHandler = null;
+		}
+		BobberReset?.Invoke();
+	}
+
+	public bool CanReloadWith(IPickupable pickupable)
+	{
+		return pickupable.CraftingType.InteractiveType == InteractiveType.TOOLS_BOBBER;
+	}
+
+	public void Reload(IPickupable pickupable)
+	{
+		ResetBobber();
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = pickupable as Interacting_FISHING_BOBBER;
+			if (interacting_FISHING_BOBBER != null && CanReloadWith(interacting_FISHING_BOBBER))
+			{
+				CreateBobberProxy(interacting_FISHING_BOBBER);
+				_reloaded = true;
+			}
+		}
+		else
+		{
+			Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = Owner.Holder.Storage.Get<Interacting_FISHING_BOBBER>();
+			if (interacting_FISHING_BOBBER != null)
+			{
+				CreateBobberProxy(interacting_FISHING_BOBBER);
+				_reloaded = true;
+			}
+		}
+	}
+
+	public bool ValidateSecondary(IBase obj)
+	{
+		if (_activeBobber != null)
+		{
+			return false;
+		}
+		if (!obj.IsNullOrDestroyed())
+		{
+			Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = obj as Interacting_FISHING_BOBBER;
+			if (interacting_FISHING_BOBBER != null && CanReloadWith(interacting_FISHING_BOBBER))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = Owner.Holder.Storage.Get<Interacting_FISHING_BOBBER>();
+			if (interacting_FISHING_BOBBER != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void PreSecondary()
+	{
+		ActionEventData.Populate(this, null);
+		_charged.Invoke(this, ActionEventData);
+	}
+
+	public void UseSecondary()
+	{
+		Interacting_FISHING_BOBBER interacting_FISHING_BOBBER = Owner.Holder.Storage.Get<Interacting_FISHING_BOBBER>();
+		if (interacting_FISHING_BOBBER != null)
+		{
+			Owner.Holder.Storage.Pop(interacting_FISHING_BOBBER);
+			interacting_FISHING_BOBBER.transform.position = _bobberProxy.transform.position;
+			BeamRay ray = Owner.PlayerCamera.GetRay(5f);
+			float num = Vector3.Distance(interacting_FISHING_BOBBER.transform.position, ray.OriginPoint);
+			interacting_FISHING_BOBBER.transform.position = ray.OriginPoint;
+			interacting_FISHING_BOBBER.transform.LookAt(ray.EndPoint);
+			interacting_FISHING_BOBBER.transform.position += interacting_FISHING_BOBBER.transform.forward * num;
+			Physics.IgnoreCollision(interacting_FISHING_BOBBER.GetComponent<Collider>(), GetComponent<Collider>(), ignore: true);
+			_activeBobber = interacting_FISHING_BOBBER;
+			_activeBobber.AttachedFishingRod = this;
+			interacting_FISHING_BOBBER.rigidbody.AddForce(interacting_FISHING_BOBBER.transform.forward * _bobberCastSpeed, ForceMode.Impulse);
+			interacting_FISHING_BOBBER.transform.up = Vector3.up;
+			interacting_FISHING_BOBBER.rigidbody.constraints = RigidbodyConstraints.FreezeRotationZ;
+			interacting_FISHING_BOBBER.rigidbody.constraints = RigidbodyConstraints.FreezeRotationX;
+			_casting = true;
+			_bobberProxy.gameObject.SetActive(value: false);
+			_reloaded = false;
+			ActionEventData.Populate(this, null);
+			_usedSecondary.Invoke(this, ActionEventData);
+		}
+	}
+
+	public void PostSecondary()
+	{
+	}
+
+	private void ZigZagWaypoint(float dodgeRate)
+	{
+		_fishAvoidTimer += Time.deltaTime;
+		if (_fishAvoidTimer > dodgeRate)
+		{
+			_fishAvoidTimer = 0f;
+			Vector3 lhs = Owner.transform.position - _activeBobber.transform.position;
+			lhs.y = 0f;
+			lhs.Normalize();
+			Vector3 vector = Vector3.Cross(lhs, Vector3.up);
+			_fishRandomDir = ((UnityEngine.Random.value < 0.5f) ? (-vector) : vector);
+		}
+	}
+
+	private void CreateBobberProxy(Interacting_FISHING_BOBBER bobber)
+	{
+		_bobberProxy.MeshFilter.sharedMesh = bobber.Proxy.MeshFilter.sharedMesh;
+		_bobberProxy.Renderer.sharedMaterial = bobber.Proxy.MeshRenderer.sharedMaterial;
+		_bobberProxy.gameObject.SetActive(value: true);
+	}
+
+	private float Spring(float start, float end, float value)
+	{
+		value = Mathf.Clamp01(value);
+		value = (Mathf.Sin(value * MathF.PI * (0.2f + 2.5f * value * value * value)) * Mathf.Pow(1f - value, 2.2f) + value) * (1f + 1.2f * (1f - value));
+		return start + (end - start) * value;
+	}
+
+	private Vector3 SpringVector(Vector3 from, Vector3 to, float time)
+	{
+		return new Vector3(Spring(from.x, to.x, time), Spring(from.y, to.y, time), Spring(from.z, to.z, time));
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 365
+PATH: Assembly-CSharp__InteractiveObject_BOAR.cs
+SIZE: 1543 bytes
+SHA256: 9f53898718bf024d02119fdec54649512ca3a78e0aa78447e6a66a807fd28e8a
+====================================================================================================
+
+using Beam;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_BOAR : InteractiveObject_ANIMAL
+{
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Boar _boar;
+
+	[SerializeField]
+	private InteractiveObject _ragdoll;
+
+	private bool _destroyed;
+
+	public override void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
+			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
+		}
+		_boar.TakeDamage();
+		base.Damage(damage, damager);
+	}
+
+	public override void Destroy()
+	{
+		if (!_destroyed)
+		{
+			_destroyed = true;
+			EventManager.RaiseEvent(new ExperienceEvent(LastPlayerIdToDamageThis, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SMALL_KILL));
+			EventManager.RaiseEvent(new AddStatsEvent(LastPlayerIdToDamageThis, new Stats
+			{
+				AnimalsKilled = 1
+			}));
+			_boar.Kill();
+			if (Game.Mode.IsMaster())
+			{
+				CreateRagdoll();
+			}
+			MultiplayerMng.Destroy(this, DestroyDelay.LATE);
+		}
+	}
+
+	public void CreateRagdoll()
+	{
+		InteractiveObject_RAGDOLL interactiveObject_RAGDOLL = MultiplayerMng.Instantiate<InteractiveObject_RAGDOLL>(_ragdoll.PrefabId, MiniGuid.New());
+		interactiveObject_RAGDOLL.transform.position = transform.position;
+		this.ReplicatedCopyTransformsTo(interactiveObject_RAGDOLL);
+		this.ReplicatedCopyProjectilesTo(interactiveObject_RAGDOLL);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 366
+PATH: Assembly-CSharp__InteractiveObject_HARVESTPLANT.cs
+SIZE: 5070 bytes
+SHA256: 8de71fa0c01cf929b542fbe9206cbae2127b8fcc7ca905160099bcc7f2593938
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_HARVESTPLANT : InteractiveObject
+{
+	[Serializable]
+	public class HarvestResources
+	{
+		public GameObject HarvestPrefab;
+
+		public Transform HarvestPosition;
+
+		public int SpawnAmount = 1;
+	}
+
+	private bool _canRespawn;
+
+	[SerializeField]
+	private float HoursToRespawn = 48f;
+
+	[SerializeField]
+	private HarvestResources[] _resources;
+
+	[SerializeField]
+	private GameObject _fullModel;
+
+	[SerializeField]
+	private GameObject _harvestedModel;
+
+	private DateTime _lastHarvestedTime;
+
+	[HideInInspector]
+	public BaseActionUnityEvent Harvested;
+
+	[SerializeField]
+	private InteractiveObject_FOOD _seedPrefab;
+
+	[SerializeField]
+	private Transform _seedPosition;
+
+	private void CreateSeed()
+	{
+		if (!(_seedPrefab == null) && !Game.Mode.IsClient())
+		{
+			InteractiveObject_FOOD interactiveObject_FOOD = MultiplayerMng.Instantiate<InteractiveObject_FOOD>(_seedPrefab.PrefabId, MiniGuid.New(), transform.parent);
+			interactiveObject_FOOD.transform.position = _seedPosition.position;
+			interactiveObject_FOOD.transform.rotation = _seedPosition.rotation;
+			interactiveObject_FOOD.Attach(new StaticAttachingAnchor(_seedPosition));
+		}
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		SetDifficultyParams();
+		_canRespawn = HoursToRespawn > 0f;
+		if (!LevelLoader.IsLoading())
+		{
+			CreateSeed();
+			_lastHarvestedTime = GameTime.Now.RemoveHours(HoursToRespawn * 2f);
+			Initialize();
+		}
+	}
+
+	private void SetDifficultyParams()
+	{
+		if (PlayerUtilities.GetServerGameDifficulty() == EGameDifficultyMode.Hard)
+		{
+			HoursToRespawn *= 1.5f;
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		_lastHarvestedTime = GameTime.Now.RemoveHours(HoursToRespawn * 2f);
+		Initialize();
+		CreateSeed();
+	}
+
+	private void Initialize()
+	{
+		if (_canRespawn)
+		{
+			InvokeRepeating("PollRespawn", 0f, 1f * GameTime.OneGameHour);
+		}
+		else
+		{
+			UpdateStage(respawned: true);
+		}
+	}
+
+	public override void OnDestroy()
+	{
+		if (_canRespawn)
+		{
+			CancelInvoke("PollRespawn");
+		}
+		base.OnDestroy();
+	}
+
+	private void PollRespawn()
+	{
+		bool respawned = GameTime.GetHoursSince(_lastHarvestedTime) > HoursToRespawn;
+		UpdateStage(respawned);
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		OnDamaged(damage, damager);
+		if (!(GameTime.GetHoursSince(_lastHarvestedTime) > HoursToRespawn))
+		{
+			return;
+		}
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			BaseUtilities.DoPlayerDamageMultipliers_Harvesting(ref damage, pickupable);
+		}
+		HealthPoints -= damage;
+		if (HealthPoints <= 0f)
+		{
+			float originalHealthPoints = OriginalHealthPoints;
+			if (!pickupable.IsNullOrDestroyed())
+			{
+				BaseUtilities.DoPlayerDamageExperience_Harvesting(originalHealthPoints, pickupable);
+			}
+			SpawnHarvest();
+		}
+	}
+
+	private void SpawnHarvest()
+	{
+		HealthPoints = OriginalHealthPoints;
+		if (Game.Mode.IsMaster())
+		{
+			for (int i = 0; i < _resources.Length; i++)
+			{
+				HarvestResources harvestResources = _resources[i];
+				if (harvestResources.SpawnAmount <= 1)
+				{
+					MultiplayerMng.Instantiate<SaveablePrefab>(harvestResources.HarvestPrefab.GetComponent<SaveablePrefab>().PrefabId, harvestResources.HarvestPosition.position, harvestResources.HarvestPosition.rotation, MiniGuid.New());
+					continue;
+				}
+				float num = 0.5f;
+				Vector3 axis = new Vector3(0f, 1f, 0f);
+				Vector3 vector = new Vector3(1f - Mathf.Clamp01(axis.x), 1f - Mathf.Clamp01(axis.y), 1f - Mathf.Clamp01(axis.z));
+				int num2 = 0;
+				for (int j = 0; j < harvestResources.SpawnAmount; j++)
+				{
+					float angle = 360f / (float)harvestResources.SpawnAmount * (float)num2++;
+					Vector3 vector2 = transform.rotation * (Quaternion.AngleAxis(angle, axis) * vector * num);
+					Vector3 vector3 = harvestResources.HarvestPosition.position + vector2;
+					MultiplayerMng.Instantiate<SaveablePrefab>(harvestResources.HarvestPrefab.GetComponent<SaveablePrefab>().PrefabId, vector3, harvestResources.HarvestPosition.rotation, MiniGuid.New()).transform.forward = (transform.position - vector3).normalized;
+				}
+			}
+		}
+		transform.CheckForProjectilesInChildren();
+		Harvested?.Invoke(this, BaseActionEventData.Empty);
+		_ = _canRespawn;
+		_lastHarvestedTime = GameTime.Now;
+		UpdateStage(respawned: false);
+	}
+
+	private void UpdateStage(bool respawned)
+	{
+		_fullModel.SetActive(respawned);
+		if (_harvestedModel != null)
+		{
+			_harvestedModel.SetActive(!respawned);
+		}
+		for (int i = 0; i < colliders.Length; i++)
+		{
+			colliders[i].enabled = respawned;
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("StartedTime", JSerializer.Serialize(_lastHarvestedTime));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("StartedTime");
+		if ((bool)field)
+		{
+			_lastHarvestedTime = JSerializer.Deserialize<DateTime>(field);
+		}
+		Initialize();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 367
+PATH: Assembly-CSharp__InteractiveObject_HOG.cs
+SIZE: 1640 bytes
+SHA256: d30747b282a3747e348207b42178a5ffbb6231e7f88755cef70ec7d4ae405c2e
+====================================================================================================
+
+using Beam;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_HOG : InteractiveObject_ANIMAL
+{
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Hog _hog;
+
+	[SerializeField]
+	private InteractiveObject_RAGDOLL _ragdollPrefab;
+
+	[SerializeField]
+	private GameObject _gib;
+
+	private bool _destroyed;
+
+	public override void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
+			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
+		}
+		if (Game.Mode.IsMaster())
+		{
+			_hog.TakeDamage();
+		}
+		base.Damage(damage, damager);
+	}
+
+	public override void Destroy()
+	{
+		if (!_destroyed)
+		{
+			_destroyed = true;
+			EventManager.RaiseEvent(new ExperienceEvent(LastPlayerIdToDamageThis, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SHARK_KILL));
+			EventManager.RaiseEvent(new AddStatsEvent(LastPlayerIdToDamageThis, new Stats
+			{
+				AnimalsKilled = 1
+			}));
+			_hog.Kill();
+			if (Game.Mode.IsMaster())
+			{
+				CreateRagdoll();
+			}
+			MultiplayerMng.Destroy(this, DestroyDelay.LATE);
+		}
+	}
+
+	public void CreateRagdoll()
+	{
+		InteractiveObject_RAGDOLL interactiveObject_RAGDOLL = MultiplayerMng.Instantiate<InteractiveObject_RAGDOLL>(_ragdollPrefab.PrefabId, MiniGuid.New());
+		interactiveObject_RAGDOLL.transform.position = transform.position;
+		this.ReplicatedCopyTransformsTo(interactiveObject_RAGDOLL);
+		this.ReplicatedCopyProjectilesTo(interactiveObject_RAGDOLL);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 368
+PATH: Assembly-CSharp__InteractiveObject_PISCUS.cs
+SIZE: 2355 bytes
+SHA256: 301119dade7af1179b2012b4c17a8801c4a05cf76c0f0dd77ea8b8e1ce2f92ad
+====================================================================================================
+
+using Beam;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using Photon.Bolt;
+using UnityEngine;
+
+public class InteractiveObject_PISCUS : InteractiveObject, IMultiplayerState<IPiscus_CreatureState>
+{
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Piscus_Creature _piscusCreature;
+
+	[SerializeField]
+	private InteractiveObject_RAGDOLL _piscusCarcass;
+
+	private bool _destroyed;
+
+	public IPiscus_CreatureState MultiplayerState => GetMultiplayerState<IPiscus_CreatureState>();
+
+	public override void Attached()
+	{
+		base.Attached();
+		MultiplayerState.SetTransforms(MultiplayerState.Transform, transform);
+		if ((bool)_piscusCreature && (bool)_piscusCreature.Animation && (bool)_piscusCreature.Animation.AnimatorController)
+		{
+			MultiplayerState.SetAnimator(_piscusCreature.Animation.AnimatorController);
+		}
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
+			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
+		}
+		base.Damage(damage, damager);
+		_piscusCreature.ApplyDamage(damage);
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		_piscusCreature.Setup_Position();
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		_piscusCreature.Setup_Position();
+	}
+
+	public override void Destroy()
+	{
+		if (!_destroyed)
+		{
+			_destroyed = true;
+			EventManager.RaiseEvent(new ExperienceEvent(LastPlayerIdToDamageThis, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SHARK_KILL));
+			EventManager.RaiseEvent(new AddStatsEvent(LastPlayerIdToDamageThis, new Stats
+			{
+				AnimalsKilled = 1
+			}));
+			if (!Game.Mode.IsClient())
+			{
+				CreateRagdoll();
+				MultiplayerMng.Destroy(this, DestroyDelay.LATE);
+			}
+		}
+	}
+
+	private void CreateRagdoll()
+	{
+		InteractiveObject_RAGDOLL interactiveObject_RAGDOLL = MultiplayerMng.Instantiate<InteractiveObject_RAGDOLL>(_piscusCarcass.GetComponent<SaveablePrefab>().PrefabId, MiniGuid.New());
+		interactiveObject_RAGDOLL.transform.position = transform.position;
+		this.ReplicatedCopyTransformsTo(interactiveObject_RAGDOLL);
+		this.ReplicatedCopyProjectilesTo(interactiveObject_RAGDOLL);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 369
+PATH: Assembly-CSharp__InteractiveObject_PLAYER_RAGDOLL.cs
+SIZE: 4325 bytes
+SHA256: 8d01084a65831b2b06cb5350da21d7f0ef886311dc30d3af225a343a869614f2
+====================================================================================================
+
+using System;
+using System.Collections;
+using Beam;
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_PLAYER_RAGDOLL : InteractiveObject, IRagdoll, IBase, IHasCraftingType, ISaveablePrefab, ISaveableReference, ISaveable, IHaveAttribute
+{
+	[Header("ATTRIBUTE")]
+	[SerializeField]
+	private IconType _type;
+
+	[SerializeField]
+	private GameObject _playerModel;
+
+	[PREFAB_PROCESSOR_GetComponentsInChildren]
+	[SerializeField]
+	private RagdollChild[] _ragdollChildren;
+
+	[SerializeField]
+	private RagdollHelper _ragdollHelper;
+
+	public Transform RagdollCameraJoint;
+
+	public Transform RagdollRevivePos;
+
+	private IPlayer _player;
+
+	IconType IHaveAttribute.Type => _type;
+
+	public RagdollChild[] RagdollChildren => _ragdollChildren;
+
+	public RagdollHelper RagdollHelper => _ragdollHelper;
+
+	public override bool IsValidPrefab => true;
+
+	float IHaveAttribute.GetValue()
+	{
+		return HealthPoints / OriginalHealthPoints;
+	}
+
+	public override string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed() || _player.Statistics.IsReviving || _player.Id == playerId)
+		{
+			return string.Empty;
+		}
+		if (IsRevivable(obj))
+		{
+			return "ITEM_INTERACTION_DESCRIPTION_REVIVE";
+		}
+		return string.Empty;
+	}
+
+	public override void Attached()
+	{
+		base.Attached();
+		Player player = (Player)PlayerUtilities.GetPlayerFromId(MiniGuid.PLAYER_ID_FROM_RAGDOLL(ReferenceId));
+		if (player.IsValid())
+		{
+			Initialize(player);
+		}
+	}
+
+	public void Initialize(IPlayer player)
+	{
+		_player = player;
+		_ragdollHelper.player = _player;
+		_ragdollHelper.ragdolled = true;
+		player.Character.CharacterFirstPerson.AnimController.transform.CopyTransformsToRecursive(transform);
+		player.PlayerCamera.CameraMovement.SetCameraTarget(RagdollCameraJoint);
+		if (PlayerRegistry.AllPlayers.Count > 1)
+		{
+			StartCoroutine(Decay());
+		}
+		EventManager.AddListener<PlayerDisconnectedEvent>(PlayerDisconnected);
+	}
+
+	public override void OnDestroy()
+	{
+		EventManager.RemoveListener<PlayerDisconnectedEvent>(PlayerDisconnected);
+	}
+
+	private IEnumerator Decay()
+	{
+		while (_ragdollHelper.ragdolled)
+		{
+			_player.transform.position = transform.position;
+			HealthPoints -= 0.25f * Time.deltaTime;
+			if (HealthPoints <= 0f)
+			{
+				Die();
+				break;
+			}
+			yield return null;
+		}
+	}
+
+	public override bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed() || _player.Statistics.IsReviving)
+		{
+			return Interact(player);
+		}
+		if (!_player.Statistics.IsReviving && IsRevivable(obj))
+		{
+			_player.Statistics.IsReviving = true;
+			player.Holder.ReleaseAndDestroyCurrent();
+			Revive();
+			return Interact(player);
+		}
+		return Interact(player);
+	}
+
+	private bool IsRevivable(IBase obj)
+	{
+		return obj.CraftingType.InteractiveType == InteractiveType.MEDICAL_BANDAGE;
+	}
+
+	private void Revive()
+	{
+		StartCoroutine(ReviveAnimation());
+	}
+
+	private IEnumerator ReviveAnimation()
+	{
+		float timer = 0f;
+		float reviveTime = 3f;
+		_ragdollHelper.ragdolled = false;
+		while (timer < reviveTime)
+		{
+			timer += Time.deltaTime;
+			yield return null;
+		}
+		_player.Statistics.Revive(RagdollRevivePos.transform);
+		MultiplayerMng.DestroyMultiplayerEntity(gameObject);
+	}
+
+	private void Die()
+	{
+		CanInteract = false;
+		CanDamage = false;
+		_player.Statistics.Die();
+	}
+
+	private void PlayerDisconnected(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		if (Game.Mode.IsServer() && _player.Id == 0 && disconnectedEvent.PlayerId == 1)
+		{
+			PlayerRegistry.GameOver();
+		}
+		if (_player.Id != disconnectedEvent.PlayerId)
+		{
+			return;
+		}
+		try
+		{
+			if (!gameObject.IsNullOrDestroyed())
+			{
+				SaveablePrefab component = gameObject.GetComponent<SaveablePrefab>();
+				if (!component.IsNullOrDestroyed())
+				{
+					MultiplayerMng.Destroy(component);
+				}
+			}
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = this.SaveRagdoll();
+		jObject.AddField("Ragdolls", data);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject ragdollData = data.GetField("Ragdolls");
+		if (ragdollData != null)
+		{
+			LevelLoader.CurrentLoader.PhysicalLoading.Add(() =>
+			{
+				this.LoadRagdoll(ragdollData);
+			});
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 370
+PATH: Assembly-CSharp__InteractiveObject_SNAKE.cs
+SIZE: 2785 bytes
+SHA256: e027c480b56845809915737b8548373663752c8f647aba370ba5e92306bf0091
+====================================================================================================
+
+using Beam;
+using Beam.Crafting;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_SNAKE : InteractiveObject_ANIMAL
+{
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Snake _snake;
+
+	[SerializeField]
+	private InteractiveObject_RAGDOLL _ragdollPrefab;
+
+	private bool _destroyed;
+
+	public override void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
+			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
+		}
+		if (Game.Mode.IsMaster())
+		{
+			_snake.TakeDamage();
+		}
+		base.Damage(damage, damager);
+	}
+
+	public override void Destroy()
+	{
+		if (!_destroyed)
+		{
+			_destroyed = true;
+			EventManager.RaiseEvent(new ExperienceEvent(LastPlayerIdToDamageThis, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SMALL_KILL));
+			EventManager.RaiseEvent(new AddStatsEvent(LastPlayerIdToDamageThis, new Stats
+			{
+				AnimalsKilled = 1
+			}));
+			if (Game.Mode.IsMaster())
+			{
+				CreateRagdoll();
+			}
+			MultiplayerMng.Destroy(this, DestroyDelay.LATE);
+		}
+	}
+
+	private void CreateRagdoll()
+	{
+		InteractiveObject_RAGDOLL interactiveObject_RAGDOLL = MultiplayerMng.Instantiate<InteractiveObject_RAGDOLL>(_ragdollPrefab.PrefabId, MiniGuid.New());
+		interactiveObject_RAGDOLL.transform.position = transform.position;
+		this.ReplicatedCopyTransformsTo(interactiveObject_RAGDOLL, broad: true);
+		this.ReplicatedCopyProjectilesTo(interactiveObject_RAGDOLL);
+	}
+
+	private void CopyTransformsRecurse(Transform source, Transform destination)
+	{
+		destination.position = source.position;
+		destination.rotation = source.rotation;
+		foreach (Transform item in destination)
+		{
+			Transform transform2 = transform.FindInChildren(item.name);
+			if ((bool)transform2)
+			{
+				CopyTransformsRecurse(transform2, item);
+			}
+		}
+	}
+
+	public void CopyProjectiles(Transform source, Transform destination, BaseObject owner)
+	{
+		ProjectileObject[] componentsInChildren = base.transform.GetComponentsInChildren<ProjectileObject>(includeInactive: true);
+		foreach (ProjectileObject projectileObject in componentsInChildren)
+		{
+			Transform transform = destination.FindInChildren(projectileObject.transform.parent.name);
+			if (transform != null)
+			{
+				projectileObject.transform.parent = null;
+				projectileObject.TransformParent = transform;
+				projectileObject.Parent();
+				projectileObject.ProjectileMovement.AttachedBase = owner;
+			}
+		}
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (HealthPoints > 40f)
+		{
+			HealthPoints = 40f;
+			OriginalHealthPoints = 40f;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 371
+PATH: Assembly-CSharp__InteractiveObject_YUCCA_HARVEST.cs
+SIZE: 2256 bytes
+SHA256: b2665210b86f831af8c0bb621f99658ae13ba09a1889b6eb7e598a9aa9bb2034
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class InteractiveObject_YUCCA_HARVEST : InteractiveObject_FOOD
+{
+	[Serializable]
+	public class HarvestResources
+	{
+		public GameObject HarvestPrefab;
+
+		public Transform HarvestPosition;
+
+		public int SpawnAmount = 1;
+	}
+
+	[SerializeField]
+	private HarvestResources[] _resources;
+
+	[HideInInspector]
+	public BaseActionUnityEvent Harvested;
+
+	public override void Damage(float damage, IBase damager)
+	{
+		OnDamaged(damage, damager);
+		IPickupable damager2 = damager as IPickupable;
+		BaseUtilities.DoPlayerDamageMultipliers_Harvesting(ref damage, damager2);
+		HealthPoints -= damage;
+		if (HealthPoints <= 0f)
+		{
+			BaseUtilities.DoPlayerDamageExperience_Harvesting(OriginalHealthPoints, damager2);
+			SpawnHarvest();
+		}
+	}
+
+	private void SpawnHarvest()
+	{
+		HealthPoints = OriginalHealthPoints;
+		if (Game.Mode.IsMaster())
+		{
+			for (int i = 0; i < _resources.Length; i++)
+			{
+				HarvestResources harvestResources = _resources[i];
+				if (harvestResources.SpawnAmount <= 1)
+				{
+					MultiplayerMng.Instantiate<SaveablePrefab>(harvestResources.HarvestPrefab.GetComponent<SaveablePrefab>().PrefabId, harvestResources.HarvestPosition.position, harvestResources.HarvestPosition.rotation, MiniGuid.New());
+					continue;
+				}
+				float num = 0.5f;
+				Vector3 axis = new Vector3(0f, 1f, 0f);
+				Vector3 vector = new Vector3(1f - Mathf.Clamp01(axis.x), 1f - Mathf.Clamp01(axis.y), 1f - Mathf.Clamp01(axis.z));
+				int num2 = 0;
+				for (int j = 0; j < harvestResources.SpawnAmount; j++)
+				{
+					float angle = 360f / (float)harvestResources.SpawnAmount * (float)num2++;
+					Vector3 vector2 = transform.rotation * (Quaternion.AngleAxis(angle, axis) * vector * num);
+					Vector3 vector3 = harvestResources.HarvestPosition.position + vector2;
+					MultiplayerMng.Instantiate<SaveablePrefab>(harvestResources.HarvestPrefab.GetComponent<SaveablePrefab>().PrefabId, vector3, harvestResources.HarvestPosition.rotation, MiniGuid.New()).transform.forward = (transform.position - vector3).normalized;
+				}
+			}
+		}
+		transform.CheckForProjectilesInChildren();
+		Harvested?.Invoke(this, BaseActionEventData.Empty);
+		base.Detach();
+		BeamTeam.Destroy(gameObject);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 372
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_Object.cs
+SIZE: 7682 bytes
+SHA256: 3214abe4a662705284af8b8db3f105d2e1256b043ff577fdb6e888160e95d906
+====================================================================================================
+
+using System;
+using LE_LevelEditor.Events;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_Object : MonoBehaviour
+{
+	public enum Categories
+	{
+		NONE,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_ITEMS", "")]
+		ITEMS,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_TREES", "")]
+		TREES,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_ROCKS", "")]
+		ROCKS,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_ANIMALS", "")]
+		ANIMALS,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_STRUCTURES", "")]
+		STRUCTURES,
+		[Description("MAP_EDITOR_OBJECTS_CATEGORY_MISC", "")]
+		MISC
+	}
+
+	public enum ESnapType
+	{
+		SNAP_DISABLED,
+		SNAP_TO_TERRAIN,
+		SNAP_TO_OBJECT,
+		SNAP_TO_3D_GRID,
+		SNAP_TO_2D_GRID_AND_TERRAIN
+	}
+
+	public uint Id;
+
+	public Categories Category;
+
+	public string EditorObjectName;
+
+	[SerializeField]
+	private int _densityWeight = 1;
+
+	private const float OUTLINE_INV_WIDTH = 300f;
+
+	private static int s_nextFreeUID = 1;
+
+	[SerializeField]
+	private string m_iconPath = "";
+
+	[SerializeField]
+	private bool m_isPlacementRotationByNormal = true;
+
+	[SerializeField]
+	private bool m_isMovable = true;
+
+	[SerializeField]
+	private bool m_isMovableOnX = true;
+
+	[SerializeField]
+	private bool m_isMovableOnY = true;
+
+	[SerializeField]
+	private bool m_isMovableOnZ = true;
+
+	[SerializeField]
+	private bool m_isRotatable = true;
+
+	[SerializeField]
+	private bool m_isRotatableAroundX = true;
+
+	[SerializeField]
+	private bool m_isRotatableAroundY = true;
+
+	[SerializeField]
+	private bool m_isRotatableAroundZ = true;
+
+	[SerializeField]
+	private int m_maxInstancesInLevel;
+
+	[SerializeField]
+	private ESnapType m_snapType;
+
+	[SerializeField]
+	private int m_rootSnapPointIndex = -1;
+
+	[SerializeField]
+	private LE_ObjectSnapPoint[] m_objectSnapPoints = new LE_ObjectSnapPoint[0];
+
+	[SerializeField]
+	private bool m_isDrawSnapToObjectUI = true;
+
+	[SerializeField]
+	private Vector3 m_snapGridOffset = Vector3.zero;
+
+	[SerializeField]
+	private Vector3 m_snapGridCellSize = Vector3.one * 10f;
+
+	private int m_UID = s_nextFreeUID++;
+
+	private bool m_isSelectedChanged;
+
+	private bool m_isSelected;
+
+	private LE_EObjectEditMode m_editMode;
+
+	private LE_ObjectEditHandle m_editHandle;
+
+	public int DensityWeight
+	{
+		get
+		{
+			return _densityWeight;
+		}
+		set
+		{
+			_densityWeight = value;
+		}
+	}
+
+	[HideInInspector]
+	public string IconPath
+	{
+		get
+		{
+			return m_iconPath;
+		}
+		set
+		{
+			m_iconPath = value;
+		}
+	}
+
+	public bool IsPlacementRotationByNormal
+	{
+		get
+		{
+			return m_isPlacementRotationByNormal;
+		}
+		set
+		{
+			m_isPlacementRotationByNormal = value;
+		}
+	}
+
+	public bool IsMovable
+	{
+		get
+		{
+			return m_isMovable;
+		}
+		set
+		{
+			m_isMovable = value;
+		}
+	}
+
+	public bool IsMovableOnX
+	{
+		get
+		{
+			return m_isMovableOnX;
+		}
+		set
+		{
+			m_isMovableOnX = value;
+		}
+	}
+
+	public bool IsMovableOnY
+	{
+		get
+		{
+			return m_isMovableOnY;
+		}
+		set
+		{
+			m_isMovableOnY = value;
+		}
+	}
+
+	public bool IsMovableOnZ
+	{
+		get
+		{
+			return m_isMovableOnZ;
+		}
+		set
+		{
+			m_isMovableOnZ = value;
+		}
+	}
+
+	public bool IsRotatable
+	{
+		get
+		{
+			return m_isRotatable;
+		}
+		set
+		{
+			m_isRotatable = value;
+		}
+	}
+
+	public bool IsRotatableAroundX
+	{
+		get
+		{
+			return m_isRotatableAroundX;
+		}
+		set
+		{
+			m_isRotatableAroundX = value;
+		}
+	}
+
+	public bool IsRotatableAroundY
+	{
+		get
+		{
+			return m_isRotatableAroundY;
+		}
+		set
+		{
+			m_isRotatableAroundY = value;
+		}
+	}
+
+	public bool IsRotatableAroundZ
+	{
+		get
+		{
+			return m_isRotatableAroundZ;
+		}
+		set
+		{
+			m_isRotatableAroundZ = value;
+		}
+	}
+
+	public int MaxInstancesInLevel
+	{
+		get
+		{
+			return m_maxInstancesInLevel;
+		}
+		set
+		{
+			m_maxInstancesInLevel = value;
+		}
+	}
+
+	public ESnapType SnapType
+	{
+		get
+		{
+			return m_snapType;
+		}
+		set
+		{
+			m_snapType = value;
+		}
+	}
+
+	public int RootSnapPointIndex
+	{
+		get
+		{
+			return m_rootSnapPointIndex;
+		}
+		set
+		{
+			m_rootSnapPointIndex = value;
+		}
+	}
+
+	public LE_ObjectSnapPoint[] ObjectSnapPoints
+	{
+		get
+		{
+			return m_objectSnapPoints;
+		}
+		set
+		{
+			m_objectSnapPoints = value;
+		}
+	}
+
+	public bool IsDrawSnapToObjectUI
+	{
+		get
+		{
+			return m_isDrawSnapToObjectUI;
+		}
+		set
+		{
+			m_isDrawSnapToObjectUI = value;
+		}
+	}
+
+	public Vector3 SnapGridOffset
+	{
+		get
+		{
+			return m_snapGridOffset;
+		}
+		set
+		{
+			m_snapGridOffset = value;
+		}
+	}
+
+	public Vector3 SnapGridCellSize
+	{
+		get
+		{
+			return m_snapGridCellSize;
+		}
+		set
+		{
+			m_snapGridCellSize = value;
+		}
+	}
+
+	public int UID
+	{
+		get
+		{
+			return m_UID;
+		}
+		set
+		{
+			m_UID = value;
+		}
+	}
+
+	public bool IsSelected
+	{
+		get
+		{
+			return m_isSelected;
+		}
+		set
+		{
+			if (m_isSelected != value)
+			{
+				m_isSelected = value;
+				m_isSelectedChanged = true;
+			}
+		}
+	}
+
+	public LE_EObjectEditMode EditMode
+	{
+		get
+		{
+			return m_editMode;
+		}
+		set
+		{
+			m_editMode = value;
+		}
+	}
+
+	public static void ReportUsedUID(int p_usedUID)
+	{
+		s_nextFreeUID = Mathf.Max(s_nextFreeUID, p_usedUID + 1);
+	}
+
+	public void SetupReferences(LE_ObjectReference le)
+	{
+		Category = le.Category;
+		EditorObjectName = le.EditorObjectName;
+		_densityWeight = le.DensityWeight;
+		m_iconPath = le.IconPath;
+		m_isPlacementRotationByNormal = le.IsPlacementRotationByNormal;
+		m_isMovable = le.IsMovable;
+		m_isMovableOnX = le.IsMovableOnX;
+		m_isMovableOnY = le.IsMovableOnY;
+		m_isMovableOnZ = le.IsMovableOnZ;
+		m_isRotatable = le.IsRotatable;
+		m_isRotatableAroundX = le.IsRotatableAroundX;
+		m_isRotatableAroundY = le.IsRotatableAroundY;
+		m_isRotatableAroundZ = le.IsRotatableAroundZ;
+		m_maxInstancesInLevel = le.MaxInstancesInLevel;
+		m_snapType = le.SnapType;
+		m_rootSnapPointIndex = le.RootSnapPointIndex;
+		m_objectSnapPoints = le.ObjectSnapPoints;
+		m_isDrawSnapToObjectUI = le.IsDrawSnapToObjectUI;
+		m_snapGridOffset = le.SnapGridOffset;
+		m_snapGridCellSize = le.SnapGridCellSize;
+	}
+
+	private void Update()
+	{
+		if (m_isSelectedChanged)
+		{
+			m_isSelectedChanged = false;
+		}
+		if (m_editMode == LE_EObjectEditMode.NO_EDIT)
+		{
+			if (m_editHandle != null)
+			{
+				UnityEngine.Object.Destroy(m_editHandle.gameObject);
+			}
+		}
+		else
+		{
+			if (!(m_editHandle == null) && m_editHandle.EditMode == m_editMode)
+			{
+				return;
+			}
+			if (m_editHandle != null)
+			{
+				UnityEngine.Object.Destroy(m_editHandle.gameObject);
+			}
+			if ((m_editMode != LE_EObjectEditMode.MOVE || !m_isMovable || (!m_isMovableOnX && !m_isMovableOnY && !m_isMovableOnZ)) && (m_editMode != LE_EObjectEditMode.ROTATE || !m_isRotatable || (!m_isRotatableAroundX && !m_isRotatableAroundY && !m_isRotatableAroundZ)))
+			{
+				return;
+			}
+			string text = m_editMode.ToString();
+			GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(Resources.Load("ObjectEditHandle" + text), transform.position, transform.rotation);
+			gameObject.transform.parent = transform;
+			m_editHandle = gameObject.GetComponent<LE_ObjectEditHandle>();
+			LE_ObjectEditHandle editHandle = m_editHandle;
+			editHandle.m_onTransformed = (EventHandler)Delegate.Combine(editHandle.m_onTransformed, (EventHandler)((object p_obj, EventArgs p_args) =>
+			{
+				LE_EventInterface.LevelDataChanged(m_editHandle);
+			}));
+			switch (m_editMode)
+			{
+			case LE_EObjectEditMode.MOVE:
+				if (!m_isMovableOnX)
+				{
+					m_editHandle.DisableAxisX();
+				}
+				if (!m_isMovableOnY)
+				{
+					m_editHandle.DisableAxisY();
+				}
+				if (!m_isMovableOnZ)
+				{
+					m_editHandle.DisableAxisZ();
+				}
+				break;
+			case LE_EObjectEditMode.ROTATE:
+				if (!m_isRotatableAroundX)
+				{
+					m_editHandle.DisableAxisX();
+				}
+				if (!m_isRotatableAroundY)
+				{
+					m_editHandle.DisableAxisY();
+				}
+				if (!m_isRotatableAroundZ)
+				{
+					m_editHandle.DisableAxisZ();
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 373
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandle.cs
+SIZE: 6332 bytes
+SHA256: f2f0f55367ce3018b27f7760f6fce54149e028b228d23f7b985357f371bd12a6
+====================================================================================================
+
+using System;
+using Funlabs;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_ObjectEditHandle : MonoBehaviour
+{
+	private const int SKIP_FRAMES = 0;
+
+	private const float MIN_SCALE_VALUE = 0.05f;
+
+	[SerializeField]
+	private LE_EObjectEditMode m_editMode = LE_EObjectEditMode.MOVE;
+
+	private Vector3 m_activeEditAxis = Vector3.zero;
+
+	private int m_lastDragFrame = -1;
+
+	private Vector3 m_lastCursorPos = -1f * Vector3.one;
+
+	private int m_dragSkipCounter;
+
+	private Camera m_cam;
+
+	public EventHandler m_onTransformed;
+
+	public LE_EObjectEditMode EditMode => m_editMode;
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	public bool IsDrag => m_lastDragFrame == Time.frameCount;
+
+	public void OnMyMouseDrag(Vector3 p_axis)
+	{
+		m_activeEditAxis = p_axis;
+		m_lastDragFrame = Time.frameCount;
+	}
+
+	public void DisableAxisX()
+	{
+		DisableAxis(Vector3.right);
+	}
+
+	public void DisableAxisY()
+	{
+		DisableAxis(Vector3.up);
+	}
+
+	public void DisableAxisZ()
+	{
+		DisableAxis(Vector3.forward);
+	}
+
+	private void DisableAxis(Vector3 p_axis)
+	{
+		LE_ObjectEditHandleCollider[] componentsInChildren = GetComponentsInChildren<LE_ObjectEditHandleCollider>();
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			if (componentsInChildren[i].Axis == p_axis)
+			{
+				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
+			}
+			else if (Vector3.Dot(componentsInChildren[i].Axis, p_axis) > 0.0001f)
+			{
+				Vector3 axis = componentsInChildren[i].Axis;
+				axis.Scale(Vector3.one - p_axis);
+				componentsInChildren[i].Axis = axis;
+			}
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (m_lastDragFrame < Time.frameCount)
+		{
+			m_activeEditAxis = Vector3.zero;
+			m_dragSkipCounter = 0;
+		}
+		if ((double)m_activeEditAxis.sqrMagnitude > 0.01)
+		{
+			switch (m_editMode)
+			{
+			case LE_EObjectEditMode.MOVE:
+				Move();
+				break;
+			case LE_EObjectEditMode.ROTATE:
+				Rotate();
+				break;
+			case LE_EObjectEditMode.SCALE:
+				Scale();
+				break;
+			}
+		}
+		m_lastCursorPos = GetCursorPosition();
+	}
+
+	private void OnDestroy()
+	{
+		m_onTransformed = null;
+	}
+
+	private void Move()
+	{
+		float editDelta = GetEditDelta();
+		if (m_dragSkipCounter == 0)
+		{
+			float num = 15625f;
+			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
+			if ((vector * editDelta + transform.position).XZSqr() < num)
+			{
+				transform.parent.position += vector * editDelta;
+			}
+			Vector3 position = transform.parent.position;
+			position.y = Mathf.Clamp(transform.parent.position.y, -25f, 300f);
+			transform.parent.position = position;
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDelta) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private void Scale()
+	{
+		float editDelta = GetEditDelta();
+		if (m_dragSkipCounter == 0)
+		{
+			transform.parent.localScale += m_activeEditAxis * editDelta;
+			transform.parent.localScale = Vector3.Max(Vector3.one * 0.05f, transform.parent.localScale);
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDelta) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private float GetEditDelta()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 p_screenAxis = cam.WorldToScreenPoint(transform.position + transform.TransformDirection(m_activeEditAxis)) - cam.WorldToScreenPoint(transform.position);
+			p_screenAxis.z *= p_screenAxis.z;
+			p_screenAxis.z *= p_screenAxis.z;
+			float num = 1f / (1f - Mathf.Clamp(p_screenAxis.z, 0f, 0.8f));
+			p_screenAxis.z = 0f;
+			p_screenAxis.Normalize();
+			if (cam.orthographic)
+			{
+				return GetEditDeltaOrthogonal(p_screenAxis, num, cam);
+			}
+			float magnitude = (cam.transform.position - transform.position).magnitude;
+			return GetEditDeltaPerspective(p_screenAxis, num * magnitude, cam);
+		}
+		return 0f;
+	}
+
+	private void Rotate()
+	{
+		float editDeltaRotation = GetEditDeltaRotation();
+		if (m_dragSkipCounter == 0)
+		{
+			transform.parent.Rotate(m_activeEditAxis * editDeltaRotation);
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDeltaRotation) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private float GetEditDeltaRotation()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
+			Vector3 vector2 = cam.WorldToScreenPoint(transform.position);
+			vector2.z = 0f;
+			Vector3 p_screenAxis;
+			if (Mathf.Abs(Vector3.Dot(vector, cam.transform.forward)) > 0.5f)
+			{
+				float num = Mathf.Sign(Vector3.Dot(cam.transform.forward, vector));
+				if (num == 0f)
+				{
+					num = 1f;
+				}
+				Vector3 normalized = (GetCursorPosition() - vector2).normalized;
+				p_screenAxis = new Vector3(0f - Mathf.Sign(normalized.y), Mathf.Sign(normalized.x), 0f);
+				p_screenAxis *= num;
+			}
+			else
+			{
+				p_screenAxis = Vector3.Cross(cam.transform.forward, vector);
+				p_screenAxis = cam.transform.InverseTransformDirection(p_screenAxis);
+				p_screenAxis.z = 0f;
+			}
+			p_screenAxis.Normalize();
+			if (cam.orthographic)
+			{
+				return GetEditDeltaOrthogonal(p_screenAxis, 360f / cam.orthographicSize, cam);
+			}
+			return GetEditDeltaPerspective(p_screenAxis, 360f, cam);
+		}
+		return 0f;
+	}
+
+	private float GetEditDeltaPerspective(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
+	{
+		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
+		Ray ray = p_cam.ScreenPointToRay(m_lastCursorPos + num * p_screenAxis);
+		Ray ray2 = p_cam.ScreenPointToRay(m_lastCursorPos);
+		Vector3 direction = ray.direction;
+		Vector3 direction2 = ray2.direction;
+		return (direction - direction2).magnitude * Mathf.Sign(num) * p_multiplier;
+	}
+
+	private float GetEditDeltaOrthogonal(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
+	{
+		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
+		Vector3 vector = p_cam.ScreenToWorldPoint(m_lastCursorPos + num * p_screenAxis);
+		Vector3 vector2 = p_cam.ScreenToWorldPoint(m_lastCursorPos);
+		return (vector - vector2).magnitude * Mathf.Sign(num) * p_multiplier;
+	}
+
+	private Vector3 GetCursorPosition()
+	{
+		if (Input.touchCount > 0)
+		{
+			return Input.GetTouch(0).position;
+		}
+		return Input.mousePosition;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 374
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandleCollider.cs
+SIZE: 4020 bytes
+SHA256: 7e46fd92836a4e25948c1f5c08e6a1e8edc11337f0f0d646c32ec118c17a9b28
+====================================================================================================
+
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_ObjectEditHandleCollider : MonoBehaviour
+{
+	[SerializeField]
+	private LE_ObjectEditHandle m_parent;
+
+	[SerializeField]
+	private Vector3 m_axis;
+
+	[SerializeField]
+	private bool m_isRotationHandle;
+
+	[SerializeField]
+	private Vector3 m_rotationHandleDir;
+
+	private Renderer m_renderer;
+
+	private Collider[] m_colliders;
+
+	private Color m_originalColor;
+
+	private bool m_isDrag;
+
+	private float m_lastCamDist = -1f;
+
+	private Vector3 m_lastParentScale = Vector3.one;
+
+	private Vector3 m_lastParentParentScale = Vector3.one;
+
+	private bool m_isMouseDown;
+
+	private bool m_isMouseDownOnMe;
+
+	private Camera m_cam;
+
+	public Vector3 Axis
+	{
+		get
+		{
+			return m_axis;
+		}
+		set
+		{
+			m_axis = value;
+		}
+	}
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	private void Start()
+	{
+		m_colliders = GetComponentsInChildren<Collider>();
+		m_renderer = GetComponent<Renderer>();
+		m_originalColor = m_renderer.material.color;
+	}
+
+	private void Update()
+	{
+		bool flag = (Input.GetMouseButton(0) && Input.touchCount < 2) || Input.touchCount == 1;
+		if (!m_isMouseDown && !flag)
+		{
+			return;
+		}
+		if (m_isMouseDownOnMe && !flag)
+		{
+			OnMyMouseUp();
+		}
+		else if (m_isMouseDownOnMe & flag)
+		{
+			OnMyMouseDrag();
+		}
+		else
+		{
+			Camera cam = Cam;
+			if (m_colliders != null && cam != null)
+			{
+				for (int i = 0; i < m_colliders.Length; i++)
+				{
+					Collider collider = m_colliders[i];
+					if (((collider != null && !m_isMouseDown) & flag) && !m_parent.IsDrag && (collider.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hitInfo, float.PositiveInfinity) || (Input.touchCount == 1 && collider.Raycast(cam.ScreenPointToRay(Input.GetTouch(0).position), out hitInfo, float.PositiveInfinity))))
+					{
+						m_isMouseDownOnMe = true;
+						OnMyMouseDown();
+						break;
+					}
+				}
+			}
+		}
+		m_isMouseDown = flag;
+		if (!m_isMouseDown)
+		{
+			m_isMouseDownOnMe = false;
+		}
+	}
+
+	private void LateUpdate()
+	{
+		Camera cam = Cam;
+		if (!(cam != null))
+		{
+			return;
+		}
+		if (!m_isDrag && m_isRotationHandle)
+		{
+			Vector3 vector = transform.parent.InverseTransformPoint(cam.transform.position);
+			Vector3 rhs = vector - Vector3.Dot(m_axis, vector) * m_axis;
+			rhs.Normalize();
+			float num = Vector3.Dot(m_rotationHandleDir, rhs);
+			Vector3 euler = Vector3.Cross(m_rotationHandleDir, rhs);
+			euler.Scale(m_axis);
+			float num2 = 57.29578f * Mathf.Asin(euler.magnitude);
+			euler.Normalize();
+			if (num < 0f)
+			{
+				num2 = Mathf.Abs(-180f + num2);
+			}
+			euler *= num2;
+			transform.localRotation = Quaternion.Euler(euler);
+		}
+		float magnitude = (cam.transform.position - transform.position).magnitude;
+		if (!m_isDrag && (cam.orthographic || Mathf.Abs(magnitude - m_lastCamDist) > 0.0001f || m_lastParentScale != m_parent.transform.localScale || m_lastParentParentScale != m_parent.transform.parent.localScale))
+		{
+			float num3 = ((!cam.orthographic) ? (magnitude / 75f) : (cam.orthographicSize / 50f));
+			transform.localScale = new Vector3(num3 / (m_parent.transform.parent.localScale.x * m_parent.transform.localScale.x), num3 / (m_parent.transform.parent.localScale.y * m_parent.transform.localScale.y), num3 / (m_parent.transform.parent.localScale.z * m_parent.transform.localScale.z));
+			m_lastCamDist = magnitude;
+			m_lastParentScale = m_parent.transform.localScale;
+			m_lastParentParentScale = m_parent.transform.parent.localScale;
+		}
+	}
+
+	private void OnMyMouseDown()
+	{
+		m_parent.OnMyMouseDrag(m_axis);
+		m_renderer.material.color = Color.yellow;
+		m_isDrag = true;
+	}
+
+	private void OnMyMouseDrag()
+	{
+		m_parent.OnMyMouseDrag(m_axis);
+		m_isDrag = true;
+	}
+
+	private void OnMyMouseUp()
+	{
+		m_renderer.material.color = m_originalColor;
+		m_parent.transform.localScale = new Vector3(1f / m_parent.transform.parent.localScale.x, 1f / m_parent.transform.parent.localScale.y, 1f / m_parent.transform.parent.localScale.z);
+		m_isDrag = false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 375
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectSnapPoint.cs
+SIZE: 3623 bytes
+SHA256: 4ac9de937f5e90f6d9502ed468cd33cd490ef16e00f8301fd79e30643b7d5857
+====================================================================================================
+
+using System;
+using S_SnapTools;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+[Serializable]
+public class LE_ObjectSnapPoint
+{
+	private const string BUTTON_VISUALS_NAME = "LE_ObjectSnapPoint.Button.Visuals";
+
+	[SerializeField]
+	private Transform m_point;
+
+	[SerializeField]
+	private S_SnapToObjectPrefab[] m_prefabs = new S_SnapToObjectPrefab[1];
+
+	[SerializeField]
+	private Vector3 m_snapButtonLocalOffset = Vector3.zero;
+
+	[SerializeField]
+	private float m_snapButtonSize = 1f;
+
+	private S_SnapToObject m_snapSysInstance;
+
+	public Transform Point
+	{
+		get
+		{
+			return m_point;
+		}
+		set
+		{
+			m_point = value;
+		}
+	}
+
+	public S_SnapToObjectPrefab[] Prefabs
+	{
+		get
+		{
+			return m_prefabs;
+		}
+		set
+		{
+			m_prefabs = value;
+		}
+	}
+
+	public Vector3 SnapButtonLocalOffset
+	{
+		get
+		{
+			return m_snapButtonLocalOffset;
+		}
+		set
+		{
+			m_snapButtonLocalOffset = value;
+		}
+	}
+
+	public float SnapButtonSize
+	{
+		get
+		{
+			return m_snapButtonSize;
+		}
+		set
+		{
+			m_snapButtonSize = value;
+		}
+	}
+
+	public S_SnapToObject SnapSystemInstance
+	{
+		get
+		{
+			return m_snapSysInstance;
+		}
+		set
+		{
+			m_snapSysInstance = value;
+		}
+	}
+
+	public LE_ObjectSnapPoint()
+	{
+		if (m_prefabs != null && m_prefabs.Length == 1)
+		{
+			m_prefabs[0] = new S_SnapToObjectPrefab();
+		}
+	}
+
+	public S_SnapToObject InstatiateSnapSystem(GameObject p_buttonVisuals, bool p_isDrawUI, Material p_materialLine, Material p_materialFill)
+	{
+		if (m_point == null)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Transform property 'Point' is null! Set it in the inspector!");
+			return null;
+		}
+		if (m_prefabs == null || m_prefabs.Length == 0)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Prefabs property array is null or has no entries!");
+			return null;
+		}
+		if (m_snapSysInstance != null)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the system was already initialized!");
+			UnityEngine.Object.Destroy(m_snapSysInstance);
+		}
+		m_snapSysInstance = Point.gameObject.AddComponent<S_SnapToObject>();
+		m_snapSysInstance.Prefabs = Prefabs;
+		m_snapSysInstance.IsDeactivatedAfterSnap = true;
+		m_snapSysInstance.IsDestroyedAfterSnap = false;
+		m_snapSysInstance.IsDrawUI = p_isDrawUI;
+		m_snapSysInstance.UImaterialLine = p_materialLine;
+		m_snapSysInstance.UImaterialFill = p_materialFill;
+		SphereCollider sphereCollider = Point.gameObject.AddComponent<SphereCollider>();
+		sphereCollider.radius = SnapButtonSize * 0.5f;
+		sphereCollider.center = SnapButtonLocalOffset;
+		p_buttonVisuals.name = "LE_ObjectSnapPoint.Button.Visuals";
+		if (p_buttonVisuals != null)
+		{
+			p_buttonVisuals.transform.parent = Point;
+			p_buttonVisuals.transform.localPosition = m_snapButtonLocalOffset;
+			p_buttonVisuals.transform.localScale = Vector3.one * m_snapButtonSize;
+			p_buttonVisuals.transform.localRotation = Quaternion.identity;
+		}
+		else
+		{
+			Debug.LogWarning("LE_ObjectSnapPoint: InstatiateSnapSystem: p_buttonVisuals is null! The snap button will be invisible for the user!");
+		}
+		return m_snapSysInstance;
+	}
+
+	public static void DestroySnapSystem(S_SnapToObject p_system)
+	{
+		if (!(p_system != null))
+		{
+			return;
+		}
+		UnityEngine.Object.Destroy(p_system);
+		UnityEngine.Object.Destroy(p_system.GetComponent<SphereCollider>());
+		Transform[] componentsInChildren = p_system.GetComponentsInChildren<Transform>(includeInactive: true);
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			if (componentsInChildren[i].name == "LE_ObjectSnapPoint.Button.Visuals")
+			{
+				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
+			}
+		}
+	}
+}
+
+

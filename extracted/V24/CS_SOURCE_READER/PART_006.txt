@@ -1,0 +1,6209 @@
+
+====================================================================================================
+SOURCE FILE 126
+PATH: Assembly-CSharp__AudioManager.cs
+SIZE: 11507 bytes
+SHA256: d1b229317ab1d6ee08dd0d06e5f47dc88ac052aab3aabe42c5c4ef4aace3d995
+====================================================================================================
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using Beam.Events;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+using UnityEngine.Audio;
+
+public class AudioManager : MonoBehaviour, IAudioPlayer
+{
+	private const int AUDIO_PRIORITY_2D = 126;
+
+	private const int AUDIO_PRIORITY_3D = 127;
+
+	private static AudioManager _Instance;
+
+	[SerializeField]
+	private Transform _pooledParent;
+
+	[SerializeField]
+	private Transform _activeParent;
+
+	[Header("MIXER")]
+	[SerializeField]
+	private AudioMixer _audioMixer;
+
+	[SerializeField]
+	private AudioMixerGroup _musicMixerGroup;
+
+	[SerializeField]
+	private AudioMixerGroup _environmentMixerGroup;
+
+	[SerializeField]
+	private AudioMixerGroup _fxMixerGroup;
+
+	[SerializeField]
+	private AudioMixerGroup _voiceMixerGroup;
+
+	[SerializeField]
+	private AudioMixerGroup _uiMixerGroup;
+
+	[SerializeField]
+	private AudioMixerSnapshot _regularMixerSnapshot;
+
+	[SerializeField]
+	private AudioMixerSnapshot _underwaterMixerSnapshot;
+
+	[Header("ROLLOFF PRESETS")]
+	[SerializeField]
+	private AudioRollOff _veryNearRollOff;
+
+	[SerializeField]
+	private AudioRollOff _nearRollOff;
+
+	[SerializeField]
+	private AudioRollOff _farRollOff;
+
+	[SerializeField]
+	private AudioRollOff _veryFarRollOff;
+
+	private IPlayer[] _listeners;
+
+	private CoroutineHandle _updateSequence;
+
+	private UAudioMixer _uAudioMixer;
+
+	public static IAudioPlayer GetAudioPlayer()
+	{
+		IAudioPlayer instance = _Instance;
+		return instance ?? NullAudioPlayer.Instance;
+	}
+
+	private void Awake()
+	{
+		if (_Instance != null)
+		{
+			BeamTeam.Destroy(gameObject);
+			return;
+		}
+		_Instance = this;
+		if (Game.State != GameState.MAP_EDITOR)
+		{
+			_listeners = new IPlayer[Game.Mode.GetLocalPlayersCount()];
+			_updateSequence = Timing.RunCoroutine(Update_Sequence(), Segment.SlowUpdate);
+		}
+	}
+
+	private void Start()
+	{
+		if (Game.State == GameState.MAP_EDITOR)
+		{
+			return;
+		}
+		if (LevelLoader.IsLoading())
+		{
+			LevelLoader.CurrentLoader.PostLoading.Add(() =>
+			{
+				PlayerRegistry.LocalPlayer.PlayerCamera.ToggleUnderwater += Cameras_ToggleUnderwater;
+			});
+		}
+		else
+		{
+			PlayerRegistry.LocalPlayer.PlayerCamera.ToggleUnderwater += Cameras_ToggleUnderwater;
+		}
+		EventManager.AddListener<OptionsAppliedEvent>(EventManager_OptionsAppliedEvent);
+		LoadOptions();
+	}
+
+	protected void OnDestroy()
+	{
+		Timing.KillCoroutines(_updateSequence);
+		AudioActorFactory<AudioActor>.Dispose();
+		AudioActorFactory<SpatialAudioActor>.Dispose();
+		Cameras_ToggleUnderwater(underwater: false);
+		if (PlayerRegistry.LocalPlayer != null && PlayerRegistry.LocalPlayer.PlayerCamera != null)
+		{
+			PlayerRegistry.LocalPlayer.PlayerCamera.ToggleUnderwater -= Cameras_ToggleUnderwater;
+		}
+		EventManager.RemoveListener<OptionsAppliedEvent>(EventManager_OptionsAppliedEvent);
+		if (_Instance == this)
+		{
+			_Instance = null;
+		}
+	}
+
+	private void LoadOptions()
+	{
+		GetAudioMixer().GetChannel(AudioMixerChannels.Master).Volume = Options.AudioSettings.MasterVolume;
+		GetAudioMixer().GetChannel(AudioMixerChannels.Music).Volume = Options.AudioSettings.MusicVolume;
+		GetAudioMixer().GetChannel(AudioMixerChannels.UI).Volume = Options.AudioSettings.UIVolume;
+		GetAudioMixer().GetChannel(AudioMixerChannels.Environment).Volume = Options.AudioSettings.EnvironmentVolume;
+		GetAudioMixer().GetChannel(AudioMixerChannels.FX).Volume = Options.AudioSettings.EffectsVolume;
+		GetAudioMixer().GetChannel(AudioMixerChannels.Voice).Volume = Options.AudioSettings.VoiceVolume;
+	}
+
+	private void EventManager_OptionsAppliedEvent(OptionsAppliedEvent e)
+	{
+		LoadOptions();
+	}
+
+	private void Cameras_ToggleUnderwater(bool underwater)
+	{
+		(underwater ? _underwaterMixerSnapshot : _regularMixerSnapshot).TransitionTo(0f);
+	}
+
+	public AudioActorHandle Play2D(AudioClip clip, AudioMixerChannels channel, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return Play2D_(clip, channel, mode)?.Handle ?? AudioActorHandle.Empty;
+	}
+
+	private AudioActor Play2D_(AudioClip clip, AudioMixerChannels channel, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		if (clip == null)
+		{
+			return null;
+		}
+		AudioActor audioActor = Pop<AudioActor>();
+		audioActor.Position = Vector3.zero;
+		audioActor.Source.Clip = clip;
+		audioActor.Source.Loop = mode == AudioPlayMode.Persistent;
+		audioActor.Source.Priority = 126;
+		audioActor.Source.OutputAudioMixerGroup = GetAudioMixerGroup(channel);
+		audioActor.Source.Play();
+		return audioActor;
+	}
+
+	public AudioActorHandle Play3D(AudioClip clip, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return Play3D_(clip, position, channel, distance, mode)?.Handle ?? AudioActorHandle.Empty;
+	}
+
+	public AudioActorHandle Play3D(AudioClip[] clips, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		if (clips == null || clips.Length == 0)
+		{
+			return AudioActorHandle.Empty;
+		}
+		AudioClip clip = clips[Random.Range(0, clips.Length)];
+		SpatialAudioActor spatialAudioActor = Play3D_(clip, position, channel, distance, mode);
+		if (spatialAudioActor != null)
+		{
+			spatialAudioActor.Target = null;
+			return spatialAudioActor.Handle;
+		}
+		return AudioActorHandle.Empty;
+	}
+
+	public AudioActorHandle Play3D(AudioClip clip, Transform target, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		SpatialAudioActor spatialAudioActor = Play3D_(clip, target.position, channel, distance, mode);
+		if (spatialAudioActor != null)
+		{
+			spatialAudioActor.Target = target;
+			return spatialAudioActor.Handle;
+		}
+		return AudioActorHandle.Empty;
+	}
+
+	private SpatialAudioActor Play3D_(AudioClip clip, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		if (clip == null)
+		{
+			return null;
+		}
+		AudioRollOff audioRollOff = GetAudioRollOff(distance);
+		int listeners = GetListeners(position, audioRollOff.MaxDistance);
+		if (listeners == 0 && mode == AudioPlayMode.Single)
+		{
+			return null;
+		}
+		SpatialAudioActor spatialAudioActor = Pop<SpatialAudioActor>();
+		spatialAudioActor.Position = position;
+		spatialAudioActor.Source.Clip = clip;
+		spatialAudioActor.Source.Loop = mode == AudioPlayMode.Persistent;
+		spatialAudioActor.Source.OutputAudioMixerGroup = GetAudioMixerGroup(channel);
+		spatialAudioActor.Source.RollOff = audioRollOff;
+		spatialAudioActor.Source.Priority = 127;
+		spatialAudioActor.Target = null;
+		if (listeners > 0)
+		{
+			spatialAudioActor.Source.Play();
+		}
+		return spatialAudioActor;
+	}
+
+	private TAudioActor Pop<TAudioActor>() where TAudioActor : AudioActor
+	{
+		TAudioActor val = AudioActorFactory<TAudioActor>.Create();
+		val.Source.transform.SetParent(_activeParent, worldPositionStays: false);
+		val.Source.transform.position = Vector3.zero;
+		return val;
+	}
+
+	private void Pool<TAudioActor>(TAudioActor audioActor) where TAudioActor : AudioActor
+	{
+		audioActor.Source.transform.SetParent(_pooledParent, worldPositionStays: false);
+		AudioActorFactory<TAudioActor>.Pool(audioActor);
+	}
+
+	public void Stop(AudioActorHandle handle)
+	{
+		if (!handle.IsValid())
+		{
+			return;
+		}
+		AudioActor audioActor = AudioActorFactory<AudioActor>.GetActiveActors().FirstOrDefault((AudioActor s) => s.Handle == handle);
+		if (audioActor != null)
+		{
+			Pool(audioActor);
+			return;
+		}
+		SpatialAudioActor spatialAudioActor = AudioActorFactory<SpatialAudioActor>.GetActiveActors().FirstOrDefault((SpatialAudioActor s) => s.Handle == handle);
+		if (spatialAudioActor != null)
+		{
+			Pool(spatialAudioActor);
+		}
+	}
+
+	public IAudioSource GetAudioSource(AudioActorHandle handle)
+	{
+		if (!handle.IsValid())
+		{
+			return NullAudioSource.Instance;
+		}
+		AudioActor audioActor = AudioActorFactory<AudioActor>.GetActiveActors().FirstOrDefault((AudioActor s) => s.Handle == handle);
+		if (audioActor != null)
+		{
+			return audioActor.Source ?? NullAudioSource.Instance;
+		}
+		SpatialAudioActor spatialAudioActor = AudioActorFactory<SpatialAudioActor>.GetActiveActors().FirstOrDefault((SpatialAudioActor s) => s.Handle == handle);
+		if (spatialAudioActor != null)
+		{
+			return spatialAudioActor.Source ?? NullAudioSource.Instance;
+		}
+		return NullAudioSource.Instance;
+	}
+
+	public IAudioMixer GetAudioMixer()
+	{
+		return _uAudioMixer ?? (_uAudioMixer = new UAudioMixer(_audioMixer));
+	}
+
+	private int GetListeners(Vector3 position, float maxDistance)
+	{
+		return PlayerUtilities.FindPlayers_NonAlloc(_listeners, position, maxDistance, Game.Mode.IsMultiplayer() ? PlayerUtilities.LocalPlayers() : PlayerUtilities.AllPlayers());
+	}
+
+	private IEnumerator<float> Update_Sequence()
+	{
+		while (true)
+		{
+			IList<AudioActor> activeActors = AudioActorFactory<AudioActor>.GetActiveActors();
+			for (int num = activeActors.Count - 1; num >= 0; num--)
+			{
+				AudioActor audioActor = activeActors[num];
+				if (!audioActor.Source.Loop && !audioActor.Source.IsPlaying)
+				{
+					Pool(audioActor);
+				}
+			}
+			IList<SpatialAudioActor> activeActors2 = AudioActorFactory<SpatialAudioActor>.GetActiveActors();
+			for (int num2 = activeActors2.Count - 1; num2 >= 0; num2--)
+			{
+				SpatialAudioActor spatialAudioActor = activeActors2[num2];
+				if (!spatialAudioActor.Source.Loop && !spatialAudioActor.Source.IsPlaying)
+				{
+					Pool(spatialAudioActor);
+				}
+				else
+				{
+					if (spatialAudioActor.Target != null)
+					{
+						spatialAudioActor.Position = spatialAudioActor.Target.position;
+					}
+					int listeners = GetListeners(spatialAudioActor.Position, spatialAudioActor.Source.RollOff.MaxDistance);
+					if (listeners == 0)
+					{
+						if (!spatialAudioActor.Source.Loop)
+						{
+							Pool(spatialAudioActor);
+						}
+						else if (spatialAudioActor.Source.IsPlaying)
+						{
+							spatialAudioActor.Source.Pause();
+						}
+					}
+					else
+					{
+						float num3 = 0f;
+						float num4 = 0f;
+						for (int i = 0; i < listeners; i++)
+						{
+							IPlayer player = _listeners[i];
+							float magnitude = (player.transform.position - spatialAudioActor.Position).magnitude;
+							float num5 = spatialAudioActor.Source.RollOff.Evaluate(magnitude);
+							num3 += num5 * (float)((player.Id != 0) ? 1 : (-1));
+							num4 += num5;
+						}
+						if (num4 > 0f)
+						{
+							spatialAudioActor.Source.Pan = ((Game.Mode.GetLocalPlayersCount() == 1) ? 0f : (num3 / num4));
+							spatialAudioActor.Source.Level = Mathf.Clamp01(num4 / (float)listeners);
+						}
+						if (spatialAudioActor.Source.IsPaused)
+						{
+							spatialAudioActor.Source.Unpause();
+						}
+						else if (!spatialAudioActor.Source.IsPlaying)
+						{
+							spatialAudioActor.Source.Play();
+						}
+					}
+				}
+			}
+			yield return 0f;
+		}
+	}
+
+	public AudioMixerGroup GetAudioMixerGroup(AudioMixerChannels channel)
+	{
+		return channel switch
+		{
+			AudioMixerChannels.Music => _musicMixerGroup, 
+			AudioMixerChannels.Environment => _environmentMixerGroup, 
+			AudioMixerChannels.FX => _fxMixerGroup, 
+			AudioMixerChannels.Voice => _voiceMixerGroup, 
+			AudioMixerChannels.UI => _uiMixerGroup, 
+			_ => null, 
+		};
+	}
+
+	private AudioRollOff GetAudioRollOff(AudioRollOffDistance distance)
+	{
+		return distance switch
+		{
+			AudioRollOffDistance.VeryNear => _veryNearRollOff, 
+			AudioRollOffDistance.Near => _nearRollOff, 
+			AudioRollOffDistance.VeryFar => _veryFarRollOff, 
+			_ => _farRollOff, 
+		};
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 127
+PATH: Assembly-CSharp__BEAMSeaFortGenerator.cs
+SIZE: 2471 bytes
+SHA256: 394bdd2c2a5577bb921b6cab6b3f714969cdbeb1a130ad0bd02bb8b87333b307
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using UnityEngine;
+
+public class BEAMSeaFortGenerator : MonoBehaviour, IGenerationObject
+{
+	[SerializeField]
+	private Transform startingPoint;
+
+	public Module[] Modules;
+
+	public Module[] StartModule;
+
+	private static System.Random _randomSeed;
+
+	[SerializeField]
+	private int minIteration = 1;
+
+	[SerializeField]
+	private int maxIteration = 4;
+
+	private void Start()
+	{
+		_randomSeed = Singleton<StrandedWorld>.Instance.GenerateLocalSeed(transform.position);
+		int num = _randomSeed.Next(minIteration, maxIteration);
+		Module module = UnityEngine.Object.Instantiate(StartModule[_randomSeed.Next(StartModule.Length)], startingPoint.position, transform.rotation);
+		module.transform.parent = transform.parent;
+		module.SetUpSupport(seaLadderAccess: true);
+		List<ModuleConnector> list = new List<ModuleConnector>(module.GetExits());
+		for (int i = 0; i < num; i++)
+		{
+			List<ModuleConnector> list2 = new List<ModuleConnector>();
+			foreach (ModuleConnector item in list)
+			{
+				string random = GetRandom(item.Tags);
+				Module module2 = UnityEngine.Object.Instantiate(GetRandomWithTag(Modules, random));
+				module2.transform.parent = transform.parent;
+				bool upSupport = _randomSeed.NextDouble() < 0.20000000298023224;
+				module2.SetUpSupport(upSupport);
+				ModuleConnector[] exits = module2.GetExits();
+				ModuleConnector exitToMatch = exits.FirstOrDefault((ModuleConnector x) => x.IsDefault) ?? GetRandom(exits);
+				MatchExits(item, exitToMatch);
+				list2.AddRange(exits.Where((ModuleConnector e) => e != exitToMatch));
+			}
+			list = list2;
+		}
+	}
+
+	private void MatchExits(ModuleConnector oldExit, ModuleConnector newExit)
+	{
+		Transform parent = newExit.transform.parent.parent;
+		parent.RotateAround(angle: Azimuth(-oldExit.transform.forward) - Azimuth(newExit.transform.forward), point: newExit.transform.position, axis: Vector3.up);
+		Vector3 vector = oldExit.transform.position - newExit.transform.position;
+		parent.transform.position += vector;
+	}
+
+	private static TItem GetRandom<TItem>(TItem[] array)
+	{
+		return array[_randomSeed.Next(0, array.Length)];
+	}
+
+	private static Module GetRandomWithTag(IEnumerable<Module> modules, string tagToMatch)
+	{
+		return GetRandom(modules.Where((Module m) => m.Tags.Contains(tagToMatch)).ToArray());
+	}
+
+	private static float Azimuth(Vector3 vector)
+	{
+		return Vector3.Angle(Vector3.forward, vector) * Mathf.Sign(vector.x);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 128
+PATH: Assembly-CSharp__Beam.Crafting__Connector.cs
+SIZE: 5249 bytes
+SHA256: b4f1a47185a132e7c2b33e2c7b26922815e7d475a6a1580197532729440475f3
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+[ExecuteInEditMode]
+public class Connector : MonoBehaviour
+{
+	private enum EConnectMode
+	{
+		Free,
+		RequireConnector
+	}
+
+	[SerializeField]
+	private Constructing _constructing;
+
+	private List<Constructing> _constructions = new List<Constructing>();
+
+	[SerializeField]
+	private ConnectorType _type;
+
+	[SerializeField]
+	private AttributeType _maximumTier;
+
+	[SerializeField]
+	private EConnectMode _connectMode;
+
+	[SerializeField]
+	private bool _canSet = true;
+
+	[SerializeField]
+	private bool _isValid;
+
+	[SerializeField]
+	private bool _checkType = true;
+
+	[SerializeField]
+	[Tooltip("Don't snap to collider center, used transform position instead")]
+	private bool _useTransformPositionForSnapping;
+
+	private SphereCollider _collider;
+
+	private ConnectorCheck[] _checks;
+
+	public Constructing Constructing
+	{
+		get
+		{
+			return _constructing;
+		}
+		set
+		{
+			_constructing = value;
+		}
+	}
+
+	public IList<Constructing> Constructions => _constructions;
+
+	public ConnectorType Type => _type;
+
+	public AttributeType MaximumTier => _maximumTier;
+
+	public bool CanSet => _canSet;
+
+	public bool IsValid
+	{
+		get
+		{
+			return _isValid;
+		}
+		set
+		{
+			if (_canSet)
+			{
+				_isValid = value;
+			}
+		}
+	}
+
+	public SphereCollider Collider
+	{
+		get
+		{
+			if (_collider == null)
+			{
+				_collider = GetComponent<SphereCollider>();
+			}
+			return _collider;
+		}
+	}
+
+	public IList<ConnectorCheck> Checks
+	{
+		get
+		{
+			if (_checks == null)
+			{
+				_checks = GetComponents<ConnectorCheck>();
+			}
+			return _checks;
+		}
+	}
+
+	public void Enable(bool enabled)
+	{
+		Collider.enabled = enabled;
+	}
+
+	public bool ConnectTo(Connector connector, Placement placement)
+	{
+		if (!connector)
+		{
+			if (_connectMode == EConnectMode.RequireConnector)
+			{
+				return false;
+			}
+			bool flag = true;
+			foreach (ConnectorCheck check in Checks)
+			{
+				flag = check.Check(placement, null);
+				if (!flag)
+				{
+					break;
+				}
+			}
+			return flag;
+		}
+		if (!connector.IsValid)
+		{
+			return false;
+		}
+		if (_checkType && _type != connector.Type)
+		{
+			return false;
+		}
+		if (_maximumTier > AttributeType.None && _constructing.CraftingType.AttributeType > _maximumTier)
+		{
+			return false;
+		}
+		if ((_type == ConnectorType.WALL || _type == ConnectorType.DOOR) && (!connector.Constructing || !connector.Constructing.Structure))
+		{
+			return false;
+		}
+		for (int i = 0; i < Checks.Count; i++)
+		{
+			if (!Checks[i].Check(placement, connector))
+			{
+				return false;
+			}
+		}
+		placement.Position = (_useTransformPositionForSnapping ? connector.transform.position : connector.Collider.transform.TransformPoint(connector.Collider.center));
+		placement.Rotation = connector.transform.rotation;
+		return true;
+	}
+
+	public void Refresh(GameObject placingObject = null)
+	{
+		_constructions.Clear();
+		IList<Constructing> componentsInSphere = BeamPhysics.GetComponentsInSphere<Constructing>(Collider.transform.TransformPoint(Collider.center), Collider.radius, 1 << transform.parent.gameObject.layer);
+		for (int i = 0; i < componentsInSphere.Count; i++)
+		{
+			Constructing constructing = componentsInSphere[i];
+			if (constructing != _constructing)
+			{
+				_constructions.Add(constructing);
+			}
+		}
+		if (componentsInSphere.Count == 0 && placingObject != null && placingObject.activeInHierarchy)
+		{
+			Constructing inParent = placingObject.transform.GetInParent<Constructing>();
+			if (inParent != _constructing)
+			{
+				_constructions.Add(inParent);
+			}
+		}
+		IsValid = _constructions.Count == 0;
+	}
+
+	public int GetLocalId()
+	{
+		return _constructing.GetConnectorId(this);
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("IsValid", JSerializer.Serialize(IsValid));
+		jObject.AddField("Type", JSerializer.Serialize(Type));
+		JObject data = JSerializer.Serialize(Collider);
+		jObject.AddField(Collider.GetType().Name, data);
+		if (!_isValid)
+		{
+			JObject jObject2 = new JObject();
+			for (int i = 0; i < _constructions.Count; i++)
+			{
+				Constructing constructing = _constructions[i];
+				jObject2.Add(JSerializer.Serialize(constructing.ReferenceId.ToString()));
+			}
+			jObject.AddField("Constructions", jObject2);
+		}
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+		JObject field = data.GetField("IsValid");
+		_isValid = field.GetValue<bool>();
+		if (_isValid)
+		{
+			return;
+		}
+		JObject constructionsData = data.GetField("Constructions");
+		if (constructionsData == null || constructionsData.IsNull())
+		{
+			return;
+		}
+		LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+		{
+			foreach (JObject child in constructionsData.Children)
+			{
+				MiniGuid referenceId = child.GetValue<string>().ToMiniGuid();
+				Constructing constructing = null;
+				constructing = ((!Constructing.Structure.IsValid()) ? MultiplayerMng.FindObject<Constructing>(referenceId) : Constructing.Structure.transform.FindObject<Constructing>(referenceId));
+				if (constructing != null)
+				{
+					_constructions.Add(constructing);
+				}
+				else
+				{
+					Debug.LogError("Connector::Load:: Error finding construction by reference [" + child?.ToString() + "]");
+				}
+			}
+		});
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 129
+PATH: Assembly-CSharp__Beam.Crafting__Constructing.cs
+SIZE: 18847 bytes
+SHA256: 76d2b89cabeebcb9a652de38de89158d13689acd32811b5297a1bf848b3d3ee6
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam.Crafting;
+
+public class Constructing : BaseObject, IConstructable, ICraftable, IBase, IHasCraftingType, IPlaceable, ISelectable
+{
+	[Serializable]
+	public class ConstructingLevel
+	{
+		public GameObject LevelGameObject;
+	}
+
+	public enum ERotationMode
+	{
+		None,
+		Free
+	}
+
+	private class ReplicateCreateConstruction : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public Construction_STRUCTURE Structure;
+
+		[Replicate]
+		public int StructureLayer;
+
+		[Replicate]
+		public uint PrefabId;
+
+		[Replicate]
+		public MiniGuid ReferenceId;
+
+		[Replicate]
+		public Vector3 Position;
+
+		[Replicate]
+		public Quaternion Rotation;
+
+		public override void OnPeer()
+		{
+			Structure.gameObject.layer = StructureLayer;
+			Constructing constructing = MultiplayerMng.Instantiate<Constructing>(PrefabId, ReferenceId);
+			constructing.transform.position = Position;
+			constructing.transform.rotation = Rotation;
+			constructing.Structure = Structure;
+			constructing.Place();
+		}
+	}
+
+	[SerializeField]
+	private bool handlePlayerColission;
+
+	public const float UNIT_WIDTH = 0.3f;
+
+	public const float ONE_UNIT = 3f;
+
+	public const float ONE_HALF_UNIT = 1.5f;
+
+	public const float CONNECTOR_PANEL_DIAMTER = 0.6f;
+
+	public const float CONNECTOR_FOUNDATION_DIAMETER = 1.2f;
+
+	public const float SNAPPING_THRESHOLD = 0.2f;
+
+	public const float SPHERECAST_RADIUS = 0.3f;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[HideInInspector]
+	[SerializeField]
+	private Selecting _selecting;
+
+	[Header("CRAFTING")]
+	[SerializeField]
+	private GhostCollider.ColliderType _colliderType;
+
+	[SerializeField]
+	private bool _craftImmediate;
+
+	[SerializeField]
+	private GameObject _structurePrefab;
+
+	private Connector _snappedConnector;
+
+	private Connector _prevSnappedConnector;
+
+	[SerializeField]
+	private float _placingDistance = 4f;
+
+	[SerializeField]
+	private ERotationMode _rotationMode;
+
+	[SerializeField]
+	private int _rotationAngle = 90;
+
+	private float _proximityDistance = 4.5f;
+
+	private Placement _previousPlacement = new Placement();
+
+	[SerializeField]
+	private GameObject _ghostObject;
+
+	[SerializeField]
+	private Mesh _ghostMesh;
+
+	[SerializeField]
+	private Renderer _ghostRenderer;
+
+	private Construction_STRUCTURE _structure;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Connector _myConnector;
+
+	[HideInInspector]
+	[SerializeField]
+	private Connector[] _myConnectors;
+
+	[FormerlySerializedAs("_onCrafted")]
+	[SerializeField]
+	[HideInInspector]
+	private InteracterUnityEvent _crafted;
+
+	[Header("PROXIMITY CHECKING")]
+	[SerializeField]
+	private ConstructingProximityCheckMode _proximityChecking;
+
+	private IConstructingProximityCheck _proximityCheck;
+
+	[PREFAB_PROCESSOR_GetComponents]
+	[SerializeField]
+	private PlacementModifier[] _placementModifiers;
+
+	[SerializeField]
+	private LayerMask _connectorLayerMask;
+
+	public float MaximumHealthPoints;
+
+	[SerializeField]
+	private ConstructingLevel[] _constructingLevels;
+
+	[SerializeField]
+	private Collider[] _constructingLevelColliders;
+
+	[PREFAB_PROCESSOR_GetComponents]
+	[SerializeField]
+	private Collider[] _colliders;
+
+	[SerializeField]
+	[FormerlySerializedAs("nestedPlacingCollider")]
+	private bool _nestedPlacingCollider;
+
+	private bool _snapped;
+
+	private int _previousLevel;
+
+	[HideInInspector]
+	public Vector3 Pos;
+
+	[HideInInspector]
+	public Quaternion Rot;
+
+	public Selecting Selecting => _selecting;
+
+	public int CreatorId { get; set; }
+
+	public GhostCollider.ColliderType ColliderType => _colliderType;
+
+	public bool CraftImmediate => _craftImmediate;
+
+	protected GameObject StructurePrefab => _structurePrefab;
+
+	public Connector SnappedConnector
+	{
+		get
+		{
+			return _snappedConnector;
+		}
+		set
+		{
+			_snappedConnector = value;
+		}
+	}
+
+	public int Walls
+	{
+		get
+		{
+			int num = 0;
+			Connector[] myConnectors = _myConnectors;
+			foreach (Connector connector in myConnectors)
+			{
+				if (connector.Type == ConnectorType.WALL && connector.CanSet && !connector.IsValid)
+				{
+					num++;
+				}
+			}
+			return num;
+		}
+	}
+
+	public float PlacingDistance => _placingDistance;
+
+	public ERotationMode RotationMode => _rotationMode;
+
+	protected float ProximityDistance
+	{
+		get
+		{
+			return _proximityDistance;
+		}
+		set
+		{
+			_proximityDistance = value;
+		}
+	}
+
+	public Mesh GhostMesh => _ghostMesh;
+
+	public Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
+
+	public Construction_STRUCTURE Structure
+	{
+		get
+		{
+			return _structure;
+		}
+		set
+		{
+			_structure = value;
+			CanParent = _structure == null;
+		}
+	}
+
+	public Connector MyConnector => _myConnector;
+
+	public Connector[] MyConnectors => _myConnectors;
+
+	protected LayerMask ConnectorLayerMask => _connectorLayerMask;
+
+	public Collider[] Colliders => _colliders;
+
+	public bool IsSnapped => _snapped;
+
+	public bool IsStructurePrefabAMultiplayerEntity()
+	{
+		if (!(_structurePrefab == null))
+		{
+			return _structurePrefab.GetComponent<SaveablePrefab>()?.IsMultiplayerEntity ?? false;
+		}
+		return false;
+	}
+
+	public void SetSnapped(Connector snappedConnector)
+	{
+		_snapped = snappedConnector != null;
+		_prevSnappedConnector = _snappedConnector;
+		_snappedConnector = snappedConnector;
+	}
+
+	protected override void Awake()
+	{
+		base.Awake();
+		InitializeProximityCheck();
+		CheckHealth();
+	}
+
+	private void InitializeProximityCheck()
+	{
+		if (_proximityChecking == ConstructingProximityCheckMode.None)
+		{
+			_proximityCheck = new NoConstructingProximityCheck();
+		}
+		else
+		{
+			_proximityCheck = new DefaultConstructingProximityCheck();
+		}
+	}
+
+	public virtual void OnBeginCrafting()
+	{
+	}
+
+	public virtual bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		Placement placement = new Placement();
+		placement.Position = ghost.position;
+		placement.Rotation = ghost.rotation;
+		for (int i = 0; i < _placementModifiers.Length; i++)
+		{
+			placement = _placementModifiers[i].Modify(placement, ray);
+		}
+		bool result = false;
+		_prevSnappedConnector = _snappedConnector;
+		_snappedConnector = null;
+		_snapped = false;
+		IList<Connector> componentSphereCastAll = BeamPhysics.GetComponentSphereCastAll<Connector>(ray.BaseRay, 0.3f, ray.Length, _connectorLayerMask.value);
+		if (componentSphereCastAll.Count > 0)
+		{
+			for (int j = 0; j < componentSphereCastAll.Count; j++)
+			{
+				Connector connector = componentSphereCastAll[j];
+				_snapped = _myConnector.ConnectTo(connector, placement);
+				if (!_snapped)
+				{
+					continue;
+				}
+				placement = CheckPlacement(placement);
+				_snappedConnector = connector;
+				if (_snappedConnector != _prevSnappedConnector)
+				{
+					Ghost component = ghost.GetComponent<Ghost>();
+					IList<Constructing> constructions;
+					if (!_snappedConnector.Constructing.Structure.DisableGhostCollisionOnSnap)
+					{
+						IList<Constructing> list = _snappedConnector.Constructing.Structure.Constructions.Where((Constructing c) => c is Construction_RAFT).ToList();
+						constructions = list;
+					}
+					else
+					{
+						constructions = _snappedConnector.Constructing.Structure.Constructions;
+					}
+					component.SetCollisionForConstructions(constructions, ignore: true);
+				}
+				result = true;
+				break;
+			}
+		}
+		else
+		{
+			result = _myConnector.ConnectTo(null, placement);
+		}
+		if ((bool)_prevSnappedConnector && _prevSnappedConnector != _snappedConnector && (bool)_prevSnappedConnector.Constructing && (bool)_prevSnappedConnector.Constructing.Structure)
+		{
+			ghost.GetComponent<Ghost>().SetCollisionForConstructions(_prevSnappedConnector.Constructing.Structure.Constructions, ignore: false);
+		}
+		_prevSnappedConnector = null;
+		if (_snapped)
+		{
+			Quaternion rotation = placement.Rotation;
+			if (_rotationMode != ERotationMode.None)
+			{
+				float y = Mathf.Round(yRotation / (float)_rotationAngle) * (float)_rotationAngle;
+				rotation *= Quaternion.Euler(new Vector3(0f, y, 0f));
+			}
+			ghost.position = placement.Position;
+			ghost.rotation = rotation;
+		}
+		else
+		{
+			ghost.position = placement.Position;
+			ghost.rotation = placement.Rotation;
+			if (_rotationMode != ERotationMode.None)
+			{
+				ghost.rotation *= Quaternion.Euler(new Vector3(0f, yRotation, 0f));
+			}
+		}
+		return result;
+	}
+
+	public virtual bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		Placement placement = new Placement();
+		placement.Position = ghost.position;
+		placement.Rotation = ghost.rotation;
+		for (int i = 0; i < _placementModifiers.Length; i++)
+		{
+			placement = _placementModifiers[i].Modify(placement, ray);
+		}
+		bool flag = false;
+		if (_snapped)
+		{
+			_myConnector.ConnectTo(_snappedConnector, placement);
+			placement = CheckPlacement(placement);
+			if (_snappedConnector != _prevSnappedConnector && _snappedConnector.Constructing.Structure.DisableGhostCollisionOnSnap)
+			{
+				Ghost component = ghost.GetComponent<Ghost>();
+				IList<Constructing> constructions;
+				if (!_snappedConnector.Constructing.Structure.DisableGhostCollisionOnSnap)
+				{
+					IList<Constructing> list = _snappedConnector.Constructing.Structure.Constructions.Where((Constructing c) => c is Construction_RAFT).ToList();
+					constructions = list;
+				}
+				else
+				{
+					constructions = _snappedConnector.Constructing.Structure.Constructions;
+				}
+				component.SetCollisionForConstructions(constructions, ignore: true);
+			}
+			flag = true;
+		}
+		else
+		{
+			flag = _myConnector.ConnectTo(null, placement);
+		}
+		if ((bool)_prevSnappedConnector && _prevSnappedConnector != _snappedConnector && (bool)_prevSnappedConnector.Constructing && (bool)_prevSnappedConnector.Constructing.Structure)
+		{
+			ghost.GetComponent<Ghost>().SetCollisionForConstructions(_prevSnappedConnector.Constructing.Structure.Constructions, ignore: false);
+		}
+		_prevSnappedConnector = null;
+		if (_snapped)
+		{
+			Quaternion rotation = placement.Rotation;
+			if (_rotationMode != ERotationMode.None)
+			{
+				float y = Mathf.Round(yRotation / (float)_rotationAngle) * (float)_rotationAngle;
+				rotation *= Quaternion.Euler(new Vector3(0f, y, 0f));
+			}
+			ghost.position = placement.Position;
+			ghost.rotation = rotation;
+		}
+		else
+		{
+			ghost.position = placement.Position;
+			ghost.rotation = placement.Rotation;
+			if (_rotationMode != ERotationMode.None)
+			{
+				ghost.rotation *= Quaternion.Euler(new Vector3(0f, yRotation, 0f));
+			}
+		}
+		return flag;
+	}
+
+	public virtual void Place()
+	{
+		IList<Connector> connectorsAtPlacement = GetConnectorsAtPlacement();
+		if (true)
+		{
+			DoPlace(connectorsAtPlacement);
+		}
+		else
+		{
+			Dismantle();
+		}
+	}
+
+	public virtual void OnCrafted(IPlayer player)
+	{
+		_crafted?.Invoke(player);
+	}
+
+	protected virtual IList<Connector> GetConnectorsAtPlacement()
+	{
+		return BeamPhysics.GetComponentsInBounds<Connector>(_colliders, _connectorLayerMask);
+	}
+
+	protected virtual void DoPlace(IList<Connector> connectors)
+	{
+		UpdateConnectorsAtPlacement(connectors);
+		CheckStructure();
+	}
+
+	protected virtual void UpdateConnectorsAtPlacement(IList<Connector> connectors)
+	{
+		for (int i = 0; i < connectors.Count; i++)
+		{
+			Connector connector = connectors[i];
+			if (_nestedPlacingCollider)
+			{
+				connector.Refresh(gameObject);
+			}
+			else
+			{
+				connector.Refresh();
+			}
+		}
+		for (int j = 0; j < _myConnectors.Length; j++)
+		{
+			Connector connector2 = _myConnectors[j];
+			if (_nestedPlacingCollider)
+			{
+				connector2.Refresh(gameObject);
+			}
+			else
+			{
+				connector2.Refresh();
+			}
+		}
+	}
+
+	protected virtual bool CheckPlacementIsSupported(IList<Connector> connectors)
+	{
+		return true;
+	}
+
+	public bool CheckProximity(Transform ghost)
+	{
+		return _proximityCheck.CheckProximity(this, ghost, _proximityDistance);
+	}
+
+	public virtual void CheckStructure()
+	{
+		if (_snappedConnector != null)
+		{
+			Structure = _snappedConnector.Constructing.Structure;
+		}
+		else if (Structure.IsNullOrDestroyed())
+		{
+			uint prefabId = StructurePrefab.GetComponent<SaveablePrefab>().PrefabId;
+			Structure = MultiplayerMng.Instantiate<Construction_STRUCTURE>(prefabId, MiniGuid.NewFrom(ReferenceId), Singleton<StrandedWorld>.Instance?.NmlZone.SaveContainer);
+			Structure.transform.position = transform.position;
+			Structure.transform.rotation = transform.rotation;
+			Structure.transform.localScale = Vector3.one;
+			Structure.gameObject.layer = gameObject.layer;
+			if (Game.Mode.IsServer() && Prefabs.IsMultiplayerEntity(prefabId))
+			{
+				ReplicateCreateConstruction replicateCreateConstruction = new ReplicateCreateConstruction();
+				replicateCreateConstruction.Structure = Structure;
+				replicateCreateConstruction.StructureLayer = gameObject.layer;
+				replicateCreateConstruction.PrefabId = PrefabId;
+				replicateCreateConstruction.ReferenceId = ReferenceId;
+				replicateCreateConstruction.Position = transform.position;
+				replicateCreateConstruction.Rotation = transform.rotation;
+				replicateCreateConstruction.Post();
+			}
+		}
+		transform.parent = null;
+		TransformParent = Structure.transform;
+		Parent();
+		transform.localScale = Vector3.one;
+		Structure.AddConstruction(this);
+	}
+
+	protected virtual Placement CheckPlacement(Placement placement)
+	{
+		if ((_previousPlacement.Position - placement.Position).magnitude > 0.2f)
+		{
+			_previousPlacement.Position = placement.Position;
+			_previousPlacement.Rotation = placement.Rotation;
+		}
+		return _previousPlacement;
+	}
+
+	public bool HasMaxHealth()
+	{
+		return HealthPoints == MaximumHealthPoints;
+	}
+
+	public virtual void CheckHealth()
+	{
+		HealthPoints = Mathf.Min(HealthPoints, MaximumHealthPoints);
+		if (_constructingLevels == null || _constructingLevels.Length == 0)
+		{
+			return;
+		}
+		int a = Mathf.FloorToInt((HealthPoints - 25f) / MaximumHealthPoints / 0.33f);
+		a = Mathf.Max(0, Mathf.Min(a, _constructingLevels.Length - 1));
+		bool flag = false;
+		for (int i = 0; i < _constructingLevels.Length; i++)
+		{
+			ConstructingLevel obj = _constructingLevels[i];
+			bool flag2 = i == a;
+			obj.LevelGameObject.SetActive(flag2);
+			if (!flag2)
+			{
+				continue;
+			}
+			for (int j = 0; j < _constructingLevelColliders.Length; j++)
+			{
+				if (_previousLevel == _constructingLevels.Length - 2 && a == _constructingLevels.Length - 1 && handlePlayerColission)
+				{
+					Collider[] array = Physics.OverlapBox(_constructingLevelColliders[j].bounds.center, _constructingLevelColliders[j].bounds.extents * 0.7f);
+					foreach (Collider collider in array)
+					{
+						if (collider.gameObject.layer == Layers.PLAYER && collider.GetType() == typeof(CharacterController))
+						{
+							if (FindSuitableTranslatePoint(collider, out var translatePoint) && !flag)
+							{
+								collider.transform.Translate(translatePoint, Space.World);
+								flag = true;
+							}
+							else
+							{
+								collider.transform.Translate(Vector3.up);
+							}
+						}
+					}
+				}
+				_previousLevel = a;
+				_constructingLevelColliders[j].isTrigger = a != _constructingLevels.Length - 1;
+			}
+		}
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		base.Damage(damage, damager);
+		CheckHealth();
+	}
+
+	public virtual void Dismantle()
+	{
+		transform.CheckForProjectilesInChildren();
+		gameObject.SetActive(value: false);
+		MultiplayerMng.Destroy(this);
+	}
+
+	public override void Destroy()
+	{
+		IList<Connector> connectorsAtPlacement = GetConnectorsAtPlacement();
+		Dismantle();
+		UpdateConnectorsAtPlacement(connectorsAtPlacement);
+		if ((bool)Structure)
+		{
+			Structure.RemoveConstruction(this);
+		}
+	}
+
+	public int GetConnectorId(Connector connector)
+	{
+		if (connector == _myConnector)
+		{
+			return 0;
+		}
+		for (int i = 0; i < _myConnectors.Length; i++)
+		{
+			if (_myConnectors[i] == connector)
+			{
+				return i + 1;
+			}
+		}
+		return -1;
+	}
+
+	public Connector GetConnectorById(int id)
+	{
+		if (id < 0)
+		{
+			return null;
+		}
+		if (id == 0)
+		{
+			return _myConnector;
+		}
+		return _myConnectors[id - 1];
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		if (Structure != null)
+		{
+			JObject jObject2 = new JObject();
+			jObject2.AddField("Transform", JSerializer.Serialize(Structure.transform));
+			jObject.AddField("Parent", jObject2);
+		}
+		JObject jObject3 = new JObject();
+		for (int i = 0; i < _myConnectors.Length; i++)
+		{
+			try
+			{
+				JObject data = _myConnectors[i].Save();
+				jObject3.Add(data);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Constructing::Load:: Error saving a connector [" + _myConnectors[i].name + "]\n" + ex);
+			}
+		}
+		jObject.AddField("Connectors", jObject3);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		CheckHealth();
+		JObject field = data.GetField("Transform");
+		Pos = JSerializer.Deserialize<Vector3>(field.GetField("localPosition"));
+		Rot = JSerializer.Deserialize<Quaternion>(field.GetField("localRotation"));
+		JObject field2 = data.GetField("Connectors");
+		for (int i = 0; i < _myConnectors.Length; i++)
+		{
+			if (i >= field2.Children.Count)
+			{
+				Debug.LogError("Missing data for connector '" + _myConnectors[i].name + "'");
+				continue;
+			}
+			try
+			{
+				JObject jObject = field2.Children[i];
+				if (jObject != null)
+				{
+					_myConnectors[i].Load(jObject);
+				}
+				else
+				{
+					Debug.LogError("No saved data for connector [" + _myConnectors[i].name + "]");
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError("Error loading a connector [" + _myConnectors[i].name + "]\n" + ex);
+			}
+		}
+	}
+
+	private bool FindSuitableTranslatePoint(Collider hit, out Vector3 translatePoint)
+	{
+		CharacterController component = hit.GetComponent<CharacterController>();
+		Vector3 vector = hit.transform.position + (component.bounds.size.y - component.radius) * 1.5f * Vector3.up;
+		Vector3 vector2 = hit.transform.position + (component.bounds.size.y + component.radius) * 0.5f * Vector3.up;
+		LayerMask physicsLayerMask = GetPhysicsLayerMask(Layers.PLAYER);
+		physicsLayerMask = (int)physicsLayerMask ^ LayerMask.GetMask(LayerMask.LayerToName(Layers.PLAYER));
+		Collider[] array = Physics.OverlapCapsule(vector, vector2, component.radius, physicsLayerMask);
+		if (array.Length == 0)
+		{
+			translatePoint = Vector3.up;
+			return true;
+		}
+		for (int i = 0; i < array.Length; i++)
+		{
+			for (int j = -1; j < 2; j++)
+			{
+				for (int k = -1; k < 2; k++)
+				{
+					Vector3 vector3 = new Vector3(j, 0f, k);
+					if (!Physics.CheckCapsule(vector + vector3, vector2 + vector3, component.radius, physicsLayerMask))
+					{
+						translatePoint = Vector3.up + vector3;
+						return true;
+					}
+				}
+			}
+		}
+		translatePoint = Vector3.zero;
+		return false;
+	}
+
+	private LayerMask GetPhysicsLayerMask(int currentLayer)
+	{
+		int num = 0;
+		for (int i = 0; i < 32; i++)
+		{
+			if (!Physics.GetIgnoreLayerCollision(currentLayer, i))
+			{
+				num |= 1 << i;
+			}
+		}
+		return num;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 130
+PATH: Assembly-CSharp__Beam.Crafting__Constructing_ANCHOR.cs
+SIZE: 5809 bytes
+SHA256: 827b3066346fbc85fc52efae46fbd8f19c585d596852b3210a3ec28dafe48741
+====================================================================================================
+
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Ceto;
+using Funlabs;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Beam.Crafting;
+
+public class Constructing_ANCHOR : Constructing, IInteractable, IBase, IHasCraftingType
+{
+	[SerializeField]
+	private Transform _packedAnchorTransform;
+
+	[SerializeField]
+	private GameObject _deployedAnchorGameObject;
+
+	[SerializeField]
+	private Transform _deployedAnchorTransform;
+
+	[SerializeField]
+	private VerletLine _deployedAnchorRope;
+
+	private Construction_STRUCTURE_RAFT _raftStructure;
+
+	private bool _serverJoinInProgressAttemptDeploy;
+
+	private bool _deployed;
+
+	[HideInInspector]
+	public UnityEvent OnDeploy;
+
+	[HideInInspector]
+	public UnityEvent OnRetrieve;
+
+	public bool CanInteract { get; set; } = true;
+
+	protected Construction_STRUCTURE_RAFT RaftStructure
+	{
+		get
+		{
+			if (_raftStructure == null)
+			{
+				_raftStructure = Structure as Construction_STRUCTURE_RAFT;
+			}
+			return _raftStructure;
+		}
+	}
+
+	public string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (!_deployed)
+		{
+			return "ITEM_INTERACTION_DESCRIPTION_DROP";
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_RETRIEVE";
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		EventManager.AddListener<ServerJoinInProgressStarted>(OnServerJoinInProgressStarted);
+		EventManager.AddListener<ServerJoinInProgressEnded>(OnServerJoinInProgressEnded);
+	}
+
+	private void OnDestroy()
+	{
+		EventManager.RemoveListener<ServerJoinInProgressStarted>(OnServerJoinInProgressStarted);
+		EventManager.RemoveListener<ServerJoinInProgressEnded>(OnServerJoinInProgressEnded);
+		if (_deployed)
+		{
+			Retrieve();
+		}
+		if (_deployedAnchorTransform != null)
+		{
+			BeamTeam.Destroy(_deployedAnchorTransform.gameObject);
+		}
+	}
+
+	private void OnServerJoinInProgressStarted(ServerJoinInProgressStarted @event)
+	{
+		_serverJoinInProgressAttemptDeploy = false;
+		if (!_deployed && !PlayerRegistry.LocalPlayer.IsNullOrDestroyed() && PlayerRegistry.LocalPlayer.IsInitialized && !PlayerRegistry.LocalPlayer.Movement.IsNullOrDestroyed() && !Structure.IsNullOrDestroyed() && !(Structure.transform != PlayerRegistry.LocalPlayer.Movement.ActivePlatform))
+		{
+			_serverJoinInProgressAttemptDeploy = true;
+			Interact(PlayerRegistry.LocalPlayer);
+		}
+	}
+
+	private void OnServerJoinInProgressEnded(ServerJoinInProgressEnded @event)
+	{
+		if (_deployed && _serverJoinInProgressAttemptDeploy)
+		{
+			LocalizedNotification.Post(PlayerRegistry.LocalPlayer, NotificationPriority.Low, 4f, "ANCHOR_NTF_SERVER_JIP_DEPLOYED");
+			_serverJoinInProgressAttemptDeploy = false;
+		}
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		base.Damage(damage, damager);
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		if (!_deployed)
+		{
+			if (!CanDeploy())
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "ANCHOR_NTF_CANT_DROP_HERE_DESC");
+				return false;
+			}
+			Deploy(GetAnchorPlacement(transform.position));
+			return true;
+		}
+		if (_deployed)
+		{
+			Retrieve();
+			return true;
+		}
+		return false;
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		return Interact(player);
+	}
+
+	private void Deploy(Placement placement)
+	{
+		_deployedAnchorGameObject.SetActive(value: true);
+		_deployedAnchorTransform.position = placement.Position + new Vector3(0f, 0.9f, 0f);
+		_deployedAnchorTransform.rotation = placement.Rotation;
+		_deployedAnchorTransform.parent = transform.parent.parent;
+		_deployedAnchorRope.gameObject.SetActive(value: true);
+		_packedAnchorTransform.gameObject.SetActive(value: false);
+		RaftStructure.StructureBuoyancy.EnableWind(enable: false);
+		RaftStructure.StructureBuoyancy.SetDampening(0.7f);
+		_deployed = true;
+		_raftStructure.AnchorsDeployed++;
+		OnDeploy?.Invoke();
+	}
+
+	public void Retrieve()
+	{
+		_deployedAnchorGameObject.SetActive(value: false);
+		_deployedAnchorTransform.parent = _deployedAnchorGameObject.transform;
+		_deployedAnchorTransform.localPosition = Vector3.zero;
+		_deployedAnchorRope.gameObject.SetActive(value: false);
+		_packedAnchorTransform.gameObject.SetActive(value: true);
+		_deployed = false;
+		_raftStructure.AnchorsDeployed--;
+		if (_raftStructure.AnchorsDeployed <= 0)
+		{
+			RaftStructure.StructureBuoyancy.Rigidbody.constraints = RigidbodyConstraints.None;
+			RaftStructure.StructureBuoyancy.EnableWind(enable: true);
+			RaftStructure.StructureBuoyancy.ResetDampening();
+		}
+		OnRetrieve?.Invoke();
+	}
+
+	private bool CanDeploy()
+	{
+		if (Singleton<StrandedWorld>.Instance == null)
+		{
+			return true;
+		}
+		float height = Singleton<StrandedWorld>.Instance.GetHeight(transform.position);
+		if (height < Ceto.Ocean.Instance.level && height >= -100f)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private Placement GetAnchorPlacement(Vector3 position)
+	{
+		if (Physics.Raycast(position, Vector3.down, out var hitInfo, 100f, (1 << Layers.TERRAIN) | (1 << Layers.TERRAIN_OBJECTS)))
+		{
+			return new Placement
+			{
+				Position = hitInfo.point,
+				Rotation = Quaternion.LookRotation(Vector3.forward, hitInfo.normal)
+			};
+		}
+		return new Placement
+		{
+			Position = position - Vector3.up * 15f,
+			Rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up)
+		};
+	}
+
+	public override void OnTransformSerialisationIdChanged()
+	{
+		base.OnTransformSerialisationIdChanged();
+		if (!Game.Mode.IsMaster() && _deployed)
+		{
+			Deploy(GetAnchorPlacement(transform.position));
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("Deployed", _deployed);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data.GetField("Deployed").GetValue<bool>())
+		{
+			LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+			{
+				Deploy(GetAnchorPlacement(transform.position));
+			});
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 131
+PATH: Assembly-CSharp__Beam.Crafting__Constructing_SPIT.cs
+SIZE: 6704 bytes
+SHA256: 11ffbd389008414147e7a2032dd292e60247a73253be16608db743286af03873
+====================================================================================================
+
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Constructing_SPIT : Constructing, IInteractable, IBase, IHasCraftingType
+{
+	[Header("INTERACTING")]
+	[SerializeField]
+	private bool _canInteract;
+
+	[SerializeField]
+	private Transform _attachedPosition;
+
+	private bool _isCooking;
+
+	private Construction_CAMPFIRE _fire;
+
+	public bool CanInteract
+	{
+		get
+		{
+			return _canInteract;
+		}
+		set
+		{
+			_canInteract = value;
+		}
+	}
+
+	public InteractiveObject_FOOD Food { get; set; }
+
+	public bool IsCooking => _isCooking;
+
+	public event FoodEventHandler AttachedEvent;
+
+	public event EmptyEventHandler DetachedEvent;
+
+	public event FoodEventHandler StartedCooking;
+
+	public event EmptyEventHandler StoppedCooking;
+
+	public event FloatEventHandler Burned;
+
+	string IInteractable.GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return string.Empty;
+		}
+		InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
+		if (interactiveObject_FOOD != null && interactiveObject_FOOD.CanAttach)
+		{
+			if (interactiveObject_FOOD.Spoiled || interactiveObject_FOOD.Cooking == null || (interactiveObject_FOOD.Cooking != null && interactiveObject_FOOD.Cooking.IsCooked) || (interactiveObject_FOOD.Smoking != null && interactiveObject_FOOD.Smoking.IsSmoked))
+			{
+				return GetInteractionDescription();
+			}
+			if (!(Food != null))
+			{
+				return "ITEM_INTERACTION_DESCRIPTION_ATTACH";
+			}
+			return "ITEM_INTERACTION_DESCRIPTION_DETACH";
+		}
+		return GetInteractionDescription();
+	}
+
+	private string GetInteractionDescription()
+	{
+		if (!(Food != null))
+		{
+			return string.Empty;
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_DETACH";
+	}
+
+	protected virtual void OnAttached(InteractiveObject_FOOD food)
+	{
+		AttachedEvent?.Invoke(food);
+	}
+
+	protected virtual void OnDetached()
+	{
+		DetachedEvent?.Invoke();
+	}
+
+	protected virtual void OnStartedCooking(InteractiveObject_FOOD food)
+	{
+		StartedCooking?.Invoke(food);
+	}
+
+	protected virtual void OnStoppedCooking()
+	{
+		StoppedCooking?.Invoke();
+	}
+
+	protected virtual void OnBurnt(float hours)
+	{
+		Burned?.Invoke(hours);
+	}
+
+	public override void Place()
+	{
+		base.Place();
+		Construction_CAMPFIRE construction = Structure.GetConstruction<Construction_CAMPFIRE>();
+		Initialize(construction);
+	}
+
+	private void Initialize(Construction_CAMPFIRE fire)
+	{
+		_fire = fire;
+		_fire.FireStarted += Fire_FireStarted;
+		_fire.FireStopped += Fire_FireStopped;
+		_fire.FireBurned += Fire_FireBurned;
+		if (_fire.IsBurning)
+		{
+			Fire_FireStarted();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if ((bool)_fire)
+		{
+			_fire.FireStarted -= Fire_FireStarted;
+			_fire.FireStopped -= Fire_FireStopped;
+			_fire.FireBurned -= Fire_FireBurned;
+		}
+		AttachedEvent = null;
+		DetachedEvent = null;
+		StartedCooking = null;
+		StoppedCooking = null;
+		Burned = null;
+	}
+
+	private void Fire_FireStarted()
+	{
+		_isCooking = true;
+		OnStartedCooking(Food);
+	}
+
+	private void Fire_FireStopped()
+	{
+		_isCooking = false;
+		OnStoppedCooking();
+	}
+
+	private void Fire_FireBurned(float hours)
+	{
+		OnBurnt(hours);
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		return false;
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		if (Food != null)
+		{
+			return false;
+		}
+		InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
+		if (interactiveObject_FOOD != null && interactiveObject_FOOD.CanAttach)
+		{
+			if (interactiveObject_FOOD.Spoiled || interactiveObject_FOOD.Cooking == null || (interactiveObject_FOOD.Cooking != null && interactiveObject_FOOD.Cooking.IsCooked) || (interactiveObject_FOOD.Smoking != null && interactiveObject_FOOD.Smoking.IsSmoked))
+			{
+				return false;
+			}
+			player.Holder.DropCurrent();
+			Attach(interactiveObject_FOOD);
+			return true;
+		}
+		return false;
+	}
+
+	private void Attach(InteractiveObject_FOOD food)
+	{
+		Food = food;
+		Food.transform.position = _attachedPosition.position - Food.AttachingAnchor.GetPosition();
+		Food.transform.rotation = _attachedPosition.rotation * Food.AttachingAnchor.GetRotation();
+		Food.Attach(new StaticAttachingAnchor(_attachedPosition));
+		Food.DetachedEvent += Food_Detached;
+		if ((bool)Food.Cooking)
+		{
+			if (_isCooking)
+			{
+				Food.Cooking.IsBeingCooked = true;
+			}
+			if (_fire != null)
+			{
+				_fire.AddCookable(Food.Cooking, Food.PreviousOwnerId);
+			}
+		}
+		CanInteract = false;
+		OnAttached(Food);
+	}
+
+	private void Detach()
+	{
+		if (!(Food != null))
+		{
+			return;
+		}
+		if ((bool)Food.Cooking)
+		{
+			Food.Cooking.IsBeingCooked = false;
+			if (_fire != null)
+			{
+				_fire.RemoveCookable(Food.Cooking);
+			}
+		}
+		Food.DetachedEvent -= Food_Detached;
+		Food = null;
+		CanInteract = true;
+	}
+
+	private void Food_Detached(IAttachable sender)
+	{
+		Detach();
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (pickupable.IsNullOrDestroyed())
+		{
+			return;
+		}
+		IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(pickupable.OwnerId);
+		if (playerFromId.IsNullOrDestroyed())
+		{
+			return;
+		}
+		if ((bool)Food)
+		{
+			LocalizedNotification.Post(playerFromId, NotificationPriority.Low, 4f, "CONSTRUCTING_NTF_CANT_DESTROY_WITH_ATTACHED_DESC");
+			return;
+		}
+		for (int i = 0; i < MyConnectors.Length; i++)
+		{
+			if (!MyConnectors[i].IsValid)
+			{
+				LocalizedNotification.Post(playerFromId, NotificationPriority.Low, 4f, "CONSTRUCTING_NTF_CANT_DESTROY_ANOTHER_DEPENDS_DESC");
+				return;
+			}
+		}
+		base.Damage(damage, damager);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("Fire", _fire.ReferenceId.ToString());
+		if (Food != null)
+		{
+			jObject.AddField("Food", Food.ReferenceId.ToString());
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		string fireReferenceId = data.GetField("Fire").GetValue<string>();
+		LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+		{
+			_fire = Structure.transform.FindObject<Construction_CAMPFIRE>(fireReferenceId.ToMiniGuid());
+			if (_fire != null)
+			{
+				Initialize(_fire);
+			}
+			else
+			{
+				Debug.LogError("Constructing_SPIT::Load:: Error finding fire.");
+			}
+		});
+		JObject foodReferenceData = data.GetField("Food");
+		if (!foodReferenceData)
+		{
+			return;
+		}
+		LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+		{
+			string value = foodReferenceData.GetValue<string>();
+			Food = MultiplayerMng.FindObject<InteractiveObject_FOOD>(value.ToMiniGuid());
+			if (Food != null)
+			{
+				Attach(Food);
+			}
+			else
+			{
+				Debug.LogError("Constructing_SPIT::Load:: Error finding food.");
+			}
+		});
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 132
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject.cs
+SIZE: 3039 bytes
+SHA256: 6dc647258e04ae8ba203b00581612043b586f5d3d9f38e71da2e6410a0b18630
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam.Crafting;
+
+public class ConstructionObject : InteractiveObject, ICraftable, IBase, IHasCraftingType, IPlaceable
+{
+	[Header("CRAFTING")]
+	[SerializeField]
+	private GhostCollider.ColliderType _colliderType;
+
+	[SerializeField]
+	private bool _craftImmediate;
+
+	[SerializeField]
+	private Mesh _ghostMesh;
+
+	[SerializeField]
+	private Renderer _ghostRenderer;
+
+	[SerializeField]
+	private GameObject _ghostColliders;
+
+	[SerializeField]
+	private float _placingDistance = 4f;
+
+	[SerializeField]
+	private bool _canPlace;
+
+	[PREFAB_PROCESSOR_GetComponents]
+	[SerializeField]
+	private PlacementModifier[] _placementModifiers;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Connector _myConnector;
+
+	[FormerlySerializedAs("_onCrafted")]
+	[SerializeField]
+	[HideInInspector]
+	private InteracterUnityEvent _crafted;
+
+	public int CreatorId { get; set; }
+
+	public GhostCollider.ColliderType ColliderType => _colliderType;
+
+	public bool CraftImmediate => _craftImmediate;
+
+	public Mesh GhostMesh => _ghostMesh;
+
+	public virtual Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
+
+	public GameObject GhostColliders
+	{
+		get
+		{
+			if (!_ghostColliders)
+			{
+				_ghostColliders = gameObject;
+			}
+			return _ghostColliders;
+		}
+	}
+
+	public float PlacingDistance => _placingDistance;
+
+	public bool CanPlace
+	{
+		get
+		{
+			return _canPlace;
+		}
+		set
+		{
+			_canPlace = value;
+		}
+	}
+
+	public virtual void OnBeginCrafting()
+	{
+	}
+
+	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		Placement placement = new Placement();
+		placement.Position = ghost.position;
+		placement.Rotation = ghost.rotation;
+		for (int i = 0; i < _placementModifiers.Length; i++)
+		{
+			placement = _placementModifiers[i].Modify(placement, ray);
+		}
+		bool flag = true;
+		if (_myConnector != null)
+		{
+			for (int j = 0; j < _myConnector.Checks.Count; j++)
+			{
+				flag = _myConnector.Checks[j].Check(placement, null);
+				if (!flag)
+				{
+					break;
+				}
+			}
+		}
+		ghost.position = placement.Position;
+		ghost.rotation = placement.Rotation * Quaternion.Euler(new Vector3(0f, yRotation, 0f));
+		return flag;
+	}
+
+	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return OwnerPlacing(ghost, ray, yRotation);
+	}
+
+	public virtual void Place()
+	{
+	}
+
+	public virtual bool CheckProximity(Transform ghost)
+	{
+		return false;
+	}
+
+	public virtual void OnCrafted(IPlayer player)
+	{
+		_crafted?.Invoke(player);
+	}
+
+	public override void EnablePhysics()
+	{
+		base.EnablePhysics();
+		if ((bool)rigidbody)
+		{
+			rigidbody.constraints = RigidbodyConstraints.None;
+		}
+	}
+
+	public override void DisablePhysics()
+	{
+		base.DisablePhysics();
+		if ((bool)rigidbody)
+		{
+			rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+		}
+	}
+
+	public void SetRigidBodyMass(float mass)
+	{
+		if ((bool)rigidbody)
+		{
+			rigidbody.mass = mass;
+		}
+	}
+
+	public float GetRigidBodyMass()
+	{
+		if (!rigidbody)
+		{
+			return 0f;
+		}
+		return rigidbody.mass;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 133
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_BED.cs
+SIZE: 12031 bytes
+SHA256: cff068ff95dc35f464ca185bcb5fab5a8fc02504d6e96b3cc3769ba9a20f7437
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class ConstructionObject_BED : ConstructionObject
+{
+	private struct Result
+	{
+		public bool Succeeded;
+
+		public string Message;
+	}
+
+	private class ReplicateSaveGameOnMasterMsg : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer InvokingPlayer;
+
+		public override void OnPeer()
+		{
+			SaveManager.SaveGame(InvokingPlayer);
+		}
+	}
+
+	private class ReplicateSleep_Sequence : MultiplayerMessage
+	{
+		[Replicate]
+		public ConstructionObject_BED Bed;
+
+		[Replicate]
+		public float RandomValue;
+
+		[Replicate]
+		public float MilitaryTime;
+
+		public override void OnPeer()
+		{
+			Timing.RunCoroutine(Bed.Sleep_Sequence(RandomValue, MilitaryTime), Segment.RealtimeUpdate);
+		}
+	}
+
+	private const float SLEEP_TIME = 9f;
+
+	private const float MINIMUM_HOURS_BETWEEN_SLEEP = 4f;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Buoyancy _buoyancy;
+
+	private static DateTime _LastTimeSlept;
+
+	private ICheckBounds _boundsChecker;
+
+	private bool _isSleeping;
+
+	private DialogueBoxViewAdapter saveDialogueBox;
+
+	public override string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (_isSleeping)
+		{
+			return string.Empty;
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_SLEEP_SAVE";
+	}
+
+	protected override void Awake()
+	{
+		base.Awake();
+		if (CanPickUp)
+		{
+			SetLOD(1);
+		}
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		ICheckBounds instance = Singleton<StrandedWorld>.Instance;
+		_boundsChecker = instance ?? NullObject<NullCheckBounds>.Instance;
+		_LastTimeSlept = GameTime.Now.RemoveHours(4f);
+		EventManager.AddListener<EndGameSequenceEvent>(AbortInteraction);
+	}
+
+	protected override void OnPlayerDisconnect(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		if (saveDialogueBox != null)
+		{
+			saveDialogueBox.Destroy();
+			HideDialogue(PlayerRegistry.LocalPlayer);
+		}
+		base.OnPlayerDisconnect(disconnectedEvent);
+	}
+
+	private void AbortInteraction(EndGameSequenceEvent e)
+	{
+		CanInteract = false;
+		CanPickUp = false;
+	}
+
+	public override void Hold(bool holding)
+	{
+		base.Hold(holding);
+		SetLOD((!holding) ? 1 : 0);
+	}
+
+	public override bool Interact(IPlayer player)
+	{
+		if (_isSleeping || !player.IsOwner)
+		{
+			return false;
+		}
+		player.Movement.StopAutoWalk();
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+			return false;
+		}
+		if (Time.timeScale != 0f)
+		{
+			ShowDialogue(player);
+		}
+		return true;
+	}
+
+	private Result CheckCanUseBed(IPlayer player)
+	{
+		Result result = new Result
+		{
+			Succeeded = false
+		};
+		if (LevelLoader.IsCreatingOrLoading)
+		{
+			result.Message = "BED_NTF_CANT_USE_LOADING";
+			return result;
+		}
+		if (AnyPlayerIsBusy())
+		{
+			result.Message = "BED_NTF_CANT_USE_BUSY";
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private Result CheckCanSave(IPlayer player)
+	{
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			return result;
+		}
+		result.Succeeded = false;
+		if (AnyPlayerKnockedOut())
+		{
+			result.Message = "BED_NTF_CANT_SAVE_KNOCKED_OUT";
+			return result;
+		}
+		if (!AllPlayersOverLand())
+		{
+			result.Message = ((Game.Mode == GameMode.SinglePlayer) ? "BED_NTF_CANT_SAVE_DESC" : "BED_NTF_CANT_SAVE_COOP_DESC");
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private Result CheckCanSleep(IPlayer player)
+	{
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			return result;
+		}
+		result.Succeeded = false;
+		if ((bool)_buoyancy && (_buoyancy.Floating || _buoyancy.IsInWater))
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_UNDERWATER_DESC";
+			return result;
+		}
+		if (GameTime.GetHoursSince(_LastTimeSlept) < 4f)
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_DESC";
+			return result;
+		}
+		if (Singleton<GameTime>.Instance.MilitaryTime > 4f && Singleton<GameTime>.Instance.MilitaryTime < 18f)
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_NIGHT";
+			return result;
+		}
+		if (!AllPlayersInProximity(player))
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_APART_DESC";
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private void DoSave(IPlayer player)
+	{
+		HideDialogue(player);
+		Result result = CheckCanSave(player);
+		if (!result.Succeeded)
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+		}
+		else
+		{
+			SaveOnMaster(player);
+		}
+	}
+
+	private void DoSleep(IPlayer player)
+	{
+		HideDialogue(player);
+		Result result = CheckCanSleep(player);
+		if (!result.Succeeded)
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+		}
+		else
+		{
+			ReplicatedSleep_Sequence(UnityEngine.Random.value);
+		}
+	}
+
+	private void DoCancel(IPlayer player)
+	{
+		HideDialogue(player);
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void ShowDialogue(IPlayer player)
+	{
+		Time.timeScale = 0f;
+		player.Input.GetOtherPlayers().DisableMaps();
+		player.Input.SetAndCacheMapsEnabled(state: false, 0);
+		player.Input.SetAndCacheMapsEnabled(state: true, 16);
+		player.Input.SetCursorEnabled(enabled: true);
+		player.IsBusy = true;
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+		saveDialogueBox = DialogueBox.Show(player.Input, "BED_DB_SLEEP_TITLE", "BED_DB_SLEEP_SAVE_DESC", "BED_DB_BUTTON_SLEEP", "BED_DB_BUTTON_SAVE", "BED_DB_BUTTON_CANCEL");
+		saveDialogueBox.Accept += () =>
+		{
+			DoSleep(player);
+		};
+		saveDialogueBox.Decline += () =>
+		{
+			DoSave(player);
+		};
+		saveDialogueBox.Cancel += () =>
+		{
+			DoCancel(player);
+		};
+	}
+
+	private void HideDialogue(IPlayer player)
+	{
+		Time.timeScale = 1f;
+		player.Input.GetOtherPlayers().RestoreMapsEnabled();
+		player.Input.SetAndCacheMapsEnabled(state: false, 16);
+		player.Input.SetAndCacheMapsEnabled(state: true, 0);
+		player.Input.SetCursorEnabled(enabled: false);
+		player.IsBusy = false;
+	}
+
+	private IEnumerator<float> Sleep_Sequence(float randomValue, float militaryTime)
+	{
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 0);
+		_isSleeping = true;
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			++allPlayer.Movement.IsBusy;
+		}
+		Singleton<Fader>.Instance.FadeOut(3f);
+		float timer = 0f;
+		while (timer < 3f)
+		{
+			timer += Time.deltaTime;
+			AudioListener.volume -= 1f / 3f * Time.deltaTime;
+			yield return 0f;
+		}
+		AudioListener.volume = 0f;
+		if (Game.Mode.IsClient())
+		{
+			Singleton<GameTime>.Instance.MilitaryTime_NoEvents = militaryTime;
+		}
+		if (Singleton<GameTime>.Instance.MilitaryTime > 18f)
+		{
+			CheckShelter();
+			Singleton<GameTime>.Instance.MilitaryTime = 24f;
+			yield return Timing.WaitForSeconds(0.5f);
+		}
+		float num = 4f + randomValue * 3f;
+		if (Singleton<GameTime>.Instance.MilitaryTime < num)
+		{
+			float num2 = num - Singleton<GameTime>.Instance.MilitaryTime;
+			CheckShelter();
+			Singleton<GameTime>.Instance.MilitaryTime += num2;
+		}
+		yield return Timing.WaitForSeconds(1.5f);
+		_LastTimeSlept = GameTime.Now;
+		Singleton<Fader>.Instance.FadeIn(3f);
+		timer = 0f;
+		while (timer < 3f)
+		{
+			timer += Time.deltaTime;
+			AudioListener.volume += 1f / 3f * Time.deltaTime;
+			yield return 0f;
+		}
+		AudioListener.volume = 1f;
+		_isSleeping = false;
+		foreach (IPlayer allPlayer2 in PlayerRegistry.AllPlayers)
+		{
+			--allPlayer2.Movement.IsBusy;
+		}
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 0);
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void CheckShelter()
+	{
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
+			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
+			{
+				playerEffect.Protected = true;
+			}
+		}
+	}
+
+	private bool AllPlayersOverLand()
+	{
+		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+			{
+				return false;
+			}
+			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+			{
+				return false;
+			}
+			if (hitInfo.point.y < -5f)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private bool AllPlayersInProximity(IPlayer player)
+	{
+		if (Game.Mode == GameMode.SinglePlayer)
+		{
+			return true;
+		}
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private bool IsFightingBoss()
+	{
+		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (!allPlayer.IsNullOrDestroyed())
+			{
+				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private bool AnyPlayerKnockedOut()
+	{
+		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool AnyPlayerIsBusy()
+	{
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (allPlayer.Crafter.IsPlacing)
+			{
+				return true;
+			}
+			if (allPlayer.Lighter.IsLightingFire)
+			{
+				return true;
+			}
+			if (allPlayer.Skinner.IsSkinning)
+			{
+				return true;
+			}
+			if (allPlayer.Movement.CheckVehicle())
+			{
+				return true;
+			}
+			if (allPlayer.Movement.groundedAnimal)
+			{
+				return true;
+			}
+			if (allPlayer.IsBusy)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("LastTimeSlept", JSerializer.Serialize(_LastTimeSlept));
+		jObject.AddField("canDrag", JSerializer.Serialize(CanDrag));
+		jObject.AddField("canPickup", JSerializer.Serialize(CanPickUp));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		_LastTimeSlept = JSerializer.Deserialize<DateTime>(data.GetField("LastTimeSlept"));
+		JObject field = data.GetField("canDrag");
+		if (field != null)
+		{
+			CanDrag = field.GetValue<bool>();
+		}
+		JObject field2 = data.GetField("canPickup");
+		if (field2 != null)
+		{
+			CanPickUp = field2.GetValue<bool>();
+		}
+	}
+
+	private static void SaveOnMaster(IPlayer invokingPlayer)
+	{
+		if (Game.Mode.IsClient())
+		{
+			ReplicateSaveGameOnMasterMsg replicateSaveGameOnMasterMsg = new ReplicateSaveGameOnMasterMsg();
+			replicateSaveGameOnMasterMsg.InvokingPlayer = invokingPlayer;
+			replicateSaveGameOnMasterMsg.Post();
+		}
+		else
+		{
+			SaveManager.SaveGame(invokingPlayer);
+		}
+	}
+
+	private void ReplicatedSleep_Sequence(float randomValue)
+	{
+		Timing.RunCoroutine(Sleep_Sequence(randomValue, Singleton<GameTime>.Instance.MilitaryTime), Segment.RealtimeUpdate);
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSleep_Sequence replicateSleep_Sequence = new ReplicateSleep_Sequence();
+			replicateSleep_Sequence.Bed = this;
+			replicateSleep_Sequence.RandomValue = randomValue;
+			replicateSleep_Sequence.MilitaryTime = Singleton<GameTime>.Instance.MilitaryTime;
+			replicateSleep_Sequence.Post();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 134
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_WATERBOTTLE.cs
+SIZE: 1505 bytes
+SHA256: 21144d598ca262c8a3ade6f18ded80e2e27c2b6e3d0d9996363d7dc2c547eeb5
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam.Crafting;
+
+public class ConstructionObject_WATERBOTTLE : InteractiveObject_FOOD, ICraftable, IBase, IHasCraftingType, IPlaceable
+{
+	[SerializeField]
+	private GhostCollider.ColliderType _colliderType;
+
+	[SerializeField]
+	private bool _craftImmediate;
+
+	[SerializeField]
+	private GameObject _ghostObject;
+
+	private Mesh _ghostMesh;
+
+	private Renderer _ghostRenderer;
+
+	[SerializeField]
+	private float _placingDistance = 4f;
+
+	[FormerlySerializedAs("_onCrafted")]
+	[SerializeField]
+	[HideInInspector]
+	private InteracterUnityEvent _crafted;
+
+	public int CreatorId { get; set; }
+
+	public GhostCollider.ColliderType ColliderType => _colliderType;
+
+	public bool CraftImmediate => _craftImmediate;
+
+	public Mesh GhostMesh => _ghostMesh;
+
+	public Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
+
+	public float PlacingDistance => _placingDistance;
+
+	protected override void Awake()
+	{
+		base.Awake();
+		_ghostRenderer = _ghostObject.GetComponent<Renderer>();
+		_ghostMesh = _ghostObject.GetComponent<MeshFilter>().sharedMesh;
+	}
+
+	public void OnBeginCrafting()
+	{
+	}
+
+	public bool CheckProximity(Transform ghost)
+	{
+		return false;
+	}
+
+	public void Place()
+	{
+	}
+
+	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return true;
+	}
+
+	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return true;
+	}
+
+	public void OnCrafted(IPlayer player)
+	{
+		_crafted?.Invoke(player);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 135
+PATH: Assembly-CSharp__Beam.Crafting__Construction_CAMPFIRE.cs
+SIZE: 15220 bytes
+SHA256: 9dbb00cbd39af929d64c7e95937ac25539b606fefc707a74f34e067ee034b1c9
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Construction_CAMPFIRE : Constructing, IInteractable, IBase, IHasCraftingType, IIgnitable, IFlammable, IHaveAttribute
+{
+	[SerializeField]
+	private bool _isOnUsing;
+
+	private const float MAXIMUM_FUEL_HOURS = 12f;
+
+	private const float REFUEL_THRESHOLD = 10.799999f;
+
+	[Header("INTERACTING")]
+	[SerializeField]
+	private bool _canInteract;
+
+	private PlayerSkills.ExpSource _skillExpSource = PlayerSkills.ExpSource.CAMPFIRE_COOKING;
+
+	private float _proximityCheckTimeleft;
+
+	[Header("ATTRIBUTE")]
+	[SerializeField]
+	private IconType _type;
+
+	[SerializeField]
+	private Transform _attachedPosition;
+
+	[SerializeField]
+	private GameObject _attachmentModel;
+
+	private bool _isBurning;
+
+	private bool _isCooking;
+
+	[SerializeField]
+	private Transform[] _sticksTransforms;
+
+	[SerializeField]
+	private ParticleSystem[] _particles;
+
+	[SerializeField]
+	private GameObject _light;
+
+	[SerializeField]
+	private float _fuelHours = 12f;
+
+	private float _efficiency = 1f;
+
+	private float _burningPerHour = 1f;
+
+	private float _emptyFuelStickPosition = -0.24f;
+
+	private List<Cooking> _cookables = new List<Cooking>();
+
+	private bool _ignoreCookableCollisions;
+
+	[HideInInspector]
+	public BaseActionUnityEvent Ignited;
+
+	[HideInInspector]
+	public InteracterUnityEvent _ignitedTrophy;
+
+	[HideInInspector]
+	public BaseActionUnityEvent Extinguished;
+
+	[HideInInspector]
+	public BaseActionUnityEvent OnAttach;
+
+	[HideInInspector]
+	public BaseActionUnityEvent Refuelled;
+
+	[HideInInspector]
+	public BaseActionUnityEvent StartedCooking;
+
+	[HideInInspector]
+	public BaseActionUnityEvent StoppedCooking;
+
+	[SerializeField]
+	public bool IsOnUsing
+	{
+		get
+		{
+			return _isOnUsing;
+		}
+		set
+		{
+			_isOnUsing = value;
+		}
+	}
+
+	public bool CanInteract
+	{
+		get
+		{
+			return _canInteract;
+		}
+		set
+		{
+			_canInteract = value;
+		}
+	}
+
+	IconType IHaveAttribute.Type => _type;
+
+	public InteractiveObject_FOOD Food { get; set; }
+
+	public bool IsBurning => _isBurning;
+
+	public float FuelHours => _fuelHours;
+
+	public bool IgnoreCookableCollisionsWhileLoading
+	{
+		get
+		{
+			return _ignoreCookableCollisions;
+		}
+		set
+		{
+			_ignoreCookableCollisions = value;
+		}
+	}
+
+	public event FoodEventHandler AttachedEvent;
+
+	public event EmptyEventHandler DetachedEvent;
+
+	public event EmptyEventHandler FireStarted;
+
+	public event EmptyEventHandler FireStopped;
+
+	public event FloatEventHandler FireBurned;
+
+	string IInteractable.GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return GetInteractionDescription();
+		}
+		if (_fuelHours < 10.799999f)
+		{
+			InteractiveObject io = obj as InteractiveObject;
+			if (IsRefillable(io))
+			{
+				return "ITEM_INTERACTION_DESCRIPTION_REFILL";
+			}
+		}
+		if (_isBurning)
+		{
+			if (!(obj as IIgnitable).IsNullOrDestroyed())
+			{
+				return "ITEM_INTERACTION_DESCRIPTION_IGNITE";
+			}
+		}
+		else
+		{
+			IFlammable flammable = obj as IFlammable;
+			if (!flammable.IsNullOrDestroyed() && flammable.IsBurning)
+			{
+				return "ITEM_INTERACTION_DESCRIPTION_LIGHT";
+			}
+		}
+		InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
+		Constructing_FUEL_STILL_BOILER componentInChildren = transform.parent.GetComponentInChildren<Constructing_FUEL_STILL_BOILER>();
+		if (interactiveObject_FOOD != null && interactiveObject_FOOD.CanAttach && componentInChildren == null && Food == null)
+		{
+			if (interactiveObject_FOOD.Spoiled || interactiveObject_FOOD.Cooking == null || (interactiveObject_FOOD.Cooking != null && interactiveObject_FOOD.Cooking.IsCooked) || (interactiveObject_FOOD.Smoking != null && interactiveObject_FOOD.Smoking.IsSmoked))
+			{
+				return GetInteractionDescription();
+			}
+			return "ITEM_INTERACTION_DESCRIPTION_ATTACH";
+		}
+		return GetInteractionDescription();
+	}
+
+	private string GetInteractionDescription()
+	{
+		if (!_isBurning)
+		{
+			return string.Empty;
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_EXTINGUISH";
+	}
+
+	float IHaveAttribute.GetValue()
+	{
+		return _fuelHours / 12f;
+	}
+
+	protected virtual void OnAttached(InteractiveObject_FOOD food)
+	{
+		AttachedEvent?.Invoke(food);
+	}
+
+	protected virtual void OnDetached()
+	{
+		DetachedEvent?.Invoke();
+	}
+
+	protected virtual void OnFireStarted(IPlayer player)
+	{
+		FireStarted?.Invoke();
+		ActionEventData.Populate(this, null);
+		Ignited?.Invoke(this, ActionEventData);
+		if (player.IsValid())
+		{
+			_ignitedTrophy?.Invoke(player);
+		}
+	}
+
+	protected virtual void OnFireStopped()
+	{
+		FireStopped?.Invoke();
+		ActionEventData.Populate(this, null);
+		Extinguished?.Invoke(this, ActionEventData);
+	}
+
+	protected virtual void OnFireBurned(float hours)
+	{
+		FireBurned?.Invoke(hours);
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		_attachmentModel.SetActive(value: false);
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	private void Selecting_Selected(IPlayer player)
+	{
+		if (_fuelHours > 0f)
+		{
+			DisplayNamePrefixes.Remove("ITEM_DISPLAY_NAME_PREFIX_EMPTY");
+		}
+		else
+		{
+			DisplayNamePrefixes.AddOrIgnore("ITEM_DISPLAY_NAME_PREFIX_EMPTY", -1);
+		}
+	}
+
+	private void Initialize()
+	{
+		if ((bool)Singleton<GameTime>.Instance)
+		{
+			Singleton<GameTime>.Instance.HourChanged += GameTime_HourChanged;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if ((bool)Singleton<GameTime>.Instance)
+		{
+			Singleton<GameTime>.Instance.HourChanged -= GameTime_HourChanged;
+		}
+		FireStarted = null;
+		FireStopped = null;
+		FireBurned = null;
+	}
+
+	public override void Place()
+	{
+		base.Place();
+		EventManager.RaiseEvent(new CampFirePlacedEvent(transform.position));
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		Debug.Log("Interacting");
+		if (_isBurning)
+		{
+			Extinguish();
+			return true;
+		}
+		return false;
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return Interact(player);
+		}
+		if (Food == null)
+		{
+			InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
+			if (interactiveObject_FOOD != null && interactiveObject_FOOD.CanAttach && (bool)interactiveObject_FOOD.Cooking)
+			{
+				if (interactiveObject_FOOD.Spoiled || interactiveObject_FOOD.Cooking.IsCooked || (interactiveObject_FOOD.Smoking != null && interactiveObject_FOOD.Smoking.IsSmoked))
+				{
+					return Interact(player);
+				}
+				player.Holder.DropCurrent();
+				Attach(interactiveObject_FOOD, player.Id);
+				return true;
+			}
+		}
+		if (_fuelHours < 10.799999f)
+		{
+			InteractiveObject io = obj as InteractiveObject;
+			if (TryConsumeObjectAsFuel(io, player))
+			{
+				return true;
+			}
+		}
+		if (_isBurning)
+		{
+			IIgnitable ignitable = obj as IIgnitable;
+			if (!ignitable.IsNullOrDestroyed())
+			{
+				ignitable.Ignite();
+				return true;
+			}
+		}
+		else
+		{
+			IFlammable flammable = obj as IFlammable;
+			if (!flammable.IsNullOrDestroyed() && flammable.IsBurning)
+			{
+				Ignite(player);
+				return true;
+			}
+		}
+		return Interact(player);
+	}
+
+	private void Attach(InteractiveObject_FOOD food, int playerID)
+	{
+		Food = food;
+		if (!(Food.Cooking == null))
+		{
+			if (_isBurning && !Food.Cooking.IsCooked)
+			{
+				Food.Cooking.IsBeingCooked = true;
+			}
+			Food.transform.position = _attachedPosition.position - Food.AttachingAnchor.GetPosition();
+			Food.transform.rotation = _attachedPosition.rotation * Food.AttachingAnchor.GetRotation();
+			Food.Attach(new StaticAttachingAnchor(_attachedPosition));
+			Food.DetachedEvent += Food_Detached;
+			AddCookable(Food.Cooking, playerID);
+			ActionEventData.Populate(this, null);
+			OnAttach?.Invoke(this, ActionEventData);
+			_attachmentModel.SetActive(value: true);
+			OnAttached(Food);
+		}
+	}
+
+	private void Detach()
+	{
+		if (Food != null)
+		{
+			if ((bool)Food.Cooking)
+			{
+				Food.Cooking.IsBeingCooked = false;
+				RemoveCookable(Food.Cooking);
+			}
+			_attachmentModel.SetActive(value: false);
+			Food.DetachedEvent -= Food_Detached;
+			Food = null;
+		}
+	}
+
+	private void Food_Detached(IAttachable sender)
+	{
+		Detach();
+	}
+
+	public void Ignite(IPlayer player)
+	{
+		if (!_isBurning && _fuelHours > 0f)
+		{
+			StartCoroutine(Burn(player));
+		}
+	}
+
+	public void Ignite()
+	{
+		Ignite(null);
+	}
+
+	private IEnumerator Burn(IPlayer player = null)
+	{
+		_isBurning = true;
+		OnFireStarted(player);
+		_light.SetActive(value: true);
+		for (int i = 0; i < _particles.Length; i++)
+		{
+			_particles[i].Play();
+		}
+		while (_isBurning)
+		{
+			if (_cookables.Count > 0)
+			{
+				if (!_isCooking)
+				{
+					ActionEventData.Populate(this, null);
+					StartedCooking?.Invoke(this, ActionEventData);
+					_isCooking = true;
+				}
+				for (int j = 0; j < _cookables.Count; j++)
+				{
+					if (_cookables[j].Food.IsPickedUp)
+					{
+						_cookables[j].IsBeingCooked = false;
+						_cookables.RemoveAt(j);
+						j--;
+					}
+				}
+				for (int k = 0; k < _cookables.Count; k++)
+				{
+					if (!_cookables[k].IsCooked)
+					{
+						_cookables[k].IsBeingCooked = true;
+					}
+					_cookables[k].Burn(_burningPerHour);
+				}
+				_proximityCheckTimeleft -= Time.deltaTime;
+				if (_proximityCheckTimeleft <= 0f)
+				{
+					_proximityCheckTimeleft = 1f;
+					CheckPlayersInProximity();
+				}
+			}
+			else if (_isCooking)
+			{
+				ActionEventData.Populate(this, null);
+				StoppedCooking?.Invoke(this, ActionEventData);
+				_isCooking = false;
+			}
+			RemoveFuel();
+			yield return null;
+		}
+	}
+
+	private void CheckPlayersInProximity()
+	{
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (!PlayerInProximity(allPlayer))
+			{
+				continue;
+			}
+			for (int i = 0; i < _cookables.Count; i++)
+			{
+				if (!_cookables[i].IsCooked)
+				{
+					allPlayer.PlayerSkills.ReplicatedAddCooking(_skillExpSource);
+				}
+			}
+		}
+	}
+
+	private bool PlayerInProximity(IPlayer player)
+	{
+		return Vector3.SqrMagnitude(player.transform.position - transform.position) <= BeamMath.Sqr(8f);
+	}
+
+	private void BurnManual(float hours)
+	{
+		float hours2 = Mathf.Clamp(_fuelHours, 0f, hours);
+		for (int i = 0; i < _cookables.Count; i++)
+		{
+			_cookables[i].BurnManual(hours2);
+		}
+		OnFireBurned(hours2);
+		_fuelHours -= hours;
+		_fuelHours = Mathf.Clamp(_fuelHours, 0f, 12f);
+	}
+
+	private bool TryConsumeObjectAsFuel(InteractiveObject io, IPlayer player)
+	{
+		if (io == null)
+		{
+			return false;
+		}
+		if (!IsRefillable(io))
+		{
+			return false;
+		}
+		_fuelHours += io.Burning.FuelHours;
+		_fuelHours = Mathf.Clamp(_fuelHours, 0f, 12f);
+		ActionEventData.Populate(this, io);
+		Refuelled?.Invoke(this, ActionEventData);
+		RepositionSticks();
+		player.Holder.ReleaseAndDestroy(io);
+		return true;
+	}
+
+	private void RemoveFuel()
+	{
+		_fuelHours -= _efficiency * GameTime.DeltaTimeHour;
+		if (_fuelHours <= 0f)
+		{
+			Extinguish();
+		}
+		RepositionSticks();
+	}
+
+	public bool AddCookable(Cooking cookable, int cookerID = -1)
+	{
+		if (_cookables.DoesntContain(cookable))
+		{
+			_cookables.Add(cookable);
+			cookable.PlayerChefID = cookerID;
+			if (cookable.Food.Smoking != null)
+			{
+				cookable.Food.Smoking.PlayerChefID = cookerID;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public bool RemoveCookable(Cooking cookable)
+	{
+		cookable.PlayerChefID = -1;
+		return _cookables.Remove(cookable);
+	}
+
+	private void GameTime_HourChanged(float hours)
+	{
+		if (_isBurning)
+		{
+			BurnManual(hours);
+		}
+	}
+
+	private void Extinguish()
+	{
+		if (_isBurning)
+		{
+			for (int i = 0; i < _cookables.Count; i++)
+			{
+				_cookables[i].IsBeingCooked = false;
+			}
+			_isBurning = false;
+			OnFireStopped();
+			_light.SetActive(value: false);
+			for (int j = 0; j < _particles.Length; j++)
+			{
+				_particles[j].Stop();
+			}
+		}
+	}
+
+	private void RepositionSticks()
+	{
+		float value = _emptyFuelStickPosition + Mathf.Abs(_emptyFuelStickPosition) / (12f / _fuelHours);
+		value = Mathf.Clamp(value, _emptyFuelStickPosition, 0f);
+		Transform[] sticksTransforms = _sticksTransforms;
+		foreach (Transform obj in sticksTransforms)
+		{
+			Vector3 localPosition = obj.localPosition;
+			localPosition.y = value;
+			obj.localPosition = localPosition;
+		}
+	}
+
+	private bool IsRefillable(InteractiveObject io)
+	{
+		if (io != null && io.Burning != null && io.Burning.FuelHours > 0f)
+		{
+			return !(io is InteractiveObject_FOOD);
+		}
+		return false;
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		if (_isOnUsing)
+		{
+			return;
+		}
+		IPickupable pickupable = damager as IPickupable;
+		if (pickupable.IsNullOrDestroyed())
+		{
+			return;
+		}
+		IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(pickupable.OwnerId);
+		if (playerFromId.IsNullOrDestroyed())
+		{
+			return;
+		}
+		if ((bool)Food)
+		{
+			LocalizedNotification.Post(playerFromId, NotificationPriority.Low, 4f, "CONSTRUCTING_NTF_CANT_DESTROY_WITH_ATTACHED_DESC");
+			return;
+		}
+		for (int i = 0; i < MyConnectors.Length; i++)
+		{
+			if (!MyConnectors[i].IsValid && MyConnectors[i].Constructions.Count > 0 && MyConnectors[i].Constructions[0].CraftingType.InteractiveType != InteractiveType.CRAFTING_FIRE)
+			{
+				LocalizedNotification.Post(playerFromId, NotificationPriority.Low, 4f, "CONSTRUCTING_NTF_CANT_DESTROY_ANOTHER_DEPENDS_DESC");
+				return;
+			}
+		}
+		base.Damage(damage, damager);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("FuelHours", JSerializer.Serialize(_fuelHours));
+		jObject.AddField("IsBurning", JSerializer.Serialize(_isBurning));
+		jObject.AddField("TimeLeft", JSerializer.Serialize(GameTime.Now));
+		if (_cookables.Count > 0)
+		{
+			JObject jObject2 = new JObject();
+			for (int i = 0; i < _cookables.Count; i++)
+			{
+				jObject2.Add(_cookables[i].Food.ReferenceId.ToString());
+			}
+			jObject.AddField("Cookables", jObject2);
+		}
+		if (Food != null)
+		{
+			jObject.AddField("PlayerChefID", Food.Cooking.PlayerChefID);
+			jObject.AddField("Food", Food.ReferenceId.ToString());
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("FuelHours");
+		_fuelHours = field.GetValue<float>();
+		JObject field2 = data.GetField("IsBurning");
+		_isBurning = field2.GetValue<bool>();
+		if (_isBurning)
+		{
+			DateTime a = JSerializer.Deserialize<DateTime>(data.GetField("TimeLeft"));
+			float elapsed = GameTime.GetHoursSince(a);
+			LevelLoader.CurrentLoader.PostLoading.Add(() =>
+			{
+				BurnManual(elapsed);
+				if (_fuelHours <= 0f)
+				{
+					Extinguish();
+					RepositionSticks();
+				}
+				else if (_fuelHours > 0f)
+				{
+					StartCoroutine(Burn());
+				}
+			});
+		}
+		JObject foodReferenceData = data.GetField("Food");
+		if (foodReferenceData != null)
+		{
+			JObject field3 = data.GetField("PlayerChefID");
+			int cookerID = ((field3 != null) ? field3.GetValue<int>() : (-1));
+			LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+			{
+				MiniGuid referenceId = foodReferenceData.GetValue<string>().ToMiniGuid();
+				Food = MultiplayerMng.FindObject<InteractiveObject_FOOD>(referenceId);
+				if (Food != null)
+				{
+					Attach(Food, cookerID);
+				}
+				else
+				{
+					Debug.LogError("Constructing_Campfire::Load:: Error finding food.");
+				}
+				IgnoreCookableCollisionsWhileLoading = true;
+			});
+		}
+		Initialize();
+		RepositionSticks();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 136
+PATH: Assembly-CSharp__Beam.Crafting__Construction_FOUNDATION.cs
+SIZE: 720 bytes
+SHA256: 226e87d8469667483cbbc3b2ca9aad26e1510ec2e09bf01b85aa2e9af7a5b548
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Construction_FOUNDATION : Constructing, IHaveAttribute
+{
+	[Header("ATTRIBUTE")]
+	[SerializeField]
+	private IconType _type = IconType.Construction;
+
+	[SerializeField]
+	private Transform _geometryCenter;
+
+	IconType IHaveAttribute.Type => _type;
+
+	public Transform GeometryCenter
+	{
+		get
+		{
+			if (!_geometryCenter)
+			{
+				_geometryCenter = transform;
+			}
+			return _geometryCenter;
+		}
+	}
+
+	float IHaveAttribute.GetValue()
+	{
+		return HealthPoints / MaximumHealthPoints;
+	}
+
+	protected override void Awake()
+	{
+		base.Awake();
+		ProximityDistance += 0.3f;
+	}
+
+	public override void Damage(float damage, IBase damager)
+	{
+		base.Damage(damage, damager);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 137
+PATH: Assembly-CSharp__Beam.Crafting__Construction_PANEL.cs
+SIZE: 3044 bytes
+SHA256: 76539e772f8ed73ece21d776dfa2fe98643b8948e208b7684cc56c1b4715eb68
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Serialization.Json;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Construction_PANEL : Constructing, IHaveAttribute
+{
+	[Header("ATTRIBUTE")]
+	[SerializeField]
+	private IconType _type = IconType.Construction;
+
+	[SerializeField]
+	private GameObject _cap;
+
+	[SerializeField]
+	private Transform _leftCapPosition;
+
+	[SerializeField]
+	private Transform _rightCapPosition;
+
+	private bool _hasLeftCap;
+
+	private bool _hasRightCap;
+
+	IconType IHaveAttribute.Type => _type;
+
+	float IHaveAttribute.GetValue()
+	{
+		return HealthPoints / MaximumHealthPoints;
+	}
+
+	protected override void DoPlace(IList<Connector> connectors)
+	{
+		base.DoPlace(connectors);
+		CheckForCaps();
+	}
+
+	protected override void UpdateConnectorsAtPlacement(IList<Connector> connectors)
+	{
+		for (int i = 0; i < connectors.Count; i++)
+		{
+			Connector connector = connectors[i];
+			if (!(connector.Constructing == this) || connector.Type != ConnectorType.DOOR)
+			{
+				connector.Refresh();
+			}
+		}
+		for (int j = 0; j < MyConnectors.Length; j++)
+		{
+			Connector connector2 = MyConnectors[j];
+			if (connector2.Type != ConnectorType.DOOR)
+			{
+				connector2.Refresh();
+			}
+		}
+	}
+
+	protected override bool CheckPlacementIsSupported(IList<Connector> connectors)
+	{
+		foreach (Connector connector in connectors)
+		{
+			if (connector.Constructing is Construction_FOUNDATION)
+			{
+				return true;
+			}
+		}
+		foreach (Connector connector2 in connectors)
+		{
+			if ((bool)connector2.Constructing.SnappedConnector && connector2.Constructing.SnappedConnector.Constructing is Construction_FOUNDATION)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void CheckForCaps()
+	{
+		if (SnappedConnector.Constructing.ColliderType != GhostCollider.ColliderType.WALL_HALF)
+		{
+			if (!Physics.CheckSphere(_leftCapPosition.position - new Vector3(0f, 0.14f, 0f), 0.14f, 1 << Layers.CONSTRUCTIONS))
+			{
+				CreateCap(_leftCapPosition.position);
+				_hasLeftCap = true;
+			}
+			if (!Physics.CheckSphere(_rightCapPosition.position - new Vector3(0f, 0.14f, 0f), 0.14f, 1 << Layers.CONSTRUCTIONS))
+			{
+				CreateCap(_rightCapPosition.position);
+				_hasRightCap = true;
+			}
+		}
+	}
+
+	private void CreateCap(Vector3 position)
+	{
+		GameObject gameObject = Object.Instantiate(_cap, position, Quaternion.identity);
+		gameObject.transform.parent = transform;
+		gameObject.transform.localRotation = Quaternion.identity;
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("HasLeftCap", JSerializer.Serialize(_hasLeftCap));
+		jObject.AddField("HasRightCap", JSerializer.Serialize(_hasRightCap));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("HasLeftCap");
+		_hasLeftCap = field.GetValue<bool>();
+		JObject field2 = data.GetField("HasRightCap");
+		_hasRightCap = field2.GetValue<bool>();
+		if (_hasLeftCap)
+		{
+			CreateCap(_leftCapPosition.position);
+		}
+		if (_hasRightCap)
+		{
+			CreateCap(_rightCapPosition.position);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 138
+PATH: Assembly-CSharp__Beam.Crafting__Construction_STEPS.cs
+SIZE: 316 bytes
+SHA256: 26fc1d05681e02cfe7f89f34b7dfffe280855d3833c8d81c6af37f050596b8f6
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Construction_STEPS : Construction_FOUNDATION, IHaveAttribute
+{
+	public override bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return base.OwnerPlacing(ghost, ray, yRotation);
+	}
+
+	public override void Place()
+	{
+		base.Place();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 139
+PATH: Assembly-CSharp__Beam.Crafting__Construction_STRUCTURE.cs
+SIZE: 2823 bytes
+SHA256: 37d574f3023223dbea5c753739d325d08638f4afdf000c8dcb3bc860b166f7ee
+====================================================================================================
+
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Construction_STRUCTURE : BaseObject
+{
+	private List<Constructing> _constructions = new List<Constructing>();
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Rigidbody _rigidbody;
+
+	[SerializeField]
+	[Tooltip("Disable ghost collision when snapping to a connector")]
+	private bool _disableGhostCollisionOnSnap;
+
+	public IList<Constructing> Constructions => _constructions;
+
+	public Rigidbody rigidbody => _rigidbody;
+
+	public bool DisableGhostCollisionOnSnap => _disableGhostCollisionOnSnap;
+
+	public override bool CanReorder => false;
+
+	public virtual void AddConstruction(Constructing constructing)
+	{
+		_constructions.Add(constructing);
+	}
+
+	public void RemoveConstruction(Constructing constructing)
+	{
+		_constructions.Remove(constructing);
+		if (_constructions.Count == 0)
+		{
+			MultiplayerMng.Destroy(this);
+		}
+	}
+
+	public TConstruction GetConstruction<TConstruction>() where TConstruction : Constructing
+	{
+		return _constructions.FirstOrDefault((Constructing construction) => construction.GetType() == typeof(TConstruction)) as TConstruction;
+	}
+
+	public virtual void Recenter()
+	{
+	}
+
+	public override void OnTransformSerialisationIdChanged()
+	{
+		base.OnTransformSerialisationIdChanged();
+		if (_constructions.IsNullOrDestroyed())
+		{
+			return;
+		}
+		foreach (Constructing construction in _constructions)
+		{
+			construction.OnTransformSerialisationIdChanged();
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject jObject2 = new JObject();
+		for (int i = 0; i < _constructions.Count; i++)
+		{
+			Constructing constructing = _constructions[i];
+			jObject2.Add(constructing.ReferenceId.ToString());
+		}
+		jObject.AddField("Constructions", jObject2);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		transform.localScale = Vector3.one;
+		JObject constructionsData = data.GetField("Constructions");
+		if (constructionsData == null || constructionsData.IsNull())
+		{
+			return;
+		}
+		LevelLoader.CurrentLoader.DeferredLoading.Insert(0, () =>
+		{
+			for (int i = 0; i < constructionsData.Children.Count; i++)
+			{
+				Constructing constructing = MultiplayerMng.FindObject<Constructing>(constructionsData.Children[i].GetValue<string>().ToMiniGuid());
+				if (constructing != null)
+				{
+					constructing.Structure = this;
+					constructing.TransformParent = transform;
+					constructing.transform.parent = transform;
+					constructing.transform.localPosition = constructing.Pos;
+					constructing.transform.localRotation = constructing.Rot;
+					constructing.transform.localScale = Vector3.one;
+					AddConstruction(constructing);
+				}
+			}
+		});
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 140
+PATH: Assembly-CSharp__Beam.Crafting__DefaultConstructingProximityCheck.cs
+SIZE: 806 bytes
+SHA256: fb063dc3c687f7e76911f24141ebbe47f54210f248733c4d35e507ef8d4a5ebc
+====================================================================================================
+
+using System.Collections.Generic;
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class DefaultConstructingProximityCheck : IConstructingProximityCheck
+{
+	public bool CheckProximity(Constructing constructing, Transform ghost, float distance)
+	{
+		IList<Constructing> componentsInSphere = BeamPhysics.GetComponentsInSphere<Constructing>(ghost.position, distance, (1 << Layers.CONSTRUCTIONS) | (1 << Layers.CONSTRUCTIONS_RAFTS));
+		if ((bool)constructing.SnappedConnector)
+		{
+			for (int i = 0; i < componentsInSphere.Count; i++)
+			{
+				Constructing constructing2 = componentsInSphere[i];
+				if (constructing.SnappedConnector.Constructing.Structure != constructing2.Structure)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return componentsInSphere.Count > 0;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 141
+PATH: Assembly-CSharp__Beam.Crafting__Dragger.cs
+SIZE: 9870 bytes
+SHA256: c5fabf3e56e29c6194a555c5ed709e60a3780c171acfdc83a56b46435d948d91
+====================================================================================================
+
+using System.Collections;
+using System.Collections.Generic;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Dragger : MonoBehaviour, IGameInputHandler, INeedPlayerComponent, IDragger
+{
+	private class ReplicateStartDrag : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public ISaveablePrefab Draggable;
+
+		[Replicate]
+		public float Distance;
+
+		[Replicate]
+		public Vector3 JointPosition;
+
+		public override void OnPeer()
+		{
+			Player.Dragger.StartDraging(Draggable, Distance, JointPosition);
+		}
+	}
+
+	private class ReplicateStopDrag : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public bool ThrowObject;
+
+		public override void OnPeer()
+		{
+			Dragger dragger = Player.Dragger;
+			dragger._throwObject = ThrowObject;
+			dragger._isDragging = false;
+		}
+	}
+
+	private const float DRAGGING_OFFSET_Y = 0.2f;
+
+	private const float WAIT_TO_ENABLE_AFTER_THROW = 1f;
+
+	[SerializeField]
+	private LayerMask _draggingLayerMask;
+
+	private IPlayer _player;
+
+	private IDraggable _draggable;
+
+	private bool _localCanDrag = true;
+
+	private IGameInputController _controller;
+
+	private bool _isDragging;
+
+	private bool _throwObject;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public IDraggable Draggable
+	{
+		get
+		{
+			if (!IsPickedUp(_draggable) && !IsOwned(_draggable))
+			{
+				return _draggable;
+			}
+			return null;
+		}
+	}
+
+	public bool CanDrag { get; set; } = true;
+
+	public bool IsDragging => _isDragging;
+
+	public void Initialize(IGameInputController controller)
+	{
+		_controller = controller;
+		_localCanDrag = true;
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+	}
+
+	public void CheckInput()
+	{
+		if (_isDragging || _controller.Raycaster.CurrentObject == null || !_player.IsOwner || _player.Input.GetButton(7) || !_player.Input.GetButtonDown(8) || !CanDrag || !_localCanDrag || !(_controller.Raycaster.CurrentObject is IDraggable { CanDrag: not false, IsDragging: false } draggable))
+		{
+			return;
+		}
+		_draggable = draggable;
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (allPlayer != _player && allPlayer.Dragger._draggable != null && allPlayer.Dragger._draggable == draggable)
+			{
+				return;
+			}
+		}
+		ReplicatedStartDrag(_draggable as ISaveablePrefab, _controller.Raycaster.LastHitInfo.distance, _controller.Raycaster.LastHitInfo.point);
+	}
+
+	private bool IsOwned(IDraggable draggable)
+	{
+		return ((draggable as InteractiveObject)?.OwnerId ?? (-1)) != -1;
+	}
+
+	private bool IsPickedUp(IDraggable draggable)
+	{
+		return (draggable as InteractiveObject)?.IsPickedUp ?? false;
+	}
+
+	private IEnumerator Drag(ISaveablePrefab draggable, float distance, Vector3 jointPosition)
+	{
+		_draggable = draggable as IDraggable;
+		_controller.CurrentHandler = this;
+		if (_player.IsOwner)
+		{
+			_player.Input.SetAndCacheMapsEnabled(state: false, 0);
+			_player.Input.SetAndCacheMapsEnabled(state: true, 14);
+		}
+		_isDragging = true;
+		_throwObject = false;
+		bool isKinematic = _draggable.rigidbody.isKinematic;
+		RigidbodyInterpolation interpolation = _draggable.rigidbody.interpolation;
+		CollisionDetectionMode collisionDetection = _draggable.rigidbody.collisionDetectionMode;
+		SaveablePrefab saveablePrefab = _draggable as SaveablePrefab;
+		if (Game.Mode.IsMultiplayer() && saveablePrefab != null)
+		{
+			yield return StartCoroutine(SetLocalDrag(saveablePrefab, enabled: true));
+		}
+		_player.PlayerCamera.DraggingJoint.Joint.connectedBody = ((IDraggable)draggable).rigidbody;
+		_player.PlayerCamera.DraggingJoint.Joint.transform.position = jointPosition;
+		_player.PlayerCamera.DraggingJoint.Joint.anchor = Vector3.zero;
+		_draggable.IsDragging = true;
+		_draggable.BeginDrag();
+		_draggable.rigidbody.drag = 8f;
+		_draggable.rigidbody.angularDrag = 8f;
+		_draggable.rigidbody.isKinematic = false;
+		_draggable.rigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
+		_draggable.rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+		float currentMass = _draggable.rigidbody.mass;
+		while (!_draggable.IsNullOrDestroyed() && _isDragging && !IsOwned(_draggable) && !IsPickedUp(_draggable))
+		{
+			if (_draggable.IsNullOrDestroyed())
+			{
+				yield return null;
+			}
+			_draggable.rigidbody.mass = Mathf.Lerp(_draggable.rigidbody.mass, _player.Movement.ActivePlatform.IsNullOrDestroyed() ? currentMass : 0.01f, Time.deltaTime * 3f);
+			BeamRay ray = _player.PlayerCamera.GetRay(distance);
+			if (Physics.Raycast(ray.BaseRay, out var hitInfo, ray.Length, _draggingLayerMask))
+			{
+				_player.PlayerCamera.DraggingJoint.Rigidbody.MovePosition(hitInfo.point + new Vector3(0f, 0.2f, 0f));
+			}
+			else
+			{
+				_player.PlayerCamera.DraggingJoint.Rigidbody.MovePosition(ray.EndPoint + new Vector3(0f, 0.2f, 0f));
+			}
+			if (_player.IsOwner)
+			{
+				if (!_player.Input.GetButton(8) || !_draggable.CanDrag || !CanDrag || !_localCanDrag)
+				{
+					ReplicatedStopDrag(throwObject: false);
+				}
+				if (_player.Input.GetButtonDown(7))
+				{
+					ReplicatedStopDrag(throwObject: true);
+					if (Game.Mode.IsMultiplayer())
+					{
+						_localCanDrag = false;
+						StartCoroutine(WaitToEnableDrag(1f));
+					}
+				}
+			}
+			yield return null;
+		}
+		if (!_draggable.IsNullOrDestroyed())
+		{
+			_draggable.rigidbody.WakeUp();
+			_draggable.IsDragging = false;
+			_draggable.EndDrag();
+			_draggable.rigidbody.drag = _draggable.CurrentDrag;
+			_draggable.rigidbody.angularDrag = _draggable.CurrentAngularDrag;
+			_draggable.rigidbody.isKinematic = isKinematic;
+			_draggable.rigidbody.interpolation = interpolation;
+			_draggable.rigidbody.collisionDetectionMode = collisionDetection;
+			_draggable.rigidbody.mass = currentMass;
+			_player.PlayerCamera.DraggingJoint.Joint.connectedBody = null;
+			if (Game.Mode.IsMultiplayer() && saveablePrefab != null)
+			{
+				yield return StartCoroutine(SetLocalDrag(saveablePrefab, enabled: false));
+			}
+			if (_throwObject)
+			{
+				_draggable.rigidbody.AddForce(_player.PlayerCamera.Camera.transform.forward * 6f, ForceMode.VelocityChange);
+			}
+			else
+			{
+				_draggable.rigidbody.AddForce(_player.PlayerCamera.Camera.transform.up * -0.1f, ForceMode.Impulse);
+			}
+		}
+		_isDragging = false;
+		_draggable = null;
+		_controller.CurrentHandler = null;
+		if (_player.IsOwner)
+		{
+			_player.Input.SetAndCacheMapsEnabled(state: true, 0);
+			_player.Input.SetAndCacheMapsEnabled(state: false, 14);
+		}
+	}
+
+	private IEnumerator SetLocalDrag(SaveablePrefab saveablePrefab, bool enabled)
+	{
+		TransformId parentId = (enabled ? TransformId.Unknown : saveablePrefab.gameObject.transform.parent.GetTransfromId());
+		InteractiveObject_PALM_LOG interactiveObject_PALM_LOG = saveablePrefab as InteractiveObject_PALM_LOG;
+		if (!interactiveObject_PALM_LOG.IsNullOrDestroyed())
+		{
+			HashSet<InteractiveObject_PALM_LOG> island = new HashSet<InteractiveObject_PALM_LOG>();
+			GatherPalmLogsIsland(island, interactiveObject_PALM_LOG);
+			if (enabled && Game.Mode.IsClient())
+			{
+				yield return StartCoroutine(RecreatePhysicsSetupForPalmLogsIsland(island));
+			}
+			{
+				foreach (InteractiveObject_PALM_LOG item in island)
+				{
+					item.ParentId = parentId;
+					item.SetKinematic(!enabled && Game.Mode.IsClient());
+				}
+				yield break;
+			}
+		}
+		saveablePrefab.ParentId = parentId;
+		InteractiveObject interactiveObject = saveablePrefab as InteractiveObject;
+		if (!interactiveObject.IsNullOrDestroyed())
+		{
+			interactiveObject.SetKinematic(!enabled && Game.Mode.IsClient());
+		}
+	}
+
+	private void GatherPalmLogsIsland(HashSet<InteractiveObject_PALM_LOG> island, InteractiveObject_PALM_LOG log)
+	{
+		if (!log.IsNullOrDestroyed() && !island.Contains(log))
+		{
+			island.Add(log);
+			GatherPalmLogsIsland(island, log.ConnectedAboveLog);
+			GatherPalmLogsIsland(island, log.ConnectedBelowLog);
+		}
+	}
+
+	private IEnumerator RecreatePhysicsSetupForPalmLogsIsland(HashSet<InteractiveObject_PALM_LOG> island)
+	{
+		foreach (InteractiveObject_PALM_LOG item in island)
+		{
+			if (!item.FixedJoint.IsNullOrDestroyed())
+			{
+				item.FixedJoint.connectedBody = null;
+				BeamTeam.Destroy(item.FixedJoint);
+				item.FixedJoint = null;
+			}
+		}
+		yield return null;
+		foreach (InteractiveObject_PALM_LOG item2 in island)
+		{
+			item2.RemoveRigidbody(IsOwner: true);
+		}
+		yield return null;
+		foreach (InteractiveObject_PALM_LOG item3 in island)
+		{
+			item3.CheckRigidbody(IsOwner: true);
+		}
+		yield return null;
+		foreach (InteractiveObject_PALM_LOG item4 in island)
+		{
+			if (!item4.ConnectedAboveLog.IsNullOrDestroyed())
+			{
+				item4.FixedJoint = item4.gameObject.AddComponent<FixedJoint>();
+				item4.FixedJoint.connectedBody = item4.ConnectedAboveLog.rigidbody;
+			}
+		}
+		yield return null;
+	}
+
+	public void StartDraging(ISaveablePrefab draggable, float distance, Vector3 jointPosition)
+	{
+		StartCoroutine(Drag(draggable, distance, jointPosition));
+	}
+
+	public void ReplicatedStartDrag(ISaveablePrefab draggable, float distance, Vector3 jointPosition)
+	{
+		if (!draggable.IsNullOrDestroyed())
+		{
+			StartDraging(draggable, distance, jointPosition);
+			if (Game.Mode.IsMultiplayer())
+			{
+				ReplicateStartDrag replicateStartDrag = new ReplicateStartDrag();
+				replicateStartDrag.Player = _player;
+				replicateStartDrag.Draggable = draggable;
+				replicateStartDrag.Distance = distance;
+				replicateStartDrag.JointPosition = jointPosition;
+				replicateStartDrag.Post();
+			}
+		}
+	}
+
+	public void ReplicatedStopDrag(bool throwObject)
+	{
+		_isDragging = false;
+		_throwObject = throwObject;
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateStopDrag replicateStopDrag = new ReplicateStopDrag();
+			replicateStopDrag.Player = _player;
+			replicateStopDrag.ThrowObject = throwObject;
+			replicateStopDrag.Post();
+		}
+	}
+
+	public IEnumerator WaitToEnableDrag(float waitTime)
+	{
+		yield return new WaitForSeconds(waitTime);
+		_localCanDrag = true;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 142
+PATH: Assembly-CSharp__Beam.Crafting__DummyPickupable.cs
+SIZE: 5203 bytes
+SHA256: a31ba1e77aa5023e7bf3399c87a9200219b07cbcb84f5809858ca6167e56d342
+====================================================================================================
+
+using System;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using Photon.Bolt;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class DummyPickupable : IPickupable, IAnimatablePrimary, ICraftingDisplayableStorable, IDisplayableStorable, IStorable, IBase, IHasCraftingType, ISaveablePrefab, ISaveableReference, ISaveable, ICraftingMaterial, IDisposable
+{
+	private string _description;
+
+	private InteractiveObjectClassification _classification;
+
+	public uint PrefabId { get; set; }
+
+	public MiniGuid ReferenceId { get; set; }
+
+	public CraftingType CraftingType { get; set; }
+
+	public GameObject gameObject => null;
+
+	public Transform transform
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Transform TransformParent
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public string DisplayName { get; private set; }
+
+	public RaycastMode RaycastMode
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public bool CanParent
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public bool IsDamageable
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public bool CanPickUp
+	{
+		get
+		{
+			return true;
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public bool IsPickedUp
+	{
+		get
+		{
+			return true;
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Collider[] AllColliders
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Vector3 LocalHoldingPosition
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Vector3 LocalHoldingRotation
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public int OwnerId
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public int PreviousOwnerId
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public AnimationType Idle
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public AnimationType Primary
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public AnimationType PrimaryOnObject
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Action<DummyPickupable> OnConsumed { get; set; }
+
+	bool ISaveablePrefab.IsValidPrefab => false;
+
+	bool ISaveablePrefab.IsMultiplayerEntity => false;
+
+	bool ISaveablePrefab.IsOwner => true;
+
+	BoltEntity ISaveablePrefab.Entity
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	Collider[] ISaveablePrefab.AllColliders
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	Rigidbody[] ISaveablePrefab.AllRigidbodies
+	{
+		get
+		{
+			throw new NotImplementedException();
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public event Action<IPickupable> PickedUp;
+
+	public void Damage(float damage, IBase damager)
+	{
+		throw new NotImplementedException();
+	}
+
+	public void Destroy()
+	{
+	}
+
+	public void Parent()
+	{
+		throw new NotImplementedException();
+	}
+
+	public void SetOwner(IPlayer player)
+	{
+		throw new NotImplementedException();
+	}
+
+	public void Hold(bool holding)
+	{
+		throw new NotImplementedException();
+	}
+
+	public void SetLOD(int level)
+	{
+		throw new NotImplementedException();
+	}
+
+	public bool ValidatePrimary(IBase obj)
+	{
+		throw new NotImplementedException();
+	}
+
+	string ICraftingDisplayableStorable.GetHealthTerm()
+	{
+		return string.Empty;
+	}
+
+	float ICraftingDisplayableStorable.GetHealthUnits()
+	{
+		return 1f;
+	}
+
+	float ICraftingDisplayableStorable.GetHealthRange()
+	{
+		return 1f;
+	}
+
+	InteractiveObjectClassification ICraftingDisplayableStorable.GetClassification()
+	{
+		return _classification;
+	}
+
+	string IDisplayableStorable.GetDisplayName()
+	{
+		return DisplayName;
+	}
+
+	string IDisplayableStorable.GetDescription()
+	{
+		return _description;
+	}
+
+	public bool Store()
+	{
+		return true;
+	}
+
+	public void Release()
+	{
+	}
+
+	public JObject Save()
+	{
+		throw new NotImplementedException();
+	}
+
+	public void Load(JObject data)
+	{
+		throw new NotImplementedException();
+	}
+
+	int ISaveablePrefab.GetColliderId(Collider collider)
+	{
+		throw new NotImplementedException();
+	}
+
+	int ISaveablePrefab.GetRigidbodyId(Rigidbody rigidbody)
+	{
+		throw new NotImplementedException();
+	}
+
+	public DummyPickupable(uint prefabId)
+		: this(GetTemplate(prefabId))
+	{
+	}
+
+	public DummyPickupable(IPickupable template)
+	{
+		PrefabId = template.PrefabId;
+		ReferenceId = MiniGuid.New();
+		CraftingType = template.CraftingType;
+		DisplayName = template.DisplayName;
+		_description = template.GetDescription();
+		_classification = template.GetClassification();
+	}
+
+	public void Consume()
+	{
+		OnConsumed(this);
+	}
+
+	public void Dispose()
+	{
+		PickedUp = null;
+		OnConsumed = null;
+	}
+
+	public IPickupable GetInstance()
+	{
+		if (!(Prefabs.GetPrefab(((ISaveablePrefab)this).PrefabId) is IPickupable))
+		{
+			return null;
+		}
+		return MultiplayerMng.Instantiate<SaveablePrefab>(((ISaveablePrefab)this).PrefabId, MiniGuid.New()) as IPickupable;
+	}
+
+	public static IPickupable GetTemplate(uint prefabId)
+	{
+		return Prefabs.GetPrefab(prefabId).GetInterface<IPickupable>();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 143
+PATH: Assembly-CSharp__Beam.Crafting__FarmingManager.cs
+SIZE: 2299 bytes
+SHA256: 324a7805e32d96ccb4ca8c2a5a5e513245d81604f25873b8378b4289e3a60e96
+====================================================================================================
+
+using System.Collections.Generic;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class FarmingManager : MonoBehaviour, IPlantFactory, IFruitFactory, ISerializationCallbackReceiver
+{
+	[SerializeField]
+	private Transform _pooledPlantsParent;
+
+	private Dictionary<PlantType, PlantData> _plantData;
+
+	[SerializeField]
+	[HideInInspector]
+	private List<PlantType> _keys;
+
+	[SerializeField]
+	[HideInInspector]
+	private List<PlantData> _values;
+
+	private Dictionary<PlantType, Stack<Plant>> _plantStacks = new Dictionary<PlantType, Stack<Plant>>();
+
+	void ISerializationCallbackReceiver.OnBeforeSerialize()
+	{
+		_keys.Clear();
+		_values.Clear();
+		if (_plantData == null)
+		{
+			return;
+		}
+		foreach (KeyValuePair<PlantType, PlantData> plantDatum in _plantData)
+		{
+			_keys.Add(plantDatum.Key);
+			_values.Add(plantDatum.Value);
+		}
+	}
+
+	void ISerializationCallbackReceiver.OnAfterDeserialize()
+	{
+		_plantData = new Dictionary<PlantType, PlantData>();
+		for (int i = 0; i < Mathf.Min(_keys.Count, _values.Count); i++)
+		{
+			_plantData.Add(_keys[i], _values[i]);
+		}
+	}
+
+	private void Awake()
+	{
+		InitializePlantStacks();
+	}
+
+	private void InitializePlantStacks()
+	{
+		foreach (KeyValuePair<PlantType, PlantData> plantDatum in _plantData)
+		{
+			PlantType key = plantDatum.Key;
+			if (!_plantStacks.ContainsKey(key))
+			{
+				_plantStacks.Add(key, new Stack<Plant>());
+			}
+		}
+	}
+
+	public InteractiveObject_FOOD CreateFruit(PlantType type)
+	{
+		_plantData.TryGetValue(type, out var value);
+		if (value != null)
+		{
+			return MultiplayerMng.Instantiate<InteractiveObject_FOOD>(value.HarvestedPrefab.PrefabId, MiniGuid.New());
+		}
+		return null;
+	}
+
+	public Plant CreatePlant(PlantType plantType)
+	{
+		return PopPlant(plantType);
+	}
+
+	public void DestroyPlant(Plant plant)
+	{
+		PushPlant(plant);
+	}
+
+	private Plant PopPlant(PlantType plantType)
+	{
+		Plant plant;
+		if (_plantStacks[plantType].Count > 0)
+		{
+			plant = _plantStacks[plantType].Pop();
+		}
+		else
+		{
+			plant = Object.Instantiate(_plantData[plantType].PlantPrefab);
+			plant.Initialize(this, plantType, _plantData[plantType].HarvestTime);
+		}
+		plant.Reset();
+		return plant;
+	}
+
+	private void PushPlant(Plant plant)
+	{
+		plant.transform.parent = _pooledPlantsParent;
+		_plantStacks[plant.PlantType].Push(plant);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 144
+PATH: Assembly-CSharp__Beam.Crafting__FireLighter.cs
+SIZE: 12169 bytes
+SHA256: 88dcf8ca3e952d2be6794e1de21df07cb8f96181f355c25a282adc1ac7944f36
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam.Language;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class FireLighter : MonoBehaviour, IGameInputHandler, INeedPlayerComponent
+{
+	private class ReplicateStartLighting : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public Construction_CAMPFIRE Fire;
+
+		public override void OnPeer()
+		{
+			Player.Lighter.StartLighting(Fire);
+		}
+	}
+
+	private abstract class FireLighterMessage : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public float Energy;
+
+		public override void OnPeer()
+		{
+			Player.Lighter._replicatedMessages.Enqueue(this);
+		}
+
+		public abstract IEnumerator<float> Execute();
+	}
+
+	private class ReplicateSequence : FireLighterMessage
+	{
+		[Replicate]
+		public bool Success;
+
+		public override IEnumerator<float> Execute()
+		{
+			Player.Lighter._energy = Energy;
+			if (Success)
+			{
+				return Player.Lighter.SuccessMove_Sequence();
+			}
+			return Player.Lighter.FailMove_Sequence();
+		}
+	}
+
+	private class ReplicateInputForceStop : FireLighterMessage
+	{
+		public override IEnumerator<float> Execute()
+		{
+			Player.Lighter._inputForceStopButton = true;
+			yield return 0f;
+		}
+	}
+
+	private const int ATTEMPTS_REQUIRED = 6;
+
+	private const float TOTAL_ENERGY_REQUIRED = 100f;
+
+	private const float ENERGY_PER_PRESS = 3f;
+
+	private const float DECAY_PER_SEC = 7.5f;
+
+	private const string FIRE_IDLE = "LIGHT_FIRE_IDLE";
+
+	private const string FIRE_LEFT = "LIGHT_FIRE_LEFT";
+
+	private const string FIRE_RIGHT = "LIGHT_FIRE_RIGHT";
+
+	private const string FIRE_FAIL = "LIGHT_FIRE_FAIL";
+
+	private const string STICK_LIGHT_LEFT = "STICK_LIGHT_LEFT";
+
+	private const string STICK_LIGHT_RIGHT = "STICK_LIGHT_RIGHT";
+
+	[SerializeField]
+	private Light _pointLight;
+
+	[SerializeField]
+	private ParticleSystem _emberParticles;
+
+	[SerializeField]
+	private ParticleSystem _smokeParticles;
+
+	[SerializeField]
+	private AudioClip[] _rubbingAudioClips;
+
+	[SerializeField]
+	private AudioClip _failedAudioClip;
+
+	[SerializeField]
+	private AudioClip _failedFemaleAudioClip;
+
+	[SerializeField]
+	private SceneGameAction _action;
+
+	private IPlayer _player;
+
+	private IGameInputController _controller;
+
+	private bool _isLightingFire;
+
+	private CoroutineHandle _fireSequence;
+
+	private bool _inputLeftButton;
+
+	private bool _inputRightButton;
+
+	private bool _inputForceStopButton;
+
+	private Construction_CAMPFIRE _fire;
+
+	private CoroutineHandle _animHandle;
+
+	private AudioActorHandle _audioHandle;
+
+	private bool _inputLeft;
+
+	private Animation _proxyAnim;
+
+	private float _energy;
+
+	private Queue<FireLighterMessage> _replicatedMessages = new Queue<FireLighterMessage>();
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public bool IsLightingFire => _isLightingFire;
+
+	public event Action<bool> ToggleFiring;
+
+	public event Action<float> EnergyPercentUpdated;
+
+	protected virtual void OnToggleFiring(bool firing)
+	{
+		ToggleFiring?.Invoke(firing);
+	}
+
+	protected virtual void OnEnergyPercentUpdated(float energy)
+	{
+		EnergyPercentUpdated?.Invoke(energy);
+	}
+
+	public void Initialize(IGameInputController controller)
+	{
+		_controller = controller;
+		_controller.Interacter.RequestGameActions += Interacter_RequestGameActions;
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+	}
+
+	private void OnDestroy()
+	{
+		if (!_controller.IsNullOrDestroyed())
+		{
+			_controller.Interacter.RequestGameActions -= Interacter_RequestGameActions;
+		}
+	}
+
+	private void Interacter_RequestGameActions(Interacter sender, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return;
+		}
+		Construction_CAMPFIRE component = obj.gameObject.GetComponent<Construction_CAMPFIRE>();
+		if (component != null && !component.IsBurning)
+		{
+			IPickupable currentObject = _player.Holder.CurrentObject;
+			if (!currentObject.IsNullOrDestroyed() && currentObject.CraftingType.InteractiveType == InteractiveType.TOOLS_KINDLING)
+			{
+				sender.AddGameAction(_action);
+			}
+		}
+	}
+
+	public void CheckInput()
+	{
+	}
+
+	public void FireLighting_GameAction(IBase obj)
+	{
+		if (!_player.Movement.grounded)
+		{
+			return;
+		}
+		Construction_CAMPFIRE component = obj.gameObject.GetComponent<Construction_CAMPFIRE>();
+		if (component != null)
+		{
+			if (component.FuelHours > 0f)
+			{
+				ReplicatedStartLighting(component);
+			}
+			else
+			{
+				LocalizedNotification.Post(_player, NotificationPriority.Immediate, 4f, "FIRE_LIGHTER_NTF_OUT_OF_FUEL_DESC");
+			}
+		}
+	}
+
+	private void StartLighting(Construction_CAMPFIRE fire)
+	{
+		_fire = fire;
+		_fire.IsOnUsing = true;
+		Timing.RunCoroutine(Lighting_Sequence());
+	}
+
+	private void GetInput()
+	{
+		_inputLeftButton = _player.Input.GetButtonDown(79);
+		_inputRightButton = _player.Input.GetButtonDown(80);
+		_inputForceStopButton = _player.Input.GetButtonDown(4) || _player.Input.GetButtonDown(39) || _player.Input.GetButtonDown(31);
+	}
+
+	private IEnumerator<float> FailMove_Sequence()
+	{
+		AudioClip clip = ((_player.Gender == 0) ? _failedAudioClip : _failedFemaleAudioClip);
+		_audioHandle = AudioManager.GetAudioPlayer().Play3D(clip, transform.position, AudioMixerChannels.FX);
+		_animHandle = _player.Character.PlayAnimation("LIGHT_FIRE_FAIL");
+		_player.PlayerSkills.ReplicatedAddPhysical(PlayerSkills.ExpSource.CAMPFIRE_FAIL);
+		yield return Timing.WaitForSeconds(1f);
+	}
+
+	private IEnumerator<float> SuccessMove_Sequence()
+	{
+		_audioHandle = AudioManager.GetAudioPlayer().Play3D(_rubbingAudioClips, transform.position, AudioMixerChannels.FX);
+		_animHandle = _player.Character.PlayAnimation(_inputLeft ? "LIGHT_FIRE_LEFT" : "LIGHT_FIRE_RIGHT");
+		_proxyAnim.Play(_inputLeft ? "STICK_LIGHT_LEFT" : "STICK_LIGHT_RIGHT");
+		_inputLeft = !_inputLeft;
+		yield return 0f;
+	}
+
+	private IEnumerator<float> Lighting_Sequence()
+	{
+		_replicatedMessages.Clear();
+		_isLightingFire = true;
+		if (_player.IsOwner)
+		{
+			_controller.CurrentHandler = this;
+			_player.Input.SetAndCacheMapsEnabled(state: false, 0);
+			_player.Input.SetAndCacheMapsEnabled(state: true, 13);
+			_player.Input.SetCursorEnabled(enabled: false);
+			_player.PlayerCamera.CameraMovement.SetRotation(_player.Character.CameraRigTransform);
+			_player.PlayerUI.Suspend(suspend: true);
+		}
+		_player.Character.HideCurrentItem();
+		GameObject proxy = _player.Holder.Proxies.GetProxy(new CraftingType(AttributeType.None, InteractiveType.TOOLS_KINDLING));
+		proxy.SetActive(value: true);
+		_proxyAnim = proxy.GetComponent<Animation>();
+		_player.Character.SetBool("starting_fire", val: true);
+		yield return 0f;
+		_player.Character.PlayAnimation("LIGHT_FIRE_IDLE");
+		PlatformLocalizedText platformLocalizedText = new PlatformLocalizedText();
+		platformLocalizedText.SetPlayer(_player.Id);
+		platformLocalizedText.SetTerm("FIRE_LIGHTER_NTF_PRESS_TO_LIGHT");
+		platformLocalizedText.SetActions(79, 80);
+		LocalizedNotification.Post(_player, NotificationPriority.Immediate, 8f, platformLocalizedText);
+		bool completed = false;
+		bool forceStop = false;
+		_inputForceStopButton = false;
+		_inputLeft = true;
+		_energy = 0f;
+		if (_player.IsOwner)
+		{
+			OnToggleFiring(firing: true);
+		}
+		_animHandle = default;
+		_audioHandle = default;
+		ParticleSystem.EmissionModule ep = _emberParticles.emission;
+		ParticleSystem.EmissionModule sp = _smokeParticles.emission;
+		_emberParticles.Clear();
+		if (!_emberParticles.isPlaying)
+		{
+			_emberParticles.Play();
+		}
+		_smokeParticles.Clear();
+		if (!_smokeParticles.isPlaying)
+		{
+			_smokeParticles.Play();
+		}
+		if (!_fire.IsNullOrDestroyed() && _player.IsOwner)
+		{
+			Vector3 vector = _fire.transform.position - _player.transform.position;
+			vector.y = 0f;
+			float magnitude = vector.magnitude;
+			Vector3 position = _player.transform.position + vector.normalized * (magnitude - 1f);
+			position.y = _fire.transform.position.y + 0.9f;
+			if (magnitude > 1.5f)
+			{
+				_player.transform.position = position;
+			}
+		}
+		float physicalLevelValue = _player.PlayerSkills.PhysicalPercentage;
+		int numberOfFails = 0;
+		float value = UnityEngine.Random.value;
+		float failAtEnergy = UnityEngine.Random.Range(30, 70);
+		bool willFail = value > physicalLevelValue;
+		while (!completed && !forceStop)
+		{
+			_energy -= Time.deltaTime * 7.5f;
+			if (_energy < 0f)
+			{
+				_energy = 0f;
+			}
+			if (_player.IsOwner)
+			{
+				GetInput();
+				if ((_inputLeftButton && _inputLeft) || (_inputRightButton && !_inputLeft))
+				{
+					if (((PlayerUtilities.GetServerGameDifficulty() == EGameDifficultyMode.Hard) & willFail) && _energy >= failAtEnergy)
+					{
+						_energy = 20f;
+						numberOfFails++;
+						_player.SetVibration(0, 0.5f, 0.15f);
+						value = UnityEngine.Random.value;
+						failAtEnergy = UnityEngine.Random.Range(30, 70);
+						physicalLevelValue = Mathf.Clamp(_player.PlayerSkills.PhysicalPercentage, 0.2f, 1f);
+						willFail = value > physicalLevelValue && numberOfFails < 5;
+						yield return Timing.WaitUntilDone(ReplicatedFailMove_Sequence());
+					}
+					else
+					{
+						_energy += 3f + physicalLevelValue;
+						yield return Timing.WaitUntilDone(ReplicatedSuccessMove_Sequence());
+					}
+				}
+				if (_inputForceStopButton)
+				{
+					ReplicateInputForceStop replicateInputForceStop = new ReplicateInputForceStop();
+					replicateInputForceStop.Player = _player;
+					replicateInputForceStop.Energy = _energy;
+					replicateInputForceStop.Post();
+				}
+				OnEnergyPercentUpdated(_energy / 100f);
+			}
+			else
+			{
+				while (_replicatedMessages.Count != 0)
+				{
+					yield return Timing.WaitUntilDone(_replicatedMessages.Dequeue().Execute());
+				}
+			}
+			ep.rateOverTime = Mathf.Clamp(_energy, 0f, 50f);
+			sp.rateOverTime = Mathf.Clamp(_energy, 0f, 50f);
+			float t = Mathf.PerlinNoise(5f, Time.time * 5f);
+			float b = _energy * 0.03f;
+			_pointLight.intensity = Mathf.Lerp(0f, b, t);
+			if (_inputForceStopButton || _player.Statistics.IsKnockedOut)
+			{
+				_fire.IsOnUsing = false;
+				forceStop = true;
+				_isLightingFire = false;
+				AudioManager.GetAudioPlayer().Stop(_audioHandle);
+				_proxyAnim["STICK_LIGHT_LEFT"].normalizedTime = 0f;
+				_proxyAnim["STICK_LIGHT_RIGHT"].normalizedTime = 0f;
+				_player.Character.SetBool("starting_fire", val: false);
+			}
+			else if (_energy >= 100f)
+			{
+				_player.SetVibration(0, 0.3f, 0.1f);
+				_fire.Ignite(_player);
+				_player.PlayerSkills.ReplicatedAddPhysical(PlayerSkills.ExpSource.CAMPFIRE_LIGHT);
+				completed = true;
+				_fire.IsOnUsing = false;
+				_fire = null;
+			}
+			yield return 0f;
+		}
+		if (completed)
+		{
+			while (_animHandle.IsRunning)
+			{
+				yield return 0f;
+			}
+		}
+		_animHandle.IsRunning = false;
+		AudioManager.GetAudioPlayer().Stop(_audioHandle);
+		proxy.SetActive(value: false);
+		if (_player.IsOwner)
+		{
+			OnToggleFiring(firing: false);
+			_player.Input.SetAndCacheMapsEnabled(state: true, 0);
+			_player.Input.SetAndCacheMapsEnabled(state: false, 13);
+			_player.PlayerUI.Suspend(suspend: false);
+			_controller.CurrentHandler = null;
+			_controller.Raycaster.Reset();
+		}
+		_player.Character.ShowCurrentItem();
+		_isLightingFire = false;
+		_player.Character.SetBool("starting_fire", val: false);
+	}
+
+	private void ReplicatedStartLighting(Construction_CAMPFIRE fire)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateStartLighting replicateStartLighting = new ReplicateStartLighting();
+			replicateStartLighting.Player = _player;
+			replicateStartLighting.Fire = fire;
+			replicateStartLighting.Post();
+		}
+		StartLighting(fire);
+	}
+
+	private IEnumerator<float> ReplicatedSuccessMove_Sequence()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSequence replicateSequence = new ReplicateSequence();
+			replicateSequence.Player = _player;
+			replicateSequence.Energy = _energy;
+			replicateSequence.Success = true;
+			replicateSequence.Post();
+		}
+		return SuccessMove_Sequence();
+	}
+
+	private IEnumerator<float> ReplicatedFailMove_Sequence()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSequence replicateSequence = new ReplicateSequence();
+			replicateSequence.Player = _player;
+			replicateSequence.Energy = _energy;
+			replicateSequence.Success = false;
+			replicateSequence.Post();
+		}
+		return FailMove_Sequence();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 145
+PATH: Assembly-CSharp__Beam.Crafting__Holder.cs
+SIZE: 17767 bytes
+SHA256: 3a499d8dbc955c7ec312b8f573521347b56debf7605c8e2adf3f141cffd45703
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using Sirenix.OdinInspector;
+using UdpKit;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Beam.Crafting;
+
+public class Holder : SerializedMonoBehaviour, IHolder, INeedPlayerComponent, IHotkeySource, IGameInputHandler, IGameActionProvider, ISaveable
+{
+	private class PostReplicatePickup : I_MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[I_Replicate]
+		public IPickupable Pickupable;
+
+		[Replicate]
+		public bool Animate;
+
+		public override void OnPeer()
+		{
+			Player.Holder.ReplicatedPickup(Pickupable, Animate);
+		}
+	}
+
+	private class ReplicatePickup : I_MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[I_Replicate]
+		public IPickupable Pickupable;
+
+		[Replicate]
+		public bool Animate;
+
+		public override void OnPeer()
+		{
+			Player.Holder.Pickup(Pickupable, Animate);
+		}
+	}
+
+	private class ReplicateSelect : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public IPickupable Pickupable;
+
+		public override void OnPeer()
+		{
+			Player.Holder.Select(Pickupable);
+		}
+	}
+
+	private class ReplicateRelease : I_MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[I_Replicate]
+		public IPickupable Pickupable;
+
+		public override void OnPeer()
+		{
+			Player.Holder.Release(Pickupable);
+		}
+	}
+
+	public class ReplicateHolderCommand : MultiplayerMessage
+	{
+		public enum Command
+		{
+			SelectHands,
+			DropCurrent
+		}
+
+		[Replicate]
+		public IPlayer Player;
+
+		public Command Cmd;
+
+		public override void OnPeer()
+		{
+			switch (Cmd)
+			{
+			case Command.SelectHands:
+				Player.Holder.SelectHands();
+				break;
+			case Command.DropCurrent:
+				Player.Holder.DropCurrent();
+				break;
+			}
+		}
+
+		public override void Read(UdpPacket packet)
+		{
+			base.Read(packet);
+			Cmd = (Command)packet.ReadByte();
+		}
+
+		public override void Write(UdpPacket packet)
+		{
+			base.Write(packet);
+			packet.WriteByte((byte)Cmd);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + $"({Cmd})";
+		}
+	}
+
+	private class ReplicateSwitchCurrent : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer Player;
+
+		[Replicate]
+		public ISaveablePrefab RaycasterCurrentObject;
+
+		public ReplicateSwitchCurrent()
+		{
+		}
+
+		public ReplicateSwitchCurrent(IPlayer player)
+		{
+			Player = player;
+			RaycasterCurrentObject = player.User.Controller.Raycaster.CurrentObject as ISaveablePrefab;
+		}
+
+		public override void OnPeer()
+		{
+			Player.User.Controller.Raycaster.SetCurrentObject(RaycasterCurrentObject as IBase);
+			Player.Holder.SwitchCurrent();
+		}
+	}
+
+	[SerializeField]
+	private Transform _holdingContainer;
+
+	[SerializeField]
+	private ISlotStorageProvider<IPickupable> _storageProvider;
+
+	private ISlotStorage<IPickupable> _storage;
+
+	private bool _loaded;
+
+	private IPickupable _currentObject;
+
+	private IPickupable _currentlyPicking;
+
+	[SerializeField]
+	private EventItemProxies _proxies;
+
+	private IPlayer _player;
+
+	private IDynamicParentProvider _dynamicParenter;
+
+	private IGameInputController _controller;
+
+	private bool _poll = true;
+
+	private List<IGameAction> _gameActions = new List<IGameAction>();
+
+	private GameAction _gameAction = new GameAction();
+
+	private int _objectResourceCount;
+
+	private bool _objectiveComplete;
+
+	[SerializeField]
+	private UnityEvent _onGatheredResources;
+
+	public ISlotStorage<IPickupable> Storage => _storage;
+
+	public bool Loaded => _loaded;
+
+	public IPickupable CurrentObject => _currentObject;
+
+	public EventItemProxies Proxies => _proxies;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public UnityEvent OnGatheredResources => _onGatheredResources;
+
+	public event Action<IPickupable> SelectedItemChanged;
+
+	public event Action<IPickupable> PickedUp;
+
+	public event Action<IPickupable> Dropped;
+
+	protected virtual void OnSelectedItemChanged(IPickupable pickupable)
+	{
+		SelectedItemChanged?.Invoke(pickupable);
+	}
+
+	protected virtual void OnPickedUp(IPickupable pickupable)
+	{
+		PickedUp?.Invoke(pickupable);
+	}
+
+	protected virtual void OnDropped(IPickupable pickupable)
+	{
+		Dropped?.Invoke(pickupable);
+	}
+
+	private void Awake()
+	{
+		_storage = _storageProvider.GetSlotStorage();
+		_storage.SelectionChanged += Storage_SelectionChanged;
+		_storage.Pushed += Storage_Pushed;
+	}
+
+	private void Start()
+	{
+		_dynamicParenter = UnityEngine.Object.FindObjectOfType<StrandedWorld>();
+	}
+
+	public void Initialize(IGameInputController controller)
+	{
+		_controller = controller;
+		_controller.Interacter.InteractingFellThrough += Interacter_InteractingFellThrough;
+		_controller.Raycaster.SetFilter(new HoldingRaycastFilter(_holdingContainer));
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_player.GameInput.Subscribe(this);
+		_player.Movement.BeginClimbing += PlayerMovement_BeginClimbing;
+		_player.Movement.EndClimbing += PlayerMovement_EndClimbing;
+		_gameAction.PlayerActionRequiredDescription = "PLAYER_ACTION_PRESS";
+		_gameAction.ElementRequiredId = 9;
+		_gameAction.ResultingActionDescription = "PLAYER_ACTION_PICK_UP";
+		_gameAction.Action = Pickup_GameAction;
+		_gameActions.Add(_gameAction);
+	}
+
+	public void SetEnabled(bool enabled)
+	{
+		_poll = enabled;
+	}
+
+	private void OnDestroy()
+	{
+		PickedUp = null;
+		Dropped = null;
+		SelectedItemChanged = null;
+		if (_player.IsValid())
+		{
+			if (_player.GameInput != null)
+			{
+				_player.GameInput.Unsubscribe(this);
+			}
+			if (_player.Movement != null)
+			{
+				_player.Movement.BeginClimbing -= PlayerMovement_BeginClimbing;
+				_player.Movement.EndClimbing -= PlayerMovement_EndClimbing;
+			}
+		}
+		if (_storage.IsValid())
+		{
+			_storage.SelectionChanged -= Storage_SelectionChanged;
+			_storage.Pushed -= Storage_Pushed;
+		}
+		if (_controller.IsValid())
+		{
+			_controller.Interacter.InteractingFellThrough -= Interacter_InteractingFellThrough;
+		}
+	}
+
+	private void PlayerMovement_BeginClimbing()
+	{
+		HideCurrent();
+	}
+
+	private void PlayerMovement_EndClimbing()
+	{
+		ShowCurrent();
+	}
+
+	public void CheckInput()
+	{
+		if (_poll && _player.IsOwner)
+		{
+			if (_player.Input.GetButtonDown(29))
+			{
+				ReplicatedSwitchCurrent();
+			}
+			else if (_player.Input.GetButtonDown(10))
+			{
+				ReplicatedDropCurrent();
+			}
+			else if (_player.Input.GetButtonDown(17))
+			{
+				ReplicatedSelectHands();
+			}
+		}
+	}
+
+	IEnumerable<IGameAction> IGameActionProvider.GetGameActions()
+	{
+		IPickupable pickupable = _controller.Raycaster.CurrentObject as IPickupable;
+		if (IsValidPickupable(pickupable))
+		{
+			return _gameActions;
+		}
+		return null;
+	}
+
+	private void Interacter_InteractingFellThrough()
+	{
+		if (_poll)
+		{
+			IPickupable pickupable = _controller.Raycaster.CurrentObject as IPickupable;
+			if (IsValidPickupable(pickupable))
+			{
+				PostReplicatedPickup(pickupable);
+			}
+		}
+	}
+
+	private void Pickup_GameAction(IBase obj)
+	{
+		IPickupable pickupable = obj as IPickupable;
+		if (IsValidPickupable(pickupable))
+		{
+			Pickup(pickupable);
+		}
+	}
+
+	public bool IsPickingUp(IPickupable pickupable)
+	{
+		if (_currentlyPicking != pickupable)
+		{
+			return CurrentObject == pickupable;
+		}
+		return true;
+	}
+
+	public bool CanPickup(IPickupable pickupable, bool notification = true)
+	{
+		bool flag = true;
+		IDisintegratable disintegratable = pickupable as IDisintegratable;
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (allPlayer.Dragger.IsDragging && allPlayer.Dragger.Draggable == pickupable)
+			{
+				flag = false;
+			}
+			if (allPlayer.Holder._currentlyPicking == pickupable)
+			{
+				flag = false;
+			}
+			if (allPlayer.Holder.CurrentObject == pickupable)
+			{
+				flag = false;
+			}
+			if (allPlayer.Crafter.CurrentCraftable != pickupable && allPlayer.Crafter.CraftingWithMaterial(pickupable))
+			{
+				flag = false;
+			}
+			if (allPlayer.Skinner.CurrentSkinnable == pickupable)
+			{
+				flag = false;
+			}
+		}
+		if (disintegratable != null && disintegratable.Disintegrating)
+		{
+			flag = false;
+		}
+		if (pickupable.IsNullOrDestroyed())
+		{
+			flag = false;
+		}
+		else if (pickupable.IsPickedUp && pickupable.OwnerId != _player.Id)
+		{
+			flag = false;
+		}
+		if (flag)
+		{
+			flag = _currentObject.IsNullOrDestroyed() || _storage.CanPush(pickupable, notification);
+		}
+		else
+		{
+			_storage.CanPush(pickupable, notification);
+		}
+		return flag;
+	}
+
+	public bool Pickup(IPickupable pickupable, bool animate = true)
+	{
+		if (CanPickup(pickupable))
+		{
+			StartCoroutine(Pickup_Sequence(pickupable, animate));
+			return true;
+		}
+		return false;
+	}
+
+	private IEnumerator Pickup_Sequence(IPickupable pickupable, bool animate)
+	{
+		_controller.CurrentHandler = this;
+		_currentlyPicking = pickupable;
+		if (animate)
+		{
+			_player.Character.Animater.PlayPickupAnimation();
+			yield return new WaitForSeconds(0.3f);
+		}
+		if (!pickupable.IsNullOrDestroyed() && pickupable.gameObject.activeInHierarchy)
+		{
+			PickupCallback(pickupable);
+			yield return Reload(pickupable);
+		}
+		_controller.CurrentHandler = null;
+		_currentlyPicking = null;
+	}
+
+	private void PickupCallback(IPickupable pickupable)
+	{
+		if (_currentObject.IsNullOrDestroyed())
+		{
+			Select(pickupable);
+		}
+		else
+		{
+			_storage.Push(pickupable);
+		}
+		OnPickedUp(pickupable);
+		CheckTutorialObjective();
+	}
+
+	public void DropCurrent()
+	{
+		DropAndPop(ref _currentObject);
+	}
+
+	private void DropAndPop(ref IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed() && !_player.Statistics.IsKnockedOut)
+		{
+			IPickupable obj = pickupable;
+			Drop(ref pickupable);
+			_storage.PopNext(obj);
+			_controller.Raycaster.Reset();
+		}
+	}
+
+	private void Drop(ref IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			if (!pickupable.gameObject.activeInHierarchy)
+			{
+				pickupable.gameObject.SetActive(value: true);
+			}
+			pickupable.Release();
+			pickupable.transform.parent = null;
+			pickupable.TransformParent = _dynamicParenter?.GetParent();
+			pickupable.Parent();
+			pickupable.Hold(holding: false);
+			pickupable.SetOwner(null);
+			_player.Character.Hold(null);
+			OnDropped(pickupable);
+			pickupable = null;
+		}
+	}
+
+	private void SwitchCurrent()
+	{
+		if (!_currentObject.IsNullOrDestroyed())
+		{
+			IPickupable pickupable = _controller.Raycaster.CurrentObject as IPickupable;
+			if (IsValidPickupable(pickupable))
+			{
+				Drop(ref _currentObject);
+				Pickup(pickupable, animate: false);
+			}
+		}
+	}
+
+	private bool IsValidPickupable(IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed() && pickupable.CanPickUp)
+		{
+			return _currentObject != pickupable;
+		}
+		return false;
+	}
+
+	public void HideCurrent()
+	{
+		HidePickupable(_currentObject);
+	}
+
+	public void ShowCurrent()
+	{
+		ShowPickupable(_currentObject);
+	}
+
+	private void HidePickupable(IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed() && pickupable.gameObject.activeSelf)
+		{
+			pickupable.gameObject.SetActive(value: false);
+		}
+	}
+
+	private void ShowPickupable(IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed() && !pickupable.gameObject.activeSelf)
+		{
+			pickupable.gameObject.SetActive(value: true);
+			pickupable.SetLOD(0);
+		}
+	}
+
+	public bool CheckCurrent()
+	{
+		if (_currentObject == null)
+		{
+			return _proxies.CheckProxiesActive();
+		}
+		return true;
+	}
+
+	public void ReleaseAndDestroyCurrent()
+	{
+		if (!_currentObject.IsNullOrDestroyed())
+		{
+			ReleaseAndDestroy(_currentObject);
+		}
+	}
+
+	private void Release(IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			if (_currentObject == pickupable)
+			{
+				DropCurrent();
+			}
+			else
+			{
+				_storage.Pop(pickupable);
+			}
+		}
+	}
+
+	public void ReleaseAndDestroy(IPickupable pickupable)
+	{
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			Release(pickupable);
+			pickupable.transform.CheckForProjectilesInChildren();
+			MultiplayerMng.Destroy((SaveablePrefab)pickupable);
+		}
+	}
+
+	public bool Select(IPickupable pickupable)
+	{
+		if (pickupable == null)
+		{
+			return false;
+		}
+		if (pickupable == _currentObject)
+		{
+			return true;
+		}
+		_storage.Pop(pickupable);
+		if (!_currentObject.IsNullOrDestroyed() && !_storage.Push(_currentObject))
+		{
+			_storage.Push(pickupable);
+			_storage.CanPush(_currentObject);
+			return false;
+		}
+		if (_player.Movement.ClimbingLadder)
+		{
+			ShowCurrent();
+			HidePickupable(pickupable);
+		}
+		else
+		{
+			ShowPickupable(pickupable);
+		}
+		_currentObject = pickupable;
+		_currentObject.SetOwner(_player);
+		_currentObject.Store();
+		_currentObject.transform.CheckForProjectilesInChildren();
+		_currentObject.transform.parent = null;
+		_currentObject.TransformParent = _holdingContainer;
+		_currentObject.Parent();
+		_currentObject.transform.localRotation = Quaternion.identity;
+		_currentObject.transform.localPosition = Vector3.zero;
+		_currentObject.transform.localScale = Vector3.one;
+		_currentObject.Hold(holding: true);
+		_player.Character.Hold(_currentObject);
+		OnSelectedItemChanged(_currentObject);
+		Reload(null, manual: true);
+		_controller.Raycaster.Reset();
+		return true;
+	}
+
+	private void SelectHands()
+	{
+		if (!_currentObject.IsNullOrDestroyed() && _storage.Push(_currentObject))
+		{
+			EmptyHands();
+		}
+	}
+
+	private void EmptyHands()
+	{
+		_player.Character.Hold(null);
+		_controller.Raycaster.Reset();
+		_currentObject = null;
+		OnSelectedItemChanged(null);
+	}
+
+	private void CheckTutorialObjective()
+	{
+		if (!_objectiveComplete)
+		{
+			_objectResourceCount++;
+			if (_objectResourceCount > 4)
+			{
+				OnGatheredResources?.Invoke();
+				_objectiveComplete = true;
+			}
+		}
+	}
+
+	public void Storage_SelectionChanged(IPickupable pickupable)
+	{
+		if (pickupable.IsNullOrDestroyed())
+		{
+			SelectHands();
+		}
+		else
+		{
+			Select(pickupable);
+		}
+	}
+
+	private void Storage_Pushed(IPickupable pickupable, bool success)
+	{
+	}
+
+	private Coroutine Reload(IPickupable pickupable, bool manual = false)
+	{
+		IReloadable reloadable = _currentObject as IReloadable;
+		if (!reloadable.IsNullOrDestroyed() && !reloadable.Reloaded && (manual || reloadable.CanReloadWith(pickupable)))
+		{
+			return StartCoroutine(Reload_Sequence(reloadable, pickupable));
+		}
+		return null;
+	}
+
+	private IEnumerator Reload_Sequence(IReloadable reloadable, IPickupable pickupable)
+	{
+		_controller.CurrentHandler = this;
+		reloadable.Reload(pickupable);
+		if (_player.Character.Animater.CurrentAnimationType != AnimationType.SPEAR_SECONDARY)
+		{
+			yield return _player.Character.Animater.Play(reloadable.ReloadAnimation);
+		}
+		_controller.CurrentHandler = null;
+	}
+
+	public bool ReplicatedPickup(IPickupable pickupable, bool animate = true)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicatePickup replicatePickup = new ReplicatePickup();
+			replicatePickup.Player = _player;
+			replicatePickup.Pickupable = pickupable;
+			replicatePickup.Animate = animate;
+			replicatePickup.Post();
+		}
+		return Pickup(pickupable, animate);
+	}
+
+	private void PostReplicatedPickup(IPickupable pickupable, bool animate = true)
+	{
+		if (_player.Id == 1 && Game.Mode.IsMultiplayer())
+		{
+			PostReplicatePickup postReplicatePickup = new PostReplicatePickup();
+			postReplicatePickup.Player = _player;
+			postReplicatePickup.Pickupable = pickupable;
+			postReplicatePickup.Animate = animate;
+			postReplicatePickup.Post();
+		}
+		else
+		{
+			ReplicatedPickup(pickupable, animate);
+		}
+	}
+
+	public bool ReplicatedSelect(IPickupable pickupable)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSelect replicateSelect = new ReplicateSelect();
+			replicateSelect.Player = _player;
+			replicateSelect.Pickupable = pickupable;
+			replicateSelect.Post();
+		}
+		return Select(pickupable);
+	}
+
+	private void ReplicatedSelectHands()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateHolderCommand replicateHolderCommand = new ReplicateHolderCommand();
+			replicateHolderCommand.Player = _player;
+			replicateHolderCommand.Cmd = ReplicateHolderCommand.Command.SelectHands;
+			replicateHolderCommand.Post();
+		}
+		SelectHands();
+	}
+
+	private void ReplicatedSwitchCurrent()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			new ReplicateSwitchCurrent(_player).Post();
+		}
+		SwitchCurrent();
+	}
+
+	public void ReplicatedRelease(IPickupable pickupable)
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateRelease replicateRelease = new ReplicateRelease();
+			replicateRelease.Player = _player;
+			replicateRelease.Pickupable = pickupable;
+			replicateRelease.Post();
+		}
+		Release(pickupable);
+	}
+
+	public void ReplicatedDropCurrent()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateHolderCommand replicateHolderCommand = new ReplicateHolderCommand();
+			replicateHolderCommand.Player = _player;
+			replicateHolderCommand.Cmd = ReplicateHolderCommand.Command.DropCurrent;
+			replicateHolderCommand.Post();
+		}
+		DropCurrent();
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		if (!_currentObject.IsNullOrDestroyed())
+		{
+			JObject jObject2 = SavingUtilities.SavePrefabToJObject(_currentObject);
+			if (jObject2 != null)
+			{
+				jObject.AddField("CurrentObject", jObject2);
+			}
+			else
+			{
+				Debug.LogError("Holder::Save:: Error saving current object.\n\nName: " + _currentObject.gameObject.name + "\nReference Id: " + _currentObject.ReferenceId.ToString());
+			}
+		}
+		else
+		{
+			jObject.AddField("CurrentObject", "Empty");
+		}
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+		JObject field = data.GetField("CurrentObject");
+		if (field.IsValid() && !field.IsNull() && field.Type != JObject.EToken.STRING)
+		{
+			SavingUtilities.LoadPrefabFromJData(MultiplayerZoneSync.Usage.Holder, field, (SaveablePrefab instance) =>
+			{
+				instance?.transform?.SetParent(null);
+			}, (SaveablePrefab instance) =>
+			{
+				Select((IPickupable)instance.GetComponent<BaseObject>());
+				_loaded = true;
+			});
+		}
+		else
+		{
+			_loaded = true;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 146
+PATH: Assembly-CSharp__Beam.Crafting__HoldingRaycastFilter.cs
+SIZE: 440 bytes
+SHA256: 9274e7aedee11ee62a15bd360722cb6fd2fef58ce52410a75b406f1fd197ec93
+====================================================================================================
+
+using Beam.Utilities;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class HoldingRaycastFilter : IRaycastFilter
+{
+	private readonly Transform _holdingContainer;
+
+	public HoldingRaycastFilter(Transform holdingContainer)
+	{
+		_holdingContainer = holdingContainer;
+	}
+
+	public bool Validate(RaycastHit hit)
+	{
+		if (_holdingContainer == null)
+		{
+			return true;
+		}
+		return !_holdingContainer.ContainsNestedChild(hit.transform);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 147
+PATH: Assembly-CSharp__Beam.Crafting__IConstructingProximityCheck.cs
+SIZE: 177 bytes
+SHA256: 78ef910a2c680b0ad449ac139a15a1c3ab202bdee9df684b4043379a59a75395
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public interface IConstructingProximityCheck
+{
+	bool CheckProximity(Constructing constructing, Transform ghost, float distance);
+}
+
+
+
+====================================================================================================
+SOURCE FILE 148
+PATH: Assembly-CSharp__Beam.Crafting__InteractiveObject_COMPASS.cs
+SIZE: 1694 bytes
+SHA256: b2e2c9f8bd5825ab5ee92309781272c02c0e3e77dff481695194ec9a448aae10
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class InteractiveObject_COMPASS : InteractiveObject
+{
+	private float turnSpeed = 3f;
+
+	private Vector3 trueNorth = new Vector3(-60f, 0f, -20f);
+
+	private bool isUsing;
+
+	[SerializeField]
+	private Transform _lid;
+
+	[SerializeField]
+	private Transform compassPointer;
+
+	[SerializeField]
+	private Transform _waypoint;
+
+	private Vector3 _waypointPosition;
+
+	public override void Hold(bool holding)
+	{
+		isUsing = false;
+		if (holding && (bool)_lid)
+		{
+			LeanTween.cancel(gameObject);
+			_lid.localRotation = Quaternion.identity;
+			LeanTween.value(gameObject, AnimateLid, 0f, -99f, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+		}
+		base.Hold(holding);
+	}
+
+	public override void Use()
+	{
+		isUsing = !isUsing;
+		base.Use();
+	}
+
+	private void Update()
+	{
+		RotateCompass();
+		if (Owner != null && isUsing)
+		{
+			Owner.PlayerCamera.ForceFirstPersonView();
+		}
+	}
+
+	private void RotateCompass()
+	{
+		compassPointer.rotation = Quaternion.Lerp(compassPointer.rotation, Quaternion.LookRotation(trueNorth.normalized), Time.deltaTime * turnSpeed);
+		compassPointer.localRotation = Quaternion.Euler(new Vector3(0f, compassPointer.localEulerAngles.y, 0f));
+	}
+
+	private void AnimateLid(float rotation)
+	{
+		_lid.localRotation = Quaternion.Euler(rotation * new Vector3(1f, 0f, 0f));
+	}
+
+	private void SetWaypoint()
+	{
+		_waypointPosition = Owner.Movement.transform.position;
+	}
+
+	private void DisplayWaypoint(bool display)
+	{
+		if (!(_waypoint == null))
+		{
+			if (display)
+			{
+				_waypoint.gameObject.SetActive(value: true);
+				_waypoint.position = _waypointPosition;
+			}
+			else
+			{
+				_waypoint.gameObject.SetActive(value: false);
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 149
+PATH: Assembly-CSharp__Beam.Crafting__Inventory.cs
+SIZE: 2286 bytes
+SHA256: 1fcc6d76fd6ab8aebcef90c666d856e1ab04d6742ec917063b6777e841ccfe55
+====================================================================================================
+
+using Beam.Language;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Inventory : MonoBehaviour, ISlotStorageProvider<IPickupable>, INeedPlayerComponent, ISaveable
+{
+	[SerializeField]
+	private SlotStorage _slotStorage;
+
+	private IPlayer _player;
+
+	private IDynamicParentProvider _dynamicParenter;
+
+	private bool _firstPush = true;
+
+	public bool Loaded => _slotStorage.LoadState.IsLoaded();
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	public ISlotStorage<IPickupable> GetSlotStorage()
+	{
+		return _slotStorage;
+	}
+
+	private void Awake()
+	{
+		_slotStorage.Name = "INVENTORY_MENU_BACKPACK_TITLE";
+		_slotStorage.Initialize();
+		_slotStorage.Pushed += SlotStorage_Pushed;
+		_slotStorage.Popped += SlotStorage_Popped;
+	}
+
+	private void Start()
+	{
+		_dynamicParenter = Object.FindObjectOfType<StrandedWorld>();
+		StorageRegistry.Link(_slotStorage);
+	}
+
+	private void OnDestroy()
+	{
+		_slotStorage.Pushed -= SlotStorage_Pushed;
+		_slotStorage.Popped -= SlotStorage_Popped;
+		StorageRegistry.Unlink(_slotStorage);
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_slotStorage.ReferenceId = MiniGuid.PLAYER_STORAGE(player);
+		_player = player;
+	}
+
+	private void SlotStorage_Pushed(IPickupable pickupable, bool success)
+	{
+		if (!success)
+		{
+			LocalizedNotification.Post(_player, NotificationPriority.Low, 4f, "INVENTORY_MENU_NTF_NOT_ENOUGH_ROOM_DESC");
+			return;
+		}
+		pickupable.SetOwner(_player);
+		pickupable.Hold(holding: false);
+		if (_firstPush)
+		{
+			PlatformLocalizedText platformLocalizedText = new PlatformLocalizedText();
+			platformLocalizedText.SetTerm("INVENTORY_MENU_NTF_ITEM_STORED_DESC");
+			platformLocalizedText.SetArgs(pickupable.DisplayName);
+			platformLocalizedText.SetActions(12);
+			LocalizedNotification.Post(_player, NotificationPriority.Immediate, 8f, platformLocalizedText);
+			_firstPush = false;
+		}
+	}
+
+	private void SlotStorage_Popped(IPickupable pickupable)
+	{
+		pickupable.transform.parent = null;
+		pickupable.TransformParent = _dynamicParenter?.GetParent();
+		pickupable.Parent();
+		pickupable.Hold(holding: false);
+		pickupable.SetOwner(null);
+	}
+
+	public JObject Save()
+	{
+		return _slotStorage.Save();
+	}
+
+	public void Load(JObject data)
+	{
+		_slotStorage.Load(data);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 150
+PATH: Assembly-CSharp__Beam.Crafting__NoConstructingProximityCheck.cs
+SIZE: 232 bytes
+SHA256: cd44e5acea251b6fecaadc49e803eea6894ab8da5c57770fbdcc719eaa1969f8
+====================================================================================================
+
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class NoConstructingProximityCheck : IConstructingProximityCheck
+{
+	public bool CheckProximity(Constructing constructing, Transform ghost, float distance)
+	{
+		return false;
+	}
+}
+
+

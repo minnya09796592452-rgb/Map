@@ -1,0 +1,6106 @@
+
+====================================================================================================
+SOURCE FILE 376
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_TerrainManager.cs
+SIZE: 9425 bytes
+SHA256: 6a69458febae5f5a6807b81eada07df770fb7f0fea51274f8b766447b6b52b0e
+====================================================================================================
+
+using LE_LevelEditor.Events;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_TerrainManager
+{
+	private TerrainData m_terrainData;
+
+	public TerrainData TerrainData => m_terrainData;
+
+	public LE_TerrainManager(TerrainData p_terrainData)
+	{
+		m_terrainData = p_terrainData;
+	}
+
+	public void SmoothHeight(float p_amount, int p_neighbourCount, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, bool p_isDirected, float p_angle)
+	{
+		float num = m_terrainData.heightmapResolution - 1;
+		float num2 = m_terrainData.heightmapResolution - 1;
+		float p_relativeBrushSize2 = Mathf.Clamp01(p_relativeBrushSize + (float)(p_neighbourCount - 1) / Mathf.Max(num, num2));
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize2, p_relativeLocalLocation, num, num2, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var _, out var _);
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, num, num2, out var o_minX2, out var o_maxX2, out var o_minY2, out var o_maxY2, out var o_relBrushMinX2, out var o_relBrushMinY2);
+		float[,] heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+		int num3 = o_minX2 - o_minX;
+		int num4 = o_minY2 - o_minY;
+		int num5 = heights.GetLength(0) - 1;
+		int num6 = heights.GetLength(1) - 1;
+		int num7 = Mathf.Min(num3 + o_maxX2 - o_minX2, num5);
+		int num8 = Mathf.Min(num4 + o_maxY2 - o_minY2, num6);
+		int num9 = (p_neighbourCount - 1) / 2;
+		for (int i = num4; i <= num8; i++)
+		{
+			int num10;
+			int num11;
+			if (i == 0)
+			{
+				num10 = num9 + 1;
+				num11 = 0;
+			}
+			else if (i == num6)
+			{
+				num10 = num9 + 1;
+				num11 = -num9;
+			}
+			else if (i - num9 < 0)
+			{
+				int num12 = num9 - i;
+				num10 = p_neighbourCount - num12;
+				num11 = -num9 + num12;
+			}
+			else if (i + num9 >= num6)
+			{
+				int num13 = num9 + i - num6;
+				num10 = p_neighbourCount - num13;
+				num11 = -num9;
+			}
+			else
+			{
+				num10 = p_neighbourCount;
+				num11 = -num9;
+			}
+			for (int j = num3; j <= num7; j++)
+			{
+				int num14;
+				int num15;
+				if (j == 0)
+				{
+					num14 = num9 + 1;
+					num15 = 0;
+				}
+				else if (j == num5)
+				{
+					num14 = num9 + 1;
+					num15 = -num9;
+				}
+				else if (j - num9 < 0)
+				{
+					int num16 = num9 - j;
+					num14 = p_neighbourCount - num16;
+					num15 = -num9 + num16;
+				}
+				else if (j + num9 >= num5)
+				{
+					int num17 = num9 + j - num5;
+					num14 = p_neighbourCount - num17;
+					num15 = -num9;
+				}
+				else
+				{
+					num14 = p_neighbourCount;
+					num15 = -num9;
+				}
+				float num18 = 0f;
+				int num19 = 0;
+				for (int k = 0; k < num10; k++)
+				{
+					for (int l = 0; l < num14; l++)
+					{
+						if (p_isDirected)
+						{
+							int num20 = l + num15;
+							int num21 = k + num11;
+							if (num20 != 0 || num21 != 0)
+							{
+								Vector2 normalized = new Vector2(num20, num21).normalized;
+								float num22;
+								if (normalized.y >= 0f)
+								{
+									num22 = 57.29578f * Mathf.Acos(normalized.x);
+								}
+								else
+								{
+									num22 = 57.29578f * Mathf.Asin(normalized.y);
+									if (normalized.x < 0f)
+									{
+										num22 = -90f - (90f + num22);
+									}
+								}
+								if (Mathf.Abs(Mathf.DeltaAngle(p_angle, num22)) > 5f && Mathf.Abs(Mathf.DeltaAngle(p_angle, num22 + 180f)) > 5f)
+								{
+									continue;
+								}
+							}
+						}
+						float num23 = heights[j + l + num15, i + k + num11];
+						num18 += num23;
+						num19++;
+					}
+				}
+				float num24 = num18 / (float)num19;
+				float num25 = heights[j, i];
+				float v = ((float)(j + o_minX) / num - o_relBrushMinX2) / p_relativeBrushSize;
+				float u = ((float)(i + o_minY) / num2 - o_relBrushMinY2) / p_relativeBrushSize;
+				float num26 = p_amount * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+				heights[j, i] = num25 * (1f - num26) + num24 * num26;
+				heights[j, i] = ClampHeightBounds(heights[j, i], o_minX + j, o_minY + i);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	public void ChangeHeight(float p_delta, float p_targetHeight, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+	{
+		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+		for (int i = 0; i <= num; i++)
+		{
+			for (int j = 0; j <= num2; j++)
+			{
+				float num3 = o_heights[i, j];
+				if (Mathf.Abs(num3 - p_targetHeight) > 0.0001f)
+				{
+					float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+					float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+					float num4 = p_delta * p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+					float num5 = ((p_targetHeight - num3 > 0f) ? 1f : (-1f));
+					if (Mathf.Sign(p_targetHeight - num3) != Mathf.Sign(p_targetHeight - (num3 + num5 * num4)))
+					{
+						o_heights[i, j] = p_targetHeight;
+					}
+					else
+					{
+						o_heights[i, j] += num5 * num4;
+					}
+				}
+				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	private float ClampHeightBounds(float heightToClamp, int x, int y)
+	{
+		float num = 20f;
+		float num2 = 257f;
+		if ((!((float)x > num) || !((float)x < num2 - num) || !((float)y > num) || !((float)y < num2 - num)) && heightToClamp > 0.65f)
+		{
+			heightToClamp = 0.65f;
+		}
+		return heightToClamp;
+	}
+
+	public void ChangeHeight(float p_delta, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation)
+	{
+		ChangeHeightInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var o_heights, out var o_relBrushMinX, out var o_relBrushMinY, out var o_heightmapMaxX, out var o_heightmapMaxY);
+		int num = Mathf.Min(o_maxX - o_minX, o_heights.GetLength(0) - 1);
+		int num2 = Mathf.Min(o_maxY - o_minY, o_heights.GetLength(1) - 1);
+		for (int i = 0; i <= num; i++)
+		{
+			for (int j = 0; j <= num2; j++)
+			{
+				float v = ((float)(i + o_minX) / o_heightmapMaxX - o_relBrushMinX) / p_relativeBrushSize;
+				float u = ((float)(j + o_minY) / o_heightmapMaxY - o_relBrushMinY) / p_relativeBrushSize;
+				float a = p_alphaBrushTexture.GetPixelBilinear(u, v).a;
+				o_heights[i, j] += p_delta * a;
+				o_heights[i, j] = ClampHeightBounds(o_heights[i, j], o_minX + i, o_minY + j);
+			}
+		}
+		m_terrainData.SetHeights(o_minY, o_minX, o_heights);
+		LE_EventInterface.LevelDataChanged(this);
+	}
+
+	private void ChangeHeightInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float[,] o_heights, out float o_relBrushMinX, out float o_relBrushMinY, out float o_heightmapMaxX, out float o_heightmapMaxY)
+	{
+		o_heightmapMaxX = m_terrainData.heightmapResolution - 1;
+		o_heightmapMaxY = m_terrainData.heightmapResolution - 1;
+		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, o_heightmapMaxX, o_heightmapMaxY, out o_minX, out o_maxX, out o_minY, out o_maxY, out o_relBrushMinX, out o_relBrushMinY);
+		o_heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+	}
+
+	private void GetAffectedAreaInternal(Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, float p_maxX, float p_maxY, out int o_minX, out int o_maxX, out int o_minY, out int o_maxY, out float o_relBrushMinX, out float o_relBrushMinY)
+	{
+		o_minX = 0;
+		o_maxX = 0;
+		o_minY = 0;
+		o_maxY = 0;
+		o_relBrushMinX = p_relativeLocalLocation.x - p_relativeBrushSize * 0.5f;
+		float num = p_relativeLocalLocation.x + p_relativeBrushSize * 0.5f;
+		o_relBrushMinY = p_relativeLocalLocation.y - p_relativeBrushSize * 0.5f;
+		float num2 = p_relativeLocalLocation.y + p_relativeBrushSize * 0.5f;
+		if (p_alphaBrushTexture == null)
+		{
+			Debug.LogError("LE_TerrainManager: Parameter 'p_alphaBrushTexture' is null!");
+			return;
+		}
+		if (p_relativeBrushSize != Mathf.Clamp01(p_relativeBrushSize))
+		{
+			Debug.LogError("LE_TerrainManager: Parameter 'p_relativeBrushSize' is out of bounds expected range [0,1], but was '" + p_relativeBrushSize + "'!");
+			return;
+		}
+		if (p_relativeLocalLocation.x != Mathf.Clamp01(p_relativeLocalLocation.x) || p_relativeLocalLocation.y != Mathf.Clamp01(p_relativeLocalLocation.y))
+		{
+			Vector2 vector = p_relativeLocalLocation;
+			Debug.LogError("LE_TerrainManager: Parameter 'p_relativeLocalLocation' is out of bounds expected range ([0,1],[0,1]), but was '" + vector.ToString() + "'!");
+			return;
+		}
+		o_minX = Mathf.Clamp(Mathf.FloorToInt(p_maxX * o_relBrushMinX), 0, (int)p_maxX);
+		o_maxX = Mathf.Clamp(Mathf.CeilToInt(p_maxX * num), 0, (int)p_maxX);
+		o_minY = Mathf.Clamp(Mathf.FloorToInt(p_maxY * o_relBrushMinY), 0, (int)p_maxY);
+		o_maxY = Mathf.Clamp(Mathf.CeilToInt(p_maxY * num2), 0, (int)p_maxY);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 377
+PATH: Assembly-CSharp__LE_LevelEditor.Logic__LE_ScreenshotCamera.cs
+SIZE: 2385 bytes
+SHA256: 09887f9f6363e9379a6908038f1db5d0b29baf4946d69ce1a9e2235068c6aaae
+====================================================================================================
+
+using System.Collections;
+using Beam;
+using UnityEngine;
+
+namespace LE_LevelEditor.Logic;
+
+public class LE_ScreenshotCamera : Singleton<LE_ScreenshotCamera>
+{
+	[SerializeField]
+	private Animation _cameraShutter;
+
+	private Transform _camTransform;
+
+	private Camera _cam;
+
+	private int replacementCounter;
+
+	private void Start()
+	{
+		_cam = Camera.main;
+		_camTransform = _cam.GetComponent<Transform>();
+	}
+
+	private void Update()
+	{
+		if (Input.GetMouseButtonDown(0) && !Singleton<LE_LevelEditorMain>.Instance.IsMouseOverGUI())
+		{
+			RenderLevelPreviewScreenshot();
+		}
+	}
+
+	private void RenderLevelPreviewScreenshot()
+	{
+		gameObject.GetComponent<AudioSource>().Play();
+		_cameraShutter.Play();
+		StartCoroutine(DrawLevelPreview());
+	}
+
+	private IEnumerator DrawLevelPreview()
+	{
+		int imageWidth = 540;
+		int imageHeight = 320;
+		Singleton<LE_LevelEditorMain>.Instance.Boundary.SetActive(value: false);
+		yield return new WaitForEndOfFrame();
+		Texture2D texture2D = new Texture2D(imageWidth, imageHeight, TextureFormat.RGB24, mipChain: false, linear: false);
+		_ = _cam.pixelRect;
+		Rect source = new Rect((float)Screen.width * 0.5f - (float)imageWidth * 0.5f, (float)Screen.height * 0.5f - (float)imageHeight * 0.5f, imageWidth, imageHeight);
+		_cam.Render();
+		texture2D.ReadPixels(source, 0, 0);
+		texture2D.Apply(updateMipmaps: false);
+		if (Singleton<LE_LevelEditorMain>.Instance.MapScreenshots.Count >= 8)
+		{
+			Singleton<LE_LevelEditorMain>.Instance.MapScreenshots[replacementCounter] = texture2D;
+			replacementCounter++;
+			if (replacementCounter >= 8)
+			{
+				replacementCounter = 0;
+			}
+		}
+		else
+		{
+			Singleton<LE_LevelEditorMain>.Instance.MapScreenshots.Add(texture2D);
+		}
+		Singleton<LE_LevelEditorMain>.Instance.Boundary.SetActive(value: true);
+	}
+
+	public void TakeManualScreenShots()
+	{
+		_ = _camTransform.position;
+		_camTransform.transform.position = new Vector3(165f, 0f, 113f);
+		_camTransform.transform.LookAt(Vector3.zero);
+		RenderLevelPreviewScreenshot();
+		_camTransform.position = new Vector3(-165f, 0f, 113f);
+		_camTransform.LookAt(Vector3.zero);
+		RenderLevelPreviewScreenshot();
+		_camTransform.position = new Vector3(165f, 0f, -113f);
+		_camTransform.LookAt(Vector3.zero);
+		RenderLevelPreviewScreenshot();
+		_camTransform.position = new Vector3(-165f, 0f, -113f);
+		_camTransform.LookAt(Vector3.zero);
+		RenderLevelPreviewScreenshot();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 378
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUI3dObject.cs
+SIZE: 26291 bytes
+SHA256: a95d25a38b2864fc38e5d83f2dda4843e35a6bff41516d09fce477e05de01645
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Funlabs;
+using LE_LevelEditor.Core;
+using LE_LevelEditor.Events;
+using MyUtility;
+using Rewired;
+using S_SnapTools;
+using UnityEngine;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUI3dObject : LE_GUI3dBase
+{
+	private const float MIN_FOCUS_DISTANCE = 3f;
+
+	private const float SELECTION_MAX_OVERSIZE = 10f;
+
+	private LE_Object m_object;
+
+	private bool m_isObjectPlaceable;
+
+	private string m_dragMessage = "";
+
+	private LE_Object m_previewInstance;
+
+	private LE_Object m_selectedObject;
+
+	private LE_Object m_cursorActionOnObject;
+
+	private bool m_isSelectionPossible;
+
+	private bool m_isCursorAction;
+
+	private bool m_isCursorActionInThisFrame;
+
+	private Vector3 m_lastCursorActionStartPos = -100f * Vector3.one;
+
+	private bool m_isSnapToObjectActive = true;
+
+	private Dictionary<string, S_SnapToObject> m_snapPointUIDsToSnapPoints = new Dictionary<string, S_SnapToObject>();
+
+	private Dictionary<string, int> m_snapPointUIDsToObjUIDs = new Dictionary<string, int>();
+
+	public int TERRAIN_LAYER = 14;
+
+	public Action<Vector3, float> OnFocused;
+
+	private LE_EObjectEditMode m_objectEditMode;
+
+	private bool m_isKeyComboDuplicate = true;
+
+	private bool m_isKeyComboFocus = true;
+
+	public LE_Object SelectedObject => m_selectedObject;
+
+	public Dictionary<string, int> SnapPointUIDsToObjUIDs => m_snapPointUIDsToObjUIDs;
+
+	public override LE_EEditMode ActiveEditMode => LE_EEditMode.OBJECT;
+
+	public LE_EObjectEditMode ObjectEditMode
+	{
+		get
+		{
+			return m_objectEditMode;
+		}
+		set
+		{
+			m_objectEditMode = value;
+		}
+	}
+
+	public bool IsKeyComboDuplicate
+	{
+		get
+		{
+			return m_isKeyComboDuplicate;
+		}
+		set
+		{
+			m_isKeyComboDuplicate = value;
+		}
+	}
+
+	public bool IsKeyComboFocus
+	{
+		get
+		{
+			return m_isKeyComboFocus;
+		}
+		set
+		{
+			m_isKeyComboFocus = value;
+		}
+	}
+
+	public override void SetCursorPosition(Vector3 p_cursorScreenCoords)
+	{
+		if (m_object != null && (m_object.SnapType == LE_Object.ESnapType.SNAP_TO_TERRAIN || m_object.SnapType == LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN))
+		{
+			m_cursorScreenCoords = p_cursorScreenCoords;
+			m_cursorRay = Camera.main.ScreenPointToRay(p_cursorScreenCoords);
+			SetIsCursorOverSomething(Physics.Raycast(m_cursorRay, out m_cursorHitInfo, float.MaxValue, 1 << TERRAIN_LAYER, QueryTriggerInteraction.Ignore));
+		}
+		else
+		{
+			base.SetCursorPosition(p_cursorScreenCoords);
+		}
+	}
+
+	public override void SetIsCursorAction(bool p_isCursorAction)
+	{
+		if (IsInteractable)
+		{
+			m_isCursorActionInThisFrame |= p_isCursorAction;
+		}
+	}
+
+	public void SetDraggableObject(LE_Object p_object)
+	{
+		if (m_object != p_object)
+		{
+			m_dragMessage = "";
+			SetDragMessageInUI();
+			m_object = p_object;
+			m_isObjectPlaceable = IsObjectPlaceable();
+		}
+	}
+
+	public void Focus()
+	{
+		if (!(m_selectedObject != null))
+		{
+			return;
+		}
+		Renderer[] componentsInChildren = m_selectedObject.GetComponentsInChildren<Renderer>();
+		Vector3 vector = Vector3.zero;
+		Vector3 vector2 = Vector3.zero;
+		float num = 0f;
+		Renderer[] array = componentsInChildren;
+		foreach (Renderer renderer in array)
+		{
+			if (renderer.GetComponentInParent<LE_ObjectEditHandle>() == null)
+			{
+				vector += renderer.bounds.center;
+				vector2 += renderer.bounds.size;
+				num++;
+			}
+		}
+		if (num != 0f)
+		{
+			vector *= 1f / num;
+			vector2 *= 1f / num;
+		}
+		else
+		{
+			vector = m_selectedObject.transform.position;
+			vector2 = Vector3.one * 3f;
+		}
+		Vector3 vector3 = Camera.main.transform.position - vector;
+		float num2 = Mathf.Max(vector2.x, vector2.y, vector2.z) * 3f;
+		Camera.main.transform.position = vector + vector3.normalized * num2;
+		if (Camera.main.transform.position.y < vector.y)
+		{
+			Vector3 position = Camera.main.transform.position;
+			position.y = vector.y;
+			Camera.main.transform.position = position;
+		}
+		Camera.main.transform.LookAt(vector, Vector3.up);
+		if (OnFocused != null)
+		{
+			OnFocused(vector, num2);
+		}
+	}
+
+	public void Delete()
+	{
+		if (m_selectedObject != null)
+		{
+			ReactivateSnapPoints(m_selectedObject.UID);
+			UnityEngine.Object.Destroy(m_selectedObject.gameObject);
+			m_selectedObject.name = "deleted";
+			m_isObjectPlaceable = IsObjectPlaceable();
+			LE_EventInterface.LevelDataChanged(m_selectedObject.gameObject);
+		}
+	}
+
+	public void RemoveSelection()
+	{
+		SelectObject(null);
+	}
+
+	public void CloneObject()
+	{
+		if (m_selectedObject != null && IsObjectPlaceable(m_selectedObject))
+		{
+			m_selectedObject.EditMode = LE_EObjectEditMode.NO_EDIT;
+			m_selectedObject.IsSelected = false;
+			_ = m_selectedObject.name;
+			PlaceObject(m_selectedObject, m_selectedObject.transform, p_isDestroyClonedScripts: true, clonedOffset: true);
+		}
+	}
+
+	public bool IsObjectPlaceable(LE_Object p_object)
+	{
+		if (p_object.MaxInstancesInLevel != 0)
+		{
+			int num = 0;
+			LE_Object[] array = UnityEngine.Object.FindObjectsOfType<LE_Object>();
+			for (int i = 0; i < array.Length; i++)
+			{
+				if ((!(m_previewInstance != null) || !(m_previewInstance == array[i])) && array[i].Id == p_object.Id)
+				{
+					num++;
+					if (p_object.MaxInstancesInLevel <= num)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	public void AddSnappingScripts(LE_Object p_newObject)
+	{
+		if (p_newObject != null)
+		{
+			if (p_newObject.SnapType == LE_Object.ESnapType.SNAP_TO_OBJECT)
+			{
+				AddObjectSnapping(p_newObject);
+			}
+			else if (p_newObject.SnapType == LE_Object.ESnapType.SNAP_TO_TERRAIN)
+			{
+				AddTerrainSnapping(p_newObject);
+			}
+			else if (p_newObject.SnapType == LE_Object.ESnapType.SNAP_TO_3D_GRID || p_newObject.SnapType == LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN)
+			{
+				AddGridSnapping(p_newObject, p_isPreview: false);
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_GUI3dObject: AddSnappingScripts: passed object is null!");
+		}
+	}
+
+	public void SetSnapPointUIDsToObjUIDs(Dictionary<string, int> p_snapPointUIDsToObjUIDs)
+	{
+		foreach (KeyValuePair<string, int> p_snapPointUIDsToObjUID in p_snapPointUIDsToObjUIDs)
+		{
+			m_snapPointUIDsToObjUIDs.Add(p_snapPointUIDsToObjUID.Key, p_snapPointUIDsToObjUID.Value);
+		}
+	}
+
+	public void ClearLevelData()
+	{
+		m_snapPointUIDsToSnapPoints.Clear();
+		m_snapPointUIDsToObjUIDs.Clear();
+		m_isSnapToObjectActive = true;
+	}
+
+	private void Start()
+	{
+		if (LE_GUIInterface.Instance.delegates.IsObjectDragged == null)
+		{
+			Debug.LogError("LE_GUI3dObject: you must provide the LE_GUIInterface.delegates.IsObjectDragged to make the object drag&drop working!");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetDraggableObjectMessage == null)
+		{
+			Debug.LogWarning("LE_GUI3dObject: LE_GUIInterface.delegates.SetDraggableObjectMessage is not set. Set it if you want to visualize the 'max. # reached!' message or messages generated via LE_ObjectDragEvent.");
+		}
+		if (LE_GUIInterface.Instance.delegates.SetDraggableObjectState == null)
+		{
+			Debug.LogWarning("LE_GUI3dObject: LE_GUIInterface.delegates.SetDraggableObjectState is not set. Set it if you want to hide your UI when a 3d preview is shown or show different UI if the object is not placeable.");
+		}
+		S_SnapToObject.OnNewObjectSnapped = (EventHandler<S_SnapToObjectEventArgs>)Delegate.Combine(S_SnapToObject.OnNewObjectSnapped, new EventHandler<S_SnapToObjectEventArgs>(OnNewObjectSnapped));
+		S_SnapToObject.OnPreviewObjectInstantiated = (EventHandler<S_SnapToObjectEventArgs>)Delegate.Combine(S_SnapToObject.OnPreviewObjectInstantiated, new EventHandler<S_SnapToObjectEventArgs>(OnPreviewObjectInstantiated));
+	}
+
+	private void OnDestroy()
+	{
+		S_SnapToObject.OnNewObjectSnapped = (EventHandler<S_SnapToObjectEventArgs>)Delegate.Remove(S_SnapToObject.OnNewObjectSnapped, new EventHandler<S_SnapToObjectEventArgs>(OnNewObjectSnapped));
+		S_SnapToObject.OnPreviewObjectInstantiated = (EventHandler<S_SnapToObjectEventArgs>)Delegate.Remove(S_SnapToObject.OnPreviewObjectInstantiated, new EventHandler<S_SnapToObjectEventArgs>(OnPreviewObjectInstantiated));
+	}
+
+	private void OnNewObjectPlaced(LE_Object p_newInstance)
+	{
+		AddSnappingScripts(p_newInstance);
+		SelectObject(p_newInstance);
+		m_isObjectPlaceable = IsObjectPlaceable();
+		LE_EventInterface.LevelDataChanged(p_newInstance);
+		if (LE_EventInterface.OnObjectPlaced != null)
+		{
+			LE_EventInterface.OnObjectPlaced(this, new LE_ObjectPlacedEvent(p_newInstance));
+		}
+	}
+
+	private void OnPreviewObjectInstantiated(object p_sender, S_SnapToObjectEventArgs p_args)
+	{
+		LE_Object component = p_args.NewInstance.GetComponent<LE_Object>();
+		if (component != null)
+		{
+			UnityEngine.Object.Destroy(component);
+		}
+	}
+
+	private void OnNewObjectSnapped(object p_sender, S_SnapToObjectEventArgs p_args)
+	{
+		LE_Object component = p_args.NewInstance.GetComponent<LE_Object>();
+		if (component != null)
+		{
+			LE_Object componentInParent = p_args.Source.GetComponentInParent<LE_Object>();
+			LE_Object component2 = p_args.NewInstance.GetComponent<LE_Object>();
+			MarkSnapPointAsUsed(componentInParent, component2, p_args.Source);
+			if (component2.RootSnapPointIndex != -1)
+			{
+				MarkSnapPointAsUsed(component2, componentInParent, component2.RootSnapPointIndex);
+			}
+			OnNewObjectPlaced(component);
+		}
+		else
+		{
+			Debug.LogError("LE_GUI3dObject: OnNewObjectSnapped: LE_Object is not attached to the root of the new object! This object will not be saved if it has no LE_Object attached!");
+		}
+	}
+
+	private void MarkSnapPointAsUsed(LE_Object p_sourceObj, LE_Object p_destinationObj, S_SnapToObject p_snapScript)
+	{
+		if (p_sourceObj != null)
+		{
+			int snapPointIndex = -1;
+			for (int i = 0; i < p_sourceObj.ObjectSnapPoints.Length; i++)
+			{
+				if (p_sourceObj.ObjectSnapPoints[i].SnapSystemInstance == p_snapScript)
+				{
+					snapPointIndex = i;
+					break;
+				}
+			}
+			MarkSnapPointAsUsed(p_sourceObj, p_destinationObj, snapPointIndex);
+		}
+		else
+		{
+			Debug.LogError("LE_GUI3dObject: MarkSnapPointAsUsed: could not find LE_Object of snap source!");
+		}
+	}
+
+	private void MarkSnapPointAsUsed(LE_Object p_sourceObj, LE_Object p_destinationObj, int snapPointIndex)
+	{
+		if (p_sourceObj != null)
+		{
+			if (snapPointIndex != -1)
+			{
+				string text = p_sourceObj.UID + "_" + snapPointIndex;
+				if (!m_snapPointUIDsToObjUIDs.ContainsKey(text))
+				{
+					m_snapPointUIDsToObjUIDs.Add(text, p_destinationObj.UID);
+					return;
+				}
+				Debug.LogError("LE_GUI3dObject: MarkSnapPointAsUsed: duplicate snapping on snapPointUID(" + text + ") new (ignored) objID(" + p_destinationObj.UID + ") and old objID(" + m_snapPointUIDsToObjUIDs[text] + ")");
+			}
+			else
+			{
+				Debug.LogError("LE_GUI3dObject: MarkSnapPointAsUsed: could not find LE_ObjectSnapPoint of snap source!");
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_GUI3dObject: MarkSnapPointAsUsed: could not find LE_Object of snap source!");
+		}
+	}
+
+	private bool IsObjectPlaceable()
+	{
+		if (m_object != null)
+		{
+			if (!IsObjectPlaceable(m_object))
+			{
+				m_dragMessage = "MAP_EDITOR_MAX_NUM_OBJECTS";
+				SetDragMessageInUI();
+				return false;
+			}
+			m_dragMessage = "";
+			SetDragMessageInUI();
+			return true;
+		}
+		return false;
+	}
+
+	private void AddObjectSnapping(LE_Object p_newObject)
+	{
+		for (int i = 0; i < p_newObject.ObjectSnapPoints.Length; i++)
+		{
+			if (p_newObject.ObjectSnapPoints[i] != null)
+			{
+				Material p_materialLine = null;
+				Material p_materialFill = null;
+				if (p_newObject.IsDrawSnapToObjectUI)
+				{
+					p_materialLine = (Material)Resources.Load("SnapToObjectUIMaterial_Line");
+					p_materialFill = (Material)Resources.Load("SnapToObjectUIMaterial_Fill");
+				}
+				S_SnapToObject s_SnapToObject = p_newObject.ObjectSnapPoints[i].InstatiateSnapSystem((GameObject)UnityEngine.Object.Instantiate(Resources.Load("ObjectSnapButtonVisuals")), p_newObject.IsDrawSnapToObjectUI, p_materialLine, p_materialFill);
+				if (s_SnapToObject != null)
+				{
+					string text = p_newObject.UID + "_" + i;
+					if (!m_snapPointUIDsToSnapPoints.ContainsKey(text))
+					{
+						m_snapPointUIDsToSnapPoints.Add(text, s_SnapToObject);
+					}
+					else
+					{
+						Debug.LogError("LE_GUI3dObject: AddObjectSnapping: a snap point instance of with the UID '" + text + "' already exists!");
+					}
+					if (!m_isSnapToObjectActive)
+					{
+						s_SnapToObject.gameObject.SetActive(value: false);
+					}
+					if (m_snapPointUIDsToObjUIDs.ContainsKey(text))
+					{
+						s_SnapToObject.IncSnapCounter();
+					}
+				}
+			}
+			else
+			{
+				Debug.LogError("LE_GUI3dObject: AddObjectSnapping: object '" + p_newObject.name + "' has a nullpointer in the ObjectSnapPoints array at index '" + i + "'!");
+			}
+		}
+	}
+
+	private void AddTerrainSnapping(LE_Object p_newObject)
+	{
+		S_SnapToWorld worldSnap = p_newObject.gameObject.AddComponent<S_SnapToWorld>();
+		worldSnap.SnapToLayers = 1 << TERRAIN_LAYER;
+		worldSnap.SnapFrameRate = -1;
+		worldSnap.IsRotationSnap = p_newObject.IsPlacementRotationByNormal;
+		worldSnap.DoSnap();
+		EventHandler snapUpdateFunct = (object p_object, EventArgs p_args) =>
+		{
+			if (p_object is LE_TerrainManager || (p_object is LE_ObjectEditHandle && ((LE_ObjectEditHandle)p_object).transform.IsChildOf(p_newObject.transform)))
+			{
+				worldSnap.DoSnap();
+			}
+		};
+		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Combine(LE_EventInterface.OnChangeLevelData, snapUpdateFunct);
+		p_newObject.gameObject.AddComponent<UtilityOnDestroyHandler>().m_onDestroy = () =>
+		{
+			LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Remove(LE_EventInterface.OnChangeLevelData, snapUpdateFunct);
+		};
+	}
+
+	private void AddGridSnapping(LE_Object p_newObject, bool p_isPreview)
+	{
+		S_SnapToGrid s_SnapToGrid = p_newObject.gameObject.AddComponent<S_SnapToGrid>();
+		s_SnapToGrid.GridOffset = p_newObject.SnapGridOffset;
+		s_SnapToGrid.GridCellSize = p_newObject.SnapGridCellSize;
+		s_SnapToGrid.SnapCondition = ((!p_isPreview) ? S_SnapToGrid.ESnapCondition.WHEN_STILL : S_SnapToGrid.ESnapCondition.ON_UPDATE);
+		s_SnapToGrid.IsInstantSnap = p_isPreview;
+		if (p_newObject.SnapType == LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN)
+		{
+			s_SnapToGrid.IsSnapAxisY = false;
+			if (!p_isPreview)
+			{
+				AddTerrainSnapping(p_newObject);
+			}
+		}
+	}
+
+	private void Update()
+	{
+		UpdateObjectSelection();
+		UpdateNewObjectDragAndDrop();
+		UpdateSnapToObjectInstances();
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		if (m_isKeyComboFocus && player.GetButtonDown(53))
+		{
+			Focus();
+		}
+		m_isCursorActionInThisFrame = false;
+	}
+
+	private void UpdateObjectSelection()
+	{
+		bool isCursorOverSomething = IsCursorOverSomething;
+		if (m_previewInstance == null && !IsObjectDraggedInUI())
+		{
+			if (!IsInteractable)
+			{
+				m_isCursorAction = isCursorOverSomething;
+				m_isSelectionPossible = false;
+			}
+			else if (!m_isCursorAction && m_isCursorActionInThisFrame)
+			{
+				if (isCursorOverSomething)
+				{
+					m_cursorActionOnObject = m_cursorHitInfo.collider.GetComponentInParent<LE_Object>();
+				}
+				else
+				{
+					m_cursorActionOnObject = null;
+				}
+				m_lastCursorActionStartPos = m_cursorScreenCoords;
+				m_isSelectionPossible = true;
+				m_isCursorAction = true;
+			}
+			else if (m_isCursorAction && m_isCursorActionInThisFrame)
+			{
+				if ((!isCursorOverSomething && m_cursorActionOnObject != null) || (isCursorOverSomething && m_cursorActionOnObject != m_cursorHitInfo.collider.GetComponentInParent<LE_Object>()) || (double)(m_lastCursorActionStartPos - m_cursorScreenCoords).magnitude > (double)Screen.height * 0.025)
+				{
+					m_isSelectionPossible = false;
+					m_cursorActionOnObject = null;
+				}
+			}
+			else if (m_isCursorAction && !m_isCursorActionInThisFrame)
+			{
+				if (m_isSelectionPossible)
+				{
+					if (m_cursorActionOnObject == null)
+					{
+						m_cursorActionOnObject = TrySelectByOversizedBoundingVolume();
+					}
+					SelectObject(m_cursorActionOnObject);
+				}
+				m_isSelectionPossible = false;
+				m_cursorActionOnObject = null;
+				m_isCursorAction = false;
+			}
+			else
+			{
+				m_cursorActionOnObject = null;
+				m_isCursorAction = false;
+			}
+		}
+		if (m_selectedObject != null)
+		{
+			m_selectedObject.EditMode = m_objectEditMode;
+		}
+	}
+
+	private void UpdateNewObjectDragAndDrop()
+	{
+		if (!(m_object != null))
+		{
+			return;
+		}
+		SetDragMessageInUI();
+		if (!IsInteractable)
+		{
+			if (m_previewInstance != null)
+			{
+				UnityEngine.Object.Destroy(m_previewInstance.gameObject);
+			}
+		}
+		else if (IsCursorOverSomething && m_cursorHitInfo.point.x < 150f && m_cursorHitInfo.point.x > -150f && m_cursorHitInfo.point.z < 150f && m_cursorHitInfo.point.z > -150f)
+		{
+			if (IsObjectDraggedInUI())
+			{
+				if (OnObjectDrag() && ((m_object.SnapType != LE_Object.ESnapType.SNAP_TO_TERRAIN && m_object.SnapType != LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN) || (m_cursorHitInfo.collider != null && m_cursorHitInfo.collider.gameObject.layer == TERRAIN_LAYER)))
+				{
+					if (m_previewInstance == null)
+					{
+						m_previewInstance = UnityEngine.Object.Instantiate(m_object);
+						m_previewInstance.gameObject.GetComponent<Transform>().parent = Singleton<LE_LevelEditorMain>.Instance.ObjectDumpContainer;
+						MoveToLayer(m_previewInstance.transform, LayerMask.NameToLayer("Ignore Raycast"));
+						Rigidbody[] componentsInChildren = m_previewInstance.GetComponentsInChildren<Rigidbody>();
+						for (int i = 0; i < componentsInChildren.Length; i++)
+						{
+							UnityEngine.Object.Destroy(componentsInChildren[i]);
+						}
+						if (m_previewInstance.SnapType == LE_Object.ESnapType.SNAP_TO_3D_GRID || m_previewInstance.SnapType == LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN)
+						{
+							AddGridSnapping(m_previewInstance, p_isPreview: true);
+						}
+					}
+					m_previewInstance.transform.position = m_cursorHitInfo.point;
+					if (m_previewInstance.SnapType == LE_Object.ESnapType.SNAP_TO_3D_GRID || m_previewInstance.SnapType == LE_Object.ESnapType.SNAP_TO_2D_GRID_AND_TERRAIN)
+					{
+						m_previewInstance.transform.position += m_cursorHitInfo.normal * 0.005f;
+					}
+					if (m_previewInstance.IsPlacementRotationByNormal)
+					{
+						m_previewInstance.transform.up = m_cursorHitInfo.normal;
+					}
+				}
+			}
+			else if (m_isObjectPlaceable)
+			{
+				PlaceObject();
+			}
+			else if (m_previewInstance != null)
+			{
+				UnityEngine.Object.Destroy(m_previewInstance.gameObject);
+			}
+		}
+		else if (m_previewInstance != null)
+		{
+			UnityEngine.Object.Destroy(m_previewInstance.gameObject);
+		}
+		if (LE_GUIInterface.Instance.delegates.SetDraggableObjectState != null)
+		{
+			if (!IsInteractable || !IsObjectDraggedInUI())
+			{
+				LE_GUIInterface.Instance.delegates.SetDraggableObjectState(LE_GUIInterface.Delegates.EDraggedObjectState.NONE);
+			}
+			else if (m_previewInstance != null)
+			{
+				LE_GUIInterface.Instance.delegates.SetDraggableObjectState(LE_GUIInterface.Delegates.EDraggedObjectState.IN_3D_PREVIEW);
+			}
+			else
+			{
+				LE_GUIInterface.Instance.delegates.SetDraggableObjectState(LE_GUIInterface.Delegates.EDraggedObjectState.NOT_PLACEABLE);
+			}
+		}
+	}
+
+	private void UpdateSnapToObjectInstances()
+	{
+		bool flag = !m_isSnapToObjectActive && IsInteractable;
+		if (!flag && (!m_isSnapToObjectActive || IsInteractable))
+		{
+			return;
+		}
+		m_isSnapToObjectActive = flag;
+		List<string> list = new List<string>();
+		foreach (string key in m_snapPointUIDsToSnapPoints.Keys)
+		{
+			if (m_snapPointUIDsToSnapPoints[key] != null)
+			{
+				if (!flag || m_snapPointUIDsToSnapPoints[key].SnapCounter == 0)
+				{
+					m_snapPointUIDsToSnapPoints[key].gameObject.SetActive(flag);
+				}
+			}
+			else
+			{
+				list.Add(key);
+			}
+		}
+		foreach (string item in list)
+		{
+			m_snapPointUIDsToSnapPoints.Remove(item);
+		}
+	}
+
+	private void ReactivateSnapPoints(int p_deletedObjectUID)
+	{
+		List<string> list = new List<string>();
+		foreach (KeyValuePair<string, int> snapPointUIDsToObjUID in m_snapPointUIDsToObjUIDs)
+		{
+			if (snapPointUIDsToObjUID.Value == p_deletedObjectUID)
+			{
+				list.Add(snapPointUIDsToObjUID.Key);
+				if (m_snapPointUIDsToSnapPoints.ContainsKey(snapPointUIDsToObjUID.Key))
+				{
+					m_snapPointUIDsToSnapPoints[snapPointUIDsToObjUID.Key].DecSnapCounter();
+				}
+			}
+		}
+		foreach (string item in list)
+		{
+			m_snapPointUIDsToObjUIDs.Remove(item);
+		}
+	}
+
+	private LE_Object TrySelectByOversizedBoundingVolume()
+	{
+		List<LE_Object> list = new List<LE_Object>();
+		List<float> list2 = new List<float>();
+		LE_Object[] array = UnityEngine.Object.FindObjectsOfType<LE_Object>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (GetMinMaxBounds(array[i], out var o_min, out var o_max))
+			{
+				float num = 1f;
+				float magnitude = (array[i].transform.position - Camera.main.transform.position).magnitude;
+				Vector3 vector = new Vector3
+				{
+					x = Mathf.Abs(o_max.x - o_min.x),
+					y = Mathf.Abs(o_max.y - o_min.y),
+					z = Mathf.Abs(o_max.z - o_min.z)
+				};
+				float magnitude2 = vector.magnitude;
+				Vector3 rhs = Vector3.one * 10f + vector;
+				if (magnitude > 50f)
+				{
+					num = 2.25f;
+					vector = Vector3.Max(vector, Vector3.one * 1.5f);
+				}
+				else if (magnitude > 25f)
+				{
+					num = 1.85f;
+					vector = Vector3.Max(vector, Vector3.one);
+				}
+				else if (magnitude > 15f)
+				{
+					num = 1.5f;
+					vector = Vector3.Max(vector, Vector3.one * 0.5f);
+				}
+				vector = Vector3.Min(vector * num, rhs);
+				if (new Bounds((o_max + o_min) * 0.5f, vector).IntersectRay(m_cursorRay))
+				{
+					list.Add(array[i]);
+					list2.Add(magnitude2);
+				}
+			}
+		}
+		if (list.Count > 0)
+		{
+			LE_Object result = list[0];
+			float num2 = list2[0];
+			for (int j = 1; j < list.Count; j++)
+			{
+				if (list2[j] < num2)
+				{
+					result = list[j];
+					num2 = list2[j];
+				}
+			}
+			float num3 = 9999999f;
+			for (int k = 0; k < list.Count; k++)
+			{
+				if (list2[k] <= num2 * 1.25f)
+				{
+					float magnitude3 = Vector3.Cross(m_cursorRay.direction, list[k].transform.position - m_cursorRay.origin).magnitude;
+					if (num3 > magnitude3)
+					{
+						num3 = magnitude3;
+						result = list[k];
+					}
+				}
+			}
+			return result;
+		}
+		return null;
+	}
+
+	private bool GetMinMaxBounds(LE_Object p_object, out Vector3 o_min, out Vector3 o_max)
+	{
+		o_min = Vector3.one * 9999999f;
+		o_max = -Vector3.one * 9999999f;
+		Collider[] componentsInChildren = p_object.GetComponentsInChildren<Collider>();
+		if (componentsInChildren.Length != 0)
+		{
+			bool result = false;
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				if (componentsInChildren[i].GetComponent<LE_ObjectEditHandleCollider>() == null)
+				{
+					result = true;
+					Bounds bounds = componentsInChildren[i].bounds;
+					o_min = Vector3.Min(o_min, bounds.min);
+					o_max = Vector3.Max(o_max, bounds.max);
+				}
+			}
+			return result;
+		}
+		return false;
+	}
+
+	private void PlaceObject()
+	{
+		if (m_previewInstance != null)
+		{
+			UnityEngine.Object.Destroy(m_previewInstance.gameObject);
+			PlaceObject(m_object, m_previewInstance.transform, p_isDestroyClonedScripts: false);
+		}
+	}
+
+	private LE_Object PlaceObject(LE_Object p_prefab, Transform p_copyTransform, bool p_isDestroyClonedScripts, bool clonedOffset = false)
+	{
+		Vector3 position = p_copyTransform.position;
+		position.x++;
+		if (position.XZSqr() > 15625f)
+		{
+			return null;
+		}
+		LE_Object lE_Object = UnityEngine.Object.Instantiate(p_prefab);
+		lE_Object.gameObject.name = p_prefab.name;
+		lE_Object.gameObject.GetComponent<Transform>().parent = Singleton<LE_LevelEditorMain>.Instance.ObjectDumpContainer;
+		if (clonedOffset)
+		{
+			lE_Object.transform.position = p_copyTransform.position + new Vector3(1f, 0f, 0f);
+		}
+		else
+		{
+			lE_Object.transform.position = p_copyTransform.position;
+		}
+		lE_Object.transform.rotation = p_copyTransform.rotation;
+		lE_Object.transform.localScale = p_copyTransform.localScale;
+		if (p_isDestroyClonedScripts)
+		{
+			LE_ObjectEditHandle componentInChildren = lE_Object.GetComponentInChildren<LE_ObjectEditHandle>();
+			if (componentInChildren != null)
+			{
+				UnityEngine.Object.Destroy(componentInChildren.gameObject);
+			}
+			S_SnapToWorld component = lE_Object.GetComponent<S_SnapToWorld>();
+			if (component != null)
+			{
+				UnityEngine.Object.Destroy(component);
+			}
+			S_SnapToGrid component2 = lE_Object.GetComponent<S_SnapToGrid>();
+			if (component2 != null)
+			{
+				UnityEngine.Object.Destroy(component2);
+			}
+			S_SnapToObject[] componentsInChildren = lE_Object.GetComponentsInChildren<S_SnapToObject>(includeInactive: true);
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				LE_ObjectSnapPoint.DestroySnapSystem(componentsInChildren[i]);
+			}
+			UtilityOnDestroyHandler component3 = lE_Object.GetComponent<UtilityOnDestroyHandler>();
+			if (component3 != null)
+			{
+				component3.DestroyWithoutHandling();
+			}
+		}
+		OnNewObjectPlaced(lE_Object);
+		return lE_Object;
+	}
+
+	private void MoveToLayer(Transform root, int layer)
+	{
+		root.gameObject.layer = layer;
+		foreach (Transform item in root)
+		{
+			MoveToLayer(item, layer);
+		}
+	}
+
+	private void SelectObject(LE_Object p_object)
+	{
+		if (m_selectedObject != null && m_selectedObject != p_object)
+		{
+			m_selectedObject.EditMode = LE_EObjectEditMode.NO_EDIT;
+			m_selectedObject.IsSelected = false;
+		}
+		m_selectedObject = p_object;
+		if (m_selectedObject != null)
+		{
+			m_selectedObject.IsSelected = true;
+		}
+	}
+
+	private bool OnObjectDrag()
+	{
+		bool isObjectPlaceable = m_isObjectPlaceable;
+		if (LE_EventInterface.OnObjectDragged != null)
+		{
+			LE_ObjectDragEvent lE_ObjectDragEvent = new LE_ObjectDragEvent(m_object, m_previewInstance, m_isObjectPlaceable, m_dragMessage, m_cursorHitInfo);
+			LE_EventInterface.OnObjectDragged(this, lE_ObjectDragEvent);
+			isObjectPlaceable = lE_ObjectDragEvent.IsObjectPlaceable;
+			SetDragMessageInUI(lE_ObjectDragEvent.Message);
+		}
+		if (!isObjectPlaceable && m_previewInstance != null)
+		{
+			UnityEngine.Object.Destroy(m_previewInstance.gameObject);
+		}
+		return isObjectPlaceable;
+	}
+
+	private void SetDragMessageInUI()
+	{
+		SetDragMessageInUI(m_dragMessage);
+	}
+
+	private void SetDragMessageInUI(string p_message)
+	{
+		if (LE_GUIInterface.Instance.delegates.SetDraggableObjectMessage != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetDraggableObjectMessage(m_dragMessage);
+		}
+	}
+
+	private bool IsObjectDraggedInUI()
+	{
+		if (LE_GUIInterface.Instance.delegates.IsObjectDragged != null)
+		{
+			return LE_GUIInterface.Instance.delegates.IsObjectDragged();
+		}
+		return false;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 379
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUI3dTerrain.cs
+SIZE: 9096 bytes
+SHA256: 5a3ba1eee67652944b768fd1bebf671dbf840e4ea4a82a4c70b5c9cade30ae68
+====================================================================================================
+
+using LE_LevelEditor.Core;
+using LE_LevelEditor.Events;
+using LE_LevelEditor.Logic;
+using Rewired;
+using UnityEngine;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUI3dTerrain : LE_GUI3dBase
+{
+	public int TERRAIN_LAYER = 14;
+
+	private Terrain m_terrain;
+
+	private LE_TerrainManager m_terrainMgr;
+
+	private TerrainData m_defaultTerrainDataPrefab;
+
+	private Projector m_brushProjector;
+
+	private Texture2D m_brushAlphaTexture;
+
+	private LE_LogicTerrain.Heightmap _heightmap;
+
+	private float m_amount = 0.1f;
+
+	private float m_size = 0.1f;
+
+	private float m_targetRelativeValue = 0.5f;
+
+	private bool m_isReadingTerrainSetHeight;
+
+	private int m_isTerrainSetHeightReadInFrame = -1;
+
+	private bool m_isDirectedSmooth;
+
+	private float m_directedSmoothAngle;
+
+	private LE_ETerrainEditMode m_editMode;
+
+	private Vector3 m_lastCursorActiveScreenCoords = -1f * Vector3.one;
+
+	public Terrain TerrainInstance => m_terrain;
+
+	public LE_TerrainManager TerrainManager => m_terrainMgr;
+
+	public TerrainData DefaultTerrainDataPrefab
+	{
+		get
+		{
+			return m_defaultTerrainDataPrefab;
+		}
+		set
+		{
+			m_defaultTerrainDataPrefab = value;
+		}
+	}
+
+	public Projector BrushProjector
+	{
+		get
+		{
+			return m_brushProjector;
+		}
+		set
+		{
+			m_brushProjector = value;
+			m_brushProjector.material = Object.Instantiate(m_brushProjector.material);
+		}
+	}
+
+	public Texture2D BrushAlphaTexture
+	{
+		get
+		{
+			return m_brushAlphaTexture;
+		}
+		set
+		{
+			m_brushAlphaTexture = value;
+			m_brushProjector.material.mainTexture = m_brushAlphaTexture;
+		}
+	}
+
+	public LE_LogicTerrain.Heightmap Heightmap
+	{
+		get
+		{
+			return _heightmap;
+		}
+		set
+		{
+			_heightmap = value;
+		}
+	}
+
+	public float Amount
+	{
+		get
+		{
+			return m_amount;
+		}
+		set
+		{
+			m_amount = value;
+		}
+	}
+
+	public float Size
+	{
+		get
+		{
+			return m_size;
+		}
+		set
+		{
+			m_size = value;
+			if (m_terrainMgr != null)
+			{
+				float num = 1f / (float)Mathf.Min(m_terrainMgr.TerrainData.heightmapResolution - 1, m_terrainMgr.TerrainData.heightmapResolution - 1);
+				m_size = Mathf.Floor(m_size / num) * num;
+			}
+		}
+	}
+
+	public float TargetRelativeValue
+	{
+		get
+		{
+			return m_targetRelativeValue;
+		}
+		set
+		{
+			m_targetRelativeValue = value;
+		}
+	}
+
+	public bool IsReadingTerrainSetHeight
+	{
+		get
+		{
+			return m_isReadingTerrainSetHeight;
+		}
+		set
+		{
+			m_isReadingTerrainSetHeight = value;
+			m_isTerrainSetHeightReadInFrame = -1;
+		}
+	}
+
+	public bool IsDirectedSmooth
+	{
+		get
+		{
+			return m_isDirectedSmooth;
+		}
+		set
+		{
+			m_isDirectedSmooth = value;
+		}
+	}
+
+	public float DirectedSmoothAngle
+	{
+		get
+		{
+			return m_directedSmoothAngle;
+		}
+		set
+		{
+			m_directedSmoothAngle = value;
+			if (m_brushProjector.transform.childCount > 0)
+			{
+				m_brushProjector.transform.GetChild(0).transform.localRotation = Quaternion.Euler(Vector3.back * m_directedSmoothAngle);
+			}
+		}
+	}
+
+	public LE_ETerrainEditMode EditMode
+	{
+		get
+		{
+			return m_editMode;
+		}
+		set
+		{
+			m_editMode = value;
+			if (m_editMode != LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE)
+			{
+				m_isReadingTerrainSetHeight = false;
+				m_isTerrainSetHeightReadInFrame = -1;
+			}
+		}
+	}
+
+	public override LE_EEditMode ActiveEditMode => LE_EEditMode.TERRAIN;
+
+	public void SetTerrain(Terrain p_terrain)
+	{
+		if (m_terrainMgr != null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: SetTerrain: a terrain manager was already set and will be overwritten! Use 'RemoveTerrainManager' to reset the instance.");
+		}
+		m_terrain = p_terrain;
+		m_terrainMgr = new LE_TerrainManager(p_terrain.terrainData);
+		LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+	}
+
+	public void RemoveTerrainManager()
+	{
+		if (m_terrain != null)
+		{
+			LE_EventInterface.LevelDataChanged(m_terrain.gameObject);
+		}
+		m_terrain = null;
+		m_terrainMgr = null;
+	}
+
+	public override void SetCursorPosition(Vector3 p_cursorScreenCoords)
+	{
+		m_cursorScreenCoords = p_cursorScreenCoords;
+		m_cursorRay = Camera.main.ScreenPointToRay(p_cursorScreenCoords);
+		if (m_terrain != null)
+		{
+			SetIsCursorOverSomething(m_terrain.GetComponent<Collider>().Raycast(m_cursorRay, out m_cursorHitInfo, float.MaxValue));
+		}
+		else
+		{
+			SetIsCursorOverSomething(p_isHit: false);
+		}
+	}
+
+	public override void SetIsCursorAction(bool p_isCursorAction)
+	{
+		if (m_isTerrainSetHeightReadInFrame != -1 && !p_isCursorAction && m_isTerrainSetHeightReadInFrame + 1 < Time.frameCount)
+		{
+			m_isReadingTerrainSetHeight = false;
+			m_isTerrainSetHeightReadInFrame = -1;
+		}
+		if (((IsCursorOverSomething && IsInteractable) & p_isCursorAction) && m_lastCursorActiveScreenCoords != m_cursorScreenCoords)
+		{
+			m_lastCursorActiveScreenCoords = m_cursorScreenCoords;
+			if (!(m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>() != null))
+			{
+				return;
+			}
+			if (m_isReadingTerrainSetHeight)
+			{
+				Terrain component = m_cursorHitInfo.transform.gameObject.GetComponent<Terrain>();
+				float num = component.SampleHeight(m_cursorHitInfo.point);
+				m_targetRelativeValue = Mathf.Clamp01(num / component.terrainData.size.y);
+				m_isTerrainSetHeightReadInFrame = Time.frameCount;
+				return;
+			}
+			switch (m_editMode)
+			{
+			case LE_ETerrainEditMode.CHANGE_HEIGHT:
+				m_terrainMgr.ChangeHeight(Mathf.Sign(Amount) * Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+				break;
+			case LE_ETerrainEditMode.CHANGE_HEIGHT_TO_TARGET_VALUE:
+				m_terrainMgr.ChangeHeight(Mathf.Max(0.002f, Amount * Amount) * Time.deltaTime * 2f, TargetRelativeValue, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo));
+				break;
+			case LE_ETerrainEditMode.SMOOTH_HEIGHT:
+			{
+				int p_neighbourCount = 3 + 2 * Mathf.RoundToInt(Mathf.Abs(Amount) * 3f);
+				m_terrainMgr.SmoothHeight(Time.deltaTime * 2f, p_neighbourCount, BrushAlphaTexture, Size, GetRelativeLocalLocation(m_cursorHitInfo), m_isDirectedSmooth, m_directedSmoothAngle);
+				break;
+			}
+			default:
+				Debug.LogError("LE_GUI3dTerrain: unknown EditMode!");
+				break;
+			case LE_ETerrainEditMode.PROCEDURAL:
+				break;
+			}
+		}
+		else
+		{
+			m_lastCursorActiveScreenCoords = -1f * Vector3.one;
+		}
+	}
+
+	public void HideCursor()
+	{
+		BrushProjector.orthographicSize = 0f;
+		if (BrushProjector.transform.childCount > 0)
+		{
+			BrushProjector.transform.GetChild(0).gameObject.SetActive(value: false);
+		}
+		SetIsCursorOverSomething(p_isHit: false);
+	}
+
+	private void Start()
+	{
+		if (m_brushProjector == null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: m_brushProjector was not initialized!");
+		}
+		if (m_brushAlphaTexture == null)
+		{
+			Debug.LogError("LE_GUI3dTerrain: m_brushAlphaTexture was not initialized!");
+		}
+	}
+
+	private void Update()
+	{
+		UpdateBrushProjector(IsCursorOverSomething, m_cursorHitInfo);
+		if (ReInput.players.GetPlayer(0).GetButtonDown(53))
+		{
+			Focus();
+		}
+	}
+
+	public void Focus()
+	{
+		if (IsCursorOverSomething)
+		{
+			Vector3 point = m_cursorHitInfo.point;
+			Vector3 vector = new Vector3(m_brushProjector.orthographicSize, m_brushProjector.orthographicSize * 0.7f, m_brushProjector.orthographicSize);
+			Vector3 vector2 = Camera.main.transform.position - point;
+			float num = Mathf.Max(vector.x, vector.y, vector.z) * 3f;
+			Camera.main.transform.position = point + vector2.normalized * num;
+			if (Camera.main.transform.position.y < point.y)
+			{
+				Vector3 position = Camera.main.transform.position;
+				position.y = point.y;
+				Camera.main.transform.position = position;
+			}
+			Camera.main.transform.LookAt(point, Vector3.up);
+		}
+	}
+
+	private void UpdateBrushProjector(bool p_isHit, RaycastHit p_hitInfo)
+	{
+		if (p_isHit)
+		{
+			Vector3 size = m_terrainMgr.TerrainData.size;
+			Vector2 relativeLocalLocation = GetRelativeLocalLocation(p_hitInfo);
+			BrushProjector.transform.position = new Vector3(p_hitInfo.transform.position.x + relativeLocalLocation.y * size.x, p_hitInfo.point.y, p_hitInfo.transform.position.z + relativeLocalLocation.x * size.z);
+			BrushProjector.orthographicSize = m_terrainMgr.TerrainData.size.z * m_size * 0.5f;
+			BrushProjector.aspectRatio = m_terrainMgr.TerrainData.size.x / m_terrainMgr.TerrainData.size.z;
+			if (BrushProjector.transform.childCount > 0)
+			{
+				BrushProjector.transform.GetChild(0).gameObject.SetActive(m_editMode == LE_ETerrainEditMode.SMOOTH_HEIGHT && IsDirectedSmooth);
+			}
+		}
+		else
+		{
+			BrushProjector.orthographicSize = 0f;
+			if (BrushProjector.transform.childCount > 0)
+			{
+				BrushProjector.transform.GetChild(0).gameObject.SetActive(value: false);
+			}
+		}
+	}
+
+	private Vector2 GetRelativeLocalLocation(RaycastHit hit)
+	{
+		Terrain component = hit.transform.gameObject.GetComponent<Terrain>();
+		Vector3 size = component.terrainData.size;
+		Vector3 vector = hit.transform.InverseTransformPoint(hit.point);
+		Vector2 zero = Vector2.zero;
+		zero.x = vector.z / size.z;
+		zero.y = vector.x / size.x;
+		float num = 1f / (float)(component.terrainData.heightmapResolution - 1);
+		float num2 = 1f / (float)(component.terrainData.heightmapResolution - 1);
+		zero.x = Mathf.Round(zero.x / num) * num;
+		zero.y = Mathf.Round(zero.y / num2) * num2;
+		return zero;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 380
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUIInterface_uGUIimpl.cs
+SIZE: 22361 bytes
+SHA256: 94e2c4099668f809fed53e2710286c3987cb52a70329fca055118888b5571e93
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Language;
+using Beam.UI;
+using Beam.Utilities;
+using LE_LevelEditor.Core;
+using Rewired;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using uMyGUI;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUIInterface_uGUIimpl : LE_GUIInterface_uGUIimplBase
+{
+	private LE_GUI3dTerrain m_GUI3dTerrain;
+
+	[SerializeField]
+	private float CAM_GIZMO_RIGHT_PIXEL_OFFSET = 265f;
+
+	[SerializeField]
+	private float CAM_OBLIQUE_RIGHT_PIXEL_OFFSET = 250f;
+
+	[SerializeField]
+	private uMyGUI_TexturePicker TERRAIN_BRUSH_PICKER;
+
+	[SerializeField]
+	private uMyGUI_TexturePicker TERRAIN_HEIGHTMAP_PICKER;
+
+	[SerializeField]
+	private Slider TERRAIN_EDIT_BRUSH_SIZE_SLIDER;
+
+	[SerializeField]
+	private Slider TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER;
+
+	[SerializeField]
+	private Slider TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT;
+
+	[SerializeField]
+	private Button TERRAIN_READ_SET_HEIGHT_BTN;
+
+	[SerializeField]
+	private RectTransform TERRAIN_MENU;
+
+	[SerializeField]
+	private string TERRAIN_MENU_FADE_IN_ANIM = "TabRotatedFadeIn";
+
+	[SerializeField]
+	private RectTransform TERRAIN_UI_MODE_EDIT;
+
+	[SerializeField]
+	private uMyGUI_TreeBrowser OBJECT_BROWSER;
+
+	[SerializeField]
+	private uMyGUI_Draggable OBJECT_PREVIEW_DRAGGABLE;
+
+	[SerializeField]
+	private RawImage OBJECT_PREVIEW_IMAGE;
+
+	[SerializeField]
+	private TMPLabelViewAdapter OBJECT_PREVIEW_MESSAGE;
+
+	[SerializeField]
+	private Button OBJECT_FOCUS_SELECTED_BTN;
+
+	[SerializeField]
+	private Button OBJECT_DUPLICATE_SELECTED_BTN;
+
+	[SerializeField]
+	private Button OBJECT_DELETE_SELECTED_BTN;
+
+	[SerializeField]
+	private Button TERRAIN_GENERATE_PERLIN;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_PERLIN_FREQ;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_PERLIN_AMPLITUDE;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_PERLIN_OCTAVES;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_PERLIN_BLEND;
+
+	[SerializeField]
+	private Button TERRAIN_GENERATE_NORMALISE;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_NORMALISE_MIN;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_NORMALISE_MAX;
+
+	[SerializeField]
+	private Slider TERRAIN_GENERATE_NORMALISE_BLEND;
+
+	[SerializeField]
+	private Button TERRAIN_SMOOTH;
+
+	[SerializeField]
+	private AudioSource BUTTON_CLICK_AUDIO_SOURCE;
+
+	private Dictionary<uMyGUI_TreeBrowser.Node, LE_Object> m_nodeToObject = new Dictionary<uMyGUI_TreeBrowser.Node, LE_Object>();
+
+	protected override void Start()
+	{
+		base.Start();
+		if (LE_GUIInterface.Instance != null)
+		{
+			LE_GUIInterface.Delegates delegates = LE_GUIInterface.Instance.delegates;
+			delegates.GetCameraPerspectiveGizmoRightPixelOffset = (LE_GUIInterface.Delegates.GetFloatFunction)Delegate.Combine(delegates.GetCameraPerspectiveGizmoRightPixelOffset, new LE_GUIInterface.Delegates.GetFloatFunction(GetCameraPerspectiveGizmoRightPixelOffset));
+			LE_GUIInterface.Delegates delegates2 = LE_GUIInterface.Instance.delegates;
+			delegates2.GetObliqueCameraPerspectiveRightPixelOffset = (LE_GUIInterface.Delegates.GetFloatFunction)Delegate.Combine(delegates2.GetObliqueCameraPerspectiveRightPixelOffset, new LE_GUIInterface.Delegates.GetFloatFunction(GetObliqueCameraPerspectiveRightPixelOffset));
+			LE_GUIInterface.Delegates delegates3 = LE_GUIInterface.Instance.delegates;
+			delegates3.SetTerrainUIMode = (Action<LE_GUIInterface.Delegates.ETerrainUIMode>)Delegate.Combine(delegates3.SetTerrainUIMode, new Action<LE_GUIInterface.Delegates.ETerrainUIMode>(SetTerrainUIMode));
+			LE_GUIInterface.Delegates delegates4 = LE_GUIInterface.Instance.delegates;
+			delegates4.SetTerrainEditBrushSize = (Action<float>)Delegate.Combine(delegates4.SetTerrainEditBrushSize, new Action<float>(SetTerrainEditBrushSize));
+			LE_GUIInterface.Delegates delegates5 = LE_GUIInterface.Instance.delegates;
+			delegates5.SetTerrainEditBrushAmount = (Action<float>)Delegate.Combine(delegates5.SetTerrainEditBrushAmount, new Action<float>(SetTerrainEditBrushAmount));
+			LE_GUIInterface.Delegates delegates6 = LE_GUIInterface.Instance.delegates;
+			delegates6.SetTerrainEditBrushTargetValue = (Action<float>)Delegate.Combine(delegates6.SetTerrainEditBrushTargetValue, new Action<float>(SetTerrainEditBrushTargetValue));
+			LE_GUIInterface.Delegates delegates7 = LE_GUIInterface.Instance.delegates;
+			delegates7.SetTerrainIsReadingSetHeight = (Action<bool>)Delegate.Combine(delegates7.SetTerrainIsReadingSetHeight, new Action<bool>(SetTerrainIsReadingSetHeight));
+			LE_GUIInterface.Delegates delegates8 = LE_GUIInterface.Instance.delegates;
+			delegates8.SetObjects = (Action<LE_ObjectMap>)Delegate.Combine(delegates8.SetObjects, new Action<LE_ObjectMap>(SetObjects));
+			LE_GUIInterface.Delegates delegates9 = LE_GUIInterface.Instance.delegates;
+			delegates9.IsObjectDragged = (LE_GUIInterface.Delegates.GetBoolFunction)Delegate.Combine(delegates9.IsObjectDragged, new LE_GUIInterface.Delegates.GetBoolFunction(IsObjectDragged));
+			LE_GUIInterface.Delegates delegates10 = LE_GUIInterface.Instance.delegates;
+			delegates10.SetDraggableObjectState = (Action<LE_GUIInterface.Delegates.EDraggedObjectState>)Delegate.Combine(delegates10.SetDraggableObjectState, new Action<LE_GUIInterface.Delegates.EDraggedObjectState>(SetDraggableObjectState));
+			LE_GUIInterface.Delegates delegates11 = LE_GUIInterface.Instance.delegates;
+			delegates11.SetDraggableObjectMessage = (Action<string>)Delegate.Combine(delegates11.SetDraggableObjectMessage, new Action<string>(SetDraggableObjectMessage));
+			LE_GUIInterface.Delegates delegates12 = LE_GUIInterface.Instance.delegates;
+			delegates12.SetIsSelectedObjectFocusBtnInteractable = (Action<bool>)Delegate.Combine(delegates12.SetIsSelectedObjectFocusBtnInteractable, new Action<bool>(SetIsSelectedObjectFocusBtnInteractable));
+			LE_GUIInterface.Delegates delegates13 = LE_GUIInterface.Instance.delegates;
+			delegates13.SetIsSelectedObjectDuplicateBtnInteractable = (Action<bool>)Delegate.Combine(delegates13.SetIsSelectedObjectDuplicateBtnInteractable, new Action<bool>(SetIsSelectedObjectDuplicateBtnInteractable));
+			LE_GUIInterface.Delegates delegates14 = LE_GUIInterface.Instance.delegates;
+			delegates14.SetIsSelectedObjectDeleteBtnInteractable = (Action<bool>)Delegate.Combine(delegates14.SetIsSelectedObjectDeleteBtnInteractable, new Action<bool>(SetIsSelectedObjectDeleteBtnInteractable));
+			LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+			events.OnTerrainGenerateShoremap = (EventHandler)Delegate.Combine(events.OnTerrainGenerateShoremap, new EventHandler(OnTerrainGenerateShoremap));
+			LE_GUIInterface.EventHandlers events2 = LE_GUIInterface.Instance.events;
+			events2.OnTerrainGenerateCustomHeightmap = (EventHandler)Delegate.Combine(events2.OnTerrainGenerateCustomHeightmap, new EventHandler(OnTerrainGenerateCustomHeightmap));
+			LE_GUIInterface.EventHandlers events3 = LE_GUIInterface.Instance.events;
+			events3.OnTerrainGeneratePerlin = (EventHandler)Delegate.Combine(events3.OnTerrainGeneratePerlin, new EventHandler(OnTerrainGeneratePerlin));
+			LE_GUIInterface.EventHandlers events4 = LE_GUIInterface.Instance.events;
+			events4.OnTerrainGenerateNormalise = (EventHandler)Delegate.Combine(events4.OnTerrainGenerateNormalise, new EventHandler(OnTerrainGenerateNormalise));
+			LE_GUIInterface.EventHandlers events5 = LE_GUIInterface.Instance.events;
+			events5.OnTerrainGenerateIsland = (EventHandler)Delegate.Combine(events5.OnTerrainGenerateIsland, new EventHandler(OnTerrainGenerateIsland));
+			LE_GUIInterface.EventHandlers events6 = LE_GUIInterface.Instance.events;
+			events6.OnTerrainSmooth = (EventHandler)Delegate.Combine(events6.OnTerrainSmooth, new EventHandler(OnTerrainSmooth));
+			SetupTexturePickerEvents("TERRAIN_BRUSH_PICKER", TERRAIN_BRUSH_PICKER, ref LE_GUIInterface.Instance.delegates.SetTerrainBrushes, LE_GUIInterface.Instance.OnTerrainBrushChanged, ref LE_GUIInterface.Instance.events.OnTerrainBrushChanged);
+			SetupTexturePickerEvents("TERRAIN_HEIGHTMAP_PICKER", TERRAIN_HEIGHTMAP_PICKER, ref LE_GUIInterface.Instance.delegates.SetTerrainHeightmapTextures, LE_GUIInterface.Instance.OnTerrainHeightmapTextureChanged, ref LE_GUIInterface.Instance.events.OnTerrainHeightmapTextureChanged);
+			LE_GUIInterface.Delegates delegates15 = LE_GUIInterface.Instance.delegates;
+			delegates15.ShowPopupConfirmDeleteObject = (Action<Action<bool>>)Delegate.Combine(delegates15.ShowPopupConfirmDeleteObject, new Action<Action<bool>>(ShowPopupConfirmDeleteObject));
+		}
+		if (OBJECT_PREVIEW_DRAGGABLE == null)
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: OBJECT_PREVIEW_DRAGGABLE was not set in the inspector -> drag&drop will not work!");
+		}
+		if (OBJECT_PREVIEW_IMAGE == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: OBJECT_PREVIEW_IMAGE was not set in the inspector!");
+		}
+		if (OBJECT_PREVIEW_MESSAGE == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: OBJECT_PREVIEW_MESSAGE was not set in the inspector!");
+		}
+		if (OBJECT_FOCUS_SELECTED_BTN == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: OBJECT_FOCUS_SELECTED_BTN was not set in the inspector!");
+		}
+		if (OBJECT_DUPLICATE_SELECTED_BTN == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: OBJECT_DUPLICATE_SELECTED_BTN was not set in the inspector!");
+		}
+		if (OBJECT_DELETE_SELECTED_BTN == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: OBJECT_DELETE_SELECTED_BTN was not set in the inspector!");
+		}
+		if (BUTTON_CLICK_AUDIO_SOURCE == null)
+		{
+			Debug.LogWarning("LE_GUIInterface_uGUIimpl: BUTTON_CLICK_AUDIO_SOURCE was not set in the inspector!");
+		}
+	}
+
+	private Rewired.Player GetPlayerInput()
+	{
+		return ReInput.players.GetPlayer(0);
+	}
+
+	private void OnTerrainGenerateCustomHeightmap(object p_obj, EventArgs p_args)
+	{
+		if (Singleton<LE_LevelEditorMain>.Instance.GUI3dTerrain.Heightmap == null)
+		{
+			DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_NO_SELECTION_DESC", DialogueButton.Ok, DialogueIcon.Warning);
+			return;
+		}
+		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			if ((bool)Singleton<LE_ZoneTileGenerator>.Instance)
+			{
+				Singleton<LE_ZoneTileGenerator>.Instance.terrain.terrainData.SetHeights(0, 0, Singleton<LE_LevelEditorMain>.Instance.GUI3dTerrain.Heightmap.Heights);
+			}
+		};
+	}
+
+	private void OnTerrainGeneratePerlin(object p_obj, EventArgs p_args)
+	{
+		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			DialogueBoxViewAdapter dialogue = DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATING_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATING_HEIGHTMAP_DESC", DialogueButton.None, DialogueIcon.Information);
+			BeamTeam.InvokeDelayed(0.5f, () =>
+			{
+				TerrainGeneratePerlin();
+				dialogue.Destroy();
+			});
+		};
+	}
+
+	private void TerrainGeneratePerlin()
+	{
+		if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+		{
+			Singleton<LE_ZoneTileGenerator>.Instance.GenerateAdvancedPerlin((int)TERRAIN_GENERATE_PERLIN_FREQ.value, TERRAIN_GENERATE_PERLIN_AMPLITUDE.value, (int)TERRAIN_GENERATE_PERLIN_OCTAVES.value, TERRAIN_GENERATE_PERLIN_BLEND.value);
+		}
+	}
+
+	private void OnTerrainGenerateNormalise(object p_obj, EventArgs p_args)
+	{
+		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+			{
+				Singleton<LE_ZoneTileGenerator>.Instance.GenerateAdvancedNormalise(TERRAIN_GENERATE_NORMALISE_MIN.value, TERRAIN_GENERATE_NORMALISE_MAX.value, TERRAIN_GENERATE_NORMALISE_BLEND.value);
+			}
+		};
+	}
+
+	private void OnTerrainGenerateIsland(object p_obj, EventArgs p_args)
+	{
+		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_GENERATE_ISLAND_TITLE", "MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+			{
+				Singleton<LE_ZoneTileGenerator>.Instance.GenerateRandomIsland();
+			}
+		};
+	}
+
+	private void OnTerrainGenerateShoremap(object p_obj, EventArgs p_args)
+	{
+		if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+		{
+			Singleton<LE_ZoneTileGenerator>.Instance.GenerateShoreMap();
+		}
+	}
+
+	private void OnTerrainSmooth(object p_obj, EventArgs p_args)
+	{
+		DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_SMOOTH_TERRAIN_TITLE", "MAP_EDITOR_DB_SMOOTH_TERRAIN_DESC", DialogueButton.YesNo, DialogueIcon.Warning).Accept += () =>
+		{
+			if (Singleton<LE_ZoneTileGenerator>.Instance != null)
+			{
+				Singleton<LE_ZoneTileGenerator>.Instance.GenerateSmooth();
+			}
+		};
+	}
+
+	private void SetupTexturePickerEvents(string p_errorPickerName, uMyGUI_TexturePicker p_texPicker, ref Action<Texture2D[], int> r_setTexturesDelegate, Action<int> p_buttonCallback, ref EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs> r_onChangedEvent)
+	{
+		if (p_texPicker != null)
+		{
+			r_setTexturesDelegate = (Action<Texture2D[], int>)Delegate.Combine(r_setTexturesDelegate, (Action<Texture2D[], int>)((Texture2D[] p_textures, int p_selectedIndex) =>
+			{
+				p_texPicker.SetTextures(p_textures, p_selectedIndex);
+				AddButtonClickSoundsToGeneratedUI(p_texPicker.transform as RectTransform);
+			}));
+			p_texPicker.ButtonCallback = p_buttonCallback;
+			r_onChangedEvent = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Combine(r_onChangedEvent, (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)((object p_obj, LE_GUIInterface.EventHandlers.IntEventArgs p_args) =>
+			{
+				if (p_texPicker != null)
+				{
+					p_texPicker.SetSelection(p_args.Value);
+				}
+			}));
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: " + p_errorPickerName + " is not set in inspector!");
+		}
+	}
+
+	private float GetCameraPerspectiveGizmoRightPixelOffset()
+	{
+		return CAM_GIZMO_RIGHT_PIXEL_OFFSET * ((float)Screen.height / m_transform.rect.height);
+	}
+
+	private float GetObliqueCameraPerspectiveRightPixelOffset()
+	{
+		return CAM_OBLIQUE_RIGHT_PIXEL_OFFSET * ((float)Screen.height / m_transform.rect.height);
+	}
+
+	private void SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode p_mode)
+	{
+		if (TERRAIN_UI_MODE_EDIT != null)
+		{
+			bool flag = p_mode == LE_GUIInterface.Delegates.ETerrainUIMode.EDIT;
+			TERRAIN_UI_MODE_EDIT.gameObject.SetActive(flag);
+			if (flag)
+			{
+				TERRAIN_UI_MODE_EDIT.gameObject.SendMessage("uMyGUI_OnActivateTab", SendMessageOptions.DontRequireReceiver);
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainUIMode: TERRAIN_UI_MODE_EDIT is not set in inspector!");
+		}
+		if (TERRAIN_MENU != null && !string.IsNullOrEmpty(TERRAIN_MENU_FADE_IN_ANIM) && TERRAIN_MENU.gameObject.activeInHierarchy)
+		{
+			Animation component = TERRAIN_MENU.GetComponent<Animation>();
+			if (component != null)
+			{
+				component.Play(TERRAIN_MENU_FADE_IN_ANIM);
+			}
+		}
+		else if (TERRAIN_MENU == null)
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainUIMode: TERRAIN_MENU is not set in inspector!");
+		}
+	}
+
+	private void SetTerrainEditBrushSize(float p_brushSize)
+	{
+		if (TERRAIN_EDIT_BRUSH_SIZE_SLIDER != null)
+		{
+			TERRAIN_EDIT_BRUSH_SIZE_SLIDER.value = p_brushSize;
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainEditBrushSize: TERRAIN_EDIT_BRUSH_SIZE_SLIDER is not set in inspector!");
+		}
+	}
+
+	private void SetTerrainEditBrushAmount(float p_brushAmount)
+	{
+		if (TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER != null)
+		{
+			TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER.value = p_brushAmount;
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainEditBrushAmount: TERRAIN_EDIT_BRUSH_AMOUNT_SLIDER is not set in inspector!");
+		}
+	}
+
+	private void SetTerrainEditBrushTargetValue(float p_brushTargetValue)
+	{
+		if (TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT != null)
+		{
+			TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT.value = p_brushTargetValue;
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainEditBrushTargetValue: TERRAIN_EDIT_BRUSH_TARGET_VALUE_SLIDER_HEIGHT is not set in inspector!");
+		}
+	}
+
+	private void SetTerrainIsReadingSetHeight(bool p_isReadingSetHeight)
+	{
+		if (TERRAIN_READ_SET_HEIGHT_BTN != null)
+		{
+			TERRAIN_READ_SET_HEIGHT_BTN.interactable = !p_isReadingSetHeight;
+			TextMeshProUGUI component = TERRAIN_READ_SET_HEIGHT_BTN.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+			string term = (p_isReadingSetHeight ? "MAP_EDITOR_TERRAIN_BUTTON_CLICK_TO_READ_TERRAIN_HEIGHT" : "MAP_EDITOR_TERRAIN_BUTTON_READ_TERRAIN_PAINT_HEIGHT");
+			component.text = Localization.GetLanguageHandler().Localize(term);
+			component.color = (p_isReadingSetHeight ? Color.red : (Color.white * 0.196f + Color.black));
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetTerrainIsReadingSetHeight: TERRAIN_READ_SET_HEIGHT_BTN is not set in inspector!");
+		}
+	}
+
+	private void SetObjects(LE_ObjectMap p_objectMap)
+	{
+		if (OBJECT_BROWSER != null)
+		{
+			OBJECT_BROWSER.BuildTree(SetObjectsRecursive(p_objectMap, 0));
+			AddButtonClickSoundsToGeneratedUI(OBJECT_BROWSER.transform as RectTransform);
+			uMyGUI_TreeBrowser oBJECT_BROWSER = OBJECT_BROWSER;
+			oBJECT_BROWSER.OnInnerNodeClick = (EventHandler<uMyGUI_TreeBrowser.NodeClickEventArgs>)Delegate.Combine(oBJECT_BROWSER.OnInnerNodeClick, (EventHandler<uMyGUI_TreeBrowser.NodeClickEventArgs>)((object p_object, uMyGUI_TreeBrowser.NodeClickEventArgs p_args) =>
+			{
+				AddButtonClickSoundsToGeneratedUI(OBJECT_BROWSER.transform as RectTransform);
+			}));
+			uMyGUI_TreeBrowser oBJECT_BROWSER2 = OBJECT_BROWSER;
+			oBJECT_BROWSER2.OnLeafNodeClick = (EventHandler<uMyGUI_TreeBrowser.NodeClickEventArgs>)Delegate.Combine(oBJECT_BROWSER2.OnLeafNodeClick, (EventHandler<uMyGUI_TreeBrowser.NodeClickEventArgs>)((object p_object, uMyGUI_TreeBrowser.NodeClickEventArgs p_args) =>
+			{
+				if (!m_nodeToObject.TryGetValue(p_args.ClickedNode, out var value))
+				{
+					Debug.LogError("LE_GUIInterface_uGUIimpl: could not find selected node's object!");
+				}
+				if (value != null)
+				{
+					LE_GUIInterface.Instance.OnObjectSelectDraggable(value);
+				}
+			}));
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimpl: SetObjects: OBJECT_BROWSER is not set in inspector!");
+		}
+	}
+
+	private uMyGUI_TreeBrowser.Node[] SetObjectsRecursive(LE_ObjectMap p_objectMap, int p_indentLevel)
+	{
+		List<uMyGUI_TreeBrowser.Node> list = new List<uMyGUI_TreeBrowser.Node>();
+		foreach (LE_ObjectMap subObjectMap in p_objectMap.SubObjectMaps)
+		{
+			if (subObjectMap != null)
+			{
+				LE_ObjectCategoryNode.SendMessageInitData p_sendMessageData = new LE_ObjectCategoryNode.SendMessageInitData(subObjectMap.CategoryName, p_indentLevel);
+				list.Add(new uMyGUI_TreeBrowser.Node(p_sendMessageData, SetObjectsRecursive(subObjectMap, p_indentLevel + 1)));
+			}
+		}
+		foreach (LE_Object objectPrefab in p_objectMap.ObjectPrefabs)
+		{
+			if (objectPrefab != null)
+			{
+				uMyGUI_TreeBrowser.Node node = new uMyGUI_TreeBrowser.Node(new LE_ObjectPrefabNode.SendMessageInitData(objectPrefab, p_indentLevel), null);
+				list.Add(node);
+				m_nodeToObject.Add(node, objectPrefab);
+			}
+			else
+			{
+				Debug.LogError("LE_GUIInterface_uGUIimpl: SetObjectsRecursive: object from map '" + p_objectMap.CategoryName + "' at index '' is null!");
+			}
+		}
+		return list.ToArray();
+	}
+
+	private bool IsObjectDragged()
+	{
+		if (OBJECT_PREVIEW_DRAGGABLE != null)
+		{
+			return OBJECT_PREVIEW_DRAGGABLE.IsDragged;
+		}
+		return false;
+	}
+
+	private void SetDraggableObjectState(LE_GUIInterface.Delegates.EDraggedObjectState p_state)
+	{
+		if (OBJECT_PREVIEW_IMAGE != null)
+		{
+			switch (p_state)
+			{
+			case LE_GUIInterface.Delegates.EDraggedObjectState.NOT_PLACEABLE:
+				OBJECT_PREVIEW_IMAGE.color = Color.red;
+				break;
+			case LE_GUIInterface.Delegates.EDraggedObjectState.IN_3D_PREVIEW:
+				OBJECT_PREVIEW_IMAGE.color = Color.clear;
+				break;
+			default:
+				OBJECT_PREVIEW_IMAGE.color = Color.white;
+				break;
+			}
+		}
+	}
+
+	private void SetDraggableObjectMessage(string p_message)
+	{
+		if (OBJECT_PREVIEW_MESSAGE != null)
+		{
+			OBJECT_PREVIEW_MESSAGE.Text = p_message;
+		}
+	}
+
+	private void SetIsSelectedObjectFocusBtnInteractable(bool p_isInteractable)
+	{
+		if (OBJECT_FOCUS_SELECTED_BTN != null)
+		{
+			OBJECT_FOCUS_SELECTED_BTN.interactable = p_isInteractable;
+		}
+	}
+
+	private void SetIsSelectedObjectDuplicateBtnInteractable(bool p_isInteractable)
+	{
+		if (OBJECT_DUPLICATE_SELECTED_BTN != null)
+		{
+			OBJECT_DUPLICATE_SELECTED_BTN.interactable = p_isInteractable;
+		}
+	}
+
+	private void SetIsSelectedObjectDeleteBtnInteractable(bool p_isInteractable)
+	{
+		if (OBJECT_DELETE_SELECTED_BTN != null)
+		{
+			OBJECT_DELETE_SELECTED_BTN.interactable = p_isInteractable;
+		}
+	}
+
+	private void ShowPopupConfirmDeleteObject(Action<bool> p_confirmCallback)
+	{
+		DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(GetPlayerInput(), "MAP_EDITOR_DB_DELETE_OBJECT_TITLE", "MAP_EDITOR_DB_DELETE_OBJECT_DESC", DialogueButton.YesNo);
+		dialogueBoxViewAdapter.Accept += () =>
+		{
+			p_confirmCallback(obj: true);
+		};
+		dialogueBoxViewAdapter.Cancel += () =>
+		{
+			p_confirmCallback(obj: false);
+		};
+	}
+
+	private void AddButtonClickSoundsToGeneratedUI(RectTransform p_root)
+	{
+		if (p_root != null && BUTTON_CLICK_AUDIO_SOURCE != null)
+		{
+			Button[] componentsInChildren = p_root.GetComponentsInChildren<Button>(includeInactive: true);
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				componentsInChildren[i].onClick.RemoveListener(OnButtonClickSound);
+				componentsInChildren[i].onClick.AddListener(OnButtonClickSound);
+			}
+			Toggle[] componentsInChildren2 = p_root.GetComponentsInChildren<Toggle>(includeInactive: true);
+			for (int j = 0; j < componentsInChildren2.Length; j++)
+			{
+				componentsInChildren2[j].onValueChanged.RemoveListener(OnToggleClickSound);
+				componentsInChildren2[j].onValueChanged.AddListener(OnToggleClickSound);
+			}
+		}
+	}
+
+	private void OnButtonClickSound()
+	{
+		if (BUTTON_CLICK_AUDIO_SOURCE != null)
+		{
+			BUTTON_CLICK_AUDIO_SOURCE.Play();
+		}
+	}
+
+	private void OnToggleClickSound(bool p_isOn)
+	{
+		if (BUTTON_CLICK_AUDIO_SOURCE != null)
+		{
+			BUTTON_CLICK_AUDIO_SOURCE.Play();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 381
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUIInterface_uGUIimplBase.cs
+SIZE: 925 bytes
+SHA256: b1a12e4307f294d2e3ed9df62b18d75b71416982d324941bfad57d740c1bf282
+====================================================================================================
+
+using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_GUIInterface_uGUIimplBase : MonoBehaviour
+{
+	protected RectTransform m_transform;
+
+	protected virtual void Start()
+	{
+		if (LE_GUIInterface.Instance != null)
+		{
+			LE_GUIInterface.Delegates delegates = LE_GUIInterface.Instance.delegates;
+			delegates.IsCursorOverUI = (LE_GUIInterface.Delegates.GetBoolFunction)Delegate.Combine(delegates.IsCursorOverUI, new LE_GUIInterface.Delegates.GetBoolFunction(IsCursorOverUI));
+		}
+		else
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimplBase: Start: could not find LE_GUIInterface!");
+		}
+		m_transform = (RectTransform)transform;
+		if (m_transform == null)
+		{
+			Debug.LogError("LE_GUIInterface_uGUIimplBase: this script must be attached to a RectTransform!");
+		}
+	}
+
+	protected virtual bool IsCursorOverUI()
+	{
+		return EventSystem.main.IsPointerOverGameObject();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 382
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectCategoryNode.cs
+SIZE: 1489 bytes
+SHA256: 2abf585d93c4c33a6923eaa79eaa4c89b35014b5ca5b77920402db133f2aa96b
+====================================================================================================
+
+using Beam.UI;
+using MyUtility;
+using UnityEngine;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_ObjectCategoryNode : MonoBehaviour
+{
+	public class SendMessageInitData
+	{
+		public readonly string m_categoryName;
+
+		public readonly int m_indentLevel;
+
+		public SendMessageInitData(string p_categoryName, int p_indentLevel)
+		{
+			m_categoryName = p_categoryName;
+			m_indentLevel = p_indentLevel;
+		}
+	}
+
+	[SerializeField]
+	private TMPLabelViewAdapter m_text;
+
+	public void uMyGUI_TreeBrowser_InitNode(object p_data)
+	{
+		if (m_text != null)
+		{
+			if (p_data is SendMessageInitData)
+			{
+				SendMessageInitData sendMessageInitData = (SendMessageInitData)p_data;
+				m_text.Text = sendMessageInitData.m_categoryName;
+				Vector2 offsetMax = ((RectTransform)m_text.transform).offsetMax;
+				offsetMax.x -= (float)sendMessageInitData.m_indentLevel * 10f;
+				((RectTransform)m_text.transform).offsetMax = offsetMax;
+			}
+			else
+			{
+				Debug.LogError("LE_ObjectCategoryNode: uMyGUI_TreeBrowser_InitNode: expected p_data to be a string! p_data: " + p_data);
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectCategoryNode: uMyGUI_TreeBrowser_InitNode: m_text was not set via inspector!");
+		}
+	}
+
+	public static string GetCleanCategoryName(string p_categoryName)
+	{
+		if (p_categoryName.Contains("_"))
+		{
+			return UtilityStrings.InsertSpacesIntoCamelCase(p_categoryName.Substring(0, p_categoryName.IndexOf("_")));
+		}
+		return UtilityStrings.InsertSpacesIntoCamelCase(p_categoryName);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 383
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectDragDrop.cs
+SIZE: 1699 bytes
+SHA256: a0d6e8a8cf889e0a9b5a175545d3f746284434c21a1d3a6eeb3bd6b4b5ca2b2e
+====================================================================================================
+
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_ObjectDragDrop : MonoBehaviour
+{
+	[SerializeField]
+	private float MAX_IMAGE_SIZE = 150f;
+
+	[SerializeField]
+	private RectTransform SELECTED_OBJECT_TRANSFORM;
+
+	[SerializeField]
+	private RawImage SELECTED_OBJECT_IMAGE;
+
+	private float m_selectedObjectTransformHeight;
+
+	private LE_ObjectPrefabNode m_selectedNode;
+
+	public void OnObjectSelected(LE_ObjectPrefabNode p_objectNode)
+	{
+		if (!(m_selectedNode != p_objectNode))
+		{
+			return;
+		}
+		if (m_selectedNode != null)
+		{
+			m_selectedNode.HideSelection();
+		}
+		m_selectedNode = p_objectNode;
+		if (SELECTED_OBJECT_TRANSFORM != null)
+		{
+			SELECTED_OBJECT_TRANSFORM.gameObject.SetActive(value: true);
+			float size = Mathf.Min(MAX_IMAGE_SIZE, m_selectedObjectTransformHeight);
+			SELECTED_OBJECT_TRANSFORM.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size);
+			SELECTED_OBJECT_TRANSFORM.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectDragDrop: OnObjectSelected: SELECTED_OBJECT_TRANSFORM was not set in inspector!");
+		}
+		if (SELECTED_OBJECT_IMAGE != null)
+		{
+			if (m_selectedNode.Image != null)
+			{
+				SELECTED_OBJECT_IMAGE.texture = m_selectedNode.Image.texture;
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectDragDrop: OnObjectSelected: SELECTED_OBJECT_IMAGE was not set in inspector!");
+		}
+	}
+
+	private void Start()
+	{
+		if (SELECTED_OBJECT_TRANSFORM != null)
+		{
+			m_selectedObjectTransformHeight = SELECTED_OBJECT_TRANSFORM.rect.height;
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectDragDrop: OnObjectSelected: SELECTED_OBJECT_TRANSFORM was not set in inspector!");
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 384
+PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectPrefabNode.cs
+SIZE: 2776 bytes
+SHA256: e4955f3071d56c468aefecc0e44c48a5ba66068c706fb31961a9717930a743dd
+====================================================================================================
+
+using Beam.UI;
+using LE_LevelEditor.Core;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace LE_LevelEditor.UI;
+
+public class LE_ObjectPrefabNode : MonoBehaviour
+{
+	public class SendMessageInitData
+	{
+		public readonly LE_Object m_object;
+
+		public readonly int m_indentLevel;
+
+		public SendMessageInitData(LE_Object p_object, int p_indentLevel)
+		{
+			m_object = p_object;
+			m_indentLevel = p_indentLevel;
+		}
+	}
+
+	[SerializeField]
+	private TMPLabelViewAdapter m_text;
+
+	[SerializeField]
+	private RawImage m_image;
+
+	[SerializeField]
+	private Image m_selectionImage;
+
+	public RawImage Image => m_image;
+
+	public void uMyGUI_TreeBrowser_InitNode(object p_data)
+	{
+		if (m_text != null && m_image != null)
+		{
+			if (p_data is SendMessageInitData)
+			{
+				SendMessageInitData sendMessageInitData = (SendMessageInitData)p_data;
+				Texture2D texture2D = (Texture2D)Resources.Load("WorldEditor/ObjectIcons/" + sendMessageInitData.m_object.name);
+				if (texture2D != null)
+				{
+					m_image.texture = texture2D;
+				}
+				else
+				{
+					Debug.LogError("LE_ObjectPrefabNode: uMyGUI_TreeBrowser_InitNode: object '" + sendMessageInitData.m_object.name);
+				}
+				m_text.Text = sendMessageInitData.m_object.EditorObjectName;
+				Vector2 offsetMax = ((RectTransform)m_text.transform).offsetMax;
+				offsetMax.x -= (float)sendMessageInitData.m_indentLevel * 10f;
+				((RectTransform)m_text.transform).offsetMax = offsetMax;
+			}
+			else if (p_data is LE_ObjectCategoryNode.SendMessageInitData)
+			{
+				LE_ObjectCategoryNode.SendMessageInitData sendMessageInitData2 = (LE_ObjectCategoryNode.SendMessageInitData)p_data;
+				m_image.gameObject.SetActive(value: false);
+				m_text.Text = LE_ObjectCategoryNode.GetCleanCategoryName(sendMessageInitData2.m_categoryName);
+			}
+			else
+			{
+				Debug.LogError("LE_ObjectPrefabNode: uMyGUI_TreeBrowser_InitNode: expected p_data to be a LE_ObjectPrefabNode.SendMessageInitData! p_data: " + p_data);
+			}
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectPrefabNode: uMyGUI_TreeBrowser_InitNode: m_text or m_image were not set via inspector!");
+		}
+	}
+
+	public void OnSelected()
+	{
+		LE_ObjectDragDrop componentInParent = GetComponentInParent<LE_ObjectDragDrop>();
+		if (componentInParent != null)
+		{
+			componentInParent.OnObjectSelected(this);
+		}
+		else
+		{
+			Debug.LogError("LE_ObjectPrefabNode: OnSelected: could not find LE_ObjectDragDrop in parents!");
+		}
+		ShowSelection();
+	}
+
+	public void ShowSelection()
+	{
+		if (m_selectionImage != null)
+		{
+			m_selectionImage.color = Color.green;
+		}
+		if (m_text != null)
+		{
+			m_text.Color = Color.green;
+		}
+	}
+
+	public void HideSelection()
+	{
+		if (m_selectionImage != null)
+		{
+			m_selectionImage.color = Color.white;
+		}
+		if (m_text != null)
+		{
+			m_text.Color = Color.white;
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 385
+PATH: Assembly-CSharp__LE_LevelEditor__LE_DensityBounds.cs
+SIZE: 2732 bytes
+SHA256: b31b02f58b2301ced14e4b8b5b6f05296b4da071f0396f244037e28e24498bba
+====================================================================================================
+
+using Beam;
+using LE_LevelEditor.Core;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_DensityBounds : Singleton<LE_DensityBounds>
+{
+	private class DensityBound
+	{
+		public Bounds Bound;
+
+		public int Density;
+
+		public Material densityMat;
+
+		public DensityBound(Bounds bound, int density)
+		{
+			Bound = bound;
+			Density = density;
+		}
+	}
+
+	[SerializeField]
+	private Transform densityGridParent;
+
+	[SerializeField]
+	private GameObject densityProjector;
+
+	private DensityBound[,] bounds;
+
+	private int numberOfBounds = 20;
+
+	private int boundSize = 25;
+
+	private int zoneSize = 500;
+
+	private void Start()
+	{
+		boundSize = zoneSize / numberOfBounds;
+		bounds = new DensityBound[numberOfBounds, numberOfBounds];
+		for (int i = 0; i < numberOfBounds; i++)
+		{
+			for (int j = 0; j < numberOfBounds; j++)
+			{
+				bounds[i, j] = new DensityBound(default, 0);
+				bounds[i, j].Bound.size = new Vector3(boundSize, 200f, boundSize);
+				bounds[i, j].Bound.center = new Vector3(250f, 0f, 250f) - new Vector3(i * boundSize, 0f, j * boundSize);
+				GameObject gameObject = Object.Instantiate(densityProjector, new Vector3(250f, 150f, 250f) - new Vector3(i * boundSize, 0f, j * boundSize), Quaternion.identity);
+				gameObject.transform.parent = densityGridParent;
+				gameObject.transform.rotation = Quaternion.LookRotation(Vector3.down);
+				bounds[i, j].densityMat = new Material(gameObject.GetComponent<Projector>().material);
+				gameObject.GetComponent<Projector>().material = bounds[i, j].densityMat;
+			}
+		}
+		InvokeRepeating("UpdateVisual", 1f, 1f);
+	}
+
+	private void UpdateVisual()
+	{
+		CheckDensity();
+		for (int i = 0; i < numberOfBounds; i++)
+		{
+			for (int j = 0; j < numberOfBounds; j++)
+			{
+				float t = (float)bounds[i, j].Density / 100f;
+				Color color = Color.Lerp(Color.green, Color.red, t);
+				bounds[i, j].densityMat.color = color;
+			}
+		}
+	}
+
+	public bool CheckObjectDensity(LE_Object leObj, Vector3 position)
+	{
+		for (int i = 0; i < numberOfBounds; i++)
+		{
+			for (int j = 0; j < numberOfBounds; j++)
+			{
+				if (bounds[i, j].Bound.Contains(position) && bounds[i, j].Density + leObj.DensityWeight > 100)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void CheckDensity()
+	{
+		LE_Object[] array = Object.FindObjectsOfType<LE_Object>();
+		for (int i = 0; i < numberOfBounds; i++)
+		{
+			for (int j = 0; j < numberOfBounds; j++)
+			{
+				bounds[i, j].Density = 0;
+			}
+		}
+		for (int k = 0; k < array.Length; k++)
+		{
+			for (int l = 0; l < numberOfBounds; l++)
+			{
+				for (int m = 0; m < numberOfBounds; m++)
+				{
+					if (bounds[l, m].Bound.Contains(array[k].transform.position))
+					{
+						bounds[l, m].Density += array[k].DensityWeight;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 386
+PATH: Assembly-CSharp__LE_LevelEditor__LE_LevelEditorMain.cs
+SIZE: 24682 bytes
+SHA256: 7aa156e431510e5853365f81e82e338349a49cb3815ef2269ed1fd79aebd3092
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using Beam.Utilities.Reflection;
+using CPG_CameraPerspective;
+using LE_LevelEditor.Core;
+using LE_LevelEditor.Events;
+using LE_LevelEditor.LEInput;
+using LE_LevelEditor.Logic;
+using LE_LevelEditor.UI;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_LevelEditorMain : Singleton<LE_LevelEditorMain>, LE_IInputHandler
+{
+	private enum EEstimateDistanceMode
+	{
+		AVERAGE,
+		NEAREST
+	}
+
+	public static int MAP_EDITOR_SEED;
+
+	[SerializeField]
+	private GameObject _screenShotCamera;
+
+	public List<Texture2D> MapScreenshots = new List<Texture2D>();
+
+	public List<LE_Object> MapObjectReferences = new List<LE_Object>();
+
+	public GameObject Boundary;
+
+	public Transform ObjectDumpContainer;
+
+	public Transform ObjectInstanceContainer;
+
+	[SerializeField]
+	[Tooltip("Show/hide camera perspective gizmo. Works like the built-in Unity Editor scene view handle: click on the axes to change camera's position and direction; click in the middle to toggle between perspective and orthographic camera view.")]
+	private bool IS_WITH_CAMERA_PERSPECTIVE_GIZMO = true;
+
+	[SerializeField]
+	[Tooltip("Camera perspective gizmo's render layer index. This layer should be excluded from the main camera.")]
+	private int CAMERA_PERSPECTIVE_GIZMO_LAYER = 14;
+
+	[SerializeField]
+	[Tooltip("Root object map shown in the object editor's tree browser.")]
+	private LE_ObjectMap ROOT_OBJECT_MAP;
+
+	[SerializeField]
+	[Tooltip("Enable to bring focused objects to the center of the visible screen (not hidden by right menu). On low resolution devices the right menu could use half of the screen. Without the oblique projection only the left half of a big object would be visible, because the right half would be behind the menu.")]
+	private bool IS_OBLIQUE_FOCUS_CENTERING = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the camera will be controlled by the level editor as described in the help popup.")]
+	private bool IS_CAMERA_MOVEMENT = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the terrain editor logic will be initialized and terrain related events handled.")]
+	private bool IS_TERRAIN_EDITOR = true;
+
+	[SerializeField]
+	[Tooltip("If enabled, then the object editor logic will be initialized and object related events handled.")]
+	private bool IS_OBJECT_EDITOR = true;
+
+	[SerializeField]
+	[LE_EnumFlags("Flag enum containing activated key combinations. For example if DUPLICATE is picked then objects will be cloned when Ctrl+D is typed.")]
+	private LE_EKeyCombo ACTIVE_KEY_COMBOS = LE_EKeyCombo.FOCUS | LE_EKeyCombo.DUPLICATE;
+
+	private LE_EEditMode m_editMode;
+
+	private List<LE_GUI3dBase> m_GUI3d = new List<LE_GUI3dBase>();
+
+	private LE_GUI3dTerrain m_GUI3dTerrain;
+
+	private LE_GUI3dObject m_GUI3dObject;
+
+	private List<LE_LogicBase> m_logic = new List<LE_LogicBase>();
+
+	private LE_LogicTerrain m_logicTerrain;
+
+	private LE_LogicLevel m_logicLevel;
+
+	private LE_LogicObjects m_LogicObjects;
+
+	private LE_Input m_input;
+
+	private CPG_CameraPerspectiveGizmo m_cameraPerspectiveGizmo;
+
+	private Vector3 m_camPivot = Vector3.zero;
+
+	private Camera m_cam;
+
+	private Rect m_perspectiveGizmoRect;
+
+	private bool m_isFirstUpdateInitialized;
+
+	private bool m_isSecondUpdateInitialized;
+
+	private Action m_executeWhenReady;
+
+	private int m_lastChangeFrame = -1;
+
+	public LE_EEditMode EditMode => m_editMode;
+
+	public LE_GUI3dTerrain GUI3dTerrain => m_GUI3dTerrain;
+
+	public Vector3 CamPivot
+	{
+		get
+		{
+			return m_camPivot;
+		}
+		set
+		{
+			m_camPivot = value;
+		}
+	}
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	public bool IsReady => m_isFirstUpdateInitialized;
+
+	public int LastChangeFrame => m_lastChangeFrame;
+
+	public void ExecuteWhenReady(Action p_action)
+	{
+		m_executeWhenReady = (Action)Delegate.Combine(m_executeWhenReady, p_action);
+	}
+
+	public static bool SetObliqueFocusProjectionMatrix(bool p_isObliqueProjectionEnabled)
+	{
+		if (LE_GUIInterface.Instance.delegates.GetObliqueCameraPerspectiveRightPixelOffset != null)
+		{
+			if (p_isObliqueProjectionEnabled)
+			{
+				Camera.main.ResetProjectionMatrix();
+				Matrix4x4 projectionMatrix = Camera.main.projectionMatrix;
+				projectionMatrix[0, 2] = LE_GUIInterface.Instance.delegates.GetObliqueCameraPerspectiveRightPixelOffset() / (float)Screen.width;
+				Camera.main.projectionMatrix = projectionMatrix;
+			}
+			else
+			{
+				Camera.main.ResetProjectionMatrix();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	void LE_IInputHandler.SetCursorPosition(Vector3 p_cursorScreenCoords)
+	{
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i].ActiveEditMode == m_editMode && m_GUI3d[i].IsInteractable)
+			{
+				m_GUI3d[i].SetCursorPosition(p_cursorScreenCoords);
+			}
+		}
+	}
+
+	void LE_IInputHandler.SetIsCursorAction(bool p_isCursorAction)
+	{
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i].ActiveEditMode == m_editMode)
+			{
+				m_GUI3d[i].SetIsCursorAction(p_isCursorAction);
+			}
+		}
+	}
+
+	void LE_IInputHandler.MoveCamera(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords, bool scrolling = false)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if ((!scrolling || !IsMouseOverGUI()) && cam != null)
+		{
+			float num = EstimateDistanceToLevel(EEstimateDistanceMode.AVERAGE);
+			Vector3 direction = p_toScreenCoords - p_fromScreenCoords;
+			direction = cam.transform.TransformDirection(direction);
+			Vector3 vector;
+			if (cam.orthographic)
+			{
+				float num2 = Vector3.Dot(direction, cam.transform.forward);
+				direction -= cam.transform.forward * num2;
+				cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - num2 * (cam.orthographicSize / (float)Screen.width), 5f, 1000f);
+				vector = direction * (cam.orthographicSize / (float)Screen.width);
+			}
+			else
+			{
+				vector = direction * (num / (float)Screen.width);
+			}
+			cam.transform.position += vector;
+			cam.transform.position = new Vector3(Mathf.Clamp(cam.transform.position.x, -300f, 300f), Mathf.Clamp(cam.transform.position.y, -100f, 150f), Mathf.Clamp(cam.transform.position.z, -300f, 300f));
+		}
+	}
+
+	void LE_IInputHandler.RotateCamera(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Ray ray = cam.ScreenPointToRay(p_fromScreenCoords);
+			Ray ray2 = cam.ScreenPointToRay(p_toScreenCoords);
+			if (cam.orthographic)
+			{
+				ray.direction = (ray.origin + ray.direction * 100f - cam.transform.position).normalized;
+				ray2.direction = (ray2.origin + ray2.direction * 100f - cam.transform.position).normalized;
+			}
+			float num = Vector3.Angle(ray.direction, ray2.direction);
+			Vector3 normalized = Vector3.Cross(ray.direction, ray2.direction).normalized;
+			float num2 = Mathf.Abs(cam.transform.forward.y);
+			if (num2 > 0.9f)
+			{
+				num2 = (1f - num2) / 0.100000024f;
+				num2 *= num2;
+				float num3 = Vector3.Dot(normalized, cam.transform.right);
+				normalized -= (1f - num2) * (normalized - num3 * cam.transform.right);
+			}
+			cam.transform.Rotate(normalized, 0f - num, Space.World);
+			if (cam.transform.up.y > 0f)
+			{
+				cam.transform.LookAt(cam.transform.position + cam.transform.forward, Vector3.up);
+			}
+			else
+			{
+				cam.transform.LookAt(cam.transform.position + cam.transform.forward, Vector3.down);
+			}
+		}
+	}
+
+	void LE_IInputHandler.RotateCameraAroundPivot(Vector3 p_fromScreenCoords, Vector3 p_toScreenCoords)
+	{
+		if (!IS_CAMERA_MOVEMENT)
+		{
+			return;
+		}
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector2 vector = new Vector2(p_toScreenCoords.x, p_toScreenCoords.y) - new Vector2(p_fromScreenCoords.x, p_fromScreenCoords.y);
+			vector.x /= Screen.width;
+			vector.y /= Screen.height;
+			cam.transform.RotateAround(m_camPivot, cam.transform.right, vector.y * 300f);
+			cam.transform.RotateAround(m_camPivot, cam.transform.up, (0f - vector.x) * 300f);
+			if (cam.transform.up.y > 0f)
+			{
+				cam.transform.LookAt(m_camPivot, Vector3.up);
+			}
+			else
+			{
+				cam.transform.LookAt(m_camPivot, Vector3.down);
+			}
+		}
+	}
+
+	private void Start()
+	{
+		if (LE_GUIInterface.Instance == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: a LE_GUIInterface object must be added to the scene!");
+		}
+		LE_ConfigTerrain lE_ConfigTerrain = GetComponentInChildren<LE_ConfigTerrain>();
+		if (lE_ConfigTerrain == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: a LE_ConfigTerrain component must be added to the game object with the LE_LevelEditorMain script!");
+			lE_ConfigTerrain = gameObject.AddComponent<LE_ConfigTerrain>();
+		}
+		if (!IS_TERRAIN_EDITOR)
+		{
+			if (lE_ConfigTerrain.Brushes.Length != 0)
+			{
+				Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a non empty array for LE_ConfigTerrain.Brushes! This is performance waist and will increase loading time! Remove brushes or reenable terrain editing.");
+			}
+			if (lE_ConfigTerrain.BrushProjector != null)
+			{
+				Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a value for LE_ConfigTerrain.BrushProjector! This is performance waist and will increase loading time! Remove brush projector from scene or reenable terrain editing.");
+			}
+		}
+		Camera cam = Cam;
+		if (cam == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: Start: could not find main camera!");
+		}
+		if (IS_OBJECT_EDITOR)
+		{
+			m_GUI3dObject = gameObject.AddComponent<LE_GUI3dObject>();
+			m_GUI3dObject.TERRAIN_LAYER = 14;
+			LE_GUI3dObject gUI3dObject = m_GUI3dObject;
+			gUI3dObject.OnFocused = (Action<Vector3, float>)Delegate.Combine(gUI3dObject.OnFocused, new Action<Vector3, float>(OnGUI3dObjectFocused));
+			m_GUI3dObject.IsKeyComboFocus = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.FOCUS) != 0;
+			m_GUI3dObject.IsKeyComboDuplicate = (ACTIVE_KEY_COMBOS & LE_EKeyCombo.DUPLICATE) != 0;
+			m_GUI3d.Add(m_GUI3dObject);
+		}
+		m_input = new LE_Input(this);
+		m_camPivot = cam.transform.position + cam.transform.forward * 100f;
+		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Combine(LE_EventInterface.OnChangeLevelData, new EventHandler(OnChangeLevelData));
+		LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+		events.OnEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>)Delegate.Combine(events.OnEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>(OnEditModeBtn));
+		MAP_EDITOR_SEED = StrandedWorld.GetRandowWorldSeed();
+	}
+
+	private void Initialize_InFirstUpdate()
+	{
+		Camera cam = Cam;
+		LE_ConfigTerrain componentInChildren = GetComponentInChildren<LE_ConfigTerrain>();
+		if (LE_GUIInterface.Instance.delegates.IsCursorOverUI == null)
+		{
+			Debug.LogError("LE_LevelEditorMain: you have not setup LE_GUIInterface.delegates.IsCursorOverUI. Terrain might be edited behind UI while the user interacts with the UI, same is true for object placement!");
+		}
+		if (IS_TERRAIN_EDITOR)
+		{
+			m_GUI3dTerrain = gameObject.AddComponent<LE_GUI3dTerrain>();
+			m_GUI3d.Add(m_GUI3dTerrain);
+			InitializeDefaultTerrain(componentInChildren);
+			m_logicTerrain = new LE_LogicTerrain(componentInChildren, m_GUI3dTerrain);
+			m_logic.Add(m_logicTerrain);
+		}
+		else if (componentInChildren.CustomDefaultTerrain != null)
+		{
+			Debug.LogWarning("LE_LevelEditorMain: IS_TERRAIN_EDITOR is set to 'false', but you have provided a value for LE_ConfigTerrain.CustomDefaultTerrain! The value will be ignored!");
+		}
+		m_logicLevel = new LE_LogicLevel(m_GUI3dTerrain, m_GUI3dObject, IS_OBLIQUE_FOCUS_CENTERING);
+		m_logic.Add(m_logicLevel);
+		if (IS_OBJECT_EDITOR)
+		{
+			if (ROOT_OBJECT_MAP == null)
+			{
+				InitializeObjects();
+			}
+			m_LogicObjects = new LE_LogicObjects(m_GUI3dObject, ROOT_OBJECT_MAP);
+			m_logic.Add(m_LogicObjects);
+		}
+		if (cam != null && IS_WITH_CAMERA_PERSPECTIVE_GIZMO)
+		{
+			if (LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset != null)
+			{
+				float num = 0.2f * (float)Screen.width / cam.aspect;
+				float height = 0.2f * (float)Screen.height;
+				m_perspectiveGizmoRect = new Rect((float)Screen.width - LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset() - num, 0f, num, height);
+				if (string.IsNullOrEmpty(LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER)))
+				{
+					Debug.LogWarning("LE_LevelEditorMain: Inspector property 'CAMERA_PERSPECTIVE_GIZMO_LAYER' is set to '" + CAMERA_PERSPECTIVE_GIZMO_LAYER + "', but this layer has no name in 'Tags & Layers' set. Please set the name of this layer to 'CameraPerspectiveGizmo' or change the value of the 'CAMERA_PERSPECTIVE_GIZMO_LAYER' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+				}
+				else if (LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER) != "CameraPerspectiveGizmo")
+				{
+					Debug.LogWarning("LE_LevelEditorMain: Inspector property 'CAMERA_PERSPECTIVE_GIZMO_LAYER' is set to '" + CAMERA_PERSPECTIVE_GIZMO_LAYER + "', but the name of this layer is '" + LayerMask.LayerToName(CAMERA_PERSPECTIVE_GIZMO_LAYER) + "'. Is this intended? If not please set the name of this layer to 'CameraPerspectiveGizmo' or change the value of the 'CAMERA_PERSPECTIVE_GIZMO_LAYER' property! To open the 'Tags & Layers' manager select any game object, in the inspector click on the layer drop down at top right then click on 'Add Layer...'.");
+				}
+				m_cameraPerspectiveGizmo = CPG_CameraPerspectiveGizmo.Create(cam, CAMERA_PERSPECTIVE_GIZMO_LAYER);
+				if (m_cameraPerspectiveGizmo != null)
+				{
+					m_cameraPerspectiveGizmo.transform.position = Vector3.down * -10000f;
+					m_cameraPerspectiveGizmo.OrthoOffset = cam.farClipPlane * 0.2f;
+					cam.cullingMask &= ~(1 << CAMERA_PERSPECTIVE_GIZMO_LAYER);
+					m_cameraPerspectiveGizmo.RelativeScreenSize = 0.2f;
+					float num2 = LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset() / (float)Screen.width;
+					m_cameraPerspectiveGizmo.RelativeScreenPos = new Vector2(1f - 0.1f / cam.aspect - num2, 0.9f);
+					CPG_CameraPerspectiveGizmo cameraPerspectiveGizmo = m_cameraPerspectiveGizmo;
+					cameraPerspectiveGizmo.m_onBeforeSwitchToOrthographic = (EventHandler)Delegate.Combine(cameraPerspectiveGizmo.m_onBeforeSwitchToOrthographic, new EventHandler(OnCameraPerspectiveSwitchToOrthographic));
+					CPG_CameraPerspectiveGizmo cameraPerspectiveGizmo2 = m_cameraPerspectiveGizmo;
+					cameraPerspectiveGizmo2.m_onAfterSwitchToPerspective = (EventHandler)Delegate.Combine(cameraPerspectiveGizmo2.m_onAfterSwitchToPerspective, new EventHandler(OnCameraPerspectiveSwitchToPerspective));
+				}
+			}
+			else
+			{
+				Debug.LogError("LE_LevelEditorMain: LE_GUIInterface.delegates.GetCameraPerspectiveGizmoRightPixelOffset was not set from the UI scripts! The camera perspective gizmo cannot be placed to the right screen position! To set this delegate use 'LE_GUIInterface.Instance.delegates.GetCameraPerspectiveGizmoRightPixelOffset = ...' in one of the Start functions of your scripts!");
+			}
+		}
+		if (IS_OBLIQUE_FOCUS_CENTERING && !SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: true))
+		{
+			Debug.LogError("LE_LevelEditorMain: IS_OBLIQUE_FOCUS_CENTERING is true, but you have not provided the LE_GUIInterface.delegates.GetObliqueCameraPerspectiveRightPixelOffset delegate! Provide it to bring focused objects in the center of the visible (not covered by UI) screen area!");
+		}
+	}
+
+	public void OnObjectEditModeKey(LE_EObjectEditMode editMode)
+	{
+		m_GUI3dObject.ObjectEditMode = editMode;
+	}
+
+	public void OnSelectedObjectDeleteKey()
+	{
+		if (m_GUI3dObject.SelectedObject != null)
+		{
+			if (LE_GUIInterface.Instance.delegates.ShowPopupConfirmDeleteObject != null)
+			{
+				m_LogicObjects.ConfirmDelete();
+			}
+			else
+			{
+				Debug.LogError("LE_LogicObject: OnSelectedObjectDeleteBtn: you have triggered the delete button behaviour, but the LE_GUIInterface.delegates.ShowPopupConfirmDeleteObject delegate is not set! Set this delegate to make the delete button work!");
+			}
+		}
+	}
+
+	public void OnSelectedObjectDuplicateKey()
+	{
+		m_GUI3dObject.CloneObject();
+	}
+
+	public void InitializeObjects()
+	{
+		Debug.Log("LevelEditorMain:: Initializing Editor Objects");
+		List<LE_ObjectMap> list = new List<LE_ObjectMap>();
+		foreach (LE_Object.Categories value in Enum.GetValues(typeof(LE_Object.Categories)))
+		{
+			if (value != LE_Object.Categories.NONE)
+			{
+				LE_ObjectMap lE_ObjectMap = new LE_ObjectMap();
+				lE_ObjectMap.CategoryName = value.GetAttribute<DescriptionAttribute>().Text;
+				lE_ObjectMap.ObjectPrefabs = new List<LE_Object>();
+				list.Add(lE_ObjectMap);
+			}
+		}
+		ROOT_OBJECT_MAP = new LE_ObjectMap();
+		ROOT_OBJECT_MAP.ObjectPrefabs = new List<LE_Object>();
+		Shader.SetGlobalColor("_HighlightRimColor", Color.black);
+		Shader.SetGlobalFloat("_HighlightRimPower", 1f);
+		LE_Object[] componentsInChildren = ObjectInstanceContainer.GetComponentsInChildren<LE_Object>();
+		foreach (LE_Object item in componentsInChildren)
+		{
+			MapObjectReferences.Add(item);
+		}
+		ObjectInstanceContainer.gameObject.SetActive(value: false);
+		foreach (LE_Object mapObjectReference in MapObjectReferences)
+		{
+			if (mapObjectReference.Category == LE_Object.Categories.NONE)
+			{
+				ROOT_OBJECT_MAP.ObjectPrefabs.Add(mapObjectReference);
+			}
+			else
+			{
+				list[(int)(mapObjectReference.Category - 1)].ObjectPrefabs.Add(mapObjectReference);
+			}
+		}
+		foreach (LE_ObjectMap item2 in list)
+		{
+			item2.ObjectPrefabs = item2.ObjectPrefabs.OrderBy((LE_Object go) => go.gameObject.name).ToList();
+			ROOT_OBJECT_MAP.SubObjectMaps.Add(item2);
+		}
+	}
+
+	private void Validate_References()
+	{
+	}
+
+	private void Initialize_InSecondUpdate()
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			Camera cam = Cam;
+			if (cam != null)
+			{
+				SetObliqueFocusProjectionMatrix(!cam.orthographic);
+			}
+		}
+	}
+
+	private void InitializeDefaultTerrain(LE_ConfigTerrain p_LEConfTerrain)
+	{
+		if (p_LEConfTerrain.CustomDefaultTerrain != null && p_LEConfTerrain.CustomDefaultTerrain.terrainData != null)
+		{
+			m_GUI3dTerrain.SetTerrain(p_LEConfTerrain.CustomDefaultTerrain);
+			LE_EventInterface.LevelDataChanged(p_LEConfTerrain.CustomDefaultTerrain.gameObject);
+			if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+			{
+				LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.EDIT);
+			}
+			else
+			{
+				Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to disable the create UI if the default Unity terrain is set!");
+			}
+		}
+		else if (LE_GUIInterface.Instance.delegates.SetTerrainUIMode != null)
+		{
+			LE_GUIInterface.Instance.delegates.SetTerrainUIMode(LE_GUIInterface.Delegates.ETerrainUIMode.CREATE);
+		}
+		else
+		{
+			Debug.LogWarning("LE_LevelEditorMain: you have not set the LE_GUIInterface.delegates.SetTerrainUIMode delegate. You need to set it for example if you want to show the create UI if there is no default Unity terrain set!");
+		}
+	}
+
+	private void Update()
+	{
+		if (m_isFirstUpdateInitialized && !m_isSecondUpdateInitialized)
+		{
+			m_isSecondUpdateInitialized = true;
+			Initialize_InSecondUpdate();
+		}
+		if (!m_isFirstUpdateInitialized)
+		{
+			m_isFirstUpdateInitialized = true;
+			Initialize_InFirstUpdate();
+		}
+		bool flag = IsMouseOverGUI();
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			m_GUI3d[i].IsInteractable = !flag && m_GUI3d[i].ActiveEditMode == m_editMode;
+		}
+		for (int j = 0; j < m_logic.Count; j++)
+		{
+			m_logic[j].Update();
+		}
+		m_input.Update();
+		UpdateCameraPivotPoint();
+		if (m_cameraPerspectiveGizmo != null)
+		{
+			m_cameraPerspectiveGizmo.Pivot = m_camPivot;
+		}
+		if (m_executeWhenReady != null && IsReady)
+		{
+			m_executeWhenReady();
+			m_executeWhenReady = null;
+		}
+	}
+
+	public bool IsMouseOverGUI()
+	{
+		bool flag = LE_GUIInterface.Instance.delegates.IsCursorOverUI != null && LE_GUIInterface.Instance.delegates.IsCursorOverUI();
+		bool flag2 = false;
+		if (IS_WITH_CAMERA_PERSPECTIVE_GIZMO && !flag)
+		{
+			Vector3 mousePosition = Input.mousePosition;
+			mousePosition.y = Mathf.Clamp((float)Screen.height - mousePosition.y, 0f, Screen.height);
+			mousePosition.x = Mathf.Clamp(mousePosition.x, 0f, Screen.width);
+			flag2 = m_perspectiveGizmoRect.Contains(mousePosition);
+		}
+		return flag | flag2;
+	}
+
+	private void OnGUI3dObjectFocused(Vector3 p_focusOn, float p_distance)
+	{
+		m_camPivot = p_focusOn;
+		Camera cam = Cam;
+		if (cam != null && cam.orthographic && m_cameraPerspectiveGizmo != null)
+		{
+			cam.transform.position = m_camPivot - cam.transform.forward * Mathf.Abs(m_cameraPerspectiveGizmo.OrthoOffset + p_distance);
+			cam.orthographicSize = p_distance;
+		}
+	}
+
+	protected override void OnDestroy()
+	{
+		LE_EventInterface.OnChangeLevelData = (EventHandler)Delegate.Remove(LE_EventInterface.OnChangeLevelData, new EventHandler(OnChangeLevelData));
+		if (LE_GUIInterface.Instance != null)
+		{
+			LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+			events.OnEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>)Delegate.Remove(events.OnEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.EditModeEventArgs>(OnEditModeBtn));
+		}
+		for (int i = 0; i < m_GUI3d.Count; i++)
+		{
+			if (m_GUI3d[i] is LE_GUI3dObject)
+			{
+				((LE_GUI3dObject)m_GUI3d[i]).OnFocused = null;
+			}
+		}
+		m_executeWhenReady = null;
+		if (m_input != null)
+		{
+			m_input.Destroy();
+		}
+		for (int j = 0; j < m_logic.Count; j++)
+		{
+			m_logic[j].Destroy();
+		}
+		base.OnDestroy();
+	}
+
+	private void OnChangeLevelData(object p_sender, EventArgs p_args)
+	{
+		m_lastChangeFrame = Time.frameCount;
+	}
+
+	private void OnEditModeBtn(object p_sender, LE_GUIInterface.EventHandlers.EditModeEventArgs p_args)
+	{
+		m_editMode = p_args.EditMode;
+		if (m_editMode != LE_EEditMode.TERRAIN && m_GUI3dTerrain != null)
+		{
+			m_GUI3dTerrain.HideCursor();
+		}
+		if (m_editMode != LE_EEditMode.OBJECT && m_GUI3dObject != null)
+		{
+			m_GUI3dObject.RemoveSelection();
+		}
+		if (m_editMode != LE_EEditMode.NONE)
+		{
+			_screenShotCamera.SetActive(value: false);
+		}
+		else
+		{
+			_screenShotCamera.SetActive(value: true);
+		}
+	}
+
+	private void OnCameraPerspectiveSwitchToOrthographic(object p_sender, EventArgs p_args)
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: false);
+		}
+		if (m_cameraPerspectiveGizmo != null)
+		{
+			float value = EstimateDistanceToLevel(EEstimateDistanceMode.NEAREST);
+			Camera cam = Cam;
+			if (cam != null)
+			{
+				cam.orthographicSize = Mathf.Clamp(value, 5f, 60f);
+			}
+		}
+	}
+
+	private void OnCameraPerspectiveSwitchToPerspective(object p_sender, EventArgs p_args)
+	{
+		if (IS_OBLIQUE_FOCUS_CENTERING)
+		{
+			SetObliqueFocusProjectionMatrix(p_isObliqueProjectionEnabled: true);
+		}
+	}
+
+	private void UpdateCameraPivotPoint()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 rhs = m_camPivot - cam.transform.position;
+			float num = Vector3.Dot(cam.transform.forward, rhs);
+			if (num < 1f)
+			{
+				float num2 = num - 1.5f;
+				m_camPivot = cam.transform.position - cam.transform.forward * num2;
+				rhs = m_camPivot - cam.transform.position;
+				num = Vector3.Dot(cam.transform.forward, rhs);
+			}
+			if (Vector3.Cross(cam.transform.forward, rhs).magnitude > 1f)
+			{
+				m_camPivot = cam.transform.position + cam.transform.forward * num;
+			}
+		}
+	}
+
+	private float EstimateDistanceToLevel(EEstimateDistanceMode p_mode)
+	{
+		float result = 300f;
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			float num = 0f;
+			Vector3 vector = Vector3.zero;
+			float num2 = float.MaxValue;
+			for (float num3 = 0f; num3 < 2f; num3++)
+			{
+				for (float num4 = 0f; num4 < 2f; num4++)
+				{
+					if (!Physics.Raycast(cam.ScreenPointToRay(new Vector3(cam.rect.width * (float)Screen.width * (0.25f + 0.5f * num3), cam.rect.height * (float)Screen.height * (0.25f + 0.5f * num4), 0f)), out var hitInfo))
+					{
+						continue;
+					}
+					num++;
+					if (p_mode == EEstimateDistanceMode.AVERAGE)
+					{
+						vector += hitInfo.point;
+						continue;
+					}
+					float magnitude = (hitInfo.point - cam.transform.position).magnitude;
+					if (num2 > magnitude)
+					{
+						num2 = magnitude;
+						vector = hitInfo.point;
+					}
+				}
+			}
+			if (num > 0f)
+			{
+				if (p_mode == EEstimateDistanceMode.AVERAGE)
+				{
+					vector /= num;
+				}
+				result = (vector - cam.transform.position).magnitude;
+			}
+		}
+		return result;
+	}
+
+	public void ClearLevel()
+	{
+		foreach (Transform item in ObjectDumpContainer)
+		{
+			UnityEngine.Object.Destroy(item.gameObject);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 387
+PATH: Assembly-CSharp__LE_LevelEditor__LE_ZoneTileGenerator.cs
+SIZE: 4902 bytes
+SHA256: 621bbdfa03f6331ef1bfd1f3723d491f8933a337ce3221d52ddce3074a541013
+====================================================================================================
+
+using Beam;
+using Beam.Terrain;
+using Ceto;
+using LE_LevelEditor.UI;
+using UnityEngine;
+
+namespace LE_LevelEditor;
+
+public class LE_ZoneTileGenerator : Singleton<LE_ZoneTileGenerator>
+{
+	public Terrain terrain;
+
+	private AddWaveOverlay _waveOverlay;
+
+	private void Start()
+	{
+		InvokeRepeating("GenerateShoreMap", 0f, 10f);
+	}
+
+	public void GenerateHeightmapFromTexture(Texture2D heightmap)
+	{
+		terrain.terrainData.SetHeights(0, 0, MapTools.GetHeightsFromTexture(heightmap));
+	}
+
+	public void GenerateShoreMap()
+	{
+		if (Singleton<LE_LevelEditorMain>.Instance.EditMode == LE_EEditMode.TERRAIN)
+		{
+			Texture2D height = WorldTools.CreateHeightMapTexture(terrain.terrainData);
+			Texture2D shore = WorldTools.CreateShoreMaskTexture(terrain.terrainData);
+			AddWaveOverlay(terrain.gameObject, height, shore);
+		}
+	}
+
+	public void GenerateRandomIsland()
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		int randowWorldSeed = StrandedWorld.GetRandowWorldSeed();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.GenerateZoneHeightmap(Zone.BiomeType.ISLAND, randowWorldSeed));
+	}
+
+	public void GenerateAdvancedPerlin(int freq, float amplitude, int octaves, float blend)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.PerlinGenerator(terrain.terrainData.GetHeights(0, 0, 257, 257), Random.Range(1, 99999999), freq, amplitude, octaves, blend));
+	}
+
+	public void GenerateAdvancedNormalise(float min, float max, float blend)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, WorldTools.NormalizeHeightmap(terrain.terrainData.GetHeights(0, 0, 257, 257), min, max, blend));
+	}
+
+	public void GenerateSmooth()
+	{
+		terrain.terrainData.SetHeights(0, 0, WorldTools.SmoothTerrain(terrain.terrainData.GetHeights(0, 0, 257, 257), 2, 0.25f, Zone.BiomeType.ISLAND));
+	}
+
+	private Texture2D CreateHeightMapTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				float num = terrain.GetHeight(i, j) + -100f;
+				Color color = Color.Lerp(Color.black, Color.white, Mathf.Clamp01((num + 10f) / 10f));
+				Color color2 = ((num > 0f) ? Color.white : color);
+				texture2D.SetPixel(i, j, color2);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	private Texture2D CreateShoreMaskTexture(TerrainData terrain)
+	{
+		int heightmapResolution = terrain.heightmapResolution;
+		int heightmapResolution2 = terrain.heightmapResolution;
+		Texture2D texture2D = new Texture2D(heightmapResolution, heightmapResolution2, TextureFormat.RGB24, mipChain: false, linear: false);
+		int num = -100;
+		for (int i = 0; i < heightmapResolution; i++)
+		{
+			for (int j = 0; j < heightmapResolution2; j++)
+			{
+				Color color = ((terrain.GetHeight(i, j) + (float)num >= 0f) ? Color.white : Color.black);
+				texture2D.SetPixel(i, j, color);
+			}
+		}
+		texture2D.Apply();
+		return texture2D;
+	}
+
+	private void AddWaveOverlay(GameObject zone, Texture2D height, Texture2D shore)
+	{
+		if ((bool)_waveOverlay)
+		{
+			Object.Destroy(_waveOverlay.heightTexture.tex);
+			Object.Destroy(_waveOverlay.heightTexture.mask);
+			Object.Destroy(_waveOverlay.normalTexture.tex);
+			Object.Destroy(_waveOverlay.normalTexture.mask);
+			Object.Destroy(_waveOverlay.foamTexture.tex);
+			Object.Destroy(_waveOverlay.foamTexture.mask);
+			Object.Destroy(_waveOverlay.gameObject);
+		}
+		GameObject gameObject = new GameObject("WaveOverlay");
+		gameObject.transform.parent = zone.transform;
+		gameObject.transform.position = new Vector3(0f, 0f, 0f);
+		_waveOverlay = gameObject.AddComponent<AddWaveOverlay>();
+		_waveOverlay.width = 250f;
+		_waveOverlay.height = 250f;
+		_waveOverlay.heightTexture = new OverlayHeightTexture();
+		_waveOverlay.heightTexture.tex = shore;
+		_waveOverlay.heightTexture.mask = height;
+		_waveOverlay.heightTexture.alpha = 0f;
+		_waveOverlay.heightTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		_waveOverlay.normalTexture = new OverlayNormalTexture();
+		_waveOverlay.normalTexture.tex = shore;
+		_waveOverlay.normalTexture.mask = height;
+		_waveOverlay.normalTexture.alpha = 0f;
+		_waveOverlay.normalTexture.maskAlpha = 0.4f;
+		_waveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+		_waveOverlay.foamTexture = new OverlayFoamTexture();
+		_waveOverlay.foamTexture.tex = shore;
+		_waveOverlay.foamTexture.mask = height;
+		_waveOverlay.foamTexture.alpha = 0.4f;
+		_waveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+	}
+
+	public void LoadMap(Map map)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+		terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 388
+PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceTrigger.cs
+SIZE: 1576 bytes
+SHA256: a3eb1c83d2e308d4aa8b8068e1f2625d7e074796353e96efd61e2a028227fa30
+====================================================================================================
+
+using UnityEngine;
+
+namespace LS_LevelStreaming;
+
+public class LS_DistanceTrigger : LS_ITrigger
+{
+	private int m_updateFrequency;
+
+	private Transform m_playerOrCameraTransform;
+
+	private Transform m_triggeredObjectTransform;
+
+	private float m_spawnDistance;
+
+	private float m_despawnDistance;
+
+	private bool m_isVisible;
+
+	private int m_updateCounter;
+
+	public LS_DistanceTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, Transform p_triggeredObjectTransform, float p_spawnDistance, float p_despawnDistance)
+	{
+		m_updateFrequency = p_updateFrequency;
+		if (m_updateFrequency > 0)
+		{
+			m_updateCounter = Random.Range(0, m_updateFrequency);
+		}
+		m_playerOrCameraTransform = p_playerOrCameraTransform;
+		m_triggeredObjectTransform = p_triggeredObjectTransform;
+		m_spawnDistance = p_spawnDistance;
+		m_despawnDistance = p_despawnDistance;
+		if (m_triggeredObjectTransform != null)
+		{
+			m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
+		}
+	}
+
+	bool LS_ITrigger.IsVisible()
+	{
+		if (m_updateCounter <= 0)
+		{
+			m_updateCounter = m_updateFrequency;
+			if (m_playerOrCameraTransform != null && m_triggeredObjectTransform != null)
+			{
+				m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
+				float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectTransform.position).magnitude;
+				if (m_spawnDistance >= magnitude)
+				{
+					m_isVisible = true;
+				}
+				else if (m_despawnDistance <= magnitude)
+				{
+					m_isVisible = false;
+				}
+			}
+		}
+		else
+		{
+			m_updateCounter--;
+		}
+		return m_isVisible;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 389
+PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceUpdatedTrigger.cs
+SIZE: 2130 bytes
+SHA256: 672ba0d3c7ed2bf02058e18807497729c0bd90e216b7ec03109cf4d047af3689
+====================================================================================================
+
+using UnityEngine;
+
+namespace LS_LevelStreaming;
+
+public class LS_DistanceUpdatedTrigger : LS_ITriggerByUpdatedPosition, LS_ITrigger
+{
+	private int m_updateFrequency;
+
+	private Transform m_playerOrCameraTransform;
+
+	private Vector3 m_triggeredObjectPosition;
+
+	private float m_spawnDistance;
+
+	private float m_despawnDistance;
+
+	private bool m_isAlwaysVisibleWithOrthoCam;
+
+	private bool m_isVisible;
+
+	private int m_updateCounter;
+
+	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance, bool p_isAlwaysVisibleWithOrthoCam)
+		: this(p_updateFrequency, p_playerOrCameraTransform, p_spawnDistance, p_despawnDistance)
+	{
+		m_isAlwaysVisibleWithOrthoCam = p_isAlwaysVisibleWithOrthoCam;
+	}
+
+	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance)
+	{
+		m_updateFrequency = p_updateFrequency;
+		if (m_updateFrequency > 0)
+		{
+			m_updateCounter = Random.Range(0, m_updateFrequency);
+		}
+		m_playerOrCameraTransform = p_playerOrCameraTransform;
+		m_spawnDistance = p_spawnDistance;
+		m_despawnDistance = p_despawnDistance;
+		m_isVisible = false;
+	}
+
+	void LS_ITriggerByUpdatedPosition.Update(Vector3 p_newPosition)
+	{
+		m_triggeredObjectPosition = p_newPosition;
+	}
+
+	bool LS_ITrigger.IsVisible()
+	{
+		if (m_updateCounter <= 0)
+		{
+			m_updateCounter = m_updateFrequency;
+			if (m_playerOrCameraTransform != null)
+			{
+				bool flag = false;
+				if (m_isAlwaysVisibleWithOrthoCam)
+				{
+					Camera component = m_playerOrCameraTransform.GetComponent<Camera>();
+					if (component != null && component.orthographic)
+					{
+						flag = true;
+					}
+				}
+				if (flag)
+				{
+					m_isVisible = true;
+				}
+				else
+				{
+					float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectPosition).magnitude;
+					if (m_spawnDistance >= magnitude)
+					{
+						m_isVisible = true;
+					}
+					else if (m_despawnDistance <= magnitude)
+					{
+						m_isVisible = false;
+					}
+				}
+			}
+		}
+		else
+		{
+			m_updateCounter--;
+		}
+		return m_isVisible;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 390
+PATH: Assembly-CSharp__Ladders.cs
+SIZE: 1116 bytes
+SHA256: b1590f70ea7530959d91374dfe4788d4869939fa2588b5b38589786a9d245061
+====================================================================================================
+
+using Beam;
+using Beam.Utilities;
+using UnityEngine;
+
+public class Ladders : MonoBehaviour
+{
+	public bool isTree;
+
+	public Transform LandPos;
+
+	[HideInInspector]
+	public BoxCollider LadderCollider;
+
+	private void Awake()
+	{
+		LadderCollider = GetComponent<BoxCollider>();
+	}
+
+	private void OnTriggerEnter(Collider collided)
+	{
+		if (collided.CompareTag("Player"))
+		{
+			IPlayer ladder = collided.GetInterface<IPlayer>();
+			SetLadder(ladder);
+		}
+	}
+
+	private void OnTriggerExit(Collider collided)
+	{
+		if (collided.CompareTag("Player"))
+		{
+			IPlayer player = collided.GetInterface<IPlayer>();
+			ResetLadder(player);
+		}
+	}
+
+	private void SetLadder(IPlayer player)
+	{
+		if (!player.IsNullOrDestroyed())
+		{
+			player.Movement.activeLadder = this;
+		}
+	}
+
+	private void ResetLadder(IPlayer player)
+	{
+		if (!player.IsNullOrDestroyed() && player.Movement.activeLadder == this)
+		{
+			if (player.Movement.ClimbingLadder)
+			{
+				player.Movement.CharacterController.Move(-player.Movement.transform.forward * 1f + player.Movement.transform.up * 0.2f * Time.deltaTime);
+			}
+			player.Movement.ExitLadder();
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 391
+PATH: Assembly-CSharp__LandAnimalSpawner.cs
+SIZE: 4461 bytes
+SHA256: be8f8a065eebffd746526dfb0f93d29dbe6491a90d16c429d77276ed7657b8f1
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Crafting;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class LandAnimalSpawner : SaveablePrefab
+{
+	[SerializeField]
+	private GameObject _landCreature;
+
+	private LandAnimal _activeCreature;
+
+	[SerializeField]
+	private bool _canRespawn;
+
+	[SerializeField]
+	private bool _ignoreRemovedWildLifeSetting;
+
+	private bool _removedWildlifeSetting;
+
+	[SerializeField]
+	private int _respawnHours;
+
+	private int _respawningTimer = -1;
+
+	private DateTime _lastPollTime;
+
+	private void Start()
+	{
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
+		}
+		if (_activeCreature.IsNullOrDestroyed())
+		{
+			PollSpawn();
+		}
+	}
+
+	private void SetDifficultyParams()
+	{
+		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
+	}
+
+	private void OnDestroy()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
+		}
+	}
+
+	private void GameTime_HourTick()
+	{
+		if (_activeCreature.IsNullOrDestroyed())
+		{
+			_respawningTimer++;
+			PollSpawn();
+		}
+	}
+
+	private void PollSpawn()
+	{
+		if (Game.Mode.IsClient())
+		{
+			return;
+		}
+		SetDifficultyParams();
+		if (_removedWildlifeSetting && !_ignoreRemovedWildLifeSetting)
+		{
+			return;
+		}
+		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+		if (player != null)
+		{
+			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < 20f;
+			if (((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == -1) && !SpawnerInsideStructure())
+			{
+				_respawningTimer = 0;
+				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_landCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
+				_activeCreature = gameObject.GetComponent<LandAnimal>();
+			}
+		}
+	}
+
+	private bool SpawnerInsideStructure()
+	{
+		if (BeamPhysics.GetComponentsInSphere<Constructing>(transform.position, 1.5f, (1 << Layers.CONSTRUCTIONS) | (1 << Layers.CONSTRUCTIONS_SMALL)).Count > 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
+	{
+		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
+		_lastPollTime = GameTime.Now;
+		jObject.AddField("lastPollTime", JSerializer.Serialize(_lastPollTime));
+		if (!_activeCreature.IsNullOrDestroyed())
+		{
+			InteractiveObject component = _activeCreature.GetComponent<InteractiveObject>();
+			if (!component.IsNullOrDestroyed())
+			{
+				jObject.AddField("ActiveAnimal", component.ReferenceId.ToString());
+			}
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			int value = data.GetField("respawnCounter").GetValue<int>();
+			_respawningTimer = value;
+			JObject field = data.GetField("lastPollTime");
+			if (field != null)
+			{
+				_lastPollTime = JSerializer.Deserialize<DateTime>(field);
+				int num = (int)GameTime.GetHoursSince(_lastPollTime);
+				if (_respawningTimer > 0)
+				{
+					_respawningTimer += num;
+				}
+			}
+			JObject activeAnimalData = data.GetField("ActiveAnimal");
+			if (activeAnimalData != null)
+			{
+				LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+				{
+					InteractiveObject interactiveObject = MultiplayerMng.FindObject<InteractiveObject>(activeAnimalData.GetValue<string>().ToMiniGuid());
+					if (!interactiveObject.IsNullOrDestroyed())
+					{
+						LandAnimal component = interactiveObject.GetComponent<LandAnimal>();
+						if (!component.IsNullOrDestroyed())
+						{
+							_activeCreature = component;
+							_activeCreature.StartingPosition = transform.position;
+							Initialize();
+						}
+					}
+				});
+				return;
+			}
+		}
+		Initialize();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 392
+PATH: Assembly-CSharp__LevelLoader.cs
+SIZE: 26669 bytes
+SHA256: cfdb0ccbbeb6a8a50c04987f708d0ca4c9bc67e47b48d2cae2d3de7f2b2057b5
+====================================================================================================
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using Beam.Crafting;
+using Beam.Events;
+using Beam.Language;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Terrain;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using Rewired;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class LevelLoader : MonoBehaviour, ILoader
+{
+	private static LevelLoader _Instance;
+
+	private bool _creating;
+
+	private Stack<ILoader> _loaders = new Stack<ILoader>();
+
+	private ILoader _currentLoader;
+
+	private HashSet<int> _hashCodes = new HashSet<int>();
+
+	private HashSet<Zone> _loadingZones = new HashSet<Zone>();
+
+	private List<Action> _deferredLoading = new List<Action>();
+
+	private List<Action> _postLoading = new List<Action>();
+
+	private List<Action> _physicalLoading = new List<Action>();
+
+	private Transform _loadingContainer;
+
+	private CoroutineHandle _loadingSequence;
+
+	private bool _isLoadingScene;
+
+	private CoroutineHandle _serverJoinInProgress;
+
+	private JObject _serverClientCopy;
+
+	private CoroutineHandle _syncWorldCoroutine;
+
+	private CoroutineHandle _syncWorldCoroutineSend;
+
+	private CoroutineHandle _syncWorldCoroutineRecv;
+
+	private CoroutineHandle _syncSaveCoroutine;
+
+	private CoroutineHandle _syncSaveCoroutineSend;
+
+	private CoroutineHandle _syncSaveCoroutineRecv;
+
+	public static LevelLoader Instance
+	{
+		get
+		{
+			if (_Instance == null && !Game.IsQuitting)
+			{
+				_Instance = new GameObject("~LevelLoader").AddComponent<LevelLoader>();
+				_Instance.transform.SetAsFirstSibling();
+				_Instance.transform.position = Vector3.zero;
+				_Instance.transform.rotation = Quaternion.identity;
+			}
+			return _Instance;
+		}
+	}
+
+	public static bool IsCreatingOrLoading
+	{
+		get
+		{
+			if ((!Instance || !Instance._creating) && !IsLoading())
+			{
+				if ((bool)Singleton<StrandedWorld>.Instance && Singleton<StrandedWorld>.Instance.ZoneLoader != null)
+				{
+					return Singleton<StrandedWorld>.Instance.ZoneLoader.IsGenerating;
+				}
+				return false;
+			}
+			return true;
+		}
+	}
+
+	public static ILoader CurrentLoader
+	{
+		get
+		{
+			return Instance._currentLoader;
+		}
+		set
+		{
+			Instance.SetCurrentLoader(value);
+		}
+	}
+
+	bool ILoader.IsLoading { get; set; }
+
+	public ICollection<int> HashCodes => _hashCodes;
+
+	public ICollection<Zone> LoadingZones => _loadingZones;
+
+	public IList<Action> DeferredLoading => _deferredLoading;
+
+	public IList<Action> PostLoading => _postLoading;
+
+	public IList<Action> PhysicalLoading => _physicalLoading;
+
+	public Transform LoadingContainer => _loadingContainer;
+
+	public JObject ServerClientCopy
+	{
+		get
+		{
+			return _serverClientCopy;
+		}
+		set
+		{
+			_serverClientCopy = value;
+		}
+	}
+
+	public static bool IsServerJoinInProgress => Instance?._serverJoinInProgress.IsRunning ?? false;
+
+	public static bool IsLoading()
+	{
+		return CurrentLoader?.IsLoading ?? false;
+	}
+
+	public static bool IsLoading(GameObject gameObject)
+	{
+		if (IsLoading())
+		{
+			return Instance.HashCodes.Contains(gameObject.GetHashCode());
+		}
+		return false;
+	}
+
+	public static bool IsLoadingScene()
+	{
+		return Instance._isLoadingScene;
+	}
+
+	private void SetCurrentLoader(ILoader value)
+	{
+		if (value == null)
+		{
+			ILoader currentLoader = null;
+			if (_loaders.Count > 0)
+			{
+				currentLoader = _loaders.Pop();
+			}
+			_currentLoader = currentLoader;
+		}
+		else
+		{
+			if (!_currentLoader.IsNullOrDestroyed())
+			{
+				_loaders.Push(_currentLoader);
+			}
+			_currentLoader = value;
+		}
+	}
+
+	public static bool IsPlayable()
+	{
+		if (!IsLoading())
+		{
+			return PlayerUtilities.AllPlayersPresent();
+		}
+		return false;
+	}
+
+	public static bool IsClientJoinInProgress()
+	{
+		if (Game.Mode.IsClient())
+		{
+			return MultiplayerMng.ServerGameState.IsGame();
+		}
+		return false;
+	}
+
+	private void Awake()
+	{
+		if ((bool)_Instance)
+		{
+			BeamTeam.Destroy(gameObject);
+			return;
+		}
+		_Instance = this;
+		Debug.Log(string.Format("{0}:: Created instance, #{1}", "LevelLoader", GetHashCode()));
+		UnityEngine.Object.DontDestroyOnLoad(gameObject);
+		_loadingContainer = new GameObject("LoadingContainer").transform;
+		_loadingContainer.gameObject.SetActive(value: false);
+		_loadingContainer.parent = _Instance.transform;
+		_loadingContainer.transform.position = Vector3.zero;
+		_loadingContainer.transform.rotation = Quaternion.identity;
+		EventManager.AddListener<PlayerConnectedEvent>(OnConnect);
+		EventManager.AddListener<PlayerDisconnectedEvent>(OnDisconnect);
+		SceneManager.sceneLoaded += SceneManager_SceneLoaded;
+	}
+
+	private void OnDestroy()
+	{
+		_loaders.Clear();
+		_currentLoader = null;
+		BeamTeam.Destroy(_loadingContainer.gameObject);
+		EventManager.RemoveListener<PlayerConnectedEvent>(OnConnect);
+		EventManager.RemoveListener<PlayerDisconnectedEvent>(OnDisconnect);
+		SceneManager.sceneLoaded -= SceneManager_SceneLoaded;
+	}
+
+	private void SceneManager_SceneLoaded(Scene scene, LoadSceneMode mode)
+	{
+		if (scene.buildIndex == 1)
+		{
+			Debug.Log("LevelLoader:: Destroying instance...");
+			BeamTeam.Destroy(gameObject);
+		}
+	}
+
+	private void OnConnect(PlayerConnectedEvent @event)
+	{
+		if (!Game.State.IsMenu() && Game.Mode.IsServer() && @event.PlayerId == 1 && !_loadingSequence.IsRunning)
+		{
+			_serverJoinInProgress = Timing.RunCoroutine(ServerJoinInProgress());
+		}
+	}
+
+	private void OnDisconnect(PlayerDisconnectedEvent @event)
+	{
+		if (!Game.State.IsMenu())
+		{
+			Debug.LogError($"OnDisconnect {@event.PlayerId} {Game.State} Loading: {_loadingSequence.IsRunning} Join {_serverJoinInProgress.IsRunning}");
+			if (Game.Mode.IsServer() && IsInNormalGameplay())
+			{
+				UpdateServerClientCopy(PlayerUtilities.GetPlayerFromId(1));
+			}
+			Timing.RunCoroutine(OnDisconnect_Sequence(@event));
+		}
+	}
+
+	private bool IsInNormalGameplay()
+	{
+		if (!_serverJoinInProgress.IsRunning)
+		{
+			return !_loadingSequence.IsRunning;
+		}
+		return false;
+	}
+
+	private IEnumerator<float> OnDisconnect_Sequence(PlayerDisconnectedEvent @event)
+	{
+		yield return 0f;
+		if (Game.Mode.IsServer() && @event.PlayerId == 1)
+		{
+			if (_serverJoinInProgress.IsRunning)
+			{
+				_serverJoinInProgress.IsRunning = false;
+				StopSync();
+			}
+			else if (_loadingSequence.IsRunning)
+			{
+				StopSync();
+			}
+		}
+		bool hostDisconnected = @event.PlayerId == 0;
+		if (hostDisconnected)
+		{
+			Timing.KillCoroutines();
+		}
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		if (player.IsValid() && @event.TryGetDisconnectDialog(out var title, out var content))
+		{
+			player.SetAndCacheMapsEnabled(state: false, 0);
+			player.SetAndCacheMapsEnabled(state: true, 16);
+			player.SetCursorEnabled(enabled: true);
+			DialogueBox.Show(player, title, content, DialogueButton.Ok, DialogueIcon.Warning).Accept += () =>
+			{
+				if (hostDisconnected)
+				{
+					StartCoroutine(QuitToMenu_Sequence());
+				}
+			};
+		}
+		else if (hostDisconnected)
+		{
+			StartCoroutine(QuitToMenu_Sequence());
+		}
+	}
+
+	private void StopSync()
+	{
+		_syncSaveCoroutine.IsRunning = false;
+		_syncSaveCoroutineSend.IsRunning = false;
+		_syncSaveCoroutineRecv.IsRunning = false;
+		_syncWorldCoroutine.IsRunning = false;
+		_syncWorldCoroutineSend.IsRunning = false;
+		_syncWorldCoroutineRecv.IsRunning = false;
+	}
+
+	public void ShutdownToMainMenu()
+	{
+		Timing.KillCoroutines();
+		StartCoroutine(QuitToMenu_Sequence());
+	}
+
+	private IEnumerator QuitToMenu_Sequence()
+	{
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_CLEANING_UP"));
+		yield return 0f;
+		MainMenuPresenter.Instance.QuitToMenu();
+	}
+
+	public void UpdateServerClientCopy(IPlayer client)
+	{
+		if (client.IsNullOrDestroyed())
+		{
+			return;
+		}
+		try
+		{
+			_serverClientCopy = new JObject().Set(string.Format("Persistent/{0}/#{1}", "PlayerRegistry", client.Id), SavingUtilities.Save(client).Clear("Movement"));
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Error in UpdateServerClientCopy\n" + ex.Message + "\n" + ex.StackTrace);
+		}
+	}
+
+	public void PatchServerClientCopy(JObject save)
+	{
+		if (!Game.Mode.IsClient() && !_serverClientCopy.IsNullOrDestroyed() && !save.IsNullOrDestroyed())
+		{
+			string path = "Persistent/PlayerRegistry/#1";
+			if (!save.Get(path).IsValid())
+			{
+				save.Clear(path).ApplyPatch(_serverClientCopy);
+			}
+		}
+	}
+
+	private IEnumerator<float> ServerJoinInProgress()
+	{
+		yield return BeamTiming.WaitForPeer(1, 10f);
+		if (PlayerUtilities.GetPeerFromId(1).IsNullOrDestroyed())
+		{
+			yield break;
+		}
+		EventManager.RaiseEvent(new ServerJoinInProgressStarted());
+		EventManager.EventDelegate<PlayerDisconnectedEvent> onDisconnect = null;
+		onDisconnect = (PlayerDisconnectedEvent @event) =>
+		{
+			if (@event.PlayerId == 1)
+			{
+				EventManager.RemoveListener(onDisconnect);
+				Singleton<GameTime>.Instance.Paused = false;
+				Physics.autoSimulation = true;
+				--PlayerRegistry.LocalPlayer.Movement.IsBusy;
+				PlayerRegistry.LocalPlayer.Input.SetAndCacheMapsEnabled(state: true, PlayerRegistry.LocalPlayer.Input.GetCurrentMapId());
+				PlayerRegistry.LocalPlayer.PlayerUI.Refresh(RefreshUIMode.Clear);
+				MainMenuPresenter.Instance.LoadingScreenPresenter.Hide();
+				Singleton<Fader>.Instance.FadeIn(0.1f);
+				AudioListener.volume = 1f;
+				PlayerRegistry.LocalPeer.SetTimeout(Peer.GetDefaultTimeout());
+				MultiplayerWorldSync.Instance?.Reset();
+				EventManager.RaiseEvent(new ServerJoinInProgressEnded(PlayerRegistry.IsClientPeerValid));
+			}
+		};
+		while (IsLoading())
+		{
+			yield return 0f;
+		}
+		EventManager.AddListener(onDisconnect);
+		Singleton<GameTime>.Instance.Paused = true;
+		Physics.autoSimulation = false;
+		Singleton<Fader>.Instance.FadeOut(0.1f);
+		AudioListener.volume = 0f;
+		MainMenuPresenter.Instance.LoadingScreenPresenter.Show();
+		++PlayerRegistry.LocalPlayer.Movement.IsBusy;
+		yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		JObject save = new JObject();
+		JObject persistent = new JObject();
+		bool succeeded = true;
+		yield return Timing.WaitUntilDone(Timing.Instance.RunCoroutine(SaveManager.GenerateSave_Sequence(save, persistent), (Exception ex) =>
+		{
+			if (ex != null)
+			{
+				succeeded = false;
+				Debug.LogException(ex);
+			}
+		}));
+		if (succeeded)
+		{
+			yield return Timing.WaitUntilDone(SyncSave_Async((JObject saveData) =>
+			{
+				persistent = SaveManager.GetPersistentData(saveData);
+			}, save));
+			yield return Timing.WaitUntilDone(SyncWorld_Async(serverLoadWorld: false));
+			yield return BeamTiming.WaitForAllPlayers();
+			PlayerRegistry.InitializeReplicants();
+			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ServerJoinInProgress_LoadPlayerReplicant(persistent)));
+			yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.FinishLoading));
+			onDisconnect(new PlayerDisconnectedEvent(1, null));
+		}
+	}
+
+	private IEnumerator<float> ServerJoinInProgress_LoadPlayerReplicant(JObject persistent)
+	{
+		IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(1);
+		if (playerFromId.IsNullOrDestroyed())
+		{
+			yield break;
+		}
+		StorageLoader storageLoader = new StorageLoader
+		{
+			IsLoading = true
+		};
+		CurrentLoader = storageLoader;
+		if (persistent.IsValid())
+		{
+			JObject jObject = persistent.Get("PlayerRegistry");
+			if (jObject.IsValid() && jObject.Children.IsValid() && jObject.Children.Count > 1)
+			{
+				JObject jObject2 = jObject.Children[1];
+				if (jObject2.IsValid() && !jObject2.IsNull())
+				{
+					SavingUtilities.Load(playerFromId, jObject2);
+				}
+			}
+		}
+		Zone zone = StrandedWorld.GetZone(PlayerRegistry.LocalPlayer.transform.position);
+		int numLoadedZones = (zone ? 1 : 0);
+		if (!persistent.Get("StrandedWorld/Zones").GetZoneData(Singleton<StrandedWorld>.Instance.NmlZone.Id).GetField("Objects")
+			.IsNull())
+		{
+			numLoadedZones++;
+		}
+		for (int i = 0; i < numLoadedZones; i++)
+		{
+			yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.ProcessLoading));
+		}
+		for (int j = 0; j < storageLoader.DeferredLoading.Count; j++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(storageLoader.DeferredLoading[j]);
+		}
+		for (int k = 0; k < storageLoader.PostLoading.Count; k++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(storageLoader.PostLoading[k]);
+		}
+		for (int l = 0; l < storageLoader.PhysicalLoading.Count; l++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(storageLoader.PhysicalLoading[l]);
+		}
+		storageLoader.IsLoading = false;
+		CurrentLoader = null;
+	}
+
+	private IEnumerator<float> ClientActivateEntities()
+	{
+		yield return BeamTiming.WaitForPeer(0);
+		MultiplayerMng.ReceivedEntitiesActive = true;
+		yield return Timing.WaitForSeconds(1f);
+	}
+
+	private CoroutineHandle SyncWorld_Async(bool serverLoadWorld = true)
+	{
+		return _syncWorldCoroutine = Timing.RunCoroutine(SyncWorld_Sequence(serverLoadWorld));
+	}
+
+	private IEnumerator<float> SyncWorld_Sequence(bool serverLoadWorld = true)
+	{
+		if (Game.Mode.IsServer() & serverLoadWorld)
+		{
+			LoadingResult loadingResult = World.LoadWorld();
+			if (loadingResult.Succeeded)
+			{
+				Singleton<StrandedWorld>.Instance.ApplyWorldToZones();
+			}
+			else
+			{
+				Debug.LogError("StrandedWorld:: Error loading world: " + loadingResult.Message);
+			}
+			PlayerRegistry.ServerPeer.WorldSeed = StrandedWorld.LOCAL_WORLD_SEED;
+		}
+		if (Game.Mode.IsServer() && PlayerRegistry.IsClientPeerValid)
+		{
+			yield return MultiplayerWorldSync.Instance.SendWorld_Async(World.CurrentWorld, (CoroutineHandle coroutine) =>
+			{
+				_syncWorldCoroutineSend = coroutine;
+			}, (float ratio) =>
+			{
+				EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_WORLD", (int)((double)ratio * 100.0))));
+			}, () =>
+			{
+			}, ShutdownToMainMenu);
+		}
+		if (Game.Mode.IsClient())
+		{
+			yield return MultiplayerWorldSync.Instance.ReceiveWorld_Async((CoroutineHandle coroutine) =>
+			{
+				_syncWorldCoroutineRecv = coroutine;
+			}, (float ratio) =>
+			{
+				EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_WORLD", (int)((double)ratio * 100.0))));
+			}, (World.Bundle world) =>
+			{
+				World.PushWorld(world);
+				Singleton<StrandedWorld>.Instance.ApplyWorldToZones();
+			}, ShutdownToMainMenu);
+		}
+	}
+
+	private CoroutineHandle SyncSave_Async(Action<JObject> onSaveFile, JObject saveFile = null)
+	{
+		return _syncSaveCoroutine = Timing.RunCoroutine(SyncSave_Sequence(onSaveFile, saveFile));
+	}
+
+	private IEnumerator<float> SyncSave_Sequence(Action<JObject> onSaveFile, JObject saveFile)
+	{
+		if (Game.Mode.IsServer())
+		{
+			saveFile = saveFile ?? (SaveManager.ValidateSaveFile(Game.Mode) ? SaveManager.LoadSaveFile(Game.Mode) : null);
+			if (PlayerRegistry.IsClientPeerValid)
+			{
+				yield return MultiplayerWorldSync.Instance.SendSave_Async(saveFile, (CoroutineHandle coroutine) =>
+				{
+					_syncSaveCoroutineSend = coroutine;
+				}, (float ratio) =>
+				{
+					EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_SAVE", (int)((double)ratio * 100.0))));
+				}, onSaveFile, ShutdownToMainMenu);
+			}
+			else
+			{
+				onSaveFile?.Invoke(saveFile);
+			}
+		}
+		if (Game.Mode.IsClient())
+		{
+			yield return MultiplayerWorldSync.Instance.ReceiveSave_Async((CoroutineHandle coroutine) =>
+			{
+				_syncSaveCoroutineRecv = coroutine;
+			}, (float ratio) =>
+			{
+				EventManager.RaiseEvent(new LoadingProgressChangedEvent(string.Format("{0} [{1}%]", "LOADING_PROGRESS_SYNC_SAVE", (int)((double)ratio * 100.0))));
+			}, onSaveFile, ShutdownToMainMenu);
+		}
+	}
+
+	public static void LoadLevel(int level, LoadSceneMode mode, Action OnStart, Action OnComplete)
+	{
+		Instance.Load(level, mode, OnStart, OnComplete);
+	}
+
+	public void Load(int level, LoadSceneMode mode, Action OnStart, Action OnComplete)
+	{
+		Timing.KillCoroutines(_loadingSequence);
+		_loadingSequence = Timing.RunCoroutine(LoadScene_Sequence(level, mode, OnStart, OnComplete));
+	}
+
+	private IEnumerator<float> LoadScene_Sequence(int level, LoadSceneMode mode, Action OnStart, Action OnComplete)
+	{
+		_serverClientCopy = null;
+		_isLoadingScene = true;
+		if (Game.State == GameState.LOAD_GAME)
+		{
+			CurrentLoader = this;
+			CurrentLoader.IsLoading = true;
+		}
+		_creating = Game.State == GameState.NEW_GAME;
+		OnStart?.Invoke();
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 0);
+		AudioListener.volume = 0f;
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_INITIALIZING_OBJECTS"));
+		yield return 0f;
+		float timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			if (Game.Mode.IsServer())
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+			}
+			else
+			{
+				MainMenuPresenter.Instance.LoadingScreenPresenter.Show("TEXT_SCREEN_LABEL_JOINING");
+			}
+			timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		Prefabs.Initialize();
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_LOADING_SCENE"));
+		yield return 0f;
+		AsyncOperation async = SceneManager.LoadSceneAsync(level, mode);
+		async.allowSceneActivation = false;
+		bool loaded = false;
+		JObject rootData = null;
+		while (!async.isDone)
+		{
+			if (async.progress >= 0.9f)
+			{
+				if (Game.State == GameState.LOAD_GAME)
+				{
+					if (Game.Mode.IsMultiplayer())
+					{
+						if (Game.State == GameState.LOAD_GAME && !loaded)
+						{
+							yield return Timing.WaitUntilDone(SyncSave_Async((JObject save) =>
+							{
+								rootData = save;
+								loaded = true;
+								async.allowSceneActivation = true;
+							}));
+						}
+					}
+					else
+					{
+						if (Game.State == GameState.LOAD_GAME && !loaded)
+						{
+							rootData = SaveManager.LoadSaveFile(Game.Mode);
+							loaded = true;
+						}
+						async.allowSceneActivation = true;
+					}
+				}
+				else
+				{
+					async.allowSceneActivation = true;
+				}
+			}
+			yield return 0f;
+		}
+		Singleton<GameTime>.Instance.Paused = true;
+		if ((Game.State == GameState.NEW_GAME || Game.State == GameState.LOAD_GAME) && Game.Mode.IsClient())
+		{
+			Singleton<GameTime>.Instance.PostReplicateTick();
+		}
+		if ((bool)SceneCallbacks.Instance)
+		{
+			yield return Timing.WaitUntilDone(SceneCallbacks.Instance.Level_SceneLoaded(level));
+		}
+		foreach (IGameCamera allCamera in Cameras.AllCameras)
+		{
+			allCamera.gameObject.SetActive(value: false);
+		}
+		if (Game.State == GameState.INTRO)
+		{
+			PrivateJet_Assetloader privateJet_Assetloader = UnityEngine.Object.FindObjectOfType<PrivateJet_Assetloader>();
+			if (privateJet_Assetloader != null)
+			{
+				yield return privateJet_Assetloader.Load_Async();
+			}
+		}
+		else if (Game.State == GameState.NEW_GAME)
+		{
+			if (Game.Mode.IsMultiplayer())
+			{
+				yield return Timing.WaitUntilDone(SyncWorld_Async());
+			}
+			yield return CreateGame_Async();
+		}
+		else if (Game.State == GameState.LOAD_GAME)
+		{
+			if (Game.Mode.IsMultiplayer())
+			{
+				yield return Timing.WaitUntilDone(SyncWorld_Async());
+			}
+			yield return LoadGame_Async(rootData);
+		}
+		else if (Game.State == GameState.MAP_EDITOR)
+		{
+			AudioListener.volume = 1f;
+			yield break;
+		}
+		if (Game.State.IsGame() && Game.Mode.IsClient())
+		{
+			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientActivateEntities()));
+		}
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_UNLOADING_ASSETS"));
+		yield return 0f;
+		Resources.UnloadUnusedAssets();
+		EventManager.RaiseEvent(new LoadingProgressChangedEvent("LOADING_PROGRESS_TEXT_CLEANING_UP"));
+		yield return 0f;
+		GC.Collect();
+		OnComplete?.Invoke();
+		if (Game.State == GameState.LOAD_GAME)
+		{
+			CurrentLoader.DeferredLoading.Clear();
+			CurrentLoader.PostLoading.Clear();
+			CurrentLoader.PhysicalLoading.Clear();
+			CurrentLoader.IsLoading = false;
+			CurrentLoader = null;
+		}
+		_creating = false;
+		_isLoadingScene = false;
+		foreach (IGameCamera allCamera2 in Cameras.AllCameras)
+		{
+			allCamera2.gameObject.SetActive(value: true);
+		}
+		FollowSpawn[] spawners = UnityEngine.Object.FindObjectsOfType<FollowSpawn>();
+		bool generating;
+		do
+		{
+			generating = false;
+			FollowSpawn[] array = spawners;
+			foreach (FollowSpawn followSpawn in array)
+			{
+				generating |= followSpawn.IsGenerating;
+			}
+			if (generating)
+			{
+				yield return 0f;
+			}
+		}
+		while (generating);
+		yield return Timing.WaitForSeconds(2f);
+		yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.FinishLoading));
+		if (Game.State == GameState.NEW_GAME || Game.State == GameState.LOAD_GAME)
+		{
+			if (Game.Mode.IsServer())
+			{
+				Singleton<GameTime>.Instance.ReplicateTickRepeating();
+			}
+			Singleton<GameTime>.Instance.Paused = false;
+			Singleton<Fader>.Instance.ResetFade(FadeMode.Solid, FadeDirection.In);
+			Singleton<Fader>.Instance.SetFadeColor(Color.black);
+			Singleton<Fader>.Instance.SetFadeEasing(EasingType.Linear);
+			yield return Timing.WaitForSeconds(1f);
+			TMPTextScreenViewAdapter textScreen = UnityEngine.Object.FindObjectOfType<TMPTextScreenViewAdapter>();
+			string headerText = string.Format("{0} {1}", Localization.GetLanguageHandler().Localize("MAIN_MENU_LABEL_DAY"), Singleton<GameCalendar>.Instance.DaysAlive);
+			textScreen.SetHeaderText(headerText);
+			textScreen.SetSubheaderText(string.Empty);
+			textScreen.SetText(string.Empty);
+			textScreen.SetTooltipText(string.Empty);
+			textScreen.Show();
+			yield return Timing.WaitForSeconds(IsClientJoinInProgress() ? 2f : 4f);
+			textScreen.Hide();
+		}
+		Singleton<Fader>.Instance.FadeIn(2.7f);
+		float timer = 0f;
+		while (timer < 2.7f)
+		{
+			timer += Time.unscaledDeltaTime;
+			AudioListener.volume += 10f / 27f * Time.unscaledDeltaTime;
+			yield return 0f;
+		}
+		AudioListener.volume = 1f;
+		Singleton<Fader>.Instance.ResetColor();
+		Singleton<Fader>.Instance.ResetEase();
+		if (Game.State == GameState.NEW_GAME || Game.State == GameState.LOAD_GAME)
+		{
+			for (int num2 = 0; num2 < PlayerRegistry.AllPlayers.Count; num2++)
+			{
+				PlayerRegistry.AllPlayers[num2].Movement.IsBusy = default;
+			}
+			RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 9);
+			RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 0);
+			if (Game.Mode.IsServer())
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			}
+		}
+		else if (Game.State == GameState.INTRO)
+		{
+			RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 9);
+		}
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(timeout);
+		}
+	}
+
+	private float CreateGame_Async()
+	{
+		return Timing.WaitUntilDone(CreateGame());
+	}
+
+	private float LoadGame_Async(JObject rootData)
+	{
+		return Timing.WaitUntilDone(LoadGame(rootData));
+	}
+
+	private CoroutineHandle CreateGame()
+	{
+		return Timing.RunCoroutine(CreateGame_Sequence());
+	}
+
+	private CoroutineHandle LoadGame(JObject rootData)
+	{
+		return Timing.RunCoroutine(LoadGame_Sequence(rootData));
+	}
+
+	private IEnumerator<float> CreateGame_Sequence()
+	{
+		yield return Singleton<StrandedWorld>.Instance.CreateWorld_Async();
+	}
+
+	private IEnumerator<float> LoadGame_Sequence(JObject rootData)
+	{
+		JObject persistentData = SaveManager.GetPersistentData(rootData);
+		Vector3 originalP1position = Vector3.zero;
+		if (persistentData != null && !persistentData.IsNull())
+		{
+			JObject field = persistentData.GetField("GameTime");
+			SavingUtilities.Load(Singleton<GameTime>.Instance, field);
+			JObject field2 = persistentData.GetField("GameCalendar");
+			SavingUtilities.Load(Singleton<GameCalendar>.Instance, field2);
+			Physics.autoSimulation = false;
+			float fixedDeltaTime = Time.fixedDeltaTime;
+			if (!Game.Mode.IsMultiplayer())
+			{
+				Time.fixedDeltaTime = 10f;
+			}
+			LegacyUtilities.LoadPlayer(persistentData);
+			IPlayer player = PlayerRegistry.AllPlayers[0];
+			player.Character.RefreshPosition();
+			player.Character.RefreshRotation();
+			player.Character.SetCameraMode(player.PlayerCamera.CameraMode);
+			player.PlayerCamera.CameraMovement.SetPosition(player.Character.CameraRigTransform);
+			player.PlayerCamera.CameraMovement.SetRotation(player.Character.CameraRigTransform);
+			player.PlayerCamera.UpdateCameraPosition(force: true);
+			originalP1position = player.transform.position;
+			JObject field3 = persistentData.GetField("StrandedWorld");
+			yield return Singleton<StrandedWorld>.Instance.LoadWorld_Async(rootData, field3);
+			(from behaviour in UnityEngine.Object.FindObjectsOfType<MonoBehaviour>()
+				where behaviour is IPersistentSaveable && !(behaviour is GameTime) && !(behaviour is GameCalendar) && !(behaviour is StrandedWorld)
+				select behaviour).Cast<IPersistentSaveable>().ToList().ForEach((IPersistentSaveable saveableObject) =>
+			{
+				string text = saveableObject.GetType().Name;
+				JObject field4 = persistentData.GetField(text);
+				if (field4 != null)
+				{
+					SavingUtilities.Load(saveableObject, field4);
+				}
+				else
+				{
+					Debug.LogWarning("LevelLoader:: No data was saved for persistent object [" + text + "].");
+				}
+			});
+			for (int num = 0; num < DeferredLoading.Count; num++)
+			{
+				LoadingActionUtilities.ExecuteDeferredAction(DeferredLoading[num]);
+			}
+			for (int num2 = 0; num2 < PostLoading.Count; num2++)
+			{
+				LoadingActionUtilities.ExecuteDeferredAction(PostLoading[num2]);
+			}
+			if (!Game.Mode.IsMultiplayer())
+			{
+				Time.fixedDeltaTime = fixedDeltaTime;
+			}
+			Physics.autoSimulation = true;
+		}
+		else
+		{
+			Debug.LogError("LevelLoader:: [Persistent] node is null or empty.");
+		}
+		if (!Game.State.IsGame() || !Game.Mode.IsClient() || !(originalP1position != Vector3.zero))
+		{
+			yield break;
+		}
+		IPlayer playerFromId = PlayerUtilities.GetPlayerFromId(1);
+		LayerMask physicsLayerMask = GetPhysicsLayerMask(Layers.PLAYER);
+		physicsLayerMask = (int)physicsLayerMask ^ (1 << Layers.PLAYER);
+		if (!Physics.CheckSphere(playerFromId.transform.position, 0.7f, physicsLayerMask))
+		{
+			yield break;
+		}
+		Vector3 vector = Vector3.zero;
+		bool flag = false;
+		float num3 = 0f;
+		int num4 = 180;
+		for (int num5 = 0; num5 < num4; num5++)
+		{
+			float x = Mathf.Sin(num3);
+			float z = Mathf.Cos(num3);
+			num3 += MathF.PI * 2f / (float)num4;
+			vector = new Vector3(x, 0f, z);
+			float radius = 0.25f;
+			if (!Physics.CheckSphere(originalP1position + vector, radius, physicsLayerMask) && !Physics.Raycast(originalP1position + vector, originalP1position - (originalP1position + vector), vector.magnitude, physicsLayerMask))
+			{
+				flag = true;
+				break;
+			}
+		}
+		if (flag)
+		{
+			playerFromId.transform.position = originalP1position + vector;
+		}
+	}
+
+	private LayerMask GetPhysicsLayerMask(int currentLayer)
+	{
+		int num = 0;
+		for (int i = 0; i < 32; i++)
+		{
+			if (!Physics.GetIgnoreLayerCollision(currentLayer, i))
+			{
+				num |= 1 << i;
+			}
+		}
+		return num;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 393
+PATH: Assembly-CSharp__LootContainerSpawner.cs
+SIZE: 6931 bytes
+SHA256: 6c1b581e8346d425b72a3de5b900c89bd777e6ff020c696fcf6f0b13c9241b0d
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Crafting;
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class LootContainerSpawner : SaveablePrefab
+{
+	[Serializable]
+	public class Spawn
+	{
+		public string Name;
+
+		public Transform position;
+
+		public Container[] containers;
+
+		[HideInInspector]
+		public bool occupied;
+	}
+
+	[Serializable]
+	public class Container
+	{
+		[HideInInspector]
+		public string Name;
+
+		public GameObject prefab;
+
+		public float rarity;
+	}
+
+	[HideInInspector]
+	public bool debugGizmos;
+
+	[SerializeField]
+	private Transform _shipwreckMarker;
+
+	[SerializeField]
+	private bool IsOnShipwreck = true;
+
+	[SerializeField]
+	private List<Spawn> _containerSpawn;
+
+	private List<MiniGuid> _containerIds = new List<MiniGuid>();
+
+	private bool _containersGenerated;
+
+	private bool _scavenged;
+
+	private bool _customMap;
+
+	public List<Spawn> containerSpawn => _containerSpawn;
+
+	private void Start()
+	{
+		debugGizmos = false;
+		if (!LevelLoader.IsLoading(gameObject))
+		{
+			Initialize();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		_customMap = true;
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		SpawnContainers();
+		if (_shipwreckMarker != null)
+		{
+			_shipwreckMarker.transform.position = new Vector3(transform.position.x, 0.2f, transform.position.z);
+		}
+	}
+
+	private void SpawnContainers()
+	{
+		if (_containersGenerated)
+		{
+			return;
+		}
+		WollieSpawner component = gameObject.GetComponent<WollieSpawner>();
+		if (component != null)
+		{
+			Zone zone = StrandedWorld.GetZone(transform.position);
+			if (zone != null)
+			{
+				if (zone.HasShelter && zone.HasWollie)
+				{
+					_containerSpawn.Add(new Spawn
+					{
+						position = component.WolliePosition,
+						containers = new Container[1]
+						{
+							new Container
+							{
+								prefab = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.WolliePrefab,
+								rarity = 100f
+							}
+						}
+					});
+				}
+			}
+			else
+			{
+				Debug.LogWarning("LootContainerSpawner :: Error finding zone for Wollie Spawner!");
+			}
+		}
+		System.Random random = Singleton<StrandedWorld>.Instance.GenerateLocalSeed(transform.position);
+		foreach (Spawn item in containerSpawn)
+		{
+			float num = random.Next(1000) / 10;
+			float num2 = 0f;
+			Container[] containers = item.containers;
+			foreach (Container container in containers)
+			{
+				if (num <= num2 + container.rarity && !item.occupied)
+				{
+					Vector3 position = item.position.position;
+					Quaternion rotation = item.position.rotation;
+					ISaveablePrefab saveablePrefab = container.prefab.GetInterface<ISaveablePrefab>();
+					if (!saveablePrefab.IsNullOrDestroyed())
+					{
+						uint prefabId = saveablePrefab.PrefabId;
+						MiniGuid referenceId = MiniGuid.NewFrom(position, prefabId, 48879);
+						bool flag = Prefabs.IsMultiplayerEntity(prefabId);
+						if (Game.Mode.IsMaster() || !flag)
+						{
+							Setup(MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, position, rotation, referenceId));
+						}
+						else
+						{
+							MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.LootContainerSpawner, referenceId, (MultiplayerZoneSync.Command command) =>
+							{
+								Setup(command.Instance);
+							});
+						}
+					}
+					else
+					{
+						UnityEngine.Object.Instantiate(container.prefab, position, rotation, transform.parent);
+					}
+					item.occupied = true;
+				}
+				num2 += container.rarity;
+			}
+		}
+		_containersGenerated = true;
+	}
+
+	private void Setup(SaveablePrefab saveablePrefab)
+	{
+		InteractiveObject interactiveObject = saveablePrefab as InteractiveObject;
+		if (interactiveObject != null)
+		{
+			interactiveObject.transform.parent = transform.parent;
+			interactiveObject.TransformParent = transform.parent;
+			if (_customMap)
+			{
+				interactiveObject.OnCustomMapLoaded();
+			}
+			Interactive_STORAGE interactive_STORAGE = interactiveObject as Interactive_STORAGE;
+			if (interactive_STORAGE != null)
+			{
+				interactive_STORAGE.PickedUp += Storage_PickedUp;
+				interactive_STORAGE.BeginDragged += Storage_BeginDragged;
+				interactive_STORAGE.Opened += Storage_Opened;
+				_containerIds.Add(interactive_STORAGE.ReferenceId);
+			}
+		}
+	}
+
+	private void Storage_Opened(Interactive_STORAGE sender)
+	{
+		CheckScavenged(sender.ReferenceId);
+	}
+
+	private void Storage_PickedUp(IPickupable sender)
+	{
+		CheckScavenged(sender.ReferenceId);
+	}
+
+	private void Storage_BeginDragged(IDraggable sender)
+	{
+		ISaveablePrefab saveablePrefab = sender as ISaveablePrefab;
+		if (!saveablePrefab.IsNullOrDestroyed())
+		{
+			CheckScavenged(saveablePrefab.ReferenceId);
+		}
+	}
+
+	private void CheckScavenged(MiniGuid refId)
+	{
+		if (!_containersGenerated || _scavenged)
+		{
+			return;
+		}
+		int num = _containerIds.FindIndex((MiniGuid id) => id.Equals(refId));
+		if (num == -1)
+		{
+			return;
+		}
+		_containerIds.RemoveAt(num);
+		if (_containerIds.Count == 0)
+		{
+			if (IsOnShipwreck)
+			{
+				EventManager.RaiseEvent(new AddStatsEvent(0, new Stats
+				{
+					ShipsScavenged = 1
+				}));
+			}
+			else
+			{
+				EventManager.RaiseEvent(new ScavengedShelterEvent());
+			}
+			_scavenged = true;
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("containersGenerated", JSerializer.Serialize(_containersGenerated));
+		jObject.AddField("Scavenged", JSerializer.Serialize(_scavenged));
+		JObject jObject2 = new JObject();
+		for (int i = 0; i < _containerIds.Count; i++)
+		{
+			jObject2.Add(JSerializer.Serialize(_containerIds[i].ToString()));
+		}
+		jObject.AddField("ContainerIDs", jObject2);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			bool value = data.GetField("containersGenerated").GetValue<bool>();
+			_containersGenerated = value;
+			JObject field = data.GetField("Scavenged");
+			if (field != null)
+			{
+				_scavenged = field.GetValue<bool>();
+			}
+			JObject field2 = data.GetField("ContainerIDs");
+			if (field2 != null && field2.Children != null)
+			{
+				for (int i = 0; i < field2.Children.Count; i++)
+				{
+					MiniGuid miniGuid = field2.Children[i].GetValue<string>().ToMiniGuid();
+					if (!miniGuid.IsDefault())
+					{
+						Interactive_STORAGE interactive_STORAGE = MultiplayerMng.FindObject<Interactive_STORAGE>(miniGuid);
+						if (interactive_STORAGE != null)
+						{
+							interactive_STORAGE.PickedUp += Storage_PickedUp;
+							interactive_STORAGE.BeginDragged += Storage_BeginDragged;
+							interactive_STORAGE.Opened += Storage_Opened;
+							_containerIds.Add(miniGuid);
+						}
+					}
+				}
+			}
+		}
+		Initialize();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 394
+PATH: Assembly-CSharp__MapLoader.cs
+SIZE: 2603 bytes
+SHA256: 13ee2e3a60cb8e19075adbb1dd8eeef7983c52a3704544213d237925118fd049
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using LE_LevelEditor;
+using LE_LevelEditor.Core;
+using MEC;
+using UnityEngine;
+
+public class MapLoader : ILoader
+{
+	private List<Action> _deferredLoading = new List<Action>();
+
+	private List<Action> _postLoading = new List<Action>();
+
+	private List<Action> _physicalLoading = new List<Action>();
+
+	public IList<Action> DeferredLoading => _deferredLoading;
+
+	public IList<Action> PostLoading => _postLoading;
+
+	public IList<Action> PhysicalLoading => _physicalLoading;
+
+	public bool IsLoading { get; set; }
+
+	public CoroutineHandle LoadMap(JObject data)
+	{
+		return Timing.RunCoroutine(LoadMap_Sequence(data));
+	}
+
+	public IEnumerator<float> LoadMap_Sequence(JObject data)
+	{
+		Singleton<LE_LevelEditorMain>.Instance.InitializeObjects();
+		yield return 0f;
+		Vector3 position = new Vector3(0f, 5000f, 0f);
+		if (data != null && !data.IsNull())
+		{
+			foreach (JObject child in data.Children)
+			{
+				JObject field = child.GetField("prefab");
+				if (!field)
+				{
+					Debug.LogError("MapLoader::LoadMap:: Error loading. No prefab id field found for object data.");
+				}
+				else
+				{
+					uint num = Prefabs.ConvertLegacyPrefabId(field);
+					if (num == 0)
+					{
+						Debug.LogError("MapLoader::LoadMap:: Error loading instantiated object with empty prefab id.");
+					}
+					else
+					{
+						GameObject gameObject = null;
+						foreach (LE_Object mapObjectReference in Singleton<LE_LevelEditorMain>.Instance.MapObjectReferences)
+						{
+							if (mapObjectReference.Id == num)
+							{
+								gameObject = UnityEngine.Object.Instantiate(mapObjectReference.gameObject);
+								gameObject.name = gameObject.name.Replace("(Clone)", "");
+								break;
+							}
+						}
+						if (gameObject != null)
+						{
+							gameObject.transform.position = position;
+							gameObject.transform.parent = Singleton<LE_LevelEditorMain>.Instance.ObjectDumpContainer;
+							position += new Vector3(0f, 0f, 50f);
+							try
+							{
+								JSerializer.DeserializeInto(child.GetField("Transform"), gameObject.gameObject.transform);
+							}
+							catch (Exception ex)
+							{
+								Debug.LogError("MapLoader::LoadMap:: Error loading editor object. Object has now been destroyed. \n\nName: " + gameObject.name + "\nMessage: " + ex);
+							}
+						}
+						else
+						{
+							Debug.LogError("mapLoader:: Error loading object " + num + " :: no object to be instantiated!");
+						}
+					}
+				}
+			}
+			yield break;
+		}
+		Debug.LogError("mapLoader:: Error loading map data:: no data!");
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 395
+PATH: Assembly-CSharp__MapNameGenerator.cs
+SIZE: 1016 bytes
+SHA256: 94cf139b37fa93f2db93331f482af5d73b096a3b59879e7d11c4cdef410334be
+====================================================================================================
+
+using System;
+
+public static class MapNameGenerator
+{
+	private static readonly string[] Prefixes = new string[8] { "MAP_NAME_PREFIX_1", "MAP_NAME_PREFIX_2", "MAP_NAME_PREFIX_3", "MAP_NAME_PREFIX_4", "MAP_NAME_PREFIX_5", "MAP_NAME_PREFIX_6", "MAP_NAME_PREFIX_7", "MAP_NAME_PREFIX_8" };
+
+	private static readonly string[] Stems = new string[10] { "MAP_NAME_STEM_1", "MAP_NAME_STEM_2", "MAP_NAME_STEM_3", "MAP_NAME_STEM_4", "MAP_NAME_STEM_5", "MAP_NAME_STEM_6", "MAP_NAME_STEM_7", "MAP_NAME_STEM_8", "MAP_NAME_STEM_9", "MAP_NAME_STEM_10" };
+
+	private static readonly string[] Suffixes = new string[6] { "MAP_NAME_SUFFIX_1", "MAP_NAME_SUFFIX_2", "MAP_NAME_SUFFIX_3", "MAP_NAME_SUFFIX_4", "MAP_NAME_SUFFIX_5", "MAP_NAME_SUFFIX_6" };
+
+	public static string GenerateRandomMapName(int seedEffect)
+	{
+		Random random = new Random(StrandedWorld.WORLD_SEED + seedEffect);
+		return string.Join(" ", Prefixes[random.Next(0, Prefixes.Length)], Stems[random.Next(0, Stems.Length)], Suffixes[random.Next(0, Suffixes.Length)]);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 396
+PATH: Assembly-CSharp__Module.cs
+SIZE: 3296 bytes
+SHA256: 9327348f83a9d3f9d3986c4f03b14501fb7c80f9238439b85d418134c6f64f84
+====================================================================================================
+
+using System;
+using System.Collections.Generic;
+using Beam;
+using Beam.Rendering;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class Module : SaveablePrefab
+{
+	[Serializable]
+	public class Spawn
+	{
+		public string Name;
+
+		public Transform Position;
+
+		public GameObject Obj;
+
+		public float SpawnChance;
+	}
+
+	public string[] Tags;
+
+	public GameObject FortLadder;
+
+	private bool _seaLadderAccess;
+
+	[SerializeField]
+	private List<Spawn> _objectSpawn;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private LodController _lodController;
+
+	private bool _customMap;
+
+	public List<Spawn> ObjectSpawn => _objectSpawn;
+
+	public ModuleConnector[] GetExits()
+	{
+		return GetComponentsInChildren<ModuleConnector>();
+	}
+
+	public void Start()
+	{
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	private void Initialize()
+	{
+		if (_objectSpawn.Count > 0)
+		{
+			SpawnObjects();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		_customMap = true;
+		Initialize();
+	}
+
+	private void SetupSpawnedObject(SaveablePrefab saveable)
+	{
+		if (!saveable.IsValid())
+		{
+			return;
+		}
+		InteractiveObject component = saveable.GetComponent<InteractiveObject>();
+		if ((bool)component)
+		{
+			component.transform.parent = transform.parent;
+			component.TransformParent = transform.parent;
+			if (_customMap)
+			{
+				component.OnCustomMapLoaded();
+			}
+		}
+	}
+
+	private void SpawnObject(GameObject objToSpawn, Vector3 pos, Quaternion rot)
+	{
+		if (objToSpawn.TryGetComponent<ISaveablePrefab>(out var component))
+		{
+			uint prefabId = component.PrefabId;
+			MiniGuid referenceId = MiniGuid.NewFrom(pos, prefabId, 48879);
+			if (Game.Mode.IsMaster() || !component.IsMultiplayerEntity)
+			{
+				SaveablePrefab saveable = MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, pos, rot, referenceId);
+				SetupSpawnedObject(saveable);
+			}
+			else
+			{
+				MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.Module, referenceId, (MultiplayerZoneSync.Command cmd) =>
+				{
+					SetupSpawnedObject(cmd.Instance);
+				});
+			}
+		}
+		else
+		{
+			UnityEngine.Object.Instantiate(objToSpawn, pos, rot);
+		}
+	}
+
+	private void SpawnObjects()
+	{
+		System.Random random = Singleton<StrandedWorld>.Instance.GenerateLocalSeed(transform.position);
+		foreach (Spawn item in _objectSpawn)
+		{
+			if ((float)(random.Next(1000) / 10) <= item.SpawnChance)
+			{
+				SpawnObject(item.Obj, item.Position.position, item.Position.rotation);
+			}
+		}
+	}
+
+	public void SetUpSupport(bool seaLadderAccess = false)
+	{
+		if (!(FortLadder == null))
+		{
+			_seaLadderAccess = seaLadderAccess;
+			FortLadder.SetActive(seaLadderAccess);
+		}
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("hasLadder", JSerializer.Serialize(_seaLadderAccess));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			bool value = data.GetField("hasLadder").GetValue<bool>();
+			_seaLadderAccess = value;
+		}
+		SetUpSupport(_seaLadderAccess);
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 397
+PATH: Assembly-CSharp__NullAudioPlayer.cs
+SIZE: 1263 bytes
+SHA256: 8816230d8246891d4cdb90a2078471bfb22715b875a39409c659d5c3f6753e1c
+====================================================================================================
+
+using Beam;
+using UnityEngine;
+
+public class NullAudioPlayer : IAudioPlayer
+{
+	public static NullAudioPlayer Instance { get; } = new NullAudioPlayer();
+
+	public AudioActorHandle Play2D(AudioClip clip, AudioMixerChannels channel, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return AudioActorHandle.Empty;
+	}
+
+	public AudioActorHandle Play3D(AudioClip clip, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return AudioActorHandle.Empty;
+	}
+
+	public AudioActorHandle Play3D(AudioClip[] clips, Vector3 position, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return AudioActorHandle.Empty;
+	}
+
+	public AudioActorHandle Play3D(AudioClip clip, Transform target, AudioMixerChannels channel, AudioRollOffDistance distance = AudioRollOffDistance.Far, AudioPlayMode mode = AudioPlayMode.Single)
+	{
+		return AudioActorHandle.Empty;
+	}
+
+	public void Stop(AudioActorHandle handle)
+	{
+	}
+
+	public IAudioSource GetAudioSource(AudioActorHandle handle)
+	{
+		return NullAudioSource.Instance;
+	}
+
+	public IAudioMixer GetAudioMixer()
+	{
+		return NullObject<NullAudioMixer>.Instance;
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 398
+PATH: Assembly-CSharp__ParticleManager.cs
+SIZE: 2615 bytes
+SHA256: f5a4978daea0e826e972bbdce76717e742ca17d3c6617da7dc6a3bb04efb3dbd
+====================================================================================================
+
+using Beam;
+using UnityEngine;
+
+public class ParticleManager : Singleton<ParticleManager>
+{
+	public static Transform TRAIL_CONTAINER;
+
+	[SerializeField]
+	private Transform _trailContainer;
+
+	public GameObject bubbleBurst;
+
+	public GameObject PARTICLE_COOKING_SMOKE;
+
+	public GameObject PARTICLE_FOOD_SPOIL;
+
+	private void Awake()
+	{
+		TRAIL_CONTAINER = _trailContainer;
+	}
+
+	public static void CreateDamageParticle(IPlayer player)
+	{
+		RaycastHit lastHitInfo = player.GameInput.Raycaster.LastHitInfo;
+		Vector3 point = lastHitInfo.point;
+		Quaternion rotation = Quaternion.LookRotation(player.transform.position - point);
+		GameObject particleFromMaterial = ParticleUtiliity.GetParticleFromMaterial(lastHitInfo.collider.sharedMaterial?.name);
+		if (particleFromMaterial != null)
+		{
+			ParticleSystem component = ObjectPoolManager.CreatePooled(particleFromMaterial, point, rotation).GetComponent<ParticleSystem>();
+			if ((bool)component)
+			{
+				component.GetComponent<Renderer>().enabled = true;
+				component.time = 0f;
+				component.Clear(withChildren: true);
+				component.Play(withChildren: true);
+			}
+		}
+	}
+
+	public static GameObject CreateParticle(GameObject particle, Vector3 position, Vector3 rotation = default(Vector3))
+	{
+		if (!particle)
+		{
+			return null;
+		}
+		GameObject gameObject = ObjectPoolManager.CreatePooled(particle, position, Quaternion.Euler(rotation));
+		ParticleSystem component = gameObject.GetComponent<ParticleSystem>();
+		if ((bool)component)
+		{
+			component.GetComponent<Renderer>().enabled = true;
+			component.time = 0f;
+			component.Clear(withChildren: true);
+			component.Play(withChildren: true);
+		}
+		return gameObject;
+	}
+
+	public static GameObject CreateParticle(GameObject particle, Transform parent)
+	{
+		if (!particle)
+		{
+			return null;
+		}
+		GameObject gameObject = ObjectPoolManager.CreatePooled(particle, parent.position, Quaternion.identity);
+		gameObject.transform.parent = parent;
+		ParticleSystem component = gameObject.GetComponent<ParticleSystem>();
+		if ((bool)component)
+		{
+			component.GetComponent<Renderer>().enabled = true;
+			component.time = 0f;
+			component.Clear(withChildren: true);
+			component.Play(withChildren: true);
+		}
+		return gameObject;
+	}
+
+	public static void DestroyParticle(GameObject particle)
+	{
+		if ((bool)particle)
+		{
+			ParticleSystem component = particle.GetComponent<ParticleSystem>();
+			if ((bool)component)
+			{
+				component.Stop();
+				component.time = 0f;
+				component.Clear(withChildren: true);
+				component.GetComponent<Renderer>().enabled = false;
+			}
+			ObjectPoolManager.DestroyPooled(particle);
+		}
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 399
+PATH: Assembly-CSharp__PiscusFollower.cs
+SIZE: 9741 bytes
+SHA256: 016b64de7a5df1f33079aadbc10505f918f6268d6e9d04ab7fff56637d0cc18c
+====================================================================================================
+
+using System;
+using Beam;
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
+
+public class PiscusFollower : Singleton<PiscusFollower>, IPersistentSaveable, ISaveable
+{
+	[Serializable]
+	public class CreatureToSpawn
+	{
+		public GameObject CreatureObj;
+
+		public float Rarity;
+	}
+
+	private class PlayerGridGroup
+	{
+		private int PlayerId;
+
+		public SpawnGrid[,] SpawnGrids;
+
+		public IPlayer Player => PlayerUtilities.GetPlayerFromId(PlayerId);
+
+		public PlayerGridGroup(int playerId)
+		{
+			PlayerId = playerId;
+		}
+	}
+
+	private class SpawnGrid
+	{
+		public Transform Grid;
+
+		public PiscusManager piscusManager;
+
+		public bool CanGenerate = true;
+
+		public bool Generated;
+
+		public SpawnGrid(Transform grid)
+		{
+			Grid = grid;
+		}
+	}
+
+	private const int GRID_DIMENSION = 250;
+
+	private const int GRID_SIZE = 3;
+
+	private Vector3[] _loadedCenterGridPos = new Vector3[2];
+
+	public CreatureToSpawn[] Creatures;
+
+	private PlayerGridGroup[] _playerGridGroup;
+
+	private bool _removedWildlifeSetting;
+
+	private void Start()
+	{
+		if (!LevelLoader.IsLoading() && (bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
+		}
+	}
+
+	private void SetDifficultyParams()
+	{
+		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
+	}
+
+	protected override void OnDestroy()
+	{
+		if ((bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated -= CreateGrid;
+		}
+		base.OnDestroy();
+	}
+
+	private void CreateGrid()
+	{
+		if (Game.Mode.IsClient())
+		{
+			return;
+		}
+		SetDifficultyParams();
+		int count = PlayerRegistry.AllPlayers.Count;
+		_playerGridGroup = new PlayerGridGroup[count];
+		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			_ = PlayerRegistry.AllPlayers[i];
+			_playerGridGroup[i] = new PlayerGridGroup(i);
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
+			playerGridGroup.SpawnGrids = new SpawnGrid[3, 3];
+			Transform transform = new GameObject("PlayerGrid_" + j).transform;
+			transform.transform.parent = base.transform;
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					Transform transform2 = new GameObject("Spawn_Grid_" + k + "_" + l).transform;
+					transform2.parent = transform;
+					transform2.gameObject.layer = gameObject.layer;
+					playerGridGroup.SpawnGrids[k, l] = new SpawnGrid(transform2);
+					playerGridGroup.SpawnGrids[k, l].CanGenerate = true;
+				}
+			}
+			Vector3 position = _loadedCenterGridPos[j];
+			playerGridGroup.SpawnGrids[1, 1].Grid.position = position;
+		}
+		InvokeRepeating("MoveGrid", 0f, 1f);
+		UpdateGridPositions();
+	}
+
+	private void MoveGrid()
+	{
+		if (LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			if (playerGridGroup.Player != null && playerGridGroup.SpawnGrids[2, 2] == null)
+			{
+				return;
+			}
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup2 = _playerGridGroup[j];
+			if (playerGridGroup2.Player == null)
+			{
+				continue;
+			}
+			Vector3 position = playerGridGroup2.Player.transform.position;
+			SpawnGrid spawnGrid = null;
+			int num = 0;
+			int num2 = 0;
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					Vector3 position2 = playerGridGroup2.SpawnGrids[k, l].Grid.position;
+					if (position.x >= position2.x - 125f && position.x <= position2.x + 125f && position.z >= position2.z - 125f && position.z <= position2.z + 125f)
+					{
+						spawnGrid = playerGridGroup2.SpawnGrids[k, l];
+						num = 1 - k;
+						num2 = 1 - l;
+						break;
+					}
+				}
+			}
+			if (spawnGrid == playerGridGroup2.SpawnGrids[1, 1])
+			{
+				continue;
+			}
+			SpawnGrid[,] array = new SpawnGrid[3, 3];
+			for (int m = 0; m < 3; m++)
+			{
+				for (int n = 0; n < 3; n++)
+				{
+					int num3 = m + num;
+					int num4 = n + num2;
+					if (num3 < 0 || num3 > 2 || num4 < 0 || num4 > 2)
+					{
+						if ((bool)playerGridGroup2.SpawnGrids[m, n].piscusManager)
+						{
+							UnityEngine.Object.Destroy(playerGridGroup2.SpawnGrids[m, n].piscusManager.gameObject);
+						}
+						playerGridGroup2.SpawnGrids[m, n].CanGenerate = true;
+						playerGridGroup2.SpawnGrids[m, n].Generated = false;
+					}
+					if (num3 < 0)
+					{
+						num3 = 2;
+					}
+					else if (num3 > 2)
+					{
+						num3 = 0;
+					}
+					if (num4 < 0)
+					{
+						num4 = 2;
+					}
+					else if (num4 > 2)
+					{
+						num4 = 0;
+					}
+					array[num3, num4] = playerGridGroup2.SpawnGrids[m, n];
+					playerGridGroup2.SpawnGrids[m, n].Grid.gameObject.name = "Spawn_Grid_" + num3 + "_" + num4;
+				}
+			}
+			playerGridGroup2.SpawnGrids = array;
+			UpdateGridPositions();
+		}
+	}
+
+	private void UpdateGridPositions()
+	{
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			if (playerGridGroup.Player == null)
+			{
+				continue;
+			}
+			playerGridGroup.SpawnGrids[0, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[0, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
+			playerGridGroup.SpawnGrids[0, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			playerGridGroup.SpawnGrids[1, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[1, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			playerGridGroup.SpawnGrids[2, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[2, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
+			playerGridGroup.SpawnGrids[2, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			if (_removedWildlifeSetting)
+			{
+				break;
+			}
+			for (int j = 0; j < 3; j++)
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					SpawnGrid spawnGrid = playerGridGroup.SpawnGrids[j, k];
+					if (spawnGrid.CanGenerate)
+					{
+						CreateGridObjects(spawnGrid);
+					}
+				}
+			}
+		}
+	}
+
+	private void CreateGridObjects(SpawnGrid grid)
+	{
+		Zone[] zones = Singleton<StrandedWorld>.Instance.Zones;
+		foreach (Zone zone in zones)
+		{
+			if ((grid.Grid.position - zone.transform.position).magnitude < 150f || grid.Grid.position.x > 2500f || grid.Grid.position.x < -2500f || grid.Grid.position.z > 2500f || grid.Grid.position.z < -2500f)
+			{
+				return;
+			}
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
+			if (playerGridGroup.Player == null)
+			{
+				continue;
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					if ((grid.Grid.position - playerGridGroup.SpawnGrids[k, l].Grid.transform.position).magnitude < 10f && playerGridGroup.SpawnGrids[k, l].Generated)
+					{
+						return;
+					}
+				}
+			}
+		}
+		grid.CanGenerate = false;
+		grid.Generated = true;
+		GameObject gameObject = ChooseCreature();
+		if (!(gameObject == null))
+		{
+			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject, grid.Grid.position, Quaternion.identity);
+			grid.piscusManager = gameObject2.GetComponent<PiscusManager>();
+			grid.piscusManager.SpawnDistance = 150f;
+			gameObject2.transform.parent = grid.Grid.transform;
+			grid.piscusManager.transform.position = grid.Grid.position;
+		}
+	}
+
+	private GameObject ChooseCreature()
+	{
+		float num = 0f;
+		CreatureToSpawn[] creatures = Creatures;
+		foreach (CreatureToSpawn creatureToSpawn in creatures)
+		{
+			num += creatureToSpawn.Rarity;
+		}
+		float num2 = UnityEngine.Random.value * num;
+		for (int j = 0; j < Creatures.Length; j++)
+		{
+			if (num2 < Creatures[j].Rarity)
+			{
+				return Creatures[j].CreatureObj;
+			}
+			num2 -= Creatures[j].Rarity;
+		}
+		return null;
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			jObject.AddField("CenterGridPos_" + i, JSerializer.Serialize(playerGridGroup.SpawnGrids[1, 1].Grid.position));
+		}
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+		int playersCount = Game.Mode.GetPlayersCount();
+		_loadedCenterGridPos = new Vector3[playersCount];
+		if (data != null && !data.IsNull())
+		{
+			JObject field = data.GetField("CenterGridPos");
+			if (field != null)
+			{
+				Vector3 vector = JSerializer.Deserialize<Vector3>(field);
+				for (int i = 0; i < playersCount; i++)
+				{
+					_loadedCenterGridPos[i] = vector;
+				}
+			}
+			for (int j = 0; j < playersCount; j++)
+			{
+				JObject field2 = data.GetField("CenterGridPos_" + j);
+				if (field2 != null)
+				{
+					_loadedCenterGridPos[j] = JSerializer.Deserialize<Vector3>(field2);
+				}
+			}
+		}
+		if ((bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
+		}
+		CreateGrid();
+	}
+}
+
+
+
+====================================================================================================
+SOURCE FILE 400
+PATH: Assembly-CSharp__PiscusManager.cs
+SIZE: 4830 bytes
+SHA256: fbebe0d06b7282962f4240fd732854526ec4c0b3e88322f896075617c838769a
+====================================================================================================
+
+using Beam;
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
+
+public class PiscusManager : SaveablePrefab
+{
+	[SerializeField]
+	private GameObject _piscusCreature;
+
+	private Piscus_Creature _activeCreature;
+
+	[SerializeField]
+	private float _spawnDistance = 60f;
+
+	private float _territoryRadius;
+
+	[SerializeField]
+	private bool _canRespawn;
+
+	[SerializeField]
+	private int _respawnHours;
+
+	private int _respawningTimer;
+
+	private float _lastPollTime;
+
+	public float SpawnDistance
+	{
+		get
+		{
+			return _spawnDistance;
+		}
+		set
+		{
+			_spawnDistance = value;
+		}
+	}
+
+	private void Start()
+	{
+		transform.position = new Vector3(transform.position.x, -1f, transform.position.z);
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		if (!Game.Mode.IsClient())
+		{
+			if (Singleton<GameTime>.Instance != null)
+			{
+				Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
+			}
+			CheckInsideTerrain();
+			_territoryRadius = _spawnDistance - 15f;
+			float repeatRate = 5f;
+			InvokeRepeating("PollActivation_InvokeRepeating", 0f, repeatRate);
+			PollSpawn();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
+		}
+		if (_activeCreature != null)
+		{
+			MultiplayerMng.DestroyMultiplayerEntity(_activeCreature.gameObject);
+		}
+	}
+
+	private void GameTime_HourTick()
+	{
+		if (_activeCreature == null)
+		{
+			_respawningTimer++;
+			PollSpawn();
+		}
+	}
+
+	private void PollActivation_InvokeRepeating()
+	{
+		if (!LevelLoader.IsServerJoinInProgress)
+		{
+			IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+			if (player != null && _activeCreature != null)
+			{
+				bool activate = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
+				Activate_Creature(activate);
+			}
+		}
+	}
+
+	private void PollSpawn()
+	{
+		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+		if (player != null)
+		{
+			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
+			if ((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == 0)
+			{
+				_respawningTimer = 0;
+				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_piscusCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
+				gameObject.transform.parent = Singleton<PiscusInspectionManager>.Instance.transform;
+				_activeCreature = gameObject.GetComponent<Piscus_Creature>();
+				_activeCreature.BiomeSize = _territoryRadius;
+				_activeCreature.EngagePlayerDistance = _activeCreature.BiomeSize * 0.5f;
+				_activeCreature.Manager = this;
+			}
+		}
+	}
+
+	private void Activate_Creature(bool activate)
+	{
+		_lastPollTime = 0f;
+		if (_activeCreature.gameObject.activeSelf != activate)
+		{
+			_activeCreature.gameObject.GetComponent<SaveablePrefab>().Active = activate;
+			if (activate)
+			{
+				_activeCreature.CurrentState = Piscus_Creature.PiscusBehaviour.Explore;
+			}
+		}
+	}
+
+	private void CheckInsideTerrain()
+	{
+		if (Physics.CheckSphere(transform.position, 2f, 1 << Layers.TERRAIN) || Physics.Raycast(transform.position + Vector3.up * 5f, -Vector3.up, 7f, 1 << Layers.TERRAIN))
+		{
+			Debug.Log("Manager :: Piscus Manager Destroyed :: Collision with terrain");
+			MultiplayerMng.DestroyMultiplayerEntity(gameObject);
+		}
+	}
+
+	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
+	{
+		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
+		jObject.AddField("spawnDistance", JSerializer.Serialize(_spawnDistance));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			int value = data.GetField("respawnCounter").GetValue<int>();
+			_respawningTimer = value;
+			int value2 = data.GetField("spawnDistance").GetValue<int>();
+			_spawnDistance = value2;
+			float x = transform.localPosition.x;
+			float z = transform.localPosition.z;
+			float y = transform.localPosition.y;
+			if (Mathf.Abs(x) == 100f && Mathf.Abs(z) == 100f)
+			{
+				x = ((!(x > 0f)) ? (-88f) : 88f);
+				z = ((!(z > 0f)) ? (-88f) : 88f);
+				transform.localPosition = new Vector3(x, y, z);
+			}
+		}
+		Initialize();
+	}
+}
+
+
