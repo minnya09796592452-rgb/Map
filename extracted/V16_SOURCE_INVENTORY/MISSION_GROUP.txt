@@ -1,0 +1,759 @@
+V16 MISSION SOURCE GROUP
+=================================================================
+FILES: 151
+
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Achievements.cs
+NAMESPACE: (none)
+DECLARATIONS: Achievements
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/AmplifyImpostors/DeferredBuffers.cs
+NAMESPACE: AmplifyImpostors
+DECLARATIONS: DeferredBuffers
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ChecklistNotificationSequenceNode.cs
+NAMESPACE: Beam
+DECLARATIONS: ChecklistNotificationSequenceNode
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/CraftingCombinationMissionReward.cs
+NAMESPACE: Beam
+DECLARATIONS: CraftingCombinationMissionReward
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionData.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionData
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionDetailsProvider.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionDetailsProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionEventBroadcaster.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionEventBroadcaster
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionEventListener.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionEventListener
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionEventListenerMixins.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionEventListenerMixins
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionGoal.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionGoal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionReward.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionReward
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IMissionRewardProvider.cs
+NAMESPACE: Beam
+DECLARATIONS: IMissionRewardProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/IPlayer.cs
+NAMESPACE: Beam
+DECLARATIONS: IPlayer
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/InteractiveMissionGoal.cs
+NAMESPACE: Beam
+DECLARATIONS: InteractiveMissionGoal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/InteractiveMissionTrigger.cs
+NAMESPACE: Beam
+DECLARATIONS: InteractiveMissionTrigger
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Interactive_MISSION_TRIGGER.cs
+NAMESPACE: Beam
+DECLARATIONS: Interactive_MISSION_TRIGGER
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ItemMissionReward.cs
+NAMESPACE: Beam
+DECLARATIONS: ItemMissionReward
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/LegacyUtilities.cs
+NAMESPACE: Beam
+DECLARATIONS: LegacyUtilities
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/LoadAssetBundleOperation.cs
+NAMESPACE: Beam
+DECLARATIONS: LoadAssetBundleOperation
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/LoadAssetFromBundleOperation.cs
+NAMESPACE: Beam
+DECLARATIONS: LoadAssetFromBundleOperation
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/LocalizedObjective.cs
+NAMESPACE: Beam
+DECLARATIONS: LocalizedObjective
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionAssetLoader.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionAssetLoader; MissionType; ReplicatePrepareGoal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionControllerBase.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionControllerBase; ReplicateEnteredMission; ReplicateLeftMission; ReplicateMissionFailed; ReplicateMissionGoal_Completed; ReplicateMissionStarted; ReplicateOnePlayerLeftMission
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionData.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionData
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionDetailsUnityEvent.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionDetailsUnityEvent
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionEventBroadcasterRelay.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionEventBroadcasterRelay
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionGoalBase.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionGoalBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionInitializer.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionInitializer
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionInitializerBase.cs
+NAMESPACE: Beam
+DECLARATIONS: LinkWithEnvironmentType; MissionInitializerBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionRewardBase.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionRewardBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionRewardProvider.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionRewardProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionStartDetailsUnityEvent.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionStartDetailsUnityEvent
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MissionTrigger.cs
+NAMESPACE: Beam
+DECLARATIONS: MissionTrigger
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MotorVehicleAnimation.cs
+NAMESPACE: Beam
+DECLARATIONS: MotorVehicleAnimation
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/NetworkConnectivity.cs
+NAMESPACE: Beam
+DECLARATIONS: NetworkConnectivity
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/NullMissionEventListener.cs
+NAMESPACE: Beam
+DECLARATIONS: NullMissionEventListener
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Objective.cs
+NAMESPACE: Beam
+DECLARATIONS: Objective
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ObjectiveBase.cs
+NAMESPACE: Beam
+DECLARATIONS: ObjectiveBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ObjectiveDecoratorBase.cs
+NAMESPACE: Beam
+DECLARATIONS: ObjectiveDecoratorBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ParticlesWeatherEventEffect.cs
+NAMESPACE: Beam
+DECLARATIONS: Particles; ParticlesWeatherEventEffect
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Player.cs
+NAMESPACE: Beam
+DECLARATIONS: Player
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/PlayerSpeechTags.cs
+NAMESPACE: Beam
+DECLARATIONS: PlayerSpeechTags
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/PlayerUtilities.cs
+NAMESPACE: Beam
+DECLARATIONS: PlayerUtilities
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/PrefabMissionReward.cs
+NAMESPACE: Beam
+DECLARATIONS: PrefabMissionReward
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ProximityMissionTrigger.cs
+NAMESPACE: Beam
+DECLARATIONS: ProximityMissionTrigger
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Skinner.cs
+NAMESPACE: Beam
+DECLARATIONS: ReplicateHandleMeat; ReplicateStartSkinning; Skinner
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/StoryMissionReward.cs
+NAMESPACE: Beam
+DECLARATIONS: StoryMissionReward
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Tutorial.cs
+NAMESPACE: Beam
+DECLARATIONS: Tutorial
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/TutorialObjectiveCompletedEvent.cs
+NAMESPACE: Beam
+DECLARATIONS: TutorialObjectiveCompletedEvent
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/TutorialObjectiveCompleter.cs
+NAMESPACE: Beam
+DECLARATIONS: TutorialObjectiveCompleter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/IUserContentProvider.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: IUserContentProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/ModFolderContentProvider.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: ModFolderContentProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/NoUserContentProvider.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: NoUserContentProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/SteamAchievements.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: SteamAchievements
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/SteamLeaderboards.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: SteamLeaderboard; SteamLeaderboards
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.AccountServices/SteamWorkshop.cs
+NAMESPACE: Beam.AccountServices
+DECLARATIONS: SteamWorkshop
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: ConstructionObject_BED; ReplicateSaveGameOnMasterMsg; ReplicateSleep_Sequence; Result
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/CraftingCombinations.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: CraftingCombinations
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/FireLighter.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: FireLighter; FireLighterMessage; ReplicateInputForceStop; ReplicateSequence; ReplicateStartLighting
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/Holder.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: Command; Holder; PostReplicatePickup; ReplicateHolderCommand; ReplicatePickup; ReplicateRelease; ReplicateSelect; ReplicateSwitchCurrent
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/Interacter.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: Interacter; PostReplicateDoInteraction_GameAction; ReplicateInteract; ReplicateOnInteractingFellThrough
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/InteractiveObject_LANTERN.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: InteractiveObject_LANTERN
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/Interactive_TORCH.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: Interactive_TORCH
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/AircraftManager.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: AircraftManager
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/AircraftObjectives.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: AircraftObjectives
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/AircraftObjectivesCompletedArgs.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: AircraftObjectivesCompletedArgs
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/AircraftVFX.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: AircraftVFX; ReplicateEnterCockpit
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/Interactive_AIRCRAFT_STATION.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: Interactive_AIRCRAFT_STATION
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/PrivateJetTutorial.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: PrivateJetTutorial
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Language/LocalizationHandler.cs
+NAMESPACE: Beam.Language
+DECLARATIONS: LocalizationEntry; LocalizationHandler
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Language/LocalizationTerms.cs
+NAMESPACE: Beam.Language
+DECLARATIONS: LocalizationTerms
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Serialization/Prefabs.cs
+NAMESPACE: Beam.Serialization
+DECLARATIONS: Prefabs
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/Maps.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: Maps
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/World.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: Bundle; World; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ActiveMissionHudPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ActiveMissionHudPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ActiveMissionHudViewAdapterBase.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ActiveMissionHudViewAdapterBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: CartographerMenuPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/CartographerWorldMapTooltipPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: CartographerWorldMapTooltipPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ChecklistController.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ChecklistController
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ChecklistElementController.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ChecklistElementController
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ChecklistNotification.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ChecklistNotification
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/DisplayMissionNamePresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: DisplayMissionNamePresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/DisplayMissionNameViewAdapterBase.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: DisplayMissionNameViewAdapterBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/IMissionRewardElement.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: IMissionRewardElement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MainMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MainMenuPresenter; MainMenuScreen; ReplicateQuitToMenu; ReplicateStartGame; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MissionCompletedPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MissionCompletedPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MissionCompletedViewAdapterBase.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MissionCompletedViewAdapterBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MissionRewardElement.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MissionRewardElement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MissionRewardElementViewAdapterBase.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MissionRewardElementViewAdapterBase
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/NullActiveMissionHudViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: NullActiveMissionHudViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/NullDisplayMissionNameViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: NullDisplayMissionNameViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/NullMissionCompletedViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: NullMissionCompletedViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/NullMissionRewardElement.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: NullMissionRewardElement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/NullMissionRewardElementViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: NullMissionRewardElementViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/PermissionPromptPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: PermissionPromptPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/StorageMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ReplicateDummyPickupableExchange; ServerValidated_Answer; ServerValidated_Request; StorageMenuPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/TMPActiveMissionHudViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: TMPActiveMissionHudViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/TMPDisplayMissionNameViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: TMPDisplayMissionNameViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/TMPMissionCompletedViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: TMPMissionCompletedViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/TMPMissionRewardElementViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: TMPMissionRewardElementViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/WatchScreenViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: WatchScreenViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/BuoyMultiplayerSync.cs
+NAMESPACE: (none)
+DECLARATIONS: BuoyMultiplayerSync
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/CreateSavePointHelper.cs
+NAMESPACE: (none)
+DECLARATIONS: CreateSavePointHelper
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices/Result.cs
+NAMESPACE: Epic.OnlineServices
+DECLARATIONS: Result
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/CreateLobbyOptions.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: CreateLobbyOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/CreateLobbyOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: CreateLobbyOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyDetailsInfo.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyDetailsInfo
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyDetailsInfoInternal.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyDetailsInfoInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyInterface.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyModification.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyModification
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyModificationSetPermissionLevelOptions.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyModificationSetPermissionLevelOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyModificationSetPermissionLevelOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyModificationSetPermissionLevelOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Lobby/LobbyPermissionLevel.cs
+NAMESPACE: Epic.OnlineServices.Lobby
+DECLARATIONS: LobbyPermissionLevel
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/AddNotifyPeerConnectionRequestOptions.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: AddNotifyPeerConnectionRequestOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/AddNotifyPeerConnectionRequestOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: AddNotifyPeerConnectionRequestOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/GetNextReceivedPacketSizeOptions.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: GetNextReceivedPacketSizeOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/GetNextReceivedPacketSizeOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: GetNextReceivedPacketSizeOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/OnIncomingConnectionRequestCallback.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/OnIncomingConnectionRequestCallbackInternal.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/OnIncomingConnectionRequestInfo.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: OnIncomingConnectionRequestInfo
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/OnIncomingConnectionRequestInfoInternal.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: OnIncomingConnectionRequestInfoInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/P2PInterface.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: P2PInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/ReceivePacketOptions.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: ReceivePacketOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.P2P/ReceivePacketOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.P2P
+DECLARATIONS: ReceivePacketOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.PlayerDataStorage/PlayerDataStorageFileTransferRequest.cs
+NAMESPACE: Epic.OnlineServices.PlayerDataStorage
+DECLARATIONS: PlayerDataStorageFileTransferRequest
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.PlayerDataStorage/PlayerDataStorageInterface.cs
+NAMESPACE: Epic.OnlineServices.PlayerDataStorage
+DECLARATIONS: PlayerDataStorageInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.PlayerDataStorage/ReadResult.cs
+NAMESPACE: Epic.OnlineServices.PlayerDataStorage
+DECLARATIONS: ReadResult
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.PlayerDataStorage/WriteResult.cs
+NAMESPACE: Epic.OnlineServices.PlayerDataStorage
+DECLARATIONS: WriteResult
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/OnlineSessionPermissionLevel.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: OnlineSessionPermissionLevel
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionDetailsSettings.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionDetailsSettings
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionDetailsSettingsInternal.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionDetailsSettingsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionModification.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionModification
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionModificationSetPermissionLevelOptions.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionModificationSetPermissionLevelOptions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionModificationSetPermissionLevelOptionsInternal.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionModificationSetPermissionLevelOptionsInternal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.Sessions/SessionsInterface.cs
+NAMESPACE: Epic.OnlineServices.Sessions
+DECLARATIONS: SessionsInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.TitleStorage/ReadResult.cs
+NAMESPACE: Epic.OnlineServices.TitleStorage
+DECLARATIONS: ReadResult
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.TitleStorage/TitleStorageFileTransferRequest.cs
+NAMESPACE: Epic.OnlineServices.TitleStorage
+DECLARATIONS: TitleStorageFileTransferRequest
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Epic.OnlineServices.TitleStorage/TitleStorageInterface.cs
+NAMESPACE: Epic.OnlineServices.TitleStorage
+DECLARATIONS: TitleStorageInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/FlareGunProjectile.cs
+NAMESPACE: (none)
+DECLARATIONS: FlareGunProjectile
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/FollowSpawn.cs
+NAMESPACE: (none)
+DECLARATIONS: BiomeGrid; FollowSpawn; GridObject; SpawnGrid
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/ClientOnHold.cs
+NAMESPACE: Funlabs
+DECLARATIONS: ClientOnHold
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/DisconnectDetail.cs
+NAMESPACE: Funlabs
+DECLARATIONS: DisconnectDetail
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/DisconnectPayLoad.cs
+NAMESPACE: Funlabs
+DECLARATIONS: DisconnectPayLoad
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/MiniGuid.cs
+NAMESPACE: Funlabs
+DECLARATIONS: MiniGuid
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/MultiplayerFenceExtension.cs
+NAMESPACE: Funlabs
+DECLARATIONS: MultiplayerFenceExtension
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/MultiplayerMng.cs
+NAMESPACE: Funlabs
+DECLARATIONS: AuthenticationService; BoltDestroyCommand; MultiplayerMng; SearchContainer; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/MissionAudio.cs
+NAMESPACE: (none)
+DECLARATIONS: MissionAudio
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/StrandedWorld.cs
+NAMESPACE: (none)
+DECLARATIONS: StrandedWorld
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Zone.cs
+NAMESPACE: (none)
+DECLARATIONS: BiomeType; Zone
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/FilePath.cs
+NAMESPACE: (none)
+DECLARATIONS: FilePath
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/RootMotion.Demos/MechSpiderParticles.cs
+NAMESPACE: RootMotion.Demos
+DECLARATIONS: MechSpiderParticles
+-----------------------------------------------------------------

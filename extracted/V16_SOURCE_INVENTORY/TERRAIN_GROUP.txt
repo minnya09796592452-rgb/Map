@@ -1,0 +1,464 @@
+V16 TERRAIN SOURCE GROUP
+=================================================================
+FILES: 92
+
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/CaptureMode.cs
+NAMESPACE: Beam
+DECLARATIONS: CaptureMode
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Decal.cs
+NAMESPACE: Beam
+DECLARATIONS: Decal
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Footstep.cs
+NAMESPACE: Beam
+DECLARATIONS: Footstep; Footsteps
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/ITerrainProvider.cs
+NAMESPACE: Beam
+DECLARATIONS: ITerrainProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/LegacyUtilities.cs
+NAMESPACE: Beam
+DECLARATIONS: LegacyUtilities
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/MapTools.cs
+NAMESPACE: Beam
+DECLARATIONS: MapTools
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Movement.cs
+NAMESPACE: Beam
+DECLARATIONS: Movement; ReplicateAddVelocity; ReplicateBreakBones; ReplicateEject; ReplicateIsBusy; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/NullTerrainProvider.cs
+NAMESPACE: Beam
+DECLARATIONS: NullTerrainProvider
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/PrefabSizeFitsBetweenTerrainAndOcean.cs
+NAMESPACE: Beam
+DECLARATIONS: PrefabSizeFitsBetweenTerrainAndOcean
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/SnapHeightToTerrain.cs
+NAMESPACE: Beam
+DECLARATIONS: SnapHeightToTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/Statistics.cs
+NAMESPACE: Beam
+DECLARATIONS: DebugCommand; FoodRecord; ReplicateApply; ReplicateApplyDamage; ReplicateApplyDamageDir; ReplicateKnockOut; Statistics
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/TerrainIsBelowPlacement.cs
+NAMESPACE: Beam
+DECLARATIONS: TerrainIsBelowPlacement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/TerrainIsIslandHeightAtPlacement.cs
+NAMESPACE: Beam
+DECLARATIONS: TerrainIsIslandHeightAtPlacement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam/TerrainIsMinimumHeightAtPlacement.cs
+NAMESPACE: Beam
+DECLARATIONS: TerrainIsMinimumHeightAtPlacement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/ConnectorCheck_Height.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: ConnectorCheck_Height
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/Constructing_ANCHOR.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: Constructing_ANCHOR
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/ConstructionObject_BED.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: ConstructionObject_BED; ReplicateSaveGameOnMasterMsg; ReplicateSleep_Sequence; Result
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/Crafter.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: Crafter; ReplicateCancelPlacing; ReplicateCraft; ReplicateFinishPlacing; ReplicateGetCraftingCombinations; ReplicateGetCraftingMaterials; ReplicatePickupAndHandle; ReplicatePlacePickupable; ReplicateSetActive
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/PlacementModifier_LimitHeightToTerrain.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: PlacementModifier_LimitHeightToTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/PlacementModifier_SnapToTerrain.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: PlacementModifier_SnapToTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/PlacementModifier_SnapToWater.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: PlacementModifier_SnapToWater
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Crafting/ProjectileObject.cs
+NAMESPACE: Beam.Crafting
+DECLARATIONS: ProjectileObject
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Intro/AircraftVFX.cs
+NAMESPACE: Beam.Intro
+DECLARATIONS: AircraftVFX; ReplicateEnterCockpit
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Language/LocalizationTerms.cs
+NAMESPACE: Beam.Language
+DECLARATIONS: LocalizationTerms
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Rendering/ImposterScope.cs
+NAMESPACE: Beam.Rendering
+DECLARATIONS: ImposterScope
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Rendering/LodController.cs
+NAMESPACE: Beam.Rendering
+DECLARATIONS: LodController
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/GeneratedObject.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: GeneratedObject
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/GenerationPoints.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: GenerationPoints
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/LoadingResult.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: LoadingResult
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/Map.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: Map
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/MapEditorData.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: EMapSource; EMapState; MapEditorData
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/Maps.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: Maps
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/World.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: Bundle; World; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/ZoneEvents.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: ZoneEvents
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/ZoneLoader.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: EObjectProcessingMode; ZoneLoader; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.Terrain/ZoneObjectGenerator.cs
+NAMESPACE: Beam.Terrain
+DECLARATIONS: ZoneObjectGenerator
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/CartographerMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: CartographerMenuPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/CreateSessionMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: CreateSessionMenuPresenter; HostVisibility
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/ICartographerWorldMapTooltipViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: ICartographerWorldMapTooltipViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/MainMenuPresenter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: MainMenuPresenter; MainMenuScreen; ReplicateQuitToMenu; ReplicateStartGame; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI/UCartographerWorldMapTooltipViewAdapter.cs
+NAMESPACE: Beam.UI
+DECLARATIONS: UCartographerWorldMapTooltipViewAdapter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/IMapListElement.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: IMapListElement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/IWorldMapSlot.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: IWorldMapSlot
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/MapEditorMenuPresenter.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: MapEditorMenuPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/MapEditorSaveMenuPresenter.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: MapEditorSaveMenuPresenter
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/UMapListElement.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: UMapListElement
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Beam.UI.MapEditor/UWorldMapSlot.cs
+NAMESPACE: Beam.UI.MapEditor
+DECLARATIONS: UWorldMapSlot
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Boss_Squid.cs
+NAMESPACE: (none)
+DECLARATIONS: Boss_Squid; ReplicateIntroSetup
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Ceto/AddAutoShoreMask.cs
+NAMESPACE: Ceto
+DECLARATIONS: AddAutoShoreMask
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Ceto/Ocean.cs
+NAMESPACE: Ceto
+DECLARATIONS: Ocean
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Ceto/OverlayManager.cs
+NAMESPACE: Ceto
+DECLARATIONS: OverlayManager
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Ceto/ShoreMaskGenerator.cs
+NAMESPACE: Ceto
+DECLARATIONS: ShoreMaskGenerator
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/CullingSettings.cs
+NAMESPACE: (none)
+DECLARATIONS: CullingSettings
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/FlareGunProjectile.cs
+NAMESPACE: (none)
+DECLARATIONS: FlareGunProjectile
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/FollowSpawn.cs
+NAMESPACE: (none)
+DECLARATIONS: BiomeGrid; FollowSpawn; GridObject; SpawnGrid
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/MPExtensions.cs
+NAMESPACE: Funlabs
+DECLARATIONS: MPExtensions
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Funlabs/MultiplayerWorldSync.cs
+NAMESPACE: Funlabs
+DECLARATIONS: MultiplayerWorldSync; ReplicateState; Slot; SlotData; State
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/IslandDebugTexture.cs
+NAMESPACE: (none)
+DECLARATIONS: IslandDebugTexture
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor/LE_ConfigTerrain.cs
+NAMESPACE: LE_LevelEditor
+DECLARATIONS: LE_ConfigTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor/LE_LevelEditorMain.cs
+NAMESPACE: LE_LevelEditor
+DECLARATIONS: EEstimateDistanceMode; LE_LevelEditorMain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor/LE_SaveLoad.cs
+NAMESPACE: LE_LevelEditor
+DECLARATIONS: LE_SaveLoad
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor/LE_ZoneTileGenerator.cs
+NAMESPACE: LE_LevelEditor
+DECLARATIONS: LE_ZoneTileGenerator
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Core/LE_Object.cs
+NAMESPACE: LE_LevelEditor.Core
+DECLARATIONS: Categories; ESnapType; LE_Object
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Core/LE_TerrainManager.cs
+NAMESPACE: LE_LevelEditor.Core
+DECLARATIONS: LE_TerrainManager
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Events/LE_EventInterface.cs
+NAMESPACE: LE_LevelEditor.Events
+DECLARATIONS: LE_EventInterface
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Events/LE_TerrainCreatedEvent.cs
+NAMESPACE: LE_LevelEditor.Events
+DECLARATIONS: LE_TerrainCreatedEvent
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Logic/LE_LogicLevel.cs
+NAMESPACE: LE_LevelEditor.Logic
+DECLARATIONS: LE_LogicLevel
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.Logic/LE_LogicTerrain.cs
+NAMESPACE: LE_LevelEditor.Logic
+DECLARATIONS: Heightmap; LE_LogicTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_EEditMode.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: LE_EEditMode
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_ETerrainEditMode.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: LE_ETerrainEditMode
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dObject.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: LE_GUI3dObject
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_GUI3dTerrain.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: LE_GUI3dTerrain
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_GUIInterface.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: BoolEventArgs; ColorEventArgs; Delegates; EDraggedObjectState; ETerrainChangeHeightMode; ETerrainUIMode; EditModeEventArgs; EventHandlers; FloatEventArgs; IntEventArgs; LE_GUIInterface; ObjectEditModeEventArgs; ObjectSelectDraggableEventArgs; StringEventArgs; TerrainChangeHeightModeEventArgs; TerrainEditModeEventArgs; TextureEventArgs; bool; float
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LE_LevelEditor.UI/LE_GUIInterface_uGUIimpl.cs
+NAMESPACE: LE_LevelEditor.UI
+DECLARATIONS: LE_GUIInterface_uGUIimpl
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/LevelLoader.cs
+NAMESPACE: (none)
+DECLARATIONS: LevelLoader
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/PiscusManager.cs
+NAMESPACE: (none)
+DECLARATIONS: PiscusManager
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Piscus_Creature.cs
+NAMESPACE: (none)
+DECLARATIONS: PiscusBehaviour; Piscus_Creature; ReplicateAnimations; ReplicateAttackBite; ReplicateAttackNudge; ReplicateFinishAttack; ReplicateState
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/RefractionCullingSettings.cs
+NAMESPACE: (none)
+DECLARATIONS: RefractionCullingSettings
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/SaveManager.cs
+NAMESPACE: (none)
+DECLARATIONS: ReplicateSaveErrorDialogueMsg; ReplicateSavedNotificationMsg; ReplicateSavingStateMsg; SaveManager; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/SceneCallbacks.cs
+NAMESPACE: (none)
+DECLARATIONS: SceneCallbacks
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/SetupAdvancedFoliageShader.cs
+NAMESPACE: (none)
+DECLARATIONS: SetupAdvancedFoliageShader
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/StrandedWorld.cs
+NAMESPACE: (none)
+DECLARATIONS: StrandedWorld
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/TerrainPointSampler.cs
+NAMESPACE: (none)
+DECLARATIONS: TerrainPointSampler
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/WorldTools.cs
+NAMESPACE: (none)
+DECLARATIONS: GeneratorType; PerlinNoise2D; WorldTools
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/Zone.cs
+NAMESPACE: (none)
+DECLARATIONS: BiomeType; Zone
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/ZoneObjects.cs
+NAMESPACE: (none)
+DECLARATIONS: ZoneObjects
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/ZoneTerrainPointSampler.cs
+NAMESPACE: (none)
+DECLARATIONS: ZoneTerrainPointSampler
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp
+FILE: Assembly-CSharp/kode80.Clouds/kode80Clouds.cs
+NAMESPACE: kode80.Clouds
+DECLARATIONS: RenderSize; SubPixelSize; kode80Clouds; void
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/FilePath.cs
+NAMESPACE: (none)
+DECLARATIONS: FilePath
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/Layers.cs
+NAMESPACE: (none)
+DECLARATIONS: Layers
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/RootMotion.Demos/TerrainOffset.cs
+NAMESPACE: RootMotion.Demos
+DECLARATIONS: TerrainOffset
+-----------------------------------------------------------------
+ASSEMBLY: Assembly-CSharp-firstpass
+FILE: Assembly-CSharp-firstpass/Tags.cs
+NAMESPACE: (none)
+DECLARATIONS: Tags
+-----------------------------------------------------------------

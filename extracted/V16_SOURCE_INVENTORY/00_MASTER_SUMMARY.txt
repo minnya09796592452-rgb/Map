@@ -1,0 +1,31 @@
+MISSION 3 - V16 SOURCE INVENTORY
+=================================================================
+Date: 2026-11-20T01:30:11.709589
+Source: /storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED
+Output: /storage/emulated/0/Map Check/reports/V16_SOURCE_INVENTORY
+Boundary: Map Check only
+Original game files modified: NO
+
+TOTAL C# FILES: 3182
+
+ASSEMBLY COUNTS
+----------------------------------------
+Assembly-CSharp: 2942
+Assembly-CSharp-firstpass: 240
+
+GROUP COUNTS
+----------------------------------------
+MAP: 209
+TERRAIN: 92
+HEIGHT: 171
+ISLAND: 38
+MISSION: 151
+OBJECT: 1094
+WATER: 368
+WORLD: 202
+OTHER: 1721
+
+ERROR COUNT: 0
+
+Note: Groups may overlap. Counts are not additive.
+Classification is keyword-based, not proof of functionality.
