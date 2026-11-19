@@ -1,0 +1,1219 @@
+V20 SOURCE METHOD INVESTIGATION
+==============================================================================
+Source files scanned: 17
+
+==============================================================================
+SOURCE: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/01_BEAM_TERRAIN.txt
+MATCHES: 39
+==============================================================================
+
+--- SOURCE LINES 59-158 ---
+000059: }
+000060: 
+000061: ####################################################################################################
+000062: FILE: Beam.Terrain/LoadingResult.cs
+000063: SIZE_BYTES: 105
+000064: SHA256: 594b921c28f3807c31437a70d0699907095aaaf283fb9f72db9e4adae0a3bfe3
+000065: ####################################################################################################
+000066: 
+000067: namespace Beam.Terrain;
+000068: 
+000069: public class LoadingResult
+000070: {
+000071: 	public bool Succeeded;
+000072: 
+000073: 	public string Message;
+000074: }
+000075: 
+000076: ####################################################################################################
+000077: FILE: Beam.Terrain/Map.cs
+000078: SIZE_BYTES: 762
+000079: SHA256: 9911e28016cb4878c66393c4ab7ddef05a7c56e7caca158d6e4ad9f8be8e296d
+000080: ####################################################################################################
+000081: 
+000082: using System;
+000083: using Beam.Serialization.Json;
+000084: 
+000085: namespace Beam.Terrain;
+000086: 
+000087: [Serializable]
+000088: public class Map
+000089: {
+000090: 	public MapEditorData EditorData;
+000091: 
+000092: 	public JObject ObjectData;
+000093: 
+000094: 	public float[,] HeightmapData;
+000095: 
+000096: 	public Map()
+000097: 	{
+000098: 		EditorData = new MapEditorData();
+000099: 	}
+000100: 
+000101: 	public bool IsProceduralMap()
+000102: 	{
+000103: 		if (EditorData == null)
+000104: 		{
+000105: 			return false;
+000106: 		}
+000107: 		return EditorData.Id.Contains("INTERNAL_PROCEDURAL");
+000108: 	}
+000109: 
+000110: 	public bool IsCustomMap()
+000111: 	{
+000112: 		if (EditorData == null)
+000113: 		{
+000114: 			return false;
+000115: 		}
+000116: 		return !IsProceduralMap();
+000117: 	}
+000118: 
+000119: 	private bool IsInternalMap()
+000120: 	{
+000121: 		if (EditorData == null)
+000122: 		{
+000123: 			return false;
+000124: 		}
+000125: 		return EditorData.Id.Contains("INTERNAL");
+000126: 	}
+000127: 
+000128: 	public bool IsUserMap()
+000129: 	{
+000130: 		if (EditorData == null)
+000131: 		{
+000132: 			return false;
+000133: 		}
+000134: 		return !IsInternalMap();
+000135: 	}
+000136: }
+000137: 
+000138: ####################################################################################################
+000139: FILE: Beam.Terrain/MapEditorData.cs
+000140: SIZE_BYTES: 1091
+000141: SHA256: 199e6d47475d6ccba170f808adb225139adda62242e3e1f924177a27f57aad59
+000142: ####################################################################################################
+000143: 
+000144: using System;
+000145: using UnityEngine;
+000146: 
+000147: namespace Beam.Terrain;
+000148: 
+000149: [Serializable]
+000150: public class MapEditorData
+000151: {
+000152: 	public enum EMapSource
+000153: 	{
+000154: 		[Description("MAP_SOURCE_LOCAL", "")]
+000155: 		Local,
+000156: 		[Description("MAP_SOURCE_COMMUNITY", "")]
+000157: 		Community
+000158: 	}
+
+--- SOURCE LINES 283-520 ---
+000283: 		{
+000284: 			Succeeded = true
+000285: 		};
+000286: 	}
+000287: 
+000288: 	public static bool ValidateMapFolder(string mapPath, string mapName)
+000289: 	{
+000290: 		if (File.Exists(PathTools.Combine(mapPath, mapName + "_EDITOR.map")) && File.Exists(PathTools.Combine(mapPath, mapName + "_OBJECT.map")))
+000291: 		{
+000292: 			return File.Exists(PathTools.Combine(mapPath, mapName + "_HEIGHT.map"));
+000293: 		}
+000294: 		return false;
+000295: 	}
+000296: 
+000297: 	public static string GetMapFolderName(Map map)
+000298: 	{
+000299: 		return "MAP_" + MapTools.FormatNameForSave(map.EditorData.Id);
+000300: 	}
+000301: 
+000302: 	public static void SaveMap(Map map, string directoryPath)
+000303: 	{
+000304: 		string mapFolderName = GetMapFolderName(map);
+000305: 		string text = PathTools.Combine(directoryPath, mapFolderName);
+000306: 		if (!Directory.Exists(text))
+000307: 		{
+000308: 			Directory.CreateDirectory(text);
+000309: 		}
+000310: 		using FileStream streamEditor = new FileStream(PathTools.Combine(text, mapFolderName + "_EDITOR.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+000311: 		using FileStream streamObject = new FileStream(PathTools.Combine(text, mapFolderName + "_OBJECT.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+000312: 		using FileStream streamHeight = new FileStream(PathTools.Combine(text, mapFolderName + "_HEIGHT.map"), FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+000313: 		map.Save(streamEditor, streamObject, streamHeight);
+000314: 	}
+000315: 
+000316: 	public static void Save(this Map map, Stream streamEditor, Stream streamObject, Stream streamHeight)
+000317: 	{
+000318: 		if (!MPExtensions.IsCompressStableValuesInitialized())
+000319: 		{
+000320: 			MPExtensions.InitializeCompressStableValues();
+000321: 		}
+000322: 		try
+000323: 		{
+000324: 			new BinaryFormatter().Serialize(streamEditor, map.EditorData);
+000325: 		}
+000326: 		catch (Exception ex)
+000327: 		{
+000328: 			Debug.LogError("Map::SaveMap:: Error saving map editor data: " + ex.Message);
+000329: 			throw;
+000330: 		}
+000331: 		try
+000332: 		{
+000333: 			using StreamWriter streamWriter = new StreamWriter(streamObject);
+000334: 			streamWriter.Write(map.ObjectData.ToString());
+000335: 		}
+000336: 		catch (Exception ex2)
+000337: 		{
+000338: 			Debug.LogError("Map::SaveMap:: Error saving map object data: " + ex2.Message);
+000339: 			throw;
+000340: 		}
+000341: 		try
+000342: 		{
+000343: 			using BinaryWriter binaryWriter = new BinaryWriter(streamHeight);
+000344: 			for (int i = 0; i < 257; i++)
+000345: 			{
+000346: 				for (int j = 0; j < 257; j++)
+000347: 				{
+000348: 					binaryWriter.Write(map.HeightmapData[i, j].Compress());
+000349: 				}
+000350: 			}
+000351: 		}
+000352: 		catch (Exception ex3)
+000353: 		{
+000354: 			Debug.LogError("Map::SaveMap:: Error saving map heightmap data: " + ex3.Message);
+000355: 			throw;
+000356: 		}
+000357: 	}
+000358: 
+000359: 	public static Map LoadMap(string mapPath, string mapName, bool checkVersion = false)
+000360: 	{
+000361: 		using FileStream editorStream = new FileStream(PathTools.Combine(mapPath, mapName + "_EDITOR.map"), FileMode.Open, FileAccess.Read);
+000362: 		using FileStream objectStream = new FileStream(PathTools.Combine(mapPath, mapName + "_OBJECT.map"), FileMode.Open, FileAccess.Read);
+000363: 		using FileStream heightStream = new FileStream(PathTools.Combine(mapPath, mapName + "_HEIGHT.map"), FileMode.Open, FileAccess.Read);
+000364: 		Map map = new Map();
+000365: 		map.Load(editorStream, objectStream, heightStream, checkVersion);
+000366: 		return map;
+000367: 	}
+000368: 
+000369: 	public static void CreateTextures(this Map map)
+000370: 	{
+000371: 		if (!(map?.EditorData?.LargePreviewImage != null))
+000372: 		{
+000373: 			Texture2D texture2D = new Texture2D(1, 1);
+000374: 			texture2D.LoadImage(map.EditorData.LargePreviewImageBytes);
+000375: 			texture2D.wrapMode = TextureWrapMode.Clamp;
+000376: 			map.EditorData.LargePreviewImage = texture2D;
+000377: 			map.EditorData.Valid = true;
+000378: 			if (map.EditorData.Biome == Zone.BiomeType.CARRIER)
+000379: 			{
+000380: 				map.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Carrier") as Texture2D;
+000381: 			}
+000382: 			else if (map.EditorData.Biome == Zone.BiomeType.MISSION)
+000383: 			{
+000384: 				map.EditorData.SmallPreviewImage = Resources.Load("Icons/WorldMap_Icon_Mission") as Texture2D;
+000385: 			}
+000386: 			else
+000387: 			{
+000388: 				map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+000389: 			}
+000390: 		}
+000391: 	}
+000392: 
+000393: 	public static void Load(this Map map, Stream editorStream, Stream objectStream, Stream heightStream, bool checkVersion, bool createTextures = true)
+000394: 	{
+000395: 		if (!MPExtensions.IsCompressStableValuesInitialized())
+000396: 		{
+000397: 			MPExtensions.InitializeCompressStableValues();
+000398: 		}
+000399: 		try
+000400: 		{
+000401: 			MapEditorData editorData = (MapEditorData)new BinaryFormatter().Deserialize(editorStream);
+000402: 			map.EditorData = editorData;
+000403: 		}
+000404: 		catch (Exception ex)
+000405: 		{
+000406: 			Debug.LogError("Map::LoadMap:: Error loading map editor data:\n\n" + ex.Message + "\n" + ex.StackTrace);
+000407: 			throw;
+000408: 		}
+000409: 		if (checkVersion)
+000410: 		{
+000411: 			try
+000412: 			{
+000413: 				if (!SaveManager.ValidateVersionNumber(new Version(map.EditorData.GameVersionNumber)))
+000414: 				{
+000415: 					throw new VersionException("Map [" + map.EditorData.Name + "] is out of date and no longer supported.");
+000416: 				}
+000417: 			}
+000418: 			catch (ArgumentNullException)
+000419: 			{
+000420: 				throw new VersionException("Map [" + map.EditorData.Name + "] is out of date and no longer supported.");
+000421: 			}
+000422: 		}
+000423: 		try
+000424: 		{
+000425: 			using StreamReader streamReader = new StreamReader(objectStream);
+000426: 			try
+000427: 			{
+000428: 				JObject jObject = new JObject(streamReader.ReadToEnd());
+000429: 				PatchObjectsReferenceId(jObject);
+000430: 				map.ObjectData = jObject;
+000431: 			}
+000432: 			catch (JSerializerException ex3)
+000433: 			{
+000434: 				Debug.LogError(ex3.Message);
+000435: 				throw;
+000436: 			}
+000437: 		}
+000438: 		catch (Exception ex4)
+000439: 		{
+000440: 			Debug.LogError("Map::LoadMap:: Error loading map [" + map.EditorData.Name + "] object data:\n\n" + ex4.Message + "\n" + ex4.StackTrace);
+000441: 			throw;
+000442: 		}
+000443: 		try
+000444: 		{
+000445: 			using BinaryReader binaryReader = new BinaryReader(heightStream);
+000446: 			binaryReader.BaseStream.Seek(0L, SeekOrigin.Begin);
+000447: 			float[,] array = new float[257, 257];
+000448: 			for (int i = 0; i < 257; i++)
+000449: 			{
+000450: 				for (int j = 0; j < 257; j++)
+000451: 				{
+000452: 					ushort value = binaryReader.ReadUInt16().ToCompressStable();
+000453: 					array[i, j] = value.Decompress();
+000454: 				}
+000455: 			}
+000456: 			map.HeightmapData = array;
+000457: 		}
+000458: 		catch (Exception ex5)
+000459: 		{
+000460: 			Debug.LogError("Map::LoadMap:: Error loading map heightmap data:\n\n" + ex5.Message + "\n" + ex5.StackTrace);
+000461: 			throw;
+000462: 		}
+000463: 		if (createTextures)
+000464: 		{
+000465: 			map.CreateTextures();
+000466: 		}
+000467: 	}
+000468: 
+000469: 	private static void PatchObjectsReferenceId(JObject objects)
+000470: 	{
+000471: 		if (objects == null || objects.Children == null)
+000472: 		{
+000473: 			return;
+000474: 		}
+000475: 		foreach (JObject child in objects.Children)
+000476: 		{
+000477: 			if (child != null)
+000478: 			{
+000479: 				uint prefabId = Prefabs.GetPrefabId(child);
+000480: 				if (prefabId != 0 && Prefabs.GetReferenceId(child, safe: false).IsDefault())
+000481: 				{
+000482: 					Prefabs.SetReferenceId(child, MiniGuid.NewFrom(Prefabs.GetPosition(child), prefabId, 48879));
+000483: 				}
+000484: 			}
+000485: 		}
+000486: 	}
+000487: 
+000488: 	public static IEnumerable<Map> LoadDefaultMaps(out LoadingResult result)
+000489: 	{
+000490: 		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.DEFAULT_MAPS_FOLDER), out result);
+000491: 		if (list != null && list.Count > 0)
+000492: 		{
+000493: 			_defaultMapList.Clear();
+000494: 			_defaultMapList.AddRange(list);
+000495: 		}
+000496: 		return _defaultMapList;
+000497: 	}
+000498: 
+000499: 	public static IEnumerable<Map> LoadLocalMaps(out LoadingResult result)
+000500: 	{
+000501: 		_userMapList.Clear();
+000502: 		result = CreateMapFolders();
+000503: 		if (!result.Succeeded)
+000504: 		{
+000505: 			return _userMapList;
+000506: 		}
+000507: 		IList<Map> list = LoadMaps(Directory.GetDirectories(FilePath.LOCAL_MAPS_FOLDER), out result);
+000508: 		if (list != null && list.Count > 0)
+000509: 		{
+000510: 			_userMapList.AddRange(list);
+000511: 		}
+000512: 		return _userMapList;
+000513: 	}
+000514: 
+000515: 	public static IEnumerable<Map> LoadRemoteMaps(IEnumerable<string> paths, out LoadingResult result)
+000516: 	{
+000517: 		IList<Map> list = LoadMaps(paths, out result);
+000518: 		if (list != null && list.Count > 0)
+000519: 		{
+000520: 			_remoteMaps.Clear();
+
+--- SOURCE LINES 648-827 ---
+000648: using Funlabs;
+000649: using SharpNeatLib.Maths;
+000650: using UnityEngine;
+000651: 
+000652: namespace Beam.Terrain;
+000653: 
+000654: public static class World
+000655: {
+000656: 	public struct Bundle
+000657: 	{
+000658: 		public Map[] Maps;
+000659: 
+000660: 		public Vector2[] GenerationZonePositons;
+000661: 
+000662: 		public Vector2[] GeneratedZonePoints;
+000663: 
+000664: 		public Bundle Clear()
+000665: 		{
+000666: 			Maps = new Map[49];
+000667: 			GenerationZonePositons = (GeneratedZonePoints = null);
+000668: 			return this;
+000669: 		}
+000670: 
+000671: 		public static Bundle New()
+000672: 		{
+000673: 			return default(Bundle).Clear();
+000674: 		}
+000675: 
+000676: 		public void Save(Stream stream, byte[] header = null)
+000677: 		{
+000678: 			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Compress, leaveOpen: true);
+000679: 			if (header != null && header.Length != 0)
+000680: 			{
+000681: 				gZipStream.Write(header, 0, header.Length);
+000682: 			}
+000683: 			using BinaryWriter binaryWriter = new BinaryWriter(gZipStream);
+000684: 			for (int i = 0; i < 49; i++)
+000685: 			{
+000686: 				Map map = Maps[i];
+000687: 				using MemoryStream memoryStream = new MemoryStream();
+000688: 				using MemoryStream memoryStream2 = new MemoryStream();
+000689: 				using MemoryStream memoryStream3 = new MemoryStream();
+000690: 				map.Save(memoryStream, memoryStream2, memoryStream3);
+000691: 				byte[] array = memoryStream.ToArray();
+000692: 				byte[] array2 = memoryStream2.ToArray();
+000693: 				byte[] array3 = memoryStream3.ToArray();
+000694: 				binaryWriter.Write(array.Length);
+000695: 				binaryWriter.Write(array2.Length);
+000696: 				binaryWriter.Write(array3.Length);
+000697: 				binaryWriter.Write(array);
+000698: 				binaryWriter.Write(array2);
+000699: 				binaryWriter.Write(array3);
+000700: 			}
+000701: 			for (int j = 0; j < 49; j++)
+000702: 			{
+000703: 				binaryWriter.Write(GenerationZonePositons[j]);
+000704: 			}
+000705: 			binaryWriter.Write((ushort)GeneratedZonePoints.Length);
+000706: 			for (int k = 0; k < GeneratedZonePoints.Length; k++)
+000707: 			{
+000708: 				binaryWriter.Write(GeneratedZonePoints[k]);
+000709: 			}
+000710: 		}
+000711: 
+000712: 		public void Load(Stream stream, bool createTextures, byte[] header = null)
+000713: 		{
+000714: 			using GZipStream gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+000715: 			if (header != null && header.Length != 0)
+000716: 			{
+000717: 				gZipStream.Read(header, 0, header.Length);
+000718: 			}
+000719: 			using BinaryReader binaryReader = new BinaryReader(gZipStream);
+000720: 			Maps = new Map[49];
+000721: 			for (int i = 0; i < 49; i++)
+000722: 			{
+000723: 				Map map = new Map();
+000724: 				int num = binaryReader.ReadInt32();
+000725: 				int num2 = binaryReader.ReadInt32();
+000726: 				int num3 = binaryReader.ReadInt32();
+000727: 				byte[] buffer = new byte[num];
+000728: 				byte[] buffer2 = new byte[num2];
+000729: 				byte[] buffer3 = new byte[num3];
+000730: 				binaryReader.Read(buffer, 0, num);
+000731: 				binaryReader.Read(buffer2, 0, num2);
+000732: 				binaryReader.Read(buffer3, 0, num3);
+000733: 				using (MemoryStream editorStream = new MemoryStream(buffer, 0, num))
+000734: 				{
+000735: 					using MemoryStream objectStream = new MemoryStream(buffer2, 0, num2);
+000736: 					using MemoryStream heightStream = new MemoryStream(buffer3, 0, num3);
+000737: 					map.Load(editorStream, objectStream, heightStream, checkVersion: false, createTextures);
+000738: 				}
+000739: 				Maps[i] = map;
+000740: 			}
+000741: 			GenerationZonePositons = new Vector2[49];
+000742: 			for (int j = 0; j < 49; j++)
+000743: 			{
+000744: 				GenerationZonePositons[j] = binaryReader.ReadVector2();
+000745: 			}
+000746: 			ushort num4 = binaryReader.ReadUInt16();
+000747: 			GeneratedZonePoints = new Vector2[num4];
+000748: 			for (int k = 0; k < num4; k++)
+000749: 			{
+000750: 				GeneratedZonePoints[k] = binaryReader.ReadVector2();
+000751: 			}
+000752: 		}
+000753: 
+000754: 		public override string ToString()
+000755: 		{
+000756: 			string text = base.ToString();
+000757: 			if (Maps.IsValid() && Maps.Length != 0)
+000758: 			{
+000759: 				int num = 0;
+000760: 				Map[] maps = Maps;
+000761: 				foreach (Map map in maps)
+000762: 				{
+000763: 					num += map.HeightmapData.GetLength(0) * map.HeightmapData.GetLength(1);
+000764: 				}
+000765: 				num /= Maps.Length;
+000766: 				int num2 = (int)Mathf.Sqrt(num);
+000767: 				text += $"\nMaps[{Maps.Length}] {num2}x{num2}";
+000768: 			}
+000769: 			if (GenerationZonePositons.IsValid())
+000770: 			{
+000771: 				text += $"\nGenerationZonePositons[{GenerationZonePositons.Length}]";
+000772: 			}
+000773: 			if (GeneratedZonePoints.IsValid())
+000774: 			{
+000775: 				text += $"\nGeneratedZonePoints[{GeneratedZonePoints.Length}]";
+000776: 			}
+000777: 			return text;
+000778: 		}
+000779: 	}
+000780: 
+000781: 	public delegate void WorldSavedCallback(LoadingResult result);
+000782: 
+000783: 	public const string WORLD_SEED_FILENAME = "Seed.sdd";
+000784: 
+000785: 	private const int NUM_MISSIONS = 4;
+000786: 
+000787: 	private static Bundle[] _worlds = new Bundle[2]
+000788: 	{
+000789: 		Bundle.New(),
+000790: 		Bundle.New()
+000791: 	};
+000792: 
+000793: 	private static int _currentWorld = 0;
+000794: 
+000795: 	public static Bundle CurrentWorld => _worlds[_currentWorld];
+000796: 
+000797: 	private static Map[] _mapList
+000798: 	{
+000799: 		get
+000800: 		{
+000801: 			return _worlds[_currentWorld].Maps;
+000802: 		}
+000803: 		set
+000804: 		{
+000805: 			_worlds[_currentWorld].Maps = value;
+000806: 		}
+000807: 	}
+000808: 
+000809: 	public static Map[] MapList => _mapList;
+000810: 
+000811: 	private static Vector2[] _generationZonePositons
+000812: 	{
+000813: 		get
+000814: 		{
+000815: 			return _worlds[_currentWorld].GenerationZonePositons;
+000816: 		}
+000817: 		set
+000818: 		{
+000819: 			_worlds[_currentWorld].GenerationZonePositons = value;
+000820: 		}
+000821: 	}
+000822: 
+000823: 	public static Vector2[] GenerationZonePositons => _generationZonePositons;
+000824: 
+000825: 	private static Vector2[] _generatedZonePoints
+000826: 	{
+000827: 		get
+
+--- SOURCE LINES 968-1079 ---
+000968: 								Succeeded = false
+000969: 							};
+000970: 						}
+000971: 					}
+000972: 					continue;
+000973: 				}
+000974: 				return new LoadingResult
+000975: 				{
+000976: 					Message = "WORLD_MSG_MISSING_WORLD_FOLDER",
+000977: 					Succeeded = false
+000978: 				};
+000979: 			}
+000980: 		}
+000981: 		catch (Exception ex2)
+000982: 		{
+000983: 			return new LoadingResult
+000984: 			{
+000985: 				Message = ex2.Message,
+000986: 				Succeeded = false
+000987: 			};
+000988: 		}
+000989: 		return new LoadingResult
+000990: 		{
+000991: 			Succeeded = true
+000992: 		};
+000993: 	}
+000994: 
+000995: 	private static Map CreateProceduralMap(int index, int seed)
+000996: 	{
+000997: 		Map map = new Map();
+000998: 		Zone.BiomeType biomeType = WorldTools.GenerateZoneBiome(Zone.BiomeType.RANDOM, StrandedWorld.WORLD_SEED - seed);
+000999: 		if (index == 0)
+001000: 		{
+001001: 			biomeType = Zone.BiomeType.ISLAND_SMALL;
+001002: 		}
+001003: 		float[,] heightmapData = WorldTools.GenerateZoneHeightmap(biomeType, StrandedWorld.WORLD_SEED - seed);
+001004: 		map.EditorData = new MapEditorData
+001005: 		{
+001006: 			Name = MapNameGenerator.GenerateRandomMapName(seed),
+001007: 			Id = string.Format("{0}_{1}", "INTERNAL_PROCEDURAL", index),
+001008: 			VersionNumber = 0,
+001009: 			Biome = biomeType,
+001010: 			Author = "Beam Team",
+001011: 			Description = "MAP_DESC_PROCEDURAL"
+001012: 		};
+001013: 		map.ObjectData = new JObject();
+001014: 		map.HeightmapData = heightmapData;
+001015: 		map.EditorData.SmallPreviewImage = MapTools.CreateHeightmapTexture(map.HeightmapData);
+001016: 		return map;
+001017: 	}
+001018: 
+001019: 	public static bool ReplaceMapWithProceduralMap(Map replaceMap, out Map proceduralMap)
+001020: 	{
+001021: 		proceduralMap = null;
+001022: 		int num = 0;
+001023: 		for (int i = 0; i < 49; i++)
+001024: 		{
+001025: 			if (_mapList[i] == replaceMap)
+001026: 			{
+001027: 				Map map = CreateProceduralMap(i, num);
+001028: 				_mapList[i] = map;
+001029: 				proceduralMap = map;
+001030: 				return true;
+001031: 			}
+001032: 			num++;
+001033: 		}
+001034: 		return false;
+001035: 	}
+001036: 
+001037: 	public static void ReplaceMap(Map mapToReplace, Map replacingMap)
+001038: 	{
+001039: 		for (int i = 0; i < 49; i++)
+001040: 		{
+001041: 			if (_mapList[i] == mapToReplace)
+001042: 			{
+001043: 				_mapList[i] = replacingMap;
+001044: 				break;
+001045: 			}
+001046: 		}
+001047: 	}
+001048: 
+001049: 	private static int[] CreateMissionTiles()
+001050: 	{
+001051: 		FastRandom fastRandom = new FastRandom(StrandedWorld.WORLD_SEED);
+001052: 		int upperBound = 48;
+001053: 		List<int> list = new List<int>();
+001054: 		int[] array = new int[4];
+001055: 		for (int i = 0; i < 4; i++)
+001056: 		{
+001057: 			int num = fastRandom.Next(1, upperBound);
+001058: 			while (list.Contains(num))
+001059: 			{
+001060: 				num = fastRandom.Next(1, upperBound);
+001061: 			}
+001062: 			list.Add(num);
+001063: 			array[i] = num;
+001064: 		}
+001065: 		return array;
+001066: 	}
+001067: 
+001068: 	public static void CreateWorld(bool legacy = false)
+001069: 	{
+001070: 		CreateWorldZonePoints(StrandedWorld.WORLD_SEED);
+001071: 		_mapList = new Map[49];
+001072: 		for (int i = 0; i < _generationZonePositons.Length; i++)
+001073: 		{
+001074: 			int seed = i;
+001075: 			Map map = CreateProceduralMap(i, seed);
+001076: 			_mapList[i] = map;
+001077: 		}
+001078: 		if (legacy)
+001079: 		{
+
+--- SOURCE LINES 1369-1488 ---
+001369: 						loadingResult.Succeeded = false;
+001370: 						Debug.LogError("World::LoadWorldMaps:: " + ex2.Message);
+001371: 					}
+001372: 				}
+001373: 				continue;
+001374: 				end_IL_0138:
+001375: 				break;
+001376: 			}
+001377: 			if (loadingResult.Succeeded)
+001378: 			{
+001379: 				loadingResult.Message = "WORLD_MSG_SUCCESS";
+001380: 				Debug.Log("World::LoadWorldMaps:: Success.");
+001381: 			}
+001382: 			return loadingResult;
+001383: 		}
+001384: 		catch (Exception ex3)
+001385: 		{
+001386: 			loadingResult.Message = "WORLD_MSG_ERROR_LOADING_WORLD_MAPS " + ex3.Message;
+001387: 			loadingResult.Succeeded = false;
+001388: 			Debug.LogError("World::LoadWorldMaps:: " + ex3.Message);
+001389: 			return loadingResult;
+001390: 		}
+001391: 	}
+001392: 
+001393: 	private static string GetWorldMapFolderName(int index, bool legacy = false)
+001394: 	{
+001395: 		if (legacy)
+001396: 		{
+001397: 			int num = index % 5;
+001398: 			int num2 = (index - num) / 5;
+001399: 			return $"{num}_{num2}";
+001400: 		}
+001401: 		return index.ToString();
+001402: 	}
+001403: 
+001404: 	public static float[,] ImportHeightmapFromRawFile(string path)
+001405: 	{
+001406: 		float[,] array = new float[257, 257];
+001407: 		int num = 66049;
+001408: 		num *= 2;
+001409: 		byte[] array2 = new byte[num];
+001410: 		try
+001411: 		{
+001412: 			using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+001413: 			try
+001414: 			{
+001415: 				fileStream.Read(array2, 0, num);
+001416: 			}
+001417: 			catch (ArgumentException)
+001418: 			{
+001419: 				throw new Exception("Error raw heightmap import.");
+001420: 			}
+001421: 		}
+001422: 		catch (Exception ex2)
+001423: 		{
+001424: 			Debug.LogError("World::ImportHeightmapFromRawFile::\n\n" + ex2.Message);
+001425: 			return array;
+001426: 		}
+001427: 		int num2 = 0;
+001428: 		for (int i = 0; i < 257; i++)
+001429: 		{
+001430: 			for (int j = 0; j < 257; j++)
+001431: 			{
+001432: 				float num3 = (float)(int)array2[num2++] + (float)(int)array2[num2++] * 256f;
+001433: 				array[257 - i - 1, j] = num3 / 65535f;
+001434: 			}
+001435: 		}
+001436: 		return array;
+001437: 	}
+001438: }
+001439: 
+001440: ####################################################################################################
+001441: FILE: Beam.Terrain/ZoneEvents.cs
+001442: SIZE_BYTES: 1327
+001443: SHA256: a4cdd7041d110d651e4c64f4df4c395daf51078cab03e22c7fd8200901235fb0
+001444: ####################################################################################################
+001445: 
+001446: using System;
+001447: using Beam.Events;
+001448: using UnityEngine;
+001449: 
+001450: namespace Beam.Terrain;
+001451: 
+001452: public class ZoneEvents : MonoBehaviour
+001453: {
+001454: 	public event Action<Zone> CampFirePlaced;
+001455: 
+001456: 	public event Action<Zone, PlantType> CropPlanted;
+001457: 
+001458: 	private void Awake()
+001459: 	{
+001460: 		EventManager.AddListener<CampFirePlacedEvent>(EventManager_CampFirePlacedEvent);
+001461: 		EventManager.AddListener<CropPlantedEvent>(EventManager_PlantedCropEvent);
+001462: 	}
+001463: 
+001464: 	private void OnDestroy()
+001465: 	{
+001466: 		EventManager.RemoveListener<CampFirePlacedEvent>(EventManager_CampFirePlacedEvent);
+001467: 		EventManager.RemoveListener<CropPlantedEvent>(EventManager_PlantedCropEvent);
+001468: 		CampFirePlaced = null;
+001469: 		CropPlanted = null;
+001470: 	}
+001471: 
+001472: 	private void EventManager_CampFirePlacedEvent(CampFirePlacedEvent e)
+001473: 	{
+001474: 		Zone zone = StrandedWorld.GetZone(e.Position);
+001475: 		if (zone != null)
+001476: 		{
+001477: 			zone.Attributes.CampFires++;
+001478: 			CampFirePlaced?.Invoke(zone);
+001479: 			Debug.Log("ZoneEvents: '" + zone.name + "' campfires: " + zone.Attributes.CampFires);
+001480: 		}
+001481: 	}
+001482: 
+001483: 	private void EventManager_PlantedCropEvent(CropPlantedEvent e)
+001484: 	{
+001485: 		Zone zone = StrandedWorld.GetZone(e.Position);
+001486: 		if (zone != null && zone.Attributes.Crops.ContainsKey(e.PlantType))
+001487: 		{
+001488: 			zone.Attributes.Crops[e.PlantType]++;
+==============================================================================
+SOURCE: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/03_WORLD_TERRAIN.txt
+MATCHES: 1
+==============================================================================
+
+--- SOURCE LINES 392-491 ---
+000392: 		base.OnDestroy();
+000393: 	}
+000394: 
+000395: 	private void InitializeZones()
+000396: 	{
+000397: 		for (int i = 0; i < Zones.Length; i++)
+000398: 		{
+000399: 			Zone zone = Zones[i];
+000400: 			zone.gameObject.SetActive(value: true);
+000401: 			zone.Terrain.heightmapPixelError = 75f;
+000402: 			zone.Terrain.basemapDistance = 180f;
+000403: 			GetZoneData(zone)?.IsNull();
+000404: 		}
+000405: 	}
+000406: 
+000407: 	private void LoadWorld()
+000408: 	{
+000409: 		LoadingResult loadingResult = World.LoadWorld();
+000410: 		if (loadingResult.Succeeded)
+000411: 		{
+000412: 			ApplyWorldToZones();
+000413: 		}
+000414: 		else
+000415: 		{
+000416: 			Debug.LogError("StrandedWorld:: Error loading world: " + loadingResult.Message);
+000417: 		}
+000418: 	}
+000419: 
+000420: 	public void ApplyWorldToZones()
+000421: 	{
+000422: 		LoadZonePositions();
+000423: 		for (int i = 0; i < 49; i++)
+000424: 		{
+000425: 			Zone zone = Zones[i];
+000426: 			Map map = World.MapList[i];
+000427: 			zone.Terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+000428: 			zone.ZoneName = map.EditorData.Name;
+000429: 			zone.Id = map.EditorData.Id;
+000430: 			zone.Version = map.EditorData.VersionNumber;
+000431: 			zone.Biome = map.EditorData.Biome;
+000432: 			zone.IsMapEditor = map.IsCustomMap();
+000433: 			zone.IsUserMap = map.IsUserMap();
+000434: 			zone.Seed = i;
+000435: 			Texture2D height = WorldTools.CreateHeightMapTexture(zone.Terrain.terrainData);
+000436: 			Texture2D shore = WorldTools.CreateShoreMaskTexture(zone.Terrain.terrainData);
+000437: 			if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL || zone.Biome == Zone.BiomeType.ISLAND_ROCK || zone.Biome == Zone.BiomeType.CARRIER)
+000438: 			{
+000439: 				zone.WaveOverlay = AddWaveOverlay(zone.gameObject, height, shore);
+000440: 			}
+000441: 			zone.SaveContainer.transform.SetAsLastSibling();
+000442: 		}
+000443: 	}
+000444: 
+000445: 	private void LoadObjects(JObject rootData = null)
+000446: 	{
+000447: 		_zoneSavedObjectsLookup.Clear();
+000448: 		if (Game.State == GameState.LOAD_GAME)
+000449: 		{
+000450: 			rootData = rootData ?? SaveManager.LoadSaveFile(Game.Mode);
+000451: 			JObject persistentData = SaveManager.GetPersistentData(rootData);
+000452: 			if (persistentData == null || persistentData.IsNull())
+000453: 			{
+000454: 				return;
+000455: 			}
+000456: 			JObject field = persistentData.GetField("StrandedWorld");
+000457: 			if (field == null || field.IsNull())
+000458: 			{
+000459: 				Debug.LogError("StrandedWorld data is null or empty.");
+000460: 				return;
+000461: 			}
+000462: 			JObject field2 = field.GetField("Zones");
+000463: 			if (field2 == null || field2.IsNull())
+000464: 			{
+000465: 				Debug.LogError("Zones data is null or empty.");
+000466: 				return;
+000467: 			}
+000468: 			for (int i = 0; i < 49; i++)
+000469: 			{
+000470: 				Zone zone = Zones[i];
+000471: 				Map map = World.MapList[i];
+000472: 				JObject jObject = field2.Children[i];
+000473: 				string value = jObject.GetField("Id").GetValue<string>();
+000474: 				int value2 = jObject.GetField("Version").GetValue<int>();
+000475: 				if (map.EditorData.Id != value || map.EditorData.VersionNumber != value2)
+000476: 				{
+000477: 					JObject jObject2 = new JObject();
+000478: 					jObject2.AddField("Name", map.EditorData.Name);
+000479: 					jObject2.AddField("Id", map.EditorData.Id);
+000480: 					jObject2.AddField("Version", map.EditorData.VersionNumber);
+000481: 					if (map.IsCustomMap())
+000482: 					{
+000483: 						jObject2.AddField("Objects", map.ObjectData);
+000484: 					}
+000485: 					jObject = jObject2;
+000486: 				}
+000487: 				JObject field3 = jObject.GetField("Discovered");
+000488: 				if (field3 != null)
+000489: 				{
+000490: 					bool value3 = field3.GetValue<bool>();
+000491: 					zone.HasVisited = value3;
+==============================================================================
+SOURCE: /storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/04_LEVEL_EDITOR_TERRAIN.txt
+MATCHES: 9
+==============================================================================
+
+--- SOURCE LINES 761-895 ---
+000761: 					vector /= num;
+000762: 				}
+000763: 				result = (vector - cam.transform.position).magnitude;
+000764: 			}
+000765: 		}
+000766: 		return result;
+000767: 	}
+000768: 
+000769: 	public void ClearLevel()
+000770: 	{
+000771: 		foreach (Transform item in ObjectDumpContainer)
+000772: 		{
+000773: 			UnityEngine.Object.Destroy(item.gameObject);
+000774: 		}
+000775: 	}
+000776: }
+000777: 
+000778: ####################################################################################################
+000779: FILE: LE_LevelEditor/LE_SaveLoad.cs
+000780: SIZE_BYTES: 1374
+000781: SHA256: 83e87e55dface9899a22f99268e8b79199b25f98bd4a6a1b402def79f49db176
+000782: ####################################################################################################
+000783: 
+000784: using System.IO;
+000785: using UnityEngine;
+000786: 
+000787: namespace LE_LevelEditor;
+000788: 
+000789: public static class LE_SaveLoad
+000790: {
+000791: 	private static string filePath = "/CustomMaps/Original/";
+000792: 
+000793: 	private static void SaveMapHeightMapFile(float[,] heightmap, string mapName)
+000794: 	{
+000795: 		FileStream fileStream = new FileStream(Application.dataPath + filePath + mapName + "_heightmap.map", FileMode.Create, FileAccess.ReadWrite);
+000796: 		BinaryWriter binaryWriter = new BinaryWriter(fileStream);
+000797: 		for (int i = 0; i < 257; i++)
+000798: 		{
+000799: 			for (int j = 0; j < 257; j++)
+000800: 			{
+000801: 				if (heightmap[i, j] > 1f)
+000802: 				{
+000803: 					heightmap[i, j] = 1f;
+000804: 				}
+000805: 				if (heightmap[i, j] < 0f)
+000806: 				{
+000807: 					heightmap[i, j] = 0f;
+000808: 				}
+000809: 				ushort value = (ushort)(heightmap[i, j] * 65535f);
+000810: 				binaryWriter.Write(value);
+000811: 			}
+000812: 		}
+000813: 		fileStream.Close();
+000814: 		binaryWriter.Close();
+000815: 	}
+000816: 
+000817: 	public static float[,] LoadMapHeightMapFile(string mapName)
+000818: 	{
+000819: 		float[,] array = new float[257, 257];
+000820: 		FileStream fileStream = new FileStream(Application.dataPath + filePath + mapName + "_heightmap.map", FileMode.Open, FileAccess.ReadWrite);
+000821: 		BinaryReader binaryReader = new BinaryReader(fileStream);
+000822: 		binaryReader.BaseStream.Seek(0L, SeekOrigin.Begin);
+000823: 		for (int i = 0; i < 257; i++)
+000824: 		{
+000825: 			for (int j = 0; j < 257; j++)
+000826: 			{
+000827: 				array[i, j] = (float)(int)binaryReader.ReadUInt16() / 65535f;
+000828: 			}
+000829: 		}
+000830: 		fileStream.Close();
+000831: 		binaryReader.Close();
+000832: 		return array;
+000833: 	}
+000834: }
+000835: 
+000836: ####################################################################################################
+000837: FILE: LE_LevelEditor/LE_ZoneTileGenerator.cs
+000838: SIZE_BYTES: 4902
+000839: SHA256: 621bbdfa03f6331ef1bfd1f3723d491f8933a337ce3221d52ddce3074a541013
+000840: ####################################################################################################
+000841: 
+000842: using Beam;
+000843: using Beam.Terrain;
+000844: using Ceto;
+000845: using LE_LevelEditor.UI;
+000846: using UnityEngine;
+000847: 
+000848: namespace LE_LevelEditor;
+000849: 
+000850: public class LE_ZoneTileGenerator : Singleton<LE_ZoneTileGenerator>
+000851: {
+000852: 	public Terrain terrain;
+000853: 
+000854: 	private AddWaveOverlay _waveOverlay;
+000855: 
+000856: 	private void Start()
+000857: 	{
+000858: 		InvokeRepeating("GenerateShoreMap", 0f, 10f);
+000859: 	}
+000860: 
+000861: 	public void GenerateHeightmapFromTexture(Texture2D heightmap)
+000862: 	{
+000863: 		terrain.terrainData.SetHeights(0, 0, MapTools.GetHeightsFromTexture(heightmap));
+000864: 	}
+000865: 
+000866: 	public void GenerateShoreMap()
+000867: 	{
+000868: 		if (Singleton<LE_LevelEditorMain>.Instance.EditMode == LE_EEditMode.TERRAIN)
+000869: 		{
+000870: 			Texture2D height = WorldTools.CreateHeightMapTexture(terrain.terrainData);
+000871: 			Texture2D shore = WorldTools.CreateShoreMaskTexture(terrain.terrainData);
+000872: 			AddWaveOverlay(terrain.gameObject, height, shore);
+000873: 		}
+000874: 	}
+000875: 
+000876: 	public void GenerateRandomIsland()
+000877: 	{
+000878: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000879: 		int randowWorldSeed = StrandedWorld.GetRandowWorldSeed();
+000880: 		terrain.terrainData.SetHeights(0, 0, WorldTools.GenerateZoneHeightmap(Zone.BiomeType.ISLAND, randowWorldSeed));
+000881: 	}
+000882: 
+000883: 	public void GenerateAdvancedPerlin(int freq, float amplitude, int octaves, float blend)
+000884: 	{
+000885: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000886: 		terrain.terrainData.SetHeights(0, 0, WorldTools.PerlinGenerator(terrain.terrainData.GetHeights(0, 0, 257, 257), Random.Range(1, 99999999), freq, amplitude, octaves, blend));
+000887: 	}
+000888: 
+000889: 	public void GenerateAdvancedNormalise(float min, float max, float blend)
+000890: 	{
+000891: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000892: 		terrain.terrainData.SetHeights(0, 0, WorldTools.NormalizeHeightmap(terrain.terrainData.GetHeights(0, 0, 257, 257), min, max, blend));
+000893: 	}
+000894: 
+000895: 	public void GenerateSmooth()
+
+--- SOURCE LINES 941-1040 ---
+000941: 			Object.Destroy(_waveOverlay.heightTexture.tex);
+000942: 			Object.Destroy(_waveOverlay.heightTexture.mask);
+000943: 			Object.Destroy(_waveOverlay.normalTexture.tex);
+000944: 			Object.Destroy(_waveOverlay.normalTexture.mask);
+000945: 			Object.Destroy(_waveOverlay.foamTexture.tex);
+000946: 			Object.Destroy(_waveOverlay.foamTexture.mask);
+000947: 			Object.Destroy(_waveOverlay.gameObject);
+000948: 		}
+000949: 		GameObject gameObject = new GameObject("WaveOverlay");
+000950: 		gameObject.transform.parent = zone.transform;
+000951: 		gameObject.transform.position = new Vector3(0f, 0f, 0f);
+000952: 		_waveOverlay = gameObject.AddComponent<AddWaveOverlay>();
+000953: 		_waveOverlay.width = 250f;
+000954: 		_waveOverlay.height = 250f;
+000955: 		_waveOverlay.heightTexture = new OverlayHeightTexture();
+000956: 		_waveOverlay.heightTexture.tex = shore;
+000957: 		_waveOverlay.heightTexture.mask = height;
+000958: 		_waveOverlay.heightTexture.alpha = 0f;
+000959: 		_waveOverlay.heightTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000960: 		_waveOverlay.normalTexture = new OverlayNormalTexture();
+000961: 		_waveOverlay.normalTexture.tex = shore;
+000962: 		_waveOverlay.normalTexture.mask = height;
+000963: 		_waveOverlay.normalTexture.alpha = 0f;
+000964: 		_waveOverlay.normalTexture.maskAlpha = 0.4f;
+000965: 		_waveOverlay.normalTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000966: 		_waveOverlay.foamTexture = new OverlayFoamTexture();
+000967: 		_waveOverlay.foamTexture.tex = shore;
+000968: 		_waveOverlay.foamTexture.mask = height;
+000969: 		_waveOverlay.foamTexture.alpha = 0.4f;
+000970: 		_waveOverlay.foamTexture.maskMode = OVERLAY_MASK_MODE.WAVES;
+000971: 	}
+000972: 
+000973: 	public void LoadMap(Map map)
+000974: 	{
+000975: 		Singleton<LE_LevelEditorMain>.Instance.ClearLevel();
+000976: 		terrain.terrainData.SetHeights(0, 0, map.HeightmapData);
+000977: 	}
+000978: }
+000979: 
+000980: ####################################################################################################
+000981: FILE: LE_LevelEditor.Core/LE_TerrainManager.cs
+000982: SIZE_BYTES: 9425
+000983: SHA256: 6a69458febae5f5a6807b81eada07df770fb7f0fea51274f8b766447b6b52b0e
+000984: ####################################################################################################
+000985: 
+000986: using LE_LevelEditor.Events;
+000987: using UnityEngine;
+000988: 
+000989: namespace LE_LevelEditor.Core;
+000990: 
+000991: public class LE_TerrainManager
+000992: {
+000993: 	private TerrainData m_terrainData;
+000994: 
+000995: 	public TerrainData TerrainData => m_terrainData;
+000996: 
+000997: 	public LE_TerrainManager(TerrainData p_terrainData)
+000998: 	{
+000999: 		m_terrainData = p_terrainData;
+001000: 	}
+001001: 
+001002: 	public void SmoothHeight(float p_amount, int p_neighbourCount, Texture2D p_alphaBrushTexture, float p_relativeBrushSize, Vector2 p_relativeLocalLocation, bool p_isDirected, float p_angle)
+001003: 	{
+001004: 		float num = m_terrainData.heightmapResolution - 1;
+001005: 		float num2 = m_terrainData.heightmapResolution - 1;
+001006: 		float p_relativeBrushSize2 = Mathf.Clamp01(p_relativeBrushSize + (float)(p_neighbourCount - 1) / Mathf.Max(num, num2));
+001007: 		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize2, p_relativeLocalLocation, num, num2, out var o_minX, out var o_maxX, out var o_minY, out var o_maxY, out var _, out var _);
+001008: 		GetAffectedAreaInternal(p_alphaBrushTexture, p_relativeBrushSize, p_relativeLocalLocation, num, num2, out var o_minX2, out var o_maxX2, out var o_minY2, out var o_maxY2, out var o_relBrushMinX2, out var o_relBrushMinY2);
+001009: 		float[,] heights = m_terrainData.GetHeights(o_minY, o_minX, o_maxY - o_minY + 1, o_maxX - o_minX + 1);
+001010: 		int num3 = o_minX2 - o_minX;
+001011: 		int num4 = o_minY2 - o_minY;
+001012: 		int num5 = heights.GetLength(0) - 1;
+001013: 		int num6 = heights.GetLength(1) - 1;
+001014: 		int num7 = Mathf.Min(num3 + o_maxX2 - o_minX2, num5);
+001015: 		int num8 = Mathf.Min(num4 + o_maxY2 - o_minY2, num6);
+001016: 		int num9 = (p_neighbourCount - 1) / 2;
+001017: 		for (int i = num4; i <= num8; i++)
+001018: 		{
+001019: 			int num10;
+001020: 			int num11;
+001021: 			if (i == 0)
+001022: 			{
+001023: 				num10 = num9 + 1;
+001024: 				num11 = 0;
+001025: 			}
+001026: 			else if (i == num6)
+001027: 			{
+001028: 				num10 = num9 + 1;
+001029: 				num11 = -num9;
+001030: 			}
+001031: 			else if (i - num9 < 0)
+001032: 			{
+001033: 				int num12 = num9 - i;
+001034: 				num10 = p_neighbourCount - num12;
+001035: 				num11 = -num9 + num12;
+001036: 			}
+001037: 			else if (i + num9 >= num6)
+001038: 			{
+001039: 				int num13 = num9 + i - num6;
+001040: 				num10 = p_neighbourCount - num13;
+
+--- SOURCE LINES 1251-1350 ---
+001251: 
+001252: public class LE_LogicTerrain : LE_LogicBase
+001253: {
+001254: 	[Serializable]
+001255: 	public class Heightmap
+001256: 	{
+001257: 		public Texture2D Preview;
+001258: 
+001259: 		public float[,] Heights;
+001260: 	}
+001261: 
+001262: 	private LE_ConfigTerrain m_confT;
+001263: 
+001264: 	private LE_GUI3dTerrain m_GUI3dTerrain;
+001265: 
+001266: 	private bool m_doRebuildTerrainTab;
+001267: 
+001268: 	private int m_selectedBrushIndex;
+001269: 
+001270: 	private int m_selectedHeightmapIndex;
+001271: 
+001272: 	private bool m_isHeightRaise = true;
+001273: 
+001274: 	private void LoadRawHeightmaps(LE_ConfigTerrain confTerrain)
+001275: 	{
+001276: 		string hEIGHTMAPS_FOLDER = FilePath.HEIGHTMAPS_FOLDER;
+001277: 		if (!Directory.Exists(hEIGHTMAPS_FOLDER))
+001278: 		{
+001279: 			Directory.CreateDirectory(hEIGHTMAPS_FOLDER);
+001280: 		}
+001281: 		List<Heightmap> list = new List<Heightmap>();
+001282: 		string[] files = Directory.GetFiles(hEIGHTMAPS_FOLDER, "*.raw");
+001283: 		foreach (string path in files)
+001284: 		{
+001285: 			Heightmap heightmap = new Heightmap();
+001286: 			float[,] array = World.ImportHeightmapFromRawFile(path);
+001287: 			Texture2D preview = MapTools.CreateHeightmapTexture(array);
+001288: 			heightmap.Heights = array;
+001289: 			heightmap.Preview = preview;
+001290: 			list.Add(heightmap);
+001291: 		}
+001292: 		confTerrain.Heightmaps = list.ToArray();
+001293: 	}
+001294: 
+001295: 	public LE_LogicTerrain(LE_ConfigTerrain p_confTerrain, LE_GUI3dTerrain p_GUI3dTerrain)
+001296: 	{
+001297: 		m_confT = p_confTerrain;
+001298: 		m_GUI3dTerrain = p_GUI3dTerrain;
+001299: 		m_GUI3dTerrain.TERRAIN_LAYER = p_confTerrain.TerrainLayer;
+001300: 		if (p_confTerrain.BrushProjector != null)
+001301: 		{
+001302: 			m_GUI3dTerrain.BrushProjector = p_confTerrain.BrushProjector;
+001303: 		}
+001304: 		else
+001305: 		{
+001306: 			Debug.LogError("LE_GUILogicTerrain: LE_ConfigTerrain.BrushProjector was not initialized! You need to set it in the inspector.");
+001307: 		}
+001308: 		if (p_confTerrain.Brushes.Length != 0)
+001309: 		{
+001310: 			m_GUI3dTerrain.BrushAlphaTexture = p_confTerrain.Brushes[0];
+001311: 		}
+001312: 		else
+001313: 		{
+001314: 			Debug.LogError("LE_GUILogicTerrain: LE_ConfigTerrain.Brushes was not initialized! You need to set it in the inspector.");
+001315: 		}
+001316: 		LoadRawHeightmaps(p_confTerrain);
+001317: 		if (p_confTerrain.Heightmaps.Length != 0)
+001318: 		{
+001319: 			m_GUI3dTerrain.Heightmap = p_confTerrain.Heightmaps[0];
+001320: 		}
+001321: 		else
+001322: 		{
+001323: 			Debug.Log("LE_GUILogicTerrain: LE_ConfigTerrain.Heightmap was not initialized! You need to set it in the inspector.");
+001324: 		}
+001325: 		CheckParameters();
+001326: 		InitTerrainValues();
+001327: 		LE_EventInterface.OnLoadedLevelInEditor = (EventHandler)Delegate.Combine(LE_EventInterface.OnLoadedLevelInEditor, new EventHandler(OnLoadedLevelInEditor));
+001328: 		LE_GUIInterface.EventHandlers events = LE_GUIInterface.Instance.events;
+001329: 		events.OnTerrainBrushChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Combine(events.OnTerrainBrushChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainBrushChanged));
+001330: 		LE_GUIInterface.EventHandlers events2 = LE_GUIInterface.Instance.events;
+001331: 		events2.OnTerrainHeightmapTextureChanged = (EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>)Delegate.Combine(events2.OnTerrainHeightmapTextureChanged, new EventHandler<LE_GUIInterface.EventHandlers.IntEventArgs>(OnTerrainHeightmapTextureChanged));
+001332: 		LE_GUIInterface.EventHandlers events3 = LE_GUIInterface.Instance.events;
+001333: 		events3.OnTerrainEditBrushSizeChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events3.OnTerrainEditBrushSizeChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushSizeChanged));
+001334: 		LE_GUIInterface.EventHandlers events4 = LE_GUIInterface.Instance.events;
+001335: 		events4.OnTerrainEditBrushAmountChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events4.OnTerrainEditBrushAmountChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushAmountChanged));
+001336: 		LE_GUIInterface.EventHandlers events5 = LE_GUIInterface.Instance.events;
+001337: 		events5.OnTerrainEditBrushTargetValueChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events5.OnTerrainEditBrushTargetValueChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditBrushTargetValueChanged));
+001338: 		LE_GUIInterface.EventHandlers events6 = LE_GUIInterface.Instance.events;
+001339: 		events6.OnTerrainEditDirectionChanged = (EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>)Delegate.Combine(events6.OnTerrainEditDirectionChanged, new EventHandler<LE_GUIInterface.EventHandlers.FloatEventArgs>(OnTerrainEditDirectionChanged));
+001340: 		LE_GUIInterface.EventHandlers events7 = LE_GUIInterface.Instance.events;
+001341: 		events7.OnTerrainChangeHeightModeChanged = (EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>)Delegate.Combine(events7.OnTerrainChangeHeightModeChanged, new EventHandler<LE_GUIInterface.EventHandlers.TerrainChangeHeightModeEventArgs>(OnTerrainChangeHeightModeChanged));
+001342: 		LE_GUIInterface.EventHandlers events8 = LE_GUIInterface.Instance.events;
+001343: 		events8.OnTerrainIsDirectedSmoothChanged = (EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>)Delegate.Combine(events8.OnTerrainIsDirectedSmoothChanged, new EventHandler<LE_GUIInterface.EventHandlers.BoolEventArgs>(OnTerrainIsDirectedSmoothChanged));
+001344: 		LE_GUIInterface.EventHandlers events9 = LE_GUIInterface.Instance.events;
+001345: 		events9.OnTerrainEditModeBtn = (EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>)Delegate.Combine(events9.OnTerrainEditModeBtn, new EventHandler<LE_GUIInterface.EventHandlers.TerrainEditModeEventArgs>(OnTerrainEditModeBtn));
+001346: 		LE_GUIInterface.EventHandlers events10 = LE_GUIInterface.Instance.events;
+001347: 		events10.OnTerrainReadSetHeightBtn = (EventHandler)Delegate.Combine(events10.OnTerrainReadSetHeightBtn, new EventHandler(OnTerrainReadSetHeightBtn));
+001348: 	}
+001349: 
+001350: 	public override void Destroy()

@@ -1,0 +1,5 @@
+type,path,size_bytes,sha256
+HEIGHT,/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map,132098,4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+SOURCE,/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/01_BEAM_TERRAIN.txt,,5161e22337177cd88a7eabad5a5958737176fcb90534a19ae836c50278ae8786
+SOURCE,/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/03_WORLD_TERRAIN.txt,,3a813fabd051b2169a3ac3c7bedbe0aa2ccea42d1cb66f218cfc8274aec69e98
+SOURCE,/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH/04_LEVEL_EDITOR_TERRAIN.txt,,a5c30c54e5a5980c4a27c6c80c6a048c4e8a12bd33727d16c38b71df94cddc1d

@@ -1,0 +1,34 @@
+CASTAWAY DEPTHS - V20 MASTER SUMMARY
+==============================================================================
+MISSION 3 HEIGHT ENCODING INVESTIGATION
+
+Source files scanned: 17
+Method/symbol index entries: 26
+Source files with relevant matches: 3
+Errors: 1
+
+HEIGHT FILE
+Size: 132098
+Expected size: 132098
+Size match: True
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+V19 hash match: True
+
+V20 INVESTIGATION RULES
+1. Source implementation is the authority for conversion formulas.
+2. Binary statistics do not prove decoded height scale.
+3. No guessed conversion formula is marked verified.
+4. Original game files and source files remain read-only.
+5. No Godot project files are modified.
+
+REQUIRED NEXT EVIDENCE
+- Compress implementation
+- ToCompressStable implementation
+- Decompress implementation
+- Stable compression initialization
+- Full ImportHeightmapFromRawFile implementation
+
+STATUS: REVIEW REQUIRED
+
+ERRORS:
+MISSING SOURCE ROOT: /storage/emulated/0/Map Check/reports/V17_SOURCE_EXTRACTED
