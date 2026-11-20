@@ -1,285 +1,873 @@
-CASTAWAY DEPTHS — MISSION 3 REVERSE-ENGINEERING RECORD
-======================================================
+CASTAWAY-DEPTHS
+MISSION 3 — MASTER REVERSE-ENGINEERING RECORD
+============================================================
+Repository: https://github.com/minnya09796592452-rgb/Map
+Branch: main
+Audit date: 2026-11-20
+Purpose: Unity map/terrain evidence consolidation for Godot migration
+Scope: read-only source/data analysis; no gameplay feature implementation
 
-Record date: 2026-11-20
+DOCUMENT RULES
+- VERIFIED = directly supported by source, IL, file size/hash, or indexed record.
+- PARTIAL = relationship or rule known, but target/data coverage incomplete.
+- PENDING = required evidence/data has not been recovered or validated.
+- UNKNOWN = intentionally not inferred.
+- Path IDs are scoped by serialized file and file ID; a PathID alone is not a global identity.
+- Static object order is not assumed to equal runtime World.MapList order.
+
+============================================================
+0. REPOSITORY AUDIT SNAPSHOT
+============================================================
+
 Repository: minnya09796592452-rgb/Map
-Target file: MISSION3_REVERSE_ENGINEERING_RECORD.txt
-Purpose: Preserve verified Mission 3 Unity data/serialization findings and the remaining investigation plan for the Unity-to-Godot data migration.
+Default branch: main
+HEAD at audit start: 2e385b44b86f2b2463549aecf6dd7e1bdf883077
+Repository was readable and writable through the connected GitHub account.
+Recursive Git tree: 734 tracked blobs, not truncated.
+Top-level evidence groups at audit start:
+  extracted/ : 684 files
+  V232/      : 39 files
+  Scrpic/    : 5 files
+  root files and .github workflow: remaining files
 
-EVIDENCE AND STATUS RULES
--------------------------
-[CONFIRMED] = directly supported by command output or metadata observed in this investigation.
-[PARTIAL]   = some behavior/metadata is known, but important details remain unverified.
-[PENDING]   = not yet investigated or no supporting output has been supplied.
-Do not treat an inferred behavior as confirmed. Keep local-space and world-space coordinates distinct.
+Important root artifacts:
+  Default Maps.zip
+  MISSION3_REVERSE_ENGINEERING_RECORD.txt
+  MISSION_3_SOURCE_EXTRACTION_V15.txt
+  MISSION_3_TERRAIN_CLASS_MAP.txt
+  README.md (was only "# Map" before this documentation update)
 
-1. TRANSFORM SERIALIZATION
---------------------------
-Status: PARTIAL — Save/Load field mapping is identified; exact Truncate implementation still needs inspection.
+Major evidence generations:
+  extracted/V16_SOURCE_INVENTORY/
+  extracted/V17/
+  extracted/V18/
+  extracted/V19/
+  extracted/V20/
+  extracted/V21/
+  extracted/V22/
+  extracted/V23.1/
+  extracted/V23.2/
+  extracted/V23.2 Last New/
+  extracted/V23.2 Latest/
+  extracted/V23.2 Latest 1/
+  extracted/V24/
+  extracted/V25/
+  extracted/V26.2/
+  V232/MISSION3_MAP_SOURCE_TRACE_20261120/
+  V232/MISSION3_MAP_CONSTANTS_TRACE_20261120_070324/
+  V232/MISSION3_DEFAULT_MAP_PATH_TRACE_20261120_0712/
+  V232/V232 Map Token Audit/
+  V232/Output Now/
+  Scrpic/
 
-Confirmed metadata:
-- TransformSerializer.Save()
-  - MethodDef token: 0x0600059C
-  - RVA: 0x1AE69
-- TransformSerializer.Load()
-  - MethodDef token: 0x0600059D
-  - RVA: 0x1AE88
-- Save callback <Save>b__0
-  - MethodDef token: 0x06005B83
-  - RVA: 0x1030F4
-  - Raw callback IL size reported by callback_dump.py: 102 bytes.
+The V15 note saying "DECOMPILER NOT FOUND" is historical. Later V24 has extracted C# source, and V26.2 consumes that source evidence. Do not treat the V15 status as the current status.
 
-Save-side string keys resolved from UserString tokens:
-- 0x700033BA -> "localPosition"
-- 0x700033D6 -> "localRotation"
-- 0x700033F2 -> "localScale"
+============================================================
+1. INPUT DATA AND REPRODUCIBILITY
+============================================================
 
-Getter MemberRefs:
-- 0x0A000102 -> get_localPosition; signature bytes: 20 01 13 39
-- 0x0A000074 -> get_localRotation; signature bytes: 20 01 13 31
-- 0x0A000152 -> get_localScale; signature bytes: 20 01 13 39
+Primary serialized-field CSV:
+  03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv
+  Rows: 99,111
+  Containers: 17
+  Size: 27,037,457 bytes
+  SHA-256:
+  5f25d105378e20b3eca2988c96369071d0ed3668303ba67794b3a5d3cd1cf974
 
-The corresponding Unity value types are Vector3, Quaternion, and Vector3 respectively.
+The supplied file at /mnt/data/03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv
+was checked against the V26.2 input manifest. The size and SHA-256
+match the manifest entry exactly.
 
-Load-side behavior identified:
-- Reads "localPosition" as Vector3 and assigns Transform.localPosition.
-- Reads "localRotation" as Quaternion and assigns Transform.localRotation.
-- Reads "localScale" as Vector3, calls Truncate(), then assigns Transform.localScale.
+Other V26.2 input counts:
+  V23 pointer references: 63,510
+  V23 external references: 19
 
-Important coordinate distinction:
-- localPosition is relative to the object's parent transform.
-- It is NOT automatically a world-space position.
-- World position requires applying the parent transform hierarchy; do not copy localPosition into a Godot world/global position without resolving parent transforms and coordinate-system conversion.
+V26.2 unique serialized objects:
+  All objects:       21,100
+  GameObject:        11,373
+  Transform:          9,574
+  Terrain:               51
+  TerrainCollider:       51
+  TerrainData:           51
 
-Truncate investigation:
-- callback_resolve.py output resolved MethodDef RID 0x329F as method name "Truncate".
-- Signature bytes reported: 00 01 11 39 11 39.
-- RVA reported: 0x8AF3C.
-- The signature appears consistent with a Vector3-to-Vector3 method, but declaring type and implementation must still be verified from TypeDef ownership and IL.
-- An earlier interpretation that RID 0x329E was Truncate(float) at RVA 0x8AF22 is NOT confirmed and conflicts with the later 0x329F output. Treat 0x329E and 0x329F as separate unresolved metadata entries until both are inspected.
-- truncate_resolve.txt was generated with 28 lines, but its actual contents were not provided in the conversation. Its contents have not been reviewed.
-- Do not claim the numeric truncation/rounding algorithm is known yet.
+V25 summary:
+  Input rows: 99,111
+  Input containers: 17
+  C# files scanned: 3,631
+  C# files selected: 120
+  C# output parts: 1
+  Error count: 0
+  Warning count: 2
+  V25 expressly did NOT claim:
+    - level3 identity equals Mission 3
+    - fully composed world transforms
+    - complete TerrainData height arrays
+    - actual Unity runtime behavior
 
-2. SERIALIZATION OBJECT MODEL
------------------------------
-Status: PARTIAL — relevant metadata and known Load fields have been identified.
+V26.2 summary:
+  Errors: NONE
+  Warnings: NONE
+  The absence of parser errors does not mean every requested recovery is complete.
+  V26.2 itself marks runtime index UNKNOWN, TerrainData array recovery incomplete,
+  and terrain world transforms unresolved.
 
-JObject:
-- TypeDef RID: 2227.
-- _keys: List<string>
-- _children: List<JObject>
-- _data: object
-- _type: EToken
-- _keys and _children are paired lists; they are not a dictionary.
+Primary manifests:
+  extracted/V26.2/01_V26_2_INPUT_MANIFEST.csv
+  extracted/V26.2/15_V26_2_SOURCE_MANIFEST.csv
+  extracted/V26.2/18_V26_2_SHA256_MANIFEST.csv
 
-EToken values:
-- NULL = 0
-- NUMBER = 1
-- STRING = 2
-- BOOL = 3
-- ARRAY = 4
-- OBJECT = 5
+============================================================
+2. MAP MODEL AND THREE-FILE MAP FORMAT
+============================================================
 
-Related methods/classes identified:
-- JObject.Deserialize(string, int): parser for nested object/list representation.
-- JObject.Serialize(StringBuilder, int): writes serialized output.
-- JSerializer maintains Dictionary<Type, ISerializer> and Dictionary<Type, IComponentSerializer>.
-- ComponentSerializer<T> wraps typed Save/Load methods.
-- Concrete component serializers identified include TransformSerializer, RigidbodySerializer, JointSerializer, and ColliderSerializer.
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__Map.cs
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__Maps.cs
+Source evidence also indexed in:
+  extracted/V26.2/10_V26_2_SOURCE_METHOD_EVIDENCE.txt
 
-Known Load-side field names (do not assume all are also Save-side fields without inspecting Save IL):
-Rigidbody:
-- isKinematic
-- useGravity
-- position
-- rotation
-- velocity
-- angularVelocity
-- mass
-- drag
-- angularDrag
-- freezeRotation
-- detectCollisions
-- constraints
-- collisionDetectionMode
-- interpolation
-- velocity and angularVelocity are conditionally loaded when the body is not kinematic.
+Beam.Terrain.Map fields:
+  EditorData    : MapEditorData
+  ObjectData    : Beam.Serialization.Json.JObject
+  HeightmapData : float[,]
 
-Joint:
-- anchor
-- autoConfigureConnectedAnchor
-- axis
-- breakForce
-- breakTorque
-- enableCollision
+A standalone map folder is a three-stream set:
+  <mapName>_EDITOR.map
+  <mapName>_OBJECT.map
+  <mapName>_HEIGHT.map
 
-Collider:
-- enabled
-- isTrigger
+Maps.LoadMap opens those three separate files and passes all three
+streams to Map.Load. Maps.SaveMap creates the same three files and
+passes the streams to Map.Save.
 
-3. LINUX / PYTHON REVERSE-ENGINEERING WORKFLOW
-----------------------------------------------
-Status: CONFIRMED as a working command-line workflow from the user's reported executions. The exact complete source text of transform_trace.py is not preserved reliably in the conversation because terminal echo was mangled; do not reconstruct it as if it were the original file.
+EDITOR stream:
+  Save:
+    BinaryFormatter.Serialize(streamEditor, map.EditorData)
+  Load:
+    BinaryFormatter.Deserialize(editorStream) as MapEditorData
+  The Mission 3 sample file is 681 bytes and its serialized payload
+  identifies Beam.Terrain.MapEditorData / Assembly-CSharp.
+  The complete BinaryFormatter object graph/schema has not been
+  written out field-by-field in this record.
 
-Working directory:
+OBJECT stream:
+  Save:
+    StreamWriter writes map.ObjectData.ToString()
+  Load:
+    StreamReader reads all text.
+    new JObject(text) parses it.
+    PatchObjectsReferenceId(jObject) then map.ObjectData = jObject.
+  Mission 3 sample size: 31,135 bytes.
+  It is a JSON-like JObject array. Object entries include fields such as:
+    prefab
+    Transform
+      localPosition {x,y,z}
+      localRotation {x,y,z,w}
+      localScale {x,y,z}
+  Example at the beginning of the Mission 3 object stream:
+    localPosition = (-4.624992, 3.019135, -27.57874)
+    localRotation = (-0.07569711, 0, -0.09175407, 0.9929004)
+    localScale    = (1, 1, 1)
+  This is object-local transform data, not a world-position table.
+
+HEIGHT stream:
+  Save loops:
+    for i = 0..256
+      for j = 0..256
+        BinaryWriter.Write(map.HeightmapData[i,j].Compress())
+  Load loops in the same i-then-j order:
+    value = BinaryReader.ReadUInt16().ToCompressStable()
+    HeightmapData[i,j] = value.Decompress()
+  257 * 257 = 66,049 samples.
+  Each sample is UInt16 (2 bytes), little-endian BinaryWriter/BinaryReader.
+  66,049 * 2 = 132,098 bytes exactly.
+
+Mission 3 map files:
+  extracted/Default Maps/MAP_INTERNAL_MISSION_3/
+    MAP_INTERNAL_MISSION_3_EDITOR.map  681 bytes
+    MAP_INTERNAL_MISSION_3_OBJECT.map  31,135 bytes
+    MAP_INTERNAL_MISSION_3_HEIGHT.map  132,098 bytes
+
+Mission 3 HEIGHT file profile:
+  Actual SHA-256:
+    4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+  V26.2 expected/reference SHA-256:
+    4694e3cd0d762fcd6fb282df88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf
+  These differ. Preserve the mismatch as an audit note; do not call
+  the expected digest verified.
+
+============================================================
+3. HEIGHT ENCODING — RAW UINT16 VS UNITY RUNTIME VALUE
+============================================================
+
+V26.2 profile:
+  encoding: Little-endian UInt16
+  width: 257
+  height: 257
+  sample_count: 66,049
+  raw ushort minimum: 0
+  raw ushort maximum: 46,128
+  unique raw values: 15,791
+  zero raw samples: 8,275
+  raw ushort mean: 30,474.769867825402
+  raw ushort median: 39,817
+  maximum raw sample: row i=119, column j=128
+  minimum raw sample: row i=0, column j=0
+  recorded row_flip_applied: false
+
+V26.2 sample checkpoints (i,j,raw ushort,raw/65535 preview):
+  (0,0)       0       0.0
+  (0,128) 16,056      0.24499885737895966
+  (0,256)      0       0.0
+  (128,0) 14,594      0.22269016504287708
+  (128,128)45,752      0.6981307864189148
+  (128,256)15,324      0.23382924497127533
+  (256,0)      0       0.0
+  (256,128)18,634      0.2843366265296936
+  (256,256)      0       0.0
+  (119,128)46,128      0.7038681507110596
+
+IMPORTANT CORRECTION TO THE SIMPLE PROFILE DECODER:
+The V26.2 sample CSV shows raw ushort / 65535. That is useful as a
+raw numeric preview, but it does not by itself reproduce Map.Load.
+The actual loader first calls ToCompressStable() before Decompress().
+
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__Funlabs__MPExtensions.cs
+
+Compress(float value):
+  if value > 1: value = 1
+  if value < 0: value = 0
+  return (ushort)(value * 65535f)
+
+Decompress(ushort value):
+  return (float)value / 65535f
+
+IsCompressStable(ushort value):
+  return value == value.Decompress().Compress()
+
+GetCompressStable(ushort value):
+  if already stable, return value
+  for distance = 1, 2, 3, ...
+    test lower candidate first (value - distance), if in range
+    if lower candidate is stable, return lower
+    otherwise test upper candidate (value + distance), if in range
+    if upper candidate is stable, return upper
+
+InitializeCompressStableValues():
+  precomputes the mapping for all 65,536 ushort inputs.
+
+ToCompressStable():
+  returns the precomputed _toCompressStable[value].
+
+Therefore exact runtime-compatible decoding is:
+  raw = little_endian_uint16(bytes[2*k : 2*k+2])
+  stable = ToCompressStable(raw)
+  height = float32(stable) / float32(65535)
+
+The order is row-major as implemented by nested i then j loops.
+Do not apply a row flip unless a separate source/runtime test proves it.
+The V26.2 raw sample CSV has not applied this stable-value lookup.
+Recompute runtime-final heights through the stable table before claiming
+bit-for-bit Unity Map.Load equivalence.
+
+Earlier V19 byte-profile heuristics treated 514x257 8-bit as a candidate.
+That was a raw-byte guess, not a format conclusion. Later source code and
+V26.2's UInt16 profile supersede that heuristic.
+
+Evidence:
+  extracted/V26.2/11A_V26_2_HEIGHTMAP_PROFILE.csv
+  extracted/V26.2/11_V26_2_HEIGHTMAP_SAMPLES.csv
+  extracted/V26.2/00_V26_2_MASTER_SUMMARY.txt
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__Maps.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Funlabs__MPExtensions.cs
+
+============================================================
+4. WORLD BUNDLE / 49 MAP RECORD STRUCTURE
+============================================================
+
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__World.cs
+Source evidence: extracted/V26.2/10_V26_2_SOURCE_METHOD_EVIDENCE.txt
+
+World.Bundle fields:
+  Map[] Maps
+  Vector2[] GenerationZonePositons
+  Vector2[] GeneratedZonePoints
+
+Bundle.Clear():
+  Maps = new Map[49]
+  GenerationZonePositons = null
+  GeneratedZonePoints = null
+
+Bundle.Save():
+  wraps output in GZipStream(CompressionMode.Compress)
+  optionally writes caller-provided header bytes into the gzip stream
+  for each i = 0..48:
+    serialize one Map into three temporary streams:
+      editor bytes
+      object bytes
+      height bytes
+    write three Int32 lengths:
+      editor length
+      object length
+      height length
+    write the three byte arrays in that order
+  after all 49 maps:
+    write 49 GenerationZonePositons Vector2 values
+  then:
+    write GeneratedZonePoints.Length as UInt16
+    write each GeneratedZonePoints Vector2
+
+Bundle.Load():
+  opens GZipStream(CompressionMode.Decompress)
+  optionally consumes caller-provided header bytes
+  reads 49 map records
+  per map: read three Int32 lengths, then matching byte arrays
+  creates memory streams and Map.Load(editor, object, height)
+  reads 49 Vector2 GenerationZonePositons
+  reads UInt16 GeneratedZonePoints count
+  reads that many Vector2 values
+
+Vector2 binary helpers:
+  Write(Vector2): write x float, then y float
+  ReadVector2(): read Single x, then Single y
+
+This establishes the source-code layout of the compressed World bundle.
+It does not provide an actual Seed.sdd payload or the resolved runtime
+contents of all 49 map slots. The optional header value is supplied by
+the caller; its concrete bytes and length must be recovered from the
+relevant calling path before fully parsing a particular world file.
+
+World constants:
+  WORLD_SEED_FILENAME = "Seed.sdd"
+  NUM_MISSIONS = 4
+  Bundle maps length = 49
+
+============================================================
+5. MISSION IDENTITY, MAPLIST ORDER, AND 49 ZONE POSITIONS
+============================================================
+
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__StrandedWorld.cs
+Source: extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__World.cs
+
+StrandedWorld.ApplyWorldToZones():
+  LoadZonePositions()
+  for i = 0..48:
+    Zone zone = Zones[i]
+    Map map = World.MapList[i]
+    zone.Terrain.terrainData.SetHeights(0,0,map.HeightmapData)
+    zone.ZoneName = map.EditorData.Name
+    zone.Id = map.EditorData.Id
+    zone.Version = map.EditorData.VersionNumber
+    zone.Biome = map.EditorData.Biome
+    zone.IsMapEditor = map.IsCustomMap()
+    zone.IsUserMap = map.IsUserMap()
+    zone.Seed = i
+
+StrandedWorld.FindEndGameZone():
+  scans Zones[]
+  returns first zone where:
+    Zones[i].Id.Equals("INTERNAL_MISSION_3")
+  otherwise returns null.
+
+Mission identity is therefore attached to the Map EditorData.Id copied into
+the runtime Zone.Id. It is not established by a static serialized Terrain
+PathID, an object's order in level3, or the count of Terrain objects.
+
+World.MapList:
+  public static Map[] MapList => _mapList
+  _mapList is the Maps array in the current World.Bundle.
+
+World map assignment source evidence:
+  CreateMissionTiles() obtains mission tile indices.
+  If Maps.DefaultMapList is empty, calls Maps.LoadDefaultMaps().
+  In the assignment loop, obtains:
+    Map map2 = Maps.DefaultMapList[num]
+    _mapList[j] = map2
+  The exact resulting runtime order depends on the mission-tile/default-map
+  selection state and loaded world context.
+
+Runtime index result:
+  UNKNOWN.
+  V26.2/13_V26_2_RUNTIME_MISSION_MAPPING.csv marks all 51 static terrain rows
+  as STATIC_OBJECT_ONLY and the runtime_zone_index/runtime_map_id/mission
+  identity values as UNKNOWN.
+  The actual Mission 3 index must be recovered by inspecting the loaded
+  World bundle/map assignment or a runtime capture; it cannot be inferred
+  from level3 static object order alone.
+
+LoadZonePositions():
+  if World.GenerationZonePositons is null:
+    World.CreateWorldZonePoints(WORLD_SEED)
+  for i = 0..48:
+    Vector3 zero = Vector3.zero
+    zero.x = GenerationZonePositons[i].x
+    zero.z = GenerationZonePositons[i].y
+    _zones[i].transform.position = zero
+    if i == 0: _zones[i].IsStartingIsland = true
+
+So the exact source assignment is:
+  Unity zone world position = (position2D.x, 0, position2D.y)
+
+Actual 49 coordinate values remain unavailable in the current static
+Terrain transform export. The code rule is known; the runtime position list
+must still be extracted from a relevant World.Bundle/Seed.sdd.
+
+Zone constants from StrandedWorld:
+  ZONE_SPACING = 1.25
+  ZONE_SIZE = 500
+  ZONE_SIZE_HALF = 250
+  ZONE_TERRAIN_SIZE = 250
+  ZONE_TERRAIN_SIZE_HALF = 125
+  ZONE_HEIGHTMAP_SIZE = 257
+  ZONE_HEIGHTMAP_HEIGHT = 150
+  TERRAIN_Y_POSITION = -100
+  WORLD_ZONES = 7
+  WORLD_ZONES_SQUARED = 49
+
+ZonePositionGenerator:
+  deterministic FastRandom(WORLD_SEED)
+  Poisson-disk-like point sampling from the source region
+  returns points offset by half the sample-region x dimension
+  actual runtime seed and generation bounds are required to reproduce
+  the exact 49 values.
+
+============================================================
+6. TERRAIN / COLLIDER / TERRAIN DATA REFERENCE AUDIT
+============================================================
+
+V25 and V26.2 object counts agree on total unique components:
+  Terrain:        51
+  TerrainCollider:51
+  TerrainData:    51
+
+V25 per-container distribution:
+  level3:
+    Terrain = 49
+    TerrainCollider = 49
+    TerrainData = 0
+  level4:
+    Terrain = 1
+    TerrainCollider = 1
+    TerrainData = 0
+  sharedassets3.assets:
+    Terrain = 1
+    TerrainCollider = 1
+    TerrainData = 50
+  sharedassets4.assets:
+    Terrain = 0
+    TerrainCollider = 0
+    TerrainData = 1
+
+V26.2 Terrain component index:
+  51 rows total:
+    level3 = 49
+    level4 = 1
+    sharedassets3.assets = 1
+  each Terrain has one uniquely resolved GameObject reference.
+  transform match count is one for each listed Terrain record.
+  49 level3 entries point to TerrainData through fileID 4 and the
+  external target references are not inside the current field index.
+  level4 Terrain references fileID 2/pathID 163; target not indexed.
+  sharedassets3 Terrain references local fileID 0/pathID 1072; resolved.
+
+V26.2 Terrain/TerrainCollider link export:
+  102 component rows total:
+    Terrain = 51
+    TerrainCollider = 51
+  each listed GameObject reference resolves uniquely.
+  100 component data pointers are EXTERNAL_TARGET_NOT_IN_FIELD_INDEX.
+  2 references in sharedassets3.assets resolve to local TerrainData 1072.
+  This file is a component/reference index, not proof that all external
+  TerrainData targets have been loaded and paired successfully.
+
+TerrainData profile:
+  51 TerrainData objects:
+    sharedassets3.assets = 50
+    sharedassets4.assets = 1
+  m_Heightmap field present on all profile rows.
+  Current preview: 3,514 chars for m_Heightmap and 7,014 chars for full
+  object preview; previews marked truncated.
+  complete_height_array = NOT_CONFIRMED.
+  No complete 257x257 values array recovered from the current CSV preview.
+
+External reference audit:
+  384 reference rows.
+  20 rows: EXTERNAL_FILE_MAPPING_FOUND_NOT_FOLLOWED.
+  364 rows: EXTERNAL_FILE_REFERENCE_NOT_FOLLOWED.
+  External reference traversal remains a dependency for closing the links.
+
+Required files:
+  extracted/V25/09_V25_TERRAIN_CORRELATION_REPORT.txt
+  extracted/V26.2/03_V26_2_TERRAIN_COMPONENT_INDEX.csv
+  extracted/V26.2/04_V26_2_TERRAIN_DATA_LINKS.csv
+  extracted/V26.2/08_V26_2_TERRAIN_DATA_PROFILE.csv
+  extracted/V26.2/09_V26_2_EXTERNAL_REFERENCE_AUDIT.csv
+  extracted/V26.2/14_V26_2_POINTER_AUDIT.csv
+
+============================================================
+7. TRANSFORM SERIALIZATION AND TRUNCATE
+============================================================
+
+Source:
+  extracted/V24/CS_SOURCE/Assembly-CSharp__TransformSerializer.cs
+IL:
+  V232/Output Now/transform_trace.txt
+  V232/Output Now/transform_callback_raw.txt
+Truncate details:
+  V232/Output Now/truncate_resolve.txt
+  V232/Output Now/truncate_trace.txt
+
+TransformSerializer.Save:
+  MethodDef token: 0x0600059C
+  RVA: 0x1AE69
+  IL size: 29
+  callback: <Save>b__0
+  callback token: 0x06005B83
+  callback RVA: 0x1030F4
+  callback IL size: 102
+  callback owner: <>c__DisplayClass0_0
+
+Saved fields:
+  localPosition : Vector3
+  localRotation : Quaternion
+  localScale    : Vector3
+
+The Save callback applies:
+  localPosition = Serialize(instance.localPosition)
+  localRotation = Serialize(instance.localRotation)
+  localScale = Serialize(instance.localScale.Truncate())
+
+TransformSerializer.Load:
+  MethodDef token: 0x0600059D
+  RVA: 0x1AE88
+  IL size: 72
+  localPosition -> Deserialize<Vector3> -> instance.localPosition
+  localRotation -> Deserialize<Quaternion> -> instance.localRotation
+  localScale -> Deserialize<Vector3> -> Truncate() -> instance.localScale
+
+Important:
+  These are LOCAL transform values. localPosition is not world position.
+  World position requires parent hierarchy composition.
+  Only localScale is passed through Truncate; localPosition and localRotation
+  are not truncated in this serializer.
+
+Truncate method resolution:
+  0x0600329E:
+    name: Truncate
+    owner: Beam.Vector3Tools
+    RVA: 0x8AF22
+    IL size: 24
+    scalar helper, called by the Vector3 method.
+  0x0600329F:
+    name: Truncate
+    owner: Beam.Vector3Tools
+    RVA: 0x8AF3C
+    IL size: 46
+    Vector3 overload. Reads x, y, z, calls 0x0600329E for each component,
+    constructs and returns a new Vector3.
+
+The scalar helper IL multiplies the scalar by 1000, converts to double,
+calls MemberRef token 0x0A000CCD, then divides by 1000. The exact owner/name
+of MemberRef 0x0A000CCD has not yet been resolved from the available dumps.
+Do not label the result definitively as round, floor, or truncate-to-three
+decimal places until that MemberRef is decoded and tested.
+
+This corrects the earlier mistaken separation of 0x329E and 0x329F:
+  0x329E is the scalar overload.
+  0x329F is the Vector3 overload that calls it three times.
+
+============================================================
+8. SERIALIZATION FRAMEWORK CONTEXT
+============================================================
+
+Previously recovered JObject metadata:
+  TypeDef RID 2227: JObject
+  _keys: List<string>
+  _children: List<JObject>
+  _data: object
+  _type: EToken
+
+The object representation uses paired key and child lists; it is not
+implemented as a normal Dictionary in the fields recovered.
+
+EToken:
+  NULL=0
+  NUMBER=1
+  STRING=2
+  BOOL=3
+  ARRAY=4
+  OBJECT=5
+
+JObject methods:
+  Deserialize(string,int) parses text into nested JObject/list structures.
+  Serialize(StringBuilder,int) writes serialized text.
+
+JSerializer maintains:
+  Dictionary<Type, ISerializer>
+  Dictionary<Type, IComponentSerializer>
+
+ComponentSerializer<T> wraps component-specific Save/Load.
+
+Component Load evidence previously recovered:
+  Rigidbody fields:
+    isKinematic, useGravity, position, rotation, velocity, angularVelocity,
+    mass, drag, angularDrag, freezeRotation, detectCollisions, constraints,
+    collisionDetectionMode, interpolation.
+    velocity and angularVelocity are conditional on isKinematic.
+  Joint fields:
+    anchor, autoConfigureConnectedAnchor, axis, breakForce, breakTorque,
+    enableCollision.
+  Collider fields:
+    enabled, isTrigger.
+These are verified Load-side field names from traced IL; do not assume
+the Save callbacks contain exactly the same field set without tracing them.
+
+============================================================
+9. LINUX / PYTHON SHELL WORKFLOW
+============================================================
+
+Observed working directory:
   cd "/storage/emulated/0/Map Check"
 
 Python interpreter:
   /root/.venv_mission3/bin/python
 
-DLL argument used:
+Input DLL:
   Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
 
-The virtual environment has dnfile installed.
+dnfile:
+  installed in /root/.venv_mission3/
 
-Typical script creation/execution pattern:
-  cat > script.py <<'PY'
-  # Python source
-  PY
+Typical command pattern used:
+  cd "/storage/emulated/0/Map Check"
+  DLL="Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll"
   /root/.venv_mission3/bin/python script.py "$DLL"
 
-transform_trace.py — purpose and observed behavior:
-1. Receives the Assembly-CSharp.dll path through sys.argv[1].
-2. Opens the .NET PE/metadata using dnfile.dnPE(dll).
-3. Reads raw DLL bytes.
-4. Resolves MethodDef rows by RID.
-5. Converts a method RVA to a file offset using pe.get_offset_from_rva().
-6. Parses Tiny/Fat method headers to determine IL start and IL size.
-7. Decodes IL opcodes using a one-byte operand-length table.
-8. Resolves metadata tokens for:
-   - 0x06: MethodDef
-   - 0x0A: MemberRef
-   - 0x04: Field
-   - 0x70: UserString
-   - 0x2B: MethodSpec
-9. Decodes branch target offsets.
-10. Writes the trace to transform_trace.txt.
+Creating a helper script with a heredoc:
+  cat > helper.py <<'PY'
+  # Python source
+  PY
+  /root/.venv_mission3/bin/python helper.py "$DLL"
 
-MethodDef RIDs reported as traced:
-  0x59C, 0x59D, 0x59F, 0x5A0, 0x5A2, 0x5A3, 0x5A6, 0x5A7
-  and later-added callback RID 0x5B83.
+transform_trace.py purpose:
+  - accepts DLL path from sys.argv[1]
+  - opens PE/.NET metadata with dnfile.dnPE
+  - reads raw DLL bytes
+  - resolves MethodDef rows by RID
+  - converts RVA to file offset
+  - parses Tiny/Fat method headers
+  - decodes IL opcode and operand widths
+  - resolves metadata tokens including MethodDef, MemberRef, Field,
+    UserString and MethodSpec
+  - renders branch offsets
+  - writes method traces
 
-Most recent reported transform_trace.py execution:
-  DONE
-  Saved: /mnt/sdcard/Map Check/transform_trace.txt
+RIDs traced in the latest user run included:
+  0x59C, 0x59D, 0x59F, 0x5A0, 0x5A2, 0x5A3, 0x5A6, 0x5A7, 0x5B83
+
+Latest transform_trace.py run reported:
+  Saved: transform_trace.txt
   Lines: 770
-  File size: 26776 bytes
+  File size: 26,776 bytes
 
 callback_dump.py:
-- Reads MethodDef RID 0x5B83.
-- Reports method name/token/RVA/signature and declaring TypeDef by scanning TypeDef.MethodList.
-- Parses method header and writes raw IL bytes in 16-byte rows to transform_callback_raw.txt.
-Reported output:
-  DONE
-  Saved: /mnt/sdcard/Map Check/transform_callback_raw.txt
-  Bytes: 102
+  reads MethodDef RID 0x5B83
+  identifies declaring TypeDef
+  parses method header
+  writes raw IL bytes
+  output: transform_callback_raw.txt
+  recorded bytes: 102
 
 callback_resolve.py:
-- Resolves user strings, getter MemberRefs, and the Truncate MethodDef metadata.
-- Reported the Transform field keys/getters and Truncate RID 0x329F details listed above.
+  resolves user strings, getter MemberRefs and the Truncate method
+  outputs resolved key strings and metadata.
 
 truncate_resolve.py:
-- Was run against RID 0x329E and generated truncate_resolve.txt with 28 lines.
-- The file contents were not pasted into the conversation, so the result remains unreviewed.
+  resolved scalar Truncate 0x329E in Beam.Vector3Tools
+  output: truncate_resolve.txt (28 lines)
 
-Workflow notes:
-- Pass the DLL path as "$DLL" so the script receives it as argv[1].
-- Keep generated traces and raw dumps in the Map Check working directory.
-- Preserve raw IL dumps alongside decoded traces so token/opcode interpretations can be checked.
-- When reporting results, record MethodDef RID, token, RVA, IL size, metadata token targets, and the exact command output.
-- Do not treat the terminal's mangled echo of a script as a reliable source copy; preserve the actual script file if exact reproducibility is required.
+truncate_trace.py:
+  resolved Vector3 Truncate 0x329F and IL body
+  output: truncate_trace.txt (46-byte IL body)
 
-4. MISSION 3 REMAINING INVESTIGATION TRACKER
---------------------------------------------
+Repository copies:
+  V232/Output Now/transform_trace.txt
+  V232/Output Now/transform_callback_raw.txt
+  V232/Output Now/truncate_resolve.txt
+  V232/Output Now/truncate_trace.txt
 
-4.1 Single Heightmap decoding
-Status: PENDING.
-Required evidence:
-- Determine the exact Mission 3 heightmap payload/file and its boundaries.
-- Identify header fields, width, height, sample count, sample type/bit depth, byte order, compression (if any), scale, and offset.
-- Decode one complete heightmap first.
-- Validate that decoded sample count equals width x height and inspect min/max and representative samples.
-- Keep raw bytes and decoder output for comparison.
+Note on script source:
+  The terminal-echoed copy of transform_trace.py in chat was mangled by
+  terminal wrapping/paste output. The successful run outputs are retained
+  as evidence; do not treat the echoed terminal text as a pristine copy
+  of the exact script file.
 
-4.2 Map file structure
-Status: PENDING.
-Required evidence:
-- Identify outer file header, version/signature, offsets, lengths, section ordering, and payload boundaries.
-- Map each section to its corresponding data.
-- Distinguish confirmed fields from unknown/padding bytes.
-- Do not infer a structure solely from plausible-looking values.
+============================================================
+10. REMAINING MISSION 3 TASKS — ACCEPTANCE CRITERIA
+============================================================
 
-4.3 Transform serialization
-Status: PARTIAL.
-Confirmed Save/Load mappings and local-space semantics are documented in Section 1.
+A. Single Mission 3 HEIGHTMAP decoding
+Status: PARTIAL / raw data format confirmed; runtime-exact decode pending.
+Done:
+  257x257 little-endian UInt16 raw grid; 66,049 samples; source order i,j.
+  source code specifies ToCompressStable then Decompress.
 Remaining:
-- Verify the declaring type and IL body of Truncate at RID 0x329F.
-- Inspect RID 0x329E separately and resolve the discrepancy.
-- Establish the exact numeric behavior of Truncate.
-- Confirm how serialized transform values relate to parent transforms and the eventual world-space positions.
-- Verify the Save-side behavior for other component serializers before assuming parity with Load.
+  implement exact stable lookup and compare resulting values with Unity's
+  loaded HeightmapData or an authoritative runtime dump.
+  verify no row/column transposition or orientation flip using source/runtime
+  evidence, not visual guessing.
 
-4.4 49 Terrain / Collider component links
+B. Map file structure
+Status: PARTIAL / three-stream and World bundle layout source-confirmed.
+Done:
+  EDITOR = BinaryFormatter MapEditorData.
+  OBJECT = JObject text.
+  HEIGHT = 257x257 compressed UInt16 loop.
+  World.Bundle = gzip + per-map stream lengths/data + 49 positions + generated points.
+Remaining:
+  resolve caller-provided World bundle header bytes/length.
+  document full EditorData BinaryFormatter member graph and version fields.
+  validate a real Seed.sdd/World bundle against the source reader.
+
+C. Transform serialization
+Status: PARTIAL-TO-STRONG / Save and Load fields confirmed.
+Done:
+  localPosition, localRotation, localScale semantics and IL tokens.
+  scale-only Truncate; scalar/vector overload relationship corrected.
+Remaining:
+  resolve MemberRef 0x0A000CCD and verify exact scalar rounding rule.
+  resolve full parent/local TRS for every target needed in world coordinates.
+
+D. 49 Terrain / Collider / TerrainData links
+Status: PARTIAL.
+Done:
+  49 level3 Terrain and 49 level3 TerrainCollider components identified.
+  each indexed Terrain/Collider GameObject reference uniquely resolved.
+  51 total Terrain and 51 total TerrainCollider across all containers.
+Remaining:
+  follow external serialized-file references (fileID + target PathID).
+  confirm the corresponding Terrain and TerrainCollider share the expected
+  TerrainData object for each target zone.
+  do not globally join by PathID alone.
+
+E. 51 TerrainData full sample arrays
 Status: PENDING.
-Required evidence:
-- Build a per-zone mapping of Terrain component, TerrainData reference, Collider component(s), and owning GameObject/entity.
-- Record stable object/file identifiers and source locations.
-- Detect missing, duplicate, shared, or orphan references.
-- Do not infer links from row order alone.
+Done:
+  51 TerrainData objects indexed; m_Heightmap field exists in all profiles.
+  profile previews are known to be truncated.
+Remaining:
+  obtain referenced serialized assets and extract complete m_Heightmap data.
+  verify dimensions, element type, byte order, sample count, and per-array hashes.
+  compare TerrainData arrays numerically with decoded map.HeightmapData only
+  after stable conversion and orientation are agreed.
 
-4.5 49 TerrainData full sample arrays
-Status: PENDING.
-Required evidence:
-- Extract the full height/sample arrays for all 49 TerrainData objects.
-- Record dimensions, sample count, element precision/type, byte order, range, and extraction source.
-- Validate each array's element count against its dimensions.
-- Preserve the arrays or lossless exports and record checksums where possible.
-- A small sample or summary is not equivalent to a full array export.
+F. 49-zone world position
+Status: PARTIAL / assignment formula confirmed; actual values unresolved.
+Done:
+  GenerationZonePositons[i] -> Unity position (x,0,y).
+  49 entries; zone index 0 marked starting island.
+  ZonePositionGenerator uses WORLD_SEED and deterministic point sampling.
+Remaining:
+  recover actual 49 Vector2 positions from loaded World.Bundle/Seed.sdd
+  or reproduce using exact seed + generation region/radius arguments.
+  fully resolve parent chains and all local TRS for static Terrain scene objects.
+  compare runtime zone positions to Terrain component transforms.
 
-4.6 49-zone world position
-Status: PENDING.
-Required evidence:
-- Obtain each zone's transform and parent hierarchy.
-- Resolve local transforms into world transforms.
-- Establish world origin, axis orientation, zone spacing, and any scale/rotation inheritance.
-- Produce a 49-zone coordinate table.
-- Do not treat serialized localPosition as world position.
+G. Mission 3 runtime World.MapList index
+Status: PENDING / runtime assignment path known.
+Done:
+  Zone[i] receives MapList[i]; Zone.Id copied from Map.EditorData.Id.
+  FindEndGameZone searches for "INTERNAL_MISSION_3".
+  default-map assignment path copies DefaultMapList[num] into _mapList[j].
+Remaining:
+  recover actual loaded map list/seed bundle and identify the i where
+  MapList[i].EditorData.Id == "INTERNAL_MISSION_3".
+  verify matching Zone[i] and its transform/terrain data.
+No index is inferred from level3 path IDs or object ordering.
 
-4.7 Mission 3 runtime MapList index
-Status: PENDING.
-Required evidence:
-- Trace the runtime MapList construction and Mission 3 selection/load path.
-- Identify the actual entry corresponding to Mission 3.
-- Determine whether the value is an identifier, array/list position, or zero-based index.
-- Confirm the runtime value from code or runtime evidence; do not guess based on display order.
+H. Godot integration
+Status: NOT IMPLEMENTED / source mapping requirements recorded.
+Required before implementation verification:
+  - Unity runtime-compatible stable height decode
+  - 257x257 indexing convention and orientation validation
+  - map TerrainData physical size and vertical-height mapping
+  - Unity zone positions and mission index
+  - external TerrainData references resolved
+  - Unity-to-Godot coordinate conversion chosen and validated against known points
+  - import test using source values and a reproducible height/position check
+No Godot import scene/script or terrain output is claimed as complete in this record.
 
-4.8 Godot integration
-Status: PENDING — dependent on source format and coordinate findings.
-Required evidence and integration checks:
-- Map the verified Unity data structures to Godot data structures.
-- Establish coordinate-axis conversion, handedness, origin, units, height scale/offset, sample ordering, and terrain dimensions.
-- Define how heightmap samples and zone transforms are imported.
-- Validate imported output against source samples and known zone positions.
-- Keep this scope limited to data/terrain/transform migration; do not expand into unrelated gameplay or save/load systems unless explicitly requested.
+============================================================
+11. PRIMARY FILE INDEX
+============================================================
 
-5. CURRENT OVERALL STATUS
--------------------------
-- Transform serialization: PARTIAL; key Save/Load fields and callback metadata are identified.
-- JObject/JSerializer object model: PARTIAL; core metadata and several Load-side fields are known.
-- Linux/Python workflow: CONFIRMED as executed by the user; exact source script should be preserved from the working directory for reproducibility.
-- Single Heightmap decoding: PENDING.
-- Map file structure: PENDING.
-- 49 Terrain/Collider links: PENDING.
-- 49 TerrainData full arrays: PENDING.
-- 49-zone world positions: PENDING.
-- Mission 3 runtime MapList index: PENDING.
-- Godot integration: PENDING.
+V26.2:
+  extracted/V26.2/00_V26_2_MASTER_SUMMARY.txt
+  extracted/V26.2/01_V26_2_INPUT_MANIFEST.csv
+  extracted/V26.2/02_V26_2_SERIALIZED_OBJECT_INDEX.csv
+  extracted/V26.2/03_V26_2_TERRAIN_COMPONENT_INDEX.csv
+  extracted/V26.2/04_V26_2_TERRAIN_DATA_LINKS.csv
+  extracted/V26.2/05_V26_2_TRANSFORM_HIERARCHY.csv
+  extracted/V26.2/06_V26_2_TRANSFORM_GAMEOBJECT_LINKS.csv
+  extracted/V26.2/07_V26_2_TERRAIN_WORLD_TRANSFORMS.csv
+  extracted/V26.2/08_V26_2_TERRAIN_DATA_PROFILE.csv
+  extracted/V26.2/09_V26_2_EXTERNAL_REFERENCE_AUDIT.csv
+  extracted/V26.2/10_V26_2_SOURCE_METHOD_EVIDENCE.txt
+  extracted/V26.2/11A_V26_2_HEIGHTMAP_PROFILE.csv
+  extracted/V26.2/11_V26_2_HEIGHTMAP_SAMPLES.csv
+  extracted/V26.2/12_V26_2_HEIGHTMAP_CORRELATION.csv
+  extracted/V26.2/13_V26_2_RUNTIME_MISSION_MAPPING.csv
+  extracted/V26.2/14_V26_2_POINTER_AUDIT.csv
+  extracted/V26.2/15_V26_2_SOURCE_MANIFEST.csv
+  extracted/V26.2/16_V26_2_ERRORS.txt
+  extracted/V26.2/17_V26_2_WARNINGS.txt
+  extracted/V26.2/18_V26_2_SHA256_MANIFEST.csv
 
-6. NEXT EVIDENCE TO COLLECT
----------------------------
-1. Paste the actual 28-line truncate_resolve.txt output so RID 0x329E can be checked against 0x329F.
-2. Inspect the declaring TypeDef and IL body for Truncate RID 0x329F; inspect RID 0x329E independently.
-3. Continue with the user's chosen Mission 3 investigation order. Do not switch scope without the user's direction.
+V24 C# source relevant to this task:
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__Map.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__Maps.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Beam.Terrain__World.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__Funlabs__MPExtensions.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__StrandedWorld.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__TransformSerializer.cs
+  extracted/V24/CS_SOURCE/Assembly-CSharp__ZonePositionGenerator.cs
+
+V25:
+  extracted/V25/00_V25_MASTER_SUMMARY.txt
+  extracted/V25/09_V25_TERRAIN_CORRELATION_REPORT.txt
+
+V232:
+  V232/MISSION3_MAP_SOURCE_TRACE_20261120/
+  V232/MISSION3_MAP_CONSTANTS_TRACE_20261120_070324/
+  V232/MISSION3_DEFAULT_MAP_PATH_TRACE_20261120_0712/
+  V232/V232 Map Token Audit/
+  V232/Output Now/
+
+============================================================
+12. REVERSE-ENGINEERING STATUS SUMMARY
+============================================================
+
+VERIFIED:
+  - three-part Map asset contract and source read/write logic
+  - raw Mission 3 HEIGHT file size, dimensions and UInt16 little-endian storage
+  - source stable-value conversion step used by Unity loader
+  - TransformSerializer Save/Load field names and local-space semantics
+  - Truncate scalar/vector overload tokens and call relationship
+  - World.Bundle 49-map record structure from source
+  - 49-zone position assignment formula
+  - runtime mission identity predicate
+
+PARTIAL:
+  - runtime-exact height values until stable mapping is applied and checked
+  - full map EDITOR serialization schema/header
+  - Terrain/TerrainCollider/TerrainData external links
+  - static Terrain world transforms
+
+PENDING / UNKNOWN:
+  - all 51 complete TerrainData sample arrays
+  - actual 49 world position values
+  - exact runtime Mission 3 MapList index
+  - full external reference traversal
+  - full Godot import and validation
 
 END OF RECORD
-=============
+============================================================
