@@ -1,0 +1,1452 @@
+================================================================================
+STRANDED DEEP ORIGINAL - COMPLETE OCEAN SYSTEM FORENSIC EVIDENCE (ALL 4 SCENES)
+================================================================================
+
+
+################################################################################
+SCENE: level0 | _Ceto GameObject PathID = 29
+################################################################################
+External Asset Table: {0: 'level0', 1: 'globalgamemanagers.assets', 2: 'sharedassets0.assets', 3: 'unity default resources'}
+
+[Comp #0] Transform | PathID=146 | LocalPos=(0.0, 0.0, 0.0)
+
+--------------------------------------------------------------------------------
+[Comp #1] Beam.CetoSettings | PathID=324 | Size=432 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=2100) -> Beam.CetoSettings (Assembly-CSharp.dll)
+  DLL Fields (21): ['_aboveVisibility', '_belowVisibility', '_aboveVisibilityCurve', '_belowVisibilityCurve', '_currentWaterColor', '_currentUnderwaterColor', '_currentScatterColor', '_currentUnderwaterInscatterColor', '_morningWaterColor', '_middayWaterColor', '_morningUnderwaterColor', '_middayUnderwaterColor', '_morningScatterColor', '_middayScatterColor', '_morningUnderwaterInscatterColor', '_middayUnderwaterInscatterColor', '_weatherScatterColor', '_weatherUnderwaterColor', '_causticsTexture', '_underwater', '_waveSpectrum']
+  [VERIFIED VALUES] +108 = 0.000154 | +112 = 6.002231
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +072: hex=0x00000000 | int=           0 | float=      0.000000
+    +076: hex=0x00000000 | int=           0 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x00000002 | int=           2 | float=      0.000000
+    +096: hex=0x00000002 | int=           2 | float=      0.000000
+    +100: hex=0x00000004 | int=           4 | float=      0.000000
+    +104: hex=0x00000005 | int=           5 | float=      0.000000
+    +108: hex=0x39215040 | int=   958484544 | float=      0.000154
+    +112: hex=0x40c01246 | int=  1086329414 | float=      6.002231
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000000 | int=           0 | float=      0.000000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +132: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +136: hex=0x3e7fec9f | int=  1048571039 | float=      0.249926
+    +140: hex=0x40c02065 | int=  1086333029 | float=      6.003954
+    +144: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +148: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +160: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +164: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +168: hex=0x41f00000 | int=  1106247680 | float=     30.000000
+    +172: hex=0x00000000 | int=           0 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000000 | int=           0 | float=      0.000000
+    +184: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +188: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +192: hex=0x3f3ff483 | int=  1061155971 | float=      0.749825
+    +196: hex=0x40bfff80 | int=  1086324608 | float=      5.999939
+    +200: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +204: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +208: hex=0x00000000 | int=           0 | float=      0.000000
+    +212: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +216: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +220: hex=0x3f7ffcbb | int=  1065352379 | float=      0.999950
+    +224: hex=0x40bfcd5f | int=  1086311775 | float=      5.993820
+    +228: hex=0x00000000 | int=           0 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000000 | int=           0 | float=      0.000000
+    +240: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +244: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +248: hex=0x00000002 | int=           2 | float=      0.000000
+    +252: hex=0x00000002 | int=           2 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000000 | int=           0 | float=      0.000000
+    +264: hex=0x00000000 | int=           0 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +276: hex=0x00000000 | int=           0 | float=      0.000000
+    +280: hex=0x38897273 | int=   948531827 | float=      0.000066
+    +284: hex=0x3c40c0c1 | int=  1010876609 | float=      0.011765
+    +288: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +292: hex=0x00000000 | int=           0 | float=      0.000000
+    +296: hex=0x3c72ef5b | int=  1014165339 | float=      0.014828
+    +300: hex=0x3d169690 | int=  1024890512 | float=      0.036765
+    +304: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +308: hex=0x00000000 | int=           0 | float=      0.000000
+    +312: hex=0x3eda973b | int=  1054512955 | float=      0.426935
+    +316: hex=0x3f056042 | int=  1057316930 | float=      0.521000
+    +320: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +324: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +328: hex=0x3f0e8e8f | int=  1057918607 | float=      0.556863
+    +332: hex=0x00000000 | int=           0 | float=      0.000000
+    +336: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +340: hex=0x00000000 | int=           0 | float=      0.000000
+    +344: hex=0x3f10e560 | int=  1058071904 | float=      0.566000
+    +348: hex=0x3f3db22d | int=  1061007917 | float=      0.741000
+    +352: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +356: hex=0x3e5e7486 | int=  1046377606 | float=      0.217241
+    +360: hex=0x3e0c6741 | int=  1041000257 | float=      0.137113
+    +364: hex=0x3dbfc58f | int=  1035978127 | float=      0.093639
+    +368: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +372: hex=0x00000000 | int=           0 | float=      0.000000
+    +376: hex=0x3ea3b325 | int=  1050915621 | float=      0.319726
+    +380: hex=0x3eab4153 | int=  1051410771 | float=      0.334483
+    +384: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +388: hex=0x3e3d786e | int=  1044215918 | float=      0.185030
+    +392: hex=0x3eead054 | int=  1055576148 | float=      0.458621
+    +396: hex=0x3ec55e12 | int=  1053122066 | float=      0.385483
+    +400: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +404: hex=0x3d5e3c69 | int=  1029586025 | float=      0.054257
+    +408: hex=0x3e061604 | int=  1040586244 | float=      0.130943
+    +412: hex=0x3e09b5d8 | int=  1040823768 | float=      0.134483
+    +416: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +420: hex=0x00000002 | int=           2 | float=      0.000000
+    +424: hex=0x00000030 | int=          48 | float=      0.000000
+    +428: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #2] Ceto.Ocean | PathID=310 | Size=220 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3179) -> Ceto.Ocean (Assembly-CSharp.dll)
+  DLL Fields (38): ['disableWarnings', 'disableInfo', 'doublePrecisionProjection', 'tightProjectionFit', 'm_sun', 'level', 'heightOverlaySize', 'normalOverlaySize', 'foamOverlaySize', 'clipOverlaySize', 'heightBlendMode', 'foamBlendMode', 'defaultSkyColor', 'defaultOceanColor', 'windDir', '<WindDirVector>k__BackingField', 'specularRoughness', 'specularIntensity', 'fresnelPower', 'minFresnel', 'foamTint', 'foamIntensity', 'foamTexture0', 'foamTexture1', 'waveOverlaySdr', '<Grid>k__BackingField', '<Reflection>k__BackingField', '<Spectrum>k__BackingField', '<UnderWater>k__BackingField', '<OceanTime>k__BackingField', '<Projection>k__BackingField', 'm_positionOffset', 'm_cameraData', 'm_waveOverlayMat', '<OverlayManager>k__BackingField', 'm_scheduler', 'm_query', '<WasError>k__BackingField']
+  [VERIFIED VALUES] level (+060) = 0.000201 (Hex 0x3952e038) | windDir (+120) = 60.0 | specularIntensity (+128) = 0.30000001192092896 | foamIntensity (+156) = 1.7999999523162842
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000000 | int=           0 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000001 | int=           1 | float=      0.000000
+    +044: hex=0x00000001 | int=           1 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x3952e038 | int=   961732664 | float=      0.000201
+    +064: hex=0x00000004 | int=           4 | float=      0.000000
+    +068: hex=0x00000003 | int=           3 | float=      0.000000
+    +072: hex=0x00000003 | int=           3 | float=      0.000000
+    +076: hex=0x00000003 | int=           3 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x00000000 | int=           0 | float=      0.000000
+    +088: hex=0x00000000 | int=           0 | float=      0.000000
+    +092: hex=0x00000000 | int=           0 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+    +100: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x3d9ca6ba | int=  1033676474 | float=      0.076490
+    +112: hex=0x3e4234f7 | int=  1044526327 | float=      0.189655
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x42700000 | int=  1114636288 | float=     60.000000
+    +124: hex=0x3e4ccccd | int=  1045220557 | float=      0.200000
+    +128: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +132: hex=0x40a00000 | int=  1084227584 | float=      5.000000
+    +136: hex=0x3ca3d70a | int=  1017370378 | float=      0.020000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3fe66666 | int=  1072064102 | float=      1.800000
+    +160: hex=0x00000002 | int=           2 | float=      0.000000
+    +164: hex=0x00000052 | int=          82 | float=      0.000000
+    +168: hex=0x00000000 | int=           0 | float=      0.000000
+    +172: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +176: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0x00000002 | int=           2 | float=      0.000000
+    +188: hex=0x00000052 | int=          82 | float=      0.000000
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +200: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +204: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +208: hex=0x00000002 | int=           2 | float=      0.000000
+    +212: hex=0x000000a1 | int=         161 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #3] Ceto.WaveSpectrum | PathID=313 | Size=192 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=227) -> Ceto.WaveSpectrum (Assembly-CSharp.dll)
+  DLL Fields (50): ['fourierSize', 'spectrumType', 'numberOfGrids', 'disableReadBack', 'disableDisplacements', 'disableSlopes', 'disableFoam', 'textureFoam', 'choppyness', 'foamAmount', 'foamCoverage', 'windSpeed', 'waveAge', 'waveSpeed', 'gridScale', 'waveSmoothing', 'slopeSmoothing', 'foamSmoothing', 'm_displacementMaps', 'm_slopeMaps', 'm_foamMaps', '<MaxDisplacement>k__BackingField', 'm_slopeCopyMat', 'm_displacementCopyMat', 'm_foamCopyMat', 'm_slopeInitMat', 'm_displacementInitMat', 'm_foamInitMat', 'm_gridSizes', 'm_choppyness', 'm_scheduler', 'm_conditions', 'm_displacementBuffer', 'm_slopeBuffer', 'm_jacobianBuffer', 'm_findRangeTask', 'm_readBuffer', 'm_queryScaling', 'm_bufferSettings', 'm_conditionCache', 'm_maxConditionCacheSize', '<CustomWaveSpectrum>k__BackingField', 'initSlopeSdr', 'initDisplacementSdr', 'initJacobianSdr', 'fourierSdr', 'slopeCopySdr', 'displacementCopySdr', 'foamCopySdr', 'readSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000004 | int=           4 | float=      0.000000
+    +044: hex=0x00000001 | int=           1 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000001 | int=           1 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +072: hex=0x3e800000 | int=  1048576000 | float=      0.250000
+    +076: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +080: hex=0x3f333333 | int=  1060320051 | float=      0.700000
+    +084: hex=0x3f8ccccd | int=  1066192077 | float=      1.100000
+    +088: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x00000002 | int=           2 | float=      0.000000
+    +100: hex=0x000000b0 | int=         176 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000002 | int=           2 | float=      0.000000
+    +112: hex=0x0000009a | int=         154 | float=      0.000000
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000002 | int=           2 | float=      0.000000
+    +124: hex=0x0000009f | int=         159 | float=      0.000000
+    +128: hex=0x00000000 | int=           0 | float=      0.000000
+    +132: hex=0x00000002 | int=           2 | float=      0.000000
+    +136: hex=0x000000b2 | int=         178 | float=      0.000000
+    +140: hex=0x00000000 | int=           0 | float=      0.000000
+    +144: hex=0x00000002 | int=           2 | float=      0.000000
+    +148: hex=0x00000093 | int=         147 | float=      0.000000
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x00000002 | int=           2 | float=      0.000000
+    +160: hex=0x000000b5 | int=         181 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x00000002 | int=           2 | float=      0.000000
+    +172: hex=0x00000096 | int=         150 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000002 | int=           2 | float=      0.000000
+    +184: hex=0x000000ba | int=         186 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #4] Ceto.ProjectedGrid | PathID=312 | Size=64 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=1198) -> Ceto.ProjectedGrid (Assembly-CSharp.dll)
+  DLL Fields (8): ['resolution', 'gridGroups', 'receiveShadows', 'borderLength', 'reflectionProbes', 'oceanTopSideMat', 'oceanUnderSideMat', 'm_grids']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000002 | int=           2 | float=      0.000000
+    +044: hex=0x00000002 | int=           2 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000002 | int=           2 | float=      0.000000
+    +056: hex=0x00000003 | int=           3 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #5] Ceto.UnderWater | PathID=309 | Size=284 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=790) -> Ceto.UnderWater (Assembly-CSharp.dll)
+  DLL Fields (29): ['MAX_DEPTH_DIST', 'underwaterMode', 'depthMode', 'oceanDepthsMask', 'bottomDepth', 'depthBlend', 'edgeFade', 'aboveRefractionIntensity', 'belowRefractionIntensity', 'refractionDistortion', 'absorptionR', 'absorptionG', 'absorptionB', 'aboveAbsorptionModifier', 'belowAbsorptionModifier', 'subSurfaceScatterModifier', 'aboveInscatterModifier', 'belowInscatterModifier', '<DisableCopyDepthCmd>k__BackingField', '<DisableNormalFadeCmd>k__BackingField', 'm_bottomMask', 'NumMeshSegmentsX', 'NumMeshSegmentsY', 'oceanBottomSdr', 'oceanDepthSdr', 'copyDepthSdr', 'oceanMaskSdr', 'oceanMaskFlippedSdr', 'normalFadeSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000000 | int=           0 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000000 | int=           0 | float=      0.000000
+    +044: hex=0x43fa0000 | int=  1140457472 | float=    500.000000
+    +048: hex=0x3f333333 | int=  1060320051 | float=      0.700000
+    +052: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +056: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +060: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +064: hex=0x3cbc6a7f | int=  1018980991 | float=      0.023000
+    +068: hex=0x3bc49ba6 | int=  1002740646 | float=      0.006000
+    +072: hex=0x3a83126f | int=   981668463 | float=      0.001000
+    +076: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +080: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +084: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +088: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +100: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +104: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +108: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +112: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +124: hex=0x41800000 | int=  1098907648 | float=     16.000000
+    +128: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +132: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +136: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x43480000 | int=  1128792064 | float=    200.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x00000001 | int=           1 | float=      0.000000
+    +160: hex=0x00000000 | int=           0 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3c808081 | int=  1015054465 | float=      0.015686
+    +172: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +176: hex=0x43160000 | int=  1125515264 | float=    150.000000
+    +180: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +184: hex=0x00000001 | int=           1 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+    +192: hex=0x3e397616 | int=  1043953174 | float=      0.181115
+    +196: hex=0x3e92d2d2 | int=  1049809618 | float=      0.286765
+    +200: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +204: hex=0x00000010 | int=          16 | float=      0.000000
+    +208: hex=0x00000040 | int=          64 | float=      0.000000
+    +212: hex=0x00000002 | int=           2 | float=      0.000000
+    +216: hex=0x0000008b | int=         139 | float=      0.000000
+    +220: hex=0x00000000 | int=           0 | float=      0.000000
+    +224: hex=0x00000002 | int=           2 | float=      0.000000
+    +228: hex=0x000000b3 | int=         179 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000002 | int=           2 | float=      0.000000
+    +240: hex=0x0000009b | int=         155 | float=      0.000000
+    +244: hex=0x00000000 | int=           0 | float=      0.000000
+    +248: hex=0x00000002 | int=           2 | float=      0.000000
+    +252: hex=0x000000a8 | int=         168 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000002 | int=           2 | float=      0.000000
+    +264: hex=0x0000008e | int=         142 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x00000002 | int=           2 | float=      0.000000
+    +276: hex=0x000000a0 | int=         160 | float=      0.000000
+    +280: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #6] Ceto.PlanarReflection | PathID=311 | Size=100 bytes
+  Evidence Chain : level0 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3056) -> Ceto.PlanarReflection (Assembly-CSharp.dll)
+  DLL Fields (16): ['reflectionMask', 'reflectionResolution', 'clipPlaneOffset', 'fogInReflection', 'skyboxInReflection', 'copyCullDistances', 'blurMode', 'blurIterations', 'blurSpread', 'reflectionTint', 'reflectionIntensity', 'reflectionDistortion', 'RenderReflectionCustom', 'm_dummy', 'm_imageBlur', 'blurShader']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x81036000 | int= -2130485248 | float=     -0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x3d8f5c29 | int=  1032805417 | float=      0.070000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000001 | int=           1 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +072: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +076: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +080: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +084: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +088: hex=0x00000002 | int=           2 | float=      0.000000
+    +092: hex=0x000000a6 | int=         166 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+
+
+################################################################################
+SCENE: level2 | _Ceto GameObject PathID = 24
+################################################################################
+External Asset Table: {0: 'level2', 1: 'globalgamemanagers.assets', 2: 'sharedassets2.assets', 3: 'resources.assets', 4: 'sharedassets0.assets', 5: 'unity default resources', 6: 'sharedassets1.assets'}
+
+[Comp #0] Transform | PathID=108 | LocalPos=(0.0, 0.0, 0.0)
+
+--------------------------------------------------------------------------------
+[Comp #1] Beam.CetoSettings | PathID=299 | Size=432 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=2100) -> Beam.CetoSettings (Assembly-CSharp.dll)
+  DLL Fields (21): ['_aboveVisibility', '_belowVisibility', '_aboveVisibilityCurve', '_belowVisibilityCurve', '_currentWaterColor', '_currentUnderwaterColor', '_currentScatterColor', '_currentUnderwaterInscatterColor', '_morningWaterColor', '_middayWaterColor', '_morningUnderwaterColor', '_middayUnderwaterColor', '_morningScatterColor', '_middayScatterColor', '_morningUnderwaterInscatterColor', '_middayUnderwaterInscatterColor', '_weatherScatterColor', '_weatherUnderwaterColor', '_causticsTexture', '_underwater', '_waveSpectrum']
+  [VERIFIED VALUES] +108 = 0.000154 | +112 = 6.002231
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +072: hex=0x00000000 | int=           0 | float=      0.000000
+    +076: hex=0x00000000 | int=           0 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x00000002 | int=           2 | float=      0.000000
+    +096: hex=0x00000002 | int=           2 | float=      0.000000
+    +100: hex=0x00000004 | int=           4 | float=      0.000000
+    +104: hex=0x00000005 | int=           5 | float=      0.000000
+    +108: hex=0x39215040 | int=   958484544 | float=      0.000154
+    +112: hex=0x40c01246 | int=  1086329414 | float=      6.002231
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000000 | int=           0 | float=      0.000000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +132: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +136: hex=0x3e7fec9f | int=  1048571039 | float=      0.249926
+    +140: hex=0x40c02065 | int=  1086333029 | float=      6.003954
+    +144: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +148: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +160: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +164: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +168: hex=0x41f00000 | int=  1106247680 | float=     30.000000
+    +172: hex=0x00000000 | int=           0 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000000 | int=           0 | float=      0.000000
+    +184: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +188: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +192: hex=0x3f3ff483 | int=  1061155971 | float=      0.749825
+    +196: hex=0x40bfff80 | int=  1086324608 | float=      5.999939
+    +200: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +204: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +208: hex=0x00000000 | int=           0 | float=      0.000000
+    +212: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +216: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +220: hex=0x3f7ffcbb | int=  1065352379 | float=      0.999950
+    +224: hex=0x40bfcd5f | int=  1086311775 | float=      5.993820
+    +228: hex=0x00000000 | int=           0 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000000 | int=           0 | float=      0.000000
+    +240: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +244: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +248: hex=0x00000002 | int=           2 | float=      0.000000
+    +252: hex=0x00000002 | int=           2 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000000 | int=           0 | float=      0.000000
+    +264: hex=0x00000000 | int=           0 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +276: hex=0x00000000 | int=           0 | float=      0.000000
+    +280: hex=0x38897273 | int=   948531827 | float=      0.000066
+    +284: hex=0x3c40c0c1 | int=  1010876609 | float=      0.011765
+    +288: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +292: hex=0x00000000 | int=           0 | float=      0.000000
+    +296: hex=0x3c72ef5b | int=  1014165339 | float=      0.014828
+    +300: hex=0x3d169690 | int=  1024890512 | float=      0.036765
+    +304: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +308: hex=0x00000000 | int=           0 | float=      0.000000
+    +312: hex=0x3eda973b | int=  1054512955 | float=      0.426935
+    +316: hex=0x3f056042 | int=  1057316930 | float=      0.521000
+    +320: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +324: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +328: hex=0x3f0e8e8f | int=  1057918607 | float=      0.556863
+    +332: hex=0x00000000 | int=           0 | float=      0.000000
+    +336: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +340: hex=0x00000000 | int=           0 | float=      0.000000
+    +344: hex=0x3f10e560 | int=  1058071904 | float=      0.566000
+    +348: hex=0x3f3db22d | int=  1061007917 | float=      0.741000
+    +352: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +356: hex=0x3e5e7486 | int=  1046377606 | float=      0.217241
+    +360: hex=0x3e0c6741 | int=  1041000257 | float=      0.137113
+    +364: hex=0x3dbfc58f | int=  1035978127 | float=      0.093639
+    +368: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +372: hex=0x00000000 | int=           0 | float=      0.000000
+    +376: hex=0x3ea3b325 | int=  1050915621 | float=      0.319726
+    +380: hex=0x3eab4153 | int=  1051410771 | float=      0.334483
+    +384: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +388: hex=0x3e3d786e | int=  1044215918 | float=      0.185030
+    +392: hex=0x3eead054 | int=  1055576148 | float=      0.458621
+    +396: hex=0x3ec55e12 | int=  1053122066 | float=      0.385483
+    +400: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +404: hex=0x3d5e3c69 | int=  1029586025 | float=      0.054257
+    +408: hex=0x3e061604 | int=  1040586244 | float=      0.130943
+    +412: hex=0x3e09b5d8 | int=  1040823768 | float=      0.134483
+    +416: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +420: hex=0x00000004 | int=           4 | float=      0.000000
+    +424: hex=0x00000030 | int=          48 | float=      0.000000
+    +428: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #2] Ceto.Ocean | PathID=274 | Size=220 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3179) -> Ceto.Ocean (Assembly-CSharp.dll)
+  DLL Fields (38): ['disableWarnings', 'disableInfo', 'doublePrecisionProjection', 'tightProjectionFit', 'm_sun', 'level', 'heightOverlaySize', 'normalOverlaySize', 'foamOverlaySize', 'clipOverlaySize', 'heightBlendMode', 'foamBlendMode', 'defaultSkyColor', 'defaultOceanColor', 'windDir', '<WindDirVector>k__BackingField', 'specularRoughness', 'specularIntensity', 'fresnelPower', 'minFresnel', 'foamTint', 'foamIntensity', 'foamTexture0', 'foamTexture1', 'waveOverlaySdr', '<Grid>k__BackingField', '<Reflection>k__BackingField', '<Spectrum>k__BackingField', '<UnderWater>k__BackingField', '<OceanTime>k__BackingField', '<Projection>k__BackingField', 'm_positionOffset', 'm_cameraData', 'm_waveOverlayMat', '<OverlayManager>k__BackingField', 'm_scheduler', 'm_query', '<WasError>k__BackingField']
+  [VERIFIED VALUES] level (+060) = 0.000201 (Hex 0x3952e038) | windDir (+120) = 60.0 | specularIntensity (+128) = 0.5 | foamIntensity (+156) = 1.7999999523162842
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000000 | int=           0 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000001 | int=           1 | float=      0.000000
+    +044: hex=0x00000001 | int=           1 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000039 | int=          57 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x3952e038 | int=   961732664 | float=      0.000201
+    +064: hex=0x00000004 | int=           4 | float=      0.000000
+    +068: hex=0x00000003 | int=           3 | float=      0.000000
+    +072: hex=0x00000003 | int=           3 | float=      0.000000
+    +076: hex=0x00000003 | int=           3 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x00000000 | int=           0 | float=      0.000000
+    +088: hex=0x00000000 | int=           0 | float=      0.000000
+    +092: hex=0x00000000 | int=           0 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+    +100: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x3d9ca6ba | int=  1033676474 | float=      0.076490
+    +112: hex=0x3e4234f7 | int=  1044526327 | float=      0.189655
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x42700000 | int=  1114636288 | float=     60.000000
+    +124: hex=0x3e4ccccd | int=  1045220557 | float=      0.200000
+    +128: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +132: hex=0x40a00000 | int=  1084227584 | float=      5.000000
+    +136: hex=0x3ca3d70a | int=  1017370378 | float=      0.020000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3fe66666 | int=  1072064102 | float=      1.800000
+    +160: hex=0x00000004 | int=           4 | float=      0.000000
+    +164: hex=0x00000052 | int=          82 | float=      0.000000
+    +168: hex=0x00000000 | int=           0 | float=      0.000000
+    +172: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +176: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0x00000004 | int=           4 | float=      0.000000
+    +188: hex=0x00000052 | int=          82 | float=      0.000000
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +200: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +204: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +208: hex=0x00000004 | int=           4 | float=      0.000000
+    +212: hex=0x000000a1 | int=         161 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #3] Ceto.WaveSpectrum | PathID=271 | Size=192 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=227) -> Ceto.WaveSpectrum (Assembly-CSharp.dll)
+  DLL Fields (50): ['fourierSize', 'spectrumType', 'numberOfGrids', 'disableReadBack', 'disableDisplacements', 'disableSlopes', 'disableFoam', 'textureFoam', 'choppyness', 'foamAmount', 'foamCoverage', 'windSpeed', 'waveAge', 'waveSpeed', 'gridScale', 'waveSmoothing', 'slopeSmoothing', 'foamSmoothing', 'm_displacementMaps', 'm_slopeMaps', 'm_foamMaps', '<MaxDisplacement>k__BackingField', 'm_slopeCopyMat', 'm_displacementCopyMat', 'm_foamCopyMat', 'm_slopeInitMat', 'm_displacementInitMat', 'm_foamInitMat', 'm_gridSizes', 'm_choppyness', 'm_scheduler', 'm_conditions', 'm_displacementBuffer', 'm_slopeBuffer', 'm_jacobianBuffer', 'm_findRangeTask', 'm_readBuffer', 'm_queryScaling', 'm_bufferSettings', 'm_conditionCache', 'm_maxConditionCacheSize', '<CustomWaveSpectrum>k__BackingField', 'initSlopeSdr', 'initDisplacementSdr', 'initJacobianSdr', 'fourierSdr', 'slopeCopySdr', 'displacementCopySdr', 'foamCopySdr', 'readSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000004 | int=           4 | float=      0.000000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000001 | int=           1 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +072: hex=0x3e800000 | int=  1048576000 | float=      0.250000
+    +076: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +080: hex=0x3f4ccccd | int=  1061997773 | float=      0.800000
+    +084: hex=0x3f8ccccd | int=  1066192077 | float=      1.100000
+    +088: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x00000004 | int=           4 | float=      0.000000
+    +100: hex=0x000000b0 | int=         176 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000004 | int=           4 | float=      0.000000
+    +112: hex=0x0000009a | int=         154 | float=      0.000000
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000004 | int=           4 | float=      0.000000
+    +124: hex=0x0000009f | int=         159 | float=      0.000000
+    +128: hex=0x00000000 | int=           0 | float=      0.000000
+    +132: hex=0x00000004 | int=           4 | float=      0.000000
+    +136: hex=0x000000b2 | int=         178 | float=      0.000000
+    +140: hex=0x00000000 | int=           0 | float=      0.000000
+    +144: hex=0x00000004 | int=           4 | float=      0.000000
+    +148: hex=0x00000093 | int=         147 | float=      0.000000
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x00000004 | int=           4 | float=      0.000000
+    +160: hex=0x000000b5 | int=         181 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x00000004 | int=           4 | float=      0.000000
+    +172: hex=0x00000096 | int=         150 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000004 | int=           4 | float=      0.000000
+    +184: hex=0x000000ba | int=         186 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #4] Ceto.ProjectedGrid | PathID=270 | Size=64 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=1198) -> Ceto.ProjectedGrid (Assembly-CSharp.dll)
+  DLL Fields (8): ['resolution', 'gridGroups', 'receiveShadows', 'borderLength', 'reflectionProbes', 'oceanTopSideMat', 'oceanUnderSideMat', 'm_grids']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000004 | int=           4 | float=      0.000000
+    +044: hex=0x00000002 | int=           2 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000004 | int=           4 | float=      0.000000
+    +056: hex=0x00000003 | int=           3 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #5] Ceto.UnderWater | PathID=273 | Size=284 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=790) -> Ceto.UnderWater (Assembly-CSharp.dll)
+  DLL Fields (29): ['MAX_DEPTH_DIST', 'underwaterMode', 'depthMode', 'oceanDepthsMask', 'bottomDepth', 'depthBlend', 'edgeFade', 'aboveRefractionIntensity', 'belowRefractionIntensity', 'refractionDistortion', 'absorptionR', 'absorptionG', 'absorptionB', 'aboveAbsorptionModifier', 'belowAbsorptionModifier', 'subSurfaceScatterModifier', 'aboveInscatterModifier', 'belowInscatterModifier', '<DisableCopyDepthCmd>k__BackingField', '<DisableNormalFadeCmd>k__BackingField', 'm_bottomMask', 'NumMeshSegmentsX', 'NumMeshSegmentsY', 'oceanBottomSdr', 'oceanDepthSdr', 'copyDepthSdr', 'oceanMaskSdr', 'oceanMaskFlippedSdr', 'normalFadeSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000000 | int=           0 | float=      0.000000
+    +044: hex=0x43fa0000 | int=  1140457472 | float=    500.000000
+    +048: hex=0x3f333333 | int=  1060320051 | float=      0.700000
+    +052: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +056: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +060: hex=0x400ccccd | int=  1074580685 | float=      2.200000
+    +064: hex=0x3cbc6a7f | int=  1018980991 | float=      0.023000
+    +068: hex=0x3bc49ba6 | int=  1002740646 | float=      0.006000
+    +072: hex=0x3a83126f | int=   981668463 | float=      0.001000
+    +076: hex=0x42480000 | int=  1112014848 | float=     50.000000
+    +080: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +084: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +088: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +100: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +104: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +108: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +112: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +124: hex=0x41800000 | int=  1098907648 | float=     16.000000
+    +128: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +132: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +136: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x43480000 | int=  1128792064 | float=    200.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x00000001 | int=           1 | float=      0.000000
+    +160: hex=0x00000000 | int=           0 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3c808081 | int=  1015054465 | float=      0.015686
+    +172: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +176: hex=0x43160000 | int=  1125515264 | float=    150.000000
+    +180: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +184: hex=0x00000001 | int=           1 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+    +192: hex=0x3e397616 | int=  1043953174 | float=      0.181115
+    +196: hex=0x3e92d2d2 | int=  1049809618 | float=      0.286765
+    +200: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +204: hex=0x00000010 | int=          16 | float=      0.000000
+    +208: hex=0x00000040 | int=          64 | float=      0.000000
+    +212: hex=0x00000004 | int=           4 | float=      0.000000
+    +216: hex=0x0000008b | int=         139 | float=      0.000000
+    +220: hex=0x00000000 | int=           0 | float=      0.000000
+    +224: hex=0x00000004 | int=           4 | float=      0.000000
+    +228: hex=0x000000b3 | int=         179 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000004 | int=           4 | float=      0.000000
+    +240: hex=0x0000009b | int=         155 | float=      0.000000
+    +244: hex=0x00000000 | int=           0 | float=      0.000000
+    +248: hex=0x00000004 | int=           4 | float=      0.000000
+    +252: hex=0x000000a8 | int=         168 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000004 | int=           4 | float=      0.000000
+    +264: hex=0x0000008e | int=         142 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x00000004 | int=           4 | float=      0.000000
+    +276: hex=0x000000a0 | int=         160 | float=      0.000000
+    +280: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #6] Ceto.PlanarReflection | PathID=275 | Size=100 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3056) -> Ceto.PlanarReflection (Assembly-CSharp.dll)
+  DLL Fields (16): ['reflectionMask', 'reflectionResolution', 'clipPlaneOffset', 'fogInReflection', 'skyboxInReflection', 'copyCullDistances', 'blurMode', 'blurIterations', 'blurSpread', 'reflectionTint', 'reflectionIntensity', 'reflectionDistortion', 'RenderReflectionCustom', 'm_dummy', 'm_imageBlur', 'blurShader']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x81036000 | int= -2130485248 | float=     -0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x3d8f5c29 | int=  1032805417 | float=      0.070000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000001 | int=           1 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +072: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +076: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +080: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +084: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +088: hex=0x00000004 | int=           4 | float=      0.000000
+    +092: hex=0x000000a6 | int=         166 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #7] Tide | PathID=272 | Size=224 bytes
+  Evidence Chain : level2 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=977) -> Tide (Assembly-CSharp.dll)
+  DLL Fields (3): ['_tide', '_lowTideHeight', '_highTideHeight']
+  [VERIFIED VALUES] _tide Keyframes (+032) = 6 | _lowTideHeight (+216) = 0.000000 | _highTideHeight (+220) = 0.300000
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000006 | int=           6 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +044: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +048: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +068: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +072: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +076: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x3eb33333 | int=  1051931443 | float=      0.350000
+    +096: hex=0x3f666666 | int=  1063675494 | float=      0.900000
+    +100: hex=0x00000000 | int=           0 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000000 | int=           0 | float=      0.000000
+    +112: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +116: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +120: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +132: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +136: hex=0x00000000 | int=           0 | float=      0.000000
+    +140: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +144: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +148: hex=0x3f59999a | int=  1062836634 | float=      0.850000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +160: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +172: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +176: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +188: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +200: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +204: hex=0x00000002 | int=           2 | float=      0.000000
+    +208: hex=0x00000002 | int=           2 | float=      0.000000
+    +212: hex=0x00000004 | int=           4 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+    +220: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+
+
+################################################################################
+SCENE: level3 | _Ceto GameObject PathID = 139
+################################################################################
+External Asset Table: {0: 'level3', 1: 'globalgamemanagers.assets', 2: 'resources.assets', 3: 'sharedassets0.assets', 4: 'sharedassets3.assets', 5: 'unity default resources', 6: 'sharedassets2.assets', 7: 'sharedassets1.assets'}
+
+[Comp #0] Transform | PathID=557 | LocalPos=(0.0, 0.0, 0.0)
+
+--------------------------------------------------------------------------------
+[Comp #1] Beam.CetoSettings | PathID=1342 | Size=432 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=2100) -> Beam.CetoSettings (Assembly-CSharp.dll)
+  DLL Fields (21): ['_aboveVisibility', '_belowVisibility', '_aboveVisibilityCurve', '_belowVisibilityCurve', '_currentWaterColor', '_currentUnderwaterColor', '_currentScatterColor', '_currentUnderwaterInscatterColor', '_morningWaterColor', '_middayWaterColor', '_morningUnderwaterColor', '_middayUnderwaterColor', '_morningScatterColor', '_middayScatterColor', '_morningUnderwaterInscatterColor', '_middayUnderwaterInscatterColor', '_weatherScatterColor', '_weatherUnderwaterColor', '_causticsTexture', '_underwater', '_waveSpectrum']
+  [VERIFIED VALUES] +108 = 0.000154 | +112 = 6.002231
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +072: hex=0x00000000 | int=           0 | float=      0.000000
+    +076: hex=0x00000000 | int=           0 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x00000002 | int=           2 | float=      0.000000
+    +096: hex=0x00000002 | int=           2 | float=      0.000000
+    +100: hex=0x00000004 | int=           4 | float=      0.000000
+    +104: hex=0x00000005 | int=           5 | float=      0.000000
+    +108: hex=0x39215040 | int=   958484544 | float=      0.000154
+    +112: hex=0x40c01246 | int=  1086329414 | float=      6.002231
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000000 | int=           0 | float=      0.000000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +132: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +136: hex=0x3e7fec9f | int=  1048571039 | float=      0.249926
+    +140: hex=0x40c02065 | int=  1086333029 | float=      6.003954
+    +144: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +148: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +160: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +164: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +168: hex=0x41f00000 | int=  1106247680 | float=     30.000000
+    +172: hex=0x00000000 | int=           0 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000000 | int=           0 | float=      0.000000
+    +184: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +188: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +192: hex=0x3f3ff483 | int=  1061155971 | float=      0.749825
+    +196: hex=0x40bfff80 | int=  1086324608 | float=      5.999939
+    +200: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +204: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +208: hex=0x00000000 | int=           0 | float=      0.000000
+    +212: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +216: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +220: hex=0x3f7ffcbb | int=  1065352379 | float=      0.999950
+    +224: hex=0x40bfcd5f | int=  1086311775 | float=      5.993820
+    +228: hex=0x00000000 | int=           0 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000000 | int=           0 | float=      0.000000
+    +240: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +244: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +248: hex=0x00000002 | int=           2 | float=      0.000000
+    +252: hex=0x00000002 | int=           2 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000000 | int=           0 | float=      0.000000
+    +264: hex=0x00000000 | int=           0 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +276: hex=0x00000000 | int=           0 | float=      0.000000
+    +280: hex=0x38897273 | int=   948531827 | float=      0.000066
+    +284: hex=0x3c40c0c1 | int=  1010876609 | float=      0.011765
+    +288: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +292: hex=0x00000000 | int=           0 | float=      0.000000
+    +296: hex=0x3c72ef5b | int=  1014165339 | float=      0.014828
+    +300: hex=0x3d169690 | int=  1024890512 | float=      0.036765
+    +304: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +308: hex=0x00000000 | int=           0 | float=      0.000000
+    +312: hex=0x3eda973b | int=  1054512955 | float=      0.426935
+    +316: hex=0x3f056042 | int=  1057316930 | float=      0.521000
+    +320: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +324: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +328: hex=0x3f0e8e8f | int=  1057918607 | float=      0.556863
+    +332: hex=0x00000000 | int=           0 | float=      0.000000
+    +336: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +340: hex=0x00000000 | int=           0 | float=      0.000000
+    +344: hex=0x3f10e560 | int=  1058071904 | float=      0.566000
+    +348: hex=0x3f3db22d | int=  1061007917 | float=      0.741000
+    +352: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +356: hex=0x3e5e7486 | int=  1046377606 | float=      0.217241
+    +360: hex=0x3e0c6741 | int=  1041000257 | float=      0.137113
+    +364: hex=0x3dbfc58f | int=  1035978127 | float=      0.093639
+    +368: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +372: hex=0x00000000 | int=           0 | float=      0.000000
+    +376: hex=0x3ea3b325 | int=  1050915621 | float=      0.319726
+    +380: hex=0x3eab4153 | int=  1051410771 | float=      0.334483
+    +384: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +388: hex=0x3e3d786e | int=  1044215918 | float=      0.185030
+    +392: hex=0x3eead054 | int=  1055576148 | float=      0.458621
+    +396: hex=0x3ec55e12 | int=  1053122066 | float=      0.385483
+    +400: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +404: hex=0x3d5e3c69 | int=  1029586025 | float=      0.054257
+    +408: hex=0x3e061604 | int=  1040586244 | float=      0.130943
+    +412: hex=0x3e09b5d8 | int=  1040823768 | float=      0.134483
+    +416: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +420: hex=0x00000003 | int=           3 | float=      0.000000
+    +424: hex=0x00000030 | int=          48 | float=      0.000000
+    +428: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #2] Ceto.Ocean | PathID=1248 | Size=220 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3179) -> Ceto.Ocean (Assembly-CSharp.dll)
+  DLL Fields (38): ['disableWarnings', 'disableInfo', 'doublePrecisionProjection', 'tightProjectionFit', 'm_sun', 'level', 'heightOverlaySize', 'normalOverlaySize', 'foamOverlaySize', 'clipOverlaySize', 'heightBlendMode', 'foamBlendMode', 'defaultSkyColor', 'defaultOceanColor', 'windDir', '<WindDirVector>k__BackingField', 'specularRoughness', 'specularIntensity', 'fresnelPower', 'minFresnel', 'foamTint', 'foamIntensity', 'foamTexture0', 'foamTexture1', 'waveOverlaySdr', '<Grid>k__BackingField', '<Reflection>k__BackingField', '<Spectrum>k__BackingField', '<UnderWater>k__BackingField', '<OceanTime>k__BackingField', '<Projection>k__BackingField', 'm_positionOffset', 'm_cameraData', 'm_waveOverlayMat', '<OverlayManager>k__BackingField', 'm_scheduler', 'm_query', '<WasError>k__BackingField']
+  [VERIFIED VALUES] level (+060) = 0.000201 (Hex 0x3952e038) | windDir (+120) = 60.0 | specularIntensity (+128) = 0.5 | foamIntensity (+156) = 1.7999999523162842
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000000 | int=           0 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000001 | int=           1 | float=      0.000000
+    +044: hex=0x00000001 | int=           1 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000065 | int=         101 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x3952e038 | int=   961732664 | float=      0.000201
+    +064: hex=0x00000004 | int=           4 | float=      0.000000
+    +068: hex=0x00000003 | int=           3 | float=      0.000000
+    +072: hex=0x00000003 | int=           3 | float=      0.000000
+    +076: hex=0x00000003 | int=           3 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x00000000 | int=           0 | float=      0.000000
+    +088: hex=0x00000000 | int=           0 | float=      0.000000
+    +092: hex=0x00000000 | int=           0 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+    +100: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x3d9ca6ba | int=  1033676474 | float=      0.076490
+    +112: hex=0x3e4234f7 | int=  1044526327 | float=      0.189655
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x42700000 | int=  1114636288 | float=     60.000000
+    +124: hex=0x3e4ccccd | int=  1045220557 | float=      0.200000
+    +128: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +132: hex=0x40a00000 | int=  1084227584 | float=      5.000000
+    +136: hex=0x3ca3d70a | int=  1017370378 | float=      0.020000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3fe66666 | int=  1072064102 | float=      1.800000
+    +160: hex=0x00000003 | int=           3 | float=      0.000000
+    +164: hex=0x00000052 | int=          82 | float=      0.000000
+    +168: hex=0x00000000 | int=           0 | float=      0.000000
+    +172: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +176: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0x00000003 | int=           3 | float=      0.000000
+    +188: hex=0x00000052 | int=          82 | float=      0.000000
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +200: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +204: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +208: hex=0x00000003 | int=           3 | float=      0.000000
+    +212: hex=0x000000a1 | int=         161 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #3] Ceto.WaveSpectrum | PathID=1250 | Size=192 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=227) -> Ceto.WaveSpectrum (Assembly-CSharp.dll)
+  DLL Fields (50): ['fourierSize', 'spectrumType', 'numberOfGrids', 'disableReadBack', 'disableDisplacements', 'disableSlopes', 'disableFoam', 'textureFoam', 'choppyness', 'foamAmount', 'foamCoverage', 'windSpeed', 'waveAge', 'waveSpeed', 'gridScale', 'waveSmoothing', 'slopeSmoothing', 'foamSmoothing', 'm_displacementMaps', 'm_slopeMaps', 'm_foamMaps', '<MaxDisplacement>k__BackingField', 'm_slopeCopyMat', 'm_displacementCopyMat', 'm_foamCopyMat', 'm_slopeInitMat', 'm_displacementInitMat', 'm_foamInitMat', 'm_gridSizes', 'm_choppyness', 'm_scheduler', 'm_conditions', 'm_displacementBuffer', 'm_slopeBuffer', 'm_jacobianBuffer', 'm_findRangeTask', 'm_readBuffer', 'm_queryScaling', 'm_bufferSettings', 'm_conditionCache', 'm_maxConditionCacheSize', '<CustomWaveSpectrum>k__BackingField', 'initSlopeSdr', 'initDisplacementSdr', 'initJacobianSdr', 'fourierSdr', 'slopeCopySdr', 'displacementCopySdr', 'foamCopySdr', 'readSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000004 | int=           4 | float=      0.000000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000001 | int=           1 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +072: hex=0x3e800000 | int=  1048576000 | float=      0.250000
+    +076: hex=0x41000000 | int=  1090519040 | float=      8.000000
+    +080: hex=0x3f4ccccd | int=  1061997773 | float=      0.800000
+    +084: hex=0x3f8ccccd | int=  1066192077 | float=      1.100000
+    +088: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x00000003 | int=           3 | float=      0.000000
+    +100: hex=0x000000b0 | int=         176 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000003 | int=           3 | float=      0.000000
+    +112: hex=0x0000009a | int=         154 | float=      0.000000
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000003 | int=           3 | float=      0.000000
+    +124: hex=0x0000009f | int=         159 | float=      0.000000
+    +128: hex=0x00000000 | int=           0 | float=      0.000000
+    +132: hex=0x00000003 | int=           3 | float=      0.000000
+    +136: hex=0x000000b2 | int=         178 | float=      0.000000
+    +140: hex=0x00000000 | int=           0 | float=      0.000000
+    +144: hex=0x00000003 | int=           3 | float=      0.000000
+    +148: hex=0x00000093 | int=         147 | float=      0.000000
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x00000003 | int=           3 | float=      0.000000
+    +160: hex=0x000000b5 | int=         181 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x00000003 | int=           3 | float=      0.000000
+    +172: hex=0x00000096 | int=         150 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000003 | int=           3 | float=      0.000000
+    +184: hex=0x000000ba | int=         186 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #4] Ceto.ProjectedGrid | PathID=1249 | Size=64 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=1198) -> Ceto.ProjectedGrid (Assembly-CSharp.dll)
+  DLL Fields (8): ['resolution', 'gridGroups', 'receiveShadows', 'borderLength', 'reflectionProbes', 'oceanTopSideMat', 'oceanUnderSideMat', 'm_grids']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000003 | int=           3 | float=      0.000000
+    +044: hex=0x00000002 | int=           2 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000003 | int=           3 | float=      0.000000
+    +056: hex=0x00000003 | int=           3 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #5] Ceto.UnderWater | PathID=1246 | Size=284 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=790) -> Ceto.UnderWater (Assembly-CSharp.dll)
+  DLL Fields (29): ['MAX_DEPTH_DIST', 'underwaterMode', 'depthMode', 'oceanDepthsMask', 'bottomDepth', 'depthBlend', 'edgeFade', 'aboveRefractionIntensity', 'belowRefractionIntensity', 'refractionDistortion', 'absorptionR', 'absorptionG', 'absorptionB', 'aboveAbsorptionModifier', 'belowAbsorptionModifier', 'subSurfaceScatterModifier', 'aboveInscatterModifier', 'belowInscatterModifier', '<DisableCopyDepthCmd>k__BackingField', '<DisableNormalFadeCmd>k__BackingField', 'm_bottomMask', 'NumMeshSegmentsX', 'NumMeshSegmentsY', 'oceanBottomSdr', 'oceanDepthSdr', 'copyDepthSdr', 'oceanMaskSdr', 'oceanMaskFlippedSdr', 'normalFadeSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000000 | int=           0 | float=      0.000000
+    +044: hex=0x43fa0000 | int=  1140457472 | float=    500.000000
+    +048: hex=0x3f333333 | int=  1060320051 | float=      0.700000
+    +052: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +056: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +060: hex=0x400ccccd | int=  1074580685 | float=      2.200000
+    +064: hex=0x3cbc6a7f | int=  1018980991 | float=      0.023000
+    +068: hex=0x3bc49ba6 | int=  1002740646 | float=      0.006000
+    +072: hex=0x3a83126f | int=   981668463 | float=      0.001000
+    +076: hex=0x42480000 | int=  1112014848 | float=     50.000000
+    +080: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +084: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +088: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +100: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +104: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +108: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +112: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +124: hex=0x41800000 | int=  1098907648 | float=     16.000000
+    +128: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +132: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +136: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x43480000 | int=  1128792064 | float=    200.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x00000001 | int=           1 | float=      0.000000
+    +160: hex=0x00000000 | int=           0 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3c808081 | int=  1015054465 | float=      0.015686
+    +172: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +176: hex=0x43160000 | int=  1125515264 | float=    150.000000
+    +180: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +184: hex=0x00000001 | int=           1 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+    +192: hex=0x3e397616 | int=  1043953174 | float=      0.181115
+    +196: hex=0x3e92d2d2 | int=  1049809618 | float=      0.286765
+    +200: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +204: hex=0x00000010 | int=          16 | float=      0.000000
+    +208: hex=0x00000040 | int=          64 | float=      0.000000
+    +212: hex=0x00000003 | int=           3 | float=      0.000000
+    +216: hex=0x0000008b | int=         139 | float=      0.000000
+    +220: hex=0x00000000 | int=           0 | float=      0.000000
+    +224: hex=0x00000003 | int=           3 | float=      0.000000
+    +228: hex=0x000000b3 | int=         179 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000003 | int=           3 | float=      0.000000
+    +240: hex=0x0000009b | int=         155 | float=      0.000000
+    +244: hex=0x00000000 | int=           0 | float=      0.000000
+    +248: hex=0x00000003 | int=           3 | float=      0.000000
+    +252: hex=0x000000a8 | int=         168 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000003 | int=           3 | float=      0.000000
+    +264: hex=0x0000008e | int=         142 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x00000003 | int=           3 | float=      0.000000
+    +276: hex=0x000000a0 | int=         160 | float=      0.000000
+    +280: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #6] Ceto.PlanarReflection | PathID=1247 | Size=100 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3056) -> Ceto.PlanarReflection (Assembly-CSharp.dll)
+  DLL Fields (16): ['reflectionMask', 'reflectionResolution', 'clipPlaneOffset', 'fogInReflection', 'skyboxInReflection', 'copyCullDistances', 'blurMode', 'blurIterations', 'blurSpread', 'reflectionTint', 'reflectionIntensity', 'reflectionDistortion', 'RenderReflectionCustom', 'm_dummy', 'm_imageBlur', 'blurShader']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x81036000 | int= -2130485248 | float=     -0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x3d8f5c29 | int=  1032805417 | float=      0.070000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000001 | int=           1 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +072: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +076: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +080: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +084: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +088: hex=0x00000003 | int=           3 | float=      0.000000
+    +092: hex=0x000000a6 | int=         166 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #7] Tide | PathID=1245 | Size=224 bytes
+  Evidence Chain : level3 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=977) -> Tide (Assembly-CSharp.dll)
+  DLL Fields (3): ['_tide', '_lowTideHeight', '_highTideHeight']
+  [VERIFIED VALUES] _tide Keyframes (+032) = 6 | _lowTideHeight (+216) = 0.000000 | _highTideHeight (+220) = 0.300000
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000006 | int=           6 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +044: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +048: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +068: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +072: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +076: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x3eb33333 | int=  1051931443 | float=      0.350000
+    +096: hex=0x3f666666 | int=  1063675494 | float=      0.900000
+    +100: hex=0x00000000 | int=           0 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000000 | int=           0 | float=      0.000000
+    +112: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +116: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +120: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +132: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +136: hex=0x00000000 | int=           0 | float=      0.000000
+    +140: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +144: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +148: hex=0x3f59999a | int=  1062836634 | float=      0.850000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +160: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +172: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +176: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +188: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +200: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +204: hex=0x00000002 | int=           2 | float=      0.000000
+    +208: hex=0x00000002 | int=           2 | float=      0.000000
+    +212: hex=0x00000004 | int=           4 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+    +220: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+
+
+################################################################################
+SCENE: level4 | _Ceto GameObject PathID = 5
+################################################################################
+External Asset Table: {0: 'level4', 1: 'globalgamemanagers.assets', 2: 'sharedassets4.assets', 3: 'sharedassets0.assets', 4: 'resources.assets', 5: 'unity default resources', 6: 'sharedassets2.assets', 7: 'sharedassets3.assets', 8: 'sharedassets1.assets'}
+
+[Comp #0] Transform | PathID=1361 | LocalPos=(0.0, 0.0, 0.0)
+
+--------------------------------------------------------------------------------
+[Comp #1] Beam.CetoSettings | PathID=5630 | Size=432 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=2100) -> Beam.CetoSettings (Assembly-CSharp.dll)
+  DLL Fields (21): ['_aboveVisibility', '_belowVisibility', '_aboveVisibilityCurve', '_belowVisibilityCurve', '_currentWaterColor', '_currentUnderwaterColor', '_currentScatterColor', '_currentUnderwaterInscatterColor', '_morningWaterColor', '_middayWaterColor', '_morningUnderwaterColor', '_middayUnderwaterColor', '_morningScatterColor', '_middayScatterColor', '_morningUnderwaterInscatterColor', '_middayUnderwaterInscatterColor', '_weatherScatterColor', '_weatherUnderwaterColor', '_causticsTexture', '_underwater', '_waveSpectrum']
+  [VERIFIED VALUES] +108 = 0.000154 | +112 = 6.002231
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x41728870 | int=  1098025072 | float=     15.158310
+    +072: hex=0x00000000 | int=           0 | float=      0.000000
+    +076: hex=0x00000000 | int=           0 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x00000002 | int=           2 | float=      0.000000
+    +096: hex=0x00000002 | int=           2 | float=      0.000000
+    +100: hex=0x00000004 | int=           4 | float=      0.000000
+    +104: hex=0x00000005 | int=           5 | float=      0.000000
+    +108: hex=0x39215040 | int=   958484544 | float=      0.000154
+    +112: hex=0x40c01246 | int=  1086329414 | float=      6.002231
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000000 | int=           0 | float=      0.000000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +132: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +136: hex=0x3e7fec9f | int=  1048571039 | float=      0.249926
+    +140: hex=0x40c02065 | int=  1086333029 | float=      6.003954
+    +144: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +148: hex=0xbd34e3a8 | int= -1120607320 | float=     -0.044162
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +160: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +164: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +168: hex=0x41f00000 | int=  1106247680 | float=     30.000000
+    +172: hex=0x00000000 | int=           0 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000000 | int=           0 | float=      0.000000
+    +184: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +188: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +192: hex=0x3f3ff483 | int=  1061155971 | float=      0.749825
+    +196: hex=0x40bfff80 | int=  1086324608 | float=      5.999939
+    +200: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +204: hex=0xbe0e4a9e | int= -1106359650 | float=     -0.138957
+    +208: hex=0x00000000 | int=           0 | float=      0.000000
+    +212: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +216: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +220: hex=0x3f7ffcbb | int=  1065352379 | float=      0.999950
+    +224: hex=0x40bfcd5f | int=  1086311775 | float=      5.993820
+    +228: hex=0x00000000 | int=           0 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000000 | int=           0 | float=      0.000000
+    +240: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +244: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +248: hex=0x00000002 | int=           2 | float=      0.000000
+    +252: hex=0x00000002 | int=           2 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000000 | int=           0 | float=      0.000000
+    +264: hex=0x00000000 | int=           0 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +276: hex=0x00000000 | int=           0 | float=      0.000000
+    +280: hex=0x38897273 | int=   948531827 | float=      0.000066
+    +284: hex=0x3c40c0c1 | int=  1010876609 | float=      0.011765
+    +288: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +292: hex=0x00000000 | int=           0 | float=      0.000000
+    +296: hex=0x3c72ef5b | int=  1014165339 | float=      0.014828
+    +300: hex=0x3d169690 | int=  1024890512 | float=      0.036765
+    +304: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +308: hex=0x00000000 | int=           0 | float=      0.000000
+    +312: hex=0x3eda973b | int=  1054512955 | float=      0.426935
+    +316: hex=0x3f056042 | int=  1057316930 | float=      0.521000
+    +320: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +324: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +328: hex=0x3f0e8e8f | int=  1057918607 | float=      0.556863
+    +332: hex=0x00000000 | int=           0 | float=      0.000000
+    +336: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +340: hex=0x00000000 | int=           0 | float=      0.000000
+    +344: hex=0x3f10e560 | int=  1058071904 | float=      0.566000
+    +348: hex=0x3f3db22d | int=  1061007917 | float=      0.741000
+    +352: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +356: hex=0x3e5e7486 | int=  1046377606 | float=      0.217241
+    +360: hex=0x3e0c6741 | int=  1041000257 | float=      0.137113
+    +364: hex=0x3dbfc58f | int=  1035978127 | float=      0.093639
+    +368: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +372: hex=0x00000000 | int=           0 | float=      0.000000
+    +376: hex=0x3ea3b325 | int=  1050915621 | float=      0.319726
+    +380: hex=0x3eab4153 | int=  1051410771 | float=      0.334483
+    +384: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +388: hex=0x3e3d786e | int=  1044215918 | float=      0.185030
+    +392: hex=0x3eead054 | int=  1055576148 | float=      0.458621
+    +396: hex=0x3ec55e12 | int=  1053122066 | float=      0.385483
+    +400: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +404: hex=0x3d5e3c69 | int=  1029586025 | float=      0.054257
+    +408: hex=0x3e061604 | int=  1040586244 | float=      0.130943
+    +412: hex=0x3e09b5d8 | int=  1040823768 | float=      0.134483
+    +416: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +420: hex=0x00000003 | int=           3 | float=      0.000000
+    +424: hex=0x00000030 | int=          48 | float=      0.000000
+    +428: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #2] Ceto.Ocean | PathID=5583 | Size=220 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3179) -> Ceto.Ocean (Assembly-CSharp.dll)
+  DLL Fields (38): ['disableWarnings', 'disableInfo', 'doublePrecisionProjection', 'tightProjectionFit', 'm_sun', 'level', 'heightOverlaySize', 'normalOverlaySize', 'foamOverlaySize', 'clipOverlaySize', 'heightBlendMode', 'foamBlendMode', 'defaultSkyColor', 'defaultOceanColor', 'windDir', '<WindDirVector>k__BackingField', 'specularRoughness', 'specularIntensity', 'fresnelPower', 'minFresnel', 'foamTint', 'foamIntensity', 'foamTexture0', 'foamTexture1', 'waveOverlaySdr', '<Grid>k__BackingField', '<Reflection>k__BackingField', '<Spectrum>k__BackingField', '<UnderWater>k__BackingField', '<OceanTime>k__BackingField', '<Projection>k__BackingField', 'm_positionOffset', 'm_cameraData', 'm_waveOverlayMat', '<OverlayManager>k__BackingField', 'm_scheduler', 'm_query', '<WasError>k__BackingField']
+  [VERIFIED VALUES] level (+060) = 0.000201 (Hex 0x3952e038) | windDir (+120) = 60.0 | specularIntensity (+128) = 0.5 | foamIntensity (+156) = 1.7999999523162842
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000000 | int=           0 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000001 | int=           1 | float=      0.000000
+    +044: hex=0x00000001 | int=           1 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000015 | int=          21 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x3952e038 | int=   961732664 | float=      0.000201
+    +064: hex=0x00000004 | int=           4 | float=      0.000000
+    +068: hex=0x00000003 | int=           3 | float=      0.000000
+    +072: hex=0x00000003 | int=           3 | float=      0.000000
+    +076: hex=0x00000003 | int=           3 | float=      0.000000
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x00000000 | int=           0 | float=      0.000000
+    +088: hex=0x00000000 | int=           0 | float=      0.000000
+    +092: hex=0x00000000 | int=           0 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+    +100: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x3d9ca6ba | int=  1033676474 | float=      0.076490
+    +112: hex=0x3e4234f7 | int=  1044526327 | float=      0.189655
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x42700000 | int=  1114636288 | float=     60.000000
+    +124: hex=0x3e4ccccd | int=  1045220557 | float=      0.200000
+    +128: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +132: hex=0x40a00000 | int=  1084227584 | float=      5.000000
+    +136: hex=0x3ca3d70a | int=  1017370378 | float=      0.020000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3fe66666 | int=  1072064102 | float=      1.800000
+    +160: hex=0x00000003 | int=           3 | float=      0.000000
+    +164: hex=0x00000052 | int=          82 | float=      0.000000
+    +168: hex=0x00000000 | int=           0 | float=      0.000000
+    +172: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +176: hex=0x40800000 | int=  1082130432 | float=      4.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0x00000003 | int=           3 | float=      0.000000
+    +188: hex=0x00000052 | int=          82 | float=      0.000000
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +200: hex=0x41a00000 | int=  1101004800 | float=     20.000000
+    +204: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +208: hex=0x00000003 | int=           3 | float=      0.000000
+    +212: hex=0x000000a1 | int=         161 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #3] Ceto.WaveSpectrum | PathID=5585 | Size=192 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=227) -> Ceto.WaveSpectrum (Assembly-CSharp.dll)
+  DLL Fields (50): ['fourierSize', 'spectrumType', 'numberOfGrids', 'disableReadBack', 'disableDisplacements', 'disableSlopes', 'disableFoam', 'textureFoam', 'choppyness', 'foamAmount', 'foamCoverage', 'windSpeed', 'waveAge', 'waveSpeed', 'gridScale', 'waveSmoothing', 'slopeSmoothing', 'foamSmoothing', 'm_displacementMaps', 'm_slopeMaps', 'm_foamMaps', '<MaxDisplacement>k__BackingField', 'm_slopeCopyMat', 'm_displacementCopyMat', 'm_foamCopyMat', 'm_slopeInitMat', 'm_displacementInitMat', 'm_foamInitMat', 'm_gridSizes', 'm_choppyness', 'm_scheduler', 'm_conditions', 'm_displacementBuffer', 'm_slopeBuffer', 'm_jacobianBuffer', 'm_findRangeTask', 'm_readBuffer', 'm_queryScaling', 'm_bufferSettings', 'm_conditionCache', 'm_maxConditionCacheSize', '<CustomWaveSpectrum>k__BackingField', 'initSlopeSdr', 'initDisplacementSdr', 'initJacobianSdr', 'fourierSdr', 'slopeCopySdr', 'displacementCopySdr', 'foamCopySdr', 'readSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000002 | int=           2 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x00000004 | int=           4 | float=      0.000000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000001 | int=           1 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +072: hex=0x3e800000 | int=  1048576000 | float=      0.250000
+    +076: hex=0x41000000 | int=  1090519040 | float=      8.000000
+    +080: hex=0x3f4ccccd | int=  1061997773 | float=      0.800000
+    +084: hex=0x3f8ccccd | int=  1066192077 | float=      1.100000
+    +088: hex=0x3f000000 | int=  1056964608 | float=      0.500000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x00000003 | int=           3 | float=      0.000000
+    +100: hex=0x000000b0 | int=         176 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000003 | int=           3 | float=      0.000000
+    +112: hex=0x0000009a | int=         154 | float=      0.000000
+    +116: hex=0x00000000 | int=           0 | float=      0.000000
+    +120: hex=0x00000003 | int=           3 | float=      0.000000
+    +124: hex=0x0000009f | int=         159 | float=      0.000000
+    +128: hex=0x00000000 | int=           0 | float=      0.000000
+    +132: hex=0x00000003 | int=           3 | float=      0.000000
+    +136: hex=0x000000b2 | int=         178 | float=      0.000000
+    +140: hex=0x00000000 | int=           0 | float=      0.000000
+    +144: hex=0x00000003 | int=           3 | float=      0.000000
+    +148: hex=0x00000093 | int=         147 | float=      0.000000
+    +152: hex=0x00000000 | int=           0 | float=      0.000000
+    +156: hex=0x00000003 | int=           3 | float=      0.000000
+    +160: hex=0x000000b5 | int=         181 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x00000003 | int=           3 | float=      0.000000
+    +172: hex=0x00000096 | int=         150 | float=      0.000000
+    +176: hex=0x00000000 | int=           0 | float=      0.000000
+    +180: hex=0x00000003 | int=           3 | float=      0.000000
+    +184: hex=0x000000ba | int=         186 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #4] Ceto.ProjectedGrid | PathID=5584 | Size=64 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=1198) -> Ceto.ProjectedGrid (Assembly-CSharp.dll)
+  DLL Fields (8): ['resolution', 'gridGroups', 'receiveShadows', 'borderLength', 'reflectionProbes', 'oceanTopSideMat', 'oceanUnderSideMat', 'm_grids']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000003 | int=           3 | float=      0.000000
+    +044: hex=0x00000002 | int=           2 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000003 | int=           3 | float=      0.000000
+    +056: hex=0x00000003 | int=           3 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #5] Ceto.UnderWater | PathID=5580 | Size=284 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=790) -> Ceto.UnderWater (Assembly-CSharp.dll)
+  DLL Fields (29): ['MAX_DEPTH_DIST', 'underwaterMode', 'depthMode', 'oceanDepthsMask', 'bottomDepth', 'depthBlend', 'edgeFade', 'aboveRefractionIntensity', 'belowRefractionIntensity', 'refractionDistortion', 'absorptionR', 'absorptionG', 'absorptionB', 'aboveAbsorptionModifier', 'belowAbsorptionModifier', 'subSurfaceScatterModifier', 'aboveInscatterModifier', 'belowInscatterModifier', '<DisableCopyDepthCmd>k__BackingField', '<DisableNormalFadeCmd>k__BackingField', 'm_bottomMask', 'NumMeshSegmentsX', 'NumMeshSegmentsY', 'oceanBottomSdr', 'oceanDepthSdr', 'copyDepthSdr', 'oceanMaskSdr', 'oceanMaskFlippedSdr', 'normalFadeSdr']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000001 | int=           1 | float=      0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x00000000 | int=           0 | float=      0.000000
+    +044: hex=0x43fa0000 | int=  1140457472 | float=    500.000000
+    +048: hex=0x3f333333 | int=  1060320051 | float=      0.700000
+    +052: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +056: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +060: hex=0x400ccccd | int=  1074580685 | float=      2.200000
+    +064: hex=0x3cbc6a7f | int=  1018980991 | float=      0.023000
+    +068: hex=0x3bc49ba6 | int=  1002740646 | float=      0.006000
+    +072: hex=0x3a83126f | int=   981668463 | float=      0.001000
+    +076: hex=0x42480000 | int=  1112014848 | float=     50.000000
+    +080: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +084: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +088: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +092: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +096: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +100: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +104: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +108: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +112: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +116: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +120: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +124: hex=0x41800000 | int=  1098907648 | float=     16.000000
+    +128: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +132: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +136: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +140: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +144: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +148: hex=0x43480000 | int=  1128792064 | float=    200.000000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x00000001 | int=           1 | float=      0.000000
+    +160: hex=0x00000000 | int=           0 | float=      0.000000
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3c808081 | int=  1015054465 | float=      0.015686
+    +172: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +176: hex=0x43160000 | int=  1125515264 | float=    150.000000
+    +180: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +184: hex=0x00000001 | int=           1 | float=      0.000000
+    +188: hex=0x00000000 | int=           0 | float=      0.000000
+    +192: hex=0x3e397616 | int=  1043953174 | float=      0.181115
+    +196: hex=0x3e92d2d2 | int=  1049809618 | float=      0.286765
+    +200: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +204: hex=0x00000010 | int=          16 | float=      0.000000
+    +208: hex=0x00000040 | int=          64 | float=      0.000000
+    +212: hex=0x00000003 | int=           3 | float=      0.000000
+    +216: hex=0x0000008b | int=         139 | float=      0.000000
+    +220: hex=0x00000000 | int=           0 | float=      0.000000
+    +224: hex=0x00000003 | int=           3 | float=      0.000000
+    +228: hex=0x000000b3 | int=         179 | float=      0.000000
+    +232: hex=0x00000000 | int=           0 | float=      0.000000
+    +236: hex=0x00000003 | int=           3 | float=      0.000000
+    +240: hex=0x0000009b | int=         155 | float=      0.000000
+    +244: hex=0x00000000 | int=           0 | float=      0.000000
+    +248: hex=0x00000003 | int=           3 | float=      0.000000
+    +252: hex=0x000000a8 | int=         168 | float=      0.000000
+    +256: hex=0x00000000 | int=           0 | float=      0.000000
+    +260: hex=0x00000003 | int=           3 | float=      0.000000
+    +264: hex=0x0000008e | int=         142 | float=      0.000000
+    +268: hex=0x00000000 | int=           0 | float=      0.000000
+    +272: hex=0x00000003 | int=           3 | float=      0.000000
+    +276: hex=0x000000a0 | int=         160 | float=      0.000000
+    +280: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #6] Ceto.PlanarReflection | PathID=5582 | Size=100 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=3056) -> Ceto.PlanarReflection (Assembly-CSharp.dll)
+  DLL Fields (16): ['reflectionMask', 'reflectionResolution', 'clipPlaneOffset', 'fogInReflection', 'skyboxInReflection', 'copyCullDistances', 'blurMode', 'blurIterations', 'blurSpread', 'reflectionTint', 'reflectionIntensity', 'reflectionDistortion', 'RenderReflectionCustom', 'm_dummy', 'm_imageBlur', 'blurShader']
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x81036000 | int= -2130485248 | float=     -0.000000
+    +036: hex=0x00000001 | int=           1 | float=      0.000000
+    +040: hex=0x3d8f5c29 | int=  1032805417 | float=      0.070000
+    +044: hex=0x00000000 | int=           0 | float=      0.000000
+    +048: hex=0x00000000 | int=           0 | float=      0.000000
+    +052: hex=0x00000001 | int=           1 | float=      0.000000
+    +056: hex=0x00000000 | int=           0 | float=      0.000000
+    +060: hex=0x00000000 | int=           0 | float=      0.000000
+    +064: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +068: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +072: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +076: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +080: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +084: hex=0x40400000 | int=  1077936128 | float=      3.000000
+    +088: hex=0x00000003 | int=           3 | float=      0.000000
+    +092: hex=0x000000a6 | int=         166 | float=      0.000000
+    +096: hex=0x00000000 | int=           0 | float=      0.000000
+
+--------------------------------------------------------------------------------
+[Comp #7] Tide | PathID=5581 | Size=224 bytes
+  Evidence Chain : level4 -> m_Script(FileID=1 [globalgamemanagers.assets], PathID=977) -> Tide (Assembly-CSharp.dll)
+  DLL Fields (3): ['_tide', '_lowTideHeight', '_highTideHeight']
+  [VERIFIED VALUES] _tide Keyframes (+032) = 6 | _lowTideHeight (+216) = 0.000000 | _highTideHeight (+220) = 0.300000
+  [FULL RAW PAYLOAD DUMP (Offset +032 to End)]
+    +032: hex=0x00000006 | int=           6 | float=      0.000000
+    +036: hex=0x00000000 | int=           0 | float=      0.000000
+    +040: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +044: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +048: hex=0xc0b845e5 | int= -1061665307 | float=     -5.758532
+    +052: hex=0x00000000 | int=           0 | float=      0.000000
+    +056: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +060: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +064: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +068: hex=0x3dcccccd | int=  1036831949 | float=      0.100000
+    +072: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +076: hex=0x3f785ffc | int=  1064853500 | float=      0.970215
+    +080: hex=0x00000000 | int=           0 | float=      0.000000
+    +084: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +088: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +092: hex=0x3eb33333 | int=  1051931443 | float=      0.350000
+    +096: hex=0x3f666666 | int=  1063675494 | float=      0.900000
+    +100: hex=0x00000000 | int=           0 | float=      0.000000
+    +104: hex=0x00000000 | int=           0 | float=      0.000000
+    +108: hex=0x00000000 | int=           0 | float=      0.000000
+    +112: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +116: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +120: hex=0x3f19999a | int=  1058642330 | float=      0.600000
+    +124: hex=0x00000000 | int=           0 | float=      0.000000
+    +128: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +132: hex=0xbc0506fa | int= -1140521222 | float=     -0.008119
+    +136: hex=0x00000000 | int=           0 | float=      0.000000
+    +140: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +144: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +148: hex=0x3f59999a | int=  1062836634 | float=      0.850000
+    +152: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +156: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +160: hex=0x3cf8db7a | int=  1022942074 | float=      0.030378
+    +164: hex=0x00000000 | int=           0 | float=      0.000000
+    +168: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +172: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +176: hex=0x3f800000 | int=  1065353216 | float=      1.000000
+    +180: hex=0x3e99999a | int=  1050253722 | float=      0.300000
+    +184: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +188: hex=0xc0844560 | int= -1065073312 | float=     -4.133469
+    +192: hex=0x00000000 | int=           0 | float=      0.000000
+    +196: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +200: hex=0x3eaaaaab | int=  1051372203 | float=      0.333333
+    +204: hex=0x00000002 | int=           2 | float=      0.000000
+    +208: hex=0x00000002 | int=           2 | float=      0.000000
+    +212: hex=0x00000004 | int=           4 | float=      0.000000
+    +216: hex=0x00000000 | int=           0 | float=      0.000000
+    +220: hex=0x3e99999a | int=  1050253722 | float=      0.300000
