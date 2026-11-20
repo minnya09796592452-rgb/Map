@@ -1,0 +1,20 @@
+CASTAWAY-DEPTHS V25 MASTER SUMMARY
+========================================================================
+Created UTC: 2026-11-20T01:19:03.632140+00:00
+Input CSV: /storage/emulated/0/Map Check/reports/V23_2_UNITYPY_TERRAIN_RECOVERY/03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv
+Input rows: 99111
+Input containers: 17
+Unique Terrain: 51
+Unique TerrainCollider: 51
+Unique TerrainData: 51
+level3 Terrain: 49
+C# source files scanned: 3631
+C# source files selected: 120
+C# output parts: 1
+C# max part limit: 15000000 bytes (15 MB)
+Errors: 0
+Warnings: 2
+
+SCOPE: read-only CSV correlation, serialized reference indexing, transform hierarchy export, relevant C# source evidence, <=15 MB C# source parts.
+NOT CLAIMED: Mission 3 identity of level3; fully composed world transforms; complete TerrainData heightmap recovery; Unity runtime behavior.
+STATUS: AUDIT GENERATED — REVIEW ERRORS/WARNINGS

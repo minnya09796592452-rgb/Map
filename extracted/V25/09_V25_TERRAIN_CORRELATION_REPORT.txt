@@ -1,0 +1,21 @@
+V25 TERRAIN ASSET CORRELATION
+========================================================================
+CSV rows: 99111
+CSV containers: 17
+
+UNIQUE OBJECT COUNTS BY CONTAINER
+level3: Terrain=49, TerrainCollider=49, TerrainData=0
+level4: Terrain=1, TerrainCollider=1, TerrainData=0
+sharedassets3.assets: Terrain=1, TerrainCollider=1, TerrainData=50
+sharedassets4.assets: Terrain=0, TerrainCollider=0, TerrainData=1
+
+Unique Terrain objects: 51
+Unique TerrainCollider objects: 51
+Unique TerrainData objects: 51
+level3 Terrain objects: 49
+
+REFERENCE LIMITATIONS
+- m_FileID references may point into another serialized file; PathID alone is not globally unique.
+- Transform local positions are not world positions until every parent is resolved and parent transforms are composed.
+- TerrainData heightmap bytes/dimensions may require the referenced serialized asset itself, not only this CSV preview.
+- No Mission 3 identity is asserted from level3 object counts alone.
