@@ -1,204 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 251
-PATH: Assembly-CSharp__Beam.UI__ULobbyMenuViewAdapter.cs
-SIZE: 5096 bytes
-SHA256: 9229843cc531b1fd748ffaa54d24ea3c53c0c4abd44868722408283154af2990
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using Beam.Utilities;
-using Funlabs;
-using UdpKit;
-using UnityEngine;
-
-namespace Beam.UI;
-
-public class ULobbyMenuViewAdapter : LobbyMenuViewAdapterBase
-{
-	[SerializeField]
-	private GameObject _panel;
-
-	[SerializeField]
-	private ULobbyElement _lobbyElementButtonPrefab;
-
-	[SerializeField]
-	private ULobbyEntryElement _lobbyEntryElementPrefab;
-
-	[SerializeField]
-	private Transform _lobbyButtonContainer;
-
-	[SerializeField]
-	private UScrollviewViewAdapter _scrollView;
-
-	[SerializeField]
-	private Transform _lobbyEntryElementContainer;
-
-	[SerializeField]
-	private TMPLabelViewAdapter _retrievingLabel;
-
-	[SerializeField]
-	private TMPLabelViewAdapter _noLobbyEntriesLabel;
-
-	[SerializeField]
-	private UButtonViewAdapter _enterCodeButton;
-
-	[SerializeField]
-	private UButtonViewAdapter _backButton;
-
-	[SerializeField]
-	private UButtonViewAdapter _applyButton;
-
-	[SerializeField]
-	private UScrollviewViewAdapter _crollview;
-
-	[SerializeField]
-	private TMPOptionButtonViewAdapter _regionOptionButton;
-
-	[SerializeField]
-	private TMPLabelViewAdapter _regionLabel;
-
-	private HashSet<ILobbyElement> _lobbyButtons = new HashSet<ILobbyElement>();
-
-	public override IButtonViewAdapter EnterCodeButton => _enterCodeButton;
-
-	public override IButtonViewAdapter BackButton => _backButton;
-
-	public override IButtonViewAdapter ApplyButton => _applyButton;
-
-	public override IScrollviewViewAdapter Scrollview => _crollview;
-
-	public override IOptionButtonViewAdapter RegionOptionButton => _regionOptionButton;
-
-	public override ILabelViewAdapter RegionLabel => _regionLabel;
-
-	public override IEnumerable<ILobbyElement> LobyButtons => _lobbyButtons;
-
-	private void Awake()
-	{
-		Visible = _panel.activeSelf;
-	}
-
-	public override void Show()
-	{
-		if (!_panel.activeSelf)
-		{
-			_panel.SetActive(value: true);
-		}
-		base.Show();
-	}
-
-	public override void Hide()
-	{
-		if (_panel.activeSelf)
-		{
-			BeamTeam.DestroyAllChildren(_lobbyButtonContainer);
-			BeamTeam.DestroyAllChildren(_lobbyEntryElementContainer);
-			_lobbyButtons.Clear();
-			_panel.SetActive(value: false);
-		}
-		base.Hide();
-	}
-
-	public override ILobbyElement CreateLobbyButton(Session_Filter sessionFilter)
-	{
-		ULobbyElement uLobbyElement = UnityEngine.Object.Instantiate(_lobbyElementButtonPrefab);
-		uLobbyElement.transform.SetParent(_lobbyButtonContainer, worldPositionStays: false);
-		uLobbyElement.SetLobbyFilter(sessionFilter);
-		uLobbyElement.Selected += SessionFilterButton_Selected;
-		_lobbyButtons.Add(uLobbyElement);
-		return uLobbyElement;
-	}
-
-	private ULobbyEntryElement CreateLobbyEntryElement()
-	{
-		ULobbyEntryElement uLobbyEntryElement = UnityEngine.Object.Instantiate(_lobbyEntryElementPrefab);
-		uLobbyEntryElement.transform.SetParent(_lobbyEntryElementContainer, worldPositionStays: false);
-		return uLobbyEntryElement;
-	}
-
-	public override void UpdateLobbydEntries(Map<Guid, UdpSession> sessionList)
-	{
-		foreach (Transform item in _lobbyEntryElementContainer)
-		{
-			ULobbyEntryElement component = item.GetComponent<ULobbyEntryElement>();
-			if (!component.IsNullOrDestroyed() && sessionList.TryFind(component.GetGuid(), out var value) && !value.GetToken().IsNullOrDestroyed())
-			{
-				component.SetSession(component.GetGuid(), value, component.GetSessionFilter());
-			}
-		}
-	}
-
-	public override ULobbyEntryElement CreateLobbydEntries(List<UdpSession> sessionList, Session_Filter selectedFilter, Guid selectedGuid, Action<object> onEntryButtonClick, Action<ISelectableViewAdapter> onEntryButtonSelect)
-	{
-		CleanButtons();
-		int num = 1;
-		ULobbyEntryElement uLobbyEntryElement = null;
-		foreach (UdpSession session in sessionList)
-		{
-			MultiplayerTokens.Session token = session.GetToken();
-			if (token != null && token.IsShowable())
-			{
-				ULobbyEntryElement uLobbyEntryElement2 = CreateLobbyEntryElement();
-				uLobbyEntryElement2.SetSession(session.Id, session, selectedFilter);
-				uLobbyEntryElement2.SetRank(num);
-				num++;
-				if (uLobbyEntryElement == null)
-				{
-					uLobbyEntryElement = uLobbyEntryElement2;
-				}
-				if (uLobbyEntryElement2.GetGuid() == selectedGuid)
-				{
-					uLobbyEntryElement = uLobbyEntryElement2;
-				}
-				TMPLabelButtonViewAdapter component = uLobbyEntryElement2.gameObject.GetComponent<TMPLabelButtonViewAdapter>();
-				component.Click += onEntryButtonClick;
-				component.Selected += onEntryButtonSelect;
-			}
-		}
-		Canvas.ForceUpdateCanvases();
-		return uLobbyEntryElement;
-	}
-
-	public override IButtonViewAdapter GetFirstButton()
-	{
-		IButtonViewAdapter buttonViewAdapter = _lobbyButtons.FirstOrDefault_NonAlloc();
-		if (buttonViewAdapter.IsNullOrDestroyed())
-		{
-			return _backButton;
-		}
-		return buttonViewAdapter;
-	}
-
-	public override void CleanButtons()
-	{
-		foreach (Transform item in _lobbyEntryElementContainer)
-		{
-			UnityEngine.Object.Destroy(item.gameObject);
-		}
-	}
-
-	private void SessionFilterButton_Selected(ISelectableViewAdapter widget)
-	{
-		_scrollView.FocusElement(widget.transform);
-	}
-
-	public void ToggleNoEntriesFoundLabel(bool value)
-	{
-		_noLobbyEntriesLabel.transform.gameObject.SetActive(value);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 252
 PATH: Assembly-CSharp__Beam.UI__UMainMenuViewAdapter.cs
 SIZE: 16799 bytes
 SHA256: 3ab2d28d7e42ad8b6f8469b9bd20859b8338b8f2e534791dae48d59d57b5c14d
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using Rewired;
@@ -634,15 +439,12 @@ public class UMainMenuViewAdapter : MainMenuViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 253
+SOURCE FILE 252
 PATH: Assembly-CSharp__Beam.UI__UQuickCrafterRadialMenuViewAdapter.cs
 SIZE: 1572 bytes
 SHA256: c623b345d2c975825933e38657a4ce9e53df1a6b06264bff5c717b2b11de7cfe
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -700,15 +502,12 @@ public class UQuickCrafterRadialMenuViewAdapter : QuickCrafterRadialMenuViewAdap
 	public override Texture2D BlurMaskTexture => _blurMaskTexture;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 254
+SOURCE FILE 253
 PATH: Assembly-CSharp__Beam.UI__UScrollviewViewAdapter.cs
 SIZE: 721 bytes
 SHA256: 2809f41176670281ae3e9768c3b14356db1199bc6137f24b75c257dd8a203650
 ====================================================================================================
-
 using UnityEngine.UI;
 
 namespace Beam.UI;
@@ -754,15 +553,12 @@ public class UScrollviewViewAdapter : ScrollviewViewAdapterBase<ScrollRect>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 255
+SOURCE FILE 254
 PATH: Assembly-CSharp__Beam.UI__USkillNotificationsViewAdapter.cs
 SIZE: 283 bytes
 SHA256: c4605103a4e040abeecdbea35a1ef56dd4f72db8a4e5cfe811223dcf26caa443
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -775,15 +571,12 @@ public class USkillNotificationsViewAdapter : NotificationsViewAdapterBase
 	public override ITransformViewAdapter NotificationsContainer => _notificationsContainer;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 256
+SOURCE FILE 255
 PATH: Assembly-CSharp__Beam.UI__UStorageRadialMenuViewAdapter.cs
 SIZE: 2182 bytes
 SHA256: 7bdd392cde88744289b8a1dbe94e8635381d6e20d5b3308672333ad1d78724fc
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -861,15 +654,12 @@ public class UStorageRadialMenuViewAdapter : InventoryRadialMenuViewAdapterBase
 	public override Texture2D BlurMaskTexture => _blurMaskTexture;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 257
+SOURCE FILE 256
 PATH: Assembly-CSharp__Beam.UI__UVideoScreenViewAdapter.cs
 SIZE: 606 bytes
 SHA256: 7d08aa1e1266f62685aef1bfe4cbf1c3336978b687d91026a68484f929d9640f
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -903,15 +693,12 @@ public class UVideoScreenViewAdapter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 258
+SOURCE FILE 257
 PATH: Assembly-CSharp__Beam.UI__VomitPlayerEffect.cs
 SIZE: 1205 bytes
 SHA256: 9623084699f646a485d13536e67327adbed9088ea66f58d22c7e23e2f353cc1d
 ====================================================================================================
-
 using System.Collections.Generic;
 using MEC;
 using UnityEngine;
@@ -965,15 +752,12 @@ public class VomitPlayerEffect : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 259
+SOURCE FILE 258
 PATH: Assembly-CSharp__Beam.UI__WatchScreenViewAdapter.cs
 SIZE: 1531 bytes
 SHA256: 2a8f65af3bf1341161a34eb08d1ee03ced9be2c4d88fbfe151f78dd88f83c3f6
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -1037,15 +821,12 @@ public class WatchScreenViewAdapter : WatchScreenViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 260
+SOURCE FILE 259
 PATH: Assembly-CSharp__Beam.Utilities__BeamTeam.cs
 SIZE: 6204 bytes
 SHA256: f5f43f413c51831a1894a2e2a3a731026ab90581ab6eb67a2f9685b3a4a4054a
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1292,15 +1073,12 @@ public static class BeamTeam
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 261
+SOURCE FILE 260
 PATH: Assembly-CSharp__Beam.Utilities__Debug3DText.cs
 SIZE: 1226 bytes
 SHA256: e677763143740c58decf46b6c0dea908534e3234eb249c3963daaf95d92eaf55
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Utilities;
@@ -1339,15 +1117,12 @@ public static class Debug3DText
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 262
+SOURCE FILE 261
 PATH: Assembly-CSharp__Beam.Utilities__ExtensionMethods.cs
 SIZE: 7978 bytes
 SHA256: 102f9ef49c3dd1f679e807a38c223fa1cd4cd201860af1b4ac10202f21743675
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Crafting;
@@ -1730,7 +1505,85 @@ public static class ExtensionMethods
 	}
 }
 
+====================================================================================================
+SOURCE FILE 262
+PATH: Assembly-CSharp__Beam__Base_FRUIT_TREE.cs
+SIZE: 1514 bytes
+SHA256: 1abac80fe48f112d46cc29c60f9ac81f6f571985ef04ef22d1cde399e0cb80a1
+====================================================================================================
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
 
+namespace Beam;
+
+public class Base_FRUIT_TREE : BaseObject
+{
+	[SerializeField]
+	private InteractiveObject_FOOD _fruitPrefab;
+
+	[SerializeField]
+	private Transform _fruitPosition;
+
+	private bool _fruitCreated;
+
+	protected override void Start()
+	{
+		base.Start();
+		if (!LevelLoader.IsLoading())
+		{
+			CreateFruit();
+		}
+	}
+
+	private void CreateFruit()
+	{
+		if (_fruitCreated)
+		{
+			return;
+		}
+		_fruitCreated = true;
+		MiniGuid referenceId = MiniGuid.NewFrom(ReferenceId);
+		if (Game.Mode.IsMaster())
+		{
+			Setup(MultiplayerMng.Instantiate<InteractiveObject_FOOD>(_fruitPrefab.PrefabId, _fruitPosition.position, _fruitPosition.rotation, referenceId));
+			return;
+		}
+		MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.Fruit, referenceId, (MultiplayerZoneSync.Command command) =>
+		{
+			Setup((InteractiveObject_FOOD)command.Instance);
+		});
+	}
+
+	private void Setup(InteractiveObject_FOOD fruit)
+	{
+		fruit.Attach(new StaticAttachingAnchor(_fruitPosition));
+		fruit.IsGrowing = true;
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		CreateFruit();
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("fruitCreated", _fruitCreated);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("fruitCreated");
+		if (field != null && !field.IsNull())
+		{
+			_fruitCreated = field.GetValue<bool>();
+		}
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 263
@@ -1738,7 +1591,6 @@ PATH: Assembly-CSharp__Beam__BaseExtensions.cs
 SIZE: 398 bytes
 SHA256: 0c56a6904445e54a345727f1588c01a43fd28b54d6618afb125f893ef823b2cb
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -1758,15 +1610,12 @@ public static class BaseExtensions
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 264
 PATH: Assembly-CSharp__Beam__BaseObject.cs
 SIZE: 5253 bytes
 SHA256: b9224bd663340de5829b70ee7dfef40094d6e0c7d95f54c7fb340e9375d3dccc
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Crafting;
@@ -2013,98 +1862,12 @@ public class BaseObject : SaveablePrefab, IBase, IHasCraftingType
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 265
-PATH: Assembly-CSharp__Beam__Base_FRUIT_TREE.cs
-SIZE: 1514 bytes
-SHA256: 1abac80fe48f112d46cc29c60f9ac81f6f571985ef04ef22d1cde399e0cb80a1
-====================================================================================================
-
-using Beam.Serialization.Json;
-using Funlabs;
-using UnityEngine;
-
-namespace Beam;
-
-public class Base_FRUIT_TREE : BaseObject
-{
-	[SerializeField]
-	private InteractiveObject_FOOD _fruitPrefab;
-
-	[SerializeField]
-	private Transform _fruitPosition;
-
-	private bool _fruitCreated;
-
-	protected override void Start()
-	{
-		base.Start();
-		if (!LevelLoader.IsLoading())
-		{
-			CreateFruit();
-		}
-	}
-
-	private void CreateFruit()
-	{
-		if (_fruitCreated)
-		{
-			return;
-		}
-		_fruitCreated = true;
-		MiniGuid referenceId = MiniGuid.NewFrom(ReferenceId);
-		if (Game.Mode.IsMaster())
-		{
-			Setup(MultiplayerMng.Instantiate<InteractiveObject_FOOD>(_fruitPrefab.PrefabId, _fruitPosition.position, _fruitPosition.rotation, referenceId));
-			return;
-		}
-		MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.Fruit, referenceId, (MultiplayerZoneSync.Command command) =>
-		{
-			Setup((InteractiveObject_FOOD)command.Instance);
-		});
-	}
-
-	private void Setup(InteractiveObject_FOOD fruit)
-	{
-		fruit.Attach(new StaticAttachingAnchor(_fruitPosition));
-		fruit.IsGrowing = true;
-	}
-
-	public override void OnCustomMapLoaded()
-	{
-		base.OnCustomMapLoaded();
-		CreateFruit();
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		jObject.AddField("fruitCreated", _fruitCreated);
-		return jObject;
-	}
-
-	public override void Load(JObject data)
-	{
-		base.Load(data);
-		JObject field = data.GetField("fruitCreated");
-		if (field != null && !field.IsNull())
-		{
-			_fruitCreated = field.GetValue<bool>();
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 266
 PATH: Assembly-CSharp__Beam__Buoyancy.cs
 SIZE: 7908 bytes
 SHA256: 3ef8a8968d1fd592d73eecb333904303f9a1233fa7459f5869ee0c47d6710f0f
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.UI;
@@ -2468,15 +2231,12 @@ public class Buoyancy : MonoBehaviour, IQueryWaves
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 267
+SOURCE FILE 266
 PATH: Assembly-CSharp__Beam__CameraMovement.cs
 SIZE: 4083 bytes
 SHA256: a5bb6501196a2e226bff06d304fa2b95c24c51c51d9fbb70f7f17f568bf267d7
 ====================================================================================================
-
 using Beam.Events;
 using Beam.Utilities;
 using UnityEngine;
@@ -2648,15 +2408,12 @@ public class CameraMovement : MonoBehaviour, INeedPlayerComponent, IIdleUntilIni
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 268
+SOURCE FILE 267
 PATH: Assembly-CSharp__Beam__Cameras.cs
 SIZE: 9177 bytes
 SHA256: 564183ce9a7506fc4506cb429101367887d908201ce3bbab49fde878fc6a7e5e
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -2963,15 +2720,12 @@ public class Cameras : Singleton<Cameras>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 269
+SOURCE FILE 268
 PATH: Assembly-CSharp__Beam__CaptureCameraMovement.cs
 SIZE: 3401 bytes
 SHA256: ce18d77ec21c3001b2768674b7bd3a4c9f73616a0437e24cd5eadff32884a242
 ====================================================================================================
-
 using Beam.Utilities;
 using UnityEngine;
 using kode80.Clouds;
@@ -3120,15 +2874,12 @@ public class CaptureCameraMovement : MonoBehaviour, IGameCamera
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 270
+SOURCE FILE 269
 PATH: Assembly-CSharp__Beam__Cell.cs
 SIZE: 1984 bytes
 SHA256: c11c324debfe82c16b8c6230442e6cd3d6ccaa2bc1ac874e3c87fbbdf7d61713
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -3242,15 +2993,12 @@ public class Cell<TCellObject> : ICell where TCellObject : class, ICellObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 271
+SOURCE FILE 270
 PATH: Assembly-CSharp__Beam__CellObjectPool.cs
 SIZE: 1363 bytes
 SHA256: e53e59922f3a920e82e69a9b9f84c5386d70655fb6c3582ff9df5ccfc25d902f
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -3307,15 +3055,12 @@ public class CellObjectPool<TCellObject> : ICreateCellObjects<TCellObject>, IFre
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 272
+SOURCE FILE 271
 PATH: Assembly-CSharp__Beam__CellObjectSpawner.cs
 SIZE: 13421 bytes
 SHA256: 1677286feb2b8f4d1387a893562f8c8542d22d07a2a1e36e3a5591d872e51006
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Events;
 using Beam.Serialization;
@@ -3813,15 +3558,12 @@ public class CellObjectSpawner<TCellObject> : CellObjectSpawner, IHashCollection
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 273
+SOURCE FILE 272
 PATH: Assembly-CSharp__Beam__Character.cs
 SIZE: 21487 bytes
 SHA256: 511650f0efd93378b17344a4dd595a74afdf34632fe8f84b0d0480a9c648930e
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -4597,15 +4339,12 @@ public class Character : MonoBehaviour, INeedPlayerComponent
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 274
+SOURCE FILE 273
 PATH: Assembly-CSharp__Beam__CharacterRenderer.cs
 SIZE: 7964 bytes
 SHA256: a69fbd80e7188214573054efdd922d0a53823a45276badc22dd36ed62e7c5753
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using Funlabs;
@@ -4901,15 +4640,12 @@ public class CharacterRenderer : MonoBehaviour, INeedPlayerComponent
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 275
+SOURCE FILE 274
 PATH: Assembly-CSharp__Beam__Constructing_FUEL_STILL_COLLECTOR.cs
 SIZE: 3588 bytes
 SHA256: 91b6a29c6dd10e47dd132f517d94bb6bd4d3772aab54f40a7c68107405bb7973
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Serialization.Json;
@@ -5086,4 +4822,219 @@ public class Constructing_FUEL_STILL_COLLECTOR : ReplicableMonoBehaviour, IInter
 	}
 }
 
+====================================================================================================
+SOURCE FILE 275
+PATH: Assembly-CSharp__Beam__Constructing_STILL_COLLECTOR.cs
+SIZE: 4513 bytes
+SHA256: ed968bd8268459fcfc505e59b60c1319749b6dd3c1e18cbfefef7ad0adc5cbb0
+====================================================================================================
+using System;
+using Beam.Crafting;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Beam;
+
+public class Constructing_STILL_COLLECTOR : ReplicableMonoBehaviour, IInteractable, IBase, IHasCraftingType, IHaveAttribute, ISelectable, ISaveable
+{
+	private const int MAX_WATER = 4;
+
+	[SerializeField]
+	private Constructing_STILL _constructingStill;
+
+	private MiniGuid _referenceId;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Selecting _selecting;
+
+	[Header("ATTRIBUTE")]
+	[SerializeField]
+	private IconType _type;
+
+	private int _water;
+
+	private string _displayName = "";
+
+	public DamageUnityEvent Damaged;
+
+	public UnityEvent Drank;
+
+	public UnityEvent WaterRemoved;
+
+	public int MaxWater => 4;
+
+	public override MiniGuid ReferenceId
+	{
+		get
+		{
+			if (_referenceId.IsDefault() && _constructingStill.Structure.IsValid())
+			{
+				_referenceId = MiniGuid.NewFrom(_constructingStill.Structure.ReferenceId);
+			}
+			return _referenceId;
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public Selecting Selecting => _selecting;
+
+	IconType IHaveAttribute.Type => _type;
+
+	public int Water => _water;
+
+	public bool CanInteract { get; set; } = true;
+
+	public string DisplayName
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(_displayName))
+			{
+				_displayName = CraftingType.ToString();
+			}
+			return _displayName;
+		}
+	}
+
+	public bool CanParent { get; set; }
+
+	public Transform TransformParent { get; set; }
+
+	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.CRAFTING_WATER_STILL_COLLECTOR);
+
+	public RaycastMode RaycastMode { get; }
+
+	public bool IsDamageable => true;
+
+	float IHaveAttribute.GetValue()
+	{
+		return (float)_water / 4f;
+	}
+
+	public string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return "ITEM_INTERACTION_DESCRIPTION_DRINK";
+		}
+		if (IsRefillable(obj))
+		{
+			return "ITEM_INTERACTION_DESCRIPTION_COLLECT";
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_DRINK";
+	}
+
+	private void OnDestroy()
+	{
+		Damaged.RemoveAllListeners();
+		Damaged = null;
+		Drank = null;
+		WaterRemoved = null;
+	}
+
+	public void Damage(float damage, IBase damager)
+	{
+		Damaged?.Invoke(new DamageUnityEventArgs(damage, damager));
+	}
+
+	public void Destroy()
+	{
+	}
+
+	public void Parent()
+	{
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		if (_water <= 0)
+		{
+			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_EMPTY_DESC");
+			return false;
+		}
+		Drink(player);
+		return true;
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		if (obj.IsNullOrDestroyed())
+		{
+			return false;
+		}
+		if (_water <= 0)
+		{
+			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_EMPTY_DESC");
+			return false;
+		}
+		InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
+		if (interactiveObject_FOOD != null && IsRefillable(interactiveObject_FOOD))
+		{
+			if (interactiveObject_FOOD.Servings < interactiveObject_FOOD.OriginalServings)
+			{
+				interactiveObject_FOOD.Servings++;
+				interactiveObject_FOOD.Servings = Mathf.Clamp(interactiveObject_FOOD.Servings, 0, interactiveObject_FOOD.OriginalServings);
+				RemoveWater(1);
+				return true;
+			}
+			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_FULL_DESC");
+			return false;
+		}
+		return Interact(player);
+	}
+
+	private void RemoveWater(int qty)
+	{
+		_water -= qty;
+		WaterRemoved?.Invoke();
+	}
+
+	private void Drink(IPlayer player)
+	{
+		RemoveWater(1);
+		int num = 100;
+		player.Statistics.Eat(InteractiveType.CRAFTING_WATER_STILL, MeatProvenance.Other, 0, 0, 0, 0, num);
+		Drank?.Invoke();
+	}
+
+	public void Refill(float availableWater)
+	{
+		int num = Mathf.Min(4 - _water, (int)availableWater);
+		if (num > 0)
+		{
+			_water += num;
+			_water = Mathf.Clamp(_water, 0, 4);
+		}
+	}
+
+	private bool IsRefillable(IBase obj)
+	{
+		if (obj.CraftingType.InteractiveType != InteractiveType.FOOD_WATER_BOTTLE && obj.CraftingType.InteractiveType != InteractiveType.FOOD_WATER_SKIN)
+		{
+			return obj.CraftingType.InteractiveType == InteractiveType.FOOD_COCONUT_FLASK;
+		}
+		return true;
+	}
+
+	public new JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("Water", _water);
+		return jObject;
+	}
+
+	public new void Load(JObject data)
+	{
+		int value = data.GetField("Water").GetValue<int>();
+		_water = value;
+	}
+}
 

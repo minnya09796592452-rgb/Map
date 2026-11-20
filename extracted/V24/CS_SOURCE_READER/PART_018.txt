@@ -1,11 +1,45 @@
-
 ====================================================================================================
 SOURCE FILE 426
+PATH: Assembly-CSharp__TiltPanel.cs
+SIZE: 751 bytes
+SHA256: 1b7458d2d27a5ad631e6159d3720ff3ada4a0fe24a2eb706bdce8ba16f105bd2
+====================================================================================================
+using UnityEngine;
+
+public class TiltPanel : MonoBehaviour
+{
+	public Vector2 range = new Vector2(5f, 3f);
+
+	private Transform mTrans;
+
+	private Quaternion mStart;
+
+	private Vector2 mRot = Vector2.zero;
+
+	private void Start()
+	{
+		mTrans = transform;
+		mStart = mTrans.localRotation;
+	}
+
+	private void Update()
+	{
+		Vector3 mousePosition = Input.mousePosition;
+		float num = (float)Screen.width * 0.5f;
+		float num2 = (float)Screen.height * 0.5f;
+		float x = Mathf.Clamp((mousePosition.x - num) / num, -1f, 1f);
+		float y = Mathf.Clamp((mousePosition.y - num2) / num2, -1f, 1f);
+		mRot = Vector2.Lerp(mRot, new Vector2(x, y), Time.deltaTime * 5f);
+		mTrans.localRotation = mStart * Quaternion.Euler((0f - mRot.y) * range.y, mRot.x * range.x, 0f);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 427
 PATH: Assembly-CSharp__TransformSerializer.cs
 SIZE: 908 bytes
 SHA256: 3a446eaacabeec7d5b0f1d658c1136201f2a6a23e87514630c5041b6c54be572
 ====================================================================================================
-
 using Beam;
 using Beam.Serialization.Json;
 using UnityEngine;
@@ -31,15 +65,12 @@ public class TransformSerializer : ComponentSerializer<Transform>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 427
+SOURCE FILE 428
 PATH: Assembly-CSharp__UIMouseFollow.cs
 SIZE: 405 bytes
 SHA256: 1dee646a1c734f0f479156501a0b69e95b1cee37e0f4df5cf160bfa25036b75c
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -54,15 +85,1676 @@ public class UIMouseFollow : MonoBehaviour
 	}
 }
 
+====================================================================================================
+SOURCE FILE 429
+PATH: Assembly-CSharp__uMyGUI__uMyGUI_Draggable.cs
+SIZE: 4177 bytes
+SHA256: 56d0d785672603fd349a5d42f6bb5056ad63540cee7e0126f9acdff31c10f24a
+====================================================================================================
+using System;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
+namespace uMyGUI;
+
+public class uMyGUI_Draggable : MonoBehaviour, IBeginDragHandler, IEventSystemHandler, IDragHandler, IEndDragHandler
+{
+	public class DragEvent : EventArgs
+	{
+		public readonly PointerEventData m_event;
+
+		public DragEvent(PointerEventData p_event)
+		{
+			m_event = p_event;
+		}
+	}
+
+	[SerializeField]
+	private bool m_isResetRotationWhenDragged;
+
+	[SerializeField]
+	private bool m_isSnapBackOnEndDrag;
+
+	[SerializeField]
+	private bool m_isTopInHierarchyWhenDragged = true;
+
+	[SerializeField]
+	private CanvasGroup m_disableBlocksRaycastsOnDrag;
+
+	private bool m_isDragged;
+
+	public EventHandler<DragEvent> m_onBeginDrag;
+
+	public EventHandler<DragEvent> m_onDrag;
+
+	public EventHandler<DragEvent> m_onEndDrag;
+
+	private RectTransform m_initialParentTransform;
+
+	private RectTransform m_canvasTransform;
+
+	private RectTransform m_transform;
+
+	private int m_initialSiblingIndex;
+
+	private Vector3 m_initialPosition;
+
+	private Quaternion m_initialRotation;
+
+	private Vector3 m_dragOffset = Vector3.zero;
+
+	public bool IsResetRotationWhenDragged
+	{
+		get
+		{
+			return m_isResetRotationWhenDragged;
+		}
+		set
+		{
+			m_isResetRotationWhenDragged = value;
+		}
+	}
+
+	public bool IsSnapBackOnEndDrag
+	{
+		get
+		{
+			return m_isSnapBackOnEndDrag;
+		}
+		set
+		{
+			m_isSnapBackOnEndDrag = value;
+		}
+	}
+
+	public bool IsTopInHierarchyWhenDragged
+	{
+		get
+		{
+			return m_isTopInHierarchyWhenDragged;
+		}
+		set
+		{
+			m_isTopInHierarchyWhenDragged = value;
+		}
+	}
+
+	public CanvasGroup DisableBlocksRaycastsOnDrag
+	{
+		get
+		{
+			return m_disableBlocksRaycastsOnDrag;
+		}
+		set
+		{
+			m_disableBlocksRaycastsOnDrag = value;
+		}
+	}
+
+	public bool IsDragged => m_isDragged;
+
+	public void OnBeginDrag(PointerEventData p_event)
+	{
+		if (p_event.button == PointerEventData.InputButton.Left)
+		{
+			m_isDragged = true;
+			m_initialParentTransform = m_transform.parent as RectTransform;
+			m_initialPosition = m_transform.position;
+			m_initialRotation = m_transform.rotation;
+			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(m_canvasTransform, p_event.position, p_event.pressEventCamera, out var worldPoint))
+			{
+				m_dragOffset = m_transform.position - worldPoint;
+			}
+			else
+			{
+				m_dragOffset = Vector3.zero;
+			}
+			if (m_isResetRotationWhenDragged)
+			{
+				m_transform.rotation = Quaternion.identity;
+			}
+			if (m_isTopInHierarchyWhenDragged)
+			{
+				m_initialSiblingIndex = m_transform.GetSiblingIndex();
+				m_transform.SetParent(m_canvasTransform, worldPositionStays: true);
+				m_transform.SetAsLastSibling();
+			}
+			if (m_disableBlocksRaycastsOnDrag != null)
+			{
+				m_disableBlocksRaycastsOnDrag.blocksRaycasts = false;
+			}
+			if (m_onBeginDrag != null)
+			{
+				m_onBeginDrag(this, new DragEvent(p_event));
+			}
+		}
+	}
+
+	public void OnDrag(PointerEventData p_event)
+	{
+		if (m_isDragged)
+		{
+			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(m_canvasTransform, p_event.position, p_event.pressEventCamera, out var worldPoint))
+			{
+				m_transform.position = worldPoint + m_dragOffset;
+			}
+			if (m_onDrag != null)
+			{
+				m_onDrag(this, new DragEvent(p_event));
+			}
+		}
+	}
+
+	public void OnEndDrag(PointerEventData p_event)
+	{
+		if (m_isDragged)
+		{
+			m_isDragged = false;
+			if (m_isSnapBackOnEndDrag)
+			{
+				m_transform.position = m_initialPosition;
+				m_transform.rotation = m_initialRotation;
+			}
+			if (m_isTopInHierarchyWhenDragged)
+			{
+				m_transform.SetParent(m_initialParentTransform, worldPositionStays: true);
+				m_transform.SetSiblingIndex(m_initialSiblingIndex);
+			}
+			if (m_disableBlocksRaycastsOnDrag != null)
+			{
+				m_disableBlocksRaycastsOnDrag.blocksRaycasts = true;
+			}
+			if (m_onEndDrag != null)
+			{
+				m_onEndDrag(this, new DragEvent(p_event));
+			}
+		}
+	}
+
+	private void Start()
+	{
+		Canvas componentInParent = GetComponentInParent<Canvas>();
+		if (componentInParent != null)
+		{
+			m_canvasTransform = componentInParent.GetComponent<RectTransform>();
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_Draggable: no Canvas component was found in parent!");
+			enabled = false;
+		}
+		m_transform = GetComponent<RectTransform>();
+	}
+}
 
 ====================================================================================================
-SOURCE FILE 428
+SOURCE FILE 430
+PATH: Assembly-CSharp__uMyGUI__uMyGUI_TabBox.cs
+SIZE: 5452 bytes
+SHA256: d0df365833ca2fd6bae6c68339a105788a589cacb081ae67464f83a710d9a12d
+====================================================================================================
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace uMyGUI;
+
+public class uMyGUI_TabBox : MonoBehaviour
+{
+	public enum EAnimMode
+	{
+		NONE,
+		TAB_ONLY,
+		BTN_ONLY,
+		TAB_AND_BTN
+	}
+
+	public const string SEND_MESSAGE_ACTIVATE_NAME = "uMyGUI_OnActivateTab";
+
+	public const string SEND_MESSAGE_DEACTIVATE_NAME = "uMyGUI_OnDeactivateTab";
+
+	[SerializeField]
+	private RectTransform[] m_btns = new RectTransform[0];
+
+	[SerializeField]
+	private RectTransform[] m_tabs = new RectTransform[0];
+
+	[SerializeField]
+	private int m_selectedIndex;
+
+	[SerializeField]
+	private bool m_isSelectTabOnStart = true;
+
+	[SerializeField]
+	private bool m_isPlayTabAnimOnStart = true;
+
+	[SerializeField]
+	private bool m_isPlayBtnAnimOnStart = true;
+
+	[SerializeField]
+	private EAnimMode m_animMode;
+
+	[SerializeField]
+	private string m_fadeInAnimTab = "tab_fade_in";
+
+	[SerializeField]
+	private string m_fadeOutAnimTab = "tab_fade_out";
+
+	[SerializeField]
+	private string m_fadeInAnimBtn = "btn_fade_in";
+
+	[SerializeField]
+	private string m_fadeOutAnimBtn = "btn_fade_out";
+
+	[SerializeField]
+	private bool m_isSendMessage;
+
+	[SerializeField]
+	private bool m_isMoveDownInHierarchyOnSelect;
+
+	public void SelectTab(int p_tabIndex)
+	{
+		if (p_tabIndex == m_selectedIndex)
+		{
+			return;
+		}
+		if (p_tabIndex >= 0 && p_tabIndex < m_tabs.Length)
+		{
+			if (m_tabs[p_tabIndex] == null)
+			{
+				Debug.LogError("uMyGUI_TabBox: SelectTab tab index '" + p_tabIndex + "' is null! Check the tabs array in the inspector!");
+				return;
+			}
+			if (m_isMoveDownInHierarchyOnSelect)
+			{
+				m_tabs[p_tabIndex].SetAsLastSibling();
+			}
+			switch (m_animMode)
+			{
+			case EAnimMode.TAB_ONLY:
+				StopAllCoroutines();
+				AnimateRectRectTransformSelection(p_tabIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: true);
+				break;
+			case EAnimMode.BTN_ONLY:
+				StopAllCoroutines();
+				AnimateRectRectTransformSelection(p_tabIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
+				UpdateTabActiveStates(p_tabIndex);
+				break;
+			case EAnimMode.TAB_AND_BTN:
+				StopAllCoroutines();
+				AnimateRectRectTransformSelection(p_tabIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: true);
+				AnimateRectRectTransformSelection(p_tabIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
+				break;
+			default:
+				UpdateTabActiveStates(p_tabIndex);
+				break;
+			}
+			m_selectedIndex = p_tabIndex;
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_TabBox: SelectTab tab index '" + p_tabIndex + "' is out of bounds [0," + m_tabs.Length + "]!");
+		}
+	}
+
+	private void Start()
+	{
+		if (m_isSelectTabOnStart)
+		{
+			UpdateTabActiveStates(m_selectedIndex);
+			if (m_isPlayTabAnimOnStart && (m_animMode == EAnimMode.TAB_ONLY || m_animMode == EAnimMode.TAB_AND_BTN))
+			{
+				AnimateRectRectTransformSelection(m_selectedIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: false);
+			}
+			if (m_isPlayBtnAnimOnStart)
+			{
+				AnimateRectRectTransformSelection(m_selectedIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
+			}
+		}
+	}
+
+	private void UpdateTabActiveStates(int p_tabIndex)
+	{
+		for (int i = 0; i < m_tabs.Length; i++)
+		{
+			bool flag = i == p_tabIndex;
+			if (m_tabs[i] != null)
+			{
+				if (m_isSendMessage)
+				{
+					m_tabs[i].gameObject.SendMessage(flag ? "uMyGUI_OnActivateTab" : "uMyGUI_OnDeactivateTab", SendMessageOptions.DontRequireReceiver);
+				}
+				m_tabs[i].gameObject.SetActive(flag);
+			}
+			if (m_btns.Length > i && m_btns[i] != null)
+			{
+				Selectable component = m_btns[i].GetComponent<Selectable>();
+				if (component != null)
+				{
+					component.interactable = !flag;
+				}
+			}
+		}
+	}
+
+	private void AnimateRectRectTransformSelection(int p_tabIndex, RectTransform[] p_transforms, string p_fadeInAnim, string p_fadeOutAnim, bool p_isActivateChanged)
+	{
+		for (int i = 0; i < p_transforms.Length; i++)
+		{
+			if (!(p_transforms[i] != null))
+			{
+				continue;
+			}
+			Animation component = p_transforms[i].GetComponent<Animation>();
+			if (component != null)
+			{
+				if (i == m_selectedIndex && p_tabIndex != m_selectedIndex)
+				{
+					if (component[p_fadeOutAnim] != null)
+					{
+						if (p_isActivateChanged)
+						{
+							StartCoroutine(DeactivateAfterDelay(p_transforms[i].gameObject, component[p_fadeOutAnim].length));
+						}
+						if (m_isSendMessage)
+						{
+							p_transforms[i].gameObject.SendMessage("uMyGUI_OnDeactivateTab", SendMessageOptions.DontRequireReceiver);
+						}
+						component.Play(p_fadeOutAnim);
+					}
+				}
+				else if (i == p_tabIndex)
+				{
+					if (p_isActivateChanged)
+					{
+						p_transforms[i].gameObject.SetActive(value: true);
+					}
+					if (m_isSendMessage)
+					{
+						p_transforms[i].gameObject.SendMessage("uMyGUI_OnActivateTab", SendMessageOptions.DontRequireReceiver);
+					}
+					component.Play(p_fadeInAnim);
+				}
+			}
+			else
+			{
+				Debug.LogError("uMyGUI_TabBox: AnimateRectRectTransformSelection: object at index '" + i + "' has no Animation component and cannot fade in or out!");
+			}
+			Selectable component2 = p_transforms[i].GetComponent<Selectable>();
+			if (component2 != null)
+			{
+				component2.interactable = i != p_tabIndex;
+			}
+		}
+	}
+
+	private IEnumerator DeactivateAfterDelay(GameObject p_object, float p_delay)
+	{
+		yield return new WaitForSeconds(p_delay);
+		if (p_object != null)
+		{
+			p_object.SetActive(value: false);
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 431
+PATH: Assembly-CSharp__uMyGUI__uMyGUI_TexturePicker.cs
+SIZE: 5519 bytes
+SHA256: e6bb1b9705146654129ed522b3be18613dbaf4f5367090e9b315d560a1c04981
+====================================================================================================
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace uMyGUI;
+
+public class uMyGUI_TexturePicker : MonoBehaviour
+{
+	[SerializeField]
+	private GameObject m_texturePrefab;
+
+	[SerializeField]
+	private GameObject m_selectionPrefab;
+
+	[SerializeField]
+	private float m_offsetStart;
+
+	[SerializeField]
+	private float m_offsetEnd;
+
+	[SerializeField]
+	private float m_padding = 4f;
+
+	[SerializeField]
+	private Action<int> m_buttonCallback;
+
+	private Texture2D[] m_textures = new Texture2D[0];
+
+	private RectTransform m_rectTransform;
+
+	private float m_elementSize = 1f;
+
+	private GameObject m_selectionInstance;
+
+	private GameObject[] m_instances = new GameObject[0];
+
+	public GameObject TexturePrefab
+	{
+		get
+		{
+			return m_texturePrefab;
+		}
+		set
+		{
+			m_texturePrefab = value;
+		}
+	}
+
+	public GameObject SelectionPrefab
+	{
+		get
+		{
+			return m_selectionPrefab;
+		}
+		set
+		{
+			m_selectionPrefab = value;
+		}
+	}
+
+	public float OffsetStart
+	{
+		get
+		{
+			return m_offsetStart;
+		}
+		set
+		{
+			m_offsetStart = value;
+		}
+	}
+
+	public float OffsetEnd
+	{
+		get
+		{
+			return m_offsetEnd;
+		}
+		set
+		{
+			m_offsetEnd = value;
+		}
+	}
+
+	public float Padding
+	{
+		get
+		{
+			return m_padding;
+		}
+		set
+		{
+			m_padding = value;
+		}
+	}
+
+	public Action<int> ButtonCallback
+	{
+		get
+		{
+			return m_buttonCallback;
+		}
+		set
+		{
+			m_buttonCallback = value;
+		}
+	}
+
+	public Texture2D[] Textures
+	{
+		get
+		{
+			return m_textures;
+		}
+		set
+		{
+			m_textures = value;
+		}
+	}
+
+	private RectTransform RTransform
+	{
+		get
+		{
+			if (!(m_rectTransform != null))
+			{
+				return m_rectTransform = GetComponent<RectTransform>();
+			}
+			return m_rectTransform;
+		}
+	}
+
+	public void SetSelection(int p_selectionIndex)
+	{
+		if (m_selectionPrefab != null)
+		{
+			if (p_selectionIndex < 0 || p_selectionIndex >= m_instances.Length)
+			{
+				UnityEngine.Object.Destroy(m_selectionInstance);
+				m_selectionInstance = null;
+				return;
+			}
+			if (m_selectionInstance == null)
+			{
+				m_selectionInstance = UnityEngine.Object.Instantiate(m_selectionPrefab);
+			}
+			else
+			{
+				RectTransform component = m_selectionInstance.GetComponent<RectTransform>();
+				Vector2 anchoredPosition = component.anchoredPosition;
+				anchoredPosition.x = m_selectionPrefab.GetComponent<RectTransform>().anchoredPosition.x;
+				component.anchoredPosition = anchoredPosition;
+			}
+			SetRectTransformPosition(m_selectionInstance.GetComponent<RectTransform>(), p_selectionIndex, m_elementSize);
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_TexturePicker: SetSelection: you have passed a non negative selection index '" + p_selectionIndex + "', but the SelectionPrefab was not provided in the inspector or via script!");
+		}
+	}
+
+	public void SetTextures(Texture2D[] p_textures, int p_selectedIndex)
+	{
+		if (m_texturePrefab != null)
+		{
+			m_textures = p_textures;
+			UnityEngine.Object.Destroy(m_selectionInstance);
+			for (int i = 0; i < m_instances.Length; i++)
+			{
+				UnityEngine.Object.Destroy(m_instances[i]);
+			}
+			m_instances = new GameObject[p_textures.Length];
+			float num = 0f;
+			for (int j = 0; j < p_textures.Length; j++)
+			{
+				m_instances[j] = UnityEngine.Object.Instantiate(m_texturePrefab);
+				RectTransform component = m_instances[j].GetComponent<RectTransform>();
+				m_elementSize = component.rect.width;
+				SetRectTransformPosition(component, j, m_elementSize);
+				RawImage rawImage = TryFindComponent<RawImage>(m_instances[j]);
+				if (rawImage != null)
+				{
+					rawImage.texture = p_textures[j];
+				}
+				else
+				{
+					Debug.LogError("uMyGUI_TexturePicker: SetTextures: TexturePrefab must have a RawImage component attached (can be in children).");
+				}
+				if (m_buttonCallback != null)
+				{
+					Button button = TryFindComponent<Button>(m_instances[j]);
+					if (button != null)
+					{
+						int indexCopy = j;
+						button.onClick.AddListener(() =>
+						{
+							m_buttonCallback(indexCopy);
+						});
+					}
+				}
+				num = component.anchoredPosition.x + m_elementSize;
+				if (j == p_selectedIndex)
+				{
+					if (m_selectionPrefab != null)
+					{
+						m_selectionInstance = UnityEngine.Object.Instantiate(m_selectionPrefab);
+						SetRectTransformPosition(m_selectionInstance.GetComponent<RectTransform>(), j, m_elementSize);
+					}
+					else
+					{
+						Debug.LogError("uMyGUI_TexturePicker: SetTextures: you have passed a non negative selection index '" + p_selectedIndex + "', but the SelectionPrefab was not provided in the inspector or via script!");
+					}
+				}
+			}
+			RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, num - RTransform.rect.xMin + m_offsetEnd);
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_TexturePicker: SetTextures: you must provide the TexturePrefab in the inspector or via script!");
+		}
+	}
+
+	private void OnDestroy()
+	{
+		m_buttonCallback = null;
+	}
+
+	private void SetRectTransformPosition(RectTransform p_transform, int p_positionIndex, float p_size)
+	{
+		p_transform.SetParent(RTransform, worldPositionStays: false);
+		Vector2 anchoredPosition = p_transform.anchoredPosition;
+		anchoredPosition.x += m_offsetStart + (float)p_positionIndex * (p_size + m_padding);
+		p_transform.anchoredPosition = anchoredPosition;
+	}
+
+	private T TryFindComponent<T>(GameObject p_object) where T : Component
+	{
+		T val = p_object.GetComponent<T>();
+		if (val == null)
+		{
+			T[] componentsInChildren = p_object.GetComponentsInChildren<T>(includeInactive: true);
+			if (componentsInChildren.Length != 0)
+			{
+				val = componentsInChildren[0];
+			}
+		}
+		return val;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 432
+PATH: Assembly-CSharp__uMyGUI__uMyGUI_TreeBrowser.cs
+SIZE: 7853 bytes
+SHA256: 33deb0b898c80d94992ab4612ed1bf1982ade780e22eb51733dc0d771af1b8be
+====================================================================================================
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace uMyGUI;
+
+public class uMyGUI_TreeBrowser : MonoBehaviour
+{
+	public class Node
+	{
+		public readonly object SendMessageData;
+
+		public readonly Node[] Children;
+
+		public Node(object p_sendMessageData, Node[] p_children)
+		{
+			SendMessageData = p_sendMessageData;
+			Children = p_children;
+		}
+	}
+
+	public class NodeClickEventArgs : EventArgs
+	{
+		public readonly Node ClickedNode;
+
+		public NodeClickEventArgs(Node p_clickedNode)
+		{
+			ClickedNode = p_clickedNode;
+		}
+	}
+
+	private class InternalNode
+	{
+		public readonly Node m_node;
+
+		public GameObject m_instance;
+
+		public int m_indentLevel;
+
+		public RectTransform m_transform;
+
+		public bool m_isFoldout;
+
+		public float m_minY;
+
+		public InternalNode(Node p_node, GameObject p_instance, int p_indentLevel)
+		{
+			m_node = p_node;
+			m_instance = p_instance;
+			m_indentLevel = p_indentLevel;
+			m_transform = m_instance.GetComponent<RectTransform>();
+		}
+	}
+
+	[SerializeField]
+	private GameObject m_innerNodePrefab;
+
+	[SerializeField]
+	private GameObject m_leafNodePrefab;
+
+	[SerializeField]
+	private float m_offsetStart;
+
+	[SerializeField]
+	private float m_offsetEnd;
+
+	[SerializeField]
+	private float m_padding = 4f;
+
+	[SerializeField]
+	private float m_indentSize = 20f;
+
+	public EventHandler<NodeClickEventArgs> OnInnerNodeClick;
+
+	public EventHandler<NodeClickEventArgs> OnLeafNodeClick;
+
+	private RectTransform m_rectTransform;
+
+	private List<InternalNode> m_nodes = new List<InternalNode>();
+
+	public GameObject InnerNodePrefab
+	{
+		get
+		{
+			return m_innerNodePrefab;
+		}
+		set
+		{
+			m_innerNodePrefab = value;
+		}
+	}
+
+	public GameObject LeafNodePrefab
+	{
+		get
+		{
+			return m_leafNodePrefab;
+		}
+		set
+		{
+			m_leafNodePrefab = value;
+		}
+	}
+
+	public float OffsetStart
+	{
+		get
+		{
+			return m_offsetStart;
+		}
+		set
+		{
+			m_offsetStart = value;
+		}
+	}
+
+	public float OffsetEnd
+	{
+		get
+		{
+			return m_offsetEnd;
+		}
+		set
+		{
+			m_offsetEnd = value;
+		}
+	}
+
+	public float Padding
+	{
+		get
+		{
+			return m_padding;
+		}
+		set
+		{
+			m_padding = value;
+		}
+	}
+
+	public float IndentSize
+	{
+		get
+		{
+			return m_indentSize;
+		}
+		set
+		{
+			m_indentSize = value;
+		}
+	}
+
+	private RectTransform RTransform
+	{
+		get
+		{
+			if (!(m_rectTransform != null))
+			{
+				return m_rectTransform = GetComponent<RectTransform>();
+			}
+			return m_rectTransform;
+		}
+	}
+
+	public void BuildTree(Node[] p_rootNodes)
+	{
+		BuildTree(p_rootNodes, 0, 0);
+	}
+
+	public void BuildTree(Node[] p_rootNodes, int p_insertAt, int p_indentLevel)
+	{
+		if (m_innerNodePrefab != null && m_leafNodePrefab != null)
+		{
+			List<InternalNode> list = new List<InternalNode>();
+			float num = 0f;
+			for (int i = 0; i < p_rootNodes.Length; i++)
+			{
+				if (p_rootNodes[i] == null)
+				{
+					continue;
+				}
+				int num2;
+				GameObject gameObject;
+				if (p_rootNodes[i].Children != null)
+				{
+					num2 = ((p_rootNodes[i].Children.Length != 0) ? 1 : 0);
+					if (num2 != 0)
+					{
+						gameObject = UnityEngine.Object.Instantiate(m_innerNodePrefab);
+						goto IL_0073;
+					}
+				}
+				else
+				{
+					num2 = 0;
+				}
+				gameObject = UnityEngine.Object.Instantiate(m_leafNodePrefab);
+				goto IL_0073;
+				IL_0073:
+				if (p_rootNodes[i].SendMessageData != null)
+				{
+					if (!gameObject.activeInHierarchy)
+					{
+						Debug.LogError("uMyGUI_TreeBrowser: BuildTree: node has SendMessageData set, but instance is inactive! SendMessage call will fail! Make your prefab active!");
+					}
+					gameObject.SendMessage("uMyGUI_TreeBrowser_InitNode", p_rootNodes[i].SendMessageData);
+				}
+				InternalNode internalNode = new InternalNode(p_rootNodes[i], gameObject, p_indentLevel);
+				list.Add(internalNode);
+				if (num2 != 0)
+				{
+					SetupInnerNode(internalNode);
+				}
+				else
+				{
+					SetupLeafNode(internalNode);
+				}
+				RectTransform component = gameObject.GetComponent<RectTransform>();
+				float height = component.rect.height;
+				SetRectTransformPosition(component, p_insertAt + i, height, p_indentLevel);
+				internalNode.m_minY = component.anchoredPosition.y - height;
+				num = internalNode.m_minY;
+			}
+			if (p_insertAt < m_nodes.Count)
+			{
+				float p_moveDist = ((p_insertAt != 0) ? (num - m_nodes[p_insertAt - 1].m_minY) : num);
+				UpdateNodePosition(p_insertAt, p_moveDist);
+			}
+			if (p_insertAt < m_nodes.Count)
+			{
+				m_nodes.InsertRange(p_insertAt, list);
+			}
+			else
+			{
+				m_nodes.AddRange(list);
+			}
+			if (m_nodes.Count > 0)
+			{
+				RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Abs(m_nodes[m_nodes.Count - 1].m_minY - RTransform.rect.yMax - m_offsetEnd));
+			}
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_TreeBrowser: BuildTree: you must provide the InnerNodePrefab and LeafNodePrefab in the inspector or via script!");
+		}
+	}
+
+	private void SetRectTransformPosition(RectTransform p_transform, int p_positionIndex, float p_size, int p_indentLevel)
+	{
+		p_transform.SetParent(RTransform, worldPositionStays: false);
+		Vector2 anchoredPosition = p_transform.anchoredPosition;
+		anchoredPosition.x += (float)p_indentLevel * m_indentSize;
+		anchoredPosition.y -= m_offsetStart + (float)p_positionIndex * (p_size + m_padding);
+		p_transform.anchoredPosition = anchoredPosition;
+	}
+
+	private void UpdateNodePosition(int p_startIndex, float p_moveDist)
+	{
+		for (int i = p_startIndex; i < m_nodes.Count; i++)
+		{
+			Vector2 anchoredPosition = m_nodes[i].m_transform.anchoredPosition;
+			anchoredPosition.y += p_moveDist;
+			m_nodes[i].m_transform.anchoredPosition = anchoredPosition;
+			m_nodes[i].m_minY = anchoredPosition.y - m_nodes[i].m_transform.rect.height;
+		}
+	}
+
+	private void SetupInnerNode(InternalNode p_node)
+	{
+		if (p_node.m_instance.GetComponent<Button>() != null)
+		{
+			p_node.m_instance.GetComponent<Button>().onClick.AddListener(() =>
+			{
+				ToggleInnerNodeFoldout(p_node);
+			});
+		}
+		else if (p_node.m_instance.GetComponent<Toggle>() != null)
+		{
+			p_node.m_instance.GetComponent<Toggle>().onValueChanged.AddListener((bool p_isOn) =>
+			{
+				ToggleInnerNodeFoldout(p_node);
+			});
+		}
+		else
+		{
+			Debug.LogError("uMyGUI_TreeBrowser: BuildTree: the inner node prefabs must have either a Button or a Toggle script attached to the root. Otherwise they cannot fold out!");
+		}
+	}
+
+	private void SetupLeafNode(InternalNode p_node)
+	{
+		if (p_node.m_instance.GetComponent<Button>() != null)
+		{
+			p_node.m_instance.GetComponent<Button>().onClick.AddListener(() =>
+			{
+				SafeCallOnLeafNodeClick(p_node);
+			});
+		}
+		else if (p_node.m_instance.GetComponent<Toggle>() != null)
+		{
+			p_node.m_instance.GetComponent<Toggle>().onValueChanged.AddListener((bool p_isOn) =>
+			{
+				SafeCallOnLeafNodeClick(p_node);
+			});
+		}
+	}
+
+	private void ToggleInnerNodeFoldout(InternalNode p_node)
+	{
+		int num = m_nodes.IndexOf(p_node);
+		p_node.m_isFoldout = !p_node.m_isFoldout;
+		if (p_node.m_isFoldout)
+		{
+			BuildTree(p_node.m_node.Children, num + 1, p_node.m_indentLevel + 1);
+		}
+		else
+		{
+			float num2 = 0f;
+			for (int i = 0; i < p_node.m_node.Children.Length; i++)
+			{
+				int index = num + p_node.m_node.Children.Length - i;
+				InternalNode internalNode = m_nodes[index];
+				num2 += internalNode.m_transform.rect.height;
+				if (internalNode.m_isFoldout)
+				{
+					ToggleInnerNodeFoldout(internalNode);
+				}
+				m_nodes.RemoveAt(index);
+				UnityEngine.Object.Destroy(internalNode.m_instance);
+			}
+			UpdateNodePosition(num + 1, num2);
+			RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, RTransform.sizeDelta.y - num2);
+		}
+		if (OnInnerNodeClick != null)
+		{
+			OnInnerNodeClick(this, new NodeClickEventArgs(p_node.m_node));
+		}
+	}
+
+	private void SafeCallOnLeafNodeClick(InternalNode p_node)
+	{
+		if (OnLeafNodeClick != null)
+		{
+			OnLeafNodeClick(this, new NodeClickEventArgs(p_node.m_node));
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 433
+PATH: Assembly-CSharp__uMyGUI_ScrollbarHandleUnityFix.cs
+SIZE: 799 bytes
+SHA256: 0621dea4df7e132f47dc0e85ecf13b39ab50023a457833387c4d6d872eb9bbd5
+====================================================================================================
+using UnityEngine;
+
+public class uMyGUI_ScrollbarHandleUnityFix : MonoBehaviour
+{
+	[SerializeField]
+	private Vector2 m_anchorMin = new Vector2(0.8f, 0f);
+
+	[SerializeField]
+	private Vector2 m_anchorMax = new Vector2(1f, 1f);
+
+	[SerializeField]
+	private Vector2 m_pivot = new Vector2(0.5f, 0.5f);
+
+	[SerializeField]
+	private Vector2 m_offsetMin = new Vector2(-10f, -10f);
+
+	[SerializeField]
+	private Vector2 m_offsetMax = new Vector2(10f, 10f);
+
+	public void Awake()
+	{
+		RectTransform component = GetComponent<RectTransform>();
+		component.localPosition = Vector3.zero;
+		component.anchoredPosition3D = Vector3.zero;
+		component.anchorMin = m_anchorMin;
+		component.anchorMax = m_anchorMax;
+		component.pivot = m_pivot;
+		component.offsetMin = m_offsetMin;
+		component.offsetMax = m_offsetMax;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 434
+PATH: Assembly-CSharp__uTools__uButtonScale.cs
+SIZE: 1166 bytes
+SHA256: f68616c57b0aa7b91d86285b2db72c27615d6ced2a9a774f8b8155c3fd16a20b
+====================================================================================================
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Button Scale(uTools)")]
+public class uButtonScale : MonoBehaviour, uIPointHandler, IPointerEnterHandler, IEventSystemHandler, IPointerDownHandler, IPointerClickHandler, IPointerUpHandler, IPointerExitHandler
+{
+	public RectTransform tweenTarget;
+
+	public Vector3 enter = new Vector3(1.1f, 1.1f, 1.1f);
+
+	public Vector3 down = new Vector3(1.05f, 1.05f, 1.05f);
+
+	public float duration = 0.2f;
+
+	private Vector3 mScale;
+
+	private void Start()
+	{
+		if (tweenTarget == null)
+		{
+			tweenTarget = GetComponent<RectTransform>();
+		}
+		mScale = tweenTarget.localScale;
+	}
+
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		Scale(enter);
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		Scale(mScale);
+	}
+
+	public void OnPointerDown(PointerEventData eventData)
+	{
+		Scale(down);
+	}
+
+	public void OnPointerUp(PointerEventData eventData)
+	{
+		Scale(mScale);
+	}
+
+	public void OnPointerClick(PointerEventData eventData)
+	{
+	}
+
+	private void Scale(Vector3 to)
+	{
+		uTweenScale.Begin(tweenTarget.gameObject, tweenTarget.localScale, to, duration);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 435
+PATH: Assembly-CSharp__uTools__uDragObject.cs
+SIZE: 705 bytes
+SHA256: 8c74fcedfc85794c31e14f26c65a2dc7b4ca50faba068bd848d3bcc9dbf1ee80
+====================================================================================================
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Internal/Drag Object(uTools)")]
+public class uDragObject : MonoBehaviour, IDragHandler, IEventSystemHandler
+{
+	public RectTransform target;
+
+	private RectTransform cacheTarget
+	{
+		get
+		{
+			if (target == null)
+			{
+				target = GetComponent<RectTransform>();
+			}
+			return target;
+		}
+	}
+
+	private void Start()
+	{
+	}
+
+	private void Update()
+	{
+	}
+
+	public void OnDrag(PointerEventData eventData)
+	{
+		Vector3 localPosition = cacheTarget.localPosition;
+		Vector3 to = localPosition + new Vector3(eventData.delta.x, eventData.delta.y, 0f);
+		uTweenPosition.Begin(gameObject, localPosition, to, 0.02f);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 436
+PATH: Assembly-CSharp__uTools__uTweenAlpha.cs
+SIZE: 1652 bytes
+SHA256: 1ff73c29bf855b74580bd2cc434e08f27648e33ad444f3cd405cc6f572559b59
+====================================================================================================
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Tween Alpha(uTools)")]
+public class uTweenAlpha : uTweenValue
+{
+	public bool includeChilds;
+
+	private Text mText;
+
+	private Light mLight;
+
+	private Material mMat;
+
+	private Image mImage;
+
+	private SpriteRenderer mSpriteRender;
+
+	private float mAlpha;
+
+	public float alpha
+	{
+		get
+		{
+			return mAlpha;
+		}
+		set
+		{
+			SetAlpha(transform, value);
+			mAlpha = value;
+		}
+	}
+
+	protected override void ValueUpdate(float value, bool isFinished)
+	{
+		alpha = value;
+	}
+
+	private void SetAlpha(Transform _transform, float _alpha)
+	{
+		Color white = Color.white;
+		mText = _transform.GetComponent<Text>();
+		if (mText != null)
+		{
+			white = mText.color;
+			white.a = _alpha;
+			mText.color = white;
+		}
+		mLight = _transform.GetComponent<Light>();
+		if (mLight != null)
+		{
+			white = mLight.color;
+			white.a = _alpha;
+			mLight.color = white;
+		}
+		mImage = _transform.GetComponent<Image>();
+		if (mImage != null)
+		{
+			white = mImage.color;
+			white.a = _alpha;
+			mImage.color = white;
+		}
+		mSpriteRender = _transform.GetComponent<SpriteRenderer>();
+		if (mSpriteRender != null)
+		{
+			white = mSpriteRender.color;
+			white.a = _alpha;
+			mSpriteRender.color = white;
+		}
+		if (_transform.GetComponent<Renderer>() != null)
+		{
+			mMat = _transform.GetComponent<Renderer>().material;
+			if (mMat != null)
+			{
+				white = mMat.color;
+				white.a = _alpha;
+				mMat.color = white;
+			}
+		}
+		if (includeChilds)
+		{
+			for (int i = 0; i < _transform.childCount; i++)
+			{
+				Transform child = _transform.GetChild(i);
+				SetAlpha(child, _alpha);
+			}
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 437
+PATH: Assembly-CSharp__uTools__uTweenColor.cs
+SIZE: 1895 bytes
+SHA256: 6a6ab54de7d0662936c9cca10173d1627e03dd83b505eb78977839d2d9451b2c
+====================================================================================================
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Tween Color(uTools)")]
+public class uTweenColor : uTweener
+{
+	public Color from = Color.white;
+
+	public Color to = Color.white;
+
+	public bool includeChilds;
+
+	private Text mText;
+
+	private Light mLight;
+
+	private Material mMat;
+
+	private Image mImage;
+
+	private SpriteRenderer mSpriteRender;
+
+	private Color mColor = Color.white;
+
+	public Color colorValue
+	{
+		get
+		{
+			return mColor;
+		}
+		set
+		{
+			SetColor(transform, value);
+			mColor = value;
+		}
+	}
+
+	protected override void OnUpdate(float factor, bool isFinished)
+	{
+		colorValue = Color.Lerp(from, to, factor);
+	}
+
+	public static uTweenColor Begin(GameObject go, float duration, float delay, Color from, Color to)
+	{
+		uTweenColor uTweenColor2 = uTweener.Begin<uTweenColor>(go, duration);
+		uTweenColor2.from = from;
+		uTweenColor2.to = to;
+		uTweenColor2.delay = delay;
+		if (duration <= 0f)
+		{
+			uTweenColor2.Sample(1f, _isFinished: true);
+			uTweenColor2.enabled = false;
+		}
+		return uTweenColor2;
+	}
+
+	private void SetColor(Transform _transform, Color _color)
+	{
+		mText = _transform.GetComponent<Text>();
+		if (mText != null)
+		{
+			mText.color = _color;
+		}
+		mLight = _transform.GetComponent<Light>();
+		if (mLight != null)
+		{
+			mLight.color = _color;
+		}
+		mImage = _transform.GetComponent<Image>();
+		if (mImage != null)
+		{
+			mImage.color = _color;
+		}
+		mSpriteRender = _transform.GetComponent<SpriteRenderer>();
+		if (mSpriteRender != null)
+		{
+			mSpriteRender.color = _color;
+		}
+		if (_transform.GetComponent<Renderer>() != null)
+		{
+			mMat = _transform.GetComponent<Renderer>().material;
+			if (mMat != null)
+			{
+				mMat.color = _color;
+			}
+		}
+		if (includeChilds)
+		{
+			for (int i = 0; i < _transform.childCount; i++)
+			{
+				Transform child = _transform.GetChild(i);
+				SetColor(child, _color);
+			}
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 438
+PATH: Assembly-CSharp__uTools__uTweenPath.cs
+SIZE: 983 bytes
+SHA256: 61bd0b9dad1adb3e9787466c0356458f546ebf720beeef24e45d5e0f211a42f5
+====================================================================================================
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace uTools;
+
+public class uTweenPath : uTweenValue
+{
+	public RectTransform target;
+
+	public List<Vector3> paths;
+
+	private int mIndex = -1;
+
+	private int mPathsCount;
+
+	private bool mCache;
+
+	private int pathIndex
+	{
+		get
+		{
+			return mIndex;
+		}
+		set
+		{
+			if (mIndex != value)
+			{
+				mIndex = value;
+				Debug.Log(target.localPosition);
+				uTweenPosition.Begin(target.gameObject, target.localPosition, paths[mIndex], duration / (float)paths.Count).loopStyle = LoopStyle.Loop;
+			}
+		}
+	}
+
+	private void Cache()
+	{
+		mCache = true;
+		if (paths.Count > 1)
+		{
+			mPathsCount = paths.Count - 1;
+		}
+		if (target == null)
+		{
+			target = GetComponent<RectTransform>();
+		}
+		from = 0f;
+		to = mPathsCount;
+	}
+
+	private void Update()
+	{
+	}
+
+	protected override void ValueUpdate(float _factor, bool _isFinished)
+	{
+		if (!mCache)
+		{
+			Cache();
+		}
+		pathIndex = Mathf.FloorToInt(_factor);
+		Debug.Log(pathIndex);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 439
+PATH: Assembly-CSharp__uTools__uTweenPosition.cs
+SIZE: 1582 bytes
+SHA256: 1de5f42ee385acbd0c3adcfd1447d5c866e0640fc890b97fe59239c41865b47a
+====================================================================================================
+using UnityEngine;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Tween Position(uTools)")]
+public class uTweenPosition : uTweener
+{
+	public Vector3 from;
+
+	public Vector3 to;
+
+	private RectTransform mRectTransform;
+
+	public RectTransform cachedRectTransform
+	{
+		get
+		{
+			if (mRectTransform == null)
+			{
+				mRectTransform = GetComponent<RectTransform>();
+			}
+			return mRectTransform;
+		}
+	}
+
+	public Vector3 value
+	{
+		get
+		{
+			return cachedRectTransform.localPosition;
+		}
+		set
+		{
+			cachedRectTransform.localPosition = value;
+		}
+	}
+
+	protected override void OnUpdate(float factor, bool isFinished)
+	{
+		value = from + factor * (to - from);
+	}
+
+	public static uTweenPosition Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
+	{
+		uTweenPosition uTweenPosition2 = uTweener.Begin<uTweenPosition>(go, duration);
+		uTweenPosition2.from = from;
+		uTweenPosition2.to = to;
+		uTweenPosition2.duration = duration;
+		uTweenPosition2.delay = delay;
+		if (duration <= 0f)
+		{
+			uTweenPosition2.Sample(1f, _isFinished: true);
+			uTweenPosition2.enabled = false;
+		}
+		return uTweenPosition2;
+	}
+
+	[ContextMenu("Set 'From' to current value")]
+	public override void SetStartToCurrentValue()
+	{
+		from = value;
+	}
+
+	[ContextMenu("Set 'To' to current value")]
+	public override void SetEndToCurrentValue()
+	{
+		to = value;
+	}
+
+	[ContextMenu("Assume value of 'From'")]
+	public override void SetCurrentValueToStart()
+	{
+		value = from;
+	}
+
+	[ContextMenu("Assume value of 'To'")]
+	public override void SetCurrentValueToEnd()
+	{
+		value = to;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 440
+PATH: Assembly-CSharp__uTools__uTweenRotation.cs
+SIZE: 1234 bytes
+SHA256: c5c1f53d2fbc6072b3f24332eb8052a76759fbeefdd18d1dbc0c122ad44ffdae
+====================================================================================================
+using UnityEngine;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Tween Rotation(uTools)")]
+public class uTweenRotation : uTweener
+{
+	public Vector3 from;
+
+	public Vector3 to;
+
+	private RectTransform mRectTransfrom;
+
+	public RectTransform target;
+
+	public RectTransform cacheRectTransfrom
+	{
+		get
+		{
+			if (target == null)
+			{
+				mRectTransfrom = GetComponent<RectTransform>();
+			}
+			else
+			{
+				mRectTransfrom = target;
+			}
+			return mRectTransfrom;
+		}
+	}
+
+	public Quaternion value
+	{
+		get
+		{
+			return cacheRectTransfrom.localRotation;
+		}
+		set
+		{
+			cacheRectTransfrom.localRotation = value;
+		}
+	}
+
+	protected override void OnUpdate(float _factor, bool _isFinished)
+	{
+		value = Quaternion.Euler(Vector3.Lerp(from, to, _factor));
+	}
+
+	public static uTweenRotation Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
+	{
+		uTweenRotation uTweenRotation2 = uTweener.Begin<uTweenRotation>(go, duration);
+		uTweenRotation2.from = from;
+		uTweenRotation2.to = to;
+		uTweenRotation2.duration = duration;
+		uTweenRotation2.delay = delay;
+		if (duration <= 0f)
+		{
+			uTweenRotation2.Sample(1f, _isFinished: true);
+			uTweenRotation2.enabled = false;
+		}
+		return uTweenRotation2;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 441
+PATH: Assembly-CSharp__uTools__uTweenScale.cs
+SIZE: 1124 bytes
+SHA256: 9006c25f5a34eaa95414f9955ef2d3efff8635bf5f7d0d9364dffbb0bd81cced
+====================================================================================================
+using UnityEngine;
+
+namespace uTools;
+
+[AddComponentMenu("uTools/Tween/Tween Scale(uTools)")]
+public class uTweenScale : uTweener
+{
+	public Vector3 from = Vector3.zero;
+
+	public Vector3 to = Vector3.one;
+
+	private RectTransform mRectTransform;
+
+	public RectTransform cachedRectTransform
+	{
+		get
+		{
+			if (mRectTransform == null)
+			{
+				mRectTransform = GetComponent<RectTransform>();
+			}
+			return mRectTransform;
+		}
+	}
+
+	public Vector3 value
+	{
+		get
+		{
+			return cachedRectTransform.localScale;
+		}
+		set
+		{
+			cachedRectTransform.localScale = value;
+		}
+	}
+
+	protected override void OnUpdate(float factor, bool isFinished)
+	{
+		value = from + factor * (to - from);
+	}
+
+	public static uTweenScale Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
+	{
+		uTweenScale uTweenScale2 = uTweener.Begin<uTweenScale>(go, duration);
+		uTweenScale2.from = from;
+		uTweenScale2.to = to;
+		uTweenScale2.duration = duration;
+		uTweenScale2.delay = delay;
+		if (duration <= 0f)
+		{
+			uTweenScale2.Sample(1f, _isFinished: true);
+			uTweenScale2.enabled = false;
+		}
+		return uTweenScale2;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 442
 PATH: Assembly-CSharp__WatchLoader.cs
 SIZE: 3179 bytes
 SHA256: 55a1b55b01776a9544217b189dfc98b89672a4b9a7bc0ef0882710716be2d685
 ====================================================================================================
-
 using System.Collections;
 using Beam;
 using Beam.UI;
@@ -192,15 +1884,12 @@ public class WatchLoader : MonoBehaviour, IIdleUntilInitialized
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 429
+SOURCE FILE 443
 PATH: Assembly-CSharp__Whale_Creature.cs
 SIZE: 5696 bytes
 SHA256: ba47a13734526e20bd04fc1228d7bdae1e03c0b9ef158045087f70acad6e05e4
 ====================================================================================================
-
 using System.Collections;
 using Beam;
 using UnityEngine;
@@ -433,15 +2122,12 @@ public class Whale_Creature : Piscus_Creature
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 430
+SOURCE FILE 444
 PATH: Assembly-CSharp__WollieSpawner.cs
 SIZE: 175 bytes
 SHA256: cb21b383c2a58574fb8919ca419fb829b87ed476c0268800a62a52c6468f97d0
 ====================================================================================================
-
 using UnityEngine;
 
 public class WollieSpawner : MonoBehaviour
@@ -452,15 +2138,12 @@ public class WollieSpawner : MonoBehaviour
 	public Transform WolliePosition => _wolliePosition;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 431
+SOURCE FILE 445
 PATH: Assembly-CSharp__WorldTools.cs
 SIZE: 16833 bytes
 SHA256: 75d276343c8cc547f0de8f727a6ba1a3b8d875197460d5a4db5c279e53f1564d
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1133,15 +2816,12 @@ public static class WorldTools
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 432
+SOURCE FILE 446
 PATH: Assembly-CSharp__Zone.cs
 SIZE: 7913 bytes
 SHA256: 3ef0e64eeece977d6256c9adafe9106a952432726ef46a8de73b032db66756cc
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam;
 using Beam.Rendering;
@@ -1459,15 +3139,12 @@ public class Zone : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 433
+SOURCE FILE 447
 PATH: Assembly-CSharp__ZonePositionGenerator.cs
 SIZE: 2437 bytes
 SHA256: 90e6cb1a3e3714f6ede8bf3eb55da4e4abc500bf8fbb86d71eb3aea199176b31
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using SharpNeatLib.Maths;
@@ -1547,15 +3224,12 @@ public static class ZonePositionGenerator
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 434
+SOURCE FILE 448
 PATH: Assembly-CSharp__ZoneTerrainPointSampler.cs
 SIZE: 800 bytes
 SHA256: 53ee2e8d81ff88081acd9b267d52d23944fa7f82b1920b9322e90ba09f89deee
 ====================================================================================================
-
 using UnityEngine;
 
 public class ZoneTerrainPointSampler : IPointSampler
@@ -1588,15 +3262,12 @@ public class ZoneTerrainPointSampler : IPointSampler
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 435
+SOURCE FILE 449
 PATH: Assembly-CSharp__ZoomComponent.cs
 SIZE: 3395 bytes
 SHA256: 452647b966d1f6f4b59e11cb8b77d5bd3d471de2ba6dccc8b72be66e81d7672e
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -1729,1876 +3400,4 @@ public class ZoomComponent : MonoBehaviour, IScrollHandler, IEventSystemHandler
 		rectTransform.localPosition += vector3;
 	}
 }
-
-
-
-====================================================================================================
-SOURCE FILE 436
-PATH: Assembly-CSharp__kode80.Effects__FilmicTonemapping.cs
-SIZE: 634 bytes
-SHA256: 40582a8ace8a5e5f2ccc5f219877566888ebc80d991651f762de5ecb9119e4cc
-====================================================================================================
-
-using UnityEngine;
-
-namespace kode80.Effects;
-
-[ExecuteInEditMode]
-public class FilmicTonemapping : MonoBehaviour
-{
-	[Range(0f, 16f)]
-	public float exposure = 1.5f;
-
-	private Material _material;
-
-	private void Start()
-	{
-	}
-
-	private void Update()
-	{
-	}
-
-	[ImageEffectTransformsToLDR]
-	private void OnRenderImage(RenderTexture source, RenderTexture destination)
-	{
-		if (_material == null)
-		{
-			_material = new Material(Shader.Find("Hidden/kode80/Effects/FilmicTonemapping"));
-			_material.hideFlags = HideFlags.HideAndDontSave;
-		}
-		_material.SetFloat("_Exposure", exposure);
-		Graphics.Blit(source, destination, _material);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 437
-PATH: Assembly-CSharp__uMyGUI_ScrollbarHandleUnityFix.cs
-SIZE: 799 bytes
-SHA256: 0621dea4df7e132f47dc0e85ecf13b39ab50023a457833387c4d6d872eb9bbd5
-====================================================================================================
-
-using UnityEngine;
-
-public class uMyGUI_ScrollbarHandleUnityFix : MonoBehaviour
-{
-	[SerializeField]
-	private Vector2 m_anchorMin = new Vector2(0.8f, 0f);
-
-	[SerializeField]
-	private Vector2 m_anchorMax = new Vector2(1f, 1f);
-
-	[SerializeField]
-	private Vector2 m_pivot = new Vector2(0.5f, 0.5f);
-
-	[SerializeField]
-	private Vector2 m_offsetMin = new Vector2(-10f, -10f);
-
-	[SerializeField]
-	private Vector2 m_offsetMax = new Vector2(10f, 10f);
-
-	public void Awake()
-	{
-		RectTransform component = GetComponent<RectTransform>();
-		component.localPosition = Vector3.zero;
-		component.anchoredPosition3D = Vector3.zero;
-		component.anchorMin = m_anchorMin;
-		component.anchorMax = m_anchorMax;
-		component.pivot = m_pivot;
-		component.offsetMin = m_offsetMin;
-		component.offsetMax = m_offsetMax;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 438
-PATH: Assembly-CSharp__uMyGUI__uMyGUI_Draggable.cs
-SIZE: 4177 bytes
-SHA256: 56d0d785672603fd349a5d42f6bb5056ad63540cee7e0126f9acdff31c10f24a
-====================================================================================================
-
-using System;
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-namespace uMyGUI;
-
-public class uMyGUI_Draggable : MonoBehaviour, IBeginDragHandler, IEventSystemHandler, IDragHandler, IEndDragHandler
-{
-	public class DragEvent : EventArgs
-	{
-		public readonly PointerEventData m_event;
-
-		public DragEvent(PointerEventData p_event)
-		{
-			m_event = p_event;
-		}
-	}
-
-	[SerializeField]
-	private bool m_isResetRotationWhenDragged;
-
-	[SerializeField]
-	private bool m_isSnapBackOnEndDrag;
-
-	[SerializeField]
-	private bool m_isTopInHierarchyWhenDragged = true;
-
-	[SerializeField]
-	private CanvasGroup m_disableBlocksRaycastsOnDrag;
-
-	private bool m_isDragged;
-
-	public EventHandler<DragEvent> m_onBeginDrag;
-
-	public EventHandler<DragEvent> m_onDrag;
-
-	public EventHandler<DragEvent> m_onEndDrag;
-
-	private RectTransform m_initialParentTransform;
-
-	private RectTransform m_canvasTransform;
-
-	private RectTransform m_transform;
-
-	private int m_initialSiblingIndex;
-
-	private Vector3 m_initialPosition;
-
-	private Quaternion m_initialRotation;
-
-	private Vector3 m_dragOffset = Vector3.zero;
-
-	public bool IsResetRotationWhenDragged
-	{
-		get
-		{
-			return m_isResetRotationWhenDragged;
-		}
-		set
-		{
-			m_isResetRotationWhenDragged = value;
-		}
-	}
-
-	public bool IsSnapBackOnEndDrag
-	{
-		get
-		{
-			return m_isSnapBackOnEndDrag;
-		}
-		set
-		{
-			m_isSnapBackOnEndDrag = value;
-		}
-	}
-
-	public bool IsTopInHierarchyWhenDragged
-	{
-		get
-		{
-			return m_isTopInHierarchyWhenDragged;
-		}
-		set
-		{
-			m_isTopInHierarchyWhenDragged = value;
-		}
-	}
-
-	public CanvasGroup DisableBlocksRaycastsOnDrag
-	{
-		get
-		{
-			return m_disableBlocksRaycastsOnDrag;
-		}
-		set
-		{
-			m_disableBlocksRaycastsOnDrag = value;
-		}
-	}
-
-	public bool IsDragged => m_isDragged;
-
-	public void OnBeginDrag(PointerEventData p_event)
-	{
-		if (p_event.button == PointerEventData.InputButton.Left)
-		{
-			m_isDragged = true;
-			m_initialParentTransform = m_transform.parent as RectTransform;
-			m_initialPosition = m_transform.position;
-			m_initialRotation = m_transform.rotation;
-			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(m_canvasTransform, p_event.position, p_event.pressEventCamera, out var worldPoint))
-			{
-				m_dragOffset = m_transform.position - worldPoint;
-			}
-			else
-			{
-				m_dragOffset = Vector3.zero;
-			}
-			if (m_isResetRotationWhenDragged)
-			{
-				m_transform.rotation = Quaternion.identity;
-			}
-			if (m_isTopInHierarchyWhenDragged)
-			{
-				m_initialSiblingIndex = m_transform.GetSiblingIndex();
-				m_transform.SetParent(m_canvasTransform, worldPositionStays: true);
-				m_transform.SetAsLastSibling();
-			}
-			if (m_disableBlocksRaycastsOnDrag != null)
-			{
-				m_disableBlocksRaycastsOnDrag.blocksRaycasts = false;
-			}
-			if (m_onBeginDrag != null)
-			{
-				m_onBeginDrag(this, new DragEvent(p_event));
-			}
-		}
-	}
-
-	public void OnDrag(PointerEventData p_event)
-	{
-		if (m_isDragged)
-		{
-			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(m_canvasTransform, p_event.position, p_event.pressEventCamera, out var worldPoint))
-			{
-				m_transform.position = worldPoint + m_dragOffset;
-			}
-			if (m_onDrag != null)
-			{
-				m_onDrag(this, new DragEvent(p_event));
-			}
-		}
-	}
-
-	public void OnEndDrag(PointerEventData p_event)
-	{
-		if (m_isDragged)
-		{
-			m_isDragged = false;
-			if (m_isSnapBackOnEndDrag)
-			{
-				m_transform.position = m_initialPosition;
-				m_transform.rotation = m_initialRotation;
-			}
-			if (m_isTopInHierarchyWhenDragged)
-			{
-				m_transform.SetParent(m_initialParentTransform, worldPositionStays: true);
-				m_transform.SetSiblingIndex(m_initialSiblingIndex);
-			}
-			if (m_disableBlocksRaycastsOnDrag != null)
-			{
-				m_disableBlocksRaycastsOnDrag.blocksRaycasts = true;
-			}
-			if (m_onEndDrag != null)
-			{
-				m_onEndDrag(this, new DragEvent(p_event));
-			}
-		}
-	}
-
-	private void Start()
-	{
-		Canvas componentInParent = GetComponentInParent<Canvas>();
-		if (componentInParent != null)
-		{
-			m_canvasTransform = componentInParent.GetComponent<RectTransform>();
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_Draggable: no Canvas component was found in parent!");
-			enabled = false;
-		}
-		m_transform = GetComponent<RectTransform>();
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 439
-PATH: Assembly-CSharp__uMyGUI__uMyGUI_TabBox.cs
-SIZE: 5452 bytes
-SHA256: d0df365833ca2fd6bae6c68339a105788a589cacb081ae67464f83a710d9a12d
-====================================================================================================
-
-using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace uMyGUI;
-
-public class uMyGUI_TabBox : MonoBehaviour
-{
-	public enum EAnimMode
-	{
-		NONE,
-		TAB_ONLY,
-		BTN_ONLY,
-		TAB_AND_BTN
-	}
-
-	public const string SEND_MESSAGE_ACTIVATE_NAME = "uMyGUI_OnActivateTab";
-
-	public const string SEND_MESSAGE_DEACTIVATE_NAME = "uMyGUI_OnDeactivateTab";
-
-	[SerializeField]
-	private RectTransform[] m_btns = new RectTransform[0];
-
-	[SerializeField]
-	private RectTransform[] m_tabs = new RectTransform[0];
-
-	[SerializeField]
-	private int m_selectedIndex;
-
-	[SerializeField]
-	private bool m_isSelectTabOnStart = true;
-
-	[SerializeField]
-	private bool m_isPlayTabAnimOnStart = true;
-
-	[SerializeField]
-	private bool m_isPlayBtnAnimOnStart = true;
-
-	[SerializeField]
-	private EAnimMode m_animMode;
-
-	[SerializeField]
-	private string m_fadeInAnimTab = "tab_fade_in";
-
-	[SerializeField]
-	private string m_fadeOutAnimTab = "tab_fade_out";
-
-	[SerializeField]
-	private string m_fadeInAnimBtn = "btn_fade_in";
-
-	[SerializeField]
-	private string m_fadeOutAnimBtn = "btn_fade_out";
-
-	[SerializeField]
-	private bool m_isSendMessage;
-
-	[SerializeField]
-	private bool m_isMoveDownInHierarchyOnSelect;
-
-	public void SelectTab(int p_tabIndex)
-	{
-		if (p_tabIndex == m_selectedIndex)
-		{
-			return;
-		}
-		if (p_tabIndex >= 0 && p_tabIndex < m_tabs.Length)
-		{
-			if (m_tabs[p_tabIndex] == null)
-			{
-				Debug.LogError("uMyGUI_TabBox: SelectTab tab index '" + p_tabIndex + "' is null! Check the tabs array in the inspector!");
-				return;
-			}
-			if (m_isMoveDownInHierarchyOnSelect)
-			{
-				m_tabs[p_tabIndex].SetAsLastSibling();
-			}
-			switch (m_animMode)
-			{
-			case EAnimMode.TAB_ONLY:
-				StopAllCoroutines();
-				AnimateRectRectTransformSelection(p_tabIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: true);
-				break;
-			case EAnimMode.BTN_ONLY:
-				StopAllCoroutines();
-				AnimateRectRectTransformSelection(p_tabIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
-				UpdateTabActiveStates(p_tabIndex);
-				break;
-			case EAnimMode.TAB_AND_BTN:
-				StopAllCoroutines();
-				AnimateRectRectTransformSelection(p_tabIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: true);
-				AnimateRectRectTransformSelection(p_tabIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
-				break;
-			default:
-				UpdateTabActiveStates(p_tabIndex);
-				break;
-			}
-			m_selectedIndex = p_tabIndex;
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_TabBox: SelectTab tab index '" + p_tabIndex + "' is out of bounds [0," + m_tabs.Length + "]!");
-		}
-	}
-
-	private void Start()
-	{
-		if (m_isSelectTabOnStart)
-		{
-			UpdateTabActiveStates(m_selectedIndex);
-			if (m_isPlayTabAnimOnStart && (m_animMode == EAnimMode.TAB_ONLY || m_animMode == EAnimMode.TAB_AND_BTN))
-			{
-				AnimateRectRectTransformSelection(m_selectedIndex, m_tabs, m_fadeInAnimTab, m_fadeOutAnimTab, p_isActivateChanged: false);
-			}
-			if (m_isPlayBtnAnimOnStart)
-			{
-				AnimateRectRectTransformSelection(m_selectedIndex, m_btns, m_fadeInAnimBtn, m_fadeOutAnimBtn, p_isActivateChanged: false);
-			}
-		}
-	}
-
-	private void UpdateTabActiveStates(int p_tabIndex)
-	{
-		for (int i = 0; i < m_tabs.Length; i++)
-		{
-			bool flag = i == p_tabIndex;
-			if (m_tabs[i] != null)
-			{
-				if (m_isSendMessage)
-				{
-					m_tabs[i].gameObject.SendMessage(flag ? "uMyGUI_OnActivateTab" : "uMyGUI_OnDeactivateTab", SendMessageOptions.DontRequireReceiver);
-				}
-				m_tabs[i].gameObject.SetActive(flag);
-			}
-			if (m_btns.Length > i && m_btns[i] != null)
-			{
-				Selectable component = m_btns[i].GetComponent<Selectable>();
-				if (component != null)
-				{
-					component.interactable = !flag;
-				}
-			}
-		}
-	}
-
-	private void AnimateRectRectTransformSelection(int p_tabIndex, RectTransform[] p_transforms, string p_fadeInAnim, string p_fadeOutAnim, bool p_isActivateChanged)
-	{
-		for (int i = 0; i < p_transforms.Length; i++)
-		{
-			if (!(p_transforms[i] != null))
-			{
-				continue;
-			}
-			Animation component = p_transforms[i].GetComponent<Animation>();
-			if (component != null)
-			{
-				if (i == m_selectedIndex && p_tabIndex != m_selectedIndex)
-				{
-					if (component[p_fadeOutAnim] != null)
-					{
-						if (p_isActivateChanged)
-						{
-							StartCoroutine(DeactivateAfterDelay(p_transforms[i].gameObject, component[p_fadeOutAnim].length));
-						}
-						if (m_isSendMessage)
-						{
-							p_transforms[i].gameObject.SendMessage("uMyGUI_OnDeactivateTab", SendMessageOptions.DontRequireReceiver);
-						}
-						component.Play(p_fadeOutAnim);
-					}
-				}
-				else if (i == p_tabIndex)
-				{
-					if (p_isActivateChanged)
-					{
-						p_transforms[i].gameObject.SetActive(value: true);
-					}
-					if (m_isSendMessage)
-					{
-						p_transforms[i].gameObject.SendMessage("uMyGUI_OnActivateTab", SendMessageOptions.DontRequireReceiver);
-					}
-					component.Play(p_fadeInAnim);
-				}
-			}
-			else
-			{
-				Debug.LogError("uMyGUI_TabBox: AnimateRectRectTransformSelection: object at index '" + i + "' has no Animation component and cannot fade in or out!");
-			}
-			Selectable component2 = p_transforms[i].GetComponent<Selectable>();
-			if (component2 != null)
-			{
-				component2.interactable = i != p_tabIndex;
-			}
-		}
-	}
-
-	private IEnumerator DeactivateAfterDelay(GameObject p_object, float p_delay)
-	{
-		yield return new WaitForSeconds(p_delay);
-		if (p_object != null)
-		{
-			p_object.SetActive(value: false);
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 440
-PATH: Assembly-CSharp__uMyGUI__uMyGUI_TexturePicker.cs
-SIZE: 5519 bytes
-SHA256: e6bb1b9705146654129ed522b3be18613dbaf4f5367090e9b315d560a1c04981
-====================================================================================================
-
-using System;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace uMyGUI;
-
-public class uMyGUI_TexturePicker : MonoBehaviour
-{
-	[SerializeField]
-	private GameObject m_texturePrefab;
-
-	[SerializeField]
-	private GameObject m_selectionPrefab;
-
-	[SerializeField]
-	private float m_offsetStart;
-
-	[SerializeField]
-	private float m_offsetEnd;
-
-	[SerializeField]
-	private float m_padding = 4f;
-
-	[SerializeField]
-	private Action<int> m_buttonCallback;
-
-	private Texture2D[] m_textures = new Texture2D[0];
-
-	private RectTransform m_rectTransform;
-
-	private float m_elementSize = 1f;
-
-	private GameObject m_selectionInstance;
-
-	private GameObject[] m_instances = new GameObject[0];
-
-	public GameObject TexturePrefab
-	{
-		get
-		{
-			return m_texturePrefab;
-		}
-		set
-		{
-			m_texturePrefab = value;
-		}
-	}
-
-	public GameObject SelectionPrefab
-	{
-		get
-		{
-			return m_selectionPrefab;
-		}
-		set
-		{
-			m_selectionPrefab = value;
-		}
-	}
-
-	public float OffsetStart
-	{
-		get
-		{
-			return m_offsetStart;
-		}
-		set
-		{
-			m_offsetStart = value;
-		}
-	}
-
-	public float OffsetEnd
-	{
-		get
-		{
-			return m_offsetEnd;
-		}
-		set
-		{
-			m_offsetEnd = value;
-		}
-	}
-
-	public float Padding
-	{
-		get
-		{
-			return m_padding;
-		}
-		set
-		{
-			m_padding = value;
-		}
-	}
-
-	public Action<int> ButtonCallback
-	{
-		get
-		{
-			return m_buttonCallback;
-		}
-		set
-		{
-			m_buttonCallback = value;
-		}
-	}
-
-	public Texture2D[] Textures
-	{
-		get
-		{
-			return m_textures;
-		}
-		set
-		{
-			m_textures = value;
-		}
-	}
-
-	private RectTransform RTransform
-	{
-		get
-		{
-			if (!(m_rectTransform != null))
-			{
-				return m_rectTransform = GetComponent<RectTransform>();
-			}
-			return m_rectTransform;
-		}
-	}
-
-	public void SetSelection(int p_selectionIndex)
-	{
-		if (m_selectionPrefab != null)
-		{
-			if (p_selectionIndex < 0 || p_selectionIndex >= m_instances.Length)
-			{
-				UnityEngine.Object.Destroy(m_selectionInstance);
-				m_selectionInstance = null;
-				return;
-			}
-			if (m_selectionInstance == null)
-			{
-				m_selectionInstance = UnityEngine.Object.Instantiate(m_selectionPrefab);
-			}
-			else
-			{
-				RectTransform component = m_selectionInstance.GetComponent<RectTransform>();
-				Vector2 anchoredPosition = component.anchoredPosition;
-				anchoredPosition.x = m_selectionPrefab.GetComponent<RectTransform>().anchoredPosition.x;
-				component.anchoredPosition = anchoredPosition;
-			}
-			SetRectTransformPosition(m_selectionInstance.GetComponent<RectTransform>(), p_selectionIndex, m_elementSize);
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_TexturePicker: SetSelection: you have passed a non negative selection index '" + p_selectionIndex + "', but the SelectionPrefab was not provided in the inspector or via script!");
-		}
-	}
-
-	public void SetTextures(Texture2D[] p_textures, int p_selectedIndex)
-	{
-		if (m_texturePrefab != null)
-		{
-			m_textures = p_textures;
-			UnityEngine.Object.Destroy(m_selectionInstance);
-			for (int i = 0; i < m_instances.Length; i++)
-			{
-				UnityEngine.Object.Destroy(m_instances[i]);
-			}
-			m_instances = new GameObject[p_textures.Length];
-			float num = 0f;
-			for (int j = 0; j < p_textures.Length; j++)
-			{
-				m_instances[j] = UnityEngine.Object.Instantiate(m_texturePrefab);
-				RectTransform component = m_instances[j].GetComponent<RectTransform>();
-				m_elementSize = component.rect.width;
-				SetRectTransformPosition(component, j, m_elementSize);
-				RawImage rawImage = TryFindComponent<RawImage>(m_instances[j]);
-				if (rawImage != null)
-				{
-					rawImage.texture = p_textures[j];
-				}
-				else
-				{
-					Debug.LogError("uMyGUI_TexturePicker: SetTextures: TexturePrefab must have a RawImage component attached (can be in children).");
-				}
-				if (m_buttonCallback != null)
-				{
-					Button button = TryFindComponent<Button>(m_instances[j]);
-					if (button != null)
-					{
-						int indexCopy = j;
-						button.onClick.AddListener(() =>
-						{
-							m_buttonCallback(indexCopy);
-						});
-					}
-				}
-				num = component.anchoredPosition.x + m_elementSize;
-				if (j == p_selectedIndex)
-				{
-					if (m_selectionPrefab != null)
-					{
-						m_selectionInstance = UnityEngine.Object.Instantiate(m_selectionPrefab);
-						SetRectTransformPosition(m_selectionInstance.GetComponent<RectTransform>(), j, m_elementSize);
-					}
-					else
-					{
-						Debug.LogError("uMyGUI_TexturePicker: SetTextures: you have passed a non negative selection index '" + p_selectedIndex + "', but the SelectionPrefab was not provided in the inspector or via script!");
-					}
-				}
-			}
-			RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, num - RTransform.rect.xMin + m_offsetEnd);
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_TexturePicker: SetTextures: you must provide the TexturePrefab in the inspector or via script!");
-		}
-	}
-
-	private void OnDestroy()
-	{
-		m_buttonCallback = null;
-	}
-
-	private void SetRectTransformPosition(RectTransform p_transform, int p_positionIndex, float p_size)
-	{
-		p_transform.SetParent(RTransform, worldPositionStays: false);
-		Vector2 anchoredPosition = p_transform.anchoredPosition;
-		anchoredPosition.x += m_offsetStart + (float)p_positionIndex * (p_size + m_padding);
-		p_transform.anchoredPosition = anchoredPosition;
-	}
-
-	private T TryFindComponent<T>(GameObject p_object) where T : Component
-	{
-		T val = p_object.GetComponent<T>();
-		if (val == null)
-		{
-			T[] componentsInChildren = p_object.GetComponentsInChildren<T>(includeInactive: true);
-			if (componentsInChildren.Length != 0)
-			{
-				val = componentsInChildren[0];
-			}
-		}
-		return val;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 441
-PATH: Assembly-CSharp__uMyGUI__uMyGUI_TreeBrowser.cs
-SIZE: 7853 bytes
-SHA256: 33deb0b898c80d94992ab4612ed1bf1982ade780e22eb51733dc0d771af1b8be
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace uMyGUI;
-
-public class uMyGUI_TreeBrowser : MonoBehaviour
-{
-	public class Node
-	{
-		public readonly object SendMessageData;
-
-		public readonly Node[] Children;
-
-		public Node(object p_sendMessageData, Node[] p_children)
-		{
-			SendMessageData = p_sendMessageData;
-			Children = p_children;
-		}
-	}
-
-	public class NodeClickEventArgs : EventArgs
-	{
-		public readonly Node ClickedNode;
-
-		public NodeClickEventArgs(Node p_clickedNode)
-		{
-			ClickedNode = p_clickedNode;
-		}
-	}
-
-	private class InternalNode
-	{
-		public readonly Node m_node;
-
-		public GameObject m_instance;
-
-		public int m_indentLevel;
-
-		public RectTransform m_transform;
-
-		public bool m_isFoldout;
-
-		public float m_minY;
-
-		public InternalNode(Node p_node, GameObject p_instance, int p_indentLevel)
-		{
-			m_node = p_node;
-			m_instance = p_instance;
-			m_indentLevel = p_indentLevel;
-			m_transform = m_instance.GetComponent<RectTransform>();
-		}
-	}
-
-	[SerializeField]
-	private GameObject m_innerNodePrefab;
-
-	[SerializeField]
-	private GameObject m_leafNodePrefab;
-
-	[SerializeField]
-	private float m_offsetStart;
-
-	[SerializeField]
-	private float m_offsetEnd;
-
-	[SerializeField]
-	private float m_padding = 4f;
-
-	[SerializeField]
-	private float m_indentSize = 20f;
-
-	public EventHandler<NodeClickEventArgs> OnInnerNodeClick;
-
-	public EventHandler<NodeClickEventArgs> OnLeafNodeClick;
-
-	private RectTransform m_rectTransform;
-
-	private List<InternalNode> m_nodes = new List<InternalNode>();
-
-	public GameObject InnerNodePrefab
-	{
-		get
-		{
-			return m_innerNodePrefab;
-		}
-		set
-		{
-			m_innerNodePrefab = value;
-		}
-	}
-
-	public GameObject LeafNodePrefab
-	{
-		get
-		{
-			return m_leafNodePrefab;
-		}
-		set
-		{
-			m_leafNodePrefab = value;
-		}
-	}
-
-	public float OffsetStart
-	{
-		get
-		{
-			return m_offsetStart;
-		}
-		set
-		{
-			m_offsetStart = value;
-		}
-	}
-
-	public float OffsetEnd
-	{
-		get
-		{
-			return m_offsetEnd;
-		}
-		set
-		{
-			m_offsetEnd = value;
-		}
-	}
-
-	public float Padding
-	{
-		get
-		{
-			return m_padding;
-		}
-		set
-		{
-			m_padding = value;
-		}
-	}
-
-	public float IndentSize
-	{
-		get
-		{
-			return m_indentSize;
-		}
-		set
-		{
-			m_indentSize = value;
-		}
-	}
-
-	private RectTransform RTransform
-	{
-		get
-		{
-			if (!(m_rectTransform != null))
-			{
-				return m_rectTransform = GetComponent<RectTransform>();
-			}
-			return m_rectTransform;
-		}
-	}
-
-	public void BuildTree(Node[] p_rootNodes)
-	{
-		BuildTree(p_rootNodes, 0, 0);
-	}
-
-	public void BuildTree(Node[] p_rootNodes, int p_insertAt, int p_indentLevel)
-	{
-		if (m_innerNodePrefab != null && m_leafNodePrefab != null)
-		{
-			List<InternalNode> list = new List<InternalNode>();
-			float num = 0f;
-			for (int i = 0; i < p_rootNodes.Length; i++)
-			{
-				if (p_rootNodes[i] == null)
-				{
-					continue;
-				}
-				int num2;
-				GameObject gameObject;
-				if (p_rootNodes[i].Children != null)
-				{
-					num2 = ((p_rootNodes[i].Children.Length != 0) ? 1 : 0);
-					if (num2 != 0)
-					{
-						gameObject = UnityEngine.Object.Instantiate(m_innerNodePrefab);
-						goto IL_0073;
-					}
-				}
-				else
-				{
-					num2 = 0;
-				}
-				gameObject = UnityEngine.Object.Instantiate(m_leafNodePrefab);
-				goto IL_0073;
-				IL_0073:
-				if (p_rootNodes[i].SendMessageData != null)
-				{
-					if (!gameObject.activeInHierarchy)
-					{
-						Debug.LogError("uMyGUI_TreeBrowser: BuildTree: node has SendMessageData set, but instance is inactive! SendMessage call will fail! Make your prefab active!");
-					}
-					gameObject.SendMessage("uMyGUI_TreeBrowser_InitNode", p_rootNodes[i].SendMessageData);
-				}
-				InternalNode internalNode = new InternalNode(p_rootNodes[i], gameObject, p_indentLevel);
-				list.Add(internalNode);
-				if (num2 != 0)
-				{
-					SetupInnerNode(internalNode);
-				}
-				else
-				{
-					SetupLeafNode(internalNode);
-				}
-				RectTransform component = gameObject.GetComponent<RectTransform>();
-				float height = component.rect.height;
-				SetRectTransformPosition(component, p_insertAt + i, height, p_indentLevel);
-				internalNode.m_minY = component.anchoredPosition.y - height;
-				num = internalNode.m_minY;
-			}
-			if (p_insertAt < m_nodes.Count)
-			{
-				float p_moveDist = ((p_insertAt != 0) ? (num - m_nodes[p_insertAt - 1].m_minY) : num);
-				UpdateNodePosition(p_insertAt, p_moveDist);
-			}
-			if (p_insertAt < m_nodes.Count)
-			{
-				m_nodes.InsertRange(p_insertAt, list);
-			}
-			else
-			{
-				m_nodes.AddRange(list);
-			}
-			if (m_nodes.Count > 0)
-			{
-				RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Abs(m_nodes[m_nodes.Count - 1].m_minY - RTransform.rect.yMax - m_offsetEnd));
-			}
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_TreeBrowser: BuildTree: you must provide the InnerNodePrefab and LeafNodePrefab in the inspector or via script!");
-		}
-	}
-
-	private void SetRectTransformPosition(RectTransform p_transform, int p_positionIndex, float p_size, int p_indentLevel)
-	{
-		p_transform.SetParent(RTransform, worldPositionStays: false);
-		Vector2 anchoredPosition = p_transform.anchoredPosition;
-		anchoredPosition.x += (float)p_indentLevel * m_indentSize;
-		anchoredPosition.y -= m_offsetStart + (float)p_positionIndex * (p_size + m_padding);
-		p_transform.anchoredPosition = anchoredPosition;
-	}
-
-	private void UpdateNodePosition(int p_startIndex, float p_moveDist)
-	{
-		for (int i = p_startIndex; i < m_nodes.Count; i++)
-		{
-			Vector2 anchoredPosition = m_nodes[i].m_transform.anchoredPosition;
-			anchoredPosition.y += p_moveDist;
-			m_nodes[i].m_transform.anchoredPosition = anchoredPosition;
-			m_nodes[i].m_minY = anchoredPosition.y - m_nodes[i].m_transform.rect.height;
-		}
-	}
-
-	private void SetupInnerNode(InternalNode p_node)
-	{
-		if (p_node.m_instance.GetComponent<Button>() != null)
-		{
-			p_node.m_instance.GetComponent<Button>().onClick.AddListener(() =>
-			{
-				ToggleInnerNodeFoldout(p_node);
-			});
-		}
-		else if (p_node.m_instance.GetComponent<Toggle>() != null)
-		{
-			p_node.m_instance.GetComponent<Toggle>().onValueChanged.AddListener((bool p_isOn) =>
-			{
-				ToggleInnerNodeFoldout(p_node);
-			});
-		}
-		else
-		{
-			Debug.LogError("uMyGUI_TreeBrowser: BuildTree: the inner node prefabs must have either a Button or a Toggle script attached to the root. Otherwise they cannot fold out!");
-		}
-	}
-
-	private void SetupLeafNode(InternalNode p_node)
-	{
-		if (p_node.m_instance.GetComponent<Button>() != null)
-		{
-			p_node.m_instance.GetComponent<Button>().onClick.AddListener(() =>
-			{
-				SafeCallOnLeafNodeClick(p_node);
-			});
-		}
-		else if (p_node.m_instance.GetComponent<Toggle>() != null)
-		{
-			p_node.m_instance.GetComponent<Toggle>().onValueChanged.AddListener((bool p_isOn) =>
-			{
-				SafeCallOnLeafNodeClick(p_node);
-			});
-		}
-	}
-
-	private void ToggleInnerNodeFoldout(InternalNode p_node)
-	{
-		int num = m_nodes.IndexOf(p_node);
-		p_node.m_isFoldout = !p_node.m_isFoldout;
-		if (p_node.m_isFoldout)
-		{
-			BuildTree(p_node.m_node.Children, num + 1, p_node.m_indentLevel + 1);
-		}
-		else
-		{
-			float num2 = 0f;
-			for (int i = 0; i < p_node.m_node.Children.Length; i++)
-			{
-				int index = num + p_node.m_node.Children.Length - i;
-				InternalNode internalNode = m_nodes[index];
-				num2 += internalNode.m_transform.rect.height;
-				if (internalNode.m_isFoldout)
-				{
-					ToggleInnerNodeFoldout(internalNode);
-				}
-				m_nodes.RemoveAt(index);
-				UnityEngine.Object.Destroy(internalNode.m_instance);
-			}
-			UpdateNodePosition(num + 1, num2);
-			RTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, RTransform.sizeDelta.y - num2);
-		}
-		if (OnInnerNodeClick != null)
-		{
-			OnInnerNodeClick(this, new NodeClickEventArgs(p_node.m_node));
-		}
-	}
-
-	private void SafeCallOnLeafNodeClick(InternalNode p_node)
-	{
-		if (OnLeafNodeClick != null)
-		{
-			OnLeafNodeClick(this, new NodeClickEventArgs(p_node.m_node));
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 442
-PATH: Assembly-CSharp__uTools__uButtonScale.cs
-SIZE: 1166 bytes
-SHA256: f68616c57b0aa7b91d86285b2db72c27615d6ced2a9a774f8b8155c3fd16a20b
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Button Scale(uTools)")]
-public class uButtonScale : MonoBehaviour, uIPointHandler, IPointerEnterHandler, IEventSystemHandler, IPointerDownHandler, IPointerClickHandler, IPointerUpHandler, IPointerExitHandler
-{
-	public RectTransform tweenTarget;
-
-	public Vector3 enter = new Vector3(1.1f, 1.1f, 1.1f);
-
-	public Vector3 down = new Vector3(1.05f, 1.05f, 1.05f);
-
-	public float duration = 0.2f;
-
-	private Vector3 mScale;
-
-	private void Start()
-	{
-		if (tweenTarget == null)
-		{
-			tweenTarget = GetComponent<RectTransform>();
-		}
-		mScale = tweenTarget.localScale;
-	}
-
-	public void OnPointerEnter(PointerEventData eventData)
-	{
-		Scale(enter);
-	}
-
-	public void OnPointerExit(PointerEventData eventData)
-	{
-		Scale(mScale);
-	}
-
-	public void OnPointerDown(PointerEventData eventData)
-	{
-		Scale(down);
-	}
-
-	public void OnPointerUp(PointerEventData eventData)
-	{
-		Scale(mScale);
-	}
-
-	public void OnPointerClick(PointerEventData eventData)
-	{
-	}
-
-	private void Scale(Vector3 to)
-	{
-		uTweenScale.Begin(tweenTarget.gameObject, tweenTarget.localScale, to, duration);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 443
-PATH: Assembly-CSharp__uTools__uDragObject.cs
-SIZE: 705 bytes
-SHA256: 8c74fcedfc85794c31e14f26c65a2dc7b4ca50faba068bd848d3bcc9dbf1ee80
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Internal/Drag Object(uTools)")]
-public class uDragObject : MonoBehaviour, IDragHandler, IEventSystemHandler
-{
-	public RectTransform target;
-
-	private RectTransform cacheTarget
-	{
-		get
-		{
-			if (target == null)
-			{
-				target = GetComponent<RectTransform>();
-			}
-			return target;
-		}
-	}
-
-	private void Start()
-	{
-	}
-
-	private void Update()
-	{
-	}
-
-	public void OnDrag(PointerEventData eventData)
-	{
-		Vector3 localPosition = cacheTarget.localPosition;
-		Vector3 to = localPosition + new Vector3(eventData.delta.x, eventData.delta.y, 0f);
-		uTweenPosition.Begin(gameObject, localPosition, to, 0.02f);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 444
-PATH: Assembly-CSharp__uTools__uTweenAlpha.cs
-SIZE: 1652 bytes
-SHA256: 1ff73c29bf855b74580bd2cc434e08f27648e33ad444f3cd405cc6f572559b59
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Tween Alpha(uTools)")]
-public class uTweenAlpha : uTweenValue
-{
-	public bool includeChilds;
-
-	private Text mText;
-
-	private Light mLight;
-
-	private Material mMat;
-
-	private Image mImage;
-
-	private SpriteRenderer mSpriteRender;
-
-	private float mAlpha;
-
-	public float alpha
-	{
-		get
-		{
-			return mAlpha;
-		}
-		set
-		{
-			SetAlpha(transform, value);
-			mAlpha = value;
-		}
-	}
-
-	protected override void ValueUpdate(float value, bool isFinished)
-	{
-		alpha = value;
-	}
-
-	private void SetAlpha(Transform _transform, float _alpha)
-	{
-		Color white = Color.white;
-		mText = _transform.GetComponent<Text>();
-		if (mText != null)
-		{
-			white = mText.color;
-			white.a = _alpha;
-			mText.color = white;
-		}
-		mLight = _transform.GetComponent<Light>();
-		if (mLight != null)
-		{
-			white = mLight.color;
-			white.a = _alpha;
-			mLight.color = white;
-		}
-		mImage = _transform.GetComponent<Image>();
-		if (mImage != null)
-		{
-			white = mImage.color;
-			white.a = _alpha;
-			mImage.color = white;
-		}
-		mSpriteRender = _transform.GetComponent<SpriteRenderer>();
-		if (mSpriteRender != null)
-		{
-			white = mSpriteRender.color;
-			white.a = _alpha;
-			mSpriteRender.color = white;
-		}
-		if (_transform.GetComponent<Renderer>() != null)
-		{
-			mMat = _transform.GetComponent<Renderer>().material;
-			if (mMat != null)
-			{
-				white = mMat.color;
-				white.a = _alpha;
-				mMat.color = white;
-			}
-		}
-		if (includeChilds)
-		{
-			for (int i = 0; i < _transform.childCount; i++)
-			{
-				Transform child = _transform.GetChild(i);
-				SetAlpha(child, _alpha);
-			}
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 445
-PATH: Assembly-CSharp__uTools__uTweenColor.cs
-SIZE: 1895 bytes
-SHA256: 6a6ab54de7d0662936c9cca10173d1627e03dd83b505eb78977839d2d9451b2c
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Tween Color(uTools)")]
-public class uTweenColor : uTweener
-{
-	public Color from = Color.white;
-
-	public Color to = Color.white;
-
-	public bool includeChilds;
-
-	private Text mText;
-
-	private Light mLight;
-
-	private Material mMat;
-
-	private Image mImage;
-
-	private SpriteRenderer mSpriteRender;
-
-	private Color mColor = Color.white;
-
-	public Color colorValue
-	{
-		get
-		{
-			return mColor;
-		}
-		set
-		{
-			SetColor(transform, value);
-			mColor = value;
-		}
-	}
-
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		colorValue = Color.Lerp(from, to, factor);
-	}
-
-	public static uTweenColor Begin(GameObject go, float duration, float delay, Color from, Color to)
-	{
-		uTweenColor uTweenColor2 = uTweener.Begin<uTweenColor>(go, duration);
-		uTweenColor2.from = from;
-		uTweenColor2.to = to;
-		uTweenColor2.delay = delay;
-		if (duration <= 0f)
-		{
-			uTweenColor2.Sample(1f, _isFinished: true);
-			uTweenColor2.enabled = false;
-		}
-		return uTweenColor2;
-	}
-
-	private void SetColor(Transform _transform, Color _color)
-	{
-		mText = _transform.GetComponent<Text>();
-		if (mText != null)
-		{
-			mText.color = _color;
-		}
-		mLight = _transform.GetComponent<Light>();
-		if (mLight != null)
-		{
-			mLight.color = _color;
-		}
-		mImage = _transform.GetComponent<Image>();
-		if (mImage != null)
-		{
-			mImage.color = _color;
-		}
-		mSpriteRender = _transform.GetComponent<SpriteRenderer>();
-		if (mSpriteRender != null)
-		{
-			mSpriteRender.color = _color;
-		}
-		if (_transform.GetComponent<Renderer>() != null)
-		{
-			mMat = _transform.GetComponent<Renderer>().material;
-			if (mMat != null)
-			{
-				mMat.color = _color;
-			}
-		}
-		if (includeChilds)
-		{
-			for (int i = 0; i < _transform.childCount; i++)
-			{
-				Transform child = _transform.GetChild(i);
-				SetColor(child, _color);
-			}
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 446
-PATH: Assembly-CSharp__uTools__uTweenPath.cs
-SIZE: 983 bytes
-SHA256: 61bd0b9dad1adb3e9787466c0356458f546ebf720beeef24e45d5e0f211a42f5
-====================================================================================================
-
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace uTools;
-
-public class uTweenPath : uTweenValue
-{
-	public RectTransform target;
-
-	public List<Vector3> paths;
-
-	private int mIndex = -1;
-
-	private int mPathsCount;
-
-	private bool mCache;
-
-	private int pathIndex
-	{
-		get
-		{
-			return mIndex;
-		}
-		set
-		{
-			if (mIndex != value)
-			{
-				mIndex = value;
-				Debug.Log(target.localPosition);
-				uTweenPosition.Begin(target.gameObject, target.localPosition, paths[mIndex], duration / (float)paths.Count).loopStyle = LoopStyle.Loop;
-			}
-		}
-	}
-
-	private void Cache()
-	{
-		mCache = true;
-		if (paths.Count > 1)
-		{
-			mPathsCount = paths.Count - 1;
-		}
-		if (target == null)
-		{
-			target = GetComponent<RectTransform>();
-		}
-		from = 0f;
-		to = mPathsCount;
-	}
-
-	private void Update()
-	{
-	}
-
-	protected override void ValueUpdate(float _factor, bool _isFinished)
-	{
-		if (!mCache)
-		{
-			Cache();
-		}
-		pathIndex = Mathf.FloorToInt(_factor);
-		Debug.Log(pathIndex);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 447
-PATH: Assembly-CSharp__uTools__uTweenPosition.cs
-SIZE: 1582 bytes
-SHA256: 1de5f42ee385acbd0c3adcfd1447d5c866e0640fc890b97fe59239c41865b47a
-====================================================================================================
-
-using UnityEngine;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Tween Position(uTools)")]
-public class uTweenPosition : uTweener
-{
-	public Vector3 from;
-
-	public Vector3 to;
-
-	private RectTransform mRectTransform;
-
-	public RectTransform cachedRectTransform
-	{
-		get
-		{
-			if (mRectTransform == null)
-			{
-				mRectTransform = GetComponent<RectTransform>();
-			}
-			return mRectTransform;
-		}
-	}
-
-	public Vector3 value
-	{
-		get
-		{
-			return cachedRectTransform.localPosition;
-		}
-		set
-		{
-			cachedRectTransform.localPosition = value;
-		}
-	}
-
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		value = from + factor * (to - from);
-	}
-
-	public static uTweenPosition Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
-	{
-		uTweenPosition uTweenPosition2 = uTweener.Begin<uTweenPosition>(go, duration);
-		uTweenPosition2.from = from;
-		uTweenPosition2.to = to;
-		uTweenPosition2.duration = duration;
-		uTweenPosition2.delay = delay;
-		if (duration <= 0f)
-		{
-			uTweenPosition2.Sample(1f, _isFinished: true);
-			uTweenPosition2.enabled = false;
-		}
-		return uTweenPosition2;
-	}
-
-	[ContextMenu("Set 'From' to current value")]
-	public override void SetStartToCurrentValue()
-	{
-		from = value;
-	}
-
-	[ContextMenu("Set 'To' to current value")]
-	public override void SetEndToCurrentValue()
-	{
-		to = value;
-	}
-
-	[ContextMenu("Assume value of 'From'")]
-	public override void SetCurrentValueToStart()
-	{
-		value = from;
-	}
-
-	[ContextMenu("Assume value of 'To'")]
-	public override void SetCurrentValueToEnd()
-	{
-		value = to;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 448
-PATH: Assembly-CSharp__uTools__uTweenRotation.cs
-SIZE: 1234 bytes
-SHA256: c5c1f53d2fbc6072b3f24332eb8052a76759fbeefdd18d1dbc0c122ad44ffdae
-====================================================================================================
-
-using UnityEngine;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Tween Rotation(uTools)")]
-public class uTweenRotation : uTweener
-{
-	public Vector3 from;
-
-	public Vector3 to;
-
-	private RectTransform mRectTransfrom;
-
-	public RectTransform target;
-
-	public RectTransform cacheRectTransfrom
-	{
-		get
-		{
-			if (target == null)
-			{
-				mRectTransfrom = GetComponent<RectTransform>();
-			}
-			else
-			{
-				mRectTransfrom = target;
-			}
-			return mRectTransfrom;
-		}
-	}
-
-	public Quaternion value
-	{
-		get
-		{
-			return cacheRectTransfrom.localRotation;
-		}
-		set
-		{
-			cacheRectTransfrom.localRotation = value;
-		}
-	}
-
-	protected override void OnUpdate(float _factor, bool _isFinished)
-	{
-		value = Quaternion.Euler(Vector3.Lerp(from, to, _factor));
-	}
-
-	public static uTweenRotation Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
-	{
-		uTweenRotation uTweenRotation2 = uTweener.Begin<uTweenRotation>(go, duration);
-		uTweenRotation2.from = from;
-		uTweenRotation2.to = to;
-		uTweenRotation2.duration = duration;
-		uTweenRotation2.delay = delay;
-		if (duration <= 0f)
-		{
-			uTweenRotation2.Sample(1f, _isFinished: true);
-			uTweenRotation2.enabled = false;
-		}
-		return uTweenRotation2;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 449
-PATH: Assembly-CSharp__uTools__uTweenScale.cs
-SIZE: 1124 bytes
-SHA256: 9006c25f5a34eaa95414f9955ef2d3efff8635bf5f7d0d9364dffbb0bd81cced
-====================================================================================================
-
-using UnityEngine;
-
-namespace uTools;
-
-[AddComponentMenu("uTools/Tween/Tween Scale(uTools)")]
-public class uTweenScale : uTweener
-{
-	public Vector3 from = Vector3.zero;
-
-	public Vector3 to = Vector3.one;
-
-	private RectTransform mRectTransform;
-
-	public RectTransform cachedRectTransform
-	{
-		get
-		{
-			if (mRectTransform == null)
-			{
-				mRectTransform = GetComponent<RectTransform>();
-			}
-			return mRectTransform;
-		}
-	}
-
-	public Vector3 value
-	{
-		get
-		{
-			return cachedRectTransform.localScale;
-		}
-		set
-		{
-			cachedRectTransform.localScale = value;
-		}
-	}
-
-	protected override void OnUpdate(float factor, bool isFinished)
-	{
-		value = from + factor * (to - from);
-	}
-
-	public static uTweenScale Begin(GameObject go, Vector3 from, Vector3 to, float duration = 1f, float delay = 0f)
-	{
-		uTweenScale uTweenScale2 = uTweener.Begin<uTweenScale>(go, duration);
-		uTweenScale2.from = from;
-		uTweenScale2.to = to;
-		uTweenScale2.duration = duration;
-		uTweenScale2.delay = delay;
-		if (duration <= 0f)
-		{
-			uTweenScale2.Sample(1f, _isFinished: true);
-			uTweenScale2.enabled = false;
-		}
-		return uTweenScale2;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 450
-PATH: mission_3_v24_reader_builder.py
-SIZE: 3312 bytes
-SHA256: a8ee6337c99468e060aa3691036519574d8bdea3ed29f89ca47a6a281ed5d948
-====================================================================================================
-
-
-#!/usr/bin/env python3
-from pathlib import Path
-import hashlib
-import csv
-
-BASE = Path("/storage/emulated/0/Map Check/reports/V24_SOURCE_RECOVERY")
-SOURCE = BASE / "CS_SOURCE"
-OUTPUT = BASE / "CS_SOURCE_READER"
-
-FILES_PER_PART = 25
-
-def sha256(data):
-    return hashlib.sha256(data).hexdigest()
-
-def main():
-    if not SOURCE.is_dir():
-        raise SystemExit(f"ERROR: Source folder not found: {SOURCE}")
-
-    files = sorted(
-        p for p in SOURCE.rglob("*")
-        if p.is_file()
-    )
-
-    if not files:
-        raise SystemExit("ERROR: No source files found.")
-
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-
-    index_rows = []
-    part_count = 0
-
-    for start in range(0, len(files), FILES_PER_PART):
-        group = files[start:start + FILES_PER_PART]
-        part_count += 1
-
-        part_name = f"PART_{part_count:03d}.txt"
-        part_path = OUTPUT / part_name
-
-        chunks = []
-        for number, path in enumerate(
-            group, start=start + 1
-        ):
-            relative = path.relative_to(SOURCE).as_posix()
-            raw = path.read_bytes()
-
-            header = (
-                "\n"
-                + "=" * 100 + "\n"
-                + f"SOURCE FILE {number:03d}\n"
-                + f"PATH: {relative}\n"
-                + f"SIZE: {len(raw)} bytes\n"
-                + f"SHA256: {sha256(raw)}\n"
-                + "=" * 100 + "\n\n"
-            ).encode("utf-8")
-
-            chunks.extend([header, raw, b"\n\n"])
-
-            index_rows.append({
-                "sequence": number,
-                "part": part_name,
-                "source_path": relative,
-                "source_bytes": len(raw),
-                "source_sha256": sha256(raw),
-            })
-
-        content = b"".join(chunks)
-        part_path.write_bytes(content)
-
-        print(
-            f"[OK] {part_name}: "
-            f"{len(group)} files, {len(content)} bytes, "
-            f"SHA256={sha256(content)}"
-        )
-
-    index_path = OUTPUT / "00_READER_INDEX.txt"
-    with index_path.open("w", encoding="utf-8") as f:
-        f.write("V24 C# SOURCE READER\n")
-        f.write("====================\n")
-        f.write(f"Source files: {len(files)}\n")
-        f.write(f"Files per part: {FILES_PER_PART}\n")
-        f.write(f"Part count: {part_count}\n\n")
-        f.write("PART ORDER\n")
-        for i in range(1, part_count + 1):
-            f.write(f"PART_{i:03d}.txt\n")
-
-        f.write("\nSOURCE FILE ORDER\n")
-        for row in index_rows:
-            f.write(
-                f"{row['sequence']:03d} | "
-                f"{row['part']} | "
-                f"{row['source_path']} | "
-                f"{row['source_bytes']} bytes | "
-                f"{row['source_sha256']}\n"
-            )
-
-    manifest_path = OUTPUT / "01_READER_MANIFEST.csv"
-    with manifest_path.open(
-        "w", newline="", encoding="utf-8"
-    ) as f:
-        writer = csv.DictWriter(
-            f, fieldnames=[
-                "sequence", "part", "source_path",
-                "source_bytes", "source_sha256"
-            ]
-        )
-        writer.writeheader()
-        writer.writerows(index_rows)
-
-    print("\nV24 READER BUILD COMPLETE")
-    print(f"Source files : {len(files)}")
-    print(f"Parts        : {part_count}")
-    print(f"Output       : {OUTPUT}")
-
-if __name__ == "__main__":
-    main()
-
 

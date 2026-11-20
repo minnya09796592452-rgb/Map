@@ -1,11 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 351
 PATH: Assembly-CSharp__DynamicBoneCollider.cs
 SIZE: 5590 bytes
 SHA256: 57a747f7189138310a63edaf9f7e87a5b5d27bf95245f26b16b291eb01982488
 ====================================================================================================
-
 using UnityEngine;
 
 [AddComponentMenu("Dynamic Bone/Dynamic Bone Collider")]
@@ -215,15 +213,12 @@ public class DynamicBoneCollider : DynamicBoneColliderBase
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 352
 PATH: Assembly-CSharp__DynamicBonePlaneCollider.cs
 SIZE: 1427 bytes
 SHA256: 584822c450927939c2a4ec6f3d075b1b513f7b1123ce9c20f2d33fabc79a0452
 ====================================================================================================
-
 using UnityEngine;
 
 [AddComponentMenu("Dynamic Bone/Dynamic Bone Plane Collider")]
@@ -294,15 +289,12 @@ public class DynamicBonePlaneCollider : DynamicBoneColliderBase
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 353
 PATH: Assembly-CSharp__EndGameCreditsView.cs
 SIZE: 1826 bytes
 SHA256: 11469c08d878f84f8ad1537515e0ddb762206af6e5323e958b8ff83f794466bb
 ====================================================================================================
-
 using System;
 using System.Collections;
 using Beam.UI;
@@ -396,15 +388,12 @@ public class EndGameCreditsView : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 354
 PATH: Assembly-CSharp__ExtensionMethods.cs
 SIZE: 9493 bytes
 SHA256: 6d478104aff3371c74de3c84e59fb78da724ecac3bbdcdeb6533054b49144170
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Crafting;
@@ -761,15 +750,12 @@ public static class ExtensionMethods
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 355
 PATH: Assembly-CSharp__FollowSpawn.cs
 SIZE: 12589 bytes
 SHA256: 14165e60d0f796b2050626d36161c3c7e75e22fa887449a1fea9296e61589d3d
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -1180,15 +1166,12 @@ public class FollowSpawn : CellObjectSpawner, IHashCollection
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 356
 PATH: Assembly-CSharp__Funlabs__MPExtensions.cs
 SIZE: 25790 bytes
 SHA256: c4426c95d1c4a0d47c88dfb88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf
 ====================================================================================================
-
 using System;
 using System.Globalization;
 using System.IO;
@@ -2278,15 +2261,12 @@ public static class MPExtensions
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 357
 PATH: Assembly-CSharp__Funlabs__MultiplayerMng.cs
 SIZE: 35459 bytes
 SHA256: 7a62f146a9b2b19b3cfd9ff2c2093b50a17760473aa050b65b4d98ebab690886
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -3589,15 +3569,12 @@ public class MultiplayerMng : GlobalEventListener
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 358
 PATH: Assembly-CSharp__Funlabs__MultiplayerPrefabPool.cs
 SIZE: 890 bytes
 SHA256: 9bd399df8458cdc56caafecfc8d67d239964f0d79503de8fba1a3e553ee56a63
 ====================================================================================================
-
 using Beam;
 using Photon.Bolt;
 using UnityEngine;
@@ -3637,15 +3614,12 @@ public class MultiplayerPrefabPool : IPrefabPool
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 359
 PATH: Assembly-CSharp__Funlabs__Peer.cs
 SIZE: 12365 bytes
 SHA256: e9b77dfc48b3b14a93233f1df6a5e2a9cfbc256949e6f13521ba720f124d7bb7
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -4246,15 +4220,12 @@ public class Peer : MultiplayerBehaviour, IMultiplayerState<IPeerState>
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 360
 PATH: Assembly-CSharp__Funlabs__TransformId.cs
 SIZE: 176 bytes
 SHA256: 8d830f278dd71614a0943adaa72f26cee9b9fd2891e58a87de9cef87fb68e98e
 ====================================================================================================
-
 namespace Funlabs;
 
 public enum TransformId
@@ -4269,15 +4240,12 @@ public enum TransformId
 	Zones
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 361
 PATH: Assembly-CSharp__HighlightingSystem__Highlighter.cs
 SIZE: 10403 bytes
 SHA256: c16e48b29d796a766efce18d41807efa2ab6d2bd58de9b126e45aa12b84157e1
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Rendering;
@@ -4808,15 +4776,12 @@ public class Highlighter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 362
 PATH: Assembly-CSharp__IAudioPlayer.cs
 SIZE: 877 bytes
 SHA256: e3de6317698cca23f91820dff602ff0041572a0badbef62bd44f1e17b81f86c9
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -4837,15 +4802,12 @@ public interface IAudioPlayer
 	IAudioMixer GetAudioMixer();
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 363
 PATH: Assembly-CSharp__IDynamicParentProvider.cs
 SIZE: 88 bytes
 SHA256: ba08f25f3bfa4d40a2304e3e19a78ba51be6ef2bd78912190d4072fe7b32758d
 ====================================================================================================
-
 using UnityEngine;
 
 public interface IDynamicParentProvider
@@ -4853,15 +4815,12 @@ public interface IDynamicParentProvider
 	Transform GetParent();
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 364
 PATH: Assembly-CSharp__Interacting_FISHINGROD.cs
 SIZE: 23446 bytes
 SHA256: d64ea8edfca43e7ccb7a8a730ba8c56378beffeddd8b64fde91222892504828a
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Crafting;
@@ -5712,15 +5671,12 @@ public class Interacting_FISHINGROD : ConstructionObject, IChargeable, IUseable,
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 365
 PATH: Assembly-CSharp__InteractiveObject_BOAR.cs
 SIZE: 1543 bytes
 SHA256: 9f53898718bf024d02119fdec54649512ca3a78e0aa78447e6a66a807fd28e8a
 ====================================================================================================
-
 using Beam;
 using Beam.Events;
 using Beam.Obfuscated.Users;
@@ -5779,15 +5735,12 @@ public class InteractiveObject_BOAR : InteractiveObject_ANIMAL
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 366
 PATH: Assembly-CSharp__InteractiveObject_HARVESTPLANT.cs
 SIZE: 5070 bytes
 SHA256: 8de71fa0c01cf929b542fbe9206cbae2127b8fcc7ca905160099bcc7f2593938
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Serialization.Json;
@@ -5988,15 +5941,12 @@ public class InteractiveObject_HARVESTPLANT : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 367
 PATH: Assembly-CSharp__InteractiveObject_HOG.cs
 SIZE: 1640 bytes
 SHA256: d30747b282a3747e348207b42178a5ffbb6231e7f88755cef70ec7d4ae405c2e
 ====================================================================================================
-
 using Beam;
 using Beam.Events;
 using Beam.Obfuscated.Users;
@@ -6061,15 +6011,12 @@ public class InteractiveObject_HOG : InteractiveObject_ANIMAL
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 368
 PATH: Assembly-CSharp__InteractiveObject_PISCUS.cs
 SIZE: 2355 bytes
 SHA256: 301119dade7af1179b2012b4c17a8801c4a05cf76c0f0dd77ea8b8e1ce2f92ad
 ====================================================================================================
-
 using Beam;
 using Beam.Events;
 using Beam.Obfuscated.Users;
@@ -6153,15 +6100,12 @@ public class InteractiveObject_PISCUS : InteractiveObject, IMultiplayerState<IPi
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 369
 PATH: Assembly-CSharp__InteractiveObject_PLAYER_RAGDOLL.cs
 SIZE: 4325 bytes
 SHA256: 8d01084a65831b2b06cb5350da21d7f0ef886311dc30d3af225a343a869614f2
 ====================================================================================================
-
 using System;
 using System.Collections;
 using Beam;
@@ -6358,15 +6302,12 @@ public class InteractiveObject_PLAYER_RAGDOLL : InteractiveObject, IRagdoll, IBa
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 370
 PATH: Assembly-CSharp__InteractiveObject_SNAKE.cs
 SIZE: 2785 bytes
 SHA256: e027c480b56845809915737b8548373663752c8f647aba370ba5e92306bf0091
 ====================================================================================================
-
 using Beam;
 using Beam.Crafting;
 using Beam.Events;
@@ -6469,15 +6410,12 @@ public class InteractiveObject_SNAKE : InteractiveObject_ANIMAL
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 371
 PATH: Assembly-CSharp__InteractiveObject_YUCCA_HARVEST.cs
 SIZE: 2256 bytes
 SHA256: b2665210b86f831af8c0bb621f99658ae13ba09a1889b6eb7e598a9aa9bb2034
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Utilities;
@@ -6548,15 +6486,298 @@ public class InteractiveObject_YUCCA_HARVEST : InteractiveObject_FOOD
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 372
+PATH: Assembly-CSharp__kode80.Effects__FilmicTonemapping.cs
+SIZE: 634 bytes
+SHA256: 40582a8ace8a5e5f2ccc5f219877566888ebc80d991651f762de5ecb9119e4cc
+====================================================================================================
+using UnityEngine;
+
+namespace kode80.Effects;
+
+[ExecuteInEditMode]
+public class FilmicTonemapping : MonoBehaviour
+{
+	[Range(0f, 16f)]
+	public float exposure = 1.5f;
+
+	private Material _material;
+
+	private void Start()
+	{
+	}
+
+	private void Update()
+	{
+	}
+
+	[ImageEffectTransformsToLDR]
+	private void OnRenderImage(RenderTexture source, RenderTexture destination)
+	{
+		if (_material == null)
+		{
+			_material = new Material(Shader.Find("Hidden/kode80/Effects/FilmicTonemapping"));
+			_material.hideFlags = HideFlags.HideAndDontSave;
+		}
+		_material.SetFloat("_Exposure", exposure);
+		Graphics.Blit(source, destination, _material);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 373
+PATH: Assembly-CSharp__Ladders.cs
+SIZE: 1116 bytes
+SHA256: b1590f70ea7530959d91374dfe4788d4869939fa2588b5b38589786a9d245061
+====================================================================================================
+using Beam;
+using Beam.Utilities;
+using UnityEngine;
+
+public class Ladders : MonoBehaviour
+{
+	public bool isTree;
+
+	public Transform LandPos;
+
+	[HideInInspector]
+	public BoxCollider LadderCollider;
+
+	private void Awake()
+	{
+		LadderCollider = GetComponent<BoxCollider>();
+	}
+
+	private void OnTriggerEnter(Collider collided)
+	{
+		if (collided.CompareTag("Player"))
+		{
+			IPlayer ladder = collided.GetInterface<IPlayer>();
+			SetLadder(ladder);
+		}
+	}
+
+	private void OnTriggerExit(Collider collided)
+	{
+		if (collided.CompareTag("Player"))
+		{
+			IPlayer player = collided.GetInterface<IPlayer>();
+			ResetLadder(player);
+		}
+	}
+
+	private void SetLadder(IPlayer player)
+	{
+		if (!player.IsNullOrDestroyed())
+		{
+			player.Movement.activeLadder = this;
+		}
+	}
+
+	private void ResetLadder(IPlayer player)
+	{
+		if (!player.IsNullOrDestroyed() && player.Movement.activeLadder == this)
+		{
+			if (player.Movement.ClimbingLadder)
+			{
+				player.Movement.CharacterController.Move(-player.Movement.transform.forward * 1f + player.Movement.transform.up * 0.2f * Time.deltaTime);
+			}
+			player.Movement.ExitLadder();
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 374
+PATH: Assembly-CSharp__LandAnimalSpawner.cs
+SIZE: 4461 bytes
+SHA256: be8f8a065eebffd746526dfb0f93d29dbe6491a90d16c429d77276ed7657b8f1
+====================================================================================================
+using System;
+using Beam;
+using Beam.Crafting;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+public class LandAnimalSpawner : SaveablePrefab
+{
+	[SerializeField]
+	private GameObject _landCreature;
+
+	private LandAnimal _activeCreature;
+
+	[SerializeField]
+	private bool _canRespawn;
+
+	[SerializeField]
+	private bool _ignoreRemovedWildLifeSetting;
+
+	private bool _removedWildlifeSetting;
+
+	[SerializeField]
+	private int _respawnHours;
+
+	private int _respawningTimer = -1;
+
+	private DateTime _lastPollTime;
+
+	private void Start()
+	{
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
+		}
+		if (_activeCreature.IsNullOrDestroyed())
+		{
+			PollSpawn();
+		}
+	}
+
+	private void SetDifficultyParams()
+	{
+		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
+	}
+
+	private void OnDestroy()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
+		}
+	}
+
+	private void GameTime_HourTick()
+	{
+		if (_activeCreature.IsNullOrDestroyed())
+		{
+			_respawningTimer++;
+			PollSpawn();
+		}
+	}
+
+	private void PollSpawn()
+	{
+		if (Game.Mode.IsClient())
+		{
+			return;
+		}
+		SetDifficultyParams();
+		if (_removedWildlifeSetting && !_ignoreRemovedWildLifeSetting)
+		{
+			return;
+		}
+		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+		if (player != null)
+		{
+			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < 20f;
+			if (((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == -1) && !SpawnerInsideStructure())
+			{
+				_respawningTimer = 0;
+				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_landCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
+				_activeCreature = gameObject.GetComponent<LandAnimal>();
+			}
+		}
+	}
+
+	private bool SpawnerInsideStructure()
+	{
+		if (BeamPhysics.GetComponentsInSphere<Constructing>(transform.position, 1.5f, (1 << Layers.CONSTRUCTIONS) | (1 << Layers.CONSTRUCTIONS_SMALL)).Count > 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
+	{
+		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
+		_lastPollTime = GameTime.Now;
+		jObject.AddField("lastPollTime", JSerializer.Serialize(_lastPollTime));
+		if (!_activeCreature.IsNullOrDestroyed())
+		{
+			InteractiveObject component = _activeCreature.GetComponent<InteractiveObject>();
+			if (!component.IsNullOrDestroyed())
+			{
+				jObject.AddField("ActiveAnimal", component.ReferenceId.ToString());
+			}
+		}
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			int value = data.GetField("respawnCounter").GetValue<int>();
+			_respawningTimer = value;
+			JObject field = data.GetField("lastPollTime");
+			if (field != null)
+			{
+				_lastPollTime = JSerializer.Deserialize<DateTime>(field);
+				int num = (int)GameTime.GetHoursSince(_lastPollTime);
+				if (_respawningTimer > 0)
+				{
+					_respawningTimer += num;
+				}
+			}
+			JObject activeAnimalData = data.GetField("ActiveAnimal");
+			if (activeAnimalData != null)
+			{
+				LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+				{
+					InteractiveObject interactiveObject = MultiplayerMng.FindObject<InteractiveObject>(activeAnimalData.GetValue<string>().ToMiniGuid());
+					if (!interactiveObject.IsNullOrDestroyed())
+					{
+						LandAnimal component = interactiveObject.GetComponent<LandAnimal>();
+						if (!component.IsNullOrDestroyed())
+						{
+							_activeCreature = component;
+							_activeCreature.StartingPosition = transform.position;
+							Initialize();
+						}
+					}
+				});
+				return;
+			}
+		}
+		Initialize();
+	}
+}
+
+====================================================================================================
+SOURCE FILE 375
 PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_Object.cs
 SIZE: 7682 bytes
 SHA256: 3214abe4a662705284af8b8db3f105d2e1256b043ff577fdb6e888160e95d906
 ====================================================================================================
-
 using System;
 using LE_LevelEditor.Events;
 using UnityEngine;
@@ -7021,607 +7242,4 @@ public class LE_Object : MonoBehaviour
 		}
 	}
 }
-
-
-
-====================================================================================================
-SOURCE FILE 373
-PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandle.cs
-SIZE: 6332 bytes
-SHA256: f2f0f55367ce3018b27f7760f6fce54149e028b228d23f7b985357f371bd12a6
-====================================================================================================
-
-using System;
-using Funlabs;
-using UnityEngine;
-
-namespace LE_LevelEditor.Core;
-
-public class LE_ObjectEditHandle : MonoBehaviour
-{
-	private const int SKIP_FRAMES = 0;
-
-	private const float MIN_SCALE_VALUE = 0.05f;
-
-	[SerializeField]
-	private LE_EObjectEditMode m_editMode = LE_EObjectEditMode.MOVE;
-
-	private Vector3 m_activeEditAxis = Vector3.zero;
-
-	private int m_lastDragFrame = -1;
-
-	private Vector3 m_lastCursorPos = -1f * Vector3.one;
-
-	private int m_dragSkipCounter;
-
-	private Camera m_cam;
-
-	public EventHandler m_onTransformed;
-
-	public LE_EObjectEditMode EditMode => m_editMode;
-
-	private Camera Cam
-	{
-		get
-		{
-			if (m_cam == null)
-			{
-				m_cam = Camera.main;
-			}
-			return m_cam;
-		}
-	}
-
-	public bool IsDrag => m_lastDragFrame == Time.frameCount;
-
-	public void OnMyMouseDrag(Vector3 p_axis)
-	{
-		m_activeEditAxis = p_axis;
-		m_lastDragFrame = Time.frameCount;
-	}
-
-	public void DisableAxisX()
-	{
-		DisableAxis(Vector3.right);
-	}
-
-	public void DisableAxisY()
-	{
-		DisableAxis(Vector3.up);
-	}
-
-	public void DisableAxisZ()
-	{
-		DisableAxis(Vector3.forward);
-	}
-
-	private void DisableAxis(Vector3 p_axis)
-	{
-		LE_ObjectEditHandleCollider[] componentsInChildren = GetComponentsInChildren<LE_ObjectEditHandleCollider>();
-		for (int i = 0; i < componentsInChildren.Length; i++)
-		{
-			if (componentsInChildren[i].Axis == p_axis)
-			{
-				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
-			}
-			else if (Vector3.Dot(componentsInChildren[i].Axis, p_axis) > 0.0001f)
-			{
-				Vector3 axis = componentsInChildren[i].Axis;
-				axis.Scale(Vector3.one - p_axis);
-				componentsInChildren[i].Axis = axis;
-			}
-		}
-	}
-
-	private void LateUpdate()
-	{
-		if (m_lastDragFrame < Time.frameCount)
-		{
-			m_activeEditAxis = Vector3.zero;
-			m_dragSkipCounter = 0;
-		}
-		if ((double)m_activeEditAxis.sqrMagnitude > 0.01)
-		{
-			switch (m_editMode)
-			{
-			case LE_EObjectEditMode.MOVE:
-				Move();
-				break;
-			case LE_EObjectEditMode.ROTATE:
-				Rotate();
-				break;
-			case LE_EObjectEditMode.SCALE:
-				Scale();
-				break;
-			}
-		}
-		m_lastCursorPos = GetCursorPosition();
-	}
-
-	private void OnDestroy()
-	{
-		m_onTransformed = null;
-	}
-
-	private void Move()
-	{
-		float editDelta = GetEditDelta();
-		if (m_dragSkipCounter == 0)
-		{
-			float num = 15625f;
-			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
-			if ((vector * editDelta + transform.position).XZSqr() < num)
-			{
-				transform.parent.position += vector * editDelta;
-			}
-			Vector3 position = transform.parent.position;
-			position.y = Mathf.Clamp(transform.parent.position.y, -25f, 300f);
-			transform.parent.position = position;
-			if (m_onTransformed != null)
-			{
-				m_onTransformed(this, EventArgs.Empty);
-			}
-		}
-		else if (Mathf.Abs(editDelta) > 0.0005f)
-		{
-			m_dragSkipCounter++;
-		}
-	}
-
-	private void Scale()
-	{
-		float editDelta = GetEditDelta();
-		if (m_dragSkipCounter == 0)
-		{
-			transform.parent.localScale += m_activeEditAxis * editDelta;
-			transform.parent.localScale = Vector3.Max(Vector3.one * 0.05f, transform.parent.localScale);
-			if (m_onTransformed != null)
-			{
-				m_onTransformed(this, EventArgs.Empty);
-			}
-		}
-		else if (Mathf.Abs(editDelta) > 0.0005f)
-		{
-			m_dragSkipCounter++;
-		}
-	}
-
-	private float GetEditDelta()
-	{
-		Camera cam = Cam;
-		if (cam != null)
-		{
-			Vector3 p_screenAxis = cam.WorldToScreenPoint(transform.position + transform.TransformDirection(m_activeEditAxis)) - cam.WorldToScreenPoint(transform.position);
-			p_screenAxis.z *= p_screenAxis.z;
-			p_screenAxis.z *= p_screenAxis.z;
-			float num = 1f / (1f - Mathf.Clamp(p_screenAxis.z, 0f, 0.8f));
-			p_screenAxis.z = 0f;
-			p_screenAxis.Normalize();
-			if (cam.orthographic)
-			{
-				return GetEditDeltaOrthogonal(p_screenAxis, num, cam);
-			}
-			float magnitude = (cam.transform.position - transform.position).magnitude;
-			return GetEditDeltaPerspective(p_screenAxis, num * magnitude, cam);
-		}
-		return 0f;
-	}
-
-	private void Rotate()
-	{
-		float editDeltaRotation = GetEditDeltaRotation();
-		if (m_dragSkipCounter == 0)
-		{
-			transform.parent.Rotate(m_activeEditAxis * editDeltaRotation);
-			if (m_onTransformed != null)
-			{
-				m_onTransformed(this, EventArgs.Empty);
-			}
-		}
-		else if (Mathf.Abs(editDeltaRotation) > 0.0005f)
-		{
-			m_dragSkipCounter++;
-		}
-	}
-
-	private float GetEditDeltaRotation()
-	{
-		Camera cam = Cam;
-		if (cam != null)
-		{
-			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
-			Vector3 vector2 = cam.WorldToScreenPoint(transform.position);
-			vector2.z = 0f;
-			Vector3 p_screenAxis;
-			if (Mathf.Abs(Vector3.Dot(vector, cam.transform.forward)) > 0.5f)
-			{
-				float num = Mathf.Sign(Vector3.Dot(cam.transform.forward, vector));
-				if (num == 0f)
-				{
-					num = 1f;
-				}
-				Vector3 normalized = (GetCursorPosition() - vector2).normalized;
-				p_screenAxis = new Vector3(0f - Mathf.Sign(normalized.y), Mathf.Sign(normalized.x), 0f);
-				p_screenAxis *= num;
-			}
-			else
-			{
-				p_screenAxis = Vector3.Cross(cam.transform.forward, vector);
-				p_screenAxis = cam.transform.InverseTransformDirection(p_screenAxis);
-				p_screenAxis.z = 0f;
-			}
-			p_screenAxis.Normalize();
-			if (cam.orthographic)
-			{
-				return GetEditDeltaOrthogonal(p_screenAxis, 360f / cam.orthographicSize, cam);
-			}
-			return GetEditDeltaPerspective(p_screenAxis, 360f, cam);
-		}
-		return 0f;
-	}
-
-	private float GetEditDeltaPerspective(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
-	{
-		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
-		Ray ray = p_cam.ScreenPointToRay(m_lastCursorPos + num * p_screenAxis);
-		Ray ray2 = p_cam.ScreenPointToRay(m_lastCursorPos);
-		Vector3 direction = ray.direction;
-		Vector3 direction2 = ray2.direction;
-		return (direction - direction2).magnitude * Mathf.Sign(num) * p_multiplier;
-	}
-
-	private float GetEditDeltaOrthogonal(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
-	{
-		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
-		Vector3 vector = p_cam.ScreenToWorldPoint(m_lastCursorPos + num * p_screenAxis);
-		Vector3 vector2 = p_cam.ScreenToWorldPoint(m_lastCursorPos);
-		return (vector - vector2).magnitude * Mathf.Sign(num) * p_multiplier;
-	}
-
-	private Vector3 GetCursorPosition()
-	{
-		if (Input.touchCount > 0)
-		{
-			return Input.GetTouch(0).position;
-		}
-		return Input.mousePosition;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 374
-PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandleCollider.cs
-SIZE: 4020 bytes
-SHA256: 7e46fd92836a4e25948c1f5c08e6a1e8edc11337f0f0d646c32ec118c17a9b28
-====================================================================================================
-
-using UnityEngine;
-
-namespace LE_LevelEditor.Core;
-
-public class LE_ObjectEditHandleCollider : MonoBehaviour
-{
-	[SerializeField]
-	private LE_ObjectEditHandle m_parent;
-
-	[SerializeField]
-	private Vector3 m_axis;
-
-	[SerializeField]
-	private bool m_isRotationHandle;
-
-	[SerializeField]
-	private Vector3 m_rotationHandleDir;
-
-	private Renderer m_renderer;
-
-	private Collider[] m_colliders;
-
-	private Color m_originalColor;
-
-	private bool m_isDrag;
-
-	private float m_lastCamDist = -1f;
-
-	private Vector3 m_lastParentScale = Vector3.one;
-
-	private Vector3 m_lastParentParentScale = Vector3.one;
-
-	private bool m_isMouseDown;
-
-	private bool m_isMouseDownOnMe;
-
-	private Camera m_cam;
-
-	public Vector3 Axis
-	{
-		get
-		{
-			return m_axis;
-		}
-		set
-		{
-			m_axis = value;
-		}
-	}
-
-	private Camera Cam
-	{
-		get
-		{
-			if (m_cam == null)
-			{
-				m_cam = Camera.main;
-			}
-			return m_cam;
-		}
-	}
-
-	private void Start()
-	{
-		m_colliders = GetComponentsInChildren<Collider>();
-		m_renderer = GetComponent<Renderer>();
-		m_originalColor = m_renderer.material.color;
-	}
-
-	private void Update()
-	{
-		bool flag = (Input.GetMouseButton(0) && Input.touchCount < 2) || Input.touchCount == 1;
-		if (!m_isMouseDown && !flag)
-		{
-			return;
-		}
-		if (m_isMouseDownOnMe && !flag)
-		{
-			OnMyMouseUp();
-		}
-		else if (m_isMouseDownOnMe & flag)
-		{
-			OnMyMouseDrag();
-		}
-		else
-		{
-			Camera cam = Cam;
-			if (m_colliders != null && cam != null)
-			{
-				for (int i = 0; i < m_colliders.Length; i++)
-				{
-					Collider collider = m_colliders[i];
-					if (((collider != null && !m_isMouseDown) & flag) && !m_parent.IsDrag && (collider.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hitInfo, float.PositiveInfinity) || (Input.touchCount == 1 && collider.Raycast(cam.ScreenPointToRay(Input.GetTouch(0).position), out hitInfo, float.PositiveInfinity))))
-					{
-						m_isMouseDownOnMe = true;
-						OnMyMouseDown();
-						break;
-					}
-				}
-			}
-		}
-		m_isMouseDown = flag;
-		if (!m_isMouseDown)
-		{
-			m_isMouseDownOnMe = false;
-		}
-	}
-
-	private void LateUpdate()
-	{
-		Camera cam = Cam;
-		if (!(cam != null))
-		{
-			return;
-		}
-		if (!m_isDrag && m_isRotationHandle)
-		{
-			Vector3 vector = transform.parent.InverseTransformPoint(cam.transform.position);
-			Vector3 rhs = vector - Vector3.Dot(m_axis, vector) * m_axis;
-			rhs.Normalize();
-			float num = Vector3.Dot(m_rotationHandleDir, rhs);
-			Vector3 euler = Vector3.Cross(m_rotationHandleDir, rhs);
-			euler.Scale(m_axis);
-			float num2 = 57.29578f * Mathf.Asin(euler.magnitude);
-			euler.Normalize();
-			if (num < 0f)
-			{
-				num2 = Mathf.Abs(-180f + num2);
-			}
-			euler *= num2;
-			transform.localRotation = Quaternion.Euler(euler);
-		}
-		float magnitude = (cam.transform.position - transform.position).magnitude;
-		if (!m_isDrag && (cam.orthographic || Mathf.Abs(magnitude - m_lastCamDist) > 0.0001f || m_lastParentScale != m_parent.transform.localScale || m_lastParentParentScale != m_parent.transform.parent.localScale))
-		{
-			float num3 = ((!cam.orthographic) ? (magnitude / 75f) : (cam.orthographicSize / 50f));
-			transform.localScale = new Vector3(num3 / (m_parent.transform.parent.localScale.x * m_parent.transform.localScale.x), num3 / (m_parent.transform.parent.localScale.y * m_parent.transform.localScale.y), num3 / (m_parent.transform.parent.localScale.z * m_parent.transform.localScale.z));
-			m_lastCamDist = magnitude;
-			m_lastParentScale = m_parent.transform.localScale;
-			m_lastParentParentScale = m_parent.transform.parent.localScale;
-		}
-	}
-
-	private void OnMyMouseDown()
-	{
-		m_parent.OnMyMouseDrag(m_axis);
-		m_renderer.material.color = Color.yellow;
-		m_isDrag = true;
-	}
-
-	private void OnMyMouseDrag()
-	{
-		m_parent.OnMyMouseDrag(m_axis);
-		m_isDrag = true;
-	}
-
-	private void OnMyMouseUp()
-	{
-		m_renderer.material.color = m_originalColor;
-		m_parent.transform.localScale = new Vector3(1f / m_parent.transform.parent.localScale.x, 1f / m_parent.transform.parent.localScale.y, 1f / m_parent.transform.parent.localScale.z);
-		m_isDrag = false;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 375
-PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectSnapPoint.cs
-SIZE: 3623 bytes
-SHA256: 4ac9de937f5e90f6d9502ed468cd33cd490ef16e00f8301fd79e30643b7d5857
-====================================================================================================
-
-using System;
-using S_SnapTools;
-using UnityEngine;
-
-namespace LE_LevelEditor.Core;
-
-[Serializable]
-public class LE_ObjectSnapPoint
-{
-	private const string BUTTON_VISUALS_NAME = "LE_ObjectSnapPoint.Button.Visuals";
-
-	[SerializeField]
-	private Transform m_point;
-
-	[SerializeField]
-	private S_SnapToObjectPrefab[] m_prefabs = new S_SnapToObjectPrefab[1];
-
-	[SerializeField]
-	private Vector3 m_snapButtonLocalOffset = Vector3.zero;
-
-	[SerializeField]
-	private float m_snapButtonSize = 1f;
-
-	private S_SnapToObject m_snapSysInstance;
-
-	public Transform Point
-	{
-		get
-		{
-			return m_point;
-		}
-		set
-		{
-			m_point = value;
-		}
-	}
-
-	public S_SnapToObjectPrefab[] Prefabs
-	{
-		get
-		{
-			return m_prefabs;
-		}
-		set
-		{
-			m_prefabs = value;
-		}
-	}
-
-	public Vector3 SnapButtonLocalOffset
-	{
-		get
-		{
-			return m_snapButtonLocalOffset;
-		}
-		set
-		{
-			m_snapButtonLocalOffset = value;
-		}
-	}
-
-	public float SnapButtonSize
-	{
-		get
-		{
-			return m_snapButtonSize;
-		}
-		set
-		{
-			m_snapButtonSize = value;
-		}
-	}
-
-	public S_SnapToObject SnapSystemInstance
-	{
-		get
-		{
-			return m_snapSysInstance;
-		}
-		set
-		{
-			m_snapSysInstance = value;
-		}
-	}
-
-	public LE_ObjectSnapPoint()
-	{
-		if (m_prefabs != null && m_prefabs.Length == 1)
-		{
-			m_prefabs[0] = new S_SnapToObjectPrefab();
-		}
-	}
-
-	public S_SnapToObject InstatiateSnapSystem(GameObject p_buttonVisuals, bool p_isDrawUI, Material p_materialLine, Material p_materialFill)
-	{
-		if (m_point == null)
-		{
-			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Transform property 'Point' is null! Set it in the inspector!");
-			return null;
-		}
-		if (m_prefabs == null || m_prefabs.Length == 0)
-		{
-			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Prefabs property array is null or has no entries!");
-			return null;
-		}
-		if (m_snapSysInstance != null)
-		{
-			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the system was already initialized!");
-			UnityEngine.Object.Destroy(m_snapSysInstance);
-		}
-		m_snapSysInstance = Point.gameObject.AddComponent<S_SnapToObject>();
-		m_snapSysInstance.Prefabs = Prefabs;
-		m_snapSysInstance.IsDeactivatedAfterSnap = true;
-		m_snapSysInstance.IsDestroyedAfterSnap = false;
-		m_snapSysInstance.IsDrawUI = p_isDrawUI;
-		m_snapSysInstance.UImaterialLine = p_materialLine;
-		m_snapSysInstance.UImaterialFill = p_materialFill;
-		SphereCollider sphereCollider = Point.gameObject.AddComponent<SphereCollider>();
-		sphereCollider.radius = SnapButtonSize * 0.5f;
-		sphereCollider.center = SnapButtonLocalOffset;
-		p_buttonVisuals.name = "LE_ObjectSnapPoint.Button.Visuals";
-		if (p_buttonVisuals != null)
-		{
-			p_buttonVisuals.transform.parent = Point;
-			p_buttonVisuals.transform.localPosition = m_snapButtonLocalOffset;
-			p_buttonVisuals.transform.localScale = Vector3.one * m_snapButtonSize;
-			p_buttonVisuals.transform.localRotation = Quaternion.identity;
-		}
-		else
-		{
-			Debug.LogWarning("LE_ObjectSnapPoint: InstatiateSnapSystem: p_buttonVisuals is null! The snap button will be invisible for the user!");
-		}
-		return m_snapSysInstance;
-	}
-
-	public static void DestroySnapSystem(S_SnapToObject p_system)
-	{
-		if (!(p_system != null))
-		{
-			return;
-		}
-		UnityEngine.Object.Destroy(p_system);
-		UnityEngine.Object.Destroy(p_system.GetComponent<SphereCollider>());
-		Transform[] componentsInChildren = p_system.GetComponentsInChildren<Transform>(includeInactive: true);
-		for (int i = 0; i < componentsInChildren.Length; i++)
-		{
-			if (componentsInChildren[i].name == "LE_ObjectSnapPoint.Button.Visuals")
-			{
-				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
-			}
-		}
-	}
-}
-
 

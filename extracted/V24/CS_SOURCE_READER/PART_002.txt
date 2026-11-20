@@ -1,11 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 026
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__MotionAbsorbCharacter.cs
 SIZE: 964 bytes
 SHA256: 9de5acaaeb50bfba4b349a0804dcdeff89e49cec9e21498b0723d5a3a7b03c5a
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.Demos;
@@ -49,15 +47,12 @@ public class MotionAbsorbCharacter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 027
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__Navigator.cs
 SIZE: 4611 bytes
 SHA256: b72ac78f3ededb7563f66d885887bf4aedee993e091f10adae121e677650bb2e
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.AI;
@@ -269,15 +264,12 @@ public class Navigator
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 028
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__OffsetEffector.cs
 SIZE: 1944 bytes
 SHA256: 82d037786baab68684a802e0affdce650db554e3276918a1c1bf506580b88baa
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -346,15 +338,12 @@ public class OffsetEffector : OffsetModifier
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 029
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PendulumExample.cs
 SIZE: 3335 bytes
 SHA256: 3a7bd1346b813860ecac2c3b58a0482611fba8d4bf350aaca11ee0f7d4f8955b
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -452,15 +441,12 @@ public class PendulumExample : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 030
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PickUp2Handed.cs
 SIZE: 4949 bytes
 SHA256: 3a07592bd77a7bae391d87afaf9a2c0d6cd0d8182ae6b2f2f5bedb57c4d7326c
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -631,15 +617,12 @@ public abstract class PickUp2Handed : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 031
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__PickUpBox.cs
 SIZE: 508 bytes
 SHA256: 872bf40ea5eb72f42be092cb1dcd01ad09228b315e8471f767e6a2618fc3bd0c
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.Demos;
@@ -656,15 +639,12 @@ public class PickUpBox : PickUp2Handed
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 032
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__RagdollUtilityDemo.cs
 SIZE: 725 bytes
 SHA256: f04ccac4152984a26d955bfc5610991fbbb440abdae3d7d7f6a4aefe7bae49b3
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -699,15 +679,12 @@ public class RagdollUtilityDemo : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 033
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__ResetInteractionObject.cs
 SIZE: 1078 bytes
 SHA256: dff39006820ea72821edc1307c9bff11739cdf2b3931e9d223ec225a1a6e70f6
 ====================================================================================================
-
 using System.Collections;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -765,15 +742,12 @@ public class ResetInteractionObject : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 034
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SecondHandOnGun.cs
 SIZE: 1113 bytes
 SHA256: 663bf54d383c10fc933fa7106520e48268cff88779d81d327bed732d1514be44
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -824,15 +798,12 @@ public class SecondHandOnGun : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 035
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SimpleAimingSystem.cs
 SIZE: 1998 bytes
 SHA256: 707828afc8da2f75848aa3719b9fd80625f70e42a7d45a47023b3b7198126cf2
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -918,15 +889,12 @@ public class SimpleAimingSystem : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 036
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__SimpleLocomotion.cs
 SIZE: 3356 bytes
 SHA256: 7af4a2637862191162550a14081311178aad833e69e88326e82b2db3aa846e21
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1073,15 +1041,12 @@ public class SimpleLocomotion : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 037
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TouchWalls.cs
 SIZE: 6576 bytes
 SHA256: 1ed592e1c37b1dabad9ce735c782eb0d0bcb27b79ae179c4b585472fb9db609e
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -1297,15 +1262,12 @@ public class TouchWalls : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 038
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TransferMotion.cs
 SIZE: 537 bytes
 SHA256: 104c37b08eb78b925037605811d1dc9bceba84cfde30b08c56941e9425846aea
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.Demos;
@@ -1334,15 +1296,12 @@ public class TransferMotion : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 039
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__Turret.cs
 SIZE: 675 bytes
 SHA256: 99c50e70bfcf872eec2e8b5170ec33f3ac7141b8f2d9eab6722a79ac0a998bdd
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -1384,15 +1343,12 @@ public class Turret : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 040
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__TwoHandedProp.cs
 SIZE: 2302 bytes
 SHA256: 22ab861592cf0ca46fe21779bdad98072a7cdecf3e84ff7aa9e72f3562b604b2
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -1459,15 +1415,12 @@ public class TwoHandedProp : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 041
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__UserControlAI.cs
 SIZE: 1082 bytes
 SHA256: afd4be7e0ebeef4c8ad9ac89a180da140dc8c5fd2948d461262ff943680c173d
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.Demos;
@@ -1515,15 +1468,12 @@ public class UserControlAI : UserControlThirdPerson
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 042
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__UserControlThirdPerson.cs
 SIZE: 1224 bytes
 SHA256: 56fe667efb6f7a4be55cc8277bdc12fbc2b4597b43b877527e43a5864d246820
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.Demos;
@@ -1590,15 +1540,12 @@ public class UserControlThirdPerson : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 043
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRController.cs
 SIZE: 1809 bytes
 SHA256: dee4ed7485c445c6aaf6dbaaa722ef0667ecbd5fa87700911fcaa120e510156b
 ====================================================================================================
-
 using System;
 using RootMotion.FinalIK;
 using UnityEngine;
@@ -1697,15 +1644,12 @@ public class VRController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 044
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKCalibrationBasic.cs
 SIZE: 1934 bytes
 SHA256: 782cec494655a9c3564cc7a04efe16c14401163b81d505105897e37ce44c3d22
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -1774,15 +1718,12 @@ public class VRIKCalibrationBasic : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 045
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKCalibrationController.cs
 SIZE: 1984 bytes
 SHA256: e014912902b9830b23dfb2e25e6a77d7163ce5ea652a6d08123e64593f00f8fc
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -1845,15 +1786,12 @@ public class VRIKCalibrationController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 046
 PATH: Assembly-CSharp-firstpass__RootMotion.Demos__VRIKPlatformController.cs
 SIZE: 1357 bytes
 SHA256: 704dd957c27726bfbda797f1c639b899472c5d5f722912215f31162653844dd1
 ====================================================================================================
-
 using RootMotion.FinalIK;
 using UnityEngine;
 
@@ -1907,15 +1845,12 @@ public class VRIKPlatformController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 047
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__AimController.cs
 SIZE: 7338 bytes
 SHA256: 977114259d1e1dd7a98e03407dfb8427466d7a7fec6b7a5fc1bc2fd4adf50bb9
 ====================================================================================================
-
 using System.Collections;
 using UnityEngine;
 
@@ -2150,15 +2085,12 @@ public class AimController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 048
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Amplifier.cs
 SIZE: 2694 bytes
 SHA256: 83b2a6c471c6af44e6f6b7e2c1213875afce117b4d6c30af785c28c98ce6cf07
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2255,15 +2187,12 @@ public class Amplifier : OffsetModifier
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 049
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__BipedIK.cs
 SIZE: 4855 bytes
 SHA256: 8b48f2b72a5c8f81d2cca867b8a59941ca61752383393a0bfa242d436ba23aa1
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.FinalIK;
@@ -2462,15 +2391,12 @@ public class BipedIK : SolverManager
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 050
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Constraint.cs
 SIZE: 256 bytes
 SHA256: f3aad76bfc8764e92358d02007aa80f404fc9310f995366a8341a970f63574ff
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2487,5 +2413,4 @@ public abstract class Constraint
 
 	public abstract void UpdateConstraint();
 }
-
 

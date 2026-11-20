@@ -1,127 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 151
-PATH: Assembly-CSharp__Beam.Crafting__Plant.cs
-SIZE: 2764 bytes
-SHA256: 125b42073959ceddfc94fee06141a5acce5a780dfab768c53215d8db242f509e
-====================================================================================================
-
-using System;
-using Beam.Serialization.Json;
-using Beam.Utilities;
-using Funlabs;
-using UnityEngine;
-
-namespace Beam.Crafting;
-
-public class Plant : MonoBehaviour, ISaveable
-{
-	[SerializeField]
-	private Transform _fruitPosition;
-
-	[SerializeField]
-	private GameObject[] _plantStages;
-
-	[SerializeField]
-	private GameObject _deadStage;
-
-	private PlantModel _plantModel;
-
-	private PlantFruit _plantFruit;
-
-	private PlantType _plantType;
-
-	private float _growthTime;
-
-	public PlantType PlantType => _plantType;
-
-	public float GrowthTime => _growthTime;
-
-	public void Initialize(IFruitFactory fruitFactory, PlantType plantType, float growthTime)
-	{
-		_plantType = plantType;
-		_growthTime = growthTime;
-		_plantModel = new PlantModel(_plantStages, _deadStage, _growthTime);
-		_plantFruit = new PlantFruit(fruitFactory, _plantType, _fruitPosition, _growthTime);
-	}
-
-	public void Reset()
-	{
-		_plantModel.StartedGrowingTime = GameTime.Now;
-		_plantFruit.LastHarvestedTime = GameTime.Now;
-		_plantModel.Dead = false;
-		_plantModel.UpdateStage();
-	}
-
-	public void Poll()
-	{
-		_plantModel.Poll();
-		if (!_plantModel.Dead)
-		{
-			_plantFruit.Poll();
-		}
-	}
-
-	public void Kill()
-	{
-		_plantFruit.ClearFruit(spoil: true);
-		_plantModel.Dead = true;
-		_plantModel.UpdateStage();
-	}
-
-	public void ClearFruit()
-	{
-		_plantFruit.ClearFruit();
-	}
-
-	public JObject Save()
-	{
-		JObject jObject = new JObject();
-		jObject.AddField("StartedGrowingTime", JSerializer.Serialize(_plantModel.StartedGrowingTime));
-		jObject.AddField("LastHarvestedTime", JSerializer.Serialize(_plantFruit.LastHarvestedTime));
-		JObject jObject2 = new JObject();
-		if (!_plantFruit.Fruit.IsNullOrDestroyed())
-		{
-			jObject2.AddField("Fruit", _plantFruit.Fruit.ReferenceId.ToString());
-			jObject2.AddField("isGrowing", _plantFruit.Fruit.IsGrowing);
-		}
-		jObject.AddField("Fruits", jObject2);
-		return jObject;
-	}
-
-	public void Load(JObject data)
-	{
-		_plantModel.StartedGrowingTime = JSerializer.Deserialize<DateTime>(data.GetField("StartedGrowingTime"));
-		_plantFruit.LastHarvestedTime = JSerializer.Deserialize<DateTime>(data.GetField("LastHarvestedTime"));
-		JObject fruitsData = data.GetField("Fruits");
-		if (fruitsData != null && !fruitsData.IsNull())
-		{
-			LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
-			{
-				MiniGuid referenceId = fruitsData.GetField("Fruit").GetValue<string>().ToMiniGuid();
-				bool value = fruitsData.GetField("isGrowing").GetValue<bool>();
-				InteractiveObject_FOOD interactiveObject_FOOD = MultiplayerMng.FindObject<InteractiveObject_FOOD>(referenceId);
-				_plantFruit.AddFruit(interactiveObject_FOOD, interactiveObject_FOOD.transform);
-				_plantFruit.UpdateFruitGrowing(value);
-			});
-		}
-		else
-		{
-			_plantFruit.CheckFruit();
-		}
-		_plantModel.Poll();
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 152
 PATH: Assembly-CSharp__Beam.Crafting__PlantFruit.cs
 SIZE: 2173 bytes
 SHA256: 03ea06bcab09b37816dbeaaf63d8136d6c2c7f88a04e99954f5295da374718eb
 ====================================================================================================
-
 using System;
 using Beam.Utilities;
 using Funlabs;
@@ -227,15 +109,12 @@ public class PlantFruit
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 153
+SOURCE FILE 152
 PATH: Assembly-CSharp__Beam.Crafting__Plot.cs
 SIZE: 7134 bytes
 SHA256: eed463ea4f0de28fa0b5d7840469ed3ac27a72c6bdac3f980917342c7f7b24b8
 ====================================================================================================
-
 using System;
 using Beam.Serialization;
 using Beam.Serialization.Json;
@@ -569,15 +448,12 @@ public class Plot : MultiplayerBehaviour, IMultiplayerState<IPlotState>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 154
+SOURCE FILE 153
 PATH: Assembly-CSharp__Beam.Crafting__ProjectileHit.cs
 SIZE: 187 bytes
 SHA256: d8f996d40f4642b733b11da928dabd98844ecf2c03a33b00e3944ff057779df6
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -589,15 +465,12 @@ public struct ProjectileHit(Transform transform, IBase obj = null)
 	public IBase Object = obj;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 155
+SOURCE FILE 154
 PATH: Assembly-CSharp__Beam.Crafting__ProjectileObject.cs
 SIZE: 4864 bytes
 SHA256: 03a6b22d3df408bda8a13989658450b93eb2e60959f7542c06cfb77653904bf7
 ====================================================================================================
-
 using Beam.Serialization.Json;
 using Beam.Utilities;
 using Funlabs;
@@ -776,15 +649,12 @@ public class ProjectileObject : ConstructionObject, IPickupable, IAnimatablePrim
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 156
+SOURCE FILE 155
 PATH: Assembly-CSharp__Beam.Crafting__QuickAccessSlotUnlocker.cs
 SIZE: 1472 bytes
 SHA256: e72822c640cd59a84d09c05a384705cd3383e86d7762f585f3ddc03487b48ae6
 ====================================================================================================
-
 using Beam.Events;
 using Beam.Utilities;
 using UnityEngine;
@@ -861,15 +731,12 @@ public class QuickAccessSlotUnlocker : BaseObject, ICraftable, IBase, IHasCrafti
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 157
+SOURCE FILE 156
 PATH: Assembly-CSharp__Beam.Crafting__SmokableAttachingPosition.cs
 SIZE: 262 bytes
 SHA256: 58233b26d4d88a1f7a7bfbf1f5975148520fba30b8a890254f684406b34c4564
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -886,15 +753,12 @@ public class SmokableAttachingPosition
 	public Transform AttachingPosition => _attachingPosition;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 158
+SOURCE FILE 157
 PATH: Assembly-CSharp__Beam.Intro__AircraftAssetLoader.cs
 SIZE: 2974 bytes
 SHA256: bff24be8050d28ed763a6b8ba381eb4e85dfce2cb86590516eeea737d61df6cf
 ====================================================================================================
-
 using System.Collections;
 using Beam.Serialization;
 using Beam.Serialization.Json;
@@ -1009,15 +873,12 @@ public class AircraftAssetLoader : SaveablePrefab
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 159
+SOURCE FILE 158
 PATH: Assembly-CSharp__Beam.Intro__AircraftProximity.cs
 SIZE: 1525 bytes
 SHA256: dba6dc3cff51e6535d7a935c1194f87c83ed316bb33ad7b65952a06cc6d42ffc
 ====================================================================================================
-
 using Beam.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
@@ -1093,15 +954,12 @@ public class AircraftProximity : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 160
+SOURCE FILE 159
 PATH: Assembly-CSharp__Beam.Intro__AircraftVFX.cs
 SIZE: 29494 bytes
 SHA256: fc99ab72ba4b77fa4e5423c436303a986937b0ec6fbf0cbfabf9068ae95fe7fd
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Events;
@@ -2113,37 +1971,12 @@ public class AircraftVFX : ReplicableMonoBehaviour, ISaveable
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 161
-PATH: Assembly-CSharp__Beam.Intro__IPos.cs
-SIZE: 168 bytes
-SHA256: d0bafd735b1418fd9997cb5305dcd46d30c6948e09e5a481a097842d7df59852
-====================================================================================================
-
-using System;
-using UnityEngine;
-
-namespace Beam.Intro;
-
-[Serializable]
-public class IPos
-{
-	public Interactive_AIRCRAFT_STATION Prefab;
-
-	public Transform Position;
-}
-
-
-
-====================================================================================================
-SOURCE FILE 162
+SOURCE FILE 160
 PATH: Assembly-CSharp__Beam.Intro__Interactive_AIRCRAFT.cs
 SIZE: 5379 bytes
 SHA256: 46b613c904202c523cd333fc4d26412748ba10789578a6b86f10211171135a94
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Events;
@@ -2356,15 +2189,12 @@ public class Interactive_AIRCRAFT : ReplicableMonoBehaviour, IInteractable, IBas
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 163
+SOURCE FILE 161
 PATH: Assembly-CSharp__Beam.Intro__Interactive_AIRCRAFT_COCKPIT.cs
 SIZE: 2525 bytes
 SHA256: 328b7c562a2dcc26884058ed20334d8d8ef824ac016bc83cf31161a1adbcad0b
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Funlabs;
@@ -2495,15 +2325,12 @@ public class Interactive_AIRCRAFT_COCKPIT : ReplicableMonoBehaviour, IInteractab
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 164
+SOURCE FILE 162
 PATH: Assembly-CSharp__Beam.Intro__Interactive_AIRCRAFT_DOOR.cs
 SIZE: 1836 bytes
 SHA256: 1c9c3f38f3932de901662e139e53706221dc60925582debae5912b49cba0f99e
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Serialization.Json;
@@ -2606,15 +2433,12 @@ public class Interactive_AIRCRAFT_DOOR : ReplicableMonoBehaviour, IInteractable,
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 165
+SOURCE FILE 163
 PATH: Assembly-CSharp__Beam.Intro__Interactive_AIRCRAFT_STATION.cs
 SIZE: 4056 bytes
 SHA256: cc2b2b0e814995e7f79eb9c87beec52a70143949f696ad898dd2545cd6dee251
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Language;
@@ -2810,15 +2634,31 @@ public class Interactive_AIRCRAFT_STATION : ReplicableMonoBehaviour, IInteractab
 	}
 }
 
+====================================================================================================
+SOURCE FILE 164
+PATH: Assembly-CSharp__Beam.Intro__IPos.cs
+SIZE: 168 bytes
+SHA256: d0bafd735b1418fd9997cb5305dcd46d30c6948e09e5a481a097842d7df59852
+====================================================================================================
+using System;
+using UnityEngine;
 
+namespace Beam.Intro;
+
+[Serializable]
+public class IPos
+{
+	public Interactive_AIRCRAFT_STATION Prefab;
+
+	public Transform Position;
+}
 
 ====================================================================================================
-SOURCE FILE 166
+SOURCE FILE 165
 PATH: Assembly-CSharp__Beam.Intro__PrivateJet.cs
 SIZE: 22236 bytes
 SHA256: f230a94a0168075f6470c255b8d953625e6f5531cd25c19b876ddaf54608582c
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -3537,15 +3377,12 @@ public class PrivateJet : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 167
+SOURCE FILE 166
 PATH: Assembly-CSharp__Beam.Language__LocalizationTerms.cs
 SIZE: 131980 bytes
 SHA256: 8db90593a60b6e13fae5bc22b37b5c3f5f0fb52e56348fa20ecf20f0f7bad7d2
 ====================================================================================================
-
 namespace Beam.Language;
 
 public class LocalizationTerms
@@ -6487,15 +6324,12 @@ public class LocalizationTerms
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 168
+SOURCE FILE 167
 PATH: Assembly-CSharp__Beam.Ocean__StructureBuoyancy.cs
 SIZE: 5897 bytes
 SHA256: f24f6e4d06ee4d1463b2a1e90f92cd5126d646bd866a46a82ae59946ac15f10c
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.UI;
 using Ceto;
@@ -6741,15 +6575,12 @@ public class StructureBuoyancy : MultiplayerBehaviour, IQueryWaves
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 169
+SOURCE FILE 168
 PATH: Assembly-CSharp__Beam.PostEffects__SunshaftsEffect.cs
 SIZE: 2732 bytes
 SHA256: fe612a79a14ac5b0a2c08cf86d95a17539fe6a8ca57b366b3dca4ce8a9fde916
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
@@ -6808,15 +6639,12 @@ public class SunshaftsEffect : PostProcessEffectRenderer<SunshaftsSettings>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 170
+SOURCE FILE 169
 PATH: Assembly-CSharp__Beam.Rendering__DynamicImpostor.cs
 SIZE: 7265 bytes
 SHA256: d1de66dcddcac046f4042ad79d35b8e325ac54b54876cbe41cc5055db0fb3b37
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Utilities;
@@ -7094,15 +6922,12 @@ public class DynamicImpostor : ImpostorBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 171
+SOURCE FILE 170
 PATH: Assembly-CSharp__Beam.Rendering__ImpostorManager.cs
 SIZE: 4160 bytes
 SHA256: 57dff09f80781706f87aae8ceccc8053568c2da04edf5fbe5876fc2a0ab0aa14
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Events;
 using Funlabs;
@@ -7271,15 +7096,12 @@ public class ImpostorManager : SerializedMonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 172
+SOURCE FILE 171
 PATH: Assembly-CSharp__Beam.Serialization__Prefabs.cs
 SIZE: 7840 bytes
 SHA256: fcd353a3c3d78e0a268110e12b80b6dfa9e0999def8c5d1aac935d15a8323a16
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Serialization.Json;
 using Beam.Utilities;
@@ -7578,15 +7400,12 @@ public static class Prefabs
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 173
+SOURCE FILE 172
 PATH: Assembly-CSharp__Beam.Terrain__Map.cs
 SIZE: 762 bytes
 SHA256: 9911e28016cb4878c66393c4ab7ddef05a7c56e7caca158d6e4ad9f8be8e296d
 ====================================================================================================
-
 using System;
 using Beam.Serialization.Json;
 
@@ -7643,15 +7462,12 @@ public class Map
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 174
+SOURCE FILE 173
 PATH: Assembly-CSharp__Beam.Terrain__Maps.cs
 SIZE: 11373 bytes
 SHA256: 2ad14f56cbf00c2c874b0f02603fae51dd6c4e221e6ed7a598660b9c0662a941
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8075,15 +7891,12 @@ public static class Maps
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 175
+SOURCE FILE 174
 PATH: Assembly-CSharp__Beam.Terrain__World.cs
 SIZE: 19040 bytes
 SHA256: 58d5ce4ac8b9694d3267464e4471c28fa28032cac9e60d65184506c1e7933d5b
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8883,4 +8696,791 @@ public static class World
 	}
 }
 
+====================================================================================================
+SOURCE FILE 175
+PATH: Assembly-CSharp__Beam.Terrain__ZoneLoader.cs
+SIZE: 25252 bytes
+SHA256: 4e3a59b52d0645f6ab951cd432f74169b011d5375b50b4c4b0885f418bcc5273
+====================================================================================================
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Beam.Rendering;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using SharpNeatLib.Maths;
+using Sirenix.Utilities;
+using UnityEngine;
+
+namespace Beam.Terrain;
+
+public class ZoneLoader : ILoader
+{
+	public delegate void GenerationCallback(IGenerationObject obj, Vector3 position, Quaternion rotation, Zone zone);
+
+	public delegate void ProcessCollectionCallback<in T>(T obj, Zone zone);
+
+	public enum EObjectProcessingMode
+	{
+		Stepped,
+		Faster
+	}
+
+	private const int MIN_PROCESSING_STEPS_PER_FRAME = 4;
+
+	private const int MAX_PROCESSING_STEPS_PER_FRAME = 200;
+
+	private const int INDEX_SIZE = 256;
+
+	[SerializeField]
+	private bool _simulateSlowLoad;
+
+	private List<Action> _internalDeferredLoading = new List<Action>();
+
+	private List<Action> _deferredLoading = new List<Action>();
+
+	private List<Action> _postLoading = new List<Action>();
+
+	private List<Action> _physicalLoading = new List<Action>();
+
+	private bool _isGenerating;
+
+	private FastRandom _random = new FastRandom();
+
+	private Vector3 _position;
+
+	private int _processes;
+
+	private Stopwatch _timer = new Stopwatch();
+
+	private float _timeout;
+
+	public IList<Action> DeferredLoading => _deferredLoading;
+
+	public IList<Action> PostLoading => _postLoading;
+
+	public IList<Action> PhysicalLoading => _physicalLoading;
+
+	public bool IsGenerating => _isGenerating;
+
+	public bool IsLoading { get; set; }
+
+	public FastRandom Random => _random;
+
+	public EObjectProcessingMode ObjectProcessingMode { get; set; }
+
+	public event Action<Zone> CreatedZone;
+
+	public event Action<Zone> LoadedZone;
+
+	private void OnDestroy()
+	{
+		CreatedZone = null;
+		LoadedZone = null;
+	}
+
+	public float LoadZone_Async(Zone zone, JObject data)
+	{
+		return Timing.WaitUntilDone(LoadZone(zone, data));
+	}
+
+	public CoroutineHandle LoadZone(Zone zone, JObject data)
+	{
+		return Timing.RunCoroutine(LoadZone_Sequence(zone, data), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> LoadZone_Sequence(Zone zone, JObject data)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		LevelLoader.Instance.LoadingZones.Add(zone);
+		LevelLoader.Instance.HashCodes.Clear();
+		LevelLoader.CurrentLoader = this;
+		LevelLoader.CurrentLoader.IsLoading = true;
+		ResetTemporaryLoadingPosition();
+		zone.Loading = true;
+		zone.Enter();
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		JObject field = data.GetField("Attributes");
+		if (field != null)
+		{
+			SavingUtilities.Load(zone.Attributes, field);
+		}
+		_processes = 4;
+		JObject field2 = data.GetField("Objects");
+		if (field2 != null && !field2.IsNull())
+		{
+			yield return ProcessCollection_Async(field2.Children, CreateLoadedPrefab, zone);
+			if (Game.Mode.IsClient())
+			{
+				yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+			}
+		}
+		else
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Zone [" + zone.ZoneName + "] [Objects] field is null or empty.");
+		}
+		yield return 0f;
+		yield return 0f;
+		yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.ProcessLoading));
+		yield return ProcessCollection_Async(_internalDeferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_deferredLoading, InvokeCallback, zone);
+		yield return ProcessCollection_Async(_postLoading, InvokeCallback, zone);
+		if (AssetBundleManager.IsLoading)
+		{
+			UnityEngine.Debug.Log("ZoneLoader::LoadZoneAsync:: [" + zone.ZoneName + "] waiting for bundles to load...");
+		}
+		while (AssetBundleManager.IsLoading)
+		{
+			yield return 0f;
+		}
+		yield return 0f;
+		for (int i = 0; i < _physicalLoading.Count; i++)
+		{
+			LoadingActionUtilities.ExecuteDeferredAction(_physicalLoading[i]);
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		LoadedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		if (Game.Mode.IsMaster())
+		{
+			Singleton<StrandedWorld>.Instance.HandleOutOfGameBounds(zone, handleNmlContainer: true);
+		}
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public void AbortLoadingZone(Zone zone)
+	{
+		Timing.KillCoroutines(100);
+		BeamTeam.DestroyAllChildrenImmediate(zone.SaveContainer);
+		Transform parent = Singleton<StrandedWorld>.Instance.GetParent();
+		for (int num = parent.childCount - 1; num >= 0; num--)
+		{
+			Transform child = parent.GetChild(num);
+			if (Singleton<StrandedWorld>.Instance.InBounds(child.position))
+			{
+				BeamTeam.DestroyImmediate(child.gameObject);
+			}
+		}
+		zone.Exit();
+		zone.Loading = false;
+		zone.Loaded = false;
+		_ = _isGenerating;
+		CleanUp(zone);
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void CleanUp(Zone zone)
+	{
+		_timer.Stop();
+		_isGenerating = false;
+		if (!LevelLoader.CurrentLoader.IsNullOrDestroyed())
+		{
+			_internalDeferredLoading.Clear();
+			_deferredLoading.Clear();
+			_postLoading.Clear();
+			_physicalLoading.Clear();
+			LevelLoader.CurrentLoader.IsLoading = false;
+			LevelLoader.CurrentLoader = null;
+			LevelLoader.Instance.HashCodes.Clear();
+			LevelLoader.Instance.LoadingZones.Remove(zone);
+		}
+	}
+
+	public bool CreateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		CreateZoneObjects(zone);
+		return true;
+	}
+
+	public float CreateZoneObjects_Async(Zone zone, int seed)
+	{
+		return Timing.WaitUntilDone(CreateZoneObjects(zone));
+	}
+
+	private CoroutineHandle CreateZoneObjects(Zone zone)
+	{
+		return Timing.RunCoroutine(CreateZoneObjects_Sequence(zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> CreateZoneObjects_Sequence(Zone zone)
+	{
+		_timer.Restart();
+		UpdateSessionToken_IsBusy(isBusy: true);
+		_isGenerating = true;
+		zone.Loading = true;
+		zone.Enter();
+		_processes = 1;
+		_timeout = Peer.GetDefaultTimeout();
+		if (Game.Mode.IsMultiplayer())
+		{
+			_timeout = PlayerRegistry.LocalPeer.Timeout;
+			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
+		}
+		yield return ProcessCollection_Async(zone.GeneratedObjects, CreateGeneratedPrefab, zone);
+		if (Game.Mode.IsClient())
+		{
+			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
+		}
+		zone.Loading = false;
+		zone.Loaded = true;
+		CreatedZone?.Invoke(zone);
+		zone.HasVisited = true;
+		CleanUp(zone);
+		_isGenerating = false;
+		if (Game.Mode.IsMultiplayer())
+		{
+			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
+		}
+		UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	public bool GenerateZone(Zone zone)
+	{
+		if (_isGenerating)
+		{
+			return false;
+		}
+		GenerateObjects(zone, GenerateObject);
+		return true;
+	}
+
+	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
+	{
+		_isGenerating = true;
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		zone.GenerateGridData();
+		zone.GeneratedObjects.Clear();
+		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
+		if (zone.HasShelter)
+		{
+			GenerateShelter(sheltersGeneration, zone, generationCallback);
+		}
+		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
+		{
+			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
+			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
+			{
+				continue;
+			}
+			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
+			{
+				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
+				switch (zoneObjects.generationType)
+				{
+				case ZoneGenerationType.Position:
+					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
+					break;
+				case ZoneGenerationType.Procedural:
+					GenerateProceduralObjectsProcedural(zoneObjects, zone, generationCallback);
+					break;
+				}
+			}
+		}
+		if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL)
+		{
+			for (int k = 0; k < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration.Count; k++)
+			{
+				ObjectCategory objectCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration[k];
+				for (int l = 0; l < objectCategory.ProceduralObjects.Count; l++)
+				{
+					ZoneObjects zoneObjects2 = objectCategory.ProceduralObjects[l];
+					switch (zoneObjects2.generationType)
+					{
+					case ZoneGenerationType.Position:
+						GenerateProceduralObjectsPosition(zoneObjects2, zone, generationCallback);
+						break;
+					case ZoneGenerationType.Procedural:
+						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
+						break;
+					}
+				}
+			}
+		}
+		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
+		_isGenerating = false;
+	}
+
+	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
+		{
+			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			int num2 = 0;
+			if (zoneObjects.Objects.Length != 0)
+			{
+				float num3 = (float)_random.NextDouble() * num;
+				for (int k = 0; k < zoneObjects.Objects.Length; k++)
+				{
+					if (num3 < zoneObjects.Objects[k].Rarity)
+					{
+						num2 = k;
+						break;
+					}
+					num3 -= zoneObjects.Objects[k].Rarity;
+				}
+			}
+			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
+			Quaternion identity = Quaternion.identity;
+			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
+			generationCallback(obj, position, identity, zone);
+		}
+	}
+
+	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.");
+			return;
+		}
+		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
+		float num = 0f;
+		if (zoneObjects.Objects.Length != 0)
+		{
+			for (int i = 0; i < zoneObjects.Objects.Length; i++)
+			{
+				ZoneObject zoneObject = zoneObjects.Objects[i];
+				num += zoneObject.Rarity;
+			}
+		}
+		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
+		{
+			return;
+		}
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num2 = 0;
+		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
+		{
+			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
+			{
+				if (num2 >= zoneObjects.maxObjectCount)
+				{
+					return;
+				}
+				GenerationPoints generationPoints = zone.GenerationPoints[j, k];
+				if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f) || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+				{
+					continue;
+				}
+				int num3 = 0;
+				if (zoneObjects.Objects.Length != 0)
+				{
+					float num4 = (float)_random.NextDouble() * num;
+					for (int l = 0; l < zoneObjects.Objects.Length; l++)
+					{
+						if (num4 < zoneObjects.Objects[l].Rarity)
+						{
+							num3 = l;
+							break;
+						}
+						num4 -= zoneObjects.Objects[l].Rarity;
+					}
+				}
+				Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+				Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+				Quaternion quaternion = Quaternion.identity;
+				if (zoneObjects.terrainSnap)
+				{
+					quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+				}
+				int num5 = _random.Next(0, 360);
+				if (zoneObjects.randomRotation)
+				{
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num5)) : Quaternion.Euler(Vector3.up * num5));
+				}
+				else if (zoneObjects.randomFullRotation)
+				{
+					int num6 = _random.Next(0, 360);
+					int num7 = _random.Next(0, 360);
+					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num6, num5, num7))) : Quaternion.Euler(new Vector3(num6, num5, num7)));
+				}
+				if (zoneObjects.occupyPoint)
+				{
+					generationPoints.Occupied = true;
+				}
+				IGenerationObject obj = zoneObjects.Objects[num3].Obj;
+				generationCallback(obj, position, quaternion, zone);
+				if (zoneObjects.maxObjectCount != 0)
+				{
+					num2++;
+				}
+			}
+		}
+	}
+
+	private void GenerateShelter(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
+	{
+		if (!zone.HasShelter)
+		{
+			return;
+		}
+		int shelterType = zone.ShelterType;
+		UnityEngine.Debug.Log(">>Generating shelter type : " + zoneObjects.Objects[shelterType].Obj.gameObject.name + ", on Zone :" + zone.ZoneName);
+		int detailAmountFactor = zoneObjects.detailAmountFactor;
+		int num = 0;
+		int num2 = ((shelterType == 7) ? 8 : ((int)Mathf.Sqrt(zoneObjects.detailAmountFactor)));
+		int num3 = 257;
+		int num4 = 100;
+		int num5 = num3 * num3 % num4;
+		int num6 = 0;
+		int num7 = 0;
+		_ = num3 * num3 / num4;
+		if (num3 * num3 % num4 <= 0)
+		{
+		}
+		while (num6 < num3 * num3 && num < 1)
+		{
+			num7 = 0;
+			int num8 = num6 % num4;
+			int num9 = num6 / num4;
+			num6++;
+			for (int i = 0; i < num8; i++)
+			{
+				num7 = ((i >= num5) ? (num7 + num3 * num3 / detailAmountFactor) : (num7 + (num3 * num3 / num4 + 1)));
+			}
+			num7 += num9;
+			if (num7 >= num3 * num3)
+			{
+				continue;
+			}
+			int num10 = num7 / num3;
+			int num11 = num7 % num3;
+			if (num10 >= num3 - 1 || num11 >= num3 - 1 || !((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
+			{
+				continue;
+			}
+			GenerationPoints generationPoints = zone.GenerationPoints[num10, num11];
+			bool flag = false;
+			for (int j = num10 - num2; j <= num10 + num2; j++)
+			{
+				if (j < 0 || j >= num3 - 1)
+				{
+					continue;
+				}
+				for (int k = num11 - num2; k <= num11 + num2; k++)
+				{
+					if (k >= 0 && k < num3 - 1 && zone.GenerationPoints[j, k].Occupied)
+					{
+						flag = true;
+					}
+				}
+			}
+			if (flag || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
+			{
+				continue;
+			}
+			Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
+			Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
+			Quaternion quaternion = Quaternion.identity;
+			if (zoneObjects.terrainSnap)
+			{
+				quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
+			}
+			int num12 = _random.Next(0, 360);
+			if (zoneObjects.randomRotation)
+			{
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num12)) : Quaternion.Euler(Vector3.up * num12));
+			}
+			else if (zoneObjects.randomFullRotation)
+			{
+				int num13 = _random.Next(0, 360);
+				int num14 = _random.Next(0, 360);
+				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num13, num12, num14))) : Quaternion.Euler(new Vector3(num13, num12, num14)));
+			}
+			if (zoneObjects.occupyPoint)
+			{
+				generationPoints.Occupied = true;
+				for (int l = num10 - num2; l <= num10 + num2; l++)
+				{
+					if (l < 0 || l >= num3 - 1)
+					{
+						continue;
+					}
+					for (int m = num11 - num2; m <= num11 + num2; m++)
+					{
+						if (m >= 0 && m < num3 - 1)
+						{
+							zone.GenerationPoints[l, m].Occupied = true;
+						}
+					}
+				}
+			}
+			IGenerationObject obj = zoneObjects.Objects[shelterType].Obj;
+			generationCallback(obj, position, quaternion, zone);
+			num++;
+		}
+	}
+
+	private void GenerateObject(IGenerationObject generationObject, Vector3 position, Quaternion rotation, Zone zone)
+	{
+		GeneratedObject generatedObject = new GeneratedObject();
+		generatedObject.Prefab = generationObject.gameObject;
+		generatedObject.Position = position;
+		generatedObject.Rotation = rotation;
+		generatedObject.ImpostorParentPrefab = generationObject.gameObject.GetInterface<IImpostorParent>();
+		zone.OnObjectGenerated(generatedObject);
+	}
+
+	private void CreateGeneratedPrefab(GeneratedObject objectData, Zone zone)
+	{
+		SaveablePrefab component = objectData.Prefab.GetComponent<SaveablePrefab>();
+		GameObject gameObject;
+		if (component != null)
+		{
+			uint prefabId = component.PrefabId;
+			MiniGuid referenceId = MiniGuid.NewFrom(objectData.Position, prefabId, 48879);
+			if (Game.Mode.IsClient() && component.IsMultiplayerEntity)
+			{
+				MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneGeneration, referenceId, ClientSetParent, null, zone);
+				return;
+			}
+			gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, objectData.Position, objectData.Rotation, referenceId).gameObject;
+		}
+		else
+		{
+			gameObject = UnityEngine.Object.Instantiate(objectData.Prefab, objectData.Position, objectData.Rotation);
+		}
+		gameObject.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		gameObject.transform.position = objectData.Position;
+		gameObject.transform.rotation = objectData.Rotation;
+		zone.OnObjectCreated(gameObject);
+	}
+
+	private void CreateLoadedPrefab(JObject data, Zone zone)
+	{
+		JObject field = data.GetField("prefab");
+		if (field == null)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading. No prefab id field found for object data.");
+			return;
+		}
+		uint num = Prefabs.ConvertLegacyPrefabId(field);
+		if (num == 0)
+		{
+			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading instantiated object with empty prefab id.");
+			return;
+		}
+		bool flag = Prefabs.TryGetMultiplayerPrefabName(num, out var _);
+		if (Game.Mode.IsClient() & flag)
+		{
+			MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneLoading, Prefabs.GetReferenceId(data), ClientLoad, data, zone);
+		}
+		else
+		{
+			Load(data, _position, zone, MultiplayerMng.Instantiate<SaveablePrefab>(num, Prefabs.GetReferenceId(data)));
+		}
+		_position += new Vector3(0f, 0f, 50f);
+	}
+
+	private void Load(JObject data, Vector3 position, Zone zone, SaveablePrefab instance)
+	{
+		LevelLoader.Instance.HashCodes.Add(instance.gameObject.GetHashCode());
+		instance.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
+		instance.transform.position = position;
+		string prefabName = instance.name;
+		_internalDeferredLoading.Add(() =>
+		{
+			if (instance.gameObject == null)
+			{
+				UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading prefab [" + prefabName + "]->Object was modified before loading began.\nCheck the object's Awake, Start, Update and FixedUpdate methods for missing [LevelLoader.IsLoading] checks.");
+			}
+			else
+			{
+				if (zone.IsMapEditor && !zone.HasVisited)
+				{
+					try
+					{
+						JSerializer.DeserializeInto(data.GetField("Transform"), instance.gameObject.transform);
+						instance.CompleteTransformSerialization();
+						instance.OnCustomMapLoaded();
+					}
+					catch (Exception ex)
+					{
+						UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading editor object [" + instance.name + "] Object has now been destroyed.\n\n" + ex);
+						MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+					}
+				}
+				else if (!SavingUtilities.Load(instance, data))
+				{
+					UnityEngine.Debug.LogError($"ZoneLoader::LoadZoneAsync:: Error loading [{instance.name}] [{instance.ReferenceId}]->Object has now been destroyed.");
+					MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
+				}
+				if (instance.gameObject != null)
+				{
+					zone.OnObjectLoaded(instance.gameObject);
+				}
+			}
+		});
+	}
+
+	private void ClientLoad(MultiplayerZoneSync.Command command)
+	{
+		Load(command.Data, Vector3.zero, command.Zone, command.Instance);
+	}
+
+	private void ClientSetParent(MultiplayerZoneSync.Command command)
+	{
+		command.Instance.transform.SetParent(command.Zone.SaveContainer);
+	}
+
+	private void InvokeCallback(Action action, Zone zone)
+	{
+		LoadingActionUtilities.ExecuteDeferredAction(action);
+	}
+
+	private void ResetTemporaryLoadingPosition()
+	{
+		_position = new Vector3(0f, 5000f, 0f);
+	}
+
+	private float ProcessCollection_Async<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.WaitUntilDone(ProcessCollection(collection, callback, zone));
+	}
+
+	private CoroutineHandle ProcessCollection<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		return Timing.RunCoroutine(ProcessCollection_Sequence(collection, callback, zone), Segment.Update, 100);
+	}
+
+	private IEnumerator<float> ProcessCollection_Sequence<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
+	{
+		IEnumerator<T> enumerator = collection.GetEnumerator();
+		int index = 0;
+		bool stop = false;
+		while (!stop)
+		{
+			_ = collection.Count;
+			_ = index;
+			int processingSteps = GetProcessingSteps(collection.Count, zone.transform.position);
+			for (int i = 0; i < processingSteps; i++)
+			{
+				if (!enumerator.MoveNext())
+				{
+					stop = true;
+					break;
+				}
+				callback?.Invoke(enumerator.Current, zone);
+				index++;
+			}
+			yield return float.NegativeInfinity;
+		}
+		enumerator.Dispose();
+	}
+
+	private int GetProcessingSteps(int quantity, Vector3 position)
+	{
+		int b = ((ObjectProcessingMode == EObjectProcessingMode.Faster) ? 200 : 4);
+		Transform closestPlayer = GetClosestPlayer(position);
+		if (closestPlayer.IsNullOrDestroyed())
+		{
+			return 1;
+		}
+		float num = (position - closestPlayer.position).magnitude - 125f;
+		num /= (float)_processes;
+		return Mathf.Max(Mathf.CeilToInt((float)quantity / Mathf.Max(1f, num)), b);
+	}
+
+	private Transform GetClosestPlayer(Vector3 position)
+	{
+		if (PlayerRegistry.AllPlayers.IsNullOrDestroyed() || PlayerRegistry.AllPlayers.Count == 0)
+		{
+			return null;
+		}
+		IPlayer player = PlayerRegistry.AllPlayers[0];
+		if (Game.Mode.GetPlayersCount() == 1)
+		{
+			return player.transform;
+		}
+		float num = float.PositiveInfinity;
+		for (int i = 1; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			IPlayer player2 = PlayerRegistry.AllPlayers[i];
+			float magnitude = (position - player2.transform.position).magnitude;
+			if (magnitude < num)
+			{
+				num = magnitude;
+				player = player2;
+			}
+		}
+		return player.transform;
+	}
+
+	private void UpdateSessionToken_IsBusy(bool isBusy)
+	{
+		if (Game.Mode.IsServer())
+		{
+			if (isBusy && !MultiplayerMng.GetSessionToken().IsBusy)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+			}
+			else if (!isBusy && !LevelLoader.IsCreatingOrLoading)
+			{
+				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			}
+		}
+	}
+
+	private IEnumerator<float> ClientLinking()
+	{
+		float startTime = Time.unscaledTime;
+		bool shutdown = false;
+		do
+		{
+			if (Time.unscaledTime - startTime > MultiplayerZoneSync.CLIENT_LINK_TIME && !shutdown)
+			{
+				shutdown = true;
+				PlayerRegistry.LocalPeer.ReplicatedDisconnect(DisconnectDetail.Timeout_Linking, null, forceLocalShutdown: true);
+				MultiplayerZoneSync.Instance.DumpNotCompleted();
+			}
+			yield return 0f;
+		}
+		while (!MultiplayerZoneSync.Instance.IsLinked());
+	}
+}
 

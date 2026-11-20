@@ -1,11 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 101
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__RagdollUtility.cs
 SIZE: 9189 bytes
 SHA256: 1165ec5533b230f5bb718b792b18d610adc0259c82b84cc8c92e25912bdff4d1
 ====================================================================================================
-
 using System;
 using System.Collections;
 using UnityEngine;
@@ -458,15 +456,12 @@ public class RagdollUtility : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 102
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Recoil.cs
 SIZE: 8055 bytes
 SHA256: 9ce129287e7428fb713c74e6aa9dac9cfbe1dd5381fdc58981a14ee8de6b3b74
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -765,15 +760,12 @@ public class Recoil : OffsetModifier
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 103
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__TwistRelaxer.cs
 SIZE: 1748 bytes
 SHA256: aac589687a1fdfc9b63807b25cf066a6fee6ed3b0e94579800fcde84b155a8f3
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -851,15 +843,12 @@ public class TwistRelaxer : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 104
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__TwistSolver.cs
 SIZE: 4302 bytes
 SHA256: bbb87e650e07f91284127cdef657b5ba07f22f9470bbaed0bc7c8eea21fc51db
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -999,15 +988,12 @@ public class TwistSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 105
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__VRIK.cs
 SIZE: 9330 bytes
 SHA256: 59c75b79fab0dc72d09f4f69c45f2877f8d964b9710b0d4761cbd62822c74061
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1264,15 +1250,12 @@ public class VRIK : IK
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 106
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__VRIKCalibrator.cs
 SIZE: 21708 bytes
 SHA256: accc5798111f6b06cdab1ed5dd8e98bee95b8f993807bc52efb1b55186528943
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1793,15 +1776,12 @@ public static class VRIKCalibrator
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 107
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__VRIKRootController.cs
 SIZE: 2465 bytes
 SHA256: e582cf25dd7d9df8878e6efdff5e3edc1e93973c5f0991f63daaec6449bcd399
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1889,15 +1869,12 @@ public class VRIKRootController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 108
 PATH: Assembly-CSharp-firstpass__RootMotion__AxisTools.cs
 SIZE: 1937 bytes
 SHA256: 11402387e6a7221ec37619c426988ecb681300d21403f8d117155fdf6335b7b7
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion;
@@ -1988,15 +1965,12 @@ public class AxisTools
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 109
 PATH: Assembly-CSharp-firstpass__RootMotion__Baker.cs
 SIZE: 4686 bytes
 SHA256: cd508bcd13b24275f85540a96796073abb254fe04dc096046c5ba09a6d2121d1
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -2165,15 +2139,12 @@ public abstract class Baker : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 110
 PATH: Assembly-CSharp-firstpass__RootMotion__BakerHumanoidQT.cs
 SIZE: 5332 bytes
 SHA256: 04a4f175a4b9f3da6fe3fcb2608958f978892ca73fff9a937bb26f0aa25f46de
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2387,15 +2358,12 @@ public class BakerHumanoidQT
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 111
 PATH: Assembly-CSharp-firstpass__RootMotion__BakerTransform.cs
 SIZE: 3736 bytes
 SHA256: d555c244c13ff749c22d7f526f3b0a95c86f9bcd69ca1b7228592b621a6c0613
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2539,15 +2507,12 @@ public class BakerTransform
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 112
 PATH: Assembly-CSharp-firstpass__RootMotion__BipedNaming.cs
 SIZE: 7450 bytes
 SHA256: 03e308a9be3855a6c101b9c9ac5d8fe4221407066e7158945ec9c9efc2e741b7
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2876,15 +2841,12 @@ public static class BipedNaming
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 113
 PATH: Assembly-CSharp-firstpass__RootMotion__BipedReferences.cs
 SIZE: 19254 bytes
 SHA256: dab82cc2d4be101cc7cf05b5f0d750f79e7a35c6061c9ffe4ff483f546e632cd
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3563,15 +3525,12 @@ public class BipedReferences
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 114
 PATH: Assembly-CSharp-firstpass__RootMotion__CameraController.cs
 SIZE: 5245 bytes
 SHA256: e8d4de21fc84d7cce932bc480be3bedb260272559f2d9712367818f3f7039ccc
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3821,15 +3780,12 @@ public class CameraController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 115
 PATH: Assembly-CSharp-firstpass__RootMotion__GenericBaker.cs
 SIZE: 2534 bytes
 SHA256: 7d2b259c5d0c87e092b504bd4518033b82f8c528d20f9541bbfe445af8b6be0d
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3943,15 +3899,12 @@ public class GenericBaker : Baker
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 116
 PATH: Assembly-CSharp-firstpass__RootMotion__Hierarchy.cs
 SIZE: 4031 bytes
 SHA256: 4a53966c3a9642bf45e9462501db75942a932ac8ccd486e146e205751535c7a2
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -4156,15 +4109,12 @@ public class Hierarchy
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 117
 PATH: Assembly-CSharp-firstpass__RootMotion__HumanoidBaker.cs
 SIZE: 5750 bytes
 SHA256: d53fbe396ffa2abd043f909d0921d5167f7e2624563cff8e4ece63834dcc9021
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -4334,15 +4284,12 @@ public class HumanoidBaker : Baker
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 118
 PATH: Assembly-CSharp-firstpass__RootMotion__SolverManager.cs
 SIZE: 2644 bytes
 SHA256: c5e447656ccbf70854f79d9fa4fa5c4f6e8e35a346597aeecf7224f33b927ef3
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion;
@@ -4503,15 +4450,12 @@ public class SolverManager : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 119
 PATH: Assembly-CSharp-firstpass__RootMotion__V3Tools.cs
 SIZE: 6512 bytes
 SHA256: f283e2f18bfa47658de6ee4027e24a06e354a78bf75a553796505d40ebd09ca5
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -4751,15 +4695,12 @@ public static class V3Tools
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 120
 PATH: Assembly-CSharp-firstpass__RootMotion__Warning.cs
 SIZE: 571 bytes
 SHA256: 3cba35a5ca172a80992142eb8cea17209a9672319a3a18ec5ef181e14183dfc6
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion;
@@ -4789,15 +4730,12 @@ public static class Warning
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 121
 PATH: Assembly-CSharp__AmplifyImpostors__AmplifyImpostor.cs
 SIZE: 18369 bytes
 SHA256: 7cb9e71f1b8a26384fa0a23beaf0742d35305e35611e3c83b867716251eab4fb
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5404,15 +5342,12 @@ public class AmplifyImpostor : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 122
 PATH: Assembly-CSharp__AmplifyImpostors__BoundsEx.cs
 SIZE: 790 bytes
 SHA256: 0e95e1e2dfd7c7b7495f3ee32121c20586628a3a26a803ca070f945c2e2df4c2
 ====================================================================================================
-
 using UnityEngine;
 
 namespace AmplifyImpostors;
@@ -5437,15 +5372,12 @@ public static class BoundsEx
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 123
 PATH: Assembly-CSharp__Atmosphere.cs
 SIZE: 13480 bytes
 SHA256: 27a336e5db073279e05db5f729bd0d3b34659d5ea9026e35862f49b07040752b
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Utilities;
@@ -5923,15 +5855,12 @@ public class Atmosphere : Singleton<Atmosphere>
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 124
 PATH: Assembly-CSharp__AtmosphereClouds.cs
 SIZE: 5956 bytes
 SHA256: f717872258ffe2b61fd7e890cac17270aff09bf1dbc9e7c3424075ea0e9242c6
 ====================================================================================================
-
 using System;
 using Beam;
 using Beam.Events;
@@ -6124,15 +6053,12 @@ public class AtmosphereClouds : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 125
 PATH: Assembly-CSharp__AtmosphereStorm.cs
 SIZE: 6870 bytes
 SHA256: 832c103263ce6e3d6f1aa039564c998a55f49246ef5620b6daa90f141e9944cf
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam;
 using Beam.Events;
@@ -6418,5 +6344,4 @@ public class AtmosphereStorm : Singleton<AtmosphereStorm>, IPersistentSaveable, 
 		}
 	}
 }
-
 

@@ -1,162 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 401
-PATH: Assembly-CSharp__Piscus_Animation.cs
-SIZE: 3465 bytes
-SHA256: 5c5911044eaaa2054d510b2cafafb4bb0e6458ef157110d07e8c777d66a28ae3
-====================================================================================================
-
-using UnityEngine;
-
-public class Piscus_Animation : MonoBehaviour
-{
-	[SerializeField]
-	private Animation _anim;
-
-	[SerializeField]
-	private Animator _animatorController;
-
-	private float _normalDirection;
-
-	public Animator AnimatorController => _animatorController;
-
-	public void Animation_Setup()
-	{
-		if (_anim != null)
-		{
-			_anim.wrapMode = WrapMode.Loop;
-			if ((bool)_anim["Attack"])
-			{
-				_anim["Attack"].layer = 2;
-				_anim["Attack"].wrapMode = WrapMode.Once;
-			}
-			if ((bool)_anim["Damage_Left"])
-			{
-				_anim["Damage_Left"].layer = 1;
-				_anim["Damage_Left"].wrapMode = WrapMode.Once;
-			}
-			if ((bool)_anim["Damage_Right"])
-			{
-				_anim["Damage_Right"].layer = 1;
-				_anim["Damage_Right"].wrapMode = WrapMode.Once;
-			}
-			if ((bool)_anim["Attacking"])
-			{
-				_anim["Attacking"].wrapMode = WrapMode.Once;
-				_anim["Attacking"].layer = 2;
-			}
-			if ((bool)_anim["Swimming_Left"])
-			{
-				_anim["Swimming_Left"].wrapMode = WrapMode.Loop;
-			}
-			if ((bool)_anim["Swimming_Right"])
-			{
-				_anim["Swimming_Right"].wrapMode = WrapMode.Loop;
-			}
-		}
-	}
-
-	public void UpdateAnimation(Vector3 movementPosition, float currentSpeed, float minSpeed, float maxSpeed)
-	{
-		float a = 0f;
-		Vector3 vector = transform.InverseTransformPoint(movementPosition);
-		a = Mathf.Lerp(a, Mathf.Atan2(vector.x, vector.z), 4f * Time.deltaTime);
-		_normalDirection = Mathf.Lerp(_normalDirection, a, Time.deltaTime * 2f);
-		if (_anim != null)
-		{
-			if (_normalDirection < -0.005f && (bool)_anim["Swimming_Left"])
-			{
-				_anim["Swimming_Left"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
-				_anim.CrossFade("Swimming_Left", 0.4f);
-			}
-			else if (_normalDirection > 0.005f && (bool)_anim["Swimming_Right"])
-			{
-				_anim["Swimming_Right"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
-				_anim.CrossFade("Swimming_Right", 0.4f);
-			}
-			else
-			{
-				_anim["Swimming"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
-				_anim.CrossFade("Swimming", 0.4f);
-			}
-		}
-		if ((bool)_animatorController)
-		{
-			_animatorController.SetFloat("Direction", _normalDirection);
-			float value = (currentSpeed - minSpeed) / (maxSpeed - minSpeed);
-			_animatorController.SetFloat("Speed", value);
-		}
-	}
-
-	public void Animation_Damage(Vector3 targetPosition)
-	{
-		if (_anim != null)
-		{
-			float num = 0f;
-			Vector3 vector = transform.InverseTransformPoint(targetPosition);
-			num = Mathf.Atan2(vector.x, vector.z);
-			if (num < -0.05f && (bool)_anim["Damage_Left"])
-			{
-				_anim.CrossFade("Damage_Left", 0.2f);
-			}
-			else if (num > 0.05f && (bool)_anim["Damage_Right"])
-			{
-				_anim.CrossFade("Damage_Right", 0.2f);
-			}
-			else if ((bool)_anim["Damage_Left"])
-			{
-				_anim.CrossFade("Damage_Left", 0.2f);
-			}
-		}
-		if ((bool)_animatorController)
-		{
-			_animatorController.SetTrigger("TakeDamage");
-		}
-	}
-
-	public void Animation_Bite()
-	{
-		if (_anim != null && (bool)_anim["Attack"])
-		{
-			_anim.CrossFade("Attack", 0.05f);
-		}
-		if ((bool)_animatorController)
-		{
-			_animatorController.SetTrigger("Attack");
-		}
-	}
-
-	public void Animation_Attacking()
-	{
-		if (_anim != null && (bool)_anim["Attacking"])
-		{
-			_anim.CrossFade("Attacking");
-		}
-		if ((bool)_animatorController)
-		{
-			_animatorController.SetTrigger("Attack");
-		}
-	}
-
-	public void Animation_Attack_Complete()
-	{
-		if (_anim != null && (bool)_anim["Attacking"] && (bool)_anim["Attack"])
-		{
-			_anim["Attack"].enabled = false;
-			_anim["Attacking"].enabled = false;
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 402
 PATH: Assembly-CSharp__Piscus_Creature.cs
 SIZE: 45733 bytes
 SHA256: b256eb48cf97ba22a96ea32bc06ed5dbb292c549784787ee8d2a460cf4737d5e
 ====================================================================================================
-
 using System;
 using System.Collections;
 using Beam;
@@ -2020,15 +1867,550 @@ public class Piscus_Creature : StateMachine<Piscus_Creature>, IPlayerProximityHa
 	}
 }
 
+====================================================================================================
+SOURCE FILE 402
+PATH: Assembly-CSharp__PiscusFollower.cs
+SIZE: 9741 bytes
+SHA256: 016b64de7a5df1f33079aadbc10505f918f6268d6e9d04ab7fff56637d0cc18c
+====================================================================================================
+using System;
+using Beam;
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
 
+public class PiscusFollower : Singleton<PiscusFollower>, IPersistentSaveable, ISaveable
+{
+	[Serializable]
+	public class CreatureToSpawn
+	{
+		public GameObject CreatureObj;
+
+		public float Rarity;
+	}
+
+	private class PlayerGridGroup
+	{
+		private int PlayerId;
+
+		public SpawnGrid[,] SpawnGrids;
+
+		public IPlayer Player => PlayerUtilities.GetPlayerFromId(PlayerId);
+
+		public PlayerGridGroup(int playerId)
+		{
+			PlayerId = playerId;
+		}
+	}
+
+	private class SpawnGrid
+	{
+		public Transform Grid;
+
+		public PiscusManager piscusManager;
+
+		public bool CanGenerate = true;
+
+		public bool Generated;
+
+		public SpawnGrid(Transform grid)
+		{
+			Grid = grid;
+		}
+	}
+
+	private const int GRID_DIMENSION = 250;
+
+	private const int GRID_SIZE = 3;
+
+	private Vector3[] _loadedCenterGridPos = new Vector3[2];
+
+	public CreatureToSpawn[] Creatures;
+
+	private PlayerGridGroup[] _playerGridGroup;
+
+	private bool _removedWildlifeSetting;
+
+	private void Start()
+	{
+		if (!LevelLoader.IsLoading() && (bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
+		}
+	}
+
+	private void SetDifficultyParams()
+	{
+		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
+	}
+
+	protected override void OnDestroy()
+	{
+		if ((bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated -= CreateGrid;
+		}
+		base.OnDestroy();
+	}
+
+	private void CreateGrid()
+	{
+		if (Game.Mode.IsClient())
+		{
+			return;
+		}
+		SetDifficultyParams();
+		int count = PlayerRegistry.AllPlayers.Count;
+		_playerGridGroup = new PlayerGridGroup[count];
+		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
+		{
+			_ = PlayerRegistry.AllPlayers[i];
+			_playerGridGroup[i] = new PlayerGridGroup(i);
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
+			playerGridGroup.SpawnGrids = new SpawnGrid[3, 3];
+			Transform transform = new GameObject("PlayerGrid_" + j).transform;
+			transform.transform.parent = base.transform;
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					Transform transform2 = new GameObject("Spawn_Grid_" + k + "_" + l).transform;
+					transform2.parent = transform;
+					transform2.gameObject.layer = gameObject.layer;
+					playerGridGroup.SpawnGrids[k, l] = new SpawnGrid(transform2);
+					playerGridGroup.SpawnGrids[k, l].CanGenerate = true;
+				}
+			}
+			Vector3 position = _loadedCenterGridPos[j];
+			playerGridGroup.SpawnGrids[1, 1].Grid.position = position;
+		}
+		InvokeRepeating("MoveGrid", 0f, 1f);
+		UpdateGridPositions();
+	}
+
+	private void MoveGrid()
+	{
+		if (LevelLoader.IsServerJoinInProgress)
+		{
+			return;
+		}
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			if (playerGridGroup.Player != null && playerGridGroup.SpawnGrids[2, 2] == null)
+			{
+				return;
+			}
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup2 = _playerGridGroup[j];
+			if (playerGridGroup2.Player == null)
+			{
+				continue;
+			}
+			Vector3 position = playerGridGroup2.Player.transform.position;
+			SpawnGrid spawnGrid = null;
+			int num = 0;
+			int num2 = 0;
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					Vector3 position2 = playerGridGroup2.SpawnGrids[k, l].Grid.position;
+					if (position.x >= position2.x - 125f && position.x <= position2.x + 125f && position.z >= position2.z - 125f && position.z <= position2.z + 125f)
+					{
+						spawnGrid = playerGridGroup2.SpawnGrids[k, l];
+						num = 1 - k;
+						num2 = 1 - l;
+						break;
+					}
+				}
+			}
+			if (spawnGrid == playerGridGroup2.SpawnGrids[1, 1])
+			{
+				continue;
+			}
+			SpawnGrid[,] array = new SpawnGrid[3, 3];
+			for (int m = 0; m < 3; m++)
+			{
+				for (int n = 0; n < 3; n++)
+				{
+					int num3 = m + num;
+					int num4 = n + num2;
+					if (num3 < 0 || num3 > 2 || num4 < 0 || num4 > 2)
+					{
+						if ((bool)playerGridGroup2.SpawnGrids[m, n].piscusManager)
+						{
+							UnityEngine.Object.Destroy(playerGridGroup2.SpawnGrids[m, n].piscusManager.gameObject);
+						}
+						playerGridGroup2.SpawnGrids[m, n].CanGenerate = true;
+						playerGridGroup2.SpawnGrids[m, n].Generated = false;
+					}
+					if (num3 < 0)
+					{
+						num3 = 2;
+					}
+					else if (num3 > 2)
+					{
+						num3 = 0;
+					}
+					if (num4 < 0)
+					{
+						num4 = 2;
+					}
+					else if (num4 > 2)
+					{
+						num4 = 0;
+					}
+					array[num3, num4] = playerGridGroup2.SpawnGrids[m, n];
+					playerGridGroup2.SpawnGrids[m, n].Grid.gameObject.name = "Spawn_Grid_" + num3 + "_" + num4;
+				}
+			}
+			playerGridGroup2.SpawnGrids = array;
+			UpdateGridPositions();
+		}
+	}
+
+	private void UpdateGridPositions()
+	{
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			if (playerGridGroup.Player == null)
+			{
+				continue;
+			}
+			playerGridGroup.SpawnGrids[0, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[0, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
+			playerGridGroup.SpawnGrids[0, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			playerGridGroup.SpawnGrids[1, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[1, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			playerGridGroup.SpawnGrids[2, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
+			playerGridGroup.SpawnGrids[2, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
+			playerGridGroup.SpawnGrids[2, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
+			if (_removedWildlifeSetting)
+			{
+				break;
+			}
+			for (int j = 0; j < 3; j++)
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					SpawnGrid spawnGrid = playerGridGroup.SpawnGrids[j, k];
+					if (spawnGrid.CanGenerate)
+					{
+						CreateGridObjects(spawnGrid);
+					}
+				}
+			}
+		}
+	}
+
+	private void CreateGridObjects(SpawnGrid grid)
+	{
+		Zone[] zones = Singleton<StrandedWorld>.Instance.Zones;
+		foreach (Zone zone in zones)
+		{
+			if ((grid.Grid.position - zone.transform.position).magnitude < 150f || grid.Grid.position.x > 2500f || grid.Grid.position.x < -2500f || grid.Grid.position.z > 2500f || grid.Grid.position.z < -2500f)
+			{
+				return;
+			}
+		}
+		for (int j = 0; j < _playerGridGroup.Length; j++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
+			if (playerGridGroup.Player == null)
+			{
+				continue;
+			}
+			for (int k = 0; k < 3; k++)
+			{
+				for (int l = 0; l < 3; l++)
+				{
+					if ((grid.Grid.position - playerGridGroup.SpawnGrids[k, l].Grid.transform.position).magnitude < 10f && playerGridGroup.SpawnGrids[k, l].Generated)
+					{
+						return;
+					}
+				}
+			}
+		}
+		grid.CanGenerate = false;
+		grid.Generated = true;
+		GameObject gameObject = ChooseCreature();
+		if (!(gameObject == null))
+		{
+			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject, grid.Grid.position, Quaternion.identity);
+			grid.piscusManager = gameObject2.GetComponent<PiscusManager>();
+			grid.piscusManager.SpawnDistance = 150f;
+			gameObject2.transform.parent = grid.Grid.transform;
+			grid.piscusManager.transform.position = grid.Grid.position;
+		}
+	}
+
+	private GameObject ChooseCreature()
+	{
+		float num = 0f;
+		CreatureToSpawn[] creatures = Creatures;
+		foreach (CreatureToSpawn creatureToSpawn in creatures)
+		{
+			num += creatureToSpawn.Rarity;
+		}
+		float num2 = UnityEngine.Random.value * num;
+		for (int j = 0; j < Creatures.Length; j++)
+		{
+			if (num2 < Creatures[j].Rarity)
+			{
+				return Creatures[j].CreatureObj;
+			}
+			num2 -= Creatures[j].Rarity;
+		}
+		return null;
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		for (int i = 0; i < _playerGridGroup.Length; i++)
+		{
+			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
+			jObject.AddField("CenterGridPos_" + i, JSerializer.Serialize(playerGridGroup.SpawnGrids[1, 1].Grid.position));
+		}
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+		int playersCount = Game.Mode.GetPlayersCount();
+		_loadedCenterGridPos = new Vector3[playersCount];
+		if (data != null && !data.IsNull())
+		{
+			JObject field = data.GetField("CenterGridPos");
+			if (field != null)
+			{
+				Vector3 vector = JSerializer.Deserialize<Vector3>(field);
+				for (int i = 0; i < playersCount; i++)
+				{
+					_loadedCenterGridPos[i] = vector;
+				}
+			}
+			for (int j = 0; j < playersCount; j++)
+			{
+				JObject field2 = data.GetField("CenterGridPos_" + j);
+				if (field2 != null)
+				{
+					_loadedCenterGridPos[j] = JSerializer.Deserialize<Vector3>(field2);
+				}
+			}
+		}
+		if ((bool)Singleton<StrandedWorld>.Instance)
+		{
+			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
+		}
+		CreateGrid();
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 403
+PATH: Assembly-CSharp__PiscusManager.cs
+SIZE: 4830 bytes
+SHA256: fbebe0d06b7282962f4240fd732854526ec4c0b3e88322f896075617c838769a
+====================================================================================================
+using Beam;
+using Beam.Serialization.Json;
+using Funlabs;
+using UnityEngine;
+
+public class PiscusManager : SaveablePrefab
+{
+	[SerializeField]
+	private GameObject _piscusCreature;
+
+	private Piscus_Creature _activeCreature;
+
+	[SerializeField]
+	private float _spawnDistance = 60f;
+
+	private float _territoryRadius;
+
+	[SerializeField]
+	private bool _canRespawn;
+
+	[SerializeField]
+	private int _respawnHours;
+
+	private int _respawningTimer;
+
+	private float _lastPollTime;
+
+	public float SpawnDistance
+	{
+		get
+		{
+			return _spawnDistance;
+		}
+		set
+		{
+			_spawnDistance = value;
+		}
+	}
+
+	private void Start()
+	{
+		transform.position = new Vector3(transform.position.x, -1f, transform.position.z);
+		if (!LevelLoader.IsLoading())
+		{
+			Initialize();
+		}
+	}
+
+	public override void OnCustomMapLoaded()
+	{
+		base.OnCustomMapLoaded();
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		if (!Game.Mode.IsClient())
+		{
+			if (Singleton<GameTime>.Instance != null)
+			{
+				Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
+			}
+			CheckInsideTerrain();
+			_territoryRadius = _spawnDistance - 15f;
+			float repeatRate = 5f;
+			InvokeRepeating("PollActivation_InvokeRepeating", 0f, repeatRate);
+			PollSpawn();
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (Singleton<GameTime>.Instance != null)
+		{
+			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
+		}
+		if (_activeCreature != null)
+		{
+			MultiplayerMng.DestroyMultiplayerEntity(_activeCreature.gameObject);
+		}
+	}
+
+	private void GameTime_HourTick()
+	{
+		if (_activeCreature == null)
+		{
+			_respawningTimer++;
+			PollSpawn();
+		}
+	}
+
+	private void PollActivation_InvokeRepeating()
+	{
+		if (!LevelLoader.IsServerJoinInProgress)
+		{
+			IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+			if (player != null && _activeCreature != null)
+			{
+				bool activate = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
+				Activate_Creature(activate);
+			}
+		}
+	}
+
+	private void PollSpawn()
+	{
+		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
+		if (player != null)
+		{
+			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
+			if ((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == 0)
+			{
+				_respawningTimer = 0;
+				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_piscusCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
+				gameObject.transform.parent = Singleton<PiscusInspectionManager>.Instance.transform;
+				_activeCreature = gameObject.GetComponent<Piscus_Creature>();
+				_activeCreature.BiomeSize = _territoryRadius;
+				_activeCreature.EngagePlayerDistance = _activeCreature.BiomeSize * 0.5f;
+				_activeCreature.Manager = this;
+			}
+		}
+	}
+
+	private void Activate_Creature(bool activate)
+	{
+		_lastPollTime = 0f;
+		if (_activeCreature.gameObject.activeSelf != activate)
+		{
+			_activeCreature.gameObject.GetComponent<SaveablePrefab>().Active = activate;
+			if (activate)
+			{
+				_activeCreature.CurrentState = Piscus_Creature.PiscusBehaviour.Explore;
+			}
+		}
+	}
+
+	private void CheckInsideTerrain()
+	{
+		if (Physics.CheckSphere(transform.position, 2f, 1 << Layers.TERRAIN) || Physics.Raycast(transform.position + Vector3.up * 5f, -Vector3.up, 7f, 1 << Layers.TERRAIN))
+		{
+			Debug.Log("Manager :: Piscus Manager Destroyed :: Collision with terrain");
+			MultiplayerMng.DestroyMultiplayerEntity(gameObject);
+		}
+	}
+
+	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
+	{
+		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		JObject data = JSerializer.Serialize(transform);
+		jObject.AddField("Transform", data);
+		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
+		jObject.AddField("spawnDistance", JSerializer.Serialize(_spawnDistance));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		if (data != null && !data.IsNull())
+		{
+			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
+			CompleteTransformSerialization();
+			int value = data.GetField("respawnCounter").GetValue<int>();
+			_respawningTimer = value;
+			int value2 = data.GetField("spawnDistance").GetValue<int>();
+			_spawnDistance = value2;
+			float x = transform.localPosition.x;
+			float z = transform.localPosition.z;
+			float y = transform.localPosition.y;
+			if (Mathf.Abs(x) == 100f && Mathf.Abs(z) == 100f)
+			{
+				x = ((!(x > 0f)) ? (-88f) : 88f);
+				z = ((!(z > 0f)) ? (-88f) : 88f);
+				transform.localPosition = new Vector3(x, y, z);
+			}
+		}
+		Initialize();
+	}
+}
+
+====================================================================================================
+SOURCE FILE 404
 PATH: Assembly-CSharp__Player_Ledge.cs
 SIZE: 676 bytes
 SHA256: fdeea846ff6c577b4cac518f23b4302c09bedf19914d9b6aa49f1520415fc6f5
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -2064,15 +2446,12 @@ public class Player_Ledge : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 404
+SOURCE FILE 405
 PATH: Assembly-CSharp__RagdollHelper.cs
 SIZE: 4430 bytes
 SHA256: 4608fbda56a30920f28ff2a7e948bcbc6b9ec3535c862380ee1a5dec081db1fd
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam;
 using Ceto;
@@ -2240,15 +2619,12 @@ public class RagdollHelper : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 405
+SOURCE FILE 406
 PATH: Assembly-CSharp__Rewired.Demos.GamepadTemplateUI__GamepadTemplateUI.cs
 SIZE: 11190 bytes
 SHA256: 4c3babc6d4f3a84c5cb52fac396f9dc5eae1e05a6abd288f07e00b3f362c7dac
 ====================================================================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -2667,15 +3043,12 @@ public class GamepadTemplateUI : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 406
+SOURCE FILE 407
 PATH: Assembly-CSharp__Rewired.Demos__CustomControllersTiltDemo.cs
 SIZE: 1066 bytes
 SHA256: 5749049725c6646dbbb628d06cb2747b33814a4d990287522654b57850a299a3
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Rewired.Demos;
@@ -2724,15 +3097,12 @@ public class CustomControllersTiltDemo : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 407
+SOURCE FILE 408
 PATH: Assembly-CSharp__Rewired.Demos__DualShock4SpecialFeaturesExample.cs
 SIZE: 6290 bytes
 SHA256: 65fc46bec52c1d59cbeae9336fe20babb0114f940b3c0642de221dec429a5890
 ====================================================================================================
-
 using System.Collections.Generic;
 using Rewired.ControllerExtensions;
 using UnityEngine;
@@ -2953,15 +3323,12 @@ public class DualShock4SpecialFeaturesExample : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 408
+SOURCE FILE 409
 PATH: Assembly-CSharp__Rewired.Demos__SimpleCombinedKeyboardMouseRemapping.cs
 SIZE: 6704 bytes
 SHA256: e5c954bf2019c9340ea4a8f4d0abacf1e8ca44d2e2e3a563f111332f5eb7b57d
 ====================================================================================================
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -3196,15 +3563,12 @@ public class SimpleCombinedKeyboardMouseRemapping : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 409
+SOURCE FILE 410
 PATH: Assembly-CSharp__Rewired.Demos__SimpleControlRemapping.cs
 SIZE: 6329 bytes
 SHA256: e1f2e8fb609fc27bcbdb84cd91aeffaec982857025107652d3ae367cb184cbc9
 ====================================================================================================
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -3463,15 +3827,12 @@ public class SimpleControlRemapping : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 410
+SOURCE FILE 411
 PATH: Assembly-CSharp__Rewired.Demos__TouchJoystickExample.cs
 SIZE: 2600 bytes
 SHA256: d90f1647939c04e64fbaa91fe67d9b9b7bab19c35f94031b218e4910974dc6f9
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -3583,15 +3944,12 @@ public class TouchJoystickExample : MonoBehaviour, IPointerDownHandler, IEventSy
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 411
+SOURCE FILE 412
 PATH: Assembly-CSharp__Rewired.Demos__UIPointer.cs
 SIZE: 2197 bytes
 SHA256: 85b1d98d2275b316377a10a05f13f6d4761025d56cdc62386cd2cfff6c8dd034
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -3691,15 +4049,12 @@ public sealed class UIPointer : UIBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 412
+SOURCE FILE 413
 PATH: Assembly-CSharp__S_SnapTools__S_SnapToObject.cs
 SIZE: 9763 bytes
 SHA256: 0d6bee3802a639822f24014b66d8eaf345b3e68ace4179383abc2af6392cee50
 ====================================================================================================
-
 using System;
 using Beam.Serialization;
 using MyUtility;
@@ -4125,15 +4480,12 @@ public class S_SnapToObject : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 413
+SOURCE FILE 414
 PATH: Assembly-CSharp__S_SnapTools__S_SnapToObjectPreview.cs
 SIZE: 4362 bytes
 SHA256: ee1198f17bfe318e0e0fdc0825c49caa2b116c21d0dbf005de0188bce71e55e5
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using MyUtility;
@@ -4292,15 +4644,12 @@ public class S_SnapToObjectPreview : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 414
+SOURCE FILE 415
 PATH: Assembly-CSharp__S_SnapTools__S_SnapToWorld.cs
 SIZE: 3012 bytes
 SHA256: e86c2ec55dc2ed6599796ddb0da428484a05e10f882a936428b241a5bc3445c9
 ====================================================================================================
-
 using UnityEngine;
 
 namespace S_SnapTools;
@@ -4467,15 +4816,12 @@ public class S_SnapToWorld : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 415
+SOURCE FILE 416
 PATH: Assembly-CSharp__SailTest.cs
 SIZE: 1949 bytes
 SHA256: 11a54e681763fbf8ccc6a1fee457603dea926d53cb89247b265b4ba63f1adadc
 ====================================================================================================
-
 using UnityEngine;
 
 public class SailTest : MonoBehaviour
@@ -4538,15 +4884,268 @@ public class SailTest : MonoBehaviour
 	}
 }
 
+====================================================================================================
+SOURCE FILE 417
+PATH: Assembly-CSharp__SaveablePrefab.cs
+SIZE: 4940 bytes
+SHA256: b42c6c4ab277027318a12c5f8aaf982dd4bbbd6e96660bcffe7ea5f64ea50357
+====================================================================================================
+using System;
+using Beam;
+using Beam.Serialization;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using Photon.Bolt;
+using UnityEngine;
 
+public abstract class SaveablePrefab : SaveableReference, ISaveablePrefab, ISaveableReference, ISaveable, IGenerationObject, IMapEditorObject
+{
+	[SerializeField]
+	[HideInInspector]
+	private uint _prefabId;
+
+	[PREFAB_PROCESSOR_GetComponentsInChildren]
+	[SerializeField]
+	private Collider[] _allColliders;
+
+	[PREFAB_PROCESSOR_GetComponentsInChildren]
+	[SerializeField]
+	private Rigidbody[] _allRigidBodies;
+
+	[SerializeField]
+	private bool _canParent = true;
+
+	private TransformId _parentId;
+
+	public uint PrefabId
+	{
+		get
+		{
+			return _prefabId;
+		}
+		set
+		{
+			_prefabId = value;
+		}
+	}
+
+	public Collider[] AllColliders
+	{
+		get
+		{
+			return _allColliders;
+		}
+		set
+		{
+			_allColliders = value;
+		}
+	}
+
+	public Rigidbody[] AllRigidbodies
+	{
+		get
+		{
+			return _allRigidBodies;
+		}
+		set
+		{
+			_allRigidBodies = value;
+		}
+	}
+
+	public bool CanParent
+	{
+		get
+		{
+			return _canParent;
+		}
+		set
+		{
+			_canParent = value;
+		}
+	}
+
+	public virtual bool CanReorder => CanParent;
+
+	public TransformId ParentId
+	{
+		get
+		{
+			return _parentId;
+		}
+		set
+		{
+			_parentId = value;
+			if (Game.Mode.IsMultiplayer() && IsMultiplayerEntity)
+			{
+				if (value.IsUnknown())
+				{
+					SetTransformSyncInternal(enabled: false);
+				}
+				if (IsOwnerSafe(onException: false))
+				{
+					GetMultiplayerState<ISaveablePrefabState>().ParentId = (int)value;
+				}
+			}
+		}
+	}
+
+	public virtual bool IsValidPrefab => PrefabId != 0;
+
+	public virtual bool IsMultiplayerEntity => Prefabs.IsMultiplayerEntity(_prefabId);
+
+	public bool IsOwner => IsOwnerSafe();
+
+	public bool Active
+	{
+		get
+		{
+			return gameObject.activeSelf;
+		}
+		set
+		{
+			if (IsMultiplayerEntity && IsOwner)
+			{
+				GetMultiplayerState<ISaveablePrefabState>().Disabled = !value;
+			}
+			else
+			{
+				gameObject.SetActive(value);
+			}
+		}
+	}
+
+	public BoltEntity Entity => entity;
+
+	public MultiplayerTokens.SaveablePrefab AttachToken => (MultiplayerTokens.SaveablePrefab)entity.AttachToken;
+
+	public bool IsOwnerSafe(bool onException = true)
+	{
+		try
+		{
+			return Game.Mode.IsSinglePlayer() || !IsMultiplayerEntity || Entity.IsOwner;
+		}
+		catch (Exception)
+		{
+			return onException;
+		}
+	}
+
+	public int GetRigidbodyId(Rigidbody rigidbody)
+	{
+		if (rigidbody.IsNullOrDestroyed())
+		{
+			return -1;
+		}
+		for (int i = 0; i < AllRigidbodies.Length; i++)
+		{
+			if (AllRigidbodies[i] == rigidbody)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public int GetColliderId(Collider collider)
+	{
+		if (collider.IsNullOrDestroyed())
+		{
+			return -1;
+		}
+		for (int i = 0; i < AllColliders.Length; i++)
+		{
+			if (AllColliders[i] == collider)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	protected virtual void SetTransformSyncInternal(bool enabled)
+	{
+		ISaveablePrefabState multiplayerState = GetMultiplayerState<ISaveablePrefabState>();
+		multiplayerState.SetTransforms(multiplayerState.Transform, enabled ? transform : null);
+	}
+
+	public override void Attached()
+	{
+		if (IsValidPrefab)
+		{
+			base.Attached();
+			ReferenceId = AttachToken.Id;
+			SetTransformSyncInternal(enabled: true);
+			ISaveablePrefabState multiplayerState = GetMultiplayerState<ISaveablePrefabState>();
+			multiplayerState.AddCallback("Disabled", OnDisabledChanged);
+			multiplayerState.AddCallback("ParentId", OnParentIdChanged);
+			multiplayerState.AddCallback("TransformSerializationId", OnTransformSerialisationIdChanged);
+			if (Game.Mode.IsClient())
+			{
+				MultiplayerZoneSync.Instance.LinkInstance(this);
+			}
+		}
+	}
+
+	public virtual void OnTransformSerialisationIdChanged()
+	{
+	}
+
+	public void CompleteTransformSerialization()
+	{
+		try
+		{
+			if (!Game.Mode.IsClient() && IsMultiplayerEntity && !entity.IsNullOrDestroyed() && entity.IsAttached)
+			{
+				GetMultiplayerState<ISaveablePrefabState>().TransformSerializationId++;
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Error in CompleteTransformSerialization\n" + ex.Message + "\n" + ex.StackTrace);
+		}
+	}
+
+	protected virtual void OnTransformParentChanged()
+	{
+		ParentId = transform.parent.GetTransfromId();
+	}
+
+	private void OnDisabledChanged()
+	{
+		gameObject.SetActive(!GetMultiplayerState<ISaveablePrefabState>().Disabled);
+	}
+
+	private void OnParentIdChanged()
+	{
+		TransformId parentId = (TransformId)GetMultiplayerState<ISaveablePrefabState>().ParentId;
+		SetTransformSyncInternal(parentId.IsValid());
+		if (Game.Mode.IsClient() && IsMultiplayerEntity && MultiplayerMng.ReceivedEntitiesActive && parentId != TransformId.Unknown && parentId != _parentId)
+		{
+			transform.SetParent(parentId.GetTransfrom(), worldPositionStays: false);
+		}
+		_parentId = parentId;
+	}
+
+	public virtual void OnCustomMapLoaded()
+	{
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("prefab", JSerializer.Serialize(_prefabId));
+		return jObject;
+	}
+}
 
 ====================================================================================================
-SOURCE FILE 416
+SOURCE FILE 418
 PATH: Assembly-CSharp__SaveManager.cs
 SIZE: 16987 bytes
 SHA256: d5e4089b780da8b9f5dc740f61c30d695819cd351598d77079d205c4845ab77c
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5144,274 +5743,12 @@ public static class SaveManager
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 417
-PATH: Assembly-CSharp__SaveablePrefab.cs
-SIZE: 4940 bytes
-SHA256: b42c6c4ab277027318a12c5f8aaf982dd4bbbd6e96660bcffe7ea5f64ea50357
-====================================================================================================
-
-using System;
-using Beam;
-using Beam.Serialization;
-using Beam.Serialization.Json;
-using Beam.Utilities;
-using Funlabs;
-using Photon.Bolt;
-using UnityEngine;
-
-public abstract class SaveablePrefab : SaveableReference, ISaveablePrefab, ISaveableReference, ISaveable, IGenerationObject, IMapEditorObject
-{
-	[SerializeField]
-	[HideInInspector]
-	private uint _prefabId;
-
-	[PREFAB_PROCESSOR_GetComponentsInChildren]
-	[SerializeField]
-	private Collider[] _allColliders;
-
-	[PREFAB_PROCESSOR_GetComponentsInChildren]
-	[SerializeField]
-	private Rigidbody[] _allRigidBodies;
-
-	[SerializeField]
-	private bool _canParent = true;
-
-	private TransformId _parentId;
-
-	public uint PrefabId
-	{
-		get
-		{
-			return _prefabId;
-		}
-		set
-		{
-			_prefabId = value;
-		}
-	}
-
-	public Collider[] AllColliders
-	{
-		get
-		{
-			return _allColliders;
-		}
-		set
-		{
-			_allColliders = value;
-		}
-	}
-
-	public Rigidbody[] AllRigidbodies
-	{
-		get
-		{
-			return _allRigidBodies;
-		}
-		set
-		{
-			_allRigidBodies = value;
-		}
-	}
-
-	public bool CanParent
-	{
-		get
-		{
-			return _canParent;
-		}
-		set
-		{
-			_canParent = value;
-		}
-	}
-
-	public virtual bool CanReorder => CanParent;
-
-	public TransformId ParentId
-	{
-		get
-		{
-			return _parentId;
-		}
-		set
-		{
-			_parentId = value;
-			if (Game.Mode.IsMultiplayer() && IsMultiplayerEntity)
-			{
-				if (value.IsUnknown())
-				{
-					SetTransformSyncInternal(enabled: false);
-				}
-				if (IsOwnerSafe(onException: false))
-				{
-					GetMultiplayerState<ISaveablePrefabState>().ParentId = (int)value;
-				}
-			}
-		}
-	}
-
-	public virtual bool IsValidPrefab => PrefabId != 0;
-
-	public virtual bool IsMultiplayerEntity => Prefabs.IsMultiplayerEntity(_prefabId);
-
-	public bool IsOwner => IsOwnerSafe();
-
-	public bool Active
-	{
-		get
-		{
-			return gameObject.activeSelf;
-		}
-		set
-		{
-			if (IsMultiplayerEntity && IsOwner)
-			{
-				GetMultiplayerState<ISaveablePrefabState>().Disabled = !value;
-			}
-			else
-			{
-				gameObject.SetActive(value);
-			}
-		}
-	}
-
-	public BoltEntity Entity => entity;
-
-	public MultiplayerTokens.SaveablePrefab AttachToken => (MultiplayerTokens.SaveablePrefab)entity.AttachToken;
-
-	public bool IsOwnerSafe(bool onException = true)
-	{
-		try
-		{
-			return Game.Mode.IsSinglePlayer() || !IsMultiplayerEntity || Entity.IsOwner;
-		}
-		catch (Exception)
-		{
-			return onException;
-		}
-	}
-
-	public int GetRigidbodyId(Rigidbody rigidbody)
-	{
-		if (rigidbody.IsNullOrDestroyed())
-		{
-			return -1;
-		}
-		for (int i = 0; i < AllRigidbodies.Length; i++)
-		{
-			if (AllRigidbodies[i] == rigidbody)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public int GetColliderId(Collider collider)
-	{
-		if (collider.IsNullOrDestroyed())
-		{
-			return -1;
-		}
-		for (int i = 0; i < AllColliders.Length; i++)
-		{
-			if (AllColliders[i] == collider)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	protected virtual void SetTransformSyncInternal(bool enabled)
-	{
-		ISaveablePrefabState multiplayerState = GetMultiplayerState<ISaveablePrefabState>();
-		multiplayerState.SetTransforms(multiplayerState.Transform, enabled ? transform : null);
-	}
-
-	public override void Attached()
-	{
-		if (IsValidPrefab)
-		{
-			base.Attached();
-			ReferenceId = AttachToken.Id;
-			SetTransformSyncInternal(enabled: true);
-			ISaveablePrefabState multiplayerState = GetMultiplayerState<ISaveablePrefabState>();
-			multiplayerState.AddCallback("Disabled", OnDisabledChanged);
-			multiplayerState.AddCallback("ParentId", OnParentIdChanged);
-			multiplayerState.AddCallback("TransformSerializationId", OnTransformSerialisationIdChanged);
-			if (Game.Mode.IsClient())
-			{
-				MultiplayerZoneSync.Instance.LinkInstance(this);
-			}
-		}
-	}
-
-	public virtual void OnTransformSerialisationIdChanged()
-	{
-	}
-
-	public void CompleteTransformSerialization()
-	{
-		try
-		{
-			if (!Game.Mode.IsClient() && IsMultiplayerEntity && !entity.IsNullOrDestroyed() && entity.IsAttached)
-			{
-				GetMultiplayerState<ISaveablePrefabState>().TransformSerializationId++;
-			}
-		}
-		catch (Exception ex)
-		{
-			Debug.LogError("Error in CompleteTransformSerialization\n" + ex.Message + "\n" + ex.StackTrace);
-		}
-	}
-
-	protected virtual void OnTransformParentChanged()
-	{
-		ParentId = transform.parent.GetTransfromId();
-	}
-
-	private void OnDisabledChanged()
-	{
-		gameObject.SetActive(!GetMultiplayerState<ISaveablePrefabState>().Disabled);
-	}
-
-	private void OnParentIdChanged()
-	{
-		TransformId parentId = (TransformId)GetMultiplayerState<ISaveablePrefabState>().ParentId;
-		SetTransformSyncInternal(parentId.IsValid());
-		if (Game.Mode.IsClient() && IsMultiplayerEntity && MultiplayerMng.ReceivedEntitiesActive && parentId != TransformId.Unknown && parentId != _parentId)
-		{
-			transform.SetParent(parentId.GetTransfrom(), worldPositionStays: false);
-		}
-		_parentId = parentId;
-	}
-
-	public virtual void OnCustomMapLoaded()
-	{
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		jObject.AddField("prefab", JSerializer.Serialize(_prefabId));
-		return jObject;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 418
+SOURCE FILE 419
 PATH: Assembly-CSharp__Scaler.cs
 SIZE: 478 bytes
 SHA256: cfaa6f39c775f22efc26a42ad5e057de92be00cdb60d144af189a8f8145aa765
 ====================================================================================================
-
 using UnityEngine;
 
 [RequireComponent(typeof(RectTransform))]
@@ -5435,15 +5772,12 @@ public class Scaler : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 419
+SOURCE FILE 420
 PATH: Assembly-CSharp__SceneCallbacks.cs
 SIZE: 5195 bytes
 SHA256: 9057e1766573c5bbfe682a4ba4b6f058a3da988052fdf4977315de18f64d79a0
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -5606,15 +5940,12 @@ public class SceneCallbacks : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 420
+SOURCE FILE 421
 PATH: Assembly-CSharp__SetupAdvancedFoliageShader.cs
 SIZE: 16557 bytes
 SHA256: 1df6fcbaab607cdc9bdd194c0e0f1e121d25b041dc68ec563bdcd1e88f3fa317
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -6197,15 +6528,12 @@ public class SetupAdvancedFoliageShader : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 421
+SOURCE FILE 422
 PATH: Assembly-CSharp__ShippingContainer.cs
 SIZE: 107 bytes
 SHA256: 52812b6df3cb24090c37714f2ae04497e31f9b00e855e4eef5316c578a20ba42
 ====================================================================================================
-
 using UnityEngine;
 
 public class ShippingContainer : MonoBehaviour
@@ -6213,15 +6541,12 @@ public class ShippingContainer : MonoBehaviour
 	public Transform[] PanelPositions;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 422
+SOURCE FILE 423
 PATH: Assembly-CSharp__SpatialAudioActor.cs
 SIZE: 267 bytes
 SHA256: 4a16e9c1fc265f117595d2f0cc39405c6ca6b278ea2a1de6375c0318f5f86f99
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -6239,15 +6564,12 @@ public class SpatialAudioActor : AudioActor
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 423
+SOURCE FILE 424
 PATH: Assembly-CSharp__Spawner.cs
 SIZE: 374 bytes
 SHA256: 27e26f485ba0358123e9d0bfe27838ee2eafa63ea42a49684bead7251d3b26d6
 ====================================================================================================
-
 using Beam.Utilities;
 using UnityEngine;
 
@@ -6269,15 +6591,12 @@ public class Spawner : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 424
+SOURCE FILE 425
 PATH: Assembly-CSharp__StrandedWorld.cs
 SIZE: 34639 bytes
 SHA256: d1d9d9d0f4d969cde2ce62b245f43625d685d19c154e572e805f8f87ac8d91c8
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -7636,44 +7955,4 @@ public class StrandedWorld : Singleton<StrandedWorld>, IDynamicParentProvider, I
 		}
 	}
 }
-
-
-
-====================================================================================================
-SOURCE FILE 425
-PATH: Assembly-CSharp__TiltPanel.cs
-SIZE: 751 bytes
-SHA256: 1b7458d2d27a5ad631e6159d3720ff3ada4a0fe24a2eb706bdce8ba16f105bd2
-====================================================================================================
-
-using UnityEngine;
-
-public class TiltPanel : MonoBehaviour
-{
-	public Vector2 range = new Vector2(5f, 3f);
-
-	private Transform mTrans;
-
-	private Quaternion mStart;
-
-	private Vector2 mRot = Vector2.zero;
-
-	private void Start()
-	{
-		mTrans = transform;
-		mStart = mTrans.localRotation;
-	}
-
-	private void Update()
-	{
-		Vector3 mousePosition = Input.mousePosition;
-		float num = (float)Screen.width * 0.5f;
-		float num2 = (float)Screen.height * 0.5f;
-		float x = Mathf.Clamp((mousePosition.x - num) / num, -1f, 1f);
-		float y = Mathf.Clamp((mousePosition.y - num2) / num2, -1f, 1f);
-		mRot = Vector2.Lerp(mRot, new Vector2(x, y), Time.deltaTime * 5f);
-		mTrans.localRotation = mStart * Quaternion.Euler((0f - mRot.y) * range.y, mRot.x * range.x, 0f);
-	}
-}
-
 

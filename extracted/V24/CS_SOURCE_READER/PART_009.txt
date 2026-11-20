@@ -1,1070 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 201
-PATH: Assembly-CSharp__Beam.UI__IOptionsPanelView.cs
-SIZE: 134 bytes
-SHA256: 2e45002453c5ac047be8ce71c3ccc19c0006e7cfa265b0de9e6ce810f0d854db
-====================================================================================================
-
-using UnityEngine;
-
-namespace Beam.UI;
-
-public interface IOptionsPanelView : IViewAdapter
-{
-	Transform CategoriesContainer { get; }
-}
-
-
-
-====================================================================================================
-SOURCE FILE 202
-PATH: Assembly-CSharp__Beam.UI__IRadialMenuElement.cs
-SIZE: 340 bytes
-SHA256: 6d08d81b102fa6a95f4e1c7d7f7d2ccf702848c20f6950c1bee53c7af0e6feab
-====================================================================================================
-
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Beam.UI;
-
-public interface IRadialMenuElement<TModel> where TModel : class, IRadialMenuModel
-{
-	Transform transform { get; }
-
-	TModel SelectedValue { get; }
-
-	void Initialize(IList<TModel> data);
-
-	void Enter();
-
-	void Exit();
-
-	bool NavigateLeft();
-
-	bool NavigateRight();
-}
-
-
-
-====================================================================================================
-SOURCE FILE 203
-PATH: Assembly-CSharp__Beam.UI__IScrollviewViewAdapter.cs
-SIZE: 219 bytes
-SHA256: af6e23d95ba9db11dbc1b804f1d574be1952426b79c83a466e4b0f557d309d18
-====================================================================================================
-
-namespace Beam.UI;
-
-public interface IScrollviewViewAdapter : IViewAdapter
-{
-	ITransformViewAdapter Content { get; }
-
-	float NormalizedHorizontalPosition { get; set; }
-
-	float NormalizedVerticalPosition { get; set; }
-}
-
-
-
-====================================================================================================
-SOURCE FILE 204
-PATH: Assembly-CSharp__Beam.UI__ITransformViewAdapter.cs
-SIZE: 337 bytes
-SHA256: 1d475d52e15042b540c030a3489ad4214226f92fa14a56f5dcffd056afdc994d
-====================================================================================================
-
-using UnityEngine;
-
-namespace Beam.UI;
-
-public interface ITransformViewAdapter
-{
-	Transform Transform { get; }
-
-	Vector3 Position { get; set; }
-
-	Quaternion Rotation { get; set; }
-
-	Vector3 LocalPosition { get; set; }
-
-	Quaternion LocalRotation { get; set; }
-
-	void SetParent(ITransformViewAdapter transform, bool worldPositionStays);
-}
-
-
-
-====================================================================================================
-SOURCE FILE 205
-PATH: Assembly-CSharp__Beam.UI__IViewAdapter.cs
-SIZE: 259 bytes
-SHA256: d6684af3531176f74e5b73d0c40504df510c6fdbc99aff01f295d5019e7725f7
-====================================================================================================
-
-using UnityEngine;
-
-namespace Beam.UI;
-
-public interface IViewAdapter
-{
-	Transform transform { get; }
-
-	bool Visible { get; }
-
-	bool Enabled { get; set; }
-
-	event EmptyEventHandler ShowView;
-
-	event EmptyEventHandler HideView;
-
-	void Show();
-
-	void Hide();
-}
-
-
-
-====================================================================================================
-SOURCE FILE 206
-PATH: Assembly-CSharp__Beam.UI__IndicatorPresenter.cs
-SIZE: 2985 bytes
-SHA256: e08f6c9d4e8d0b17e8bf05493267d678233a6198c8ab97a014e63dd539007d19
-====================================================================================================
-
-using System.Collections.Generic;
-using Beam.Utilities;
-using UnityEngine;
-
-namespace Beam.UI;
-
-public class IndicatorPresenter : ControllerBase, INeedPlayerComponent
-{
-	[SerializeField]
-	private IndicatorViewBase _view;
-
-	private List<IndicatorElementBase> _indicators = new List<IndicatorElementBase>();
-
-	private IPlayer _player;
-
-	IPlayer INeedPlayerComponent.Player => _player;
-
-	private void Start()
-	{
-		if (_view == null)
-		{
-			Debug.LogError("IndicatorPresenter:: No view component assigned!");
-			_view = NullIndicatorViewBase.Instance;
-		}
-	}
-
-	public override void SetView(ViewAdapterBase view)
-	{
-		_view = view as IndicatorViewBase;
-		if (_view == null)
-		{
-			Debug.LogError("IndicatorPresenter:: No view component assigned!");
-			_view = NullIndicatorViewBase.Instance;
-		}
-	}
-
-	public void SetPlayer(IPlayer player)
-	{
-		_player = player;
-		_player.Statistics.DirectionalDamage += PlayerStatistics_DirectionalDamage;
-	}
-
-	private void OnDestroy()
-	{
-		if (_player != null && _player.Statistics != null)
-		{
-			_player.Statistics.DirectionalDamage -= PlayerStatistics_DirectionalDamage;
-		}
-	}
-
-	public void NewIndicator(IndicatorDataBase data)
-	{
-		if (data != null)
-		{
-			IndicatorElementBase indicatorElementBase = Object.Instantiate(_view.IndicatorPrefab);
-			indicatorElementBase.Initialize(data);
-			AddIndicator(indicatorElementBase);
-		}
-	}
-
-	private void Update()
-	{
-		if (_player == null)
-		{
-			return;
-		}
-		for (int i = 0; i < _indicators.Count; i++)
-		{
-			IndicatorElementBase indicatorElementBase = _indicators[i];
-			if (indicatorElementBase.IsNullOrDestroyed())
-			{
-				_indicators.Remove(indicatorElementBase);
-				break;
-			}
-			Vector3 forward = _player.transform.forward;
-			Vector3 vector = indicatorElementBase.Data.Direction - _player.transform.position;
-			vector.y = 0f;
-			vector.Normalize();
-			float dot = 0f - Vector3.Dot(Vector3.Cross(forward, vector), _player.transform.up);
-			float angle = Vector3.Angle(vector, forward);
-			angle = AngleCircumference(dot, angle);
-			indicatorElementBase.transform.localRotation = Quaternion.Slerp(indicatorElementBase.transform.localRotation, Quaternion.AngleAxis(angle, new Vector3(0f, 0f, 1f)), 10f * Time.deltaTime);
-		}
-	}
-
-	public void AddIndicator(IndicatorElementBase indicator)
-	{
-		if (!_indicators.Contains(indicator))
-		{
-			indicator.transform.SetParent(_view.IndicatorContainer.Transform, worldPositionStays: false);
-			_indicators.Add(indicator);
-		}
-	}
-
-	public void RemoveIndicator(IndicatorElementBase indicator)
-	{
-		_indicators.Remove(indicator);
-	}
-
-	public void DestroyIndicator(IndicatorElementBase indicator)
-	{
-		RemoveIndicator(indicator);
-		BeamTeam.Destroy(indicator.gameObject);
-	}
-
-	private void PlayerStatistics_DirectionalDamage(IndicatorDataBase data)
-	{
-		NewIndicator(data);
-	}
-
-	public float AngleCircumference(float dot, float angle)
-	{
-		float num = angle;
-		float num2 = 360f;
-		num = angle;
-		if (dot < 0f)
-		{
-			num = num2 - angle;
-		}
-		return num;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 207
-PATH: Assembly-CSharp__Beam.UI__IndicatorViewBase.cs
-SIZE: 215 bytes
-SHA256: 098e4fd6dd7085267b97fc92e5943a1301befcf1a2d09fe5f4a104d6d178ff5e
-====================================================================================================
-
-namespace Beam.UI;
-
-public abstract class IndicatorViewBase : ViewAdapterBase
-{
-	public abstract DamageIndicatorElement IndicatorPrefab { get; }
-
-	public abstract ITransformViewAdapter IndicatorContainer { get; }
-}
-
-
-
-====================================================================================================
-SOURCE FILE 208
-PATH: Assembly-CSharp__Beam.UI__InputMenuPresenter.cs
-SIZE: 30310 bytes
-SHA256: e370203a1690189e1038a6b60cb87b6815bc2baf90b06b5f86f96767dcc42a12
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Beam.Language;
-using Beam.Utilities;
-using Beam.Utilities.Reflection;
-using MEC;
-using Rewired;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace Beam.UI;
-
-public class InputMenuPresenter : MonoBehaviour, IOptionPanel
-{
-	private enum AssignedPlayer
-	{
-		[Description("ASSIGNED_PLAYER_NONE", "")]
-		None,
-		[Description("ASSIGNED_PLAYER_P1", "")]
-		P1,
-		[Description("ASSIGNED_PLAYER_P2", "")]
-		P2
-	}
-
-	[SerializeField]
-	private OptionsMenuPresenter _optionsMenuPresenter;
-
-	private IInputMenuViewAdapter _view;
-
-	private IInputFieldButtonViewAdapter _currentButton;
-
-	private DialogueBoxViewAdapter _dialogue;
-
-	private CoroutineHandle _timeoutSequence;
-
-	private bool _initialized;
-
-	private List<IOptionCategoryHeader> _optionCategories = new List<IOptionCategoryHeader>();
-
-	private IOptionButtonViewAdapter _toggleRadialMenusButton;
-
-	private IOptionButtonViewAdapter _crouchToggleButton;
-
-	private IOptionButtonViewAdapter _sprintToggleButton;
-
-	private IOptionButtonViewAdapter _autowalkButton;
-
-	private IOptionSliderViewAdapter _smoothnessSlider;
-
-	private IOptionSliderViewAdapter _sensitivitySlider;
-
-	private IOptionButtonViewAdapter _invertYButton;
-
-	private Dictionary<string, ControllerAssignment> _controllerAssignments = new Dictionary<string, ControllerAssignment>();
-
-	private bool _dirtyMappings;
-
-	public void Initialize(IInputMenuViewAdapter view)
-	{
-		if (!_initialized)
-		{
-			_view = view;
-			SetControlEvents();
-			InputMapper.Default.options.timeout = 5f;
-			InputMapper.Default.options.allowKeyboardKeysWithModifiers = false;
-			InputMapper.Default.options.allowKeyboardModifierKeyAsPrimary = true;
-			InputMapper.Default.InputMappedEvent += InputMapper_InputMapped;
-			InputMapper.Default.ConflictFoundEvent += InputMapper_ConflictFound;
-			InputMapper.Default.StartedEvent += InputMapper_Started;
-			InputMapper.Default.StoppedEvent += InputMapper_Stopped;
-			InputMapper.Default.CanceledEvent += InputMapper_Cancelled;
-			InputMapper.Default.ErrorEvent += InputMapper_Error;
-			InputMapper.Default.TimedOutEvent += InputMapper_TimedOut;
-			_initialized = true;
-		}
-	}
-
-	private void OnDestroy()
-	{
-		if (_initialized)
-		{
-			InputMapper.Default.InputMappedEvent -= InputMapper_InputMapped;
-			InputMapper.Default.ConflictFoundEvent -= InputMapper_ConflictFound;
-			InputMapper.Default.StartedEvent -= InputMapper_Started;
-			InputMapper.Default.StoppedEvent -= InputMapper_Stopped;
-			InputMapper.Default.CanceledEvent -= InputMapper_Cancelled;
-			InputMapper.Default.ErrorEvent -= InputMapper_Error;
-			InputMapper.Default.TimedOutEvent -= InputMapper_TimedOut;
-		}
-	}
-
-	public Transform GetCategoriesContainer()
-	{
-		return _view.CategoriesContainer;
-	}
-
-	public void Show()
-	{
-		if (!_view.Visible)
-		{
-			_view.Show();
-			_view.DefaultButton.Show();
-			_optionsMenuPresenter.SetApplyButtonEvent(ApplyButton_Click);
-			PopulateControls();
-			_optionsMenuPresenter.ResetDirtySettings();
-			ReInput.ControllerConnectedEvent += Rewired_OnControllerConnected;
-			ReInput.ControllerPreDisconnectEvent += Rewired_OnControllerPreDisconnect;
-		}
-	}
-
-	public void Hide()
-	{
-		if (_view.Visible)
-		{
-			if (_dirtyMappings)
-			{
-				Options.Load();
-				_dirtyMappings = false;
-			}
-			_view.DefaultButton.Hide();
-			_view.Hide();
-			ReInput.ControllerConnectedEvent -= Rewired_OnControllerConnected;
-			ReInput.ControllerPreDisconnectEvent -= Rewired_OnControllerPreDisconnect;
-		}
-	}
-
-	void IOptionPanel.Apply()
-	{
-		ApplyButton_Click(null);
-	}
-
-	private void SetControlEvents()
-	{
-		_view.DefaultButton.Click += DefaultButton_Click;
-	}
-
-	private void PopulateControls()
-	{
-		_controllerAssignments.Clear();
-		foreach (KeyValuePair<string, ControllerAssignment> controllerAssignment in Options.InputSettings.ControllerAssignments)
-		{
-			if (!_controllerAssignments.ContainsKey(controllerAssignment.Key))
-			{
-				_controllerAssignments.Add(controllerAssignment.Key, null);
-			}
-			_controllerAssignments[controllerAssignment.Key] = controllerAssignment.Value;
-		}
-		CreateOptionCategories();
-	}
-
-	private void RefreshControls()
-	{
-	}
-
-	private void CreateOptionCategories()
-	{
-		_optionCategories.Clear();
-		_optionsMenuPresenter.DestroyOptionCategoryHeaders();
-		_view.DestroyInputOptionButtons();
-		_view.DestroyInputOptionSliders();
-		_view.DestroyInputFields();
-		CreateInputOptionButtons();
-		CreateControllerCategory();
-		CreateInputFieldButtons();
-		_view.SetNavigation(_optionCategories);
-	}
-
-	private void CreateInputOptionButtons()
-	{
-		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_GENERAL");
-		_toggleRadialMenusButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_TOGGLE_RADIAL_MENUS", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
-		_toggleRadialMenusButton.SelectedIndex = Options.InputSettings.ToggleRadialMenus.GetIndex();
-		_optionsMenuPresenter.UpdateNavigation(_toggleRadialMenusButton.transform.GetComponent<Button>());
-		_crouchToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_CROUCH_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
-		_crouchToggleButton.SelectedIndex = Options.InputSettings.CrouchToggle.GetIndex();
-		_sprintToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_SPRINT_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
-		_sprintToggleButton.SelectedIndex = Options.InputSettings.SprintToggle.GetIndex();
-		_autowalkButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_AUTO_WALK", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
-		_autowalkButton.SelectedIndex = Options.InputSettings.AutoWalk.GetIndex();
-		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CAMERA");
-		_smoothnessSlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SMOOTHNESS");
-		_smoothnessSlider.Value = Options.InputSettings.MouseSmoothness;
-		_smoothnessSlider.Refresh();
-		_sensitivitySlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SENSITIVITY");
-		_sensitivitySlider.Value = Options.InputSettings.MouseSensitivity;
-		_sensitivitySlider.Refresh();
-		_invertYButton = CreateInputButton(header2, "OPTIONS_INPUT_MENU_BUTTON_INVERT_Y", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
-		_invertYButton.SelectedIndex = Options.InputSettings.InvertY.GetIndex();
-	}
-
-	private IOptionButtonViewAdapter CreateInputButton(IOptionCategoryHeader header, string name, IEnumerable<IOptionElementData> values)
-	{
-		IOptionButtonViewAdapter optionButtonViewAdapter = _view.CreateInputOptionButton(header);
-		optionButtonViewAdapter.Text = name;
-		optionButtonViewAdapter.Initialize(values);
-		optionButtonViewAdapter.Selected += OptionWidget_Selected;
-		optionButtonViewAdapter.SelectionChanged += OptionWidget_SelectionChanged;
-		return optionButtonViewAdapter;
-	}
-
-	private IOptionSliderViewAdapter CreateInputSlider(IOptionCategoryHeader header, string name)
-	{
-		IOptionSliderViewAdapter optionSliderViewAdapter = _view.CreateInputOptionSlider(header);
-		((IOptionWidgetViewAdapter)optionSliderViewAdapter).Text = name;
-		optionSliderViewAdapter.Selected += OptionWidget_Selected;
-		optionSliderViewAdapter.ValueChanged += OptionSlider_ValueChanged;
-		return optionSliderViewAdapter;
-	}
-
-	private void CreateInputFieldButtons()
-	{
-		Rewired.Player player = ReInput.players.GetPlayer(0);
-		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROL_MAPPING");
-		foreach (InputMapCategory userAssignableMapCategory in ReInput.mapping.UserAssignableMapCategories)
-		{
-			InputCategory actionCategory = ReInput.mapping.GetActionCategory(userAssignableMapCategory.name);
-			if (actionCategory == null)
-			{
-				continue;
-			}
-			CreateInputCategorySubheader(header, LocalizationTerms.GetActionCategoryTerm(userAssignableMapCategory.name));
-			ControllerMap firstMapInCategory = player.controllers.maps.GetFirstMapInCategory(ControllerType.Mouse, 0, userAssignableMapCategory.id);
-			ControllerMap firstMapInCategory2 = player.controllers.maps.GetFirstMapInCategory(ControllerType.Keyboard, 0, userAssignableMapCategory.id);
-			foreach (InputAction item in ReInput.mapping.UserAssignableActionsInCategory(actionCategory.id, sort: true))
-			{
-				string actionName = (string.IsNullOrEmpty(item.descriptiveName) ? item.name : item.descriptiveName);
-				if (item.type == InputActionType.Button)
-				{
-					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
-					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory2, item.id, ActionElementPredicate);
-					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory, item.id, ActionElementPredicate);
-					optionInputFieldButtonViewAdapter.SetNavigation();
-					Navigation navigation = _view.DefaultButton.transform.GetComponent<Button>().navigation;
-					navigation.mode = Navigation.Mode.Explicit;
-					navigation.selectOnUp = optionInputFieldButtonViewAdapter.transform.GetComponent<Selectable>();
-					_view.DefaultButton.transform.GetComponent<Button>().navigation = navigation;
-				}
-				else if (item.type == InputActionType.Axis)
-				{
-					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter2 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
-					CreateInputButton(optionInputFieldButtonViewAdapter2, null, item.id, AxisRange.Full, AxisActionElementPredicate);
-					CreateInputButton(optionInputFieldButtonViewAdapter2, firstMapInCategory, item.id, AxisRange.Full, AxisActionElementPredicate, onlyAxes: true);
-					optionInputFieldButtonViewAdapter2.SetNavigation();
-					string actionName2 = (string.IsNullOrEmpty(item.positiveDescriptiveName) ? (item.descriptiveName + " +") : item.positiveDescriptiveName);
-					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter3 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName2));
-					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory2, item.id, AxisRange.Positive, PositiveActionElementPredicate);
-					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory, item.id, AxisRange.Positive, PositiveActionElementPredicate);
-					optionInputFieldButtonViewAdapter3.SetNavigation();
-					string actionName3 = (string.IsNullOrEmpty(item.negativeDescriptiveName) ? (item.descriptiveName + " -") : item.negativeDescriptiveName);
-					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter4 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName3));
-					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory2, item.id, AxisRange.Negative, NegativeActionElementPredicate);
-					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory, item.id, AxisRange.Negative, NegativeActionElementPredicate);
-					optionInputFieldButtonViewAdapter4.SetNavigation();
-				}
-			}
-		}
-	}
-
-	private IOptionCategoryHeader CreateInputCategoryHeader(string name)
-	{
-		IOptionCategoryHeader optionCategoryHeader = _optionsMenuPresenter.CreateOptionCategoryHeader();
-		optionCategoryHeader.Label.Text = name;
-		optionCategoryHeader.Id = name.GetHashCode();
-		_optionCategories.Add(optionCategoryHeader);
-		return optionCategoryHeader;
-	}
-
-	private IInputMapCategoryHeader CreateInputCategorySubheader(IOptionCategoryHeader header, string name)
-	{
-		IInputMapCategoryHeader inputMapCategoryHeader = _view.CreateInputCategorySubheader(header);
-		inputMapCategoryHeader.Label.Text = name;
-		return inputMapCategoryHeader;
-	}
-
-	private IOptionInputFieldButtonViewAdapter CreateInputFieldControl(IOptionCategoryHeader header, string name)
-	{
-		IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = _view.CreateInputField(header);
-		optionInputFieldButtonViewAdapter.Text = name;
-		optionInputFieldButtonViewAdapter.Selected += OptionWidget_Selected;
-		return optionInputFieldButtonViewAdapter;
-	}
-
-	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, Func<ActionElementMap, int, bool> predicate)
-	{
-		return CreateInputButton(inputFieldOptionButton, controllerMap, actionId, AxisRange.Full, predicate);
-	}
-
-	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, AxisRange axisRange, Func<ActionElementMap, int, bool> predicate, bool onlyAxes = false)
-	{
-		ActionElementMap actionElementMap = null;
-		bool flag = controllerMap != null;
-		if (flag)
-		{
-			foreach (ActionElementMap allMap in controllerMap.AllMaps)
-			{
-				if (predicate(allMap, actionId))
-				{
-					actionElementMap = allMap;
-					break;
-				}
-			}
-		}
-		IInputFieldButtonViewAdapter inputFieldButtonViewAdapter;
-		if (actionElementMap != null)
-		{
-			bool flag2 = actionElementMap.elementIdentifierId > -1 && !actionElementMap.elementIdentifierName.Equals("NONE", StringComparison.InvariantCultureIgnoreCase);
-			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
-			inputFieldButtonViewAdapter.Text = (flag2 ? actionElementMap.elementIdentifierName : "...");
-			inputFieldButtonViewAdapter.Type = (flag2 ? InputFieldButtonType.ReassignOrRemove : InputFieldButtonType.Add);
-			inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
-			{
-				ControllerMap = controllerMap,
-				ActionId = actionId,
-				ActionRange = axisRange,
-				ActionElementMapId = actionElementMap.id,
-				AllowOnlyAxesMapping = onlyAxes
-			};
-		}
-		else
-		{
-			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
-			if (flag)
-			{
-				inputFieldButtonViewAdapter.Text = "...";
-				inputFieldButtonViewAdapter.Type = InputFieldButtonType.Add;
-				inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
-				{
-					ControllerMap = controllerMap,
-					ActionId = actionId,
-					ActionRange = axisRange,
-					AllowOnlyAxesMapping = onlyAxes
-				};
-			}
-			else
-			{
-				inputFieldButtonViewAdapter.Text = string.Empty;
-				inputFieldButtonViewAdapter.Enabled = false;
-			}
-		}
-		inputFieldButtonViewAdapter.Click += InputFieldButton_Click;
-		return inputFieldButtonViewAdapter;
-	}
-
-	private void CreateControllerCategory()
-	{
-		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLERS");
-		IEnumerable<IOptionElementData> attributes = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
-		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_KEYBOARD_MOUSE", attributes);
-		optionButtonViewAdapter.SelectedIndex = AssignedPlayer.P1.GetIndex();
-		optionButtonViewAdapter.Enabled = false;
-		Joystick[] joysticks = ReInput.controllers.GetJoysticks();
-		Joystick[] array = joysticks;
-		foreach (Joystick joystick in array)
-		{
-			JoystickOptionButton joystickOptionButton = CreateJoystickOptionButton(joystick);
-			if (joysticks.Length == 1 && _optionsMenuPresenter.CurrentPlayerInput.id == 1)
-			{
-				joystickOptionButton.Enabled = false;
-			}
-		}
-		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLER_MAPPING");
-		_view.CreateControllerLayoutImage(header2).Selected += OptionWidget_Selected;
-	}
-
-	private JoystickOptionButton CreateJoystickOptionButton(Joystick joystick)
-	{
-		IOptionCategoryHeader header = _optionCategories.First((IOptionCategoryHeader x) => x.Id == "OPTIONS_INPUT_MENU_LABEL_CONTROLLERS".GetHashCode());
-		IEnumerable<IOptionElementData> enumerable = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
-		if (_optionsMenuPresenter.CurrentPlayerInput.id == 1 && ReInput.controllers.joystickCount > 1)
-		{
-			enumerable = enumerable.Where((IOptionElementData x) => x.Text != "ASSIGNED_PLAYER_NONE");
-		}
-		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, joystick.name, enumerable);
-		string text = joystick.deviceInstanceGuid.ToString();
-		JoystickOptionButton joystickOptionButton = new JoystickOptionButton(optionButtonViewAdapter, text);
-		joystickOptionButton.SelectionChanged += JoystickOptionButton_SelectionChanged;
-		AssignedPlayer assignedPlayer = AssignedPlayer.None;
-		if (_controllerAssignments.TryGetValue(text, out var value))
-		{
-			assignedPlayer = (AssignedPlayer)(value.PlayerId + 1);
-		}
-		joystickOptionButton.SelectedIndex = assignedPlayer.GetIndex();
-		_view.Buttons.Remove(optionButtonViewAdapter);
-		_view.Buttons.Add(joystickOptionButton);
-		return joystickOptionButton;
-	}
-
-	private void Rewired_OnControllerConnected(ControllerStatusChangedEventArgs args)
-	{
-		if (args.controllerType == ControllerType.Joystick)
-		{
-			Joystick joystick = args.controller as Joystick;
-			CreateJoystickOptionButton(joystick);
-		}
-	}
-
-	private void Rewired_OnControllerPreDisconnect(ControllerStatusChangedEventArgs args)
-	{
-		if (args.controllerType != ControllerType.Joystick)
-		{
-			return;
-		}
-		string value = args.controller.deviceInstanceGuid.ToString();
-		foreach (IOptionButtonViewAdapter button in _view.Buttons)
-		{
-			if (button is JoystickOptionButton joystickOptionButton && joystickOptionButton.DeviceInstanceId.Equals(value))
-			{
-				_view.RemoveButton(joystickOptionButton);
-				break;
-			}
-		}
-	}
-
-	private void ApplyButton_Click(object sender)
-	{
-		Options.InputSettings.ToggleRadialMenus = (Quality_OFF_ON)_toggleRadialMenusButton.SelectedIndex;
-		Options.InputSettings.CrouchToggle = (Quality_OFF_ON)_crouchToggleButton.SelectedIndex;
-		Options.InputSettings.SprintToggle = (Quality_OFF_ON)_sprintToggleButton.SelectedIndex;
-		Options.InputSettings.AutoWalk = (Quality_OFF_ON)_autowalkButton.SelectedIndex;
-		Options.InputSettings.MouseSmoothness = _smoothnessSlider.Value;
-		Options.InputSettings.MouseSensitivity = _sensitivitySlider.Value;
-		Options.InputSettings.InvertY = (Quality_OFF_ON)_invertYButton.SelectedIndex;
-		Options.InputSettings.ControllerAssignments = new Dictionary<string, ControllerAssignment>(_controllerAssignments);
-		_optionsMenuPresenter.Save();
-	}
-
-	private void DefaultButton_Click(object sender)
-	{
-		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_RESET_TITLE", "OPTIONS_INPUT_MENU_DB_RESET_DESC", DialogueButton.YesNo).Accept += () =>
-		{
-			LoadDefaults();
-			PopulateControls();
-			_optionsMenuPresenter.SetDirtySettings();
-			_optionsMenuPresenter.ResetDirtySettings();
-		};
-	}
-
-	private void OptionWidget_Selected(ISelectableViewAdapter widget)
-	{
-		_view.Scrollview.FocusElement(widget.transform);
-	}
-
-	private void OptionWidget_SelectionChanged(IOptionWidgetViewAdapter widget)
-	{
-		_optionsMenuPresenter.SetDirtySettings();
-	}
-
-	private void OptionSlider_ValueChanged(float value)
-	{
-		_optionsMenuPresenter.SetDirtySettings();
-	}
-
-	private void JoystickOptionButton_SelectionChanged(IOptionButtonViewAdapter button)
-	{
-		if (!(button is JoystickOptionButton joystickOptionButton))
-		{
-			return;
-		}
-		Joystick joystick = ReInput.controllers.Joysticks.FirstOrDefault_NonAlloc((Joystick joy, string arg) => joy.isConnected && joy.deviceInstanceGuid.ToString() == arg, joystickOptionButton.DeviceInstanceId);
-		if (joystick == null)
-		{
-			Debug.LogError("JoystickOptionButton_SelectionChanged:: No matching joystick found for [" + joystickOptionButton.Text + "].");
-			return;
-		}
-		AssignedPlayer selectedIndex = (AssignedPlayer)button.SelectedIndex;
-		if (selectedIndex == AssignedPlayer.None)
-		{
-			UnassignController(joystick.id);
-			return;
-		}
-		int playerId = (int)(selectedIndex - 1);
-		AssignController(playerId, joystick.id);
-	}
-
-	private void InputFieldButton_Click(object sender)
-	{
-		IInputFieldButtonViewAdapter inputFieldButton = sender as IInputFieldButtonViewAdapter;
-		if (inputFieldButton == null || _dialogue != null)
-		{
-			return;
-		}
-		InputMapper.Context context = new InputMapper.Context();
-		context.controllerMap = inputFieldButton.Info.ControllerMap;
-		context.actionId = inputFieldButton.Info.ActionId;
-		context.actionRange = inputFieldButton.Info.ActionRange;
-		context.actionElementMapToReplace = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
-		bool allowOnlyAxes = inputFieldButton.Info.AllowOnlyAxesMapping;
-		InputMapper.Default.options.allowButtons = !allowOnlyAxes;
-		_currentButton = inputFieldButton;
-		switch (_currentButton.Type)
-		{
-		case InputFieldButtonType.Add:
-			StartMapping(context, allowOnlyAxes);
-			break;
-		case InputFieldButtonType.ReassignOrRemove:
-		{
-			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_REASSIGN_TITLE", "OPTIONS_INPUT_MENU_DB_REASSIGN_DESC", "OPTIONS_INPUT_MENU_DB_BUTTON_REASSIGN", "OPTIONS_INPUT_MENU_DB_BUTTON_REMOVE", "OPTIONS_INPUT_MENU_DB_BUTTON_CANCEL");
-			dialogueBoxViewAdapter.Accept += () =>
-			{
-				StartMapping(context, allowOnlyAxes);
-			};
-			dialogueBoxViewAdapter.Decline += () =>
-			{
-				ClearMapping(inputFieldButton);
-				_currentButton.Select();
-				_currentButton = null;
-			};
-			break;
-		}
-		}
-	}
-
-	private void StartMapping(InputMapper.Context context, bool allowOnlyAxes)
-	{
-		string remappingDialogueMessage = GetRemappingDialogueMessage(context.controllerMap.controllerType, allowOnlyAxes);
-		_dialogue = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_ASSIGN_TITLE", remappingDialogueMessage, DialogueButton.None);
-		InputMapper.Default.Start(context);
-	}
-
-	private void ClearMapping(IInputFieldButtonViewAdapter inputFieldButton)
-	{
-		ActionElementMap elementMap = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
-		if (ClearElementMapAssignment(elementMap))
-		{
-			inputFieldButton.Text = "...";
-			inputFieldButton.Type = InputFieldButtonType.Add;
-			ClearMatchingElementMapsFromControllers(elementMap);
-			_optionsMenuPresenter.SetDirtySettings();
-		}
-	}
-
-	private void BeginRemapping()
-	{
-		_timeoutSequence = Timing.RunCoroutine(InputMapper_TimeoutSequence());
-		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: false, 8);
-	}
-
-	private void EndMapping()
-	{
-		if (_timeoutSequence.IsRunning)
-		{
-			Timing.KillCoroutines(_timeoutSequence);
-		}
-		if (_dialogue != null)
-		{
-			_dialogue.Destroy();
-			_dialogue = null;
-		}
-		if (_currentButton != null)
-		{
-			_currentButton.Select();
-			_currentButton = null;
-		}
-		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: true, 8);
-	}
-
-	private void InputMapper_Started(InputMapper.StartedEventData eventData)
-	{
-		BeginRemapping();
-	}
-
-	private void InputMapper_Stopped(InputMapper.StoppedEventData eventData)
-	{
-		EndMapping();
-	}
-
-	private void InputMapper_Cancelled(InputMapper.CanceledEventData eventData)
-	{
-		EndMapping();
-	}
-
-	private void InputMapper_Error(InputMapper.ErrorEventData eventData)
-	{
-		EndMapping();
-	}
-
-	private void InputMapper_TimedOut(InputMapper.TimedOutEventData eventData)
-	{
-	}
-
-	private void InputMapper_InputMapped(InputMapper.InputMappedEventData eventData)
-	{
-		_currentButton.Text = eventData.actionElementMap.elementIdentifierName;
-		_currentButton.Type = InputFieldButtonType.ReassignOrRemove;
-		_currentButton.Info.ActionElementMapId = eventData.actionElementMap.id;
-		_dirtyMappings = true;
-		_optionsMenuPresenter.SetDirtySettings();
-		RemapMatchingElementMapsInControllers(eventData.actionElementMap);
-	}
-
-	private void RemapMatchingElementMapsInControllers(ActionElementMap newActionElementMap)
-	{
-		ElementAssignment elementAssignment = new ElementAssignment(newActionElementMap.controllerMap.controllerType, newActionElementMap.elementType, newActionElementMap.elementIdentifierId, newActionElementMap.axisRange, newActionElementMap.keyCode, newActionElementMap.modifierKeyFlags, newActionElementMap.actionId, newActionElementMap.axisContribution, invert: false);
-		foreach (ControllerMap allMap in newActionElementMap.controllerMap.player.controllers.maps.GetAllMaps(newActionElementMap.controllerMap.controllerType))
-		{
-			foreach (ActionElementMap item in from aem in allMap.GetElementMapsWithAction(newActionElementMap.actionId)
-				where aem.elementIdentifierId != newActionElementMap.elementIdentifierId && aem.axisContribution == newActionElementMap.axisContribution
-				select aem)
-			{
-				elementAssignment.elementMapId = item.id;
-				_ = item.elementIdentifierName;
-				allMap.ReplaceElementMap(elementAssignment, out var _);
-			}
-		}
-	}
-
-	private void ClearMatchingElementMapsFromControllers(ActionElementMap removedActionElementMap)
-	{
-		foreach (ControllerMap item in from map in removedActionElementMap.controllerMap.player.controllers.maps.GetAllMaps()
-			where map.controllerType == removedActionElementMap.controllerMap.controllerType
-			select map)
-		{
-			foreach (ActionElementMap item2 in from aem in item.GetElementMapsWithAction(removedActionElementMap.actionId)
-				where aem.elementIdentifierId != 0 && aem.axisContribution == removedActionElementMap.axisContribution
-				select aem)
-			{
-				ClearElementMapAssignment(item2);
-			}
-		}
-	}
-
-	private bool ClearElementMapAssignment(ActionElementMap actionElementMap)
-	{
-		_ = ReInput.mapping.GetAction(actionElementMap.actionId).descriptiveName;
-		_ = actionElementMap.elementIdentifierName;
-		_ = ReInput.mapping.GetMapCategory(actionElementMap.controllerMap.categoryId).name;
-		ElementAssignment elementAssignment = new ElementAssignment(actionElementMap.controllerMap.controllerType, actionElementMap.elementType, -1, actionElementMap.axisRange, KeyCode.None, ModifierKeyFlags.None, actionElementMap.actionId, actionElementMap.axisContribution, invert: false);
-		elementAssignment.elementMapId = actionElementMap.id;
-		if (!actionElementMap.controllerMap.ReplaceElementMap(elementAssignment, out var _))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private void InputMapper_ConflictFound(InputMapper.ConflictFoundEventData eventData)
-	{
-		Debug.LogError("InputMenu::InputMapper_ConflictFound::");
-		eventData.responseCallback(InputMapper.ConflictResponse.Cancel);
-		eventData.inputMapper.Stop();
-		string text = Localization.GetLanguageHandler().Localize("OPTIONS_INPUT_MENU_DB_CONFLICT_DESC", eventData.assignment.elementDisplayName, eventData.assignment.action.descriptiveName);
-		ElementAssignmentConflictInfo elementAssignmentConflictInfo = eventData.conflicts.FirstOrDefault_NonAlloc();
-		text = text + "[" + elementAssignmentConflictInfo.elementDisplayName + " - " + elementAssignmentConflictInfo.action.descriptiveName + "]";
-		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_CONFLICT_TITLE", text, DialogueButton.Ok);
-	}
-
-	private void LoadDefaults()
-	{
-		Rewired.Player player = ReInput.players.GetPlayer(0);
-		player.controllers.maps.LoadDefaultMaps(ControllerType.Mouse);
-		player.controllers.maps.LoadDefaultMaps(ControllerType.Keyboard);
-		Options.InputSettings = new InputSettings();
-		Options.Save();
-		Options.Load();
-	}
-
-	private void AssignController(int playerId, int controllerId)
-	{
-		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
-		if (joystick == null)
-		{
-			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
-			return;
-		}
-		ControllerAssignment controllerAssignment = new ControllerAssignment();
-		controllerAssignment.ControllerName = joystick.name;
-		controllerAssignment.ControllerGuid = joystick.deviceInstanceGuid.ToString();
-		controllerAssignment.PlayerId = playerId;
-		if (!_controllerAssignments.ContainsKey(controllerAssignment.ControllerGuid))
-		{
-			_controllerAssignments.Add(controllerAssignment.ControllerGuid, null);
-		}
-		_controllerAssignments[controllerAssignment.ControllerGuid] = controllerAssignment;
-	}
-
-	private void UnassignController(int controllerId)
-	{
-		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
-		if (joystick == null)
-		{
-			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
-		}
-		else
-		{
-			_controllerAssignments.Remove(joystick.deviceInstanceGuid.ToString());
-		}
-	}
-
-	public bool ActionElementPredicate(ActionElementMap actionElementMap, int actionId)
-	{
-		if (actionElementMap != null)
-		{
-			return actionElementMap.actionId == actionId;
-		}
-		return false;
-	}
-
-	public bool AxisActionElementPredicate(ActionElementMap actionElementMap, int actionId)
-	{
-		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.elementType != ControllerElementType.Button)
-		{
-			return actionElementMap.axisType != AxisType.Split;
-		}
-		return false;
-	}
-
-	public bool PositiveActionElementPredicate(ActionElementMap actionElementMap, int actionId)
-	{
-		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
-		{
-			return actionElementMap.axisContribution == Pole.Positive;
-		}
-		return false;
-	}
-
-	public bool NegativeActionElementPredicate(ActionElementMap actionElementMap, int actionId)
-	{
-		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
-		{
-			return actionElementMap.axisContribution == Pole.Negative;
-		}
-		return false;
-	}
-
-	private string GetRemappingDialogueMessage(ControllerType controllerType, bool onlyAxesAllowed)
-	{
-		switch (controllerType)
-		{
-		default:
-			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_BUTTON_OR_AXIS";
-		case ControllerType.Mouse:
-			if (!onlyAxesAllowed)
-			{
-				return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_MOUSE_BUTTON_OR_AXIS";
-			}
-			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_AXIS";
-		case ControllerType.Keyboard:
-			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_ANY_KEY";
-		}
-	}
-
-	private IEnumerator<float> InputMapper_TimeoutSequence()
-	{
-		string message = _dialogue.Message.Text;
-		while (true)
-		{
-			_dialogue.Message.Text = $"{message} ({Mathf.CeilToInt(InputMapper.Default.timeRemaining)})";
-			yield return 0f;
-		}
-	}
-
-	private Rewired.Player GetPlayer(AssignedPlayer value)
-	{
-		try
-		{
-			switch (value)
-			{
-			case AssignedPlayer.P1:
-				return RewiredUtilities.Players[0];
-			case AssignedPlayer.P2:
-				return RewiredUtilities.Players[1];
-			}
-		}
-		catch (IndexOutOfRangeException exception)
-		{
-			Debug.LogException(exception);
-			return null;
-		}
-		return null;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 209
 PATH: Assembly-CSharp__Beam.UI__InventoryRadialMenuViewAdapterBase.cs
 SIZE: 1510 bytes
 SHA256: d6763a09d9e1db5300eda5157c4d07d766e0254984924accd7b25b5fbbb6fb34
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -1121,15 +60,166 @@ public abstract class InventoryRadialMenuViewAdapterBase : RadialMenuViewAdapter
 	}
 }
 
+====================================================================================================
+SOURCE FILE 202
+PATH: Assembly-CSharp__Beam.UI__IOptionCategoryHeader.cs
+SIZE: 210 bytes
+SHA256: 0d8f672dfd7ae978a6dea9f20fd905fa08e68a9fadb8b78ec51f1f33672988fb
+====================================================================================================
+using UnityEngine;
 
+namespace Beam.UI;
+
+public interface IOptionCategoryHeader
+{
+	Transform transform { get; }
+
+	ILabelViewAdapter Label { get; }
+
+	Transform ElementsContainer { get; }
+
+	int Id { get; set; }
+}
 
 ====================================================================================================
-SOURCE FILE 210
+SOURCE FILE 203
+PATH: Assembly-CSharp__Beam.UI__IOptionPanel.cs
+SIZE: 157 bytes
+SHA256: 81a8151c92fa890c4989db9de6400820c15a2fadf8643c8179b3b4ff953a4052
+====================================================================================================
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IOptionPanel
+{
+	Transform GetCategoriesContainer();
+
+	void Show();
+
+	void Hide();
+
+	void Apply();
+}
+
+====================================================================================================
+SOURCE FILE 204
+PATH: Assembly-CSharp__Beam.UI__IOptionsPanelView.cs
+SIZE: 134 bytes
+SHA256: 2e45002453c5ac047be8ce71c3ccc19c0006e7cfa265b0de9e6ce810f0d854db
+====================================================================================================
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IOptionsPanelView : IViewAdapter
+{
+	Transform CategoriesContainer { get; }
+}
+
+====================================================================================================
+SOURCE FILE 205
+PATH: Assembly-CSharp__Beam.UI__IRadialMenuElement.cs
+SIZE: 340 bytes
+SHA256: 6d08d81b102fa6a95f4e1c7d7f7d2ccf702848c20f6950c1bee53c7af0e6feab
+====================================================================================================
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IRadialMenuElement<TModel> where TModel : class, IRadialMenuModel
+{
+	Transform transform { get; }
+
+	TModel SelectedValue { get; }
+
+	void Initialize(IList<TModel> data);
+
+	void Enter();
+
+	void Exit();
+
+	bool NavigateLeft();
+
+	bool NavigateRight();
+}
+
+====================================================================================================
+SOURCE FILE 206
+PATH: Assembly-CSharp__Beam.UI__IScrollviewViewAdapter.cs
+SIZE: 219 bytes
+SHA256: af6e23d95ba9db11dbc1b804f1d574be1952426b79c83a466e4b0f557d309d18
+====================================================================================================
+namespace Beam.UI;
+
+public interface IScrollviewViewAdapter : IViewAdapter
+{
+	ITransformViewAdapter Content { get; }
+
+	float NormalizedHorizontalPosition { get; set; }
+
+	float NormalizedVerticalPosition { get; set; }
+}
+
+====================================================================================================
+SOURCE FILE 207
+PATH: Assembly-CSharp__Beam.UI__ITransformViewAdapter.cs
+SIZE: 337 bytes
+SHA256: 1d475d52e15042b540c030a3489ad4214226f92fa14a56f5dcffd056afdc994d
+====================================================================================================
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface ITransformViewAdapter
+{
+	Transform Transform { get; }
+
+	Vector3 Position { get; set; }
+
+	Quaternion Rotation { get; set; }
+
+	Vector3 LocalPosition { get; set; }
+
+	Quaternion LocalRotation { get; set; }
+
+	void SetParent(ITransformViewAdapter transform, bool worldPositionStays);
+}
+
+====================================================================================================
+SOURCE FILE 208
+PATH: Assembly-CSharp__Beam.UI__IViewAdapter.cs
+SIZE: 259 bytes
+SHA256: d6684af3531176f74e5b73d0c40504df510c6fdbc99aff01f295d5019e7725f7
+====================================================================================================
+using UnityEngine;
+
+namespace Beam.UI;
+
+public interface IViewAdapter
+{
+	Transform transform { get; }
+
+	bool Visible { get; }
+
+	bool Enabled { get; set; }
+
+	event EmptyEventHandler ShowView;
+
+	event EmptyEventHandler HideView;
+
+	void Show();
+
+	void Hide();
+}
+
+====================================================================================================
+SOURCE FILE 209
 PATH: Assembly-CSharp__Beam.UI__MainMenuPresenter.cs
 SIZE: 40327 bytes
 SHA256: 1e30cf042868e153a5fb5c61b5d3917a1a746e1ac8a7e53f2bc60b86720ad12f
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -2453,15 +1543,12 @@ public class MainMenuPresenter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 211
+SOURCE FILE 210
 PATH: Assembly-CSharp__Beam.UI__MenuBackgroundScaler.cs
 SIZE: 1428 bytes
 SHA256: fd180618960e449a766002338265ba63212fbb554aabac384e936496d9a2bb82
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -2522,15 +1609,12 @@ public class MenuBackgroundScaler : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 212
+SOURCE FILE 211
 PATH: Assembly-CSharp__Beam.UI__MissionRewardElement.cs
 SIZE: 867 bytes
 SHA256: 8bd97802434acbf80a7e1f94b672db65905d76b3fadcd316187b61bb0b42a11a
 ====================================================================================================
-
 using Beam.Language;
 using Beam.Utilities;
 using UnityEngine;
@@ -2564,15 +1648,12 @@ public class MissionRewardElement : MonoBehaviour, IMissionRewardElement
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 213
+SOURCE FILE 212
 PATH: Assembly-CSharp__Beam.UI__NotificationsPresenterBase.cs
 SIZE: 4211 bytes
 SHA256: 52bc821ecb1b593f9fa3786b289bc663942f32c02fc133c8aaa052736ac654a0
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Events;
 using Beam.Utilities;
@@ -2746,15 +1827,12 @@ public abstract class NotificationsPresenterBase<TNotification, TNotificationEve
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 214
+SOURCE FILE 213
 PATH: Assembly-CSharp__Beam.UI__NotificationsViewAdapterBase.cs
 SIZE: 164 bytes
 SHA256: 7a4d6e9c765cc0b639588d7ccb44f5e046d08f1ee46f7c6a27ccac982c299cac
 ====================================================================================================
-
 namespace Beam.UI;
 
 public abstract class NotificationsViewAdapterBase : ViewAdapterBase
@@ -2762,15 +1840,12 @@ public abstract class NotificationsViewAdapterBase : ViewAdapterBase
 	public abstract ITransformViewAdapter NotificationsContainer { get; }
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 215
+SOURCE FILE 214
 PATH: Assembly-CSharp__Beam.UI__NullHudViewAdapter.cs
 SIZE: 1040 bytes
 SHA256: 5b55e77eac1bae0ba24a10181adc984c4f21f6e841284a4320848925ed966eb4
 ====================================================================================================
-
 namespace Beam.UI;
 
 public class NullHudViewAdapter : HudViewAdapterBase
@@ -2794,15 +1869,12 @@ public class NullHudViewAdapter : HudViewAdapterBase
 	public override ICanvasGroupViewAdapter ItemActionGroup => NullViewAdapter<NullCanvasGroupViewAdapter>.Instance;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 216
+SOURCE FILE 215
 PATH: Assembly-CSharp__Beam.UI__NullIndicatorViewBase.cs
 SIZE: 394 bytes
 SHA256: 5a4a25421f8915eca27091cb85e6e264e6e10b3198cfed6d275589f0aa547a4e
 ====================================================================================================
-
 namespace Beam.UI;
 
 public class NullIndicatorViewBase : IndicatorViewBase
@@ -2816,15 +1888,12 @@ public class NullIndicatorViewBase : IndicatorViewBase
 	public override ITransformViewAdapter IndicatorContainer => NullObject<NullTransformViewAdapter>.Instance;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 217
+SOURCE FILE 216
 PATH: Assembly-CSharp__Beam.UI__NullMissionRewardElement.cs
 SIZE: 268 bytes
 SHA256: 32197287c5560788b7e31127f1a1743d4ca0129eac5f619cc03918e02a867c95
 ====================================================================================================
-
 namespace Beam.UI;
 
 public class NullMissionRewardElement : NullObject<NullMissionRewardElement>, IMissionRewardElement
@@ -2836,15 +1905,12 @@ public class NullMissionRewardElement : NullObject<NullMissionRewardElement>, IM
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 218
+SOURCE FILE 217
 PATH: Assembly-CSharp__Beam.UI__NullNotificationsViewAdapter.cs
 SIZE: 512 bytes
 SHA256: 4a439a98706332ff2040cfd70bb479e94f805ed9497358264e4c3ed253affee8
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -2865,15 +1931,12 @@ public class NullNotificationsViewAdapter : NotificationsViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 219
+SOURCE FILE 218
 PATH: Assembly-CSharp__Beam.UI__NullRadialMenuElement.cs
 SIZE: 919 bytes
 SHA256: b3c2602709856efb3b9476294a29ab0e2f4e9da17a8d87164ff2728c4b049c3d
 ====================================================================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -2913,15 +1976,12 @@ public class NullRadialMenuElement : NullObject<NullRadialMenuElement>, IRadialM
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 220
+SOURCE FILE 219
 PATH: Assembly-CSharp__Beam.UI__NullRadialMenuViewAdapterBase.cs
 SIZE: 1371 bytes
 SHA256: 46c497006b5fd8c8a97733dbfd5901627e16c0b4e13d9aec2f038aab96b8a935
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -2953,15 +2013,12 @@ public class NullRadialMenuViewAdapterBase : RadialMenuViewAdapterBase<NullRadia
 	public override Texture2D BlurMaskTexture => Texture2D.blackTexture;
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 221
+SOURCE FILE 220
 PATH: Assembly-CSharp__Beam.UI__NullScrollviewViewAdapter.cs
 SIZE: 483 bytes
 SHA256: 232b1e1b8ccd1951a0bf47c78dd2f6190a208d509a99d354cb8e97d42b7d3b89
 ====================================================================================================
-
 namespace Beam.UI;
 
 public class NullScrollviewViewAdapter : ViewAdapterBase, IScrollviewViewAdapter, IViewAdapter
@@ -2977,15 +2034,12 @@ public class NullScrollviewViewAdapter : ViewAdapterBase, IScrollviewViewAdapter
 	public float NormalizedVerticalPosition { get; set; }
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 222
+SOURCE FILE 221
 PATH: Assembly-CSharp__Beam.UI__NullTransform.cs
 SIZE: 429 bytes
 SHA256: 17ce8477637911c96a1f5c2195d962e18ffd557bfe0e4a2c9d5e54df2dbd4c57
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -3010,15 +2064,12 @@ public class NullTransform : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 223
+SOURCE FILE 222
 PATH: Assembly-CSharp__Beam.UI__NullTransformViewAdapter.cs
 SIZE: 463 bytes
 SHA256: fef8ccf2839bcd0f3744b7694ccc62e51c1f161aa001f8945faf25245c1f0ca8
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -3040,15 +2091,12 @@ public class NullTransformViewAdapter : NullObject<NullTransformViewAdapter>, IT
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 224
+SOURCE FILE 223
 PATH: Assembly-CSharp__Beam.UI__NullViewAdapter.cs
 SIZE: 641 bytes
 SHA256: 3fd9f99d3431f9c5f9780ae212d57f7644370bc2a3d70821270c2270cd82219a
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3095,15 +2143,12 @@ public class NullViewAdapter<TViewAdapter> : IViewAdapter where TViewAdapter : I
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 225
+SOURCE FILE 224
 PATH: Assembly-CSharp__Beam.UI__OptionButtonDecoratorBase.cs
 SIZE: 2816 bytes
 SHA256: 1d1f086e21fca09b7ddf6ac4095f937f267b9b0a68b039b29a2f4d759577f395
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -3274,4 +2319,57 @@ public abstract class OptionButtonDecoratorBase : IOptionButtonViewAdapter, IOpt
 	}
 }
 
+====================================================================================================
+SOURCE FILE 225
+PATH: Assembly-CSharp__Beam.UI__QuickCrafterRadialMenuViewAdapterBase.cs
+SIZE: 1244 bytes
+SHA256: 76e0e7bfaa8d13c6f382ff936948677c54bc0e98643f1da8e0faca9f9662c367
+====================================================================================================
+using UnityEngine;
+
+namespace Beam.UI;
+
+public abstract class QuickCrafterRadialMenuViewAdapterBase : RadialMenuViewAdapterBase<CraftingData, QuickCrafterRadialMenuElement>
+{
+	[SerializeField]
+	private GameObject _menuGameObject;
+
+	public abstract override ICanvasGroupViewAdapter CanvasGroup { get; }
+
+	public abstract override ICanvasGroupViewAdapter DetailsCanvasGroup { get; }
+
+	public abstract override ITransformViewAdapter ElementContainer { get; }
+
+	public abstract override QuickCrafterRadialMenuElement ElementPrefab { get; }
+
+	public abstract override ITransformViewAdapter ElementPlaceholderPrefab { get; }
+
+	public abstract override ITransformViewAdapter PooledElementContainer { get; }
+
+	public abstract override IImageViewAdapter SelectorImage { get; }
+
+	public abstract override ILabelViewAdapter TitleLabel { get; }
+
+	public abstract override ILabelViewAdapter DescriptionLabel { get; }
+
+	public abstract override Texture2D BlurMaskTexture { get; }
+
+	public override void Show()
+	{
+		if (!_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: true);
+			base.Show();
+		}
+	}
+
+	public override void Hide()
+	{
+		if (_menuGameObject.activeSelf)
+		{
+			_menuGameObject.SetActive(value: false);
+			base.Hide();
+		}
+	}
+}
 

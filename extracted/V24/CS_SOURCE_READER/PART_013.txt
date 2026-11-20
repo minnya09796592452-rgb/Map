@@ -1,467 +1,94 @@
-
 ====================================================================================================
 SOURCE FILE 301
-PATH: Assembly-CSharp__Beam__Interactive_RAFT_STORAGE.cs
-SIZE: 3931 bytes
-SHA256: 51d1cf241aebe1f28afb82604ada457268ca79e603c65a3c917d6af8457d7a8f
+PATH: Assembly-CSharp__Beam__IPlayer.cs
+SIZE: 1314 bytes
+SHA256: 027d9164f387e20f6f7c8aec4fa284adcc4004be6f4a7d8e41d9751702587b21
 ====================================================================================================
-
 using Beam.Crafting;
-using Beam.Language;
-using Beam.Serialization.Json;
-using Beam.Utilities;
 using Funlabs;
 using Photon.Bolt;
+using Rewired;
 using UnityEngine;
 
 namespace Beam;
 
-public class Interactive_RAFT_STORAGE : MultiplayerBehaviour, ISelectable, IBase, IHasCraftingType, ISlotStorageProvider<IPickupable>, ISaveable, IMultiplayerState<IInteractiveObject_LIFERAFTState>
+public interface IPlayer : ISaveable, IIdleUntilInitialized
 {
-	private class ReplicateOnSlotStorageOpen : MultiplayerMessage
-	{
-		[Replicate]
-		public BoltEntity Entity;
+	Transform transform { get; }
 
-		public override void OnPeer()
-		{
-			Entity.GetComponentInChildren<Interactive_RAFT_STORAGE>().OnSlotStorageOpen();
-		}
-	}
+	IPlayerState MultiplayerState { get; }
 
-	[SerializeField]
-	[LocalizationTermDropdown]
-	[LocalizationTermPreview]
-	private string _displayName;
+	bool IsOwner { get; }
 
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Selecting _selecting;
+	int Id { get; set; }
 
-	[SerializeField]
-	private SlotStorage _slotStorage;
+	int Gender { get; set; }
 
-	[SerializeField]
-	private InteractiveObject[] _startingPrefabs;
+	PlayerCamera PlayerCamera { get; }
 
-	private JObject _storageData;
+	Movement Movement { get; }
 
-	public string DisplayName => _displayName;
+	Rewired.Player Input { get; }
 
-	public Selecting Selecting => _selecting;
+	bool IsBusy { get; set; }
 
-	public Transform TransformParent { get; set; }
+	PlayerUI PlayerUI { get; }
 
-	public CraftingType CraftingType => new CraftingType(AttributeType.None, InteractiveType.CONTAINER);
+	PlayerSpeech PlayerSpeech { get; }
 
-	public RaycastMode RaycastMode => RaycastMode.Collider;
+	Character Character { get; }
 
-	public bool CanParent { get; set; }
+	Statistics Statistics { get; }
 
-	public bool IsDamageable => false;
+	Inventory Inventory { get; }
 
-	public IInteractiveObject_LIFERAFTState MultiplayerState => GetMultiplayerState<IInteractiveObject_LIFERAFTState>();
+	User User { get; }
 
-	private bool CreatedItems
-	{
-		get
-		{
-			return MultiplayerState.CreatedItems;
-		}
-		set
-		{
-			if (entity.IsOwner)
-			{
-				MultiplayerState.CreatedItems = value;
-			}
-		}
-	}
+	Interacter Interacter { get; }
 
-	public ISlotStorage<IPickupable> GetSlotStorage()
-	{
-		return _slotStorage;
-	}
+	Holder Holder { get; }
 
-	private void Awake()
-	{
-		_slotStorage.Name = DisplayName;
-		_slotStorage.Opened += SlotStorage_Opened;
-		_slotStorage.Initialize();
-		_slotStorage.ReferenceId = MiniGuid.VEHICLE_LIFERAFT_STORAGE;
-		StorageRegistry.Link(_slotStorage);
-	}
+	HotkeyController Hotkeys { get; }
 
-	private void OnDestroy()
-	{
-		_slotStorage.ClearEventSubscribers();
-		StorageRegistry.Unlink(_slotStorage);
-	}
+	Crafter Crafter { get; }
 
-	private void SlotStorage_Opened()
-	{
-		ReplicatedOnSlotStorageOpen();
-	}
+	FireLighter Lighter { get; }
 
-	private void OnSlotStorageOpen()
-	{
-		if (_storageData != null && !_storageData.IsNull() && !_slotStorage.LoadState.IsLoaded())
-		{
-			if (_slotStorage.LoadState.IsIdle())
-			{
-				StorageUtilities.LoadStorage(_slotStorage, _storageData);
-			}
-		}
-		else if (Game.Mode.IsMaster() && !CreatedItems)
-		{
-			for (int i = 0; i < _startingPrefabs.Length; i++)
-			{
-				InteractiveObject pickupable = MultiplayerMng.Instantiate<InteractiveObject>(_startingPrefabs[i].PrefabId, MiniGuid.New());
-				_slotStorage.ReplicatedPush(pickupable);
-			}
-			CreatedItems = true;
-		}
-	}
+	Skinner Skinner { get; }
 
-	public void Damage(float damage, IBase damager1)
-	{
-	}
+	Dragger Dragger { get; }
 
-	public void Destroy()
-	{
-	}
+	GameInputController GameInput { get; }
 
-	public void Parent()
-	{
-	}
+	Audio Audio { get; }
 
-	private void ReplicatedOnSlotStorageOpen()
-	{
-		if (Game.Mode.IsMultiplayer())
-		{
-			ReplicateOnSlotStorageOpen replicateOnSlotStorageOpen = new ReplicateOnSlotStorageOpen();
-			replicateOnSlotStorageOpen.Entity = entity;
-			replicateOnSlotStorageOpen.Post();
-		}
-		OnSlotStorageOpen();
-	}
+	DeveloperMode DeveloperMode { get; }
 
-	public JObject Save()
-	{
-		JObject jObject = new JObject();
-		JObject jObject2 = (_slotStorage.Modified ? _slotStorage.Save() : _storageData);
-		if (jObject2 != null && !jObject2.IsNull())
-		{
-			jObject.AddField("Storage", jObject2);
-		}
-		if (Game.Mode.IsServer() && LevelLoader.IsServerJoinInProgress && _slotStorage.GetStored().Any_NonAlloc())
-		{
-			jObject.AddField("serverJIPHasItems", instance: true);
-		}
-		return jObject;
-	}
+	PlayerSkills PlayerSkills { get; }
 
-	public void Load(JObject data)
-	{
-		_storageData = data.GetField("Storage");
-		if (_storageData != null)
-		{
-			CreatedItems = true;
-		}
-		if (Game.Mode.IsClient() && MultiplayerMng.ServerGameState.IsGame() && _storageData.IsValid() && !_storageData.IsNull() && _slotStorage.LoadState.IsIdle() && data.GetField("serverJIPHasItems").IsValid())
-		{
-			_slotStorage.Load(_storageData);
-		}
-	}
+	PlayerExperience PlayerExperience { get; }
+
+	Achievements Achievements { get; }
+
+	Peer Peer { get; set; }
+
+	IMissionGoal CurrentMissionGoal { get; set; }
+
+	void SetInput(Rewired.Player input);
+
+	void SetCamera(PlayerCamera playerCamera);
+
+	void SetUI(PlayerUI playerUI);
+
+	void SetVibration(int motorIndex, float motorLevel, float duration);
 }
-
-
 
 ====================================================================================================
 SOURCE FILE 302
-PATH: Assembly-CSharp__Beam__Interactive_SEA_ANCHOR.cs
-SIZE: 5825 bytes
-SHA256: 582dc6f5ee6c67d08f0063e8025a1415ccd8219b8e2b624af2e80d1e1fed513d
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using Beam.Crafting;
-using Beam.Language;
-using Beam.Serialization.Json;
-using Beam.UI;
-using Ceto;
-using Funlabs;
-using MEC;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace Beam;
-
-public class Interactive_SEA_ANCHOR : ReplicableMonoBehaviour, IInteractable, IBase, IHasCraftingType, ISelectable, IQueryWaves, ISaveable
-{
-	private const float DISTANCE_TO_DEPLOY = 10f;
-
-	private const float MIN_OCEAN_DEPTH_TO_DEPLOY = -5f;
-
-	private const float ANCHOR_DEPTH_BELOW_OCEAN = 1.1f;
-
-	[SerializeField]
-	private MiniGuid _referenceId;
-
-	[SerializeField]
-	[LocalizationTermDropdown]
-	[LocalizationTermPreview]
-	private string _displayName;
-
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Selecting _selecting;
-
-	[SerializeField]
-	private Transform _packedAnchorTransform;
-
-	[SerializeField]
-	private Transform _deployedAnchorTransform;
-
-	[SerializeField]
-	private SphereCollider _deployedAnchorCollider;
-
-	[SerializeField]
-	private LayerMask _deployedAnchorCollisionMask;
-
-	[SerializeField]
-	private VerletLine _deployedAnchorRope;
-
-	[SerializeField]
-	private InteractiveObject_LIFERAFT _raft;
-
-	public UnityEvent OnDeploy;
-
-	public UnityEvent OnRetrieve;
-
-	private List<WaveQuery> _waveQueries;
-
-	private WaveQuery _anchorWaveQuery = new WaveQuery();
-
-	private CoroutineHandle _deployedSequence;
-
-	public override MiniGuid ReferenceId
-	{
-		get
-		{
-			if (_referenceId.IsDefault())
-			{
-				_referenceId = new MiniGuid(_raft.Entity.NetworkId.PackedValue);
-			}
-			return _referenceId;
-		}
-		set
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	public RaycastMode RaycastMode => RaycastMode.Collider;
-
-	public string DisplayName => _displayName;
-
-	public Selecting Selecting => _selecting;
-
-	public Transform TransformParent { get; set; }
-
-	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.None);
-
-	public bool CanInteract { get; set; } = true;
-
-	public bool CanParent { get; set; }
-
-	public bool IsDamageable { get; }
-
-	public bool Deployed { get; private set; }
-
-	bool IQueryWaves.Active
-	{
-		get
-		{
-			if (gameObject != null)
-			{
-				return gameObject.activeInHierarchy;
-			}
-			return false;
-		}
-	}
-
-	IEnumerable<WaveQuery> IQueryWaves.WaveQueries
-	{
-		get
-		{
-			if (_waveQueries == null)
-			{
-				_waveQueries = new List<WaveQuery> { _anchorWaveQuery };
-			}
-			return _waveQueries;
-		}
-	}
-
-	public string GetInteractionDescription(int playerId, IBase obj)
-	{
-		if (!Deployed)
-		{
-			return "ITEM_INTERACTION_DESCRIPTION_DEPLOY";
-		}
-		return "ITEM_INTERACTION_DESCRIPTION_RETRIEVE";
-	}
-
-	void IQueryWaves.InRange()
-	{
-	}
-
-	void IQueryWaves.OutOfRange()
-	{
-	}
-
-	private void Awake()
-	{
-		_raft.VehicleMovement.Operated += RaftVehicleMovement_Operated;
-	}
-
-	private void OnDestroy()
-	{
-		Timing.KillCoroutines(_deployedSequence);
-		_raft.VehicleMovement.Operated -= RaftVehicleMovement_Operated;
-		Singleton<BuoyancyManager>.Instance?.Remove(this);
-	}
-
-	private void RaftVehicleMovement_Operated(bool operated)
-	{
-		if (operated && Deployed)
-		{
-			Retrieve();
-		}
-	}
-
-	public bool Interact(IPlayer player)
-	{
-		if (!Deployed)
-		{
-			if (!CanDeploy())
-			{
-				LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "SEA_ANCHOR_NTF_TOO_SHALLOW_DESC");
-				return false;
-			}
-			Deploy();
-			return true;
-		}
-		if (Deployed)
-		{
-			Retrieve();
-			return true;
-		}
-		return false;
-	}
-
-	private void Deploy()
-	{
-		Singleton<BuoyancyManager>.Instance?.Add(this);
-		_deployedAnchorTransform.gameObject.SetActive(value: true);
-		_deployedAnchorTransform.position = transform.parent.position + Vector3.down * 1.1f + -Wind.Direction * 10f;
-		_deployedAnchorTransform.rotation = Quaternion.LookRotation(Wind.Direction, Vector3.up);
-		_deployedAnchorRope.gameObject.SetActive(value: true);
-		_packedAnchorTransform.gameObject.SetActive(value: false);
-		_raft.Buoyancy.EnableWind(enable: false);
-		_raft.Buoyancy.SetDampening(0.7f);
-		_deployedSequence = Timing.RunCoroutine(Deployed_Sequence());
-		Deployed = true;
-		OnDeploy?.Invoke();
-	}
-
-	public void Retrieve()
-	{
-		Singleton<BuoyancyManager>.Instance?.Remove(this);
-		_deployedAnchorTransform.gameObject.SetActive(value: false);
-		_deployedAnchorTransform.localPosition = Vector3.zero;
-		_deployedAnchorRope.gameObject.SetActive(value: false);
-		_packedAnchorTransform.gameObject.SetActive(value: true);
-		_raft.Buoyancy.EnableWind(enable: true);
-		_raft.Buoyancy.ResetDampening();
-		Timing.KillCoroutines(_deployedSequence);
-		Deployed = false;
-		OnRetrieve?.Invoke();
-	}
-
-	public bool InteractWithObject(IPlayer player, IBase obj)
-	{
-		return Interact(player);
-	}
-
-	private bool CanDeploy()
-	{
-		if (Singleton<StrandedWorld>.Instance == null)
-		{
-			return true;
-		}
-		Vector3 vector = transform.parent.position + -Wind.Direction * 10f;
-		if (Physics.CheckSphere(vector, _deployedAnchorCollider.radius, _deployedAnchorCollisionMask, QueryTriggerInteraction.Ignore))
-		{
-			return false;
-		}
-		if (Singleton<StrandedWorld>.Instance.GetHeight(vector) > -5f)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private IEnumerator<float> Deployed_Sequence()
-	{
-		while (true)
-		{
-			_anchorWaveQuery.posX = _deployedAnchorTransform.position.x;
-			_anchorWaveQuery.posZ = _deployedAnchorTransform.position.z;
-			Vector3 position = _deployedAnchorTransform.position;
-			position.y = _anchorWaveQuery.result.height - 1.1f;
-			_deployedAnchorTransform.position = position;
-			yield return 0f;
-		}
-	}
-
-	public void Parent()
-	{
-	}
-
-	public void Damage(float damage, IBase damager1)
-	{
-	}
-
-	public void Destroy()
-	{
-	}
-
-	public new JObject Save()
-	{
-		JObject jObject = new JObject();
-		jObject.AddField("Deployed", Deployed);
-		return jObject;
-	}
-
-	public new void Load(JObject data)
-	{
-		if (data.GetField("Deployed").GetValue<bool>())
-		{
-			Deploy();
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 303
 PATH: Assembly-CSharp__Beam__LandAnimal.cs
 SIZE: 11894 bytes
 SHA256: 06def3949b5657af906f32728eb6c4c6f26bf22ce083705a72525eace05e8450
 ====================================================================================================
-
 using System;
 using Beam.Events;
 using Beam.Utilities;
@@ -915,15 +542,12 @@ public class LandAnimal : StateMachine<LandAnimal>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 304
+SOURCE FILE 303
 PATH: Assembly-CSharp__Beam__LegacyUtilities.cs
 SIZE: 17463 bytes
 SHA256: 3be95e0194b0bedcacc57f1e16ba2c87d91018690adc62f5487d1db17b270b45
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1415,15 +1039,12 @@ public static class LegacyUtilities
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 305
+SOURCE FILE 304
 PATH: Assembly-CSharp__Beam__LoadAssetFromBundleOperation.cs
 SIZE: 1012 bytes
 SHA256: 6888b62302e8d8a6d76ef77231355431e6cab2a2f69ea6618d0e9ded94764bc2
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -1481,15 +1102,12 @@ public class LoadAssetFromBundleOperation : LoadAssetFromBundleOperationBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 306
+SOURCE FILE 305
 PATH: Assembly-CSharp__Beam__MissionAssetLoader.cs
 SIZE: 5001 bytes
 SHA256: 5289daf7ce444589b195b2071bbef2085e96cba0b80a744acb2dfbabe2704f32
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1686,15 +1304,12 @@ public class MissionAssetLoader : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 307
+SOURCE FILE 306
 PATH: Assembly-CSharp__Beam__MissionControllerBase.cs
 SIZE: 12655 bytes
 SHA256: fb7489bcdd32cdf303168e44e93d58c18bd6112335f1c802226bd1d6fdc75bc0
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Serialization.Json;
@@ -2140,15 +1755,12 @@ public class MissionControllerBase : SaveablePrefab, IMissionEventBroadcaster, I
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 308
+SOURCE FILE 307
 PATH: Assembly-CSharp__Beam__MotorVehicleAnimation.cs
 SIZE: 2462 bytes
 SHA256: b829224b161f8ab1ef1503325abe17fe43c7c0e7bb255a77ed2b78d035b1a10f
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -2267,15 +1879,12 @@ public class MotorVehicleAnimation : VehicleAnimation<MotorVehicleMovement>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 309
+SOURCE FILE 308
 PATH: Assembly-CSharp__Beam__MotorVehicleMovement.cs
 SIZE: 2842 bytes
 SHA256: 1c9a45924c2778311f7619424d8849f49f54f061a3d58524cd61d75b6c62fb87
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using UnityEngine;
@@ -2410,15 +2019,12 @@ public class MotorVehicleMovement : VehicleMovementBase, IHaveFuel
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 310
+SOURCE FILE 309
 PATH: Assembly-CSharp__Beam__Movement.cs
 SIZE: 46467 bytes
 SHA256: c2ad349b8ea6bd3aa2a9bd1c2fdb3f14fffc1c85173e8b00c629403731fe5508
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Events;
@@ -4396,15 +4002,12 @@ public class Movement : MultiplayerBehaviour, INeedPlayerComponent, ISaveable, I
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 311
+SOURCE FILE 310
 PATH: Assembly-CSharp__Beam__NullAudioSource.cs
 SIZE: 910 bytes
 SHA256: 785c2d0ad05fc3b920abce4061513bba7b0d15a3ca5d3abf16aa645a45305b6d
 ====================================================================================================
-
 using Beam.UI;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -4462,96 +4065,12 @@ public sealed class NullAudioSource : IAudioSource
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 312
-PATH: Assembly-CSharp__Beam__OOBB.cs
-SIZE: 2629 bytes
-SHA256: 496eb29afaf310d877595f7bb33ddfb64e69a4e5dfdb8b2bbb345370902657c8
-====================================================================================================
-
-using UnityEngine;
-
-namespace Beam;
-
-public struct OOBB(Transform transform, Vector3 size)
-{
-	public readonly Vector3 Center = transform.position;
-
-	public readonly Vector3 Forward = transform.forward;
-
-	public readonly Vector3 Right = transform.right;
-
-	public readonly Vector3 Up = transform.up;
-
-	public readonly Vector3 Size = size;
-
-	public bool Intersects(OOBB oobb)
-	{
-		Vector3[] array = new Vector3[15]
-		{
-			Forward,
-			Right,
-			Up,
-			oobb.Forward,
-			oobb.Right,
-			oobb.Up,
-			Vector3.Cross(Forward, oobb.Forward).normalized,
-			Vector3.Cross(Forward, oobb.Right).normalized,
-			Vector3.Cross(Forward, oobb.Up).normalized,
-			Vector3.Cross(Right, oobb.Forward).normalized,
-			Vector3.Cross(Right, oobb.Right).normalized,
-			Vector3.Cross(Right, oobb.Up).normalized,
-			Vector3.Cross(Up, oobb.Forward).normalized,
-			Vector3.Cross(Up, oobb.Right).normalized,
-			Vector3.Cross(Up, oobb.Up).normalized
-		};
-		Vector3 lhs = Center - oobb.Center;
-		Vector3 lhs2 = 0.5f * (Right * Size.x + Up * Size.y + Forward * Size.z);
-		Vector3 lhs3 = 0.5f * (Right * Size.x + Up * Size.y - Forward * Size.z);
-		Vector3 lhs4 = 0.5f * (Right * Size.x - Up * Size.y + Forward * Size.z);
-		Vector3 lhs5 = 0.5f * (Right * Size.x - Up * Size.y - Forward * Size.z);
-		Vector3 lhs6 = 0.5f * (oobb.Right * oobb.Size.x + oobb.Up * oobb.Size.y + oobb.Forward * oobb.Size.z);
-		Vector3 lhs7 = 0.5f * (oobb.Right * oobb.Size.x + oobb.Up * oobb.Size.y - oobb.Forward * oobb.Size.z);
-		Vector3 lhs8 = 0.5f * (oobb.Right * oobb.Size.x - oobb.Up * oobb.Size.y + oobb.Forward * oobb.Size.z);
-		Vector3 lhs9 = 0.5f * (oobb.Right * oobb.Size.x - oobb.Up * oobb.Size.y - oobb.Forward * oobb.Size.z);
-		float[] array2 = new float[2];
-		float[] array3 = new float[2];
-		float[] array4 = new float[2];
-		float[] array5 = new float[2];
-		for (uint num = 0u; num < 15; num++)
-		{
-			if (!(array[num] == Vector3.zero))
-			{
-				float f = Vector3.Dot(lhs, array[num]);
-				array2[0] = Vector3.Dot(lhs2, array[num]);
-				array2[1] = Vector3.Dot(lhs3, array[num]);
-				array3[0] = Vector3.Dot(lhs6, array[num]);
-				array3[1] = Vector3.Dot(lhs7, array[num]);
-				array4[0] = Vector3.Dot(lhs4, array[num]);
-				array4[1] = Vector3.Dot(lhs5, array[num]);
-				array5[0] = Vector3.Dot(lhs8, array[num]);
-				array5[1] = Vector3.Dot(lhs9, array[num]);
-				if (Mathf.Abs(f) > Mathf.Abs(array2[0]) + Mathf.Abs(array3[0]) && Mathf.Abs(f) > Mathf.Abs(array2[1]) + Mathf.Abs(array3[1]) && Mathf.Abs(f) > Mathf.Abs(array4[0]) + Mathf.Abs(array5[0]) && Mathf.Abs(f) > Mathf.Abs(array4[1]) + Mathf.Abs(array5[1]))
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 313
+SOURCE FILE 311
 PATH: Assembly-CSharp__Beam__OnlinePlayerNameWidget.cs
 SIZE: 3161 bytes
 SHA256: 80342635910a8eeb03ca615b18c2581ed675e642faa35a31ab293e37bc82ce96
 ====================================================================================================
-
 using System.Collections;
 using Beam.Events;
 using Beam.UI;
@@ -4686,15 +4205,90 @@ public class OnlinePlayerNameWidget : MonoBehaviour, INeedPlayerComponent
 	}
 }
 
+====================================================================================================
+SOURCE FILE 312
+PATH: Assembly-CSharp__Beam__OOBB.cs
+SIZE: 2629 bytes
+SHA256: 496eb29afaf310d877595f7bb33ddfb64e69a4e5dfdb8b2bbb345370902657c8
+====================================================================================================
+using UnityEngine;
 
+namespace Beam;
+
+public struct OOBB(Transform transform, Vector3 size)
+{
+	public readonly Vector3 Center = transform.position;
+
+	public readonly Vector3 Forward = transform.forward;
+
+	public readonly Vector3 Right = transform.right;
+
+	public readonly Vector3 Up = transform.up;
+
+	public readonly Vector3 Size = size;
+
+	public bool Intersects(OOBB oobb)
+	{
+		Vector3[] array = new Vector3[15]
+		{
+			Forward,
+			Right,
+			Up,
+			oobb.Forward,
+			oobb.Right,
+			oobb.Up,
+			Vector3.Cross(Forward, oobb.Forward).normalized,
+			Vector3.Cross(Forward, oobb.Right).normalized,
+			Vector3.Cross(Forward, oobb.Up).normalized,
+			Vector3.Cross(Right, oobb.Forward).normalized,
+			Vector3.Cross(Right, oobb.Right).normalized,
+			Vector3.Cross(Right, oobb.Up).normalized,
+			Vector3.Cross(Up, oobb.Forward).normalized,
+			Vector3.Cross(Up, oobb.Right).normalized,
+			Vector3.Cross(Up, oobb.Up).normalized
+		};
+		Vector3 lhs = Center - oobb.Center;
+		Vector3 lhs2 = 0.5f * (Right * Size.x + Up * Size.y + Forward * Size.z);
+		Vector3 lhs3 = 0.5f * (Right * Size.x + Up * Size.y - Forward * Size.z);
+		Vector3 lhs4 = 0.5f * (Right * Size.x - Up * Size.y + Forward * Size.z);
+		Vector3 lhs5 = 0.5f * (Right * Size.x - Up * Size.y - Forward * Size.z);
+		Vector3 lhs6 = 0.5f * (oobb.Right * oobb.Size.x + oobb.Up * oobb.Size.y + oobb.Forward * oobb.Size.z);
+		Vector3 lhs7 = 0.5f * (oobb.Right * oobb.Size.x + oobb.Up * oobb.Size.y - oobb.Forward * oobb.Size.z);
+		Vector3 lhs8 = 0.5f * (oobb.Right * oobb.Size.x - oobb.Up * oobb.Size.y + oobb.Forward * oobb.Size.z);
+		Vector3 lhs9 = 0.5f * (oobb.Right * oobb.Size.x - oobb.Up * oobb.Size.y - oobb.Forward * oobb.Size.z);
+		float[] array2 = new float[2];
+		float[] array3 = new float[2];
+		float[] array4 = new float[2];
+		float[] array5 = new float[2];
+		for (uint num = 0u; num < 15; num++)
+		{
+			if (!(array[num] == Vector3.zero))
+			{
+				float f = Vector3.Dot(lhs, array[num]);
+				array2[0] = Vector3.Dot(lhs2, array[num]);
+				array2[1] = Vector3.Dot(lhs3, array[num]);
+				array3[0] = Vector3.Dot(lhs6, array[num]);
+				array3[1] = Vector3.Dot(lhs7, array[num]);
+				array4[0] = Vector3.Dot(lhs4, array[num]);
+				array4[1] = Vector3.Dot(lhs5, array[num]);
+				array5[0] = Vector3.Dot(lhs8, array[num]);
+				array5[1] = Vector3.Dot(lhs9, array[num]);
+				if (Mathf.Abs(f) > Mathf.Abs(array2[0]) + Mathf.Abs(array3[0]) && Mathf.Abs(f) > Mathf.Abs(array2[1]) + Mathf.Abs(array3[1]) && Mathf.Abs(f) > Mathf.Abs(array4[0]) + Mathf.Abs(array5[0]) && Mathf.Abs(f) > Mathf.Abs(array4[1]) + Mathf.Abs(array5[1]))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}
 
 ====================================================================================================
-SOURCE FILE 314
+SOURCE FILE 313
 PATH: Assembly-CSharp__Beam__Player.cs
 SIZE: 9452 bytes
 SHA256: afaa3a500231caa1e48524e9bf5a33b9a0a3a1148ee216dce3b746b49c4a7779
 ====================================================================================================
-
 using Beam.Crafting;
 using Beam.Obfuscated.Serialization;
 using Beam.Serialization;
@@ -5073,15 +4667,12 @@ public class Player : MultiplayerBehaviour, IPlayer, ISaveable, IIdleUntilInitia
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 315
+SOURCE FILE 314
 PATH: Assembly-CSharp__Beam__PlayerCamera.cs
 SIZE: 9311 bytes
 SHA256: 0aa1ca89c808ecdbf0ae2989dd7e2cfed1d3b96b38bbbf129033fef92f2ac418
 ====================================================================================================
-
 using System;
 using Beam.Crafting;
 using Beam.Events;
@@ -5501,15 +5092,12 @@ public class PlayerCamera : MultiplayerBehaviour, IGameCamera, INeedPlayerCompon
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 316
+SOURCE FILE 315
 PATH: Assembly-CSharp__Beam__PlayerRegistry.cs
 SIZE: 9035 bytes
 SHA256: f3b61375e5f2604e707d5c332b03a4ee997909307ab832c1874742d765e0c68a
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5893,15 +5481,12 @@ public static class PlayerRegistry
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 317
+SOURCE FILE 316
 PATH: Assembly-CSharp__Beam__ProjectileMovement.cs
 SIZE: 11607 bytes
 SHA256: 392c0a84e3094fe722705ca0f427d4f61b0812c88382a805a58ee3d0960546ec
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Crafting;
@@ -6307,15 +5892,12 @@ public class ProjectileMovement : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 318
+SOURCE FILE 317
 PATH: Assembly-CSharp__Beam__RudderVehicleMovement.cs
 SIZE: 1150 bytes
 SHA256: 164bf07eef3f9c947437b3ad26c58594a02a07c06798365e6533395c5691e581
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -6363,15 +5945,12 @@ public class RudderVehicleMovement : VehicleMovementBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 319
+SOURCE FILE 318
 PATH: Assembly-CSharp__Beam__SailVehicleMovement.cs
 SIZE: 1683 bytes
 SHA256: 43c2b8364fda3fed8cc1b74af85f27ee77d964d108011d82c5f39db043d30c62
 ====================================================================================================
-
 using Beam.Crafting;
 using UnityEngine;
 
@@ -6471,15 +6050,12 @@ public class SailVehicleMovement : VehicleMovementBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 320
+SOURCE FILE 319
 PATH: Assembly-CSharp__Beam__Skinner.cs
 SIZE: 10919 bytes
 SHA256: 8fb5d88cc9654c7436bcbb03241c70032d3f350dbefd48a406fe23a398f76b47
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Crafting;
 using Beam.UI;
@@ -6879,15 +6455,12 @@ public class Skinner : MonoBehaviour, IGameInputHandler, INeedPlayerComponent
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 321
+SOURCE FILE 320
 PATH: Assembly-CSharp__Beam__SlotStorage.cs
 SIZE: 16756 bytes
 SHA256: c78fe0b248994ec6bb4971f03592cfb5f6a1b1278cbbab2890f221f7e5cdf022
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7597,15 +7170,12 @@ public class SlotStorage : ISlotStorage<IPickupable>, IMultiplayerStorage<IPicku
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 322
+SOURCE FILE 321
 PATH: Assembly-CSharp__Beam__Snake.cs
 SIZE: 11269 bytes
 SHA256: a7242c00d3dfd9bd0ea82f2b1072412947b9966014d28c69434db1ef10959243
 ====================================================================================================
-
 using System;
 using System.Collections;
 using Beam.Utilities;
@@ -8108,15 +7678,12 @@ public class Snake : LandAnimal
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 323
+SOURCE FILE 322
 PATH: Assembly-CSharp__Beam__StaticAttachingAnchor.cs
 SIZE: 652 bytes
 SHA256: e469691aaa71917fcf466934cd578fb4b462b03419299b69e8d1dc0b5a8f0238
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -8160,15 +7727,12 @@ public struct StaticAttachingAnchor : IAttachingAnchor
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 324
+SOURCE FILE 323
 PATH: Assembly-CSharp__Beam__Statistics.cs
 SIZE: 29785 bytes
 SHA256: 6d9b434663809c7bb906b53a61fd863590ff4b48162402c3914d07e644d991eb
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9433,15 +8997,12 @@ public class Statistics : MonoBehaviour, INeedPlayerComponent, ISaveable, IIdleU
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 325
+SOURCE FILE 324
 PATH: Assembly-CSharp__Beam__Sunburn.cs
 SIZE: 4652 bytes
 SHA256: 717ca3eac4daf1ba6629e1fedf4ef9dbfc110460ad19798f73937c4d28d5bdf6
 ====================================================================================================
-
 using Beam.Serialization.Json;
 using UnityEngine;
 
@@ -9624,4 +9185,39 @@ public class Sunburn : ScenePlayerEffect, IIdleUntilInitialized
 	}
 }
 
+====================================================================================================
+SOURCE FILE 325
+PATH: Assembly-CSharp__Beam__TransformAttracterRepeller.cs
+SIZE: 555 bytes
+SHA256: b91a5b8729a09b2c77047dfeb4dcea812eebfea64ae3fa1ee6191448029322a0
+====================================================================================================
+using System;
+using UnityEngine;
+
+namespace Beam;
+
+[Serializable]
+public struct TransformAttracterRepeller : IAttracterRepeller
+{
+	[SerializeField]
+	private TransformPosition _transformPosition;
+
+	[SerializeField]
+	private float _radius;
+
+	private int _id;
+
+	public Vector3 Position => _transformPosition.Position;
+
+	public float Radius => _radius;
+
+	public int Id => _id;
+
+	public TransformAttracterRepeller(TransformPosition transformPosition, float radius, int id = -1)
+	{
+		_transformPosition = transformPosition;
+		_radius = radius;
+		_id = id;
+	}
+}
 

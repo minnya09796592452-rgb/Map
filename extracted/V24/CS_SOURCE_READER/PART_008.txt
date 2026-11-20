@@ -1,802 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 176
-PATH: Assembly-CSharp__Beam.Terrain__ZoneLoader.cs
-SIZE: 25252 bytes
-SHA256: 4e3a59b52d0645f6ab951cd432f74169b011d5375b50b4c4b0885f418bcc5273
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Beam.Rendering;
-using Beam.Serialization;
-using Beam.Serialization.Json;
-using Beam.Utilities;
-using Funlabs;
-using MEC;
-using SharpNeatLib.Maths;
-using Sirenix.Utilities;
-using UnityEngine;
-
-namespace Beam.Terrain;
-
-public class ZoneLoader : ILoader
-{
-	public delegate void GenerationCallback(IGenerationObject obj, Vector3 position, Quaternion rotation, Zone zone);
-
-	public delegate void ProcessCollectionCallback<in T>(T obj, Zone zone);
-
-	public enum EObjectProcessingMode
-	{
-		Stepped,
-		Faster
-	}
-
-	private const int MIN_PROCESSING_STEPS_PER_FRAME = 4;
-
-	private const int MAX_PROCESSING_STEPS_PER_FRAME = 200;
-
-	private const int INDEX_SIZE = 256;
-
-	[SerializeField]
-	private bool _simulateSlowLoad;
-
-	private List<Action> _internalDeferredLoading = new List<Action>();
-
-	private List<Action> _deferredLoading = new List<Action>();
-
-	private List<Action> _postLoading = new List<Action>();
-
-	private List<Action> _physicalLoading = new List<Action>();
-
-	private bool _isGenerating;
-
-	private FastRandom _random = new FastRandom();
-
-	private Vector3 _position;
-
-	private int _processes;
-
-	private Stopwatch _timer = new Stopwatch();
-
-	private float _timeout;
-
-	public IList<Action> DeferredLoading => _deferredLoading;
-
-	public IList<Action> PostLoading => _postLoading;
-
-	public IList<Action> PhysicalLoading => _physicalLoading;
-
-	public bool IsGenerating => _isGenerating;
-
-	public bool IsLoading { get; set; }
-
-	public FastRandom Random => _random;
-
-	public EObjectProcessingMode ObjectProcessingMode { get; set; }
-
-	public event Action<Zone> CreatedZone;
-
-	public event Action<Zone> LoadedZone;
-
-	private void OnDestroy()
-	{
-		CreatedZone = null;
-		LoadedZone = null;
-	}
-
-	public float LoadZone_Async(Zone zone, JObject data)
-	{
-		return Timing.WaitUntilDone(LoadZone(zone, data));
-	}
-
-	public CoroutineHandle LoadZone(Zone zone, JObject data)
-	{
-		return Timing.RunCoroutine(LoadZone_Sequence(zone, data), Segment.Update, 100);
-	}
-
-	private IEnumerator<float> LoadZone_Sequence(Zone zone, JObject data)
-	{
-		_timer.Restart();
-		UpdateSessionToken_IsBusy(isBusy: true);
-		LevelLoader.Instance.LoadingZones.Add(zone);
-		LevelLoader.Instance.HashCodes.Clear();
-		LevelLoader.CurrentLoader = this;
-		LevelLoader.CurrentLoader.IsLoading = true;
-		ResetTemporaryLoadingPosition();
-		zone.Loading = true;
-		zone.Enter();
-		_timeout = Peer.GetDefaultTimeout();
-		if (Game.Mode.IsMultiplayer())
-		{
-			_timeout = PlayerRegistry.LocalPeer.Timeout;
-			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
-		}
-		JObject field = data.GetField("Attributes");
-		if (field != null)
-		{
-			SavingUtilities.Load(zone.Attributes, field);
-		}
-		_processes = 4;
-		JObject field2 = data.GetField("Objects");
-		if (field2 != null && !field2.IsNull())
-		{
-			yield return ProcessCollection_Async(field2.Children, CreateLoadedPrefab, zone);
-			if (Game.Mode.IsClient())
-			{
-				yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
-			}
-		}
-		else
-		{
-			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Zone [" + zone.ZoneName + "] [Objects] field is null or empty.");
-		}
-		yield return 0f;
-		yield return 0f;
-		yield return Timing.WaitUntilDone(MultiplayerFence.Sync(Fence.ProcessLoading));
-		yield return ProcessCollection_Async(_internalDeferredLoading, InvokeCallback, zone);
-		yield return ProcessCollection_Async(_deferredLoading, InvokeCallback, zone);
-		yield return ProcessCollection_Async(_postLoading, InvokeCallback, zone);
-		if (AssetBundleManager.IsLoading)
-		{
-			UnityEngine.Debug.Log("ZoneLoader::LoadZoneAsync:: [" + zone.ZoneName + "] waiting for bundles to load...");
-		}
-		while (AssetBundleManager.IsLoading)
-		{
-			yield return 0f;
-		}
-		yield return 0f;
-		for (int i = 0; i < _physicalLoading.Count; i++)
-		{
-			LoadingActionUtilities.ExecuteDeferredAction(_physicalLoading[i]);
-		}
-		zone.Loading = false;
-		zone.Loaded = true;
-		LoadedZone?.Invoke(zone);
-		zone.HasVisited = true;
-		CleanUp(zone);
-		if (Game.Mode.IsMaster())
-		{
-			Singleton<StrandedWorld>.Instance.HandleOutOfGameBounds(zone, handleNmlContainer: true);
-		}
-		if (Game.Mode.IsMultiplayer())
-		{
-			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
-		}
-		UpdateSessionToken_IsBusy(isBusy: false);
-	}
-
-	public void AbortLoadingZone(Zone zone)
-	{
-		Timing.KillCoroutines(100);
-		BeamTeam.DestroyAllChildrenImmediate(zone.SaveContainer);
-		Transform parent = Singleton<StrandedWorld>.Instance.GetParent();
-		for (int num = parent.childCount - 1; num >= 0; num--)
-		{
-			Transform child = parent.GetChild(num);
-			if (Singleton<StrandedWorld>.Instance.InBounds(child.position))
-			{
-				BeamTeam.DestroyImmediate(child.gameObject);
-			}
-		}
-		zone.Exit();
-		zone.Loading = false;
-		zone.Loaded = false;
-		_ = _isGenerating;
-		CleanUp(zone);
-		if (Game.Mode.IsMultiplayer())
-		{
-			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
-		}
-		UpdateSessionToken_IsBusy(isBusy: false);
-	}
-
-	private void CleanUp(Zone zone)
-	{
-		_timer.Stop();
-		_isGenerating = false;
-		if (!LevelLoader.CurrentLoader.IsNullOrDestroyed())
-		{
-			_internalDeferredLoading.Clear();
-			_deferredLoading.Clear();
-			_postLoading.Clear();
-			_physicalLoading.Clear();
-			LevelLoader.CurrentLoader.IsLoading = false;
-			LevelLoader.CurrentLoader = null;
-			LevelLoader.Instance.HashCodes.Clear();
-			LevelLoader.Instance.LoadingZones.Remove(zone);
-		}
-	}
-
-	public bool CreateZone(Zone zone)
-	{
-		if (_isGenerating)
-		{
-			return false;
-		}
-		CreateZoneObjects(zone);
-		return true;
-	}
-
-	public float CreateZoneObjects_Async(Zone zone, int seed)
-	{
-		return Timing.WaitUntilDone(CreateZoneObjects(zone));
-	}
-
-	private CoroutineHandle CreateZoneObjects(Zone zone)
-	{
-		return Timing.RunCoroutine(CreateZoneObjects_Sequence(zone), Segment.Update, 100);
-	}
-
-	private IEnumerator<float> CreateZoneObjects_Sequence(Zone zone)
-	{
-		_timer.Restart();
-		UpdateSessionToken_IsBusy(isBusy: true);
-		_isGenerating = true;
-		zone.Loading = true;
-		zone.Enter();
-		_processes = 1;
-		_timeout = Peer.GetDefaultTimeout();
-		if (Game.Mode.IsMultiplayer())
-		{
-			_timeout = PlayerRegistry.LocalPeer.Timeout;
-			yield return PlayerRegistry.LocalPeer.SetTimeout_Async(Peer.GetSessionTimeout());
-		}
-		yield return ProcessCollection_Async(zone.GeneratedObjects, CreateGeneratedPrefab, zone);
-		if (Game.Mode.IsClient())
-		{
-			yield return Timing.WaitUntilDone(Timing.RunCoroutine(ClientLinking()));
-		}
-		zone.Loading = false;
-		zone.Loaded = true;
-		CreatedZone?.Invoke(zone);
-		zone.HasVisited = true;
-		CleanUp(zone);
-		_isGenerating = false;
-		if (Game.Mode.IsMultiplayer())
-		{
-			PlayerRegistry.LocalPeer.SetTimeout(_timeout);
-		}
-		UpdateSessionToken_IsBusy(isBusy: false);
-	}
-
-	public bool GenerateZone(Zone zone)
-	{
-		if (_isGenerating)
-		{
-			return false;
-		}
-		GenerateObjects(zone, GenerateObject);
-		return true;
-	}
-
-	private void GenerateObjects(Zone zone, GenerationCallback generationCallback)
-	{
-		_isGenerating = true;
-		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
-		zone.GenerateGridData();
-		zone.GeneratedObjects.Clear();
-		ZoneObjects sheltersGeneration = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.SheltersGeneration;
-		if (zone.HasShelter)
-		{
-			GenerateShelter(sheltersGeneration, zone, generationCallback);
-		}
-		for (int i = 0; i < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration.Count; i++)
-		{
-			BiomeCategory biomeCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.BiomeGeneration[i];
-			if (biomeCategory.Biome != zone.Biome && biomeCategory.Biome != Zone.BiomeType.RANDOM)
-			{
-				continue;
-			}
-			for (int j = 0; j < biomeCategory.ProceduralObjects.Count; j++)
-			{
-				ZoneObjects zoneObjects = biomeCategory.ProceduralObjects[j];
-				switch (zoneObjects.generationType)
-				{
-				case ZoneGenerationType.Position:
-					GenerateProceduralObjectsPosition(zoneObjects, zone, generationCallback);
-					break;
-				case ZoneGenerationType.Procedural:
-					GenerateProceduralObjectsProcedural(zoneObjects, zone, generationCallback);
-					break;
-				}
-			}
-		}
-		if (zone.Biome == Zone.BiomeType.ISLAND || zone.Biome == Zone.BiomeType.ISLAND_SMALL)
-		{
-			for (int k = 0; k < Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration.Count; k++)
-			{
-				ObjectCategory objectCategory = Singleton<StrandedWorld>.Instance.ProceduralObjectsManager.ObjectGeneration[k];
-				for (int l = 0; l < objectCategory.ProceduralObjects.Count; l++)
-				{
-					ZoneObjects zoneObjects2 = objectCategory.ProceduralObjects[l];
-					switch (zoneObjects2.generationType)
-					{
-					case ZoneGenerationType.Position:
-						GenerateProceduralObjectsPosition(zoneObjects2, zone, generationCallback);
-						break;
-					case ZoneGenerationType.Procedural:
-						GenerateProceduralObjectsProcedural(zoneObjects2, zone, generationCallback);
-						break;
-					}
-				}
-			}
-		}
-		zone.GeneratedObjects.Sort((GeneratedObject a, GeneratedObject b) => Comparisons.FurthestFromPoint(zone.transform.position, a.Position, b.Position));
-		_isGenerating = false;
-	}
-
-	private void GenerateProceduralObjectsPosition(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
-	{
-		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
-		{
-			UnityEngine.Debug.LogError("ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.");
-			return;
-		}
-		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
-		float num = 0f;
-		if (zoneObjects.Objects.Length != 0)
-		{
-			for (int i = 0; i < zoneObjects.Objects.Length; i++)
-			{
-				ZoneObject zoneObject = zoneObjects.Objects[i];
-				num += zoneObject.Rarity;
-			}
-		}
-		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
-		{
-			return;
-		}
-		for (int j = 0; j < zoneObjects.maxObjectCount; j++)
-		{
-			if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
-			{
-				continue;
-			}
-			int num2 = 0;
-			if (zoneObjects.Objects.Length != 0)
-			{
-				float num3 = (float)_random.NextDouble() * num;
-				for (int k = 0; k < zoneObjects.Objects.Length; k++)
-				{
-					if (num3 < zoneObjects.Objects[k].Rarity)
-					{
-						num2 = k;
-						break;
-					}
-					num3 -= zoneObjects.Objects[k].Rarity;
-				}
-			}
-			Vector3 position = zone.transform.position + zoneObjects.manualPosition;
-			Quaternion identity = Quaternion.identity;
-			IGenerationObject obj = zoneObjects.Objects[num2].Obj;
-			generationCallback(obj, position, identity, zone);
-		}
-	}
-
-	private void GenerateProceduralObjectsProcedural(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
-	{
-		if (zoneObjects.Objects == null || zoneObjects.Objects.Length == 0)
-		{
-			UnityEngine.Debug.LogError("ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.");
-			return;
-		}
-		_random.Reinitialise(StrandedWorld.WORLD_SEED - zone.Seed);
-		float num = 0f;
-		if (zoneObjects.Objects.Length != 0)
-		{
-			for (int i = 0; i < zoneObjects.Objects.Length; i++)
-			{
-				ZoneObject zoneObject = zoneObjects.Objects[i];
-				num += zoneObject.Rarity;
-			}
-		}
-		if (zone.IsStartingIsland && !zoneObjects.spawnOnStartingIsland)
-		{
-			return;
-		}
-		int detailAmountFactor = zoneObjects.detailAmountFactor;
-		int num2 = 0;
-		for (int j = 0; j < 256 - detailAmountFactor; j += detailAmountFactor)
-		{
-			for (int k = 0; k < 256 - detailAmountFactor; k += detailAmountFactor)
-			{
-				if (num2 >= zoneObjects.maxObjectCount)
-				{
-					return;
-				}
-				GenerationPoints generationPoints = zone.GenerationPoints[j, k];
-				if (!((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f) || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
-				{
-					continue;
-				}
-				int num3 = 0;
-				if (zoneObjects.Objects.Length != 0)
-				{
-					float num4 = (float)_random.NextDouble() * num;
-					for (int l = 0; l < zoneObjects.Objects.Length; l++)
-					{
-						if (num4 < zoneObjects.Objects[l].Rarity)
-						{
-							num3 = l;
-							break;
-						}
-						num4 -= zoneObjects.Objects[l].Rarity;
-					}
-				}
-				Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
-				Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
-				Quaternion quaternion = Quaternion.identity;
-				if (zoneObjects.terrainSnap)
-				{
-					quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
-				}
-				int num5 = _random.Next(0, 360);
-				if (zoneObjects.randomRotation)
-				{
-					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num5)) : Quaternion.Euler(Vector3.up * num5));
-				}
-				else if (zoneObjects.randomFullRotation)
-				{
-					int num6 = _random.Next(0, 360);
-					int num7 = _random.Next(0, 360);
-					quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num6, num5, num7))) : Quaternion.Euler(new Vector3(num6, num5, num7)));
-				}
-				if (zoneObjects.occupyPoint)
-				{
-					generationPoints.Occupied = true;
-				}
-				IGenerationObject obj = zoneObjects.Objects[num3].Obj;
-				generationCallback(obj, position, quaternion, zone);
-				if (zoneObjects.maxObjectCount != 0)
-				{
-					num2++;
-				}
-			}
-		}
-	}
-
-	private void GenerateShelter(ZoneObjects zoneObjects, Zone zone, GenerationCallback generationCallback)
-	{
-		if (!zone.HasShelter)
-		{
-			return;
-		}
-		int shelterType = zone.ShelterType;
-		UnityEngine.Debug.Log(">>Generating shelter type : " + zoneObjects.Objects[shelterType].Obj.gameObject.name + ", on Zone :" + zone.ZoneName);
-		int detailAmountFactor = zoneObjects.detailAmountFactor;
-		int num = 0;
-		int num2 = ((shelterType == 7) ? 8 : ((int)Mathf.Sqrt(zoneObjects.detailAmountFactor)));
-		int num3 = 257;
-		int num4 = 100;
-		int num5 = num3 * num3 % num4;
-		int num6 = 0;
-		int num7 = 0;
-		_ = num3 * num3 / num4;
-		if (num3 * num3 % num4 <= 0)
-		{
-		}
-		while (num6 < num3 * num3 && num < 1)
-		{
-			num7 = 0;
-			int num8 = num6 % num4;
-			int num9 = num6 / num4;
-			num6++;
-			for (int i = 0; i < num8; i++)
-			{
-				num7 = ((i >= num5) ? (num7 + num3 * num3 / detailAmountFactor) : (num7 + (num3 * num3 / num4 + 1)));
-			}
-			num7 += num9;
-			if (num7 >= num3 * num3)
-			{
-				continue;
-			}
-			int num10 = num7 / num3;
-			int num11 = num7 % num3;
-			if (num10 >= num3 - 1 || num11 >= num3 - 1 || !((float)_random.NextDouble() < (float)zoneObjects.spawnChance / 100f))
-			{
-				continue;
-			}
-			GenerationPoints generationPoints = zone.GenerationPoints[num10, num11];
-			bool flag = false;
-			for (int j = num10 - num2; j <= num10 + num2; j++)
-			{
-				if (j < 0 || j >= num3 - 1)
-				{
-					continue;
-				}
-				for (int k = num11 - num2; k <= num11 + num2; k++)
-				{
-					if (k >= 0 && k < num3 - 1 && zone.GenerationPoints[j, k].Occupied)
-					{
-						flag = true;
-					}
-				}
-			}
-			if (flag || ((!zoneObjects.occupyPoint || generationPoints.Occupied) && zoneObjects.occupyPoint) || !(generationPoints.Position.y >= zoneObjects.minHeight) || !(generationPoints.Position.y < zoneObjects.maxHeight) || !(generationPoints.Soilmap >= zoneObjects.minStrength) || !(generationPoints.Soilmap < zoneObjects.maxStrength) || !(generationPoints.steepNess < zoneObjects.maxSteepness) || !(generationPoints.steepNess > zoneObjects.minSteepness))
-			{
-				continue;
-			}
-			Vector3 vector = new Vector3((float)_random.Next((int)(zoneObjects.minPositionOffset.x * 100f), (int)(zoneObjects.maxPositionOffset.x * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.y * 100f), (int)(zoneObjects.maxPositionOffset.y * 100f)) / 100f, (float)_random.Next((int)(zoneObjects.minPositionOffset.z * 100f), (int)(zoneObjects.maxPositionOffset.z * 100f)) / 100f);
-			Vector3 position = generationPoints.Position + zoneObjects.offsetPosition + vector;
-			Quaternion quaternion = Quaternion.identity;
-			if (zoneObjects.terrainSnap)
-			{
-				quaternion = Quaternion.Lerp(Quaternion.identity, generationPoints.Rotation, zoneObjects.TerrainSnapBias);
-			}
-			int num12 = _random.Next(0, 360);
-			if (zoneObjects.randomRotation)
-			{
-				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(Vector3.up * num12)) : Quaternion.Euler(Vector3.up * num12));
-			}
-			else if (zoneObjects.randomFullRotation)
-			{
-				int num13 = _random.Next(0, 360);
-				int num14 = _random.Next(0, 360);
-				quaternion = (zoneObjects.terrainSnap ? (quaternion * Quaternion.Euler(new Vector3(num13, num12, num14))) : Quaternion.Euler(new Vector3(num13, num12, num14)));
-			}
-			if (zoneObjects.occupyPoint)
-			{
-				generationPoints.Occupied = true;
-				for (int l = num10 - num2; l <= num10 + num2; l++)
-				{
-					if (l < 0 || l >= num3 - 1)
-					{
-						continue;
-					}
-					for (int m = num11 - num2; m <= num11 + num2; m++)
-					{
-						if (m >= 0 && m < num3 - 1)
-						{
-							zone.GenerationPoints[l, m].Occupied = true;
-						}
-					}
-				}
-			}
-			IGenerationObject obj = zoneObjects.Objects[shelterType].Obj;
-			generationCallback(obj, position, quaternion, zone);
-			num++;
-		}
-	}
-
-	private void GenerateObject(IGenerationObject generationObject, Vector3 position, Quaternion rotation, Zone zone)
-	{
-		GeneratedObject generatedObject = new GeneratedObject();
-		generatedObject.Prefab = generationObject.gameObject;
-		generatedObject.Position = position;
-		generatedObject.Rotation = rotation;
-		generatedObject.ImpostorParentPrefab = generationObject.gameObject.GetInterface<IImpostorParent>();
-		zone.OnObjectGenerated(generatedObject);
-	}
-
-	private void CreateGeneratedPrefab(GeneratedObject objectData, Zone zone)
-	{
-		SaveablePrefab component = objectData.Prefab.GetComponent<SaveablePrefab>();
-		GameObject gameObject;
-		if (component != null)
-		{
-			uint prefabId = component.PrefabId;
-			MiniGuid referenceId = MiniGuid.NewFrom(objectData.Position, prefabId, 48879);
-			if (Game.Mode.IsClient() && component.IsMultiplayerEntity)
-			{
-				MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneGeneration, referenceId, ClientSetParent, null, zone);
-				return;
-			}
-			gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(prefabId, objectData.Position, objectData.Rotation, referenceId).gameObject;
-		}
-		else
-		{
-			gameObject = UnityEngine.Object.Instantiate(objectData.Prefab, objectData.Position, objectData.Rotation);
-		}
-		gameObject.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
-		gameObject.transform.position = objectData.Position;
-		gameObject.transform.rotation = objectData.Rotation;
-		zone.OnObjectCreated(gameObject);
-	}
-
-	private void CreateLoadedPrefab(JObject data, Zone zone)
-	{
-		JObject field = data.GetField("prefab");
-		if (field == null)
-		{
-			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading. No prefab id field found for object data.");
-			return;
-		}
-		uint num = Prefabs.ConvertLegacyPrefabId(field);
-		if (num == 0)
-		{
-			UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading instantiated object with empty prefab id.");
-			return;
-		}
-		bool flag = Prefabs.TryGetMultiplayerPrefabName(num, out var _);
-		if (Game.Mode.IsClient() & flag)
-		{
-			MultiplayerZoneSync.Instance.LinkData(MultiplayerZoneSync.Usage.ZoneLoading, Prefabs.GetReferenceId(data), ClientLoad, data, zone);
-		}
-		else
-		{
-			Load(data, _position, zone, MultiplayerMng.Instantiate<SaveablePrefab>(num, Prefabs.GetReferenceId(data)));
-		}
-		_position += new Vector3(0f, 0f, 50f);
-	}
-
-	private void Load(JObject data, Vector3 position, Zone zone, SaveablePrefab instance)
-	{
-		LevelLoader.Instance.HashCodes.Add(instance.gameObject.GetHashCode());
-		instance.transform.SetParent(zone.SaveContainer, worldPositionStays: false);
-		instance.transform.position = position;
-		string prefabName = instance.name;
-		_internalDeferredLoading.Add(() =>
-		{
-			if (instance.gameObject == null)
-			{
-				UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading prefab [" + prefabName + "]->Object was modified before loading began.\nCheck the object's Awake, Start, Update and FixedUpdate methods for missing [LevelLoader.IsLoading] checks.");
-			}
-			else
-			{
-				if (zone.IsMapEditor && !zone.HasVisited)
-				{
-					try
-					{
-						JSerializer.DeserializeInto(data.GetField("Transform"), instance.gameObject.transform);
-						instance.CompleteTransformSerialization();
-						instance.OnCustomMapLoaded();
-					}
-					catch (Exception ex)
-					{
-						UnityEngine.Debug.LogError("ZoneLoader::LoadZoneAsync:: Error loading editor object [" + instance.name + "] Object has now been destroyed.\n\n" + ex);
-						MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
-					}
-				}
-				else if (!SavingUtilities.Load(instance, data))
-				{
-					UnityEngine.Debug.LogError($"ZoneLoader::LoadZoneAsync:: Error loading [{instance.name}] [{instance.ReferenceId}]->Object has now been destroyed.");
-					MultiplayerMng.Destroy(instance, DestroyDelay.LATE);
-				}
-				if (instance.gameObject != null)
-				{
-					zone.OnObjectLoaded(instance.gameObject);
-				}
-			}
-		});
-	}
-
-	private void ClientLoad(MultiplayerZoneSync.Command command)
-	{
-		Load(command.Data, Vector3.zero, command.Zone, command.Instance);
-	}
-
-	private void ClientSetParent(MultiplayerZoneSync.Command command)
-	{
-		command.Instance.transform.SetParent(command.Zone.SaveContainer);
-	}
-
-	private void InvokeCallback(Action action, Zone zone)
-	{
-		LoadingActionUtilities.ExecuteDeferredAction(action);
-	}
-
-	private void ResetTemporaryLoadingPosition()
-	{
-		_position = new Vector3(0f, 5000f, 0f);
-	}
-
-	private float ProcessCollection_Async<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
-	{
-		return Timing.WaitUntilDone(ProcessCollection(collection, callback, zone));
-	}
-
-	private CoroutineHandle ProcessCollection<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
-	{
-		return Timing.RunCoroutine(ProcessCollection_Sequence(collection, callback, zone), Segment.Update, 100);
-	}
-
-	private IEnumerator<float> ProcessCollection_Sequence<T>(ICollection<T> collection, ProcessCollectionCallback<T> callback, Zone zone)
-	{
-		IEnumerator<T> enumerator = collection.GetEnumerator();
-		int index = 0;
-		bool stop = false;
-		while (!stop)
-		{
-			_ = collection.Count;
-			_ = index;
-			int processingSteps = GetProcessingSteps(collection.Count, zone.transform.position);
-			for (int i = 0; i < processingSteps; i++)
-			{
-				if (!enumerator.MoveNext())
-				{
-					stop = true;
-					break;
-				}
-				callback?.Invoke(enumerator.Current, zone);
-				index++;
-			}
-			yield return float.NegativeInfinity;
-		}
-		enumerator.Dispose();
-	}
-
-	private int GetProcessingSteps(int quantity, Vector3 position)
-	{
-		int b = ((ObjectProcessingMode == EObjectProcessingMode.Faster) ? 200 : 4);
-		Transform closestPlayer = GetClosestPlayer(position);
-		if (closestPlayer.IsNullOrDestroyed())
-		{
-			return 1;
-		}
-		float num = (position - closestPlayer.position).magnitude - 125f;
-		num /= (float)_processes;
-		return Mathf.Max(Mathf.CeilToInt((float)quantity / Mathf.Max(1f, num)), b);
-	}
-
-	private Transform GetClosestPlayer(Vector3 position)
-	{
-		if (PlayerRegistry.AllPlayers.IsNullOrDestroyed() || PlayerRegistry.AllPlayers.Count == 0)
-		{
-			return null;
-		}
-		IPlayer player = PlayerRegistry.AllPlayers[0];
-		if (Game.Mode.GetPlayersCount() == 1)
-		{
-			return player.transform;
-		}
-		float num = float.PositiveInfinity;
-		for (int i = 1; i < PlayerRegistry.AllPlayers.Count; i++)
-		{
-			IPlayer player2 = PlayerRegistry.AllPlayers[i];
-			float magnitude = (position - player2.transform.position).magnitude;
-			if (magnitude < num)
-			{
-				num = magnitude;
-				player = player2;
-			}
-		}
-		return player.transform;
-	}
-
-	private void UpdateSessionToken_IsBusy(bool isBusy)
-	{
-		if (Game.Mode.IsServer())
-		{
-			if (isBusy && !MultiplayerMng.GetSessionToken().IsBusy)
-			{
-				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
-			}
-			else if (!isBusy && !LevelLoader.IsCreatingOrLoading)
-			{
-				MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
-			}
-		}
-	}
-
-	private IEnumerator<float> ClientLinking()
-	{
-		float startTime = Time.unscaledTime;
-		bool shutdown = false;
-		do
-		{
-			if (Time.unscaledTime - startTime > MultiplayerZoneSync.CLIENT_LINK_TIME && !shutdown)
-			{
-				shutdown = true;
-				PlayerRegistry.LocalPeer.ReplicatedDisconnect(DisconnectDetail.Timeout_Linking, null, forceLocalShutdown: true);
-				MultiplayerZoneSync.Instance.DumpNotCompleted();
-			}
-			yield return 0f;
-		}
-		while (!MultiplayerZoneSync.Instance.IsLinked());
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 177
 PATH: Assembly-CSharp__Beam.Terrain__ZoneObjectGenerator.cs
 SIZE: 1952 bytes
 SHA256: d03e9589b3ce2676ba18e3ae33e8472684c53a4f201c7c001a763551377d1b78
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Terrain;
@@ -846,15 +53,12 @@ public static class ZoneObjectGenerator
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 178
+SOURCE FILE 177
 PATH: Assembly-CSharp__Beam.Testing__Lighting.cs
 SIZE: 8576 bytes
 SHA256: 946712ff61684b098a9da1757d0a98f8a9869161caa1791c99c5119bdbe388bc
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1196,15 +400,12 @@ public class Lighting : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 179
+SOURCE FILE 178
 PATH: Assembly-CSharp__Beam.UI.Crafting__CrafterMenuViewAdapterBase.cs
 SIZE: 1478 bytes
 SHA256: 2221ed00ba52ef2270bc7277beff81f7c6c802affb802c4a684f0c5e024bb4b3
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Crafting;
 using UnityEngine;
@@ -1252,15 +453,12 @@ public abstract class CrafterMenuViewAdapterBase : ViewAdapterBase
 	public abstract void SetNavigation(CraftingSubcategory currentSubcategory);
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 180
+SOURCE FILE 179
 PATH: Assembly-CSharp__Beam.UI.Crafting__NullCrafterMenuViewAdapter.cs
 SIZE: 2618 bytes
 SHA256: 08afd553aff98ccb984f3e3413cd6c6d4aa0a45074ddc8512c8e60e83b7ea22b
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Crafting;
 using UnityEngine;
@@ -1327,15 +525,12 @@ public class NullCrafterMenuViewAdapter : CrafterMenuViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 181
+SOURCE FILE 180
 PATH: Assembly-CSharp__Beam.UI.Crafting__TMPCrafterMenuViewAdapter.cs
 SIZE: 7471 bytes
 SHA256: 41e11947d8e0032912993752e81518c9b8a4255c089e556a0d1c917f6113f1af
 ====================================================================================================
-
 using System.Collections.Generic;
 using System.Linq;
 using Beam.Crafting;
@@ -1531,15 +726,12 @@ public class TMPCrafterMenuViewAdapter : CrafterMenuViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 182
+SOURCE FILE 181
 PATH: Assembly-CSharp__Beam.UI.MapEditor__MapEditorSaveMenuPresenter.cs
 SIZE: 6067 bytes
 SHA256: 642fd10074b6f3d4c327f2b0cdda3e42d971d08fa5521e3a0d4aa78291140eaa
 ====================================================================================================
-
 using System;
 using System.Linq;
 using Beam.AccountServices;
@@ -1764,15 +956,12 @@ public class MapEditorSaveMenuPresenter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 183
+SOURCE FILE 182
 PATH: Assembly-CSharp__Beam.UI.MapEditor__UMapHandle.cs
 SIZE: 1178 bytes
 SHA256: ea7efd9a2b7ec529d66601ec36192ef9fb1041b4368db6122e00f7f3d89e6395
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI.MapEditor;
@@ -1827,15 +1016,12 @@ public class UMapHandle : ViewAdapterBase, IMapHandle, IViewAdapter
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 184
+SOURCE FILE 183
 PATH: Assembly-CSharp__Beam.UI__AboutMenuPresenter.cs
 SIZE: 575 bytes
 SHA256: 80272c3dbb2c6f957bc39260b6000905d79f2216632c1c18e4674ff2c3bb3c6a
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -1877,15 +1063,12 @@ public class AboutMenuPresenter : MonoBehaviour, IOptionPanel
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 185
+SOURCE FILE 184
 PATH: Assembly-CSharp__Beam.UI__AboutMenuView.cs
 SIZE: 260 bytes
 SHA256: 02a255ec9b816d9fb56969264a171b05f8cb32da9d01c02e91453246af0cc6ba
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -1899,15 +1082,12 @@ public abstract class AboutMenuView : ViewAdapterBase
 	public abstract void SetCreditsText(string text);
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 186
+SOURCE FILE 185
 PATH: Assembly-CSharp__Beam.UI__AudioMenuPresenter.cs
 SIZE: 5754 bytes
 SHA256: 26c84126d6b429d54650714263dbccf489cacd913ceb4166ac481a527ca56e53
 ====================================================================================================
-
 using Beam.Serialization.Json;
 using Beam.Utilities;
 using UnityEngine;
@@ -2106,15 +1286,12 @@ public class AudioMenuPresenter : MonoBehaviour, IOptionPanel
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 187
+SOURCE FILE 186
 PATH: Assembly-CSharp__Beam.UI__ButtonMarker.cs
 SIZE: 889 bytes
 SHA256: 3061622833a4aa1f71df671cb886836bef4b904bee3d505d88c3f79f2878c1c8
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -2154,15 +1331,12 @@ public class ButtonMarker : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 188
+SOURCE FILE 187
 PATH: Assembly-CSharp__Beam.UI__CartographerMenuPresenter.cs
 SIZE: 26046 bytes
 SHA256: 949a16c31f92b5a9d1ed6b6545eb3654df4fb8486695ec39b9ebdeeacf979e58
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -3045,15 +2219,12 @@ public class CartographerMenuPresenter : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 189
+SOURCE FILE 188
 PATH: Assembly-CSharp__Beam.UI__CartographerMenuViewAdapterBase.cs
 SIZE: 1253 bytes
 SHA256: 053b26f282b25a1112a9c37e138befb28c21eb35f149861cfb7720e4335bbdad
 ====================================================================================================
-
 using Beam.UI.MapEditor;
 using UnityEngine;
 
@@ -3098,15 +2269,12 @@ public abstract class CartographerMenuViewAdapterBase : MenuViewAdapterBase
 	public abstract IMapListElement CreateMapListElement(Transform container);
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 190
+SOURCE FILE 189
 PATH: Assembly-CSharp__Beam.UI__ChecklistView.cs
 SIZE: 2389 bytes
 SHA256: 6a7d9ec221d25ebe6c6076499ee11380df094d6c3a3fd7069d62a6aca5e402a4
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using MEC;
@@ -3202,15 +2370,12 @@ public class ChecklistView : NotificationViewAdapterBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 191
+SOURCE FILE 190
 PATH: Assembly-CSharp__Beam.UI__GameObjectViewAdapter.cs
 SIZE: 456 bytes
 SHA256: bc81a20e11c8b06243e782ecf366ab91473c6c17d437db692ceb5b240fac3940
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3244,15 +2409,12 @@ public class GameObjectViewAdapter : IGameObjectViewAdapter
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 192
+SOURCE FILE 191
 PATH: Assembly-CSharp__Beam.UI__GeneralMenuPresenter.cs
 SIZE: 6427 bytes
 SHA256: 738207b93c348140d7d12d77070a228cc6af20235af6f85d2b2ac3e269252444
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -3451,15 +2613,12 @@ public class GeneralMenuPresenter : MonoBehaviour, IOptionPanel
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 193
+SOURCE FILE 192
 PATH: Assembly-CSharp__Beam.UI__GraphicsMenuPresenter.cs
 SIZE: 17600 bytes
 SHA256: c40857589afe2301cb7d9ceb026b225fe14b9e2bfa15812f42fff928cb5295ae
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -3932,15 +3091,12 @@ public class GraphicsMenuPresenter : MonoBehaviour, IOptionPanel
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 194
+SOURCE FILE 193
 PATH: Assembly-CSharp__Beam.UI__HudPresenter.cs
 SIZE: 9356 bytes
 SHA256: 4f9569f322cca799f7b2dfa7bb3dea96db80c061b8e0a63146a003b27aebd399
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Crafting;
 using Beam.Events;
@@ -4260,15 +3416,12 @@ public class HudPresenter : ControllerBase, INeedPlayerComponent, IRefresh
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 195
+SOURCE FILE 194
 PATH: Assembly-CSharp__Beam.UI__HudViewAdapterBase.cs
 SIZE: 637 bytes
 SHA256: 536dedbd1a49d551dc63a9a7c6ada1526e9fb1c94477120fcdac7e18221a0647
 ====================================================================================================
-
 namespace Beam.UI;
 
 public abstract class HudViewAdapterBase : ViewAdapterBase
@@ -4290,15 +3443,12 @@ public abstract class HudViewAdapterBase : ViewAdapterBase
 	public abstract ICanvasGroupViewAdapter ItemActionGroup { get; }
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 196
+SOURCE FILE 195
 PATH: Assembly-CSharp__Beam.UI__ICanvasGroupViewAdapter.cs
 SIZE: 177 bytes
 SHA256: deed5e5f74bb87ca40db64a6f21d4184b4dcf212858b22b84a3b8dae1355ae95
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -4312,15 +3462,12 @@ public interface ICanvasGroupViewAdapter
 	float Alpha { get; set; }
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 197
+SOURCE FILE 196
 PATH: Assembly-CSharp__Beam.UI__IInputMapCategoryHeader.cs
 SIZE: 205 bytes
 SHA256: c26b24cb2f2a78aa695461df7bef0fafcee95ac1076c193f6dd9db3fc6a1f0a8
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.UI;
@@ -4334,15 +3481,12 @@ public interface IInputMapCategoryHeader
 	IGameObjectViewAdapter SubheadingsContainer { get; }
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 198
+SOURCE FILE 197
 PATH: Assembly-CSharp__Beam.UI__IMissionRewardElement.cs
 SIZE: 147 bytes
 SHA256: 9e6d31ecf2e76401c08ffd4e2af8ed68224dea580dec24e0bb9931b4c6d98b7b
 ====================================================================================================
-
 namespace Beam.UI;
 
 public interface IMissionRewardElement
@@ -4352,52 +3496,926 @@ public interface IMissionRewardElement
 	void Initialize(IMissionReward reward);
 }
 
+====================================================================================================
+SOURCE FILE 198
+PATH: Assembly-CSharp__Beam.UI__IndicatorPresenter.cs
+SIZE: 2985 bytes
+SHA256: e08f6c9d4e8d0b17e8bf05493267d678233a6198c8ab97a014e63dd539007d19
+====================================================================================================
+using System.Collections.Generic;
+using Beam.Utilities;
+using UnityEngine;
 
+namespace Beam.UI;
+
+public class IndicatorPresenter : ControllerBase, INeedPlayerComponent
+{
+	[SerializeField]
+	private IndicatorViewBase _view;
+
+	private List<IndicatorElementBase> _indicators = new List<IndicatorElementBase>();
+
+	private IPlayer _player;
+
+	IPlayer INeedPlayerComponent.Player => _player;
+
+	private void Start()
+	{
+		if (_view == null)
+		{
+			Debug.LogError("IndicatorPresenter:: No view component assigned!");
+			_view = NullIndicatorViewBase.Instance;
+		}
+	}
+
+	public override void SetView(ViewAdapterBase view)
+	{
+		_view = view as IndicatorViewBase;
+		if (_view == null)
+		{
+			Debug.LogError("IndicatorPresenter:: No view component assigned!");
+			_view = NullIndicatorViewBase.Instance;
+		}
+	}
+
+	public void SetPlayer(IPlayer player)
+	{
+		_player = player;
+		_player.Statistics.DirectionalDamage += PlayerStatistics_DirectionalDamage;
+	}
+
+	private void OnDestroy()
+	{
+		if (_player != null && _player.Statistics != null)
+		{
+			_player.Statistics.DirectionalDamage -= PlayerStatistics_DirectionalDamage;
+		}
+	}
+
+	public void NewIndicator(IndicatorDataBase data)
+	{
+		if (data != null)
+		{
+			IndicatorElementBase indicatorElementBase = Object.Instantiate(_view.IndicatorPrefab);
+			indicatorElementBase.Initialize(data);
+			AddIndicator(indicatorElementBase);
+		}
+	}
+
+	private void Update()
+	{
+		if (_player == null)
+		{
+			return;
+		}
+		for (int i = 0; i < _indicators.Count; i++)
+		{
+			IndicatorElementBase indicatorElementBase = _indicators[i];
+			if (indicatorElementBase.IsNullOrDestroyed())
+			{
+				_indicators.Remove(indicatorElementBase);
+				break;
+			}
+			Vector3 forward = _player.transform.forward;
+			Vector3 vector = indicatorElementBase.Data.Direction - _player.transform.position;
+			vector.y = 0f;
+			vector.Normalize();
+			float dot = 0f - Vector3.Dot(Vector3.Cross(forward, vector), _player.transform.up);
+			float angle = Vector3.Angle(vector, forward);
+			angle = AngleCircumference(dot, angle);
+			indicatorElementBase.transform.localRotation = Quaternion.Slerp(indicatorElementBase.transform.localRotation, Quaternion.AngleAxis(angle, new Vector3(0f, 0f, 1f)), 10f * Time.deltaTime);
+		}
+	}
+
+	public void AddIndicator(IndicatorElementBase indicator)
+	{
+		if (!_indicators.Contains(indicator))
+		{
+			indicator.transform.SetParent(_view.IndicatorContainer.Transform, worldPositionStays: false);
+			_indicators.Add(indicator);
+		}
+	}
+
+	public void RemoveIndicator(IndicatorElementBase indicator)
+	{
+		_indicators.Remove(indicator);
+	}
+
+	public void DestroyIndicator(IndicatorElementBase indicator)
+	{
+		RemoveIndicator(indicator);
+		BeamTeam.Destroy(indicator.gameObject);
+	}
+
+	private void PlayerStatistics_DirectionalDamage(IndicatorDataBase data)
+	{
+		NewIndicator(data);
+	}
+
+	public float AngleCircumference(float dot, float angle)
+	{
+		float num = angle;
+		float num2 = 360f;
+		num = angle;
+		if (dot < 0f)
+		{
+			num = num2 - angle;
+		}
+		return num;
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 199
-PATH: Assembly-CSharp__Beam.UI__IOptionCategoryHeader.cs
-SIZE: 210 bytes
-SHA256: 0d8f672dfd7ae978a6dea9f20fd905fa08e68a9fadb8b78ec51f1f33672988fb
+PATH: Assembly-CSharp__Beam.UI__IndicatorViewBase.cs
+SIZE: 215 bytes
+SHA256: 098e4fd6dd7085267b97fc92e5943a1301befcf1a2d09fe5f4a104d6d178ff5e
 ====================================================================================================
-
-using UnityEngine;
-
 namespace Beam.UI;
 
-public interface IOptionCategoryHeader
+public abstract class IndicatorViewBase : ViewAdapterBase
 {
-	Transform transform { get; }
+	public abstract DamageIndicatorElement IndicatorPrefab { get; }
 
-	ILabelViewAdapter Label { get; }
-
-	Transform ElementsContainer { get; }
-
-	int Id { get; set; }
+	public abstract ITransformViewAdapter IndicatorContainer { get; }
 }
-
-
 
 ====================================================================================================
 SOURCE FILE 200
-PATH: Assembly-CSharp__Beam.UI__IOptionPanel.cs
-SIZE: 157 bytes
-SHA256: 81a8151c92fa890c4989db9de6400820c15a2fadf8643c8179b3b4ff953a4052
+PATH: Assembly-CSharp__Beam.UI__InputMenuPresenter.cs
+SIZE: 30310 bytes
+SHA256: e370203a1690189e1038a6b60cb87b6815bc2baf90b06b5f86f96767dcc42a12
 ====================================================================================================
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam.Language;
+using Beam.Utilities;
+using Beam.Utilities.Reflection;
+using MEC;
+using Rewired;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Beam.UI;
 
-public interface IOptionPanel
+public class InputMenuPresenter : MonoBehaviour, IOptionPanel
 {
-	Transform GetCategoriesContainer();
+	private enum AssignedPlayer
+	{
+		[Description("ASSIGNED_PLAYER_NONE", "")]
+		None,
+		[Description("ASSIGNED_PLAYER_P1", "")]
+		P1,
+		[Description("ASSIGNED_PLAYER_P2", "")]
+		P2
+	}
 
-	void Show();
+	[SerializeField]
+	private OptionsMenuPresenter _optionsMenuPresenter;
 
-	void Hide();
+	private IInputMenuViewAdapter _view;
 
-	void Apply();
+	private IInputFieldButtonViewAdapter _currentButton;
+
+	private DialogueBoxViewAdapter _dialogue;
+
+	private CoroutineHandle _timeoutSequence;
+
+	private bool _initialized;
+
+	private List<IOptionCategoryHeader> _optionCategories = new List<IOptionCategoryHeader>();
+
+	private IOptionButtonViewAdapter _toggleRadialMenusButton;
+
+	private IOptionButtonViewAdapter _crouchToggleButton;
+
+	private IOptionButtonViewAdapter _sprintToggleButton;
+
+	private IOptionButtonViewAdapter _autowalkButton;
+
+	private IOptionSliderViewAdapter _smoothnessSlider;
+
+	private IOptionSliderViewAdapter _sensitivitySlider;
+
+	private IOptionButtonViewAdapter _invertYButton;
+
+	private Dictionary<string, ControllerAssignment> _controllerAssignments = new Dictionary<string, ControllerAssignment>();
+
+	private bool _dirtyMappings;
+
+	public void Initialize(IInputMenuViewAdapter view)
+	{
+		if (!_initialized)
+		{
+			_view = view;
+			SetControlEvents();
+			InputMapper.Default.options.timeout = 5f;
+			InputMapper.Default.options.allowKeyboardKeysWithModifiers = false;
+			InputMapper.Default.options.allowKeyboardModifierKeyAsPrimary = true;
+			InputMapper.Default.InputMappedEvent += InputMapper_InputMapped;
+			InputMapper.Default.ConflictFoundEvent += InputMapper_ConflictFound;
+			InputMapper.Default.StartedEvent += InputMapper_Started;
+			InputMapper.Default.StoppedEvent += InputMapper_Stopped;
+			InputMapper.Default.CanceledEvent += InputMapper_Cancelled;
+			InputMapper.Default.ErrorEvent += InputMapper_Error;
+			InputMapper.Default.TimedOutEvent += InputMapper_TimedOut;
+			_initialized = true;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		if (_initialized)
+		{
+			InputMapper.Default.InputMappedEvent -= InputMapper_InputMapped;
+			InputMapper.Default.ConflictFoundEvent -= InputMapper_ConflictFound;
+			InputMapper.Default.StartedEvent -= InputMapper_Started;
+			InputMapper.Default.StoppedEvent -= InputMapper_Stopped;
+			InputMapper.Default.CanceledEvent -= InputMapper_Cancelled;
+			InputMapper.Default.ErrorEvent -= InputMapper_Error;
+			InputMapper.Default.TimedOutEvent -= InputMapper_TimedOut;
+		}
+	}
+
+	public Transform GetCategoriesContainer()
+	{
+		return _view.CategoriesContainer;
+	}
+
+	public void Show()
+	{
+		if (!_view.Visible)
+		{
+			_view.Show();
+			_view.DefaultButton.Show();
+			_optionsMenuPresenter.SetApplyButtonEvent(ApplyButton_Click);
+			PopulateControls();
+			_optionsMenuPresenter.ResetDirtySettings();
+			ReInput.ControllerConnectedEvent += Rewired_OnControllerConnected;
+			ReInput.ControllerPreDisconnectEvent += Rewired_OnControllerPreDisconnect;
+		}
+	}
+
+	public void Hide()
+	{
+		if (_view.Visible)
+		{
+			if (_dirtyMappings)
+			{
+				Options.Load();
+				_dirtyMappings = false;
+			}
+			_view.DefaultButton.Hide();
+			_view.Hide();
+			ReInput.ControllerConnectedEvent -= Rewired_OnControllerConnected;
+			ReInput.ControllerPreDisconnectEvent -= Rewired_OnControllerPreDisconnect;
+		}
+	}
+
+	void IOptionPanel.Apply()
+	{
+		ApplyButton_Click(null);
+	}
+
+	private void SetControlEvents()
+	{
+		_view.DefaultButton.Click += DefaultButton_Click;
+	}
+
+	private void PopulateControls()
+	{
+		_controllerAssignments.Clear();
+		foreach (KeyValuePair<string, ControllerAssignment> controllerAssignment in Options.InputSettings.ControllerAssignments)
+		{
+			if (!_controllerAssignments.ContainsKey(controllerAssignment.Key))
+			{
+				_controllerAssignments.Add(controllerAssignment.Key, null);
+			}
+			_controllerAssignments[controllerAssignment.Key] = controllerAssignment.Value;
+		}
+		CreateOptionCategories();
+	}
+
+	private void RefreshControls()
+	{
+	}
+
+	private void CreateOptionCategories()
+	{
+		_optionCategories.Clear();
+		_optionsMenuPresenter.DestroyOptionCategoryHeaders();
+		_view.DestroyInputOptionButtons();
+		_view.DestroyInputOptionSliders();
+		_view.DestroyInputFields();
+		CreateInputOptionButtons();
+		CreateControllerCategory();
+		CreateInputFieldButtons();
+		_view.SetNavigation(_optionCategories);
+	}
+
+	private void CreateInputOptionButtons()
+	{
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_GENERAL");
+		_toggleRadialMenusButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_TOGGLE_RADIAL_MENUS", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_toggleRadialMenusButton.SelectedIndex = Options.InputSettings.ToggleRadialMenus.GetIndex();
+		_optionsMenuPresenter.UpdateNavigation(_toggleRadialMenusButton.transform.GetComponent<Button>());
+		_crouchToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_CROUCH_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_crouchToggleButton.SelectedIndex = Options.InputSettings.CrouchToggle.GetIndex();
+		_sprintToggleButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_SPRINT_TOGGLE", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_sprintToggleButton.SelectedIndex = Options.InputSettings.SprintToggle.GetIndex();
+		_autowalkButton = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_AUTO_WALK", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_autowalkButton.SelectedIndex = Options.InputSettings.AutoWalk.GetIndex();
+		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CAMERA");
+		_smoothnessSlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SMOOTHNESS");
+		_smoothnessSlider.Value = Options.InputSettings.MouseSmoothness;
+		_smoothnessSlider.Refresh();
+		_sensitivitySlider = CreateInputSlider(header2, "OPTIONS_INPUT_MENU_BUTTON_SENSITIVITY");
+		_sensitivitySlider.Value = Options.InputSettings.MouseSensitivity;
+		_sensitivitySlider.Refresh();
+		_invertYButton = CreateInputButton(header2, "OPTIONS_INPUT_MENU_BUTTON_INVERT_Y", typeof(Quality_OFF_ON).GetAttributes<DescriptionAttribute>());
+		_invertYButton.SelectedIndex = Options.InputSettings.InvertY.GetIndex();
+	}
+
+	private IOptionButtonViewAdapter CreateInputButton(IOptionCategoryHeader header, string name, IEnumerable<IOptionElementData> values)
+	{
+		IOptionButtonViewAdapter optionButtonViewAdapter = _view.CreateInputOptionButton(header);
+		optionButtonViewAdapter.Text = name;
+		optionButtonViewAdapter.Initialize(values);
+		optionButtonViewAdapter.Selected += OptionWidget_Selected;
+		optionButtonViewAdapter.SelectionChanged += OptionWidget_SelectionChanged;
+		return optionButtonViewAdapter;
+	}
+
+	private IOptionSliderViewAdapter CreateInputSlider(IOptionCategoryHeader header, string name)
+	{
+		IOptionSliderViewAdapter optionSliderViewAdapter = _view.CreateInputOptionSlider(header);
+		((IOptionWidgetViewAdapter)optionSliderViewAdapter).Text = name;
+		optionSliderViewAdapter.Selected += OptionWidget_Selected;
+		optionSliderViewAdapter.ValueChanged += OptionSlider_ValueChanged;
+		return optionSliderViewAdapter;
+	}
+
+	private void CreateInputFieldButtons()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROL_MAPPING");
+		foreach (InputMapCategory userAssignableMapCategory in ReInput.mapping.UserAssignableMapCategories)
+		{
+			InputCategory actionCategory = ReInput.mapping.GetActionCategory(userAssignableMapCategory.name);
+			if (actionCategory == null)
+			{
+				continue;
+			}
+			CreateInputCategorySubheader(header, LocalizationTerms.GetActionCategoryTerm(userAssignableMapCategory.name));
+			ControllerMap firstMapInCategory = player.controllers.maps.GetFirstMapInCategory(ControllerType.Mouse, 0, userAssignableMapCategory.id);
+			ControllerMap firstMapInCategory2 = player.controllers.maps.GetFirstMapInCategory(ControllerType.Keyboard, 0, userAssignableMapCategory.id);
+			foreach (InputAction item in ReInput.mapping.UserAssignableActionsInCategory(actionCategory.id, sort: true))
+			{
+				string actionName = (string.IsNullOrEmpty(item.descriptiveName) ? item.name : item.descriptiveName);
+				if (item.type == InputActionType.Button)
+				{
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
+					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory2, item.id, ActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter, firstMapInCategory, item.id, ActionElementPredicate);
+					optionInputFieldButtonViewAdapter.SetNavigation();
+					Navigation navigation = _view.DefaultButton.transform.GetComponent<Button>().navigation;
+					navigation.mode = Navigation.Mode.Explicit;
+					navigation.selectOnUp = optionInputFieldButtonViewAdapter.transform.GetComponent<Selectable>();
+					_view.DefaultButton.transform.GetComponent<Button>().navigation = navigation;
+				}
+				else if (item.type == InputActionType.Axis)
+				{
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter2 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName));
+					CreateInputButton(optionInputFieldButtonViewAdapter2, null, item.id, AxisRange.Full, AxisActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter2, firstMapInCategory, item.id, AxisRange.Full, AxisActionElementPredicate, onlyAxes: true);
+					optionInputFieldButtonViewAdapter2.SetNavigation();
+					string actionName2 = (string.IsNullOrEmpty(item.positiveDescriptiveName) ? (item.descriptiveName + " +") : item.positiveDescriptiveName);
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter3 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName2));
+					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory2, item.id, AxisRange.Positive, PositiveActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter3, firstMapInCategory, item.id, AxisRange.Positive, PositiveActionElementPredicate);
+					optionInputFieldButtonViewAdapter3.SetNavigation();
+					string actionName3 = (string.IsNullOrEmpty(item.negativeDescriptiveName) ? (item.descriptiveName + " -") : item.negativeDescriptiveName);
+					IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter4 = CreateInputFieldControl(header, LocalizationTerms.GetActionTerm(actionName3));
+					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory2, item.id, AxisRange.Negative, NegativeActionElementPredicate);
+					CreateInputButton(optionInputFieldButtonViewAdapter4, firstMapInCategory, item.id, AxisRange.Negative, NegativeActionElementPredicate);
+					optionInputFieldButtonViewAdapter4.SetNavigation();
+				}
+			}
+		}
+	}
+
+	private IOptionCategoryHeader CreateInputCategoryHeader(string name)
+	{
+		IOptionCategoryHeader optionCategoryHeader = _optionsMenuPresenter.CreateOptionCategoryHeader();
+		optionCategoryHeader.Label.Text = name;
+		optionCategoryHeader.Id = name.GetHashCode();
+		_optionCategories.Add(optionCategoryHeader);
+		return optionCategoryHeader;
+	}
+
+	private IInputMapCategoryHeader CreateInputCategorySubheader(IOptionCategoryHeader header, string name)
+	{
+		IInputMapCategoryHeader inputMapCategoryHeader = _view.CreateInputCategorySubheader(header);
+		inputMapCategoryHeader.Label.Text = name;
+		return inputMapCategoryHeader;
+	}
+
+	private IOptionInputFieldButtonViewAdapter CreateInputFieldControl(IOptionCategoryHeader header, string name)
+	{
+		IOptionInputFieldButtonViewAdapter optionInputFieldButtonViewAdapter = _view.CreateInputField(header);
+		optionInputFieldButtonViewAdapter.Text = name;
+		optionInputFieldButtonViewAdapter.Selected += OptionWidget_Selected;
+		return optionInputFieldButtonViewAdapter;
+	}
+
+	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, Func<ActionElementMap, int, bool> predicate)
+	{
+		return CreateInputButton(inputFieldOptionButton, controllerMap, actionId, AxisRange.Full, predicate);
+	}
+
+	private IInputFieldButtonViewAdapter CreateInputButton(IOptionInputFieldButtonViewAdapter inputFieldOptionButton, ControllerMap controllerMap, int actionId, AxisRange axisRange, Func<ActionElementMap, int, bool> predicate, bool onlyAxes = false)
+	{
+		ActionElementMap actionElementMap = null;
+		bool flag = controllerMap != null;
+		if (flag)
+		{
+			foreach (ActionElementMap allMap in controllerMap.AllMaps)
+			{
+				if (predicate(allMap, actionId))
+				{
+					actionElementMap = allMap;
+					break;
+				}
+			}
+		}
+		IInputFieldButtonViewAdapter inputFieldButtonViewAdapter;
+		if (actionElementMap != null)
+		{
+			bool flag2 = actionElementMap.elementIdentifierId > -1 && !actionElementMap.elementIdentifierName.Equals("NONE", StringComparison.InvariantCultureIgnoreCase);
+			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
+			inputFieldButtonViewAdapter.Text = (flag2 ? actionElementMap.elementIdentifierName : "...");
+			inputFieldButtonViewAdapter.Type = (flag2 ? InputFieldButtonType.ReassignOrRemove : InputFieldButtonType.Add);
+			inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
+			{
+				ControllerMap = controllerMap,
+				ActionId = actionId,
+				ActionRange = axisRange,
+				ActionElementMapId = actionElementMap.id,
+				AllowOnlyAxesMapping = onlyAxes
+			};
+		}
+		else
+		{
+			inputFieldButtonViewAdapter = inputFieldOptionButton.CreateButton();
+			if (flag)
+			{
+				inputFieldButtonViewAdapter.Text = "...";
+				inputFieldButtonViewAdapter.Type = InputFieldButtonType.Add;
+				inputFieldButtonViewAdapter.Info = new InputFieldButtonInfo
+				{
+					ControllerMap = controllerMap,
+					ActionId = actionId,
+					ActionRange = axisRange,
+					AllowOnlyAxesMapping = onlyAxes
+				};
+			}
+			else
+			{
+				inputFieldButtonViewAdapter.Text = string.Empty;
+				inputFieldButtonViewAdapter.Enabled = false;
+			}
+		}
+		inputFieldButtonViewAdapter.Click += InputFieldButton_Click;
+		return inputFieldButtonViewAdapter;
+	}
+
+	private void CreateControllerCategory()
+	{
+		IOptionCategoryHeader header = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLERS");
+		IEnumerable<IOptionElementData> attributes = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
+		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, "OPTIONS_INPUT_MENU_BUTTON_KEYBOARD_MOUSE", attributes);
+		optionButtonViewAdapter.SelectedIndex = AssignedPlayer.P1.GetIndex();
+		optionButtonViewAdapter.Enabled = false;
+		Joystick[] joysticks = ReInput.controllers.GetJoysticks();
+		Joystick[] array = joysticks;
+		foreach (Joystick joystick in array)
+		{
+			JoystickOptionButton joystickOptionButton = CreateJoystickOptionButton(joystick);
+			if (joysticks.Length == 1 && _optionsMenuPresenter.CurrentPlayerInput.id == 1)
+			{
+				joystickOptionButton.Enabled = false;
+			}
+		}
+		IOptionCategoryHeader header2 = CreateInputCategoryHeader("OPTIONS_INPUT_MENU_LABEL_CONTROLLER_MAPPING");
+		_view.CreateControllerLayoutImage(header2).Selected += OptionWidget_Selected;
+	}
+
+	private JoystickOptionButton CreateJoystickOptionButton(Joystick joystick)
+	{
+		IOptionCategoryHeader header = _optionCategories.First((IOptionCategoryHeader x) => x.Id == "OPTIONS_INPUT_MENU_LABEL_CONTROLLERS".GetHashCode());
+		IEnumerable<IOptionElementData> enumerable = typeof(AssignedPlayer).GetAttributes<DescriptionAttribute>();
+		if (_optionsMenuPresenter.CurrentPlayerInput.id == 1 && ReInput.controllers.joystickCount > 1)
+		{
+			enumerable = enumerable.Where((IOptionElementData x) => x.Text != "ASSIGNED_PLAYER_NONE");
+		}
+		IOptionButtonViewAdapter optionButtonViewAdapter = CreateInputButton(header, joystick.name, enumerable);
+		string text = joystick.deviceInstanceGuid.ToString();
+		JoystickOptionButton joystickOptionButton = new JoystickOptionButton(optionButtonViewAdapter, text);
+		joystickOptionButton.SelectionChanged += JoystickOptionButton_SelectionChanged;
+		AssignedPlayer assignedPlayer = AssignedPlayer.None;
+		if (_controllerAssignments.TryGetValue(text, out var value))
+		{
+			assignedPlayer = (AssignedPlayer)(value.PlayerId + 1);
+		}
+		joystickOptionButton.SelectedIndex = assignedPlayer.GetIndex();
+		_view.Buttons.Remove(optionButtonViewAdapter);
+		_view.Buttons.Add(joystickOptionButton);
+		return joystickOptionButton;
+	}
+
+	private void Rewired_OnControllerConnected(ControllerStatusChangedEventArgs args)
+	{
+		if (args.controllerType == ControllerType.Joystick)
+		{
+			Joystick joystick = args.controller as Joystick;
+			CreateJoystickOptionButton(joystick);
+		}
+	}
+
+	private void Rewired_OnControllerPreDisconnect(ControllerStatusChangedEventArgs args)
+	{
+		if (args.controllerType != ControllerType.Joystick)
+		{
+			return;
+		}
+		string value = args.controller.deviceInstanceGuid.ToString();
+		foreach (IOptionButtonViewAdapter button in _view.Buttons)
+		{
+			if (button is JoystickOptionButton joystickOptionButton && joystickOptionButton.DeviceInstanceId.Equals(value))
+			{
+				_view.RemoveButton(joystickOptionButton);
+				break;
+			}
+		}
+	}
+
+	private void ApplyButton_Click(object sender)
+	{
+		Options.InputSettings.ToggleRadialMenus = (Quality_OFF_ON)_toggleRadialMenusButton.SelectedIndex;
+		Options.InputSettings.CrouchToggle = (Quality_OFF_ON)_crouchToggleButton.SelectedIndex;
+		Options.InputSettings.SprintToggle = (Quality_OFF_ON)_sprintToggleButton.SelectedIndex;
+		Options.InputSettings.AutoWalk = (Quality_OFF_ON)_autowalkButton.SelectedIndex;
+		Options.InputSettings.MouseSmoothness = _smoothnessSlider.Value;
+		Options.InputSettings.MouseSensitivity = _sensitivitySlider.Value;
+		Options.InputSettings.InvertY = (Quality_OFF_ON)_invertYButton.SelectedIndex;
+		Options.InputSettings.ControllerAssignments = new Dictionary<string, ControllerAssignment>(_controllerAssignments);
+		_optionsMenuPresenter.Save();
+	}
+
+	private void DefaultButton_Click(object sender)
+	{
+		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_RESET_TITLE", "OPTIONS_INPUT_MENU_DB_RESET_DESC", DialogueButton.YesNo).Accept += () =>
+		{
+			LoadDefaults();
+			PopulateControls();
+			_optionsMenuPresenter.SetDirtySettings();
+			_optionsMenuPresenter.ResetDirtySettings();
+		};
+	}
+
+	private void OptionWidget_Selected(ISelectableViewAdapter widget)
+	{
+		_view.Scrollview.FocusElement(widget.transform);
+	}
+
+	private void OptionWidget_SelectionChanged(IOptionWidgetViewAdapter widget)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void OptionSlider_ValueChanged(float value)
+	{
+		_optionsMenuPresenter.SetDirtySettings();
+	}
+
+	private void JoystickOptionButton_SelectionChanged(IOptionButtonViewAdapter button)
+	{
+		if (!(button is JoystickOptionButton joystickOptionButton))
+		{
+			return;
+		}
+		Joystick joystick = ReInput.controllers.Joysticks.FirstOrDefault_NonAlloc((Joystick joy, string arg) => joy.isConnected && joy.deviceInstanceGuid.ToString() == arg, joystickOptionButton.DeviceInstanceId);
+		if (joystick == null)
+		{
+			Debug.LogError("JoystickOptionButton_SelectionChanged:: No matching joystick found for [" + joystickOptionButton.Text + "].");
+			return;
+		}
+		AssignedPlayer selectedIndex = (AssignedPlayer)button.SelectedIndex;
+		if (selectedIndex == AssignedPlayer.None)
+		{
+			UnassignController(joystick.id);
+			return;
+		}
+		int playerId = (int)(selectedIndex - 1);
+		AssignController(playerId, joystick.id);
+	}
+
+	private void InputFieldButton_Click(object sender)
+	{
+		IInputFieldButtonViewAdapter inputFieldButton = sender as IInputFieldButtonViewAdapter;
+		if (inputFieldButton == null || _dialogue != null)
+		{
+			return;
+		}
+		InputMapper.Context context = new InputMapper.Context();
+		context.controllerMap = inputFieldButton.Info.ControllerMap;
+		context.actionId = inputFieldButton.Info.ActionId;
+		context.actionRange = inputFieldButton.Info.ActionRange;
+		context.actionElementMapToReplace = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
+		bool allowOnlyAxes = inputFieldButton.Info.AllowOnlyAxesMapping;
+		InputMapper.Default.options.allowButtons = !allowOnlyAxes;
+		_currentButton = inputFieldButton;
+		switch (_currentButton.Type)
+		{
+		case InputFieldButtonType.Add:
+			StartMapping(context, allowOnlyAxes);
+			break;
+		case InputFieldButtonType.ReassignOrRemove:
+		{
+			DialogueBoxViewAdapter dialogueBoxViewAdapter = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_REASSIGN_TITLE", "OPTIONS_INPUT_MENU_DB_REASSIGN_DESC", "OPTIONS_INPUT_MENU_DB_BUTTON_REASSIGN", "OPTIONS_INPUT_MENU_DB_BUTTON_REMOVE", "OPTIONS_INPUT_MENU_DB_BUTTON_CANCEL");
+			dialogueBoxViewAdapter.Accept += () =>
+			{
+				StartMapping(context, allowOnlyAxes);
+			};
+			dialogueBoxViewAdapter.Decline += () =>
+			{
+				ClearMapping(inputFieldButton);
+				_currentButton.Select();
+				_currentButton = null;
+			};
+			break;
+		}
+		}
+	}
+
+	private void StartMapping(InputMapper.Context context, bool allowOnlyAxes)
+	{
+		string remappingDialogueMessage = GetRemappingDialogueMessage(context.controllerMap.controllerType, allowOnlyAxes);
+		_dialogue = DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_ASSIGN_TITLE", remappingDialogueMessage, DialogueButton.None);
+		InputMapper.Default.Start(context);
+	}
+
+	private void ClearMapping(IInputFieldButtonViewAdapter inputFieldButton)
+	{
+		ActionElementMap elementMap = inputFieldButton.Info.ControllerMap.GetElementMap(inputFieldButton.Info.ActionElementMapId);
+		if (ClearElementMapAssignment(elementMap))
+		{
+			inputFieldButton.Text = "...";
+			inputFieldButton.Type = InputFieldButtonType.Add;
+			ClearMatchingElementMapsFromControllers(elementMap);
+			_optionsMenuPresenter.SetDirtySettings();
+		}
+	}
+
+	private void BeginRemapping()
+	{
+		_timeoutSequence = Timing.RunCoroutine(InputMapper_TimeoutSequence());
+		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: false, 8);
+	}
+
+	private void EndMapping()
+	{
+		if (_timeoutSequence.IsRunning)
+		{
+			Timing.KillCoroutines(_timeoutSequence);
+		}
+		if (_dialogue != null)
+		{
+			_dialogue.Destroy();
+			_dialogue = null;
+		}
+		if (_currentButton != null)
+		{
+			_currentButton.Select();
+			_currentButton = null;
+		}
+		ReInput.players.GetPlayer(0).SetAndCacheMapsEnabled(state: true, 8);
+	}
+
+	private void InputMapper_Started(InputMapper.StartedEventData eventData)
+	{
+		BeginRemapping();
+	}
+
+	private void InputMapper_Stopped(InputMapper.StoppedEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_Cancelled(InputMapper.CanceledEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_Error(InputMapper.ErrorEventData eventData)
+	{
+		EndMapping();
+	}
+
+	private void InputMapper_TimedOut(InputMapper.TimedOutEventData eventData)
+	{
+	}
+
+	private void InputMapper_InputMapped(InputMapper.InputMappedEventData eventData)
+	{
+		_currentButton.Text = eventData.actionElementMap.elementIdentifierName;
+		_currentButton.Type = InputFieldButtonType.ReassignOrRemove;
+		_currentButton.Info.ActionElementMapId = eventData.actionElementMap.id;
+		_dirtyMappings = true;
+		_optionsMenuPresenter.SetDirtySettings();
+		RemapMatchingElementMapsInControllers(eventData.actionElementMap);
+	}
+
+	private void RemapMatchingElementMapsInControllers(ActionElementMap newActionElementMap)
+	{
+		ElementAssignment elementAssignment = new ElementAssignment(newActionElementMap.controllerMap.controllerType, newActionElementMap.elementType, newActionElementMap.elementIdentifierId, newActionElementMap.axisRange, newActionElementMap.keyCode, newActionElementMap.modifierKeyFlags, newActionElementMap.actionId, newActionElementMap.axisContribution, invert: false);
+		foreach (ControllerMap allMap in newActionElementMap.controllerMap.player.controllers.maps.GetAllMaps(newActionElementMap.controllerMap.controllerType))
+		{
+			foreach (ActionElementMap item in from aem in allMap.GetElementMapsWithAction(newActionElementMap.actionId)
+				where aem.elementIdentifierId != newActionElementMap.elementIdentifierId && aem.axisContribution == newActionElementMap.axisContribution
+				select aem)
+			{
+				elementAssignment.elementMapId = item.id;
+				_ = item.elementIdentifierName;
+				allMap.ReplaceElementMap(elementAssignment, out var _);
+			}
+		}
+	}
+
+	private void ClearMatchingElementMapsFromControllers(ActionElementMap removedActionElementMap)
+	{
+		foreach (ControllerMap item in from map in removedActionElementMap.controllerMap.player.controllers.maps.GetAllMaps()
+			where map.controllerType == removedActionElementMap.controllerMap.controllerType
+			select map)
+		{
+			foreach (ActionElementMap item2 in from aem in item.GetElementMapsWithAction(removedActionElementMap.actionId)
+				where aem.elementIdentifierId != 0 && aem.axisContribution == removedActionElementMap.axisContribution
+				select aem)
+			{
+				ClearElementMapAssignment(item2);
+			}
+		}
+	}
+
+	private bool ClearElementMapAssignment(ActionElementMap actionElementMap)
+	{
+		_ = ReInput.mapping.GetAction(actionElementMap.actionId).descriptiveName;
+		_ = actionElementMap.elementIdentifierName;
+		_ = ReInput.mapping.GetMapCategory(actionElementMap.controllerMap.categoryId).name;
+		ElementAssignment elementAssignment = new ElementAssignment(actionElementMap.controllerMap.controllerType, actionElementMap.elementType, -1, actionElementMap.axisRange, KeyCode.None, ModifierKeyFlags.None, actionElementMap.actionId, actionElementMap.axisContribution, invert: false);
+		elementAssignment.elementMapId = actionElementMap.id;
+		if (!actionElementMap.controllerMap.ReplaceElementMap(elementAssignment, out var _))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private void InputMapper_ConflictFound(InputMapper.ConflictFoundEventData eventData)
+	{
+		Debug.LogError("InputMenu::InputMapper_ConflictFound::");
+		eventData.responseCallback(InputMapper.ConflictResponse.Cancel);
+		eventData.inputMapper.Stop();
+		string text = Localization.GetLanguageHandler().Localize("OPTIONS_INPUT_MENU_DB_CONFLICT_DESC", eventData.assignment.elementDisplayName, eventData.assignment.action.descriptiveName);
+		ElementAssignmentConflictInfo elementAssignmentConflictInfo = eventData.conflicts.FirstOrDefault_NonAlloc();
+		text = text + "[" + elementAssignmentConflictInfo.elementDisplayName + " - " + elementAssignmentConflictInfo.action.descriptiveName + "]";
+		DialogueBox.Show(ReInput.players.GetPlayer(0), "OPTIONS_INPUT_MENU_DB_CONFLICT_TITLE", text, DialogueButton.Ok);
+	}
+
+	private void LoadDefaults()
+	{
+		Rewired.Player player = ReInput.players.GetPlayer(0);
+		player.controllers.maps.LoadDefaultMaps(ControllerType.Mouse);
+		player.controllers.maps.LoadDefaultMaps(ControllerType.Keyboard);
+		Options.InputSettings = new InputSettings();
+		Options.Save();
+		Options.Load();
+	}
+
+	private void AssignController(int playerId, int controllerId)
+	{
+		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
+		if (joystick == null)
+		{
+			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
+			return;
+		}
+		ControllerAssignment controllerAssignment = new ControllerAssignment();
+		controllerAssignment.ControllerName = joystick.name;
+		controllerAssignment.ControllerGuid = joystick.deviceInstanceGuid.ToString();
+		controllerAssignment.PlayerId = playerId;
+		if (!_controllerAssignments.ContainsKey(controllerAssignment.ControllerGuid))
+		{
+			_controllerAssignments.Add(controllerAssignment.ControllerGuid, null);
+		}
+		_controllerAssignments[controllerAssignment.ControllerGuid] = controllerAssignment;
+	}
+
+	private void UnassignController(int controllerId)
+	{
+		Joystick joystick = ReInput.controllers.GetJoystick(controllerId);
+		if (joystick == null)
+		{
+			Debug.LogError("Something went wrong. Controller id not found. Disconnected?");
+		}
+		else
+		{
+			_controllerAssignments.Remove(joystick.deviceInstanceGuid.ToString());
+		}
+	}
+
+	public bool ActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null)
+		{
+			return actionElementMap.actionId == actionId;
+		}
+		return false;
+	}
+
+	public bool AxisActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.elementType != ControllerElementType.Button)
+		{
+			return actionElementMap.axisType != AxisType.Split;
+		}
+		return false;
+	}
+
+	public bool PositiveActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
+		{
+			return actionElementMap.axisContribution == Pole.Positive;
+		}
+		return false;
+	}
+
+	public bool NegativeActionElementPredicate(ActionElementMap actionElementMap, int actionId)
+	{
+		if (actionElementMap != null && actionElementMap.actionId == actionId && actionElementMap.axisType != AxisType.Normal)
+		{
+			return actionElementMap.axisContribution == Pole.Negative;
+		}
+		return false;
+	}
+
+	private string GetRemappingDialogueMessage(ControllerType controllerType, bool onlyAxesAllowed)
+	{
+		switch (controllerType)
+		{
+		default:
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_BUTTON_OR_AXIS";
+		case ControllerType.Mouse:
+			if (!onlyAxesAllowed)
+			{
+				return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_MOUSE_BUTTON_OR_AXIS";
+			}
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_AXIS";
+		case ControllerType.Keyboard:
+			return "OPTIONS_INPUT_MENU_DB_ASSIGN_DESC_ANY_KEY";
+		}
+	}
+
+	private IEnumerator<float> InputMapper_TimeoutSequence()
+	{
+		string message = _dialogue.Message.Text;
+		while (true)
+		{
+			_dialogue.Message.Text = $"{message} ({Mathf.CeilToInt(InputMapper.Default.timeRemaining)})";
+			yield return 0f;
+		}
+	}
+
+	private Rewired.Player GetPlayer(AssignedPlayer value)
+	{
+		try
+		{
+			switch (value)
+			{
+			case AssignedPlayer.P1:
+				return RewiredUtilities.Players[0];
+			case AssignedPlayer.P2:
+				return RewiredUtilities.Players[1];
+			}
+		}
+		catch (IndexOutOfRangeException exception)
+		{
+			Debug.LogException(exception);
+			return null;
+		}
+		return null;
+	}
 }
-
 

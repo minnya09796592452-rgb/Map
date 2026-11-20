@@ -1,230 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 276
-PATH: Assembly-CSharp__Beam__Constructing_STILL_COLLECTOR.cs
-SIZE: 4513 bytes
-SHA256: ed968bd8268459fcfc505e59b60c1319749b6dd3c1e18cbfefef7ad0adc5cbb0
-====================================================================================================
-
-using System;
-using Beam.Crafting;
-using Beam.Serialization.Json;
-using Beam.UI;
-using Beam.Utilities;
-using Funlabs;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace Beam;
-
-public class Constructing_STILL_COLLECTOR : ReplicableMonoBehaviour, IInteractable, IBase, IHasCraftingType, IHaveAttribute, ISelectable, ISaveable
-{
-	private const int MAX_WATER = 4;
-
-	[SerializeField]
-	private Constructing_STILL _constructingStill;
-
-	private MiniGuid _referenceId;
-
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Selecting _selecting;
-
-	[Header("ATTRIBUTE")]
-	[SerializeField]
-	private IconType _type;
-
-	private int _water;
-
-	private string _displayName = "";
-
-	public DamageUnityEvent Damaged;
-
-	public UnityEvent Drank;
-
-	public UnityEvent WaterRemoved;
-
-	public int MaxWater => 4;
-
-	public override MiniGuid ReferenceId
-	{
-		get
-		{
-			if (_referenceId.IsDefault() && _constructingStill.Structure.IsValid())
-			{
-				_referenceId = MiniGuid.NewFrom(_constructingStill.Structure.ReferenceId);
-			}
-			return _referenceId;
-		}
-		set
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	public Selecting Selecting => _selecting;
-
-	IconType IHaveAttribute.Type => _type;
-
-	public int Water => _water;
-
-	public bool CanInteract { get; set; } = true;
-
-	public string DisplayName
-	{
-		get
-		{
-			if (string.IsNullOrEmpty(_displayName))
-			{
-				_displayName = CraftingType.ToString();
-			}
-			return _displayName;
-		}
-	}
-
-	public bool CanParent { get; set; }
-
-	public Transform TransformParent { get; set; }
-
-	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.CRAFTING_WATER_STILL_COLLECTOR);
-
-	public RaycastMode RaycastMode { get; }
-
-	public bool IsDamageable => true;
-
-	float IHaveAttribute.GetValue()
-	{
-		return (float)_water / 4f;
-	}
-
-	public string GetInteractionDescription(int playerId, IBase obj)
-	{
-		if (obj.IsNullOrDestroyed())
-		{
-			return "ITEM_INTERACTION_DESCRIPTION_DRINK";
-		}
-		if (IsRefillable(obj))
-		{
-			return "ITEM_INTERACTION_DESCRIPTION_COLLECT";
-		}
-		return "ITEM_INTERACTION_DESCRIPTION_DRINK";
-	}
-
-	private void OnDestroy()
-	{
-		Damaged.RemoveAllListeners();
-		Damaged = null;
-		Drank = null;
-		WaterRemoved = null;
-	}
-
-	public void Damage(float damage, IBase damager)
-	{
-		Damaged?.Invoke(new DamageUnityEventArgs(damage, damager));
-	}
-
-	public void Destroy()
-	{
-	}
-
-	public void Parent()
-	{
-	}
-
-	public bool Interact(IPlayer player)
-	{
-		if (_water <= 0)
-		{
-			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_EMPTY_DESC");
-			return false;
-		}
-		Drink(player);
-		return true;
-	}
-
-	public bool InteractWithObject(IPlayer player, IBase obj)
-	{
-		if (obj.IsNullOrDestroyed())
-		{
-			return false;
-		}
-		if (_water <= 0)
-		{
-			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_EMPTY_DESC");
-			return false;
-		}
-		InteractiveObject_FOOD interactiveObject_FOOD = obj as InteractiveObject_FOOD;
-		if (interactiveObject_FOOD != null && IsRefillable(interactiveObject_FOOD))
-		{
-			if (interactiveObject_FOOD.Servings < interactiveObject_FOOD.OriginalServings)
-			{
-				interactiveObject_FOOD.Servings++;
-				interactiveObject_FOOD.Servings = Mathf.Clamp(interactiveObject_FOOD.Servings, 0, interactiveObject_FOOD.OriginalServings);
-				RemoveWater(1);
-				return true;
-			}
-			LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "WATER_STILL_COLLECTOR_NTF_FULL_DESC");
-			return false;
-		}
-		return Interact(player);
-	}
-
-	private void RemoveWater(int qty)
-	{
-		_water -= qty;
-		WaterRemoved?.Invoke();
-	}
-
-	private void Drink(IPlayer player)
-	{
-		RemoveWater(1);
-		int num = 100;
-		player.Statistics.Eat(InteractiveType.CRAFTING_WATER_STILL, MeatProvenance.Other, 0, 0, 0, 0, num);
-		Drank?.Invoke();
-	}
-
-	public void Refill(float availableWater)
-	{
-		int num = Mathf.Min(4 - _water, (int)availableWater);
-		if (num > 0)
-		{
-			_water += num;
-			_water = Mathf.Clamp(_water, 0, 4);
-		}
-	}
-
-	private bool IsRefillable(IBase obj)
-	{
-		if (obj.CraftingType.InteractiveType != InteractiveType.FOOD_WATER_BOTTLE && obj.CraftingType.InteractiveType != InteractiveType.FOOD_WATER_SKIN)
-		{
-			return obj.CraftingType.InteractiveType == InteractiveType.FOOD_COCONUT_FLASK;
-		}
-		return true;
-	}
-
-	public new JObject Save()
-	{
-		JObject jObject = new JObject();
-		jObject.AddField("Water", _water);
-		return jObject;
-	}
-
-	public new void Load(JObject data)
-	{
-		int value = data.GetField("Water").GetValue<int>();
-		_water = value;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 277
 PATH: Assembly-CSharp__Beam__Decal.cs
 SIZE: 2032 bytes
 SHA256: 5defa520f3ca04ce3d42c8100b8b1130448f683ddcd4791da0b55aee0c3e2ced
 ====================================================================================================
-
 using System.Collections;
 using UnityEngine;
 
@@ -301,15 +80,12 @@ public class Decal : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 278
+SOURCE FILE 277
 PATH: Assembly-CSharp__Beam__DeveloperMode.cs
 SIZE: 4458 bytes
 SHA256: 372ffca36dc411883c5e4a9aae2d673f49384da50102779c678663b3138487f3
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Developer.UI;
 using Beam.Serialization;
@@ -508,15 +284,12 @@ public class DeveloperMode : MonoBehaviour, INeedPlayerComponent
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 279
+SOURCE FILE 278
 PATH: Assembly-CSharp__Beam__FishMovement.cs
 SIZE: 10186 bytes
 SHA256: eeec22c8ccb65a12ec0e2be611b35d34693de9d12d5ff64c087c48907afc1787
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using UnityEngine;
@@ -924,15 +697,12 @@ public class FishMovement : MonoBehaviour, IFixedTick, ITick
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 280
+SOURCE FILE 279
 PATH: Assembly-CSharp__Beam__FlockController.cs
 SIZE: 11133 bytes
 SHA256: ff69f38490da62dd7c06b9c3b4687e3d24b8543e9aa68b42fd4a7bd738a13634
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1361,15 +1131,12 @@ public class FlockController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 281
+SOURCE FILE 280
 PATH: Assembly-CSharp__Beam__FlockFish.cs
 SIZE: 4733 bytes
 SHA256: 48c4d383ef96a1c1ad56b3caaa9b2a2df6caab32f019f8a095a6a6100e058da4
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Serialization.Json;
 using Beam.Utilities;
@@ -1554,15 +1321,12 @@ public class FlockFish : FishBase, IFixedTick, IPlayerProximityHandler
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 282
+SOURCE FILE 281
 PATH: Assembly-CSharp__Beam__GameCalendar.cs
 SIZE: 5278 bytes
 SHA256: f7b06ca3950e903497b8ac5eb1ab33aea63bea35a344a7441723d745e9591ac2
 ====================================================================================================
-
 using System;
 using Beam.AccountServices;
 using Beam.Serialization.Json;
@@ -1835,15 +1599,12 @@ public class GameCalendar : Singleton<GameCalendar>, IPersistentSaveable, ISavea
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 283
+SOURCE FILE 282
 PATH: Assembly-CSharp__Beam__HelicopterVehicleMovement.cs
 SIZE: 10909 bytes
 SHA256: 77e3bc8ce50897ce1950e8f77e3b0d4c5ee0aada85a642ca986f3923391f5162
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.UI;
@@ -2331,15 +2092,12 @@ public class HelicopterVehicleMovement : VehicleMovementBase, IQueryWaves, IHave
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 284
+SOURCE FILE 283
 PATH: Assembly-CSharp__Beam__IAudioSource.cs
 SIZE: 628 bytes
 SHA256: 45c1718d38b7f1338da01b20345e4232faf8545329c602afa4bd31c6362d123f
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -2386,15 +2144,12 @@ public interface IAudioSource
 	void Stop();
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 285
+SOURCE FILE 284
 PATH: Assembly-CSharp__Beam__IBase.cs
 SIZE: 392 bytes
 SHA256: 68b13beccf9296c309e1b93e1421bfad280592c260fe5cc170f62798ad735d45
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -2422,15 +2177,12 @@ public interface IBase : IHasCraftingType
 	void Parent();
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 286
+SOURCE FILE 285
 PATH: Assembly-CSharp__Beam__IBaseMixins.cs
 SIZE: 227 bytes
 SHA256: 3f6b460e4d763b028ffb550d378e17cac8578fb9711acbb2b18058ff373e6782
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -2445,15 +2197,12 @@ public static class IBaseMixins
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 287
+SOURCE FILE 286
 PATH: Assembly-CSharp__Beam__ICraftable.cs
 SIZE: 381 bytes
 SHA256: c90e73da7ab6ee8439ee1f35a60de7ebb5e9bb0aa95eb8d5911d24e8dd89d243
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -2477,15 +2226,12 @@ public interface ICraftable : IBase, IHasCraftingType, IPlaceable
 	void OnCrafted(IPlayer player);
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 288
+SOURCE FILE 287
 PATH: Assembly-CSharp__Beam__IDisintegratableMixins.cs
 SIZE: 1675 bytes
 SHA256: 4543f351d5cbe7b3b9ee80f8e36c7276454baef539e8d82bfae0f71eab2e8baa
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using MEC;
@@ -2548,127 +2294,875 @@ public static class IDisintegratableMixins
 	}
 }
 
+====================================================================================================
+SOURCE FILE 288
+PATH: Assembly-CSharp__Beam__Interactive_BIRD.cs
+SIZE: 3605 bytes
+SHA256: ef8181f7af86b91766237a894f5702b1fdb7644e5f684bc2b9d7275736e97fbe
+====================================================================================================
+using Beam.Events;
+using Beam.Obfuscated.Users;
+using Beam.Serialization.Json;
+using UnityEngine;
+using UnityEngine.Serialization;
 
+namespace Beam;
+
+public class Interactive_BIRD : InteractiveObject, ISkinnable, IDisintegratable, IBase, IHasCraftingType, INeedSkills, IKillable
+{
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private FlockChild _flockChild;
+
+	[SerializeField]
+	private Collider _interactiveCollider;
+
+	[PREFAB_PROCESSOR_GetComponentInChildren]
+	[SerializeField]
+	private Animation _animation;
+
+	[Header("SKINNING")]
+	[SerializeField]
+	private SkinningRewardType _meatType;
+
+	[SerializeField]
+	private SkillType _skillRequired;
+
+	[SerializeField]
+	private bool _canSkin;
+
+	[SerializeField]
+	private int _quantity;
+
+	[SerializeField]
+	private int _leatherQuantity;
+
+	private bool _isAlive = true;
+
+	[FormerlySerializedAs("_onSkinned")]
+	[SerializeField]
+	private InteracterUnityEvent _skinned;
+
+	public SkinningRewardType MeatType => _meatType;
+
+	public SkillType SkillRequired => _skillRequired;
+
+	public bool CanSkin
+	{
+		get
+		{
+			return !_isAlive;
+		}
+		set
+		{
+		}
+	}
+
+	public int Quantity => _quantity;
+
+	public int LeatherQuantity
+	{
+		get
+		{
+			return _leatherQuantity;
+		}
+		set
+		{
+			_leatherQuantity = value;
+		}
+	}
+
+	public int Skinned { get; set; }
+
+	public int FailedAttempts { get; set; }
+
+	public bool Disintegrating { get; set; }
+
+	public bool IsAlive => _isAlive;
+
+	public InteracterUnityEvent OnSkinned => _skinned;
+
+	public override void Damage(float damage, IBase damager)
+	{
+		if (_flockChild != null)
+		{
+			IPickupable damager2 = damager as IPickupable;
+			BaseUtilities.DoPlayerDamageExperience_Hunting(damager2);
+			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, damager2);
+			base.Damage(damage, damager);
+		}
+	}
+
+	public override void Destroy()
+	{
+		if (IsAlive)
+		{
+			Kill(LastPlayerIdToDamageThis);
+		}
+		else
+		{
+			base.Destroy();
+		}
+	}
+
+	public void Kill(int killerId = -1)
+	{
+		if (_isAlive)
+		{
+			_isAlive = false;
+			if (killerId != -1)
+			{
+				EventManager.RaiseEvent(new ExperienceEvent(killerId, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SMALL_KILL));
+				EventManager.RaiseEvent(new AddStatsEvent(killerId, new Stats
+				{
+					AnimalsKilled = 1
+				}));
+			}
+			_flockChild?.Kill();
+			_flockChild = null;
+			IsDamageable = false;
+			IsKinematic = false;
+			IsDraggable = true;
+			CanPickUp = true;
+			_interactiveCollider.enabled = true;
+			transform.parent = null;
+			TransformParent = Singleton<StrandedWorld>.Instance.NmlZone.SaveContainer;
+			Parent();
+		}
+	}
+
+	protected override void SetTransformSyncInternal(bool enabled)
+	{
+		base.SetTransformSyncInternal(enabled: true);
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("IsAlive", _isAlive);
+		JObject data = this.SaveSkinnable();
+		jObject.AddField("Skinnable", data);
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		JObject field = data.GetField("IsAlive");
+		if ((bool)field)
+		{
+			_isAlive = field.GetValue<bool>();
+		}
+		if (!_isAlive)
+		{
+			string dieAnimation = _flockChild.DieAnimation;
+			_flockChild.enabled = false;
+			_flockChild = null;
+			_animation.playAutomatically = false;
+			_animation[dieAnimation].normalizedTime = 1f;
+			_animation.Play(dieAnimation);
+			_animation.Sample();
+			_animation.Stop();
+			IsDamageable = false;
+			IsKinematic = false;
+			IsDraggable = true;
+			CanPickUp = true;
+			_interactiveCollider.enabled = true;
+		}
+		JObject field2 = data.GetField("Skinnable");
+		if (field2 != null)
+		{
+			this.LoadSkinnable(field2);
+		}
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 289
-PATH: Assembly-CSharp__Beam__IPlaceable.cs
-SIZE: 257 bytes
-SHA256: f5be01710749617aa18286dac5576da793f4f0de7a6418e0e62e262ebca20088
+PATH: Assembly-CSharp__Beam__Interactive_FISHES.cs
+SIZE: 6066 bytes
+SHA256: 194e222dc4a24997d936e4d9a15e5b485a97da8248a8b7dc69915fa964bf51c6
 ====================================================================================================
-
+using Beam.Crafting;
+using Beam.Language;
+using Beam.Utilities;
+using Funlabs;
 using UnityEngine;
 
 namespace Beam;
 
-public interface IPlaceable
+public class Interactive_FISHES : MonoBehaviour, IBase, IHasCraftingType, ISelectable, ISpearable
 {
-	float PlacingDistance { get; }
+	private class ReplicateKillFishAndAttachProjectiles : I_MultiplayerMessage
+	{
+		[I_Replicate]
+		public Interactive_FISH Fish;
 
-	void Place();
+		[Replicate]
+		public byte PlayerId;
 
-	bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation);
+		[Replicate]
+		public ProjectileObject[] Projectiles;
 
-	bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation);
+		[Replicate]
+		public Vector3[] ProjectilePositions;
+
+		[Replicate]
+		public Quaternion[] ProjectileRotations;
+
+		public override void OnPeer()
+		{
+			KillFish(Fish, PlayerId);
+			Projectiles.AttachTo(Fish);
+			Projectiles.SetPositions(ProjectilePositions, local: true);
+			Projectiles.SetRotation(ProjectileRotations, local: true);
+		}
+	}
+
+	private class ReplicateCreateKilledFishOnMaster : MultiplayerMessage
+	{
+		[Replicate]
+		public uint PrefabId;
+
+		[Replicate]
+		public Vector3 Position;
+
+		[Replicate]
+		public Quaternion Rotation;
+
+		[Replicate]
+		public byte PlayerId;
+
+		[Replicate]
+		public ProjectileObject[] Projectiles;
+
+		[Replicate]
+		public Vector3[] ProjectilePositions;
+
+		[Replicate]
+		public Quaternion[] ProjectileRotations;
+
+		public override void OnPeer()
+		{
+			Projectiles.SetPositions(ProjectilePositions, local: false);
+			Projectiles.SetRotation(ProjectileRotations, local: false);
+			ReplicatedCreateKilledFishAndAttachProjectiles(PrefabId, Position, Rotation, PlayerId, Projectiles);
+		}
+	}
+
+	[SerializeField]
+	[LocalizationTermDropdown]
+	[LocalizationTermPreview]
+	private string _displayName;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Selecting _selecting;
+
+	[SerializeField]
+	private RaycastMode _raycastMode;
+
+	[Tooltip("Health points used for spearing and shooting damage. 0=insta-kill")]
+	[SerializeField]
+	private float _healthPoints;
+
+	private float _originalHealthPoints;
+
+	[SerializeField]
+	private FishBase _fishes;
+
+	private int _lastPlayerIdToDamageThis = -1;
+
+	public Transform TransformParent { get; set; }
+
+	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.ANIMALS_FISH);
+
+	public bool CanParent { get; set; }
+
+	public bool IsDamageable => _healthPoints > 0f;
+
+	public string DisplayName => _displayName;
+
+	public Selecting Selecting => _selecting;
+
+	public RaycastMode RaycastMode => _raycastMode;
+
+	InteractiveType ISpearable.Type => CraftingType.InteractiveType;
+
+	bool ISpearable.CanSpear => _fishes.FishingData.FishType != FishSize.ExtraLarge;
+
+	bool ISpearable.IsLocalFauna => true;
+
+	uint ISpearable.LocalFaunaSpearedInstancePrefabId => _fishes.FishingData.FishPrefab.PrefabId;
+
+	bool ISpearable.LocalFaunaCheckHit(Vector3 postion)
+	{
+		if (true)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	void ISpearable.LocalFaunaRelease()
+	{
+		_fishes.Catch();
+	}
+
+	ISpearedInstance ISpearable.GetSpearedInstance(Vector3 position)
+	{
+		return null;
+	}
+
+	private void Awake()
+	{
+		_fishes.Freed += Fish_Freed;
+		_originalHealthPoints = _healthPoints;
+	}
+
+	private void Fish_Freed(ICellObject obj)
+	{
+		_healthPoints = _originalHealthPoints;
+	}
+
+	public void Damage(float damage, IBase damager)
+	{
+		IPickupable pickupable = damager as IPickupable;
+		if (!pickupable.IsNullOrDestroyed())
+		{
+			_lastPlayerIdToDamageThis = pickupable.PreviousOwnerId;
+		}
+		BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
+		BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
+		_healthPoints -= damage;
+		if (!(_healthPoints > 0f))
+		{
+			CreateKilledFishAndAttachProjectilesOnMaster();
+			_fishes.Catch();
+		}
+	}
+
+	public void Damage(DamageUnityEventArgs args)
+	{
+		Damage(args.Damage, args.Damager);
+	}
+
+	public void Destroy()
+	{
+		BeamTeam.Destroy(gameObject);
+	}
+
+	private void OnDestroy()
+	{
+		if (_fishes != null)
+		{
+			_fishes.Freed -= Fish_Freed;
+		}
+	}
+
+	public void Parent()
+	{
+	}
+
+	private void CreateKilledFishAndAttachProjectilesOnMaster()
+	{
+		if (Game.Mode.IsMaster())
+		{
+			ReplicatedCreateKilledFishAndAttachProjectiles(_fishes.FishingData.FishPrefab.PrefabId, transform.position, transform.rotation, (byte)_lastPlayerIdToDamageThis, transform.GetProjectiles());
+			return;
+		}
+		ProjectileObject[] projectiles = transform.GetProjectiles();
+		ReplicateCreateKilledFishOnMaster replicateCreateKilledFishOnMaster = new ReplicateCreateKilledFishOnMaster();
+		replicateCreateKilledFishOnMaster.PrefabId = _fishes.FishingData.FishPrefab.PrefabId;
+		replicateCreateKilledFishOnMaster.Position = transform.position;
+		replicateCreateKilledFishOnMaster.Rotation = transform.rotation;
+		replicateCreateKilledFishOnMaster.PlayerId = (byte)_lastPlayerIdToDamageThis;
+		replicateCreateKilledFishOnMaster.Projectiles = projectiles;
+		replicateCreateKilledFishOnMaster.ProjectilePositions = projectiles.GetPositions(local: false);
+		replicateCreateKilledFishOnMaster.ProjectileRotations = projectiles.GetRotations(local: false);
+		replicateCreateKilledFishOnMaster.Post();
+	}
+
+	private static void KillFish(Interactive_FISH fish, byte playerId)
+	{
+		fish.Parent();
+		fish.Kill(playerId);
+	}
+
+	private static void ReplicatedCreateKilledFishAndAttachProjectiles(uint prefabId, Vector3 position, Quaternion rotation, byte playerId, ProjectileObject[] projectiles)
+	{
+		Interactive_FISH interactive_FISH = MultiplayerMng.Instantiate<Interactive_FISH>(prefabId, position, rotation, MiniGuid.New());
+		KillFish(interactive_FISH, playerId);
+		projectiles.AttachTo(interactive_FISH);
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateKillFishAndAttachProjectiles replicateKillFishAndAttachProjectiles = new ReplicateKillFishAndAttachProjectiles();
+			replicateKillFishAndAttachProjectiles.Fish = interactive_FISH;
+			replicateKillFishAndAttachProjectiles.PlayerId = playerId;
+			replicateKillFishAndAttachProjectiles.Projectiles = projectiles;
+			replicateKillFishAndAttachProjectiles.ProjectilePositions = projectiles.GetPositions(local: true);
+			replicateKillFishAndAttachProjectiles.ProjectileRotations = projectiles.GetRotations(local: true);
+			replicateKillFishAndAttachProjectiles.Post();
+		}
+	}
 }
-
-
 
 ====================================================================================================
 SOURCE FILE 290
-PATH: Assembly-CSharp__Beam__IPlayer.cs
-SIZE: 1314 bytes
-SHA256: 027d9164f387e20f6f7c8aec4fa284adcc4004be6f4a7d8e41d9751702587b21
+PATH: Assembly-CSharp__Beam__Interactive_RAFT_STORAGE.cs
+SIZE: 3931 bytes
+SHA256: 51d1cf241aebe1f28afb82604ada457268ca79e603c65a3c917d6af8457d7a8f
 ====================================================================================================
-
 using Beam.Crafting;
+using Beam.Language;
+using Beam.Serialization.Json;
+using Beam.Utilities;
 using Funlabs;
 using Photon.Bolt;
-using Rewired;
 using UnityEngine;
 
 namespace Beam;
 
-public interface IPlayer : ISaveable, IIdleUntilInitialized
+public class Interactive_RAFT_STORAGE : MultiplayerBehaviour, ISelectable, IBase, IHasCraftingType, ISlotStorageProvider<IPickupable>, ISaveable, IMultiplayerState<IInteractiveObject_LIFERAFTState>
 {
-	Transform transform { get; }
+	private class ReplicateOnSlotStorageOpen : MultiplayerMessage
+	{
+		[Replicate]
+		public BoltEntity Entity;
 
-	IPlayerState MultiplayerState { get; }
+		public override void OnPeer()
+		{
+			Entity.GetComponentInChildren<Interactive_RAFT_STORAGE>().OnSlotStorageOpen();
+		}
+	}
 
-	bool IsOwner { get; }
+	[SerializeField]
+	[LocalizationTermDropdown]
+	[LocalizationTermPreview]
+	private string _displayName;
 
-	int Id { get; set; }
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Selecting _selecting;
 
-	int Gender { get; set; }
+	[SerializeField]
+	private SlotStorage _slotStorage;
 
-	PlayerCamera PlayerCamera { get; }
+	[SerializeField]
+	private InteractiveObject[] _startingPrefabs;
 
-	Movement Movement { get; }
+	private JObject _storageData;
 
-	Rewired.Player Input { get; }
+	public string DisplayName => _displayName;
 
-	bool IsBusy { get; set; }
+	public Selecting Selecting => _selecting;
 
-	PlayerUI PlayerUI { get; }
+	public Transform TransformParent { get; set; }
 
-	PlayerSpeech PlayerSpeech { get; }
+	public CraftingType CraftingType => new CraftingType(AttributeType.None, InteractiveType.CONTAINER);
 
-	Character Character { get; }
+	public RaycastMode RaycastMode => RaycastMode.Collider;
 
-	Statistics Statistics { get; }
+	public bool CanParent { get; set; }
 
-	Inventory Inventory { get; }
+	public bool IsDamageable => false;
 
-	User User { get; }
+	public IInteractiveObject_LIFERAFTState MultiplayerState => GetMultiplayerState<IInteractiveObject_LIFERAFTState>();
 
-	Interacter Interacter { get; }
+	private bool CreatedItems
+	{
+		get
+		{
+			return MultiplayerState.CreatedItems;
+		}
+		set
+		{
+			if (entity.IsOwner)
+			{
+				MultiplayerState.CreatedItems = value;
+			}
+		}
+	}
 
-	Holder Holder { get; }
+	public ISlotStorage<IPickupable> GetSlotStorage()
+	{
+		return _slotStorage;
+	}
 
-	HotkeyController Hotkeys { get; }
+	private void Awake()
+	{
+		_slotStorage.Name = DisplayName;
+		_slotStorage.Opened += SlotStorage_Opened;
+		_slotStorage.Initialize();
+		_slotStorage.ReferenceId = MiniGuid.VEHICLE_LIFERAFT_STORAGE;
+		StorageRegistry.Link(_slotStorage);
+	}
 
-	Crafter Crafter { get; }
+	private void OnDestroy()
+	{
+		_slotStorage.ClearEventSubscribers();
+		StorageRegistry.Unlink(_slotStorage);
+	}
 
-	FireLighter Lighter { get; }
+	private void SlotStorage_Opened()
+	{
+		ReplicatedOnSlotStorageOpen();
+	}
 
-	Skinner Skinner { get; }
+	private void OnSlotStorageOpen()
+	{
+		if (_storageData != null && !_storageData.IsNull() && !_slotStorage.LoadState.IsLoaded())
+		{
+			if (_slotStorage.LoadState.IsIdle())
+			{
+				StorageUtilities.LoadStorage(_slotStorage, _storageData);
+			}
+		}
+		else if (Game.Mode.IsMaster() && !CreatedItems)
+		{
+			for (int i = 0; i < _startingPrefabs.Length; i++)
+			{
+				InteractiveObject pickupable = MultiplayerMng.Instantiate<InteractiveObject>(_startingPrefabs[i].PrefabId, MiniGuid.New());
+				_slotStorage.ReplicatedPush(pickupable);
+			}
+			CreatedItems = true;
+		}
+	}
 
-	Dragger Dragger { get; }
+	public void Damage(float damage, IBase damager1)
+	{
+	}
 
-	GameInputController GameInput { get; }
+	public void Destroy()
+	{
+	}
 
-	Audio Audio { get; }
+	public void Parent()
+	{
+	}
 
-	DeveloperMode DeveloperMode { get; }
+	private void ReplicatedOnSlotStorageOpen()
+	{
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateOnSlotStorageOpen replicateOnSlotStorageOpen = new ReplicateOnSlotStorageOpen();
+			replicateOnSlotStorageOpen.Entity = entity;
+			replicateOnSlotStorageOpen.Post();
+		}
+		OnSlotStorageOpen();
+	}
 
-	PlayerSkills PlayerSkills { get; }
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		JObject jObject2 = (_slotStorage.Modified ? _slotStorage.Save() : _storageData);
+		if (jObject2 != null && !jObject2.IsNull())
+		{
+			jObject.AddField("Storage", jObject2);
+		}
+		if (Game.Mode.IsServer() && LevelLoader.IsServerJoinInProgress && _slotStorage.GetStored().Any_NonAlloc())
+		{
+			jObject.AddField("serverJIPHasItems", instance: true);
+		}
+		return jObject;
+	}
 
-	PlayerExperience PlayerExperience { get; }
-
-	Achievements Achievements { get; }
-
-	Peer Peer { get; set; }
-
-	IMissionGoal CurrentMissionGoal { get; set; }
-
-	void SetInput(Rewired.Player input);
-
-	void SetCamera(PlayerCamera playerCamera);
-
-	void SetUI(PlayerUI playerUI);
-
-	void SetVibration(int motorIndex, float motorLevel, float duration);
+	public void Load(JObject data)
+	{
+		_storageData = data.GetField("Storage");
+		if (_storageData != null)
+		{
+			CreatedItems = true;
+		}
+		if (Game.Mode.IsClient() && MultiplayerMng.ServerGameState.IsGame() && _storageData.IsValid() && !_storageData.IsNull() && _slotStorage.LoadState.IsIdle() && data.GetField("serverJIPHasItems").IsValid())
+		{
+			_slotStorage.Load(_storageData);
+		}
+	}
 }
-
-
 
 ====================================================================================================
 SOURCE FILE 291
+PATH: Assembly-CSharp__Beam__Interactive_SEA_ANCHOR.cs
+SIZE: 5825 bytes
+SHA256: 582dc6f5ee6c67d08f0063e8025a1415ccd8219b8e2b624af2e80d1e1fed513d
+====================================================================================================
+using System;
+using System.Collections.Generic;
+using Beam.Crafting;
+using Beam.Language;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Ceto;
+using Funlabs;
+using MEC;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace Beam;
+
+public class Interactive_SEA_ANCHOR : ReplicableMonoBehaviour, IInteractable, IBase, IHasCraftingType, ISelectable, IQueryWaves, ISaveable
+{
+	private const float DISTANCE_TO_DEPLOY = 10f;
+
+	private const float MIN_OCEAN_DEPTH_TO_DEPLOY = -5f;
+
+	private const float ANCHOR_DEPTH_BELOW_OCEAN = 1.1f;
+
+	[SerializeField]
+	private MiniGuid _referenceId;
+
+	[SerializeField]
+	[LocalizationTermDropdown]
+	[LocalizationTermPreview]
+	private string _displayName;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Selecting _selecting;
+
+	[SerializeField]
+	private Transform _packedAnchorTransform;
+
+	[SerializeField]
+	private Transform _deployedAnchorTransform;
+
+	[SerializeField]
+	private SphereCollider _deployedAnchorCollider;
+
+	[SerializeField]
+	private LayerMask _deployedAnchorCollisionMask;
+
+	[SerializeField]
+	private VerletLine _deployedAnchorRope;
+
+	[SerializeField]
+	private InteractiveObject_LIFERAFT _raft;
+
+	public UnityEvent OnDeploy;
+
+	public UnityEvent OnRetrieve;
+
+	private List<WaveQuery> _waveQueries;
+
+	private WaveQuery _anchorWaveQuery = new WaveQuery();
+
+	private CoroutineHandle _deployedSequence;
+
+	public override MiniGuid ReferenceId
+	{
+		get
+		{
+			if (_referenceId.IsDefault())
+			{
+				_referenceId = new MiniGuid(_raft.Entity.NetworkId.PackedValue);
+			}
+			return _referenceId;
+		}
+		set
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public RaycastMode RaycastMode => RaycastMode.Collider;
+
+	public string DisplayName => _displayName;
+
+	public Selecting Selecting => _selecting;
+
+	public Transform TransformParent { get; set; }
+
+	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.None);
+
+	public bool CanInteract { get; set; } = true;
+
+	public bool CanParent { get; set; }
+
+	public bool IsDamageable { get; }
+
+	public bool Deployed { get; private set; }
+
+	bool IQueryWaves.Active
+	{
+		get
+		{
+			if (gameObject != null)
+			{
+				return gameObject.activeInHierarchy;
+			}
+			return false;
+		}
+	}
+
+	IEnumerable<WaveQuery> IQueryWaves.WaveQueries
+	{
+		get
+		{
+			if (_waveQueries == null)
+			{
+				_waveQueries = new List<WaveQuery> { _anchorWaveQuery };
+			}
+			return _waveQueries;
+		}
+	}
+
+	public string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (!Deployed)
+		{
+			return "ITEM_INTERACTION_DESCRIPTION_DEPLOY";
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_RETRIEVE";
+	}
+
+	void IQueryWaves.InRange()
+	{
+	}
+
+	void IQueryWaves.OutOfRange()
+	{
+	}
+
+	private void Awake()
+	{
+		_raft.VehicleMovement.Operated += RaftVehicleMovement_Operated;
+	}
+
+	private void OnDestroy()
+	{
+		Timing.KillCoroutines(_deployedSequence);
+		_raft.VehicleMovement.Operated -= RaftVehicleMovement_Operated;
+		Singleton<BuoyancyManager>.Instance?.Remove(this);
+	}
+
+	private void RaftVehicleMovement_Operated(bool operated)
+	{
+		if (operated && Deployed)
+		{
+			Retrieve();
+		}
+	}
+
+	public bool Interact(IPlayer player)
+	{
+		if (!Deployed)
+		{
+			if (!CanDeploy())
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Low, 4f, "SEA_ANCHOR_NTF_TOO_SHALLOW_DESC");
+				return false;
+			}
+			Deploy();
+			return true;
+		}
+		if (Deployed)
+		{
+			Retrieve();
+			return true;
+		}
+		return false;
+	}
+
+	private void Deploy()
+	{
+		Singleton<BuoyancyManager>.Instance?.Add(this);
+		_deployedAnchorTransform.gameObject.SetActive(value: true);
+		_deployedAnchorTransform.position = transform.parent.position + Vector3.down * 1.1f + -Wind.Direction * 10f;
+		_deployedAnchorTransform.rotation = Quaternion.LookRotation(Wind.Direction, Vector3.up);
+		_deployedAnchorRope.gameObject.SetActive(value: true);
+		_packedAnchorTransform.gameObject.SetActive(value: false);
+		_raft.Buoyancy.EnableWind(enable: false);
+		_raft.Buoyancy.SetDampening(0.7f);
+		_deployedSequence = Timing.RunCoroutine(Deployed_Sequence());
+		Deployed = true;
+		OnDeploy?.Invoke();
+	}
+
+	public void Retrieve()
+	{
+		Singleton<BuoyancyManager>.Instance?.Remove(this);
+		_deployedAnchorTransform.gameObject.SetActive(value: false);
+		_deployedAnchorTransform.localPosition = Vector3.zero;
+		_deployedAnchorRope.gameObject.SetActive(value: false);
+		_packedAnchorTransform.gameObject.SetActive(value: true);
+		_raft.Buoyancy.EnableWind(enable: true);
+		_raft.Buoyancy.ResetDampening();
+		Timing.KillCoroutines(_deployedSequence);
+		Deployed = false;
+		OnRetrieve?.Invoke();
+	}
+
+	public bool InteractWithObject(IPlayer player, IBase obj)
+	{
+		return Interact(player);
+	}
+
+	private bool CanDeploy()
+	{
+		if (Singleton<StrandedWorld>.Instance == null)
+		{
+			return true;
+		}
+		Vector3 vector = transform.parent.position + -Wind.Direction * 10f;
+		if (Physics.CheckSphere(vector, _deployedAnchorCollider.radius, _deployedAnchorCollisionMask, QueryTriggerInteraction.Ignore))
+		{
+			return false;
+		}
+		if (Singleton<StrandedWorld>.Instance.GetHeight(vector) > -5f)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private IEnumerator<float> Deployed_Sequence()
+	{
+		while (true)
+		{
+			_anchorWaveQuery.posX = _deployedAnchorTransform.position.x;
+			_anchorWaveQuery.posZ = _deployedAnchorTransform.position.z;
+			Vector3 position = _deployedAnchorTransform.position;
+			position.y = _anchorWaveQuery.result.height - 1.1f;
+			_deployedAnchorTransform.position = position;
+			yield return 0f;
+		}
+	}
+
+	public void Parent()
+	{
+	}
+
+	public void Damage(float damage, IBase damager1)
+	{
+	}
+
+	public void Destroy()
+	{
+	}
+
+	public new JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("Deployed", Deployed);
+		return jObject;
+	}
+
+	public new void Load(JObject data)
+	{
+		if (data.GetField("Deployed").GetValue<bool>())
+		{
+			Deploy();
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 292
 PATH: Assembly-CSharp__Beam__InteractiveCustomParticleHelper.cs
 SIZE: 421 bytes
 SHA256: 97e92daa9a06c46b304ec2ccf7e2755fad7f2b1b0a4aeab5064d809fd8bace97
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -2694,15 +3188,12 @@ public class InteractiveCustomParticleHelper : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 292
+SOURCE FILE 293
 PATH: Assembly-CSharp__Beam__InteractiveObject_CRAB.cs
 SIZE: 3896 bytes
 SHA256: 02dad2fe7394bfc410bc32c57e1d678742bb3425d35052b0f6e59724d6265bc0
 ====================================================================================================
-
 using Beam.Events;
 using Beam.Obfuscated.Users;
 using Beam.Serialization.Json;
@@ -2902,15 +3393,12 @@ public class InteractiveObject_CRAB : InteractiveObject_ANIMAL, ISpearable, ISpe
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 293
+SOURCE FILE 294
 PATH: Assembly-CSharp__Beam__InteractiveObject_FLAREGUN.cs
 SIZE: 1912 bytes
 SHA256: 87dc83ba42f853e0d90039df766a115cd7b3c37a60033da5946aada5579d04f5
 ====================================================================================================
-
 using System.Collections;
 using Beam.Utilities;
 using UnityEngine;
@@ -2995,15 +3483,12 @@ public class InteractiveObject_FLAREGUN : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 294
+SOURCE FILE 295
 PATH: Assembly-CSharp__Beam__InteractiveObject_GOAL.cs
 SIZE: 1834 bytes
 SHA256: 448e2d11b89e05fa1c55ca3007ee898a018ce2240e5c7a4bc72fd5cdbbfb4e11
 ====================================================================================================
-
 using Beam.Events;
 using Beam.Obfuscated.Users;
 using Beam.Utilities;
@@ -3074,15 +3559,12 @@ public class InteractiveObject_GOAL : InteractiveObject, IDisintegratable, IBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 295
+SOURCE FILE 296
 PATH: Assembly-CSharp__Beam__InteractiveObject_HARVESTRESOURCE.cs
 SIZE: 1232 bytes
 SHA256: a3c439eebb72a6373f1173f5a83369639eae7f3935b145dad32009a0dd6973f0
 ====================================================================================================
-
 using Beam.Utilities;
 using Funlabs;
 using UnityEngine;
@@ -3130,15 +3612,12 @@ public class InteractiveObject_HARVESTRESOURCE : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 296
+SOURCE FILE 297
 PATH: Assembly-CSharp__Beam__InteractiveObject_MIDFISH.cs
 SIZE: 1107 bytes
 SHA256: 0b0cece471d6bfc5f97f5ae526def4f6077305e6715af3c08f206bb00cf56ef3
 ====================================================================================================
-
 using Beam.Events;
 using UnityEngine;
 
@@ -3180,15 +3659,12 @@ public class InteractiveObject_MIDFISH : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 297
+SOURCE FILE 298
 PATH: Assembly-CSharp__Beam__InteractiveObject_MININGROCK.cs
 SIZE: 2442 bytes
 SHA256: 80e391a08713ea96cea2aefa4cba8031a023b1ab334dd5b143d6d4503f8800e2
 ====================================================================================================
-
 using System;
 using Beam.Serialization.Json;
 using Beam.Utilities;
@@ -3301,15 +3777,12 @@ public class InteractiveObject_MININGROCK : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 298
+SOURCE FILE 299
 PATH: Assembly-CSharp__Beam__InteractiveObject_PALM.cs
 SIZE: 11166 bytes
 SHA256: a27c9257642ce10bc69760b1e90ac67159b33c483036d418fac415e7f85577b0
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Serialization.Json;
 using Beam.Utilities;
@@ -3671,423 +4144,24 @@ public class InteractiveObject_PALM : InteractiveObject
 	}
 }
 
-
-
-====================================================================================================
-SOURCE FILE 299
-PATH: Assembly-CSharp__Beam__Interactive_BIRD.cs
-SIZE: 3605 bytes
-SHA256: ef8181f7af86b91766237a894f5702b1fdb7644e5f684bc2b9d7275736e97fbe
-====================================================================================================
-
-using Beam.Events;
-using Beam.Obfuscated.Users;
-using Beam.Serialization.Json;
-using UnityEngine;
-using UnityEngine.Serialization;
-
-namespace Beam;
-
-public class Interactive_BIRD : InteractiveObject, ISkinnable, IDisintegratable, IBase, IHasCraftingType, INeedSkills, IKillable
-{
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private FlockChild _flockChild;
-
-	[SerializeField]
-	private Collider _interactiveCollider;
-
-	[PREFAB_PROCESSOR_GetComponentInChildren]
-	[SerializeField]
-	private Animation _animation;
-
-	[Header("SKINNING")]
-	[SerializeField]
-	private SkinningRewardType _meatType;
-
-	[SerializeField]
-	private SkillType _skillRequired;
-
-	[SerializeField]
-	private bool _canSkin;
-
-	[SerializeField]
-	private int _quantity;
-
-	[SerializeField]
-	private int _leatherQuantity;
-
-	private bool _isAlive = true;
-
-	[FormerlySerializedAs("_onSkinned")]
-	[SerializeField]
-	private InteracterUnityEvent _skinned;
-
-	public SkinningRewardType MeatType => _meatType;
-
-	public SkillType SkillRequired => _skillRequired;
-
-	public bool CanSkin
-	{
-		get
-		{
-			return !_isAlive;
-		}
-		set
-		{
-		}
-	}
-
-	public int Quantity => _quantity;
-
-	public int LeatherQuantity
-	{
-		get
-		{
-			return _leatherQuantity;
-		}
-		set
-		{
-			_leatherQuantity = value;
-		}
-	}
-
-	public int Skinned { get; set; }
-
-	public int FailedAttempts { get; set; }
-
-	public bool Disintegrating { get; set; }
-
-	public bool IsAlive => _isAlive;
-
-	public InteracterUnityEvent OnSkinned => _skinned;
-
-	public override void Damage(float damage, IBase damager)
-	{
-		if (_flockChild != null)
-		{
-			IPickupable damager2 = damager as IPickupable;
-			BaseUtilities.DoPlayerDamageExperience_Hunting(damager2);
-			BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, damager2);
-			base.Damage(damage, damager);
-		}
-	}
-
-	public override void Destroy()
-	{
-		if (IsAlive)
-		{
-			Kill(LastPlayerIdToDamageThis);
-		}
-		else
-		{
-			base.Destroy();
-		}
-	}
-
-	public void Kill(int killerId = -1)
-	{
-		if (_isAlive)
-		{
-			_isAlive = false;
-			if (killerId != -1)
-			{
-				EventManager.RaiseEvent(new ExperienceEvent(killerId, PlayerSkills.Skills.HUNTING, PlayerSkills.ExpSource.SMALL_KILL));
-				EventManager.RaiseEvent(new AddStatsEvent(killerId, new Stats
-				{
-					AnimalsKilled = 1
-				}));
-			}
-			_flockChild?.Kill();
-			_flockChild = null;
-			IsDamageable = false;
-			IsKinematic = false;
-			IsDraggable = true;
-			CanPickUp = true;
-			_interactiveCollider.enabled = true;
-			transform.parent = null;
-			TransformParent = Singleton<StrandedWorld>.Instance.NmlZone.SaveContainer;
-			Parent();
-		}
-	}
-
-	protected override void SetTransformSyncInternal(bool enabled)
-	{
-		base.SetTransformSyncInternal(enabled: true);
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		jObject.AddField("IsAlive", _isAlive);
-		JObject data = this.SaveSkinnable();
-		jObject.AddField("Skinnable", data);
-		return jObject;
-	}
-
-	public override void Load(JObject data)
-	{
-		base.Load(data);
-		JObject field = data.GetField("IsAlive");
-		if ((bool)field)
-		{
-			_isAlive = field.GetValue<bool>();
-		}
-		if (!_isAlive)
-		{
-			string dieAnimation = _flockChild.DieAnimation;
-			_flockChild.enabled = false;
-			_flockChild = null;
-			_animation.playAutomatically = false;
-			_animation[dieAnimation].normalizedTime = 1f;
-			_animation.Play(dieAnimation);
-			_animation.Sample();
-			_animation.Stop();
-			IsDamageable = false;
-			IsKinematic = false;
-			IsDraggable = true;
-			CanPickUp = true;
-			_interactiveCollider.enabled = true;
-		}
-		JObject field2 = data.GetField("Skinnable");
-		if (field2 != null)
-		{
-			this.LoadSkinnable(field2);
-		}
-	}
-}
-
-
-
 ====================================================================================================
 SOURCE FILE 300
-PATH: Assembly-CSharp__Beam__Interactive_FISHES.cs
-SIZE: 6066 bytes
-SHA256: 194e222dc4a24997d936e4d9a15e5b485a97da8248a8b7dc69915fa964bf51c6
+PATH: Assembly-CSharp__Beam__IPlaceable.cs
+SIZE: 257 bytes
+SHA256: f5be01710749617aa18286dac5576da793f4f0de7a6418e0e62e262ebca20088
 ====================================================================================================
-
-using Beam.Crafting;
-using Beam.Language;
-using Beam.Utilities;
-using Funlabs;
 using UnityEngine;
 
 namespace Beam;
 
-public class Interactive_FISHES : MonoBehaviour, IBase, IHasCraftingType, ISelectable, ISpearable
+public interface IPlaceable
 {
-	private class ReplicateKillFishAndAttachProjectiles : I_MultiplayerMessage
-	{
-		[I_Replicate]
-		public Interactive_FISH Fish;
+	float PlacingDistance { get; }
 
-		[Replicate]
-		public byte PlayerId;
+	void Place();
 
-		[Replicate]
-		public ProjectileObject[] Projectiles;
+	bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation);
 
-		[Replicate]
-		public Vector3[] ProjectilePositions;
-
-		[Replicate]
-		public Quaternion[] ProjectileRotations;
-
-		public override void OnPeer()
-		{
-			KillFish(Fish, PlayerId);
-			Projectiles.AttachTo(Fish);
-			Projectiles.SetPositions(ProjectilePositions, local: true);
-			Projectiles.SetRotation(ProjectileRotations, local: true);
-		}
-	}
-
-	private class ReplicateCreateKilledFishOnMaster : MultiplayerMessage
-	{
-		[Replicate]
-		public uint PrefabId;
-
-		[Replicate]
-		public Vector3 Position;
-
-		[Replicate]
-		public Quaternion Rotation;
-
-		[Replicate]
-		public byte PlayerId;
-
-		[Replicate]
-		public ProjectileObject[] Projectiles;
-
-		[Replicate]
-		public Vector3[] ProjectilePositions;
-
-		[Replicate]
-		public Quaternion[] ProjectileRotations;
-
-		public override void OnPeer()
-		{
-			Projectiles.SetPositions(ProjectilePositions, local: false);
-			Projectiles.SetRotation(ProjectileRotations, local: false);
-			ReplicatedCreateKilledFishAndAttachProjectiles(PrefabId, Position, Rotation, PlayerId, Projectiles);
-		}
-	}
-
-	[SerializeField]
-	[LocalizationTermDropdown]
-	[LocalizationTermPreview]
-	private string _displayName;
-
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Selecting _selecting;
-
-	[SerializeField]
-	private RaycastMode _raycastMode;
-
-	[Tooltip("Health points used for spearing and shooting damage. 0=insta-kill")]
-	[SerializeField]
-	private float _healthPoints;
-
-	private float _originalHealthPoints;
-
-	[SerializeField]
-	private FishBase _fishes;
-
-	private int _lastPlayerIdToDamageThis = -1;
-
-	public Transform TransformParent { get; set; }
-
-	public CraftingType CraftingType { get; } = new CraftingType(AttributeType.None, InteractiveType.ANIMALS_FISH);
-
-	public bool CanParent { get; set; }
-
-	public bool IsDamageable => _healthPoints > 0f;
-
-	public string DisplayName => _displayName;
-
-	public Selecting Selecting => _selecting;
-
-	public RaycastMode RaycastMode => _raycastMode;
-
-	InteractiveType ISpearable.Type => CraftingType.InteractiveType;
-
-	bool ISpearable.CanSpear => _fishes.FishingData.FishType != FishSize.ExtraLarge;
-
-	bool ISpearable.IsLocalFauna => true;
-
-	uint ISpearable.LocalFaunaSpearedInstancePrefabId => _fishes.FishingData.FishPrefab.PrefabId;
-
-	bool ISpearable.LocalFaunaCheckHit(Vector3 postion)
-	{
-		if (true)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	void ISpearable.LocalFaunaRelease()
-	{
-		_fishes.Catch();
-	}
-
-	ISpearedInstance ISpearable.GetSpearedInstance(Vector3 position)
-	{
-		return null;
-	}
-
-	private void Awake()
-	{
-		_fishes.Freed += Fish_Freed;
-		_originalHealthPoints = _healthPoints;
-	}
-
-	private void Fish_Freed(ICellObject obj)
-	{
-		_healthPoints = _originalHealthPoints;
-	}
-
-	public void Damage(float damage, IBase damager)
-	{
-		IPickupable pickupable = damager as IPickupable;
-		if (!pickupable.IsNullOrDestroyed())
-		{
-			_lastPlayerIdToDamageThis = pickupable.PreviousOwnerId;
-		}
-		BaseUtilities.DoPlayerDamageExperience_Hunting(pickupable);
-		BaseUtilities.DoPlayerDamageMultipliers_Hunting(ref damage, pickupable);
-		_healthPoints -= damage;
-		if (!(_healthPoints > 0f))
-		{
-			CreateKilledFishAndAttachProjectilesOnMaster();
-			_fishes.Catch();
-		}
-	}
-
-	public void Damage(DamageUnityEventArgs args)
-	{
-		Damage(args.Damage, args.Damager);
-	}
-
-	public void Destroy()
-	{
-		BeamTeam.Destroy(gameObject);
-	}
-
-	private void OnDestroy()
-	{
-		if (_fishes != null)
-		{
-			_fishes.Freed -= Fish_Freed;
-		}
-	}
-
-	public void Parent()
-	{
-	}
-
-	private void CreateKilledFishAndAttachProjectilesOnMaster()
-	{
-		if (Game.Mode.IsMaster())
-		{
-			ReplicatedCreateKilledFishAndAttachProjectiles(_fishes.FishingData.FishPrefab.PrefabId, transform.position, transform.rotation, (byte)_lastPlayerIdToDamageThis, transform.GetProjectiles());
-			return;
-		}
-		ProjectileObject[] projectiles = transform.GetProjectiles();
-		ReplicateCreateKilledFishOnMaster replicateCreateKilledFishOnMaster = new ReplicateCreateKilledFishOnMaster();
-		replicateCreateKilledFishOnMaster.PrefabId = _fishes.FishingData.FishPrefab.PrefabId;
-		replicateCreateKilledFishOnMaster.Position = transform.position;
-		replicateCreateKilledFishOnMaster.Rotation = transform.rotation;
-		replicateCreateKilledFishOnMaster.PlayerId = (byte)_lastPlayerIdToDamageThis;
-		replicateCreateKilledFishOnMaster.Projectiles = projectiles;
-		replicateCreateKilledFishOnMaster.ProjectilePositions = projectiles.GetPositions(local: false);
-		replicateCreateKilledFishOnMaster.ProjectileRotations = projectiles.GetRotations(local: false);
-		replicateCreateKilledFishOnMaster.Post();
-	}
-
-	private static void KillFish(Interactive_FISH fish, byte playerId)
-	{
-		fish.Parent();
-		fish.Kill(playerId);
-	}
-
-	private static void ReplicatedCreateKilledFishAndAttachProjectiles(uint prefabId, Vector3 position, Quaternion rotation, byte playerId, ProjectileObject[] projectiles)
-	{
-		Interactive_FISH interactive_FISH = MultiplayerMng.Instantiate<Interactive_FISH>(prefabId, position, rotation, MiniGuid.New());
-		KillFish(interactive_FISH, playerId);
-		projectiles.AttachTo(interactive_FISH);
-		if (Game.Mode.IsMultiplayer())
-		{
-			ReplicateKillFishAndAttachProjectiles replicateKillFishAndAttachProjectiles = new ReplicateKillFishAndAttachProjectiles();
-			replicateKillFishAndAttachProjectiles.Fish = interactive_FISH;
-			replicateKillFishAndAttachProjectiles.PlayerId = playerId;
-			replicateKillFishAndAttachProjectiles.Projectiles = projectiles;
-			replicateKillFishAndAttachProjectiles.ProjectilePositions = projectiles.GetPositions(local: true);
-			replicateKillFishAndAttachProjectiles.ProjectileRotations = projectiles.GetRotations(local: true);
-			replicateKillFishAndAttachProjectiles.Post();
-		}
-	}
+	bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation);
 }
-
 

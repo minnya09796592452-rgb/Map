@@ -1,50 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 326
-PATH: Assembly-CSharp__Beam__TransformAttracterRepeller.cs
-SIZE: 555 bytes
-SHA256: b91a5b8729a09b2c77047dfeb4dcea812eebfea64ae3fa1ee6191448029322a0
-====================================================================================================
-
-using System;
-using UnityEngine;
-
-namespace Beam;
-
-[Serializable]
-public struct TransformAttracterRepeller : IAttracterRepeller
-{
-	[SerializeField]
-	private TransformPosition _transformPosition;
-
-	[SerializeField]
-	private float _radius;
-
-	private int _id;
-
-	public Vector3 Position => _transformPosition.Position;
-
-	public float Radius => _radius;
-
-	public int Id => _id;
-
-	public TransformAttracterRepeller(TransformPosition transformPosition, float radius, int id = -1)
-	{
-		_transformPosition = transformPosition;
-		_radius = radius;
-		_id = id;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 327
 PATH: Assembly-CSharp__Beam__TransformPosition.cs
 SIZE: 297 bytes
 SHA256: c17aaef9e13c8d798752184723ccaa5db5f582509bff6c2a1c24f26db9bdeacd
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -64,15 +23,12 @@ public struct TransformPosition : IHavePosition
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 328
+SOURCE FILE 327
 PATH: Assembly-CSharp__Beam__TransformProxy.cs
 SIZE: 546 bytes
 SHA256: 8ef8521cc37c88471c176214cfa470179af968543b112e0ed26069f88a97b42e
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam;
@@ -102,15 +58,12 @@ public class TransformProxy
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 329
+SOURCE FILE 328
 PATH: Assembly-CSharp__Beam__UAudioSource.cs
 SIZE: 2301 bytes
 SHA256: f7cb40fd39098c174366d67c17931d0d2df78155d6458930a4988d54bb5d7630
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -308,15 +261,12 @@ public class UAudioSource : IAudioSource
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 330
+SOURCE FILE 329
 PATH: Assembly-CSharp__Beam__VehicleMovementBase.cs
 SIZE: 7020 bytes
 SHA256: 57b963b5aabd7fd301ee7f1d75f94be916e7c5f4cadfa06e43533bfc4c871eab
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Events;
@@ -627,15 +577,12 @@ public abstract class VehicleMovementBase : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 331
+SOURCE FILE 330
 PATH: Assembly-CSharp__Beam__VerletLine.cs
 SIZE: 3060 bytes
 SHA256: 4c14c4eee5fe821a23bf60335b1df1e4c070020c65324b6a4fe4c0d762270720
 ====================================================================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -760,15 +707,12 @@ public class VerletLine : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 332
+SOURCE FILE 331
 PATH: Assembly-CSharp__Beam__ZoneUtilities.cs
 SIZE: 1754 bytes
 SHA256: 9683be38f6e129ff63d46c49baf3a46659d5d295ecd0140de15402dfe3ff0ee9
 ====================================================================================================
-
 using System.Collections.Generic;
 using System.Linq;
 using Beam.Utilities;
@@ -821,7 +765,85 @@ public static class ZoneUtilities
 	}
 }
 
+====================================================================================================
+SOURCE FILE 332
+PATH: Assembly-CSharp__BEAMSeaFortGenerator.cs
+SIZE: 2471 bytes
+SHA256: 394bdd2c2a5577bb921b6cab6b3f714969cdbeb1a130ad0bd02bb8b87333b307
+====================================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Beam;
+using UnityEngine;
 
+public class BEAMSeaFortGenerator : MonoBehaviour, IGenerationObject
+{
+	[SerializeField]
+	private Transform startingPoint;
+
+	public Module[] Modules;
+
+	public Module[] StartModule;
+
+	private static System.Random _randomSeed;
+
+	[SerializeField]
+	private int minIteration = 1;
+
+	[SerializeField]
+	private int maxIteration = 4;
+
+	private void Start()
+	{
+		_randomSeed = Singleton<StrandedWorld>.Instance.GenerateLocalSeed(transform.position);
+		int num = _randomSeed.Next(minIteration, maxIteration);
+		Module module = UnityEngine.Object.Instantiate(StartModule[_randomSeed.Next(StartModule.Length)], startingPoint.position, transform.rotation);
+		module.transform.parent = transform.parent;
+		module.SetUpSupport(seaLadderAccess: true);
+		List<ModuleConnector> list = new List<ModuleConnector>(module.GetExits());
+		for (int i = 0; i < num; i++)
+		{
+			List<ModuleConnector> list2 = new List<ModuleConnector>();
+			foreach (ModuleConnector item in list)
+			{
+				string random = GetRandom(item.Tags);
+				Module module2 = UnityEngine.Object.Instantiate(GetRandomWithTag(Modules, random));
+				module2.transform.parent = transform.parent;
+				bool upSupport = _randomSeed.NextDouble() < 0.20000000298023224;
+				module2.SetUpSupport(upSupport);
+				ModuleConnector[] exits = module2.GetExits();
+				ModuleConnector exitToMatch = exits.FirstOrDefault((ModuleConnector x) => x.IsDefault) ?? GetRandom(exits);
+				MatchExits(item, exitToMatch);
+				list2.AddRange(exits.Where((ModuleConnector e) => e != exitToMatch));
+			}
+			list = list2;
+		}
+	}
+
+	private void MatchExits(ModuleConnector oldExit, ModuleConnector newExit)
+	{
+		Transform parent = newExit.transform.parent.parent;
+		parent.RotateAround(angle: Azimuth(-oldExit.transform.forward) - Azimuth(newExit.transform.forward), point: newExit.transform.position, axis: Vector3.up);
+		Vector3 vector = oldExit.transform.position - newExit.transform.position;
+		parent.transform.position += vector;
+	}
+
+	private static TItem GetRandom<TItem>(TItem[] array)
+	{
+		return array[_randomSeed.Next(0, array.Length)];
+	}
+
+	private static Module GetRandomWithTag(IEnumerable<Module> modules, string tagToMatch)
+	{
+		return GetRandom(modules.Where((Module m) => m.Tags.Contains(tagToMatch)).ToArray());
+	}
+
+	private static float Azimuth(Vector3 vector)
+	{
+		return Vector3.Angle(Vector3.forward, vector) * Mathf.Sign(vector.x);
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 333
@@ -829,7 +851,6 @@ PATH: Assembly-CSharp__Boss_Squid.cs
 SIZE: 5707 bytes
 SHA256: b9b273a884ce4d78977df204a06330495f0bbb465be0117ed6c70c4da630a8d8
 ====================================================================================================
-
 using System.Collections;
 using System.Collections.Generic;
 using Beam;
@@ -1057,15 +1078,12 @@ public class Boss_Squid : Piscus_Creature
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 334
 PATH: Assembly-CSharp__Boss_Squid_Environment.cs
 SIZE: 1176 bytes
 SHA256: 8cc990ca2109d1013778a34d1be380896d49b2163a436d040517dea19a2e2a10
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -1127,15 +1145,12 @@ public class Boss_Squid_Environment : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 335
 PATH: Assembly-CSharp__Boss_Squid_Tentacle.cs
 SIZE: 5596 bytes
 SHA256: 2fa01864f0214bcb6dc74c6897547c3e7dc1b7d796aee723971ca3f616efa18a
 ====================================================================================================
-
 using Beam;
 using Beam.Utilities;
 using Funlabs;
@@ -1382,15 +1397,12 @@ public class Boss_Squid_Tentacle : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 336
 PATH: Assembly-CSharp__BoundsTest.cs
 SIZE: 1484 bytes
 SHA256: dc413e112c290353d99826e8c59399b2d01d21ecf11d40cd4ebb8ae9fddb8993
 ====================================================================================================
-
 using System.Linq;
 using Beam;
 using UnityEngine;
@@ -1448,15 +1460,12 @@ public class BoundsTest : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 337
 PATH: Assembly-CSharp__BuoyMultiplayerSync.cs
 SIZE: 776 bytes
 SHA256: 38d9d068eb6ac795629b19a8abaa338be117019af9bc66745696cef36e6f81c4
 ====================================================================================================
-
 using Beam;
 using Beam.Rendering;
 using Funlabs;
@@ -1494,337 +1503,12 @@ public class BuoyMultiplayerSync : MultiplayerBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 338
-PATH: Assembly-CSharp__CPG_CameraPerspective__CPG_CameraPerspectiveGizmo.cs
-SIZE: 6621 bytes
-SHA256: cc11501169b11aadeb70485417f7ed22f1baba06e3b0b0b87c9fe18123a4721f
-====================================================================================================
-
-using System;
-using UnityEngine;
-
-namespace CPG_CameraPerspective;
-
-public class CPG_CameraPerspectiveGizmo : MonoBehaviour
-{
-	public enum EButtonTypes
-	{
-		TOGGLE_ORTHO,
-		X_POS,
-		X_NEG,
-		Y_POS,
-		Y_NEG,
-		Z_POS,
-		Z_NEG
-	}
-
-	[SerializeField]
-	private Vector2 m_relativeScreenPos = Vector2.one * 0.85f;
-
-	[SerializeField]
-	private float m_relativeScreenSize = 0.1f;
-
-	[SerializeField]
-	private int m_layerToUse = 31;
-
-	[SerializeField]
-	private Vector3 m_pivot = Vector3.zero;
-
-	[SerializeField]
-	private float m_minDistToPivot = 15f;
-
-	[SerializeField]
-	private float m_orthoOffset;
-
-	private Camera m_targetCamera;
-
-	private Camera m_ownCamera;
-
-	public EventHandler m_onBeforeSwitchToOrthographic;
-
-	public EventHandler m_onAfterSwitchToOrthographic;
-
-	public EventHandler m_onBeforeSwitchToPerspective;
-
-	public EventHandler m_onAfterSwitchToPerspective;
-
-	public Vector2 RelativeScreenPos
-	{
-		get
-		{
-			return m_relativeScreenPos;
-		}
-		set
-		{
-			m_relativeScreenPos = value;
-		}
-	}
-
-	public float RelativeScreenSize
-	{
-		get
-		{
-			return m_relativeScreenSize;
-		}
-		set
-		{
-			m_relativeScreenSize = value;
-		}
-	}
-
-	public int LayerToUse
-	{
-		get
-		{
-			return m_layerToUse;
-		}
-		set
-		{
-			m_layerToUse = value;
-		}
-	}
-
-	public Vector3 Pivot
-	{
-		get
-		{
-			return m_pivot;
-		}
-		set
-		{
-			m_pivot = value;
-		}
-	}
-
-	public float MinDistToPivot
-	{
-		get
-		{
-			return m_minDistToPivot;
-		}
-		set
-		{
-			m_minDistToPivot = value;
-		}
-	}
-
-	public float OrthoOffset
-	{
-		get
-		{
-			return m_orthoOffset;
-		}
-		set
-		{
-			m_orthoOffset = value;
-		}
-	}
-
-	public Camera TargetCamera
-	{
-		get
-		{
-			if (m_targetCamera == null)
-			{
-				m_targetCamera = Camera.main;
-			}
-			return m_targetCamera;
-		}
-		set
-		{
-			m_targetCamera = value;
-		}
-	}
-
-	public Camera OwnCamera
-	{
-		get
-		{
-			if (m_ownCamera == null)
-			{
-				m_ownCamera = GetComponentInChildren<Camera>();
-			}
-			return m_ownCamera;
-		}
-	}
-
-	public static CPG_CameraPerspectiveGizmo Create(Camera p_targetCamera, int p_layerToUse)
-	{
-		if (p_targetCamera != null)
-		{
-			UnityEngine.Object obj = Resources.Load("CPG_CameraPerspectiveGizmo");
-			if (obj != null)
-			{
-				CPG_CameraPerspectiveGizmo component = ((GameObject)UnityEngine.Object.Instantiate(obj)).GetComponent<CPG_CameraPerspectiveGizmo>();
-				component.TargetCamera = p_targetCamera;
-				component.LayerToUse = p_layerToUse;
-				return component;
-			}
-			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: prefab 'CPG_CameraPerspectiveGizmo' not found!");
-		}
-		else
-		{
-			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: p_targetCamera is null!");
-		}
-		return null;
-	}
-
-	public void ReportClick(EButtonTypes p_type)
-	{
-		switch (p_type)
-		{
-		case EButtonTypes.TOGGLE_ORTHO:
-			ToggleOrtho();
-			break;
-		case EButtonTypes.X_POS:
-			ToogleAxis(Vector3.right);
-			break;
-		case EButtonTypes.X_NEG:
-			ToogleAxis(Vector3.left);
-			break;
-		case EButtonTypes.Y_POS:
-			ToogleAxis(Vector3.up);
-			break;
-		case EButtonTypes.Y_NEG:
-			ToogleAxis(Vector3.down);
-			break;
-		case EButtonTypes.Z_POS:
-			ToogleAxis(Vector3.forward);
-			break;
-		case EButtonTypes.Z_NEG:
-			ToogleAxis(Vector3.back);
-			break;
-		}
-	}
-
-	private void ToggleOrtho()
-	{
-		Camera targetCamera = TargetCamera;
-		if (targetCamera != null)
-		{
-			if (targetCamera.orthographic && m_onBeforeSwitchToPerspective != null)
-			{
-				m_onBeforeSwitchToPerspective(this, EventArgs.Empty);
-			}
-			if (!targetCamera.orthographic && m_onBeforeSwitchToOrthographic != null)
-			{
-				m_onBeforeSwitchToOrthographic(this, EventArgs.Empty);
-			}
-			if (targetCamera.orthographic)
-			{
-				targetCamera.transform.position += targetCamera.transform.forward * m_orthoOffset;
-			}
-			else
-			{
-				targetCamera.transform.position -= targetCamera.transform.forward * m_orthoOffset;
-			}
-			targetCamera.orthographic = !targetCamera.orthographic;
-			if (targetCamera.orthographic && m_onAfterSwitchToOrthographic != null)
-			{
-				m_onAfterSwitchToOrthographic(this, EventArgs.Empty);
-			}
-			if (!targetCamera.orthographic && m_onAfterSwitchToPerspective != null)
-			{
-				m_onAfterSwitchToPerspective(this, EventArgs.Empty);
-			}
-		}
-	}
-
-	private void ToogleAxis(Vector3 p_axis)
-	{
-		Camera targetCamera = TargetCamera;
-		if (targetCamera != null)
-		{
-			float num = (targetCamera.transform.position - Pivot).magnitude;
-			if (num == 0f)
-			{
-				num = 1f;
-			}
-			float num2 = m_minDistToPivot;
-			if (targetCamera.orthographic)
-			{
-				num2 += m_orthoOffset;
-			}
-			targetCamera.transform.position = Pivot + Mathf.Max(num2, num) * p_axis;
-			targetCamera.transform.LookAt(m_pivot);
-		}
-	}
-
-	private void Start()
-	{
-		MoveToLayer(transform, m_layerToUse);
-		m_ownCamera = GetComponentInChildren<Camera>();
-		if (m_ownCamera != null)
-		{
-			m_ownCamera.aspect = 1f;
-			Camera targetCamera = TargetCamera;
-			if (targetCamera != null && targetCamera.pixelRect.xMax - targetCamera.pixelRect.xMin > 1f && targetCamera.pixelRect.yMax - targetCamera.pixelRect.yMin > 1f)
-			{
-				Rect rect = targetCamera.rect;
-				float num = m_relativeScreenSize / targetCamera.aspect * rect.width;
-				float num2 = m_relativeScreenSize * rect.height;
-				Vector2 vector = new Vector2(rect.x, rect.y) + m_relativeScreenPos - new Vector2(1f - rect.xMax, 1f - rect.yMax) - 0.5f * new Vector2(num, num2);
-				m_ownCamera.rect = new Rect(vector.x, vector.y, num, num2);
-			}
-			else
-			{
-				Debug.LogError("CPG_CameraPerspectiveGizmo: Start: could not find any camera with a non empty view rect! Will destroy self now!");
-				UnityEngine.Object.Destroy(gameObject);
-			}
-			m_ownCamera.cullingMask = 1 << m_layerToUse;
-		}
-		else
-		{
-			Debug.LogError("CPG_CameraPerspectiveGizmo: Start: CPG_CameraPerspectiveGizmo prefab seems to be broken it needs a camera in its children!");
-		}
-	}
-
-	private void Update()
-	{
-		Camera targetCamera = TargetCamera;
-		if (targetCamera != null && m_ownCamera != null)
-		{
-			m_ownCamera.orthographic = targetCamera.orthographic;
-			m_ownCamera.transform.localPosition = -5.2f * targetCamera.transform.forward;
-			m_ownCamera.transform.rotation = targetCamera.transform.rotation;
-		}
-		else
-		{
-			Debug.LogWarning("CPG_CameraPerspectiveGizmo: Update: lost reference to camera ! Will destroy self now!");
-			UnityEngine.Object.Destroy(gameObject);
-		}
-	}
-
-	private void OnDestroy()
-	{
-		m_onBeforeSwitchToOrthographic = null;
-		m_onBeforeSwitchToPerspective = null;
-		m_onAfterSwitchToOrthographic = null;
-		m_onAfterSwitchToPerspective = null;
-	}
-
-	private void MoveToLayer(Transform root, int layer)
-	{
-		root.gameObject.layer = layer;
-		foreach (Transform item in root)
-		{
-			MoveToLayer(item, layer);
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 339
 PATH: Assembly-CSharp__Ceto.Common.Unity.Utility__ExtendedFind.cs
 SIZE: 4016 bytes
 SHA256: 609e5a340e8db9a4bd0c955962f8b838ec62972de5be80ada5d238d042b57df0
 ====================================================================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -2007,15 +1691,12 @@ public static class ExtendedFind
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 340
+SOURCE FILE 339
 PATH: Assembly-CSharp__Ceto__AddAutoShoreMask.cs
 SIZE: 5266 bytes
 SHA256: d4415c2e97203af725bfe002a30da783b6396f3bddf0834584f95551aa2110de
 ====================================================================================================
-
 using Ceto.Common.Containers.Interpolation;
 using UnityEngine;
 
@@ -2242,15 +1923,12 @@ public class AddAutoShoreMask : AddWaveOverlayBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 341
+SOURCE FILE 340
 PATH: Assembly-CSharp__Ceto__ShoreMaskGenerator.cs
 SIZE: 4038 bytes
 SHA256: 7e25123e056219f718fa13a40d07e9e0a0e8f86d090c2ed6fb37873846f62b99
 ====================================================================================================
-
 using Ceto.Common.Containers.Interpolation;
 using UnityEngine;
 
@@ -2390,15 +2068,12 @@ public static class ShoreMaskGenerator
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 342
+SOURCE FILE 341
 PATH: Assembly-CSharp__ConstructionObject_SPEAR.cs
 SIZE: 8799 bytes
 SHA256: 9cf57ea0229691626a4d927a324b1a7724d1241e37424dc2380d4dcbcbbc059a
 ====================================================================================================
-
 using Beam;
 using Beam.Crafting;
 using Beam.Serialization;
@@ -2726,15 +2401,12 @@ public class ConstructionObject_SPEAR : ProjectileObject, IChargeable, IUseable,
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 343
+SOURCE FILE 342
 PATH: Assembly-CSharp__ContainerObjectSpawner.cs
 SIZE: 421 bytes
 SHA256: 3d72cd624adea51dc587ba97c134e71f06065fc2b70023fae0a0f5a984bb7f43
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2765,7 +2437,324 @@ public class ContainerObjectSpawner : MonoBehaviour
 	public Slot[] objectSlots => _objectSlots;
 }
 
+====================================================================================================
+SOURCE FILE 343
+PATH: Assembly-CSharp__CPG_CameraPerspective__CPG_CameraPerspectiveGizmo.cs
+SIZE: 6621 bytes
+SHA256: cc11501169b11aadeb70485417f7ed22f1baba06e3b0b0b87c9fe18123a4721f
+====================================================================================================
+using System;
+using UnityEngine;
 
+namespace CPG_CameraPerspective;
+
+public class CPG_CameraPerspectiveGizmo : MonoBehaviour
+{
+	public enum EButtonTypes
+	{
+		TOGGLE_ORTHO,
+		X_POS,
+		X_NEG,
+		Y_POS,
+		Y_NEG,
+		Z_POS,
+		Z_NEG
+	}
+
+	[SerializeField]
+	private Vector2 m_relativeScreenPos = Vector2.one * 0.85f;
+
+	[SerializeField]
+	private float m_relativeScreenSize = 0.1f;
+
+	[SerializeField]
+	private int m_layerToUse = 31;
+
+	[SerializeField]
+	private Vector3 m_pivot = Vector3.zero;
+
+	[SerializeField]
+	private float m_minDistToPivot = 15f;
+
+	[SerializeField]
+	private float m_orthoOffset;
+
+	private Camera m_targetCamera;
+
+	private Camera m_ownCamera;
+
+	public EventHandler m_onBeforeSwitchToOrthographic;
+
+	public EventHandler m_onAfterSwitchToOrthographic;
+
+	public EventHandler m_onBeforeSwitchToPerspective;
+
+	public EventHandler m_onAfterSwitchToPerspective;
+
+	public Vector2 RelativeScreenPos
+	{
+		get
+		{
+			return m_relativeScreenPos;
+		}
+		set
+		{
+			m_relativeScreenPos = value;
+		}
+	}
+
+	public float RelativeScreenSize
+	{
+		get
+		{
+			return m_relativeScreenSize;
+		}
+		set
+		{
+			m_relativeScreenSize = value;
+		}
+	}
+
+	public int LayerToUse
+	{
+		get
+		{
+			return m_layerToUse;
+		}
+		set
+		{
+			m_layerToUse = value;
+		}
+	}
+
+	public Vector3 Pivot
+	{
+		get
+		{
+			return m_pivot;
+		}
+		set
+		{
+			m_pivot = value;
+		}
+	}
+
+	public float MinDistToPivot
+	{
+		get
+		{
+			return m_minDistToPivot;
+		}
+		set
+		{
+			m_minDistToPivot = value;
+		}
+	}
+
+	public float OrthoOffset
+	{
+		get
+		{
+			return m_orthoOffset;
+		}
+		set
+		{
+			m_orthoOffset = value;
+		}
+	}
+
+	public Camera TargetCamera
+	{
+		get
+		{
+			if (m_targetCamera == null)
+			{
+				m_targetCamera = Camera.main;
+			}
+			return m_targetCamera;
+		}
+		set
+		{
+			m_targetCamera = value;
+		}
+	}
+
+	public Camera OwnCamera
+	{
+		get
+		{
+			if (m_ownCamera == null)
+			{
+				m_ownCamera = GetComponentInChildren<Camera>();
+			}
+			return m_ownCamera;
+		}
+	}
+
+	public static CPG_CameraPerspectiveGizmo Create(Camera p_targetCamera, int p_layerToUse)
+	{
+		if (p_targetCamera != null)
+		{
+			UnityEngine.Object obj = Resources.Load("CPG_CameraPerspectiveGizmo");
+			if (obj != null)
+			{
+				CPG_CameraPerspectiveGizmo component = ((GameObject)UnityEngine.Object.Instantiate(obj)).GetComponent<CPG_CameraPerspectiveGizmo>();
+				component.TargetCamera = p_targetCamera;
+				component.LayerToUse = p_layerToUse;
+				return component;
+			}
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: prefab 'CPG_CameraPerspectiveGizmo' not found!");
+		}
+		else
+		{
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Create: p_targetCamera is null!");
+		}
+		return null;
+	}
+
+	public void ReportClick(EButtonTypes p_type)
+	{
+		switch (p_type)
+		{
+		case EButtonTypes.TOGGLE_ORTHO:
+			ToggleOrtho();
+			break;
+		case EButtonTypes.X_POS:
+			ToogleAxis(Vector3.right);
+			break;
+		case EButtonTypes.X_NEG:
+			ToogleAxis(Vector3.left);
+			break;
+		case EButtonTypes.Y_POS:
+			ToogleAxis(Vector3.up);
+			break;
+		case EButtonTypes.Y_NEG:
+			ToogleAxis(Vector3.down);
+			break;
+		case EButtonTypes.Z_POS:
+			ToogleAxis(Vector3.forward);
+			break;
+		case EButtonTypes.Z_NEG:
+			ToogleAxis(Vector3.back);
+			break;
+		}
+	}
+
+	private void ToggleOrtho()
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null)
+		{
+			if (targetCamera.orthographic && m_onBeforeSwitchToPerspective != null)
+			{
+				m_onBeforeSwitchToPerspective(this, EventArgs.Empty);
+			}
+			if (!targetCamera.orthographic && m_onBeforeSwitchToOrthographic != null)
+			{
+				m_onBeforeSwitchToOrthographic(this, EventArgs.Empty);
+			}
+			if (targetCamera.orthographic)
+			{
+				targetCamera.transform.position += targetCamera.transform.forward * m_orthoOffset;
+			}
+			else
+			{
+				targetCamera.transform.position -= targetCamera.transform.forward * m_orthoOffset;
+			}
+			targetCamera.orthographic = !targetCamera.orthographic;
+			if (targetCamera.orthographic && m_onAfterSwitchToOrthographic != null)
+			{
+				m_onAfterSwitchToOrthographic(this, EventArgs.Empty);
+			}
+			if (!targetCamera.orthographic && m_onAfterSwitchToPerspective != null)
+			{
+				m_onAfterSwitchToPerspective(this, EventArgs.Empty);
+			}
+		}
+	}
+
+	private void ToogleAxis(Vector3 p_axis)
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null)
+		{
+			float num = (targetCamera.transform.position - Pivot).magnitude;
+			if (num == 0f)
+			{
+				num = 1f;
+			}
+			float num2 = m_minDistToPivot;
+			if (targetCamera.orthographic)
+			{
+				num2 += m_orthoOffset;
+			}
+			targetCamera.transform.position = Pivot + Mathf.Max(num2, num) * p_axis;
+			targetCamera.transform.LookAt(m_pivot);
+		}
+	}
+
+	private void Start()
+	{
+		MoveToLayer(transform, m_layerToUse);
+		m_ownCamera = GetComponentInChildren<Camera>();
+		if (m_ownCamera != null)
+		{
+			m_ownCamera.aspect = 1f;
+			Camera targetCamera = TargetCamera;
+			if (targetCamera != null && targetCamera.pixelRect.xMax - targetCamera.pixelRect.xMin > 1f && targetCamera.pixelRect.yMax - targetCamera.pixelRect.yMin > 1f)
+			{
+				Rect rect = targetCamera.rect;
+				float num = m_relativeScreenSize / targetCamera.aspect * rect.width;
+				float num2 = m_relativeScreenSize * rect.height;
+				Vector2 vector = new Vector2(rect.x, rect.y) + m_relativeScreenPos - new Vector2(1f - rect.xMax, 1f - rect.yMax) - 0.5f * new Vector2(num, num2);
+				m_ownCamera.rect = new Rect(vector.x, vector.y, num, num2);
+			}
+			else
+			{
+				Debug.LogError("CPG_CameraPerspectiveGizmo: Start: could not find any camera with a non empty view rect! Will destroy self now!");
+				UnityEngine.Object.Destroy(gameObject);
+			}
+			m_ownCamera.cullingMask = 1 << m_layerToUse;
+		}
+		else
+		{
+			Debug.LogError("CPG_CameraPerspectiveGizmo: Start: CPG_CameraPerspectiveGizmo prefab seems to be broken it needs a camera in its children!");
+		}
+	}
+
+	private void Update()
+	{
+		Camera targetCamera = TargetCamera;
+		if (targetCamera != null && m_ownCamera != null)
+		{
+			m_ownCamera.orthographic = targetCamera.orthographic;
+			m_ownCamera.transform.localPosition = -5.2f * targetCamera.transform.forward;
+			m_ownCamera.transform.rotation = targetCamera.transform.rotation;
+		}
+		else
+		{
+			Debug.LogWarning("CPG_CameraPerspectiveGizmo: Update: lost reference to camera ! Will destroy self now!");
+			UnityEngine.Object.Destroy(gameObject);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		m_onBeforeSwitchToOrthographic = null;
+		m_onBeforeSwitchToPerspective = null;
+		m_onAfterSwitchToOrthographic = null;
+		m_onAfterSwitchToPerspective = null;
+	}
+
+	private void MoveToLayer(Transform root, int layer)
+	{
+		root.gameObject.layer = layer;
+		foreach (Transform item in root)
+		{
+			MoveToLayer(item, layer);
+		}
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 344
@@ -2773,7 +2762,6 @@ PATH: Assembly-CSharp__CreateSavePointHelper.cs
 SIZE: 774 bytes
 SHA256: 727d5b005eb8286feed9840105fce4b7d279a69a6236627cc40a35edf641e71f
 ====================================================================================================
-
 using Beam.Crafting;
 using UnityEngine;
 
@@ -2800,15 +2788,12 @@ public class CreateSavePointHelper : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 345
 PATH: Assembly-CSharp__DeluxeTonemapper.cs
 SIZE: 6857 bytes
 SHA256: 93397f5d4bb470b82801f32dc9ced85eb3a1d7fdf54869f3b7f476eb6e7c9532
 ====================================================================================================
-
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -3113,15 +3098,12 @@ public class DeluxeTonemapper : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 346
 PATH: Assembly-CSharp__DemoReactivator.cs
 SIZE: 452 bytes
 SHA256: 1eb45c724c26aa591db6188b07217483a13e09325c759cc608fe0ca1042011ca
 ====================================================================================================
-
 using UnityEngine;
 
 public class DemoReactivator : MonoBehaviour
@@ -3144,15 +3126,12 @@ public class DemoReactivator : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 347
 PATH: Assembly-CSharp__DifficultyHatPropellar.cs
 SIZE: 247 bytes
 SHA256: 7b5a938e4837b58fc85b3166ca8d9fd35bf2ac4b6688f4148be789492dacfae5
 ====================================================================================================
-
 using UnityEngine;
 
 public class DifficultyHatPropellar : MonoBehaviour
@@ -3167,15 +3146,12 @@ public class DifficultyHatPropellar : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 348
 PATH: Assembly-CSharp__Distant_Plane_Manager.cs
 SIZE: 1853 bytes
 SHA256: e5b5603a98aa7de5afeafacaab7c3c074d4248d37f64658a68d974e4b75d4c34
 ====================================================================================================
-
 using System;
 using Beam;
 using UnityEngine;
@@ -3253,15 +3229,12 @@ public class Distant_Plane_Manager : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 349
 PATH: Assembly-CSharp__DistortionMobile.cs
 SIZE: 3385 bytes
 SHA256: d5d37246126dce4b64aae6469bf1c4a228869ee511d671a0cc57f1239baadb18
 ====================================================================================================
-
 using System.Collections;
 using UnityEngine;
 
@@ -3423,15 +3396,12 @@ public class DistortionMobile : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 350
 PATH: Assembly-CSharp__DynamicBone.cs
 SIZE: 15704 bytes
 SHA256: d5210c15c8f8ac7759356036284d20fb98b85818997a8ad94f8817763d3b28f6
 ====================================================================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -4047,5 +4017,4 @@ public class DynamicBone : MonoBehaviour
 		}
 	}
 }
-
 

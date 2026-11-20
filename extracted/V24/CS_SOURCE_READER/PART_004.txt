@@ -1,11 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 076
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKMappingBone.cs
 SIZE: 1086 bytes
 SHA256: 110f05ec580ed040a5dbd06d68a7e19e39757f6fb5b94b9db1f8b03ab6374c2d
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -74,15 +72,12 @@ public class IKMappingBone : IKMapping
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 077
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKMappingLimb.cs
 SIZE: 4221 bytes
 SHA256: 84700b5638dfeaa174469a084d5c19bca7f1a2744be730a339ea0ea2f8f1134d
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -272,15 +267,12 @@ public class IKMappingLimb : IKMapping
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 078
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKMappingSpine.cs
 SIZE: 7817 bytes
 SHA256: 257a4e6198b9b308f54b6787f5dc2e0fac2475bbb680e99d473cf60eb07cc95c
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -575,15 +567,12 @@ public class IKMappingSpine : IKMapping
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 079
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolver.cs
 SIZE: 7587 bytes
 SHA256: 365a88fd12271f914bc2d24ef7c37c6c3d939f94fe26d423e76fe4f83bbab7f9
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -969,15 +958,12 @@ public abstract class IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 080
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverAim.cs
 SIZE: 5603 bytes
 SHA256: e9466d7601da8358e657e3bf6cfafde09e55365eb837a535c32bbdd890cb13d7
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1195,15 +1181,12 @@ public class IKSolverAim : IKSolverHeuristic
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 081
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverArm.cs
 SIZE: 3946 bytes
 SHA256: 9b9eb6e45a0817f4c233a5ea17ea5df28ec82c9dc9e50df02ff8b4c32949a61d
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1367,15 +1350,12 @@ public class IKSolverArm : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 082
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverFABRIKRoot.cs
 SIZE: 5232 bytes
 SHA256: 97e991dec11d82fe08923f5f1de61baaf683fdea92ec458cbbe885953d8afabd
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -1620,15 +1600,12 @@ public class IKSolverFABRIKRoot : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 083
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverFullBody.cs
 SIZE: 7718 bytes
 SHA256: 5f6de678793177b3bf451363129b1e51827f1d3a90d69c44898c944411443c93
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2029,15 +2006,12 @@ public class IKSolverFullBody : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 084
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverFullBodyBiped.cs
 SIZE: 15144 bytes
 SHA256: 5af2e316bf9edfc514d58dbe9c62d7ee4fe3e08680b162b42bc6e262a500b9d6
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2523,15 +2497,12 @@ public class IKSolverFullBodyBiped : IKSolverFullBody
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 085
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverHeuristic.cs
 SIZE: 5360 bytes
 SHA256: 076386d07600b3646c252c9ca69910b577191706299320936ac841394a9a10a7
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2765,15 +2736,12 @@ public class IKSolverHeuristic : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 086
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverLeg.cs
 SIZE: 3851 bytes
 SHA256: f77b2d46714a76a6e6e6f4901eca627bc8200b96027bb7db9e369e81374b0206
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -2938,15 +2906,12 @@ public class IKSolverLeg : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 087
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverLimb.cs
 SIZE: 6448 bytes
 SHA256: 31565f8bc3c32ab42f3c3de56c194988b6ac1b1a4ce7547f31b52d949b87a834
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3205,15 +3170,12 @@ public class IKSolverLimb : IKSolverTrigonometric
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 088
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverLookAt.cs
 SIZE: 11816 bytes
 SHA256: 39246b88bf5d51d4182cd6b0255d013fb5ed8698b079c0612dd3422ee7fd0a8d
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -3719,15 +3681,12 @@ public class IKSolverLookAt : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 089
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverTrigonometric.cs
 SIZE: 8815 bytes
 SHA256: f6b10c0bf776fe27398535ec5b9053db4d8ca6d969991a57ff42412510affdf2
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -4049,15 +4008,12 @@ public class IKSolverTrigonometric : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 090
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__IKSolverVR.cs
 SIZE: 115398 bytes
 SHA256: 4eafc7a91a2ceaa4cec3b644fbc4b3bffdc4898bb516ee2811d78069c320b323
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7411,15 +7367,12 @@ public class IKSolverVR : IKSolver
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 091
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Inertia.cs
 SIZE: 2529 bytes
 SHA256: e6178dd6d082ec1a0bf43b28dbf6c13c6040b728adae531a1a8974a1b3e6fe3b
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -7530,15 +7483,12 @@ public class Inertia : OffsetModifier
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 092
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionEffector.cs
 SIZE: 12839 bytes
 SHA256: dc3a036f969ddbfa7f10195da8092b58c9324c5e32f17f6f3958ef33f01c997b
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8018,15 +7968,12 @@ public class InteractionEffector
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 093
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionLookAt.cs
 SIZE: 2237 bytes
 SHA256: bf24e3a17d2039b844784efbcb6ebac5647ded73b153cfee52a72d107abe2530
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -8131,15 +8078,12 @@ public class InteractionLookAt
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 094
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionObject.cs
 SIZE: 13897 bytes
 SHA256: c1db2b96f886a35ad25ca5b7e0bffec5d35cf49b4fac7ea82a493cf2a0292ae5
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8648,15 +8592,12 @@ public class InteractionObject : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 095
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionSystem.cs
 SIZE: 23942 bytes
 SHA256: f0862d135f25a8542459d760f9bacb5570ad759ead06e403d2b72874bb786cf8
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9591,15 +9532,12 @@ public class InteractionSystem : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 096
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionTarget.cs
 SIZE: 5514 bytes
 SHA256: 0231ed3d1b41d1a814cdc720eafb9cb1bdfb40dc49d16d89f8583939a049c0e0
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -9780,15 +9718,12 @@ public class InteractionTarget : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 097
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__InteractionTrigger.cs
 SIZE: 8104 bytes
 SHA256: 064fdc735666eee4169a2a84e9d49d38dffef777ba593db5a2b3fae6648c4473
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -10073,15 +10008,12 @@ public class InteractionTrigger : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 098
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__LookAtController.cs
 SIZE: 4474 bytes
 SHA256: 4aeff65f6ed0a7048cb330743e277d73e5971b65821f57e934c51e59662496b2
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.FinalIK;
@@ -10236,15 +10168,12 @@ public class LookAtController : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 099
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__PenetrationAvoidance.cs
 SIZE: 2921 bytes
 SHA256: e570c04cd44643de9b96a4eed58dd4b34614780d60bf582a14ac035a45c51f3f
 ====================================================================================================
-
 using System;
 using UnityEngine;
 
@@ -10350,15 +10279,12 @@ public class PenetrationAvoidance : OffsetModifier
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 100
 PATH: Assembly-CSharp-firstpass__RootMotion.FinalIK__Poser.cs
 SIZE: 882 bytes
 SHA256: ba7c07a6524f714f8aa4121c931cf1a69d85545ffb012205ed668613bb5c3f5e
 ====================================================================================================
-
 using UnityEngine;
 
 namespace RootMotion.FinalIK;
@@ -10420,5 +10346,4 @@ public abstract class Poser : SolverManager
 		}
 	}
 }
-
 

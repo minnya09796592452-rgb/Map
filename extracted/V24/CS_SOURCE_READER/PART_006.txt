@@ -1,11 +1,9 @@
-
 ====================================================================================================
 SOURCE FILE 126
 PATH: Assembly-CSharp__AudioManager.cs
 SIZE: 11507 bytes
 SHA256: d1b229317ab1d6ee08dd0d06e5f47dc88ac052aab3aabe42c5c4ef4aace3d995
 ====================================================================================================
-
 using System.Collections.Generic;
 using System.Linq;
 using Beam;
@@ -391,98 +389,12 @@ public class AudioManager : MonoBehaviour, IAudioPlayer
 	}
 }
 
-
-
 ====================================================================================================
 SOURCE FILE 127
-PATH: Assembly-CSharp__BEAMSeaFortGenerator.cs
-SIZE: 2471 bytes
-SHA256: 394bdd2c2a5577bb921b6cab6b3f714969cdbeb1a130ad0bd02bb8b87333b307
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Beam;
-using UnityEngine;
-
-public class BEAMSeaFortGenerator : MonoBehaviour, IGenerationObject
-{
-	[SerializeField]
-	private Transform startingPoint;
-
-	public Module[] Modules;
-
-	public Module[] StartModule;
-
-	private static System.Random _randomSeed;
-
-	[SerializeField]
-	private int minIteration = 1;
-
-	[SerializeField]
-	private int maxIteration = 4;
-
-	private void Start()
-	{
-		_randomSeed = Singleton<StrandedWorld>.Instance.GenerateLocalSeed(transform.position);
-		int num = _randomSeed.Next(minIteration, maxIteration);
-		Module module = UnityEngine.Object.Instantiate(StartModule[_randomSeed.Next(StartModule.Length)], startingPoint.position, transform.rotation);
-		module.transform.parent = transform.parent;
-		module.SetUpSupport(seaLadderAccess: true);
-		List<ModuleConnector> list = new List<ModuleConnector>(module.GetExits());
-		for (int i = 0; i < num; i++)
-		{
-			List<ModuleConnector> list2 = new List<ModuleConnector>();
-			foreach (ModuleConnector item in list)
-			{
-				string random = GetRandom(item.Tags);
-				Module module2 = UnityEngine.Object.Instantiate(GetRandomWithTag(Modules, random));
-				module2.transform.parent = transform.parent;
-				bool upSupport = _randomSeed.NextDouble() < 0.20000000298023224;
-				module2.SetUpSupport(upSupport);
-				ModuleConnector[] exits = module2.GetExits();
-				ModuleConnector exitToMatch = exits.FirstOrDefault((ModuleConnector x) => x.IsDefault) ?? GetRandom(exits);
-				MatchExits(item, exitToMatch);
-				list2.AddRange(exits.Where((ModuleConnector e) => e != exitToMatch));
-			}
-			list = list2;
-		}
-	}
-
-	private void MatchExits(ModuleConnector oldExit, ModuleConnector newExit)
-	{
-		Transform parent = newExit.transform.parent.parent;
-		parent.RotateAround(angle: Azimuth(-oldExit.transform.forward) - Azimuth(newExit.transform.forward), point: newExit.transform.position, axis: Vector3.up);
-		Vector3 vector = oldExit.transform.position - newExit.transform.position;
-		parent.transform.position += vector;
-	}
-
-	private static TItem GetRandom<TItem>(TItem[] array)
-	{
-		return array[_randomSeed.Next(0, array.Length)];
-	}
-
-	private static Module GetRandomWithTag(IEnumerable<Module> modules, string tagToMatch)
-	{
-		return GetRandom(modules.Where((Module m) => m.Tags.Contains(tagToMatch)).ToArray());
-	}
-
-	private static float Azimuth(Vector3 vector)
-	{
-		return Vector3.Angle(Vector3.forward, vector) * Mathf.Sign(vector.x);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 128
 PATH: Assembly-CSharp__Beam.Crafting__Connector.cs
 SIZE: 5249 bytes
 SHA256: b4f1a47185a132e7c2b33e2c7b26922815e7d475a6a1580197532729440475f3
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Serialization.Json;
 using Beam.Utilities;
@@ -723,15 +635,12 @@ public class Connector : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 129
+SOURCE FILE 128
 PATH: Assembly-CSharp__Beam.Crafting__Constructing.cs
 SIZE: 18847 bytes
 SHA256: 76d2b89cabeebcb9a652de38de89158d13689acd32811b5297a1bf848b3d3ee6
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1482,15 +1391,12 @@ public class Constructing : BaseObject, IConstructable, ICraftable, IBase, IHasC
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 130
+SOURCE FILE 129
 PATH: Assembly-CSharp__Beam.Crafting__Constructing_ANCHOR.cs
 SIZE: 5809 bytes
 SHA256: 827b3066346fbc85fc52efae46fbd8f19c585d596852b3210a3ec28dafe48741
 ====================================================================================================
-
 using Beam.Events;
 using Beam.Serialization.Json;
 using Beam.UI;
@@ -1714,15 +1620,12 @@ public class Constructing_ANCHOR : Constructing, IInteractable, IBase, IHasCraft
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 131
+SOURCE FILE 130
 PATH: Assembly-CSharp__Beam.Crafting__Constructing_SPIT.cs
 SIZE: 6704 bytes
 SHA256: 11ffbd389008414147e7a2032dd292e60247a73253be16608db743286af03873
 ====================================================================================================
-
 using Beam.Serialization.Json;
 using Beam.UI;
 using Beam.Utilities;
@@ -2024,792 +1927,12 @@ public class Constructing_SPIT : Constructing, IInteractable, IBase, IHasCraftin
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 132
-PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject.cs
-SIZE: 3039 bytes
-SHA256: 6dc647258e04ae8ba203b00581612043b586f5d3d9f38e71da2e6410a0b18630
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.Serialization;
-
-namespace Beam.Crafting;
-
-public class ConstructionObject : InteractiveObject, ICraftable, IBase, IHasCraftingType, IPlaceable
-{
-	[Header("CRAFTING")]
-	[SerializeField]
-	private GhostCollider.ColliderType _colliderType;
-
-	[SerializeField]
-	private bool _craftImmediate;
-
-	[SerializeField]
-	private Mesh _ghostMesh;
-
-	[SerializeField]
-	private Renderer _ghostRenderer;
-
-	[SerializeField]
-	private GameObject _ghostColliders;
-
-	[SerializeField]
-	private float _placingDistance = 4f;
-
-	[SerializeField]
-	private bool _canPlace;
-
-	[PREFAB_PROCESSOR_GetComponents]
-	[SerializeField]
-	private PlacementModifier[] _placementModifiers;
-
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Connector _myConnector;
-
-	[FormerlySerializedAs("_onCrafted")]
-	[SerializeField]
-	[HideInInspector]
-	private InteracterUnityEvent _crafted;
-
-	public int CreatorId { get; set; }
-
-	public GhostCollider.ColliderType ColliderType => _colliderType;
-
-	public bool CraftImmediate => _craftImmediate;
-
-	public Mesh GhostMesh => _ghostMesh;
-
-	public virtual Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
-
-	public GameObject GhostColliders
-	{
-		get
-		{
-			if (!_ghostColliders)
-			{
-				_ghostColliders = gameObject;
-			}
-			return _ghostColliders;
-		}
-	}
-
-	public float PlacingDistance => _placingDistance;
-
-	public bool CanPlace
-	{
-		get
-		{
-			return _canPlace;
-		}
-		set
-		{
-			_canPlace = value;
-		}
-	}
-
-	public virtual void OnBeginCrafting()
-	{
-	}
-
-	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
-	{
-		Placement placement = new Placement();
-		placement.Position = ghost.position;
-		placement.Rotation = ghost.rotation;
-		for (int i = 0; i < _placementModifiers.Length; i++)
-		{
-			placement = _placementModifiers[i].Modify(placement, ray);
-		}
-		bool flag = true;
-		if (_myConnector != null)
-		{
-			for (int j = 0; j < _myConnector.Checks.Count; j++)
-			{
-				flag = _myConnector.Checks[j].Check(placement, null);
-				if (!flag)
-				{
-					break;
-				}
-			}
-		}
-		ghost.position = placement.Position;
-		ghost.rotation = placement.Rotation * Quaternion.Euler(new Vector3(0f, yRotation, 0f));
-		return flag;
-	}
-
-	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
-	{
-		return OwnerPlacing(ghost, ray, yRotation);
-	}
-
-	public virtual void Place()
-	{
-	}
-
-	public virtual bool CheckProximity(Transform ghost)
-	{
-		return false;
-	}
-
-	public virtual void OnCrafted(IPlayer player)
-	{
-		_crafted?.Invoke(player);
-	}
-
-	public override void EnablePhysics()
-	{
-		base.EnablePhysics();
-		if ((bool)rigidbody)
-		{
-			rigidbody.constraints = RigidbodyConstraints.None;
-		}
-	}
-
-	public override void DisablePhysics()
-	{
-		base.DisablePhysics();
-		if ((bool)rigidbody)
-		{
-			rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-		}
-	}
-
-	public void SetRigidBodyMass(float mass)
-	{
-		if ((bool)rigidbody)
-		{
-			rigidbody.mass = mass;
-		}
-	}
-
-	public float GetRigidBodyMass()
-	{
-		if (!rigidbody)
-		{
-			return 0f;
-		}
-		return rigidbody.mass;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 133
-PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_BED.cs
-SIZE: 12031 bytes
-SHA256: cff068ff95dc35f464ca185bcb5fab5a8fc02504d6e96b3cc3769ba9a20f7437
-====================================================================================================
-
-using System;
-using System.Collections.Generic;
-using Beam.Events;
-using Beam.Serialization.Json;
-using Beam.UI;
-using Beam.Utilities;
-using Funlabs;
-using MEC;
-using UnityEngine;
-
-namespace Beam.Crafting;
-
-public class ConstructionObject_BED : ConstructionObject
-{
-	private struct Result
-	{
-		public bool Succeeded;
-
-		public string Message;
-	}
-
-	private class ReplicateSaveGameOnMasterMsg : MultiplayerMessage
-	{
-		[Replicate]
-		public IPlayer InvokingPlayer;
-
-		public override void OnPeer()
-		{
-			SaveManager.SaveGame(InvokingPlayer);
-		}
-	}
-
-	private class ReplicateSleep_Sequence : MultiplayerMessage
-	{
-		[Replicate]
-		public ConstructionObject_BED Bed;
-
-		[Replicate]
-		public float RandomValue;
-
-		[Replicate]
-		public float MilitaryTime;
-
-		public override void OnPeer()
-		{
-			Timing.RunCoroutine(Bed.Sleep_Sequence(RandomValue, MilitaryTime), Segment.RealtimeUpdate);
-		}
-	}
-
-	private const float SLEEP_TIME = 9f;
-
-	private const float MINIMUM_HOURS_BETWEEN_SLEEP = 4f;
-
-	[PREFAB_PROCESSOR_GetComponent]
-	[SerializeField]
-	private Buoyancy _buoyancy;
-
-	private static DateTime _LastTimeSlept;
-
-	private ICheckBounds _boundsChecker;
-
-	private bool _isSleeping;
-
-	private DialogueBoxViewAdapter saveDialogueBox;
-
-	public override string GetInteractionDescription(int playerId, IBase obj)
-	{
-		if (_isSleeping)
-		{
-			return string.Empty;
-		}
-		return "ITEM_INTERACTION_DESCRIPTION_SLEEP_SAVE";
-	}
-
-	protected override void Awake()
-	{
-		base.Awake();
-		if (CanPickUp)
-		{
-			SetLOD(1);
-		}
-	}
-
-	protected override void Start()
-	{
-		base.Start();
-		ICheckBounds instance = Singleton<StrandedWorld>.Instance;
-		_boundsChecker = instance ?? NullObject<NullCheckBounds>.Instance;
-		_LastTimeSlept = GameTime.Now.RemoveHours(4f);
-		EventManager.AddListener<EndGameSequenceEvent>(AbortInteraction);
-	}
-
-	protected override void OnPlayerDisconnect(PlayerDisconnectedEvent disconnectedEvent)
-	{
-		if (saveDialogueBox != null)
-		{
-			saveDialogueBox.Destroy();
-			HideDialogue(PlayerRegistry.LocalPlayer);
-		}
-		base.OnPlayerDisconnect(disconnectedEvent);
-	}
-
-	private void AbortInteraction(EndGameSequenceEvent e)
-	{
-		CanInteract = false;
-		CanPickUp = false;
-	}
-
-	public override void Hold(bool holding)
-	{
-		base.Hold(holding);
-		SetLOD((!holding) ? 1 : 0);
-	}
-
-	public override bool Interact(IPlayer player)
-	{
-		if (_isSleeping || !player.IsOwner)
-		{
-			return false;
-		}
-		player.Movement.StopAutoWalk();
-		Result result = CheckCanUseBed(player);
-		if (!result.Succeeded)
-		{
-			string message = result.Message;
-			if (!string.IsNullOrWhiteSpace(message))
-			{
-				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
-			}
-			return false;
-		}
-		if (Time.timeScale != 0f)
-		{
-			ShowDialogue(player);
-		}
-		return true;
-	}
-
-	private Result CheckCanUseBed(IPlayer player)
-	{
-		Result result = new Result
-		{
-			Succeeded = false
-		};
-		if (LevelLoader.IsCreatingOrLoading)
-		{
-			result.Message = "BED_NTF_CANT_USE_LOADING";
-			return result;
-		}
-		if (AnyPlayerIsBusy())
-		{
-			result.Message = "BED_NTF_CANT_USE_BUSY";
-			return result;
-		}
-		result.Message = string.Empty;
-		result.Succeeded = true;
-		return result;
-	}
-
-	private Result CheckCanSave(IPlayer player)
-	{
-		Result result = CheckCanUseBed(player);
-		if (!result.Succeeded)
-		{
-			return result;
-		}
-		result.Succeeded = false;
-		if (AnyPlayerKnockedOut())
-		{
-			result.Message = "BED_NTF_CANT_SAVE_KNOCKED_OUT";
-			return result;
-		}
-		if (!AllPlayersOverLand())
-		{
-			result.Message = ((Game.Mode == GameMode.SinglePlayer) ? "BED_NTF_CANT_SAVE_DESC" : "BED_NTF_CANT_SAVE_COOP_DESC");
-			return result;
-		}
-		result.Message = string.Empty;
-		result.Succeeded = true;
-		return result;
-	}
-
-	private Result CheckCanSleep(IPlayer player)
-	{
-		Result result = CheckCanUseBed(player);
-		if (!result.Succeeded)
-		{
-			return result;
-		}
-		result.Succeeded = false;
-		if ((bool)_buoyancy && (_buoyancy.Floating || _buoyancy.IsInWater))
-		{
-			result.Message = "BED_NTF_CANT_SLEEP_UNDERWATER_DESC";
-			return result;
-		}
-		if (GameTime.GetHoursSince(_LastTimeSlept) < 4f)
-		{
-			result.Message = "BED_NTF_CANT_SLEEP_DESC";
-			return result;
-		}
-		if (Singleton<GameTime>.Instance.MilitaryTime > 4f && Singleton<GameTime>.Instance.MilitaryTime < 18f)
-		{
-			result.Message = "BED_NTF_CANT_SLEEP_NIGHT";
-			return result;
-		}
-		if (!AllPlayersInProximity(player))
-		{
-			result.Message = "BED_NTF_CANT_SLEEP_APART_DESC";
-			return result;
-		}
-		result.Message = string.Empty;
-		result.Succeeded = true;
-		return result;
-	}
-
-	private void DoSave(IPlayer player)
-	{
-		HideDialogue(player);
-		Result result = CheckCanSave(player);
-		if (!result.Succeeded)
-		{
-			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
-			string message = result.Message;
-			if (!string.IsNullOrWhiteSpace(message))
-			{
-				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
-			}
-		}
-		else
-		{
-			SaveOnMaster(player);
-		}
-	}
-
-	private void DoSleep(IPlayer player)
-	{
-		HideDialogue(player);
-		Result result = CheckCanSleep(player);
-		if (!result.Succeeded)
-		{
-			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
-			string message = result.Message;
-			if (!string.IsNullOrWhiteSpace(message))
-			{
-				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
-			}
-		}
-		else
-		{
-			ReplicatedSleep_Sequence(UnityEngine.Random.value);
-		}
-	}
-
-	private void DoCancel(IPlayer player)
-	{
-		HideDialogue(player);
-		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
-	}
-
-	private void ShowDialogue(IPlayer player)
-	{
-		Time.timeScale = 0f;
-		player.Input.GetOtherPlayers().DisableMaps();
-		player.Input.SetAndCacheMapsEnabled(state: false, 0);
-		player.Input.SetAndCacheMapsEnabled(state: true, 16);
-		player.Input.SetCursorEnabled(enabled: true);
-		player.IsBusy = true;
-		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
-		saveDialogueBox = DialogueBox.Show(player.Input, "BED_DB_SLEEP_TITLE", "BED_DB_SLEEP_SAVE_DESC", "BED_DB_BUTTON_SLEEP", "BED_DB_BUTTON_SAVE", "BED_DB_BUTTON_CANCEL");
-		saveDialogueBox.Accept += () =>
-		{
-			DoSleep(player);
-		};
-		saveDialogueBox.Decline += () =>
-		{
-			DoSave(player);
-		};
-		saveDialogueBox.Cancel += () =>
-		{
-			DoCancel(player);
-		};
-	}
-
-	private void HideDialogue(IPlayer player)
-	{
-		Time.timeScale = 1f;
-		player.Input.GetOtherPlayers().RestoreMapsEnabled();
-		player.Input.SetAndCacheMapsEnabled(state: false, 16);
-		player.Input.SetAndCacheMapsEnabled(state: true, 0);
-		player.Input.SetCursorEnabled(enabled: false);
-		player.IsBusy = false;
-	}
-
-	private IEnumerator<float> Sleep_Sequence(float randomValue, float militaryTime)
-	{
-		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 0);
-		_isSleeping = true;
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			++allPlayer.Movement.IsBusy;
-		}
-		Singleton<Fader>.Instance.FadeOut(3f);
-		float timer = 0f;
-		while (timer < 3f)
-		{
-			timer += Time.deltaTime;
-			AudioListener.volume -= 1f / 3f * Time.deltaTime;
-			yield return 0f;
-		}
-		AudioListener.volume = 0f;
-		if (Game.Mode.IsClient())
-		{
-			Singleton<GameTime>.Instance.MilitaryTime_NoEvents = militaryTime;
-		}
-		if (Singleton<GameTime>.Instance.MilitaryTime > 18f)
-		{
-			CheckShelter();
-			Singleton<GameTime>.Instance.MilitaryTime = 24f;
-			yield return Timing.WaitForSeconds(0.5f);
-		}
-		float num = 4f + randomValue * 3f;
-		if (Singleton<GameTime>.Instance.MilitaryTime < num)
-		{
-			float num2 = num - Singleton<GameTime>.Instance.MilitaryTime;
-			CheckShelter();
-			Singleton<GameTime>.Instance.MilitaryTime += num2;
-		}
-		yield return Timing.WaitForSeconds(1.5f);
-		_LastTimeSlept = GameTime.Now;
-		Singleton<Fader>.Instance.FadeIn(3f);
-		timer = 0f;
-		while (timer < 3f)
-		{
-			timer += Time.deltaTime;
-			AudioListener.volume += 1f / 3f * Time.deltaTime;
-			yield return 0f;
-		}
-		AudioListener.volume = 1f;
-		_isSleeping = false;
-		foreach (IPlayer allPlayer2 in PlayerRegistry.AllPlayers)
-		{
-			--allPlayer2.Movement.IsBusy;
-		}
-		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 0);
-		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
-	}
-
-	private void CheckShelter()
-	{
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
-			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
-			{
-				playerEffect.Protected = true;
-			}
-		}
-	}
-
-	private bool AllPlayersOverLand()
-	{
-		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
-			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
-			{
-				return false;
-			}
-			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
-			{
-				return false;
-			}
-			if (hitInfo.point.y < -5f)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private bool AllPlayersInProximity(IPlayer player)
-	{
-		if (Game.Mode == GameMode.SinglePlayer)
-		{
-			return true;
-		}
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private bool IsFightingBoss()
-	{
-		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			if (!allPlayer.IsNullOrDestroyed())
-			{
-				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
-				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private bool AnyPlayerKnockedOut()
-	{
-		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
-		{
-			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private bool AnyPlayerIsBusy()
-	{
-		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
-		{
-			if (allPlayer.Crafter.IsPlacing)
-			{
-				return true;
-			}
-			if (allPlayer.Lighter.IsLightingFire)
-			{
-				return true;
-			}
-			if (allPlayer.Skinner.IsSkinning)
-			{
-				return true;
-			}
-			if (allPlayer.Movement.CheckVehicle())
-			{
-				return true;
-			}
-			if (allPlayer.Movement.groundedAnimal)
-			{
-				return true;
-			}
-			if (allPlayer.IsBusy)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		jObject.AddField("LastTimeSlept", JSerializer.Serialize(_LastTimeSlept));
-		jObject.AddField("canDrag", JSerializer.Serialize(CanDrag));
-		jObject.AddField("canPickup", JSerializer.Serialize(CanPickUp));
-		return jObject;
-	}
-
-	public override void Load(JObject data)
-	{
-		base.Load(data);
-		_LastTimeSlept = JSerializer.Deserialize<DateTime>(data.GetField("LastTimeSlept"));
-		JObject field = data.GetField("canDrag");
-		if (field != null)
-		{
-			CanDrag = field.GetValue<bool>();
-		}
-		JObject field2 = data.GetField("canPickup");
-		if (field2 != null)
-		{
-			CanPickUp = field2.GetValue<bool>();
-		}
-	}
-
-	private static void SaveOnMaster(IPlayer invokingPlayer)
-	{
-		if (Game.Mode.IsClient())
-		{
-			ReplicateSaveGameOnMasterMsg replicateSaveGameOnMasterMsg = new ReplicateSaveGameOnMasterMsg();
-			replicateSaveGameOnMasterMsg.InvokingPlayer = invokingPlayer;
-			replicateSaveGameOnMasterMsg.Post();
-		}
-		else
-		{
-			SaveManager.SaveGame(invokingPlayer);
-		}
-	}
-
-	private void ReplicatedSleep_Sequence(float randomValue)
-	{
-		Timing.RunCoroutine(Sleep_Sequence(randomValue, Singleton<GameTime>.Instance.MilitaryTime), Segment.RealtimeUpdate);
-		if (Game.Mode.IsMultiplayer())
-		{
-			ReplicateSleep_Sequence replicateSleep_Sequence = new ReplicateSleep_Sequence();
-			replicateSleep_Sequence.Bed = this;
-			replicateSleep_Sequence.RandomValue = randomValue;
-			replicateSleep_Sequence.MilitaryTime = Singleton<GameTime>.Instance.MilitaryTime;
-			replicateSleep_Sequence.Post();
-		}
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 134
-PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_WATERBOTTLE.cs
-SIZE: 1505 bytes
-SHA256: 21144d598ca262c8a3ade6f18ded80e2e27c2b6e3d0d9996363d7dc2c547eeb5
-====================================================================================================
-
-using UnityEngine;
-using UnityEngine.Serialization;
-
-namespace Beam.Crafting;
-
-public class ConstructionObject_WATERBOTTLE : InteractiveObject_FOOD, ICraftable, IBase, IHasCraftingType, IPlaceable
-{
-	[SerializeField]
-	private GhostCollider.ColliderType _colliderType;
-
-	[SerializeField]
-	private bool _craftImmediate;
-
-	[SerializeField]
-	private GameObject _ghostObject;
-
-	private Mesh _ghostMesh;
-
-	private Renderer _ghostRenderer;
-
-	[SerializeField]
-	private float _placingDistance = 4f;
-
-	[FormerlySerializedAs("_onCrafted")]
-	[SerializeField]
-	[HideInInspector]
-	private InteracterUnityEvent _crafted;
-
-	public int CreatorId { get; set; }
-
-	public GhostCollider.ColliderType ColliderType => _colliderType;
-
-	public bool CraftImmediate => _craftImmediate;
-
-	public Mesh GhostMesh => _ghostMesh;
-
-	public Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
-
-	public float PlacingDistance => _placingDistance;
-
-	protected override void Awake()
-	{
-		base.Awake();
-		_ghostRenderer = _ghostObject.GetComponent<Renderer>();
-		_ghostMesh = _ghostObject.GetComponent<MeshFilter>().sharedMesh;
-	}
-
-	public void OnBeginCrafting()
-	{
-	}
-
-	public bool CheckProximity(Transform ghost)
-	{
-		return false;
-	}
-
-	public void Place()
-	{
-	}
-
-	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
-	{
-		return true;
-	}
-
-	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
-	{
-		return true;
-	}
-
-	public void OnCrafted(IPlayer player)
-	{
-		_crafted?.Invoke(player);
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 135
+SOURCE FILE 131
 PATH: Assembly-CSharp__Beam.Crafting__Construction_CAMPFIRE.cs
 SIZE: 15220 bytes
 SHA256: 9dbb00cbd39af929d64c7e95937ac25539b606fefc707a74f34e067ee034b1c9
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -3493,15 +2616,12 @@ public class Construction_CAMPFIRE : Constructing, IInteractable, IBase, IHasCra
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 136
+SOURCE FILE 132
 PATH: Assembly-CSharp__Beam.Crafting__Construction_FOUNDATION.cs
 SIZE: 720 bytes
 SHA256: 226e87d8469667483cbbc3b2ca9aad26e1510ec2e09bf01b85aa2e9af7a5b548
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -3546,15 +2666,12 @@ public class Construction_FOUNDATION : Constructing, IHaveAttribute
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 137
+SOURCE FILE 133
 PATH: Assembly-CSharp__Beam.Crafting__Construction_PANEL.cs
 SIZE: 3044 bytes
 SHA256: 76539e772f8ed73ece21d776dfa2fe98643b8948e208b7684cc56c1b4715eb68
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Serialization.Json;
 using UnityEngine;
@@ -3682,15 +2799,12 @@ public class Construction_PANEL : Constructing, IHaveAttribute
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 138
+SOURCE FILE 134
 PATH: Assembly-CSharp__Beam.Crafting__Construction_STEPS.cs
 SIZE: 316 bytes
 SHA256: 26fc1d05681e02cfe7f89f34b7dfffe280855d3833c8d81c6af37f050596b8f6
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -3708,15 +2822,12 @@ public class Construction_STEPS : Construction_FOUNDATION, IHaveAttribute
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 139
+SOURCE FILE 135
 PATH: Assembly-CSharp__Beam.Crafting__Construction_STRUCTURE.cs
 SIZE: 2823 bytes
 SHA256: 37d574f3023223dbea5c753739d325d08638f4afdf000c8dcb3bc860b166f7ee
 ====================================================================================================
-
 using System.Collections.Generic;
 using System.Linq;
 using Beam.Serialization.Json;
@@ -3824,15 +2935,780 @@ public class Construction_STRUCTURE : BaseObject
 	}
 }
 
+====================================================================================================
+SOURCE FILE 136
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject.cs
+SIZE: 3039 bytes
+SHA256: 6dc647258e04ae8ba203b00581612043b586f5d3d9f38e71da2e6410a0b18630
+====================================================================================================
+using UnityEngine;
+using UnityEngine.Serialization;
 
+namespace Beam.Crafting;
+
+public class ConstructionObject : InteractiveObject, ICraftable, IBase, IHasCraftingType, IPlaceable
+{
+	[Header("CRAFTING")]
+	[SerializeField]
+	private GhostCollider.ColliderType _colliderType;
+
+	[SerializeField]
+	private bool _craftImmediate;
+
+	[SerializeField]
+	private Mesh _ghostMesh;
+
+	[SerializeField]
+	private Renderer _ghostRenderer;
+
+	[SerializeField]
+	private GameObject _ghostColliders;
+
+	[SerializeField]
+	private float _placingDistance = 4f;
+
+	[SerializeField]
+	private bool _canPlace;
+
+	[PREFAB_PROCESSOR_GetComponents]
+	[SerializeField]
+	private PlacementModifier[] _placementModifiers;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Connector _myConnector;
+
+	[FormerlySerializedAs("_onCrafted")]
+	[SerializeField]
+	[HideInInspector]
+	private InteracterUnityEvent _crafted;
+
+	public int CreatorId { get; set; }
+
+	public GhostCollider.ColliderType ColliderType => _colliderType;
+
+	public bool CraftImmediate => _craftImmediate;
+
+	public Mesh GhostMesh => _ghostMesh;
+
+	public virtual Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
+
+	public GameObject GhostColliders
+	{
+		get
+		{
+			if (!_ghostColliders)
+			{
+				_ghostColliders = gameObject;
+			}
+			return _ghostColliders;
+		}
+	}
+
+	public float PlacingDistance => _placingDistance;
+
+	public bool CanPlace
+	{
+		get
+		{
+			return _canPlace;
+		}
+		set
+		{
+			_canPlace = value;
+		}
+	}
+
+	public virtual void OnBeginCrafting()
+	{
+	}
+
+	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		Placement placement = new Placement();
+		placement.Position = ghost.position;
+		placement.Rotation = ghost.rotation;
+		for (int i = 0; i < _placementModifiers.Length; i++)
+		{
+			placement = _placementModifiers[i].Modify(placement, ray);
+		}
+		bool flag = true;
+		if (_myConnector != null)
+		{
+			for (int j = 0; j < _myConnector.Checks.Count; j++)
+			{
+				flag = _myConnector.Checks[j].Check(placement, null);
+				if (!flag)
+				{
+					break;
+				}
+			}
+		}
+		ghost.position = placement.Position;
+		ghost.rotation = placement.Rotation * Quaternion.Euler(new Vector3(0f, yRotation, 0f));
+		return flag;
+	}
+
+	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return OwnerPlacing(ghost, ray, yRotation);
+	}
+
+	public virtual void Place()
+	{
+	}
+
+	public virtual bool CheckProximity(Transform ghost)
+	{
+		return false;
+	}
+
+	public virtual void OnCrafted(IPlayer player)
+	{
+		_crafted?.Invoke(player);
+	}
+
+	public override void EnablePhysics()
+	{
+		base.EnablePhysics();
+		if ((bool)rigidbody)
+		{
+			rigidbody.constraints = RigidbodyConstraints.None;
+		}
+	}
+
+	public override void DisablePhysics()
+	{
+		base.DisablePhysics();
+		if ((bool)rigidbody)
+		{
+			rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+		}
+	}
+
+	public void SetRigidBodyMass(float mass)
+	{
+		if ((bool)rigidbody)
+		{
+			rigidbody.mass = mass;
+		}
+	}
+
+	public float GetRigidBodyMass()
+	{
+		if (!rigidbody)
+		{
+			return 0f;
+		}
+		return rigidbody.mass;
+	}
+}
 
 ====================================================================================================
-SOURCE FILE 140
+SOURCE FILE 137
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_BED.cs
+SIZE: 12031 bytes
+SHA256: cff068ff95dc35f464ca185bcb5fab5a8fc02504d6e96b3cc3769ba9a20f7437
+====================================================================================================
+using System;
+using System.Collections.Generic;
+using Beam.Events;
+using Beam.Serialization.Json;
+using Beam.UI;
+using Beam.Utilities;
+using Funlabs;
+using MEC;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class ConstructionObject_BED : ConstructionObject
+{
+	private struct Result
+	{
+		public bool Succeeded;
+
+		public string Message;
+	}
+
+	private class ReplicateSaveGameOnMasterMsg : MultiplayerMessage
+	{
+		[Replicate]
+		public IPlayer InvokingPlayer;
+
+		public override void OnPeer()
+		{
+			SaveManager.SaveGame(InvokingPlayer);
+		}
+	}
+
+	private class ReplicateSleep_Sequence : MultiplayerMessage
+	{
+		[Replicate]
+		public ConstructionObject_BED Bed;
+
+		[Replicate]
+		public float RandomValue;
+
+		[Replicate]
+		public float MilitaryTime;
+
+		public override void OnPeer()
+		{
+			Timing.RunCoroutine(Bed.Sleep_Sequence(RandomValue, MilitaryTime), Segment.RealtimeUpdate);
+		}
+	}
+
+	private const float SLEEP_TIME = 9f;
+
+	private const float MINIMUM_HOURS_BETWEEN_SLEEP = 4f;
+
+	[PREFAB_PROCESSOR_GetComponent]
+	[SerializeField]
+	private Buoyancy _buoyancy;
+
+	private static DateTime _LastTimeSlept;
+
+	private ICheckBounds _boundsChecker;
+
+	private bool _isSleeping;
+
+	private DialogueBoxViewAdapter saveDialogueBox;
+
+	public override string GetInteractionDescription(int playerId, IBase obj)
+	{
+		if (_isSleeping)
+		{
+			return string.Empty;
+		}
+		return "ITEM_INTERACTION_DESCRIPTION_SLEEP_SAVE";
+	}
+
+	protected override void Awake()
+	{
+		base.Awake();
+		if (CanPickUp)
+		{
+			SetLOD(1);
+		}
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		ICheckBounds instance = Singleton<StrandedWorld>.Instance;
+		_boundsChecker = instance ?? NullObject<NullCheckBounds>.Instance;
+		_LastTimeSlept = GameTime.Now.RemoveHours(4f);
+		EventManager.AddListener<EndGameSequenceEvent>(AbortInteraction);
+	}
+
+	protected override void OnPlayerDisconnect(PlayerDisconnectedEvent disconnectedEvent)
+	{
+		if (saveDialogueBox != null)
+		{
+			saveDialogueBox.Destroy();
+			HideDialogue(PlayerRegistry.LocalPlayer);
+		}
+		base.OnPlayerDisconnect(disconnectedEvent);
+	}
+
+	private void AbortInteraction(EndGameSequenceEvent e)
+	{
+		CanInteract = false;
+		CanPickUp = false;
+	}
+
+	public override void Hold(bool holding)
+	{
+		base.Hold(holding);
+		SetLOD((!holding) ? 1 : 0);
+	}
+
+	public override bool Interact(IPlayer player)
+	{
+		if (_isSleeping || !player.IsOwner)
+		{
+			return false;
+		}
+		player.Movement.StopAutoWalk();
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+			return false;
+		}
+		if (Time.timeScale != 0f)
+		{
+			ShowDialogue(player);
+		}
+		return true;
+	}
+
+	private Result CheckCanUseBed(IPlayer player)
+	{
+		Result result = new Result
+		{
+			Succeeded = false
+		};
+		if (LevelLoader.IsCreatingOrLoading)
+		{
+			result.Message = "BED_NTF_CANT_USE_LOADING";
+			return result;
+		}
+		if (AnyPlayerIsBusy())
+		{
+			result.Message = "BED_NTF_CANT_USE_BUSY";
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private Result CheckCanSave(IPlayer player)
+	{
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			return result;
+		}
+		result.Succeeded = false;
+		if (AnyPlayerKnockedOut())
+		{
+			result.Message = "BED_NTF_CANT_SAVE_KNOCKED_OUT";
+			return result;
+		}
+		if (!AllPlayersOverLand())
+		{
+			result.Message = ((Game.Mode == GameMode.SinglePlayer) ? "BED_NTF_CANT_SAVE_DESC" : "BED_NTF_CANT_SAVE_COOP_DESC");
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private Result CheckCanSleep(IPlayer player)
+	{
+		Result result = CheckCanUseBed(player);
+		if (!result.Succeeded)
+		{
+			return result;
+		}
+		result.Succeeded = false;
+		if ((bool)_buoyancy && (_buoyancy.Floating || _buoyancy.IsInWater))
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_UNDERWATER_DESC";
+			return result;
+		}
+		if (GameTime.GetHoursSince(_LastTimeSlept) < 4f)
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_DESC";
+			return result;
+		}
+		if (Singleton<GameTime>.Instance.MilitaryTime > 4f && Singleton<GameTime>.Instance.MilitaryTime < 18f)
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_NIGHT";
+			return result;
+		}
+		if (!AllPlayersInProximity(player))
+		{
+			result.Message = "BED_NTF_CANT_SLEEP_APART_DESC";
+			return result;
+		}
+		result.Message = string.Empty;
+		result.Succeeded = true;
+		return result;
+	}
+
+	private void DoSave(IPlayer player)
+	{
+		HideDialogue(player);
+		Result result = CheckCanSave(player);
+		if (!result.Succeeded)
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+		}
+		else
+		{
+			SaveOnMaster(player);
+		}
+	}
+
+	private void DoSleep(IPlayer player)
+	{
+		HideDialogue(player);
+		Result result = CheckCanSleep(player);
+		if (!result.Succeeded)
+		{
+			MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+			string message = result.Message;
+			if (!string.IsNullOrWhiteSpace(message))
+			{
+				LocalizedNotification.Post(player, NotificationPriority.Immediate, 4f, message);
+			}
+		}
+		else
+		{
+			ReplicatedSleep_Sequence(UnityEngine.Random.value);
+		}
+	}
+
+	private void DoCancel(IPlayer player)
+	{
+		HideDialogue(player);
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void ShowDialogue(IPlayer player)
+	{
+		Time.timeScale = 0f;
+		player.Input.GetOtherPlayers().DisableMaps();
+		player.Input.SetAndCacheMapsEnabled(state: false, 0);
+		player.Input.SetAndCacheMapsEnabled(state: true, 16);
+		player.Input.SetCursorEnabled(enabled: true);
+		player.IsBusy = true;
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: true);
+		saveDialogueBox = DialogueBox.Show(player.Input, "BED_DB_SLEEP_TITLE", "BED_DB_SLEEP_SAVE_DESC", "BED_DB_BUTTON_SLEEP", "BED_DB_BUTTON_SAVE", "BED_DB_BUTTON_CANCEL");
+		saveDialogueBox.Accept += () =>
+		{
+			DoSleep(player);
+		};
+		saveDialogueBox.Decline += () =>
+		{
+			DoSave(player);
+		};
+		saveDialogueBox.Cancel += () =>
+		{
+			DoCancel(player);
+		};
+	}
+
+	private void HideDialogue(IPlayer player)
+	{
+		Time.timeScale = 1f;
+		player.Input.GetOtherPlayers().RestoreMapsEnabled();
+		player.Input.SetAndCacheMapsEnabled(state: false, 16);
+		player.Input.SetAndCacheMapsEnabled(state: true, 0);
+		player.Input.SetCursorEnabled(enabled: false);
+		player.IsBusy = false;
+	}
+
+	private IEnumerator<float> Sleep_Sequence(float randomValue, float militaryTime)
+	{
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: false, 0);
+		_isSleeping = true;
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			++allPlayer.Movement.IsBusy;
+		}
+		Singleton<Fader>.Instance.FadeOut(3f);
+		float timer = 0f;
+		while (timer < 3f)
+		{
+			timer += Time.deltaTime;
+			AudioListener.volume -= 1f / 3f * Time.deltaTime;
+			yield return 0f;
+		}
+		AudioListener.volume = 0f;
+		if (Game.Mode.IsClient())
+		{
+			Singleton<GameTime>.Instance.MilitaryTime_NoEvents = militaryTime;
+		}
+		if (Singleton<GameTime>.Instance.MilitaryTime > 18f)
+		{
+			CheckShelter();
+			Singleton<GameTime>.Instance.MilitaryTime = 24f;
+			yield return Timing.WaitForSeconds(0.5f);
+		}
+		float num = 4f + randomValue * 3f;
+		if (Singleton<GameTime>.Instance.MilitaryTime < num)
+		{
+			float num2 = num - Singleton<GameTime>.Instance.MilitaryTime;
+			CheckShelter();
+			Singleton<GameTime>.Instance.MilitaryTime += num2;
+		}
+		yield return Timing.WaitForSeconds(1.5f);
+		_LastTimeSlept = GameTime.Now;
+		Singleton<Fader>.Instance.FadeIn(3f);
+		timer = 0f;
+		while (timer < 3f)
+		{
+			timer += Time.deltaTime;
+			AudioListener.volume += 1f / 3f * Time.deltaTime;
+			yield return 0f;
+		}
+		AudioListener.volume = 1f;
+		_isSleeping = false;
+		foreach (IPlayer allPlayer2 in PlayerRegistry.AllPlayers)
+		{
+			--allPlayer2.Movement.IsBusy;
+		}
+		RewiredUtilities.Players.SetAndCacheMapsEnabled(state: true, 0);
+		MultiplayerMng.UpdateSessionToken_IsBusy(isBusy: false);
+	}
+
+	private void CheckShelter()
+	{
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			Sunburn playerEffect = allPlayer.Statistics.GetPlayerEffect<Sunburn>();
+			if (playerEffect != null && CraftingType.InteractiveType == InteractiveType.CRAFTING_BED_SHELTER)
+			{
+				playerEffect.Protected = true;
+			}
+		}
+	}
+
+	private bool AllPlayersOverLand()
+	{
+		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			Zone zone2 = StrandedWorld.GetZone(allPlayer.Movement.transform.position);
+			if (zone2 == null || (zone2.Biome == Zone.BiomeType.MISSION && zone2 != zone))
+			{
+				return false;
+			}
+			if (!Physics.Raycast(allPlayer.Movement.transform.position, Vector3.down, out var hitInfo, 256f, 1 << Layers.TERRAIN))
+			{
+				return false;
+			}
+			if (hitInfo.point.y < -5f)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private bool AllPlayersInProximity(IPlayer player)
+	{
+		if (Game.Mode == GameMode.SinglePlayer)
+		{
+			return true;
+		}
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if ((player.transform.position - allPlayer.transform.position).magnitude > 3f)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private bool IsFightingBoss()
+	{
+		Zone zone = Singleton<StrandedWorld>.Instance.FindEndGameZone();
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (!allPlayer.IsNullOrDestroyed())
+			{
+				Zone zone2 = StrandedWorld.GetZone(allPlayer.transform.position);
+				if (zone2.Biome == Zone.BiomeType.MISSION && zone != zone2)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private bool AnyPlayerKnockedOut()
+	{
+		foreach (Player allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (!allPlayer.IsNullOrDestroyed() && allPlayer.Statistics.IsKnockedOut)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool AnyPlayerIsBusy()
+	{
+		foreach (IPlayer allPlayer in PlayerRegistry.AllPlayers)
+		{
+			if (allPlayer.Crafter.IsPlacing)
+			{
+				return true;
+			}
+			if (allPlayer.Lighter.IsLightingFire)
+			{
+				return true;
+			}
+			if (allPlayer.Skinner.IsSkinning)
+			{
+				return true;
+			}
+			if (allPlayer.Movement.CheckVehicle())
+			{
+				return true;
+			}
+			if (allPlayer.Movement.groundedAnimal)
+			{
+				return true;
+			}
+			if (allPlayer.IsBusy)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public override JObject Save()
+	{
+		JObject jObject = base.Save();
+		jObject.AddField("LastTimeSlept", JSerializer.Serialize(_LastTimeSlept));
+		jObject.AddField("canDrag", JSerializer.Serialize(CanDrag));
+		jObject.AddField("canPickup", JSerializer.Serialize(CanPickUp));
+		return jObject;
+	}
+
+	public override void Load(JObject data)
+	{
+		base.Load(data);
+		_LastTimeSlept = JSerializer.Deserialize<DateTime>(data.GetField("LastTimeSlept"));
+		JObject field = data.GetField("canDrag");
+		if (field != null)
+		{
+			CanDrag = field.GetValue<bool>();
+		}
+		JObject field2 = data.GetField("canPickup");
+		if (field2 != null)
+		{
+			CanPickUp = field2.GetValue<bool>();
+		}
+	}
+
+	private static void SaveOnMaster(IPlayer invokingPlayer)
+	{
+		if (Game.Mode.IsClient())
+		{
+			ReplicateSaveGameOnMasterMsg replicateSaveGameOnMasterMsg = new ReplicateSaveGameOnMasterMsg();
+			replicateSaveGameOnMasterMsg.InvokingPlayer = invokingPlayer;
+			replicateSaveGameOnMasterMsg.Post();
+		}
+		else
+		{
+			SaveManager.SaveGame(invokingPlayer);
+		}
+	}
+
+	private void ReplicatedSleep_Sequence(float randomValue)
+	{
+		Timing.RunCoroutine(Sleep_Sequence(randomValue, Singleton<GameTime>.Instance.MilitaryTime), Segment.RealtimeUpdate);
+		if (Game.Mode.IsMultiplayer())
+		{
+			ReplicateSleep_Sequence replicateSleep_Sequence = new ReplicateSleep_Sequence();
+			replicateSleep_Sequence.Bed = this;
+			replicateSleep_Sequence.RandomValue = randomValue;
+			replicateSleep_Sequence.MilitaryTime = Singleton<GameTime>.Instance.MilitaryTime;
+			replicateSleep_Sequence.Post();
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 138
+PATH: Assembly-CSharp__Beam.Crafting__ConstructionObject_WATERBOTTLE.cs
+SIZE: 1505 bytes
+SHA256: 21144d598ca262c8a3ade6f18ded80e2e27c2b6e3d0d9996363d7dc2c547eeb5
+====================================================================================================
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Beam.Crafting;
+
+public class ConstructionObject_WATERBOTTLE : InteractiveObject_FOOD, ICraftable, IBase, IHasCraftingType, IPlaceable
+{
+	[SerializeField]
+	private GhostCollider.ColliderType _colliderType;
+
+	[SerializeField]
+	private bool _craftImmediate;
+
+	[SerializeField]
+	private GameObject _ghostObject;
+
+	private Mesh _ghostMesh;
+
+	private Renderer _ghostRenderer;
+
+	[SerializeField]
+	private float _placingDistance = 4f;
+
+	[FormerlySerializedAs("_onCrafted")]
+	[SerializeField]
+	[HideInInspector]
+	private InteracterUnityEvent _crafted;
+
+	public int CreatorId { get; set; }
+
+	public GhostCollider.ColliderType ColliderType => _colliderType;
+
+	public bool CraftImmediate => _craftImmediate;
+
+	public Mesh GhostMesh => _ghostMesh;
+
+	public Material[] GhostMaterials => _ghostRenderer.sharedMaterials;
+
+	public float PlacingDistance => _placingDistance;
+
+	protected override void Awake()
+	{
+		base.Awake();
+		_ghostRenderer = _ghostObject.GetComponent<Renderer>();
+		_ghostMesh = _ghostObject.GetComponent<MeshFilter>().sharedMesh;
+	}
+
+	public void OnBeginCrafting()
+	{
+	}
+
+	public bool CheckProximity(Transform ghost)
+	{
+		return false;
+	}
+
+	public void Place()
+	{
+	}
+
+	public bool OwnerPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return true;
+	}
+
+	public bool ReplicantPlacing(Transform ghost, BeamRay ray, float yRotation)
+	{
+		return true;
+	}
+
+	public void OnCrafted(IPlayer player)
+	{
+		_crafted?.Invoke(player);
+	}
+}
+
+====================================================================================================
+SOURCE FILE 139
 PATH: Assembly-CSharp__Beam.Crafting__DefaultConstructingProximityCheck.cs
 SIZE: 806 bytes
 SHA256: fb063dc3c687f7e76911f24141ebbe47f54210f248733c4d35e507ef8d4a5ebc
 ====================================================================================================
-
 using System.Collections.Generic;
 using Beam.Utilities;
 using UnityEngine;
@@ -3860,15 +3736,12 @@ public class DefaultConstructingProximityCheck : IConstructingProximityCheck
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 141
+SOURCE FILE 140
 PATH: Assembly-CSharp__Beam.Crafting__Dragger.cs
 SIZE: 9870 bytes
 SHA256: c5fabf3e56e29c6194a555c5ed709e60a3780c171acfdc83a56b46435d948d91
 ====================================================================================================
-
 using System.Collections;
 using System.Collections.Generic;
 using Beam.Utilities;
@@ -4203,15 +4076,12 @@ public class Dragger : MonoBehaviour, IGameInputHandler, INeedPlayerComponent, I
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 142
+SOURCE FILE 141
 PATH: Assembly-CSharp__Beam.Crafting__DummyPickupable.cs
 SIZE: 5203 bytes
 SHA256: a31ba1e77aa5023e7bf3399c87a9200219b07cbcb84f5809858ca6167e56d342
 ====================================================================================================
-
 using System;
 using Beam.Serialization;
 using Beam.Serialization.Json;
@@ -4550,15 +4420,12 @@ public class DummyPickupable : IPickupable, IAnimatablePrimary, ICraftingDisplay
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 143
+SOURCE FILE 142
 PATH: Assembly-CSharp__Beam.Crafting__FarmingManager.cs
 SIZE: 2299 bytes
 SHA256: 324a7805e32d96ccb4ca8c2a5a5e513245d81604f25873b8378b4289e3a60e96
 ====================================================================================================
-
 using System.Collections.Generic;
 using Funlabs;
 using UnityEngine;
@@ -4666,15 +4533,12 @@ public class FarmingManager : MonoBehaviour, IPlantFactory, IFruitFactory, ISeri
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 144
+SOURCE FILE 143
 PATH: Assembly-CSharp__Beam.Crafting__FireLighter.cs
 SIZE: 12169 bytes
 SHA256: 88dcf8ca3e952d2be6794e1de21df07cb8f96181f355c25a282adc1ac7944f36
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam.Language;
@@ -5121,15 +4985,12 @@ public class FireLighter : MonoBehaviour, IGameInputHandler, INeedPlayerComponen
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 145
+SOURCE FILE 144
 PATH: Assembly-CSharp__Beam.Crafting__Holder.cs
 SIZE: 17767 bytes
 SHA256: 3a499d8dbc955c7ec312b8f573521347b56debf7605c8e2adf3f141cffd45703
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5938,15 +5799,12 @@ public class Holder : SerializedMonoBehaviour, IHolder, INeedPlayerComponent, IH
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 146
+SOURCE FILE 145
 PATH: Assembly-CSharp__Beam.Crafting__HoldingRaycastFilter.cs
 SIZE: 440 bytes
 SHA256: 9274e7aedee11ee62a15bd360722cb6fd2fef58ce52410a75b406f1fd197ec93
 ====================================================================================================
-
 using Beam.Utilities;
 using UnityEngine;
 
@@ -5971,15 +5829,12 @@ public class HoldingRaycastFilter : IRaycastFilter
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 147
+SOURCE FILE 146
 PATH: Assembly-CSharp__Beam.Crafting__IConstructingProximityCheck.cs
 SIZE: 177 bytes
 SHA256: 78ef910a2c680b0ad449ac139a15a1c3ab202bdee9df684b4043379a59a75395
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -5989,15 +5844,12 @@ public interface IConstructingProximityCheck
 	bool CheckProximity(Constructing constructing, Transform ghost, float distance);
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 148
+SOURCE FILE 147
 PATH: Assembly-CSharp__Beam.Crafting__InteractiveObject_COMPASS.cs
 SIZE: 1694 bytes
 SHA256: b2e2c9f8bd5825ab5ee92309781272c02c0e3e77dff481695194ec9a448aae10
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -6081,15 +5933,12 @@ public class InteractiveObject_COMPASS : InteractiveObject
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 149
+SOURCE FILE 148
 PATH: Assembly-CSharp__Beam.Crafting__Inventory.cs
 SIZE: 2286 bytes
 SHA256: 1fcc6d76fd6ab8aebcef90c666d856e1ab04d6742ec917063b6777e841ccfe55
 ====================================================================================================
-
 using Beam.Language;
 using Beam.Serialization.Json;
 using Beam.UI;
@@ -6185,15 +6034,12 @@ public class Inventory : MonoBehaviour, ISlotStorageProvider<IPickupable>, INeed
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 150
+SOURCE FILE 149
 PATH: Assembly-CSharp__Beam.Crafting__NoConstructingProximityCheck.cs
 SIZE: 232 bytes
 SHA256: cd44e5acea251b6fecaadc49e803eea6894ab8da5c57770fbdcc719eaa1969f8
 ====================================================================================================
-
 using UnityEngine;
 
 namespace Beam.Crafting;
@@ -6206,4 +6052,116 @@ public class NoConstructingProximityCheck : IConstructingProximityCheck
 	}
 }
 
+====================================================================================================
+SOURCE FILE 150
+PATH: Assembly-CSharp__Beam.Crafting__Plant.cs
+SIZE: 2764 bytes
+SHA256: 125b42073959ceddfc94fee06141a5acce5a780dfab768c53215d8db242f509e
+====================================================================================================
+using System;
+using Beam.Serialization.Json;
+using Beam.Utilities;
+using Funlabs;
+using UnityEngine;
+
+namespace Beam.Crafting;
+
+public class Plant : MonoBehaviour, ISaveable
+{
+	[SerializeField]
+	private Transform _fruitPosition;
+
+	[SerializeField]
+	private GameObject[] _plantStages;
+
+	[SerializeField]
+	private GameObject _deadStage;
+
+	private PlantModel _plantModel;
+
+	private PlantFruit _plantFruit;
+
+	private PlantType _plantType;
+
+	private float _growthTime;
+
+	public PlantType PlantType => _plantType;
+
+	public float GrowthTime => _growthTime;
+
+	public void Initialize(IFruitFactory fruitFactory, PlantType plantType, float growthTime)
+	{
+		_plantType = plantType;
+		_growthTime = growthTime;
+		_plantModel = new PlantModel(_plantStages, _deadStage, _growthTime);
+		_plantFruit = new PlantFruit(fruitFactory, _plantType, _fruitPosition, _growthTime);
+	}
+
+	public void Reset()
+	{
+		_plantModel.StartedGrowingTime = GameTime.Now;
+		_plantFruit.LastHarvestedTime = GameTime.Now;
+		_plantModel.Dead = false;
+		_plantModel.UpdateStage();
+	}
+
+	public void Poll()
+	{
+		_plantModel.Poll();
+		if (!_plantModel.Dead)
+		{
+			_plantFruit.Poll();
+		}
+	}
+
+	public void Kill()
+	{
+		_plantFruit.ClearFruit(spoil: true);
+		_plantModel.Dead = true;
+		_plantModel.UpdateStage();
+	}
+
+	public void ClearFruit()
+	{
+		_plantFruit.ClearFruit();
+	}
+
+	public JObject Save()
+	{
+		JObject jObject = new JObject();
+		jObject.AddField("StartedGrowingTime", JSerializer.Serialize(_plantModel.StartedGrowingTime));
+		jObject.AddField("LastHarvestedTime", JSerializer.Serialize(_plantFruit.LastHarvestedTime));
+		JObject jObject2 = new JObject();
+		if (!_plantFruit.Fruit.IsNullOrDestroyed())
+		{
+			jObject2.AddField("Fruit", _plantFruit.Fruit.ReferenceId.ToString());
+			jObject2.AddField("isGrowing", _plantFruit.Fruit.IsGrowing);
+		}
+		jObject.AddField("Fruits", jObject2);
+		return jObject;
+	}
+
+	public void Load(JObject data)
+	{
+		_plantModel.StartedGrowingTime = JSerializer.Deserialize<DateTime>(data.GetField("StartedGrowingTime"));
+		_plantFruit.LastHarvestedTime = JSerializer.Deserialize<DateTime>(data.GetField("LastHarvestedTime"));
+		JObject fruitsData = data.GetField("Fruits");
+		if (fruitsData != null && !fruitsData.IsNull())
+		{
+			LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
+			{
+				MiniGuid referenceId = fruitsData.GetField("Fruit").GetValue<string>().ToMiniGuid();
+				bool value = fruitsData.GetField("isGrowing").GetValue<bool>();
+				InteractiveObject_FOOD interactiveObject_FOOD = MultiplayerMng.FindObject<InteractiveObject_FOOD>(referenceId);
+				_plantFruit.AddFruit(interactiveObject_FOOD, interactiveObject_FOOD.transform);
+				_plantFruit.UpdateFruitGrowing(value);
+			});
+		}
+		else
+		{
+			_plantFruit.CheckFruit();
+		}
+		_plantModel.Poll();
+	}
+}
 

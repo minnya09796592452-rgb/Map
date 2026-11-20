@@ -1,11 +1,602 @@
-
 ====================================================================================================
 SOURCE FILE 376
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandle.cs
+SIZE: 6332 bytes
+SHA256: f2f0f55367ce3018b27f7760f6fce54149e028b228d23f7b985357f371bd12a6
+====================================================================================================
+using System;
+using Funlabs;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_ObjectEditHandle : MonoBehaviour
+{
+	private const int SKIP_FRAMES = 0;
+
+	private const float MIN_SCALE_VALUE = 0.05f;
+
+	[SerializeField]
+	private LE_EObjectEditMode m_editMode = LE_EObjectEditMode.MOVE;
+
+	private Vector3 m_activeEditAxis = Vector3.zero;
+
+	private int m_lastDragFrame = -1;
+
+	private Vector3 m_lastCursorPos = -1f * Vector3.one;
+
+	private int m_dragSkipCounter;
+
+	private Camera m_cam;
+
+	public EventHandler m_onTransformed;
+
+	public LE_EObjectEditMode EditMode => m_editMode;
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	public bool IsDrag => m_lastDragFrame == Time.frameCount;
+
+	public void OnMyMouseDrag(Vector3 p_axis)
+	{
+		m_activeEditAxis = p_axis;
+		m_lastDragFrame = Time.frameCount;
+	}
+
+	public void DisableAxisX()
+	{
+		DisableAxis(Vector3.right);
+	}
+
+	public void DisableAxisY()
+	{
+		DisableAxis(Vector3.up);
+	}
+
+	public void DisableAxisZ()
+	{
+		DisableAxis(Vector3.forward);
+	}
+
+	private void DisableAxis(Vector3 p_axis)
+	{
+		LE_ObjectEditHandleCollider[] componentsInChildren = GetComponentsInChildren<LE_ObjectEditHandleCollider>();
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			if (componentsInChildren[i].Axis == p_axis)
+			{
+				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
+			}
+			else if (Vector3.Dot(componentsInChildren[i].Axis, p_axis) > 0.0001f)
+			{
+				Vector3 axis = componentsInChildren[i].Axis;
+				axis.Scale(Vector3.one - p_axis);
+				componentsInChildren[i].Axis = axis;
+			}
+		}
+	}
+
+	private void LateUpdate()
+	{
+		if (m_lastDragFrame < Time.frameCount)
+		{
+			m_activeEditAxis = Vector3.zero;
+			m_dragSkipCounter = 0;
+		}
+		if ((double)m_activeEditAxis.sqrMagnitude > 0.01)
+		{
+			switch (m_editMode)
+			{
+			case LE_EObjectEditMode.MOVE:
+				Move();
+				break;
+			case LE_EObjectEditMode.ROTATE:
+				Rotate();
+				break;
+			case LE_EObjectEditMode.SCALE:
+				Scale();
+				break;
+			}
+		}
+		m_lastCursorPos = GetCursorPosition();
+	}
+
+	private void OnDestroy()
+	{
+		m_onTransformed = null;
+	}
+
+	private void Move()
+	{
+		float editDelta = GetEditDelta();
+		if (m_dragSkipCounter == 0)
+		{
+			float num = 15625f;
+			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
+			if ((vector * editDelta + transform.position).XZSqr() < num)
+			{
+				transform.parent.position += vector * editDelta;
+			}
+			Vector3 position = transform.parent.position;
+			position.y = Mathf.Clamp(transform.parent.position.y, -25f, 300f);
+			transform.parent.position = position;
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDelta) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private void Scale()
+	{
+		float editDelta = GetEditDelta();
+		if (m_dragSkipCounter == 0)
+		{
+			transform.parent.localScale += m_activeEditAxis * editDelta;
+			transform.parent.localScale = Vector3.Max(Vector3.one * 0.05f, transform.parent.localScale);
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDelta) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private float GetEditDelta()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 p_screenAxis = cam.WorldToScreenPoint(transform.position + transform.TransformDirection(m_activeEditAxis)) - cam.WorldToScreenPoint(transform.position);
+			p_screenAxis.z *= p_screenAxis.z;
+			p_screenAxis.z *= p_screenAxis.z;
+			float num = 1f / (1f - Mathf.Clamp(p_screenAxis.z, 0f, 0.8f));
+			p_screenAxis.z = 0f;
+			p_screenAxis.Normalize();
+			if (cam.orthographic)
+			{
+				return GetEditDeltaOrthogonal(p_screenAxis, num, cam);
+			}
+			float magnitude = (cam.transform.position - transform.position).magnitude;
+			return GetEditDeltaPerspective(p_screenAxis, num * magnitude, cam);
+		}
+		return 0f;
+	}
+
+	private void Rotate()
+	{
+		float editDeltaRotation = GetEditDeltaRotation();
+		if (m_dragSkipCounter == 0)
+		{
+			transform.parent.Rotate(m_activeEditAxis * editDeltaRotation);
+			if (m_onTransformed != null)
+			{
+				m_onTransformed(this, EventArgs.Empty);
+			}
+		}
+		else if (Mathf.Abs(editDeltaRotation) > 0.0005f)
+		{
+			m_dragSkipCounter++;
+		}
+	}
+
+	private float GetEditDeltaRotation()
+	{
+		Camera cam = Cam;
+		if (cam != null)
+		{
+			Vector3 vector = transform.TransformDirection(m_activeEditAxis);
+			Vector3 vector2 = cam.WorldToScreenPoint(transform.position);
+			vector2.z = 0f;
+			Vector3 p_screenAxis;
+			if (Mathf.Abs(Vector3.Dot(vector, cam.transform.forward)) > 0.5f)
+			{
+				float num = Mathf.Sign(Vector3.Dot(cam.transform.forward, vector));
+				if (num == 0f)
+				{
+					num = 1f;
+				}
+				Vector3 normalized = (GetCursorPosition() - vector2).normalized;
+				p_screenAxis = new Vector3(0f - Mathf.Sign(normalized.y), Mathf.Sign(normalized.x), 0f);
+				p_screenAxis *= num;
+			}
+			else
+			{
+				p_screenAxis = Vector3.Cross(cam.transform.forward, vector);
+				p_screenAxis = cam.transform.InverseTransformDirection(p_screenAxis);
+				p_screenAxis.z = 0f;
+			}
+			p_screenAxis.Normalize();
+			if (cam.orthographic)
+			{
+				return GetEditDeltaOrthogonal(p_screenAxis, 360f / cam.orthographicSize, cam);
+			}
+			return GetEditDeltaPerspective(p_screenAxis, 360f, cam);
+		}
+		return 0f;
+	}
+
+	private float GetEditDeltaPerspective(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
+	{
+		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
+		Ray ray = p_cam.ScreenPointToRay(m_lastCursorPos + num * p_screenAxis);
+		Ray ray2 = p_cam.ScreenPointToRay(m_lastCursorPos);
+		Vector3 direction = ray.direction;
+		Vector3 direction2 = ray2.direction;
+		return (direction - direction2).magnitude * Mathf.Sign(num) * p_multiplier;
+	}
+
+	private float GetEditDeltaOrthogonal(Vector3 p_screenAxis, float p_multiplier, Camera p_cam)
+	{
+		float num = Vector3.Dot(p_screenAxis, GetCursorPosition() - m_lastCursorPos);
+		Vector3 vector = p_cam.ScreenToWorldPoint(m_lastCursorPos + num * p_screenAxis);
+		Vector3 vector2 = p_cam.ScreenToWorldPoint(m_lastCursorPos);
+		return (vector - vector2).magnitude * Mathf.Sign(num) * p_multiplier;
+	}
+
+	private Vector3 GetCursorPosition()
+	{
+		if (Input.touchCount > 0)
+		{
+			return Input.GetTouch(0).position;
+		}
+		return Input.mousePosition;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 377
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectEditHandleCollider.cs
+SIZE: 4020 bytes
+SHA256: 7e46fd92836a4e25948c1f5c08e6a1e8edc11337f0f0d646c32ec118c17a9b28
+====================================================================================================
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+public class LE_ObjectEditHandleCollider : MonoBehaviour
+{
+	[SerializeField]
+	private LE_ObjectEditHandle m_parent;
+
+	[SerializeField]
+	private Vector3 m_axis;
+
+	[SerializeField]
+	private bool m_isRotationHandle;
+
+	[SerializeField]
+	private Vector3 m_rotationHandleDir;
+
+	private Renderer m_renderer;
+
+	private Collider[] m_colliders;
+
+	private Color m_originalColor;
+
+	private bool m_isDrag;
+
+	private float m_lastCamDist = -1f;
+
+	private Vector3 m_lastParentScale = Vector3.one;
+
+	private Vector3 m_lastParentParentScale = Vector3.one;
+
+	private bool m_isMouseDown;
+
+	private bool m_isMouseDownOnMe;
+
+	private Camera m_cam;
+
+	public Vector3 Axis
+	{
+		get
+		{
+			return m_axis;
+		}
+		set
+		{
+			m_axis = value;
+		}
+	}
+
+	private Camera Cam
+	{
+		get
+		{
+			if (m_cam == null)
+			{
+				m_cam = Camera.main;
+			}
+			return m_cam;
+		}
+	}
+
+	private void Start()
+	{
+		m_colliders = GetComponentsInChildren<Collider>();
+		m_renderer = GetComponent<Renderer>();
+		m_originalColor = m_renderer.material.color;
+	}
+
+	private void Update()
+	{
+		bool flag = (Input.GetMouseButton(0) && Input.touchCount < 2) || Input.touchCount == 1;
+		if (!m_isMouseDown && !flag)
+		{
+			return;
+		}
+		if (m_isMouseDownOnMe && !flag)
+		{
+			OnMyMouseUp();
+		}
+		else if (m_isMouseDownOnMe & flag)
+		{
+			OnMyMouseDrag();
+		}
+		else
+		{
+			Camera cam = Cam;
+			if (m_colliders != null && cam != null)
+			{
+				for (int i = 0; i < m_colliders.Length; i++)
+				{
+					Collider collider = m_colliders[i];
+					if (((collider != null && !m_isMouseDown) & flag) && !m_parent.IsDrag && (collider.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hitInfo, float.PositiveInfinity) || (Input.touchCount == 1 && collider.Raycast(cam.ScreenPointToRay(Input.GetTouch(0).position), out hitInfo, float.PositiveInfinity))))
+					{
+						m_isMouseDownOnMe = true;
+						OnMyMouseDown();
+						break;
+					}
+				}
+			}
+		}
+		m_isMouseDown = flag;
+		if (!m_isMouseDown)
+		{
+			m_isMouseDownOnMe = false;
+		}
+	}
+
+	private void LateUpdate()
+	{
+		Camera cam = Cam;
+		if (!(cam != null))
+		{
+			return;
+		}
+		if (!m_isDrag && m_isRotationHandle)
+		{
+			Vector3 vector = transform.parent.InverseTransformPoint(cam.transform.position);
+			Vector3 rhs = vector - Vector3.Dot(m_axis, vector) * m_axis;
+			rhs.Normalize();
+			float num = Vector3.Dot(m_rotationHandleDir, rhs);
+			Vector3 euler = Vector3.Cross(m_rotationHandleDir, rhs);
+			euler.Scale(m_axis);
+			float num2 = 57.29578f * Mathf.Asin(euler.magnitude);
+			euler.Normalize();
+			if (num < 0f)
+			{
+				num2 = Mathf.Abs(-180f + num2);
+			}
+			euler *= num2;
+			transform.localRotation = Quaternion.Euler(euler);
+		}
+		float magnitude = (cam.transform.position - transform.position).magnitude;
+		if (!m_isDrag && (cam.orthographic || Mathf.Abs(magnitude - m_lastCamDist) > 0.0001f || m_lastParentScale != m_parent.transform.localScale || m_lastParentParentScale != m_parent.transform.parent.localScale))
+		{
+			float num3 = ((!cam.orthographic) ? (magnitude / 75f) : (cam.orthographicSize / 50f));
+			transform.localScale = new Vector3(num3 / (m_parent.transform.parent.localScale.x * m_parent.transform.localScale.x), num3 / (m_parent.transform.parent.localScale.y * m_parent.transform.localScale.y), num3 / (m_parent.transform.parent.localScale.z * m_parent.transform.localScale.z));
+			m_lastCamDist = magnitude;
+			m_lastParentScale = m_parent.transform.localScale;
+			m_lastParentParentScale = m_parent.transform.parent.localScale;
+		}
+	}
+
+	private void OnMyMouseDown()
+	{
+		m_parent.OnMyMouseDrag(m_axis);
+		m_renderer.material.color = Color.yellow;
+		m_isDrag = true;
+	}
+
+	private void OnMyMouseDrag()
+	{
+		m_parent.OnMyMouseDrag(m_axis);
+		m_isDrag = true;
+	}
+
+	private void OnMyMouseUp()
+	{
+		m_renderer.material.color = m_originalColor;
+		m_parent.transform.localScale = new Vector3(1f / m_parent.transform.parent.localScale.x, 1f / m_parent.transform.parent.localScale.y, 1f / m_parent.transform.parent.localScale.z);
+		m_isDrag = false;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 378
+PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_ObjectSnapPoint.cs
+SIZE: 3623 bytes
+SHA256: 4ac9de937f5e90f6d9502ed468cd33cd490ef16e00f8301fd79e30643b7d5857
+====================================================================================================
+using System;
+using S_SnapTools;
+using UnityEngine;
+
+namespace LE_LevelEditor.Core;
+
+[Serializable]
+public class LE_ObjectSnapPoint
+{
+	private const string BUTTON_VISUALS_NAME = "LE_ObjectSnapPoint.Button.Visuals";
+
+	[SerializeField]
+	private Transform m_point;
+
+	[SerializeField]
+	private S_SnapToObjectPrefab[] m_prefabs = new S_SnapToObjectPrefab[1];
+
+	[SerializeField]
+	private Vector3 m_snapButtonLocalOffset = Vector3.zero;
+
+	[SerializeField]
+	private float m_snapButtonSize = 1f;
+
+	private S_SnapToObject m_snapSysInstance;
+
+	public Transform Point
+	{
+		get
+		{
+			return m_point;
+		}
+		set
+		{
+			m_point = value;
+		}
+	}
+
+	public S_SnapToObjectPrefab[] Prefabs
+	{
+		get
+		{
+			return m_prefabs;
+		}
+		set
+		{
+			m_prefabs = value;
+		}
+	}
+
+	public Vector3 SnapButtonLocalOffset
+	{
+		get
+		{
+			return m_snapButtonLocalOffset;
+		}
+		set
+		{
+			m_snapButtonLocalOffset = value;
+		}
+	}
+
+	public float SnapButtonSize
+	{
+		get
+		{
+			return m_snapButtonSize;
+		}
+		set
+		{
+			m_snapButtonSize = value;
+		}
+	}
+
+	public S_SnapToObject SnapSystemInstance
+	{
+		get
+		{
+			return m_snapSysInstance;
+		}
+		set
+		{
+			m_snapSysInstance = value;
+		}
+	}
+
+	public LE_ObjectSnapPoint()
+	{
+		if (m_prefabs != null && m_prefabs.Length == 1)
+		{
+			m_prefabs[0] = new S_SnapToObjectPrefab();
+		}
+	}
+
+	public S_SnapToObject InstatiateSnapSystem(GameObject p_buttonVisuals, bool p_isDrawUI, Material p_materialLine, Material p_materialFill)
+	{
+		if (m_point == null)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Transform property 'Point' is null! Set it in the inspector!");
+			return null;
+		}
+		if (m_prefabs == null || m_prefabs.Length == 0)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the Prefabs property array is null or has no entries!");
+			return null;
+		}
+		if (m_snapSysInstance != null)
+		{
+			Debug.LogError("LE_ObjectSnapPoint: InstatiateSnapSystem: the system was already initialized!");
+			UnityEngine.Object.Destroy(m_snapSysInstance);
+		}
+		m_snapSysInstance = Point.gameObject.AddComponent<S_SnapToObject>();
+		m_snapSysInstance.Prefabs = Prefabs;
+		m_snapSysInstance.IsDeactivatedAfterSnap = true;
+		m_snapSysInstance.IsDestroyedAfterSnap = false;
+		m_snapSysInstance.IsDrawUI = p_isDrawUI;
+		m_snapSysInstance.UImaterialLine = p_materialLine;
+		m_snapSysInstance.UImaterialFill = p_materialFill;
+		SphereCollider sphereCollider = Point.gameObject.AddComponent<SphereCollider>();
+		sphereCollider.radius = SnapButtonSize * 0.5f;
+		sphereCollider.center = SnapButtonLocalOffset;
+		p_buttonVisuals.name = "LE_ObjectSnapPoint.Button.Visuals";
+		if (p_buttonVisuals != null)
+		{
+			p_buttonVisuals.transform.parent = Point;
+			p_buttonVisuals.transform.localPosition = m_snapButtonLocalOffset;
+			p_buttonVisuals.transform.localScale = Vector3.one * m_snapButtonSize;
+			p_buttonVisuals.transform.localRotation = Quaternion.identity;
+		}
+		else
+		{
+			Debug.LogWarning("LE_ObjectSnapPoint: InstatiateSnapSystem: p_buttonVisuals is null! The snap button will be invisible for the user!");
+		}
+		return m_snapSysInstance;
+	}
+
+	public static void DestroySnapSystem(S_SnapToObject p_system)
+	{
+		if (!(p_system != null))
+		{
+			return;
+		}
+		UnityEngine.Object.Destroy(p_system);
+		UnityEngine.Object.Destroy(p_system.GetComponent<SphereCollider>());
+		Transform[] componentsInChildren = p_system.GetComponentsInChildren<Transform>(includeInactive: true);
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			if (componentsInChildren[i].name == "LE_ObjectSnapPoint.Button.Visuals")
+			{
+				UnityEngine.Object.Destroy(componentsInChildren[i].gameObject);
+			}
+		}
+	}
+}
+
+====================================================================================================
+SOURCE FILE 379
 PATH: Assembly-CSharp__LE_LevelEditor.Core__LE_TerrainManager.cs
 SIZE: 9425 bytes
 SHA256: 6a69458febae5f5a6807b81eada07df770fb7f0fea51274f8b766447b6b52b0e
 ====================================================================================================
-
 using LE_LevelEditor.Events;
 using UnityEngine;
 
@@ -253,15 +844,12 @@ public class LE_TerrainManager
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 377
+SOURCE FILE 380
 PATH: Assembly-CSharp__LE_LevelEditor.Logic__LE_ScreenshotCamera.cs
 SIZE: 2385 bytes
 SHA256: 09887f9f6363e9379a6908038f1db5d0b29baf4946d69ce1a9e2235068c6aaae
 ====================================================================================================
-
 using System.Collections;
 using Beam;
 using UnityEngine;
@@ -346,15 +934,12 @@ public class LE_ScreenshotCamera : Singleton<LE_ScreenshotCamera>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 378
+SOURCE FILE 381
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUI3dObject.cs
 SIZE: 26291 bytes
 SHA256: a95d25a38b2864fc38e5d83f2dda4843e35a6bff41516d09fce477e05de01645
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -1242,15 +1827,12 @@ public class LE_GUI3dObject : LE_GUI3dBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 379
+SOURCE FILE 382
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUI3dTerrain.cs
 SIZE: 9096 bytes
 SHA256: 5a3ba1eee67652944b768fd1bebf671dbf840e4ea4a82a4c70b5c9cade30ae68
 ====================================================================================================
-
 using LE_LevelEditor.Core;
 using LE_LevelEditor.Events;
 using LE_LevelEditor.Logic;
@@ -1622,15 +2204,12 @@ public class LE_GUI3dTerrain : LE_GUI3dBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 380
+SOURCE FILE 383
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUIInterface_uGUIimpl.cs
 SIZE: 22361 bytes
 SHA256: 94e2c4099668f809fed53e2710286c3987cb52a70329fca055118888b5571e93
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -2183,15 +2762,12 @@ public class LE_GUIInterface_uGUIimpl : LE_GUIInterface_uGUIimplBase
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 381
+SOURCE FILE 384
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_GUIInterface_uGUIimplBase.cs
 SIZE: 925 bytes
 SHA256: b1a12e4307f294d2e3ed9df62b18d75b71416982d324941bfad57d740c1bf282
 ====================================================================================================
-
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -2226,15 +2802,12 @@ public class LE_GUIInterface_uGUIimplBase : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 382
+SOURCE FILE 385
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectCategoryNode.cs
 SIZE: 1489 bytes
 SHA256: 2abf585d93c4c33a6923eaa79eaa4c89b35014b5ca5b77920402db133f2aa96b
 ====================================================================================================
-
 using Beam.UI;
 using MyUtility;
 using UnityEngine;
@@ -2292,15 +2865,12 @@ public class LE_ObjectCategoryNode : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 383
+SOURCE FILE 386
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectDragDrop.cs
 SIZE: 1699 bytes
 SHA256: a0d6e8a8cf889e0a9b5a175545d3f746284434c21a1d3a6eeb3bd6b4b5ca2b2e
 ====================================================================================================
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -2369,15 +2939,12 @@ public class LE_ObjectDragDrop : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 384
+SOURCE FILE 387
 PATH: Assembly-CSharp__LE_LevelEditor.UI__LE_ObjectPrefabNode.cs
 SIZE: 2776 bytes
 SHA256: e4955f3071d56c468aefecc0e44c48a5ba66068c706fb31961a9717930a743dd
 ====================================================================================================
-
 using Beam.UI;
 using LE_LevelEditor.Core;
 using UnityEngine;
@@ -2488,15 +3055,12 @@ public class LE_ObjectPrefabNode : MonoBehaviour
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 385
+SOURCE FILE 388
 PATH: Assembly-CSharp__LE_LevelEditor__LE_DensityBounds.cs
 SIZE: 2732 bytes
 SHA256: b31b02f58b2301ced14e4b8b5b6f05296b4da071f0396f244037e28e24498bba
 ====================================================================================================
-
 using Beam;
 using LE_LevelEditor.Core;
 using UnityEngine;
@@ -2610,15 +3174,12 @@ public class LE_DensityBounds : Singleton<LE_DensityBounds>
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 386
+SOURCE FILE 389
 PATH: Assembly-CSharp__LE_LevelEditor__LE_LevelEditorMain.cs
 SIZE: 24682 bytes
 SHA256: 7aa156e431510e5853365f81e82e338349a49cb3815ef2269ed1fd79aebd3092
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -3330,15 +3891,12 @@ public class LE_LevelEditorMain : Singleton<LE_LevelEditorMain>, LE_IInputHandle
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 387
+SOURCE FILE 390
 PATH: Assembly-CSharp__LE_LevelEditor__LE_ZoneTileGenerator.cs
 SIZE: 4902 bytes
 SHA256: 621bbdfa03f6331ef1bfd1f3723d491f8933a337ce3221d52ddce3074a541013
 ====================================================================================================
-
 using Beam;
 using Beam.Terrain;
 using Ceto;
@@ -3477,438 +4035,12 @@ public class LE_ZoneTileGenerator : Singleton<LE_ZoneTileGenerator>
 	}
 }
 
-
-
-====================================================================================================
-SOURCE FILE 388
-PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceTrigger.cs
-SIZE: 1576 bytes
-SHA256: a3eb1c83d2e308d4aa8b8068e1f2625d7e074796353e96efd61e2a028227fa30
-====================================================================================================
-
-using UnityEngine;
-
-namespace LS_LevelStreaming;
-
-public class LS_DistanceTrigger : LS_ITrigger
-{
-	private int m_updateFrequency;
-
-	private Transform m_playerOrCameraTransform;
-
-	private Transform m_triggeredObjectTransform;
-
-	private float m_spawnDistance;
-
-	private float m_despawnDistance;
-
-	private bool m_isVisible;
-
-	private int m_updateCounter;
-
-	public LS_DistanceTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, Transform p_triggeredObjectTransform, float p_spawnDistance, float p_despawnDistance)
-	{
-		m_updateFrequency = p_updateFrequency;
-		if (m_updateFrequency > 0)
-		{
-			m_updateCounter = Random.Range(0, m_updateFrequency);
-		}
-		m_playerOrCameraTransform = p_playerOrCameraTransform;
-		m_triggeredObjectTransform = p_triggeredObjectTransform;
-		m_spawnDistance = p_spawnDistance;
-		m_despawnDistance = p_despawnDistance;
-		if (m_triggeredObjectTransform != null)
-		{
-			m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
-		}
-	}
-
-	bool LS_ITrigger.IsVisible()
-	{
-		if (m_updateCounter <= 0)
-		{
-			m_updateCounter = m_updateFrequency;
-			if (m_playerOrCameraTransform != null && m_triggeredObjectTransform != null)
-			{
-				m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
-				float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectTransform.position).magnitude;
-				if (m_spawnDistance >= magnitude)
-				{
-					m_isVisible = true;
-				}
-				else if (m_despawnDistance <= magnitude)
-				{
-					m_isVisible = false;
-				}
-			}
-		}
-		else
-		{
-			m_updateCounter--;
-		}
-		return m_isVisible;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 389
-PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceUpdatedTrigger.cs
-SIZE: 2130 bytes
-SHA256: 672ba0d3c7ed2bf02058e18807497729c0bd90e216b7ec03109cf4d047af3689
-====================================================================================================
-
-using UnityEngine;
-
-namespace LS_LevelStreaming;
-
-public class LS_DistanceUpdatedTrigger : LS_ITriggerByUpdatedPosition, LS_ITrigger
-{
-	private int m_updateFrequency;
-
-	private Transform m_playerOrCameraTransform;
-
-	private Vector3 m_triggeredObjectPosition;
-
-	private float m_spawnDistance;
-
-	private float m_despawnDistance;
-
-	private bool m_isAlwaysVisibleWithOrthoCam;
-
-	private bool m_isVisible;
-
-	private int m_updateCounter;
-
-	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance, bool p_isAlwaysVisibleWithOrthoCam)
-		: this(p_updateFrequency, p_playerOrCameraTransform, p_spawnDistance, p_despawnDistance)
-	{
-		m_isAlwaysVisibleWithOrthoCam = p_isAlwaysVisibleWithOrthoCam;
-	}
-
-	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance)
-	{
-		m_updateFrequency = p_updateFrequency;
-		if (m_updateFrequency > 0)
-		{
-			m_updateCounter = Random.Range(0, m_updateFrequency);
-		}
-		m_playerOrCameraTransform = p_playerOrCameraTransform;
-		m_spawnDistance = p_spawnDistance;
-		m_despawnDistance = p_despawnDistance;
-		m_isVisible = false;
-	}
-
-	void LS_ITriggerByUpdatedPosition.Update(Vector3 p_newPosition)
-	{
-		m_triggeredObjectPosition = p_newPosition;
-	}
-
-	bool LS_ITrigger.IsVisible()
-	{
-		if (m_updateCounter <= 0)
-		{
-			m_updateCounter = m_updateFrequency;
-			if (m_playerOrCameraTransform != null)
-			{
-				bool flag = false;
-				if (m_isAlwaysVisibleWithOrthoCam)
-				{
-					Camera component = m_playerOrCameraTransform.GetComponent<Camera>();
-					if (component != null && component.orthographic)
-					{
-						flag = true;
-					}
-				}
-				if (flag)
-				{
-					m_isVisible = true;
-				}
-				else
-				{
-					float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectPosition).magnitude;
-					if (m_spawnDistance >= magnitude)
-					{
-						m_isVisible = true;
-					}
-					else if (m_despawnDistance <= magnitude)
-					{
-						m_isVisible = false;
-					}
-				}
-			}
-		}
-		else
-		{
-			m_updateCounter--;
-		}
-		return m_isVisible;
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 390
-PATH: Assembly-CSharp__Ladders.cs
-SIZE: 1116 bytes
-SHA256: b1590f70ea7530959d91374dfe4788d4869939fa2588b5b38589786a9d245061
-====================================================================================================
-
-using Beam;
-using Beam.Utilities;
-using UnityEngine;
-
-public class Ladders : MonoBehaviour
-{
-	public bool isTree;
-
-	public Transform LandPos;
-
-	[HideInInspector]
-	public BoxCollider LadderCollider;
-
-	private void Awake()
-	{
-		LadderCollider = GetComponent<BoxCollider>();
-	}
-
-	private void OnTriggerEnter(Collider collided)
-	{
-		if (collided.CompareTag("Player"))
-		{
-			IPlayer ladder = collided.GetInterface<IPlayer>();
-			SetLadder(ladder);
-		}
-	}
-
-	private void OnTriggerExit(Collider collided)
-	{
-		if (collided.CompareTag("Player"))
-		{
-			IPlayer player = collided.GetInterface<IPlayer>();
-			ResetLadder(player);
-		}
-	}
-
-	private void SetLadder(IPlayer player)
-	{
-		if (!player.IsNullOrDestroyed())
-		{
-			player.Movement.activeLadder = this;
-		}
-	}
-
-	private void ResetLadder(IPlayer player)
-	{
-		if (!player.IsNullOrDestroyed() && player.Movement.activeLadder == this)
-		{
-			if (player.Movement.ClimbingLadder)
-			{
-				player.Movement.CharacterController.Move(-player.Movement.transform.forward * 1f + player.Movement.transform.up * 0.2f * Time.deltaTime);
-			}
-			player.Movement.ExitLadder();
-		}
-	}
-}
-
-
-
 ====================================================================================================
 SOURCE FILE 391
-PATH: Assembly-CSharp__LandAnimalSpawner.cs
-SIZE: 4461 bytes
-SHA256: be8f8a065eebffd746526dfb0f93d29dbe6491a90d16c429d77276ed7657b8f1
-====================================================================================================
-
-using System;
-using Beam;
-using Beam.Crafting;
-using Beam.Serialization.Json;
-using Beam.Utilities;
-using Funlabs;
-using UnityEngine;
-
-public class LandAnimalSpawner : SaveablePrefab
-{
-	[SerializeField]
-	private GameObject _landCreature;
-
-	private LandAnimal _activeCreature;
-
-	[SerializeField]
-	private bool _canRespawn;
-
-	[SerializeField]
-	private bool _ignoreRemovedWildLifeSetting;
-
-	private bool _removedWildlifeSetting;
-
-	[SerializeField]
-	private int _respawnHours;
-
-	private int _respawningTimer = -1;
-
-	private DateTime _lastPollTime;
-
-	private void Start()
-	{
-		if (!LevelLoader.IsLoading())
-		{
-			Initialize();
-		}
-	}
-
-	public override void OnCustomMapLoaded()
-	{
-		base.OnCustomMapLoaded();
-		Initialize();
-	}
-
-	private void Initialize()
-	{
-		if (Singleton<GameTime>.Instance != null)
-		{
-			Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
-		}
-		if (_activeCreature.IsNullOrDestroyed())
-		{
-			PollSpawn();
-		}
-	}
-
-	private void SetDifficultyParams()
-	{
-		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
-	}
-
-	private void OnDestroy()
-	{
-		if (Singleton<GameTime>.Instance != null)
-		{
-			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
-		}
-	}
-
-	private void GameTime_HourTick()
-	{
-		if (_activeCreature.IsNullOrDestroyed())
-		{
-			_respawningTimer++;
-			PollSpawn();
-		}
-	}
-
-	private void PollSpawn()
-	{
-		if (Game.Mode.IsClient())
-		{
-			return;
-		}
-		SetDifficultyParams();
-		if (_removedWildlifeSetting && !_ignoreRemovedWildLifeSetting)
-		{
-			return;
-		}
-		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
-		if (player != null)
-		{
-			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < 20f;
-			if (((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == -1) && !SpawnerInsideStructure())
-			{
-				_respawningTimer = 0;
-				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_landCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
-				_activeCreature = gameObject.GetComponent<LandAnimal>();
-			}
-		}
-	}
-
-	private bool SpawnerInsideStructure()
-	{
-		if (BeamPhysics.GetComponentsInSphere<Constructing>(transform.position, 1.5f, (1 << Layers.CONSTRUCTIONS) | (1 << Layers.CONSTRUCTIONS_SMALL)).Count > 0)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
-	{
-		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		JObject data = JSerializer.Serialize(transform);
-		jObject.AddField("Transform", data);
-		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
-		_lastPollTime = GameTime.Now;
-		jObject.AddField("lastPollTime", JSerializer.Serialize(_lastPollTime));
-		if (!_activeCreature.IsNullOrDestroyed())
-		{
-			InteractiveObject component = _activeCreature.GetComponent<InteractiveObject>();
-			if (!component.IsNullOrDestroyed())
-			{
-				jObject.AddField("ActiveAnimal", component.ReferenceId.ToString());
-			}
-		}
-		return jObject;
-	}
-
-	public override void Load(JObject data)
-	{
-		base.Load(data);
-		if (data != null && !data.IsNull())
-		{
-			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
-			CompleteTransformSerialization();
-			int value = data.GetField("respawnCounter").GetValue<int>();
-			_respawningTimer = value;
-			JObject field = data.GetField("lastPollTime");
-			if (field != null)
-			{
-				_lastPollTime = JSerializer.Deserialize<DateTime>(field);
-				int num = (int)GameTime.GetHoursSince(_lastPollTime);
-				if (_respawningTimer > 0)
-				{
-					_respawningTimer += num;
-				}
-			}
-			JObject activeAnimalData = data.GetField("ActiveAnimal");
-			if (activeAnimalData != null)
-			{
-				LevelLoader.CurrentLoader.DeferredLoading.Add(() =>
-				{
-					InteractiveObject interactiveObject = MultiplayerMng.FindObject<InteractiveObject>(activeAnimalData.GetValue<string>().ToMiniGuid());
-					if (!interactiveObject.IsNullOrDestroyed())
-					{
-						LandAnimal component = interactiveObject.GetComponent<LandAnimal>();
-						if (!component.IsNullOrDestroyed())
-						{
-							_activeCreature = component;
-							_activeCreature.StartingPosition = transform.position;
-							Initialize();
-						}
-					}
-				});
-				return;
-			}
-		}
-		Initialize();
-	}
-}
-
-
-
-====================================================================================================
-SOURCE FILE 392
 PATH: Assembly-CSharp__LevelLoader.cs
 SIZE: 26669 bytes
 SHA256: cfdb0ccbbeb6a8a50c04987f708d0ca4c9bc67e47b48d2cae2d3de7f2b2057b5
 ====================================================================================================
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -4822,15 +4954,12 @@ public class LevelLoader : MonoBehaviour, ILoader
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 393
+SOURCE FILE 392
 PATH: Assembly-CSharp__LootContainerSpawner.cs
 SIZE: 6931 bytes
 SHA256: 6c1b581e8346d425b72a3de5b900c89bd777e6ff020c696fcf6f0b13c9241b0d
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -5115,15 +5244,176 @@ public class LootContainerSpawner : SaveablePrefab
 	}
 }
 
+====================================================================================================
+SOURCE FILE 393
+PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceTrigger.cs
+SIZE: 1576 bytes
+SHA256: a3eb1c83d2e308d4aa8b8068e1f2625d7e074796353e96efd61e2a028227fa30
+====================================================================================================
+using UnityEngine;
 
+namespace LS_LevelStreaming;
+
+public class LS_DistanceTrigger : LS_ITrigger
+{
+	private int m_updateFrequency;
+
+	private Transform m_playerOrCameraTransform;
+
+	private Transform m_triggeredObjectTransform;
+
+	private float m_spawnDistance;
+
+	private float m_despawnDistance;
+
+	private bool m_isVisible;
+
+	private int m_updateCounter;
+
+	public LS_DistanceTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, Transform p_triggeredObjectTransform, float p_spawnDistance, float p_despawnDistance)
+	{
+		m_updateFrequency = p_updateFrequency;
+		if (m_updateFrequency > 0)
+		{
+			m_updateCounter = Random.Range(0, m_updateFrequency);
+		}
+		m_playerOrCameraTransform = p_playerOrCameraTransform;
+		m_triggeredObjectTransform = p_triggeredObjectTransform;
+		m_spawnDistance = p_spawnDistance;
+		m_despawnDistance = p_despawnDistance;
+		if (m_triggeredObjectTransform != null)
+		{
+			m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
+		}
+	}
+
+	bool LS_ITrigger.IsVisible()
+	{
+		if (m_updateCounter <= 0)
+		{
+			m_updateCounter = m_updateFrequency;
+			if (m_playerOrCameraTransform != null && m_triggeredObjectTransform != null)
+			{
+				m_isVisible = m_triggeredObjectTransform.gameObject.activeSelf;
+				float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectTransform.position).magnitude;
+				if (m_spawnDistance >= magnitude)
+				{
+					m_isVisible = true;
+				}
+				else if (m_despawnDistance <= magnitude)
+				{
+					m_isVisible = false;
+				}
+			}
+		}
+		else
+		{
+			m_updateCounter--;
+		}
+		return m_isVisible;
+	}
+}
 
 ====================================================================================================
 SOURCE FILE 394
+PATH: Assembly-CSharp__LS_LevelStreaming__LS_DistanceUpdatedTrigger.cs
+SIZE: 2130 bytes
+SHA256: 672ba0d3c7ed2bf02058e18807497729c0bd90e216b7ec03109cf4d047af3689
+====================================================================================================
+using UnityEngine;
+
+namespace LS_LevelStreaming;
+
+public class LS_DistanceUpdatedTrigger : LS_ITriggerByUpdatedPosition, LS_ITrigger
+{
+	private int m_updateFrequency;
+
+	private Transform m_playerOrCameraTransform;
+
+	private Vector3 m_triggeredObjectPosition;
+
+	private float m_spawnDistance;
+
+	private float m_despawnDistance;
+
+	private bool m_isAlwaysVisibleWithOrthoCam;
+
+	private bool m_isVisible;
+
+	private int m_updateCounter;
+
+	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance, bool p_isAlwaysVisibleWithOrthoCam)
+		: this(p_updateFrequency, p_playerOrCameraTransform, p_spawnDistance, p_despawnDistance)
+	{
+		m_isAlwaysVisibleWithOrthoCam = p_isAlwaysVisibleWithOrthoCam;
+	}
+
+	public LS_DistanceUpdatedTrigger(int p_updateFrequency, Transform p_playerOrCameraTransform, float p_spawnDistance, float p_despawnDistance)
+	{
+		m_updateFrequency = p_updateFrequency;
+		if (m_updateFrequency > 0)
+		{
+			m_updateCounter = Random.Range(0, m_updateFrequency);
+		}
+		m_playerOrCameraTransform = p_playerOrCameraTransform;
+		m_spawnDistance = p_spawnDistance;
+		m_despawnDistance = p_despawnDistance;
+		m_isVisible = false;
+	}
+
+	void LS_ITriggerByUpdatedPosition.Update(Vector3 p_newPosition)
+	{
+		m_triggeredObjectPosition = p_newPosition;
+	}
+
+	bool LS_ITrigger.IsVisible()
+	{
+		if (m_updateCounter <= 0)
+		{
+			m_updateCounter = m_updateFrequency;
+			if (m_playerOrCameraTransform != null)
+			{
+				bool flag = false;
+				if (m_isAlwaysVisibleWithOrthoCam)
+				{
+					Camera component = m_playerOrCameraTransform.GetComponent<Camera>();
+					if (component != null && component.orthographic)
+					{
+						flag = true;
+					}
+				}
+				if (flag)
+				{
+					m_isVisible = true;
+				}
+				else
+				{
+					float magnitude = (m_playerOrCameraTransform.position - m_triggeredObjectPosition).magnitude;
+					if (m_spawnDistance >= magnitude)
+					{
+						m_isVisible = true;
+					}
+					else if (m_despawnDistance <= magnitude)
+					{
+						m_isVisible = false;
+					}
+				}
+			}
+		}
+		else
+		{
+			m_updateCounter--;
+		}
+		return m_isVisible;
+	}
+}
+
+====================================================================================================
+SOURCE FILE 395
 PATH: Assembly-CSharp__MapLoader.cs
 SIZE: 2603 bytes
 SHA256: 13ee2e3a60cb8e19075adbb1dd8eeef7983c52a3704544213d237925118fd049
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -5215,15 +5505,12 @@ public class MapLoader : ILoader
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 395
+SOURCE FILE 396
 PATH: Assembly-CSharp__MapNameGenerator.cs
 SIZE: 1016 bytes
 SHA256: 94cf139b37fa93f2db93331f482af5d73b096a3b59879e7d11c4cdef410334be
 ====================================================================================================
-
 using System;
 
 public static class MapNameGenerator
@@ -5241,15 +5528,12 @@ public static class MapNameGenerator
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 396
+SOURCE FILE 397
 PATH: Assembly-CSharp__Module.cs
 SIZE: 3296 bytes
 SHA256: 9327348f83a9d3f9d3986c4f03b14501fb7c80f9238439b85d418134c6f64f84
 ====================================================================================================
-
 using System;
 using System.Collections.Generic;
 using Beam;
@@ -5405,15 +5689,12 @@ public class Module : SaveablePrefab
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 397
+SOURCE FILE 398
 PATH: Assembly-CSharp__NullAudioPlayer.cs
 SIZE: 1263 bytes
 SHA256: 8816230d8246891d4cdb90a2078471bfb22715b875a39409c659d5c3f6753e1c
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -5456,15 +5737,12 @@ public class NullAudioPlayer : IAudioPlayer
 	}
 }
 
-
-
 ====================================================================================================
-SOURCE FILE 398
+SOURCE FILE 399
 PATH: Assembly-CSharp__ParticleManager.cs
 SIZE: 2615 bytes
 SHA256: f5a4978daea0e826e972bbdce76717e742ca17d3c6617da7dc6a3bb04efb3dbd
 ====================================================================================================
-
 using Beam;
 using UnityEngine;
 
@@ -5559,548 +5837,151 @@ public class ParticleManager : Singleton<ParticleManager>
 	}
 }
 
-
-
-====================================================================================================
-SOURCE FILE 399
-PATH: Assembly-CSharp__PiscusFollower.cs
-SIZE: 9741 bytes
-SHA256: 016b64de7a5df1f33079aadbc10505f918f6268d6e9d04ab7fff56637d0cc18c
-====================================================================================================
-
-using System;
-using Beam;
-using Beam.Serialization.Json;
-using Funlabs;
-using UnityEngine;
-
-public class PiscusFollower : Singleton<PiscusFollower>, IPersistentSaveable, ISaveable
-{
-	[Serializable]
-	public class CreatureToSpawn
-	{
-		public GameObject CreatureObj;
-
-		public float Rarity;
-	}
-
-	private class PlayerGridGroup
-	{
-		private int PlayerId;
-
-		public SpawnGrid[,] SpawnGrids;
-
-		public IPlayer Player => PlayerUtilities.GetPlayerFromId(PlayerId);
-
-		public PlayerGridGroup(int playerId)
-		{
-			PlayerId = playerId;
-		}
-	}
-
-	private class SpawnGrid
-	{
-		public Transform Grid;
-
-		public PiscusManager piscusManager;
-
-		public bool CanGenerate = true;
-
-		public bool Generated;
-
-		public SpawnGrid(Transform grid)
-		{
-			Grid = grid;
-		}
-	}
-
-	private const int GRID_DIMENSION = 250;
-
-	private const int GRID_SIZE = 3;
-
-	private Vector3[] _loadedCenterGridPos = new Vector3[2];
-
-	public CreatureToSpawn[] Creatures;
-
-	private PlayerGridGroup[] _playerGridGroup;
-
-	private bool _removedWildlifeSetting;
-
-	private void Start()
-	{
-		if (!LevelLoader.IsLoading() && (bool)Singleton<StrandedWorld>.Instance)
-		{
-			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
-		}
-	}
-
-	private void SetDifficultyParams()
-	{
-		_removedWildlifeSetting = PlayerUtilities.GetServerWildlifeMode() == EGameWildlifeMode.Removed;
-	}
-
-	protected override void OnDestroy()
-	{
-		if ((bool)Singleton<StrandedWorld>.Instance)
-		{
-			Singleton<StrandedWorld>.Instance.WorldGenerated -= CreateGrid;
-		}
-		base.OnDestroy();
-	}
-
-	private void CreateGrid()
-	{
-		if (Game.Mode.IsClient())
-		{
-			return;
-		}
-		SetDifficultyParams();
-		int count = PlayerRegistry.AllPlayers.Count;
-		_playerGridGroup = new PlayerGridGroup[count];
-		for (int i = 0; i < PlayerRegistry.AllPlayers.Count; i++)
-		{
-			_ = PlayerRegistry.AllPlayers[i];
-			_playerGridGroup[i] = new PlayerGridGroup(i);
-		}
-		for (int j = 0; j < _playerGridGroup.Length; j++)
-		{
-			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
-			playerGridGroup.SpawnGrids = new SpawnGrid[3, 3];
-			Transform transform = new GameObject("PlayerGrid_" + j).transform;
-			transform.transform.parent = base.transform;
-			for (int k = 0; k < 3; k++)
-			{
-				for (int l = 0; l < 3; l++)
-				{
-					Transform transform2 = new GameObject("Spawn_Grid_" + k + "_" + l).transform;
-					transform2.parent = transform;
-					transform2.gameObject.layer = gameObject.layer;
-					playerGridGroup.SpawnGrids[k, l] = new SpawnGrid(transform2);
-					playerGridGroup.SpawnGrids[k, l].CanGenerate = true;
-				}
-			}
-			Vector3 position = _loadedCenterGridPos[j];
-			playerGridGroup.SpawnGrids[1, 1].Grid.position = position;
-		}
-		InvokeRepeating("MoveGrid", 0f, 1f);
-		UpdateGridPositions();
-	}
-
-	private void MoveGrid()
-	{
-		if (LevelLoader.IsServerJoinInProgress)
-		{
-			return;
-		}
-		for (int i = 0; i < _playerGridGroup.Length; i++)
-		{
-			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
-			if (playerGridGroup.Player != null && playerGridGroup.SpawnGrids[2, 2] == null)
-			{
-				return;
-			}
-		}
-		for (int j = 0; j < _playerGridGroup.Length; j++)
-		{
-			PlayerGridGroup playerGridGroup2 = _playerGridGroup[j];
-			if (playerGridGroup2.Player == null)
-			{
-				continue;
-			}
-			Vector3 position = playerGridGroup2.Player.transform.position;
-			SpawnGrid spawnGrid = null;
-			int num = 0;
-			int num2 = 0;
-			for (int k = 0; k < 3; k++)
-			{
-				for (int l = 0; l < 3; l++)
-				{
-					Vector3 position2 = playerGridGroup2.SpawnGrids[k, l].Grid.position;
-					if (position.x >= position2.x - 125f && position.x <= position2.x + 125f && position.z >= position2.z - 125f && position.z <= position2.z + 125f)
-					{
-						spawnGrid = playerGridGroup2.SpawnGrids[k, l];
-						num = 1 - k;
-						num2 = 1 - l;
-						break;
-					}
-				}
-			}
-			if (spawnGrid == playerGridGroup2.SpawnGrids[1, 1])
-			{
-				continue;
-			}
-			SpawnGrid[,] array = new SpawnGrid[3, 3];
-			for (int m = 0; m < 3; m++)
-			{
-				for (int n = 0; n < 3; n++)
-				{
-					int num3 = m + num;
-					int num4 = n + num2;
-					if (num3 < 0 || num3 > 2 || num4 < 0 || num4 > 2)
-					{
-						if ((bool)playerGridGroup2.SpawnGrids[m, n].piscusManager)
-						{
-							UnityEngine.Object.Destroy(playerGridGroup2.SpawnGrids[m, n].piscusManager.gameObject);
-						}
-						playerGridGroup2.SpawnGrids[m, n].CanGenerate = true;
-						playerGridGroup2.SpawnGrids[m, n].Generated = false;
-					}
-					if (num3 < 0)
-					{
-						num3 = 2;
-					}
-					else if (num3 > 2)
-					{
-						num3 = 0;
-					}
-					if (num4 < 0)
-					{
-						num4 = 2;
-					}
-					else if (num4 > 2)
-					{
-						num4 = 0;
-					}
-					array[num3, num4] = playerGridGroup2.SpawnGrids[m, n];
-					playerGridGroup2.SpawnGrids[m, n].Grid.gameObject.name = "Spawn_Grid_" + num3 + "_" + num4;
-				}
-			}
-			playerGridGroup2.SpawnGrids = array;
-			UpdateGridPositions();
-		}
-	}
-
-	private void UpdateGridPositions()
-	{
-		for (int i = 0; i < _playerGridGroup.Length; i++)
-		{
-			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
-			if (playerGridGroup.Player == null)
-			{
-				continue;
-			}
-			playerGridGroup.SpawnGrids[0, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
-			playerGridGroup.SpawnGrids[0, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
-			playerGridGroup.SpawnGrids[0, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x - 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
-			playerGridGroup.SpawnGrids[1, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
-			playerGridGroup.SpawnGrids[1, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
-			playerGridGroup.SpawnGrids[2, 0].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z + 250f);
-			playerGridGroup.SpawnGrids[2, 1].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z);
-			playerGridGroup.SpawnGrids[2, 2].Grid.position = new Vector3(playerGridGroup.SpawnGrids[1, 1].Grid.position.x + 250f, transform.position.y, playerGridGroup.SpawnGrids[1, 1].Grid.position.z - 250f);
-			if (_removedWildlifeSetting)
-			{
-				break;
-			}
-			for (int j = 0; j < 3; j++)
-			{
-				for (int k = 0; k < 3; k++)
-				{
-					SpawnGrid spawnGrid = playerGridGroup.SpawnGrids[j, k];
-					if (spawnGrid.CanGenerate)
-					{
-						CreateGridObjects(spawnGrid);
-					}
-				}
-			}
-		}
-	}
-
-	private void CreateGridObjects(SpawnGrid grid)
-	{
-		Zone[] zones = Singleton<StrandedWorld>.Instance.Zones;
-		foreach (Zone zone in zones)
-		{
-			if ((grid.Grid.position - zone.transform.position).magnitude < 150f || grid.Grid.position.x > 2500f || grid.Grid.position.x < -2500f || grid.Grid.position.z > 2500f || grid.Grid.position.z < -2500f)
-			{
-				return;
-			}
-		}
-		for (int j = 0; j < _playerGridGroup.Length; j++)
-		{
-			PlayerGridGroup playerGridGroup = _playerGridGroup[j];
-			if (playerGridGroup.Player == null)
-			{
-				continue;
-			}
-			for (int k = 0; k < 3; k++)
-			{
-				for (int l = 0; l < 3; l++)
-				{
-					if ((grid.Grid.position - playerGridGroup.SpawnGrids[k, l].Grid.transform.position).magnitude < 10f && playerGridGroup.SpawnGrids[k, l].Generated)
-					{
-						return;
-					}
-				}
-			}
-		}
-		grid.CanGenerate = false;
-		grid.Generated = true;
-		GameObject gameObject = ChooseCreature();
-		if (!(gameObject == null))
-		{
-			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject, grid.Grid.position, Quaternion.identity);
-			grid.piscusManager = gameObject2.GetComponent<PiscusManager>();
-			grid.piscusManager.SpawnDistance = 150f;
-			gameObject2.transform.parent = grid.Grid.transform;
-			grid.piscusManager.transform.position = grid.Grid.position;
-		}
-	}
-
-	private GameObject ChooseCreature()
-	{
-		float num = 0f;
-		CreatureToSpawn[] creatures = Creatures;
-		foreach (CreatureToSpawn creatureToSpawn in creatures)
-		{
-			num += creatureToSpawn.Rarity;
-		}
-		float num2 = UnityEngine.Random.value * num;
-		for (int j = 0; j < Creatures.Length; j++)
-		{
-			if (num2 < Creatures[j].Rarity)
-			{
-				return Creatures[j].CreatureObj;
-			}
-			num2 -= Creatures[j].Rarity;
-		}
-		return null;
-	}
-
-	public JObject Save()
-	{
-		JObject jObject = new JObject();
-		for (int i = 0; i < _playerGridGroup.Length; i++)
-		{
-			PlayerGridGroup playerGridGroup = _playerGridGroup[i];
-			jObject.AddField("CenterGridPos_" + i, JSerializer.Serialize(playerGridGroup.SpawnGrids[1, 1].Grid.position));
-		}
-		return jObject;
-	}
-
-	public void Load(JObject data)
-	{
-		int playersCount = Game.Mode.GetPlayersCount();
-		_loadedCenterGridPos = new Vector3[playersCount];
-		if (data != null && !data.IsNull())
-		{
-			JObject field = data.GetField("CenterGridPos");
-			if (field != null)
-			{
-				Vector3 vector = JSerializer.Deserialize<Vector3>(field);
-				for (int i = 0; i < playersCount; i++)
-				{
-					_loadedCenterGridPos[i] = vector;
-				}
-			}
-			for (int j = 0; j < playersCount; j++)
-			{
-				JObject field2 = data.GetField("CenterGridPos_" + j);
-				if (field2 != null)
-				{
-					_loadedCenterGridPos[j] = JSerializer.Deserialize<Vector3>(field2);
-				}
-			}
-		}
-		if ((bool)Singleton<StrandedWorld>.Instance)
-		{
-			Singleton<StrandedWorld>.Instance.WorldGenerated += CreateGrid;
-		}
-		CreateGrid();
-	}
-}
-
-
-
 ====================================================================================================
 SOURCE FILE 400
-PATH: Assembly-CSharp__PiscusManager.cs
-SIZE: 4830 bytes
-SHA256: fbebe0d06b7282962f4240fd732854526ec4c0b3e88322f896075617c838769a
+PATH: Assembly-CSharp__Piscus_Animation.cs
+SIZE: 3465 bytes
+SHA256: 5c5911044eaaa2054d510b2cafafb4bb0e6458ef157110d07e8c777d66a28ae3
 ====================================================================================================
-
-using Beam;
-using Beam.Serialization.Json;
-using Funlabs;
 using UnityEngine;
 
-public class PiscusManager : SaveablePrefab
+public class Piscus_Animation : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject _piscusCreature;
-
-	private Piscus_Creature _activeCreature;
+	private Animation _anim;
 
 	[SerializeField]
-	private float _spawnDistance = 60f;
+	private Animator _animatorController;
 
-	private float _territoryRadius;
+	private float _normalDirection;
 
-	[SerializeField]
-	private bool _canRespawn;
+	public Animator AnimatorController => _animatorController;
 
-	[SerializeField]
-	private int _respawnHours;
-
-	private int _respawningTimer;
-
-	private float _lastPollTime;
-
-	public float SpawnDistance
+	public void Animation_Setup()
 	{
-		get
+		if (_anim != null)
 		{
-			return _spawnDistance;
-		}
-		set
-		{
-			_spawnDistance = value;
-		}
-	}
-
-	private void Start()
-	{
-		transform.position = new Vector3(transform.position.x, -1f, transform.position.z);
-		if (!LevelLoader.IsLoading())
-		{
-			Initialize();
-		}
-	}
-
-	public override void OnCustomMapLoaded()
-	{
-		base.OnCustomMapLoaded();
-		Initialize();
-	}
-
-	private void Initialize()
-	{
-		if (!Game.Mode.IsClient())
-		{
-			if (Singleton<GameTime>.Instance != null)
+			_anim.wrapMode = WrapMode.Loop;
+			if ((bool)_anim["Attack"])
 			{
-				Singleton<GameTime>.Instance.HourTick += GameTime_HourTick;
+				_anim["Attack"].layer = 2;
+				_anim["Attack"].wrapMode = WrapMode.Once;
 			}
-			CheckInsideTerrain();
-			_territoryRadius = _spawnDistance - 15f;
-			float repeatRate = 5f;
-			InvokeRepeating("PollActivation_InvokeRepeating", 0f, repeatRate);
-			PollSpawn();
-		}
-	}
-
-	private void OnDestroy()
-	{
-		if (Singleton<GameTime>.Instance != null)
-		{
-			Singleton<GameTime>.Instance.HourTick -= GameTime_HourTick;
-		}
-		if (_activeCreature != null)
-		{
-			MultiplayerMng.DestroyMultiplayerEntity(_activeCreature.gameObject);
-		}
-	}
-
-	private void GameTime_HourTick()
-	{
-		if (_activeCreature == null)
-		{
-			_respawningTimer++;
-			PollSpawn();
-		}
-	}
-
-	private void PollActivation_InvokeRepeating()
-	{
-		if (!LevelLoader.IsServerJoinInProgress)
-		{
-			IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
-			if (player != null && _activeCreature != null)
+			if ((bool)_anim["Damage_Left"])
 			{
-				bool activate = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
-				Activate_Creature(activate);
+				_anim["Damage_Left"].layer = 1;
+				_anim["Damage_Left"].wrapMode = WrapMode.Once;
+			}
+			if ((bool)_anim["Damage_Right"])
+			{
+				_anim["Damage_Right"].layer = 1;
+				_anim["Damage_Right"].wrapMode = WrapMode.Once;
+			}
+			if ((bool)_anim["Attacking"])
+			{
+				_anim["Attacking"].wrapMode = WrapMode.Once;
+				_anim["Attacking"].layer = 2;
+			}
+			if ((bool)_anim["Swimming_Left"])
+			{
+				_anim["Swimming_Left"].wrapMode = WrapMode.Loop;
+			}
+			if ((bool)_anim["Swimming_Right"])
+			{
+				_anim["Swimming_Right"].wrapMode = WrapMode.Loop;
 			}
 		}
 	}
 
-	private void PollSpawn()
+	public void UpdateAnimation(Vector3 movementPosition, float currentSpeed, float minSpeed, float maxSpeed)
 	{
-		IPlayer player = FindClosestPlayer(transform.position, includeDeadPlayers: true);
-		if (player != null)
+		float a = 0f;
+		Vector3 vector = transform.InverseTransformPoint(movementPosition);
+		a = Mathf.Lerp(a, Mathf.Atan2(vector.x, vector.z), 4f * Time.deltaTime);
+		_normalDirection = Mathf.Lerp(_normalDirection, a, Time.deltaTime * 2f);
+		if (_anim != null)
 		{
-			bool flag = Vector3Tools.DistanceOnAxis(transform.position, player.transform.position, Vector3Tools.xz) < _spawnDistance;
-			if ((_canRespawn && !flag && _respawningTimer > _respawnHours) || _respawningTimer == 0)
+			if (_normalDirection < -0.005f && (bool)_anim["Swimming_Left"])
 			{
-				_respawningTimer = 0;
-				GameObject gameObject = MultiplayerMng.Instantiate<SaveablePrefab>(_piscusCreature.GetComponent<SaveablePrefab>().PrefabId, transform.position, Quaternion.identity, MiniGuid.New()).gameObject;
-				gameObject.transform.parent = Singleton<PiscusInspectionManager>.Instance.transform;
-				_activeCreature = gameObject.GetComponent<Piscus_Creature>();
-				_activeCreature.BiomeSize = _territoryRadius;
-				_activeCreature.EngagePlayerDistance = _activeCreature.BiomeSize * 0.5f;
-				_activeCreature.Manager = this;
+				_anim["Swimming_Left"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
+				_anim.CrossFade("Swimming_Left", 0.4f);
+			}
+			else if (_normalDirection > 0.005f && (bool)_anim["Swimming_Right"])
+			{
+				_anim["Swimming_Right"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
+				_anim.CrossFade("Swimming_Right", 0.4f);
+			}
+			else
+			{
+				_anim["Swimming"].speed = Mathf.Clamp(currentSpeed / 2f, 0.5f, 2f);
+				_anim.CrossFade("Swimming", 0.4f);
 			}
 		}
+		if ((bool)_animatorController)
+		{
+			_animatorController.SetFloat("Direction", _normalDirection);
+			float value = (currentSpeed - minSpeed) / (maxSpeed - minSpeed);
+			_animatorController.SetFloat("Speed", value);
+		}
 	}
 
-	private void Activate_Creature(bool activate)
+	public void Animation_Damage(Vector3 targetPosition)
 	{
-		_lastPollTime = 0f;
-		if (_activeCreature.gameObject.activeSelf != activate)
+		if (_anim != null)
 		{
-			_activeCreature.gameObject.GetComponent<SaveablePrefab>().Active = activate;
-			if (activate)
+			float num = 0f;
+			Vector3 vector = transform.InverseTransformPoint(targetPosition);
+			num = Mathf.Atan2(vector.x, vector.z);
+			if (num < -0.05f && (bool)_anim["Damage_Left"])
 			{
-				_activeCreature.CurrentState = Piscus_Creature.PiscusBehaviour.Explore;
+				_anim.CrossFade("Damage_Left", 0.2f);
+			}
+			else if (num > 0.05f && (bool)_anim["Damage_Right"])
+			{
+				_anim.CrossFade("Damage_Right", 0.2f);
+			}
+			else if ((bool)_anim["Damage_Left"])
+			{
+				_anim.CrossFade("Damage_Left", 0.2f);
 			}
 		}
-	}
-
-	private void CheckInsideTerrain()
-	{
-		if (Physics.CheckSphere(transform.position, 2f, 1 << Layers.TERRAIN) || Physics.Raycast(transform.position + Vector3.up * 5f, -Vector3.up, 7f, 1 << Layers.TERRAIN))
+		if ((bool)_animatorController)
 		{
-			Debug.Log("Manager :: Piscus Manager Destroyed :: Collision with terrain");
-			MultiplayerMng.DestroyMultiplayerEntity(gameObject);
+			_animatorController.SetTrigger("TakeDamage");
 		}
 	}
 
-	private IPlayer FindClosestPlayer(Vector3 position, bool includeDeadPlayers)
+	public void Animation_Bite()
 	{
-		return PlayerUtilities.FindClosestPlayer(position, includeDeadPlayers);
-	}
-
-	public override JObject Save()
-	{
-		JObject jObject = base.Save();
-		JObject data = JSerializer.Serialize(transform);
-		jObject.AddField("Transform", data);
-		jObject.AddField("respawnCounter", JSerializer.Serialize(_respawningTimer));
-		jObject.AddField("spawnDistance", JSerializer.Serialize(_spawnDistance));
-		return jObject;
-	}
-
-	public override void Load(JObject data)
-	{
-		base.Load(data);
-		if (data != null && !data.IsNull())
+		if (_anim != null && (bool)_anim["Attack"])
 		{
-			JSerializer.DeserializeInto(data.GetField("Transform"), transform);
-			CompleteTransformSerialization();
-			int value = data.GetField("respawnCounter").GetValue<int>();
-			_respawningTimer = value;
-			int value2 = data.GetField("spawnDistance").GetValue<int>();
-			_spawnDistance = value2;
-			float x = transform.localPosition.x;
-			float z = transform.localPosition.z;
-			float y = transform.localPosition.y;
-			if (Mathf.Abs(x) == 100f && Mathf.Abs(z) == 100f)
-			{
-				x = ((!(x > 0f)) ? (-88f) : 88f);
-				z = ((!(z > 0f)) ? (-88f) : 88f);
-				transform.localPosition = new Vector3(x, y, z);
-			}
+			_anim.CrossFade("Attack", 0.05f);
 		}
-		Initialize();
+		if ((bool)_animatorController)
+		{
+			_animatorController.SetTrigger("Attack");
+		}
+	}
+
+	public void Animation_Attacking()
+	{
+		if (_anim != null && (bool)_anim["Attacking"])
+		{
+			_anim.CrossFade("Attacking");
+		}
+		if ((bool)_animatorController)
+		{
+			_animatorController.SetTrigger("Attack");
+		}
+	}
+
+	public void Animation_Attack_Complete()
+	{
+		if (_anim != null && (bool)_anim["Attacking"] && (bool)_anim["Attack"])
+		{
+			_anim["Attack"].enabled = false;
+			_anim["Attacking"].enabled = false;
+		}
 	}
 }
-
 
