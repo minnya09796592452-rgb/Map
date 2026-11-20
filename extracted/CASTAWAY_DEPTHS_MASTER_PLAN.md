@@ -2,7 +2,7 @@
 
 **Project:** Stranded Deep Mission 3 reconstruction  
 **Repository:** `minnya09796592452-rgb/Map`  
-**Plan baseline:** V18 completed; V19 is the next planned work package  
+**Current documented checkpoint:** V24 C# source recovery published; terrain reconstruction and Godot integration remain evidence-gated  
 **Build strategy:** Bottom-up, evidence-first, one verified layer at a time
 
 ## Mission
@@ -16,28 +16,71 @@ Reconstruct the Mission 3 terrain and its supporting world data from the origina
 3. Keep each V-stage reproducible: scripts, inputs, outputs, hashes, counts, errors, and a concise summary.
 4. Prefer batch-oriented Termux exports as UTF-8 TXT/CSV files. Upload related reports to this repository and provide their **raw.githubusercontent.com** URLs in grouped batches for review.
 5. Read and cross-check related files together (manifest + source excerpts + binary report + checksums) rather than drawing conclusions from one isolated snippet.
-6. Distinguish verified facts, source-derived hypotheses, and unknowns. Do not fill gaps with guessed values.
+6. Distinguish verified facts, source-derived hypotheses, user-reported observations, and unknowns. Do not fill gaps with guessed values.
 7. Do not modify the Godot project until the full terrain data and coordinate model are validated, unless a narrowly scoped diagnostic is explicitly needed.
 8. Before any code change: state the plan, inspect the target files, keep scope minimal, run relevant tests, and report exactly what changed and what remains unverified.
 
-## Current baseline — V18
+## Current project checkpoint — 2026-11-20
 
-### Completed work recorded so far
+### Verified repository state: V24 source recovery
 
-- **V13 — Original game inventory:** 29 folders, 217 files, 0 symlinks skipped, 0 errors; approximately 2.098 GiB scanned; 124 DLLs identified.
-- **V14 — DLL classification:** 124 DLLs classified; 119 managed .NET, 2 Mono runtime, 3 native PE; 0 errors.
-- **V15 — C# source extraction:** ILSpy extraction of `Assembly-CSharp.dll` and `Assembly-CSharp-firstpass.dll`; 2,942 and 240 C# files reported respectively. Decompiled output is reconstructed source, not the original authored source.
-- **V16 — Source inventory:** 3,182 C# files indexed and grouped by filename/keyword. Groups overlap and are discovery aids, not proof of runtime behavior.
-- **V17 — Terrain/world source batch:** 33 targeted C# files exported; user-reported run had 0 missing, 0 errors, and 0 source-hash changes.
-- **V18 — Godot project audit:** one Godot project found; 16 files, Android export preset present, mobile rendering method, main scene `res://scenes/terrain_preview.tscn`. This was a read-only audit.
+The V24 recovery bundle is present on GitHub under `extracted/V24/`.
 
-### Known source facts to re-verify against raw files
+- C# files scanned: **3,182**.
+- Selected source files: **449**.
+- Flattened source outputs: **449**.
+- Total selected source bytes: **2,700,232**.
+- Extraction errors reported: **0**.
+- Original source files were treated as read-only; SHA-256 values were recorded.
+- Source roots recorded in the V24 summary:
+  - `/storage/emulated/0/Map Check/reports/V15_SOURCE_EXTRACTED`
+  - `/storage/emulated/0/Map Check/reports/V17_SOURCE_BATCH`
+
+GitHub-side cross-check of the published V24 files:
+- `CS_SOURCE` contains 449 C# files; its file set matches the 449-row source manifest (no missing or extra files).
+- The integrity audit contains 449 PASS rows and 0 FAIL rows.
+- The reader manifest contains 449 source rows distributed across 18 reader parts (17 parts of 25 entries and a final part of 24).
+- Reader-part inventory is confirmed, but concatenating the reader parts and byte-comparing the reconstructed output against all original files has **not** been independently verified here.
+
+Relevant published records:
+- `extracted/V24/00_V24_MASTER_SUMMARY.txt`
+- `extracted/V24/01_V24_CS_SOURCE_MANIFEST.csv`
+- `extracted/V24/02_V24_SOURCE_INTEGRITY_AUDIT.csv`
+- `extracted/V24/CS_SOURCE/`
+- `extracted/V24/CS_SOURCE_READER/`
+
+### Earlier baseline recorded in the previous plan
+
+The previous plan recorded V13–V18 as completed/reported:
+- **V13:** Original game inventory — 29 folders, 217 files, 0 symlinks skipped, 0 errors; approximately 2.098 GiB scanned; 124 DLLs identified.
+- **V14:** DLL classification — 124 DLLs classified; 119 managed .NET, 2 Mono runtime, 3 native PE; 0 errors.
+- **V15:** ILSpy extraction of `Assembly-CSharp.dll` and `Assembly-CSharp-firstpass.dll`; 2,942 and 240 C# files reported respectively. Decompiled output is reconstructed source, not the original authored source.
+- **V16:** Source inventory — 3,182 C# files indexed and grouped by filename/keyword. Groups overlap and are discovery aids, not proof of runtime behavior.
+- **V17:** Terrain/world source batch — 33 targeted C# files exported; user-reported run had 0 missing, 0 errors, and 0 source-hash changes.
+- **V18:** Godot project audit — one Godot project found; 16 files, Android export preset present, mobile rendering method, main scene `res://scenes/terrain_preview.tscn`. This was a read-only audit.
+
+These historical stage results are retained as previously recorded evidence; they have not all been rerun during this checkpoint.
+
+## Mission 3 terrain evidence and open questions
+
+Known source facts to re-verify against raw files:
 
 - Mission 3 height file: `MAP_INTERNAL_MISSION_3_HEIGHT.map`, 132,098 bytes.
 - Related files: `MAP_INTERNAL_MISSION_3_EDITOR.map` (681 bytes) and `MAP_INTERNAL_MISSION_3_OBJECT.map` (31,135 bytes).
 - Decompiled source indicates a 257 × 257 height grid and a ushort-compressed representation. The size arithmetic (257 × 257 × 2 = 132,098) matches the height file size, but the exact binary layout, endianness, quantization, header assumptions, and decode mapping still require direct verification.
 - Decompiled world-generation code indicates a 7 × 7 (49-zone) world and four selected mission tiles. Treat these as source-derived until checked against the relevant code and data.
 - Previously observed terrain-generation constants include base height around 0.66, peak range around 0.685–0.705, Perlin frequency 24, six octaves, and smoothing parameters 2 / 0.7. Verify exact method context and units before implementation.
+
+### Recently supplied terrain/Godot materials — pending detailed review
+
+The project conversation includes these user-supplied materials:
+- `MISSION_3_HEIGHT_CONTRAST.png`
+- `MISSION_3_HEIGHT_CONTOURS.png`
+- Godot editor screenshot dated 2026-11-19
+- Screen recording dated 2026-11-20
+- `03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv`
+
+Their presence is recorded as evidence inputs only. Their contents, measurements, transform-field meanings, and agreement with the original binary terrain have not yet been fully cross-checked in this plan update. Do not treat the visuals or CSV field names alone as proof of the final coordinate model.
 
 ## Bottom-up implementation roadmap
 
@@ -79,22 +122,19 @@ Reconstruct the Mission 3 terrain and its supporting world data from the origina
 - Validate visual fidelity and stability on the target Android device.
 - Produce repeatable APK export and final verification reports.
 
-## V19 — Next work package
+## Immediate next checkpoint
 
-**Title:** Terrain Foundation & Binary Format Verification
+**Focus:** Reconcile the V23.2 terrain transform-field evidence with the Mission 3 HEIGHT/EDITOR/OBJECT binary evidence and the supplied height contrast/contour references.
 
-**Scope:**
-1. Re-inventory and hash the three Mission 3 map files.
-2. Collect the relevant V17 decompiled methods for map loading/saving, compression/decompression, heightmap generation, and coordinate handling.
-3. Inspect the HEIGHT file structure without assuming that the entire file is a raw ushort array.
-4. Inspect EDITOR and OBJECT formats and identify references/dependencies.
-5. Produce a single V19 report bundle: master summary, byte-layout analysis, source excerpts, validation calculations, SHA-256 manifest, and explicit unknowns.
+Work sequence:
+1. Inspect the complete `03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv` and identify each field's source, type, units, and method context. Do not infer units from field names.
+2. Reconfirm the exact source paths, sizes, and SHA-256 hashes for the three Mission 3 map files.
+3. Extract and cite the relevant V17/V24 source methods for loading, saving, compression/decompression, heightmap generation, and coordinate transforms.
+4. Compare the decoded/derived terrain against the supplied contrast and contour references using reproducible sample points and dimensions.
+5. Publish a focused report bundle with explicit verified facts, hypotheses, unknowns, and next-step specification.
+6. Only after the coordinate model is supported by evidence, decide whether the next implementation step belongs in an isolated decoder/validator or a narrowly scoped Godot diagnostic.
 
-**Exit criteria:**
-- The three source files are identified by path, size, and hash.
-- Every claimed field/offset/type is tied to direct binary evidence or a cited source method.
-- No guessed decoder is labelled verified.
-- A clear specification exists for the next terrain-decoding step.
+**Exit criteria:** No transform or binary-layout assumption is labelled verified without direct source/binary evidence; the three map files are identified by path, size, and hash; terrain orientation, scale, and elevation mapping have reproducible validation.
 
 ## Batch handoff format
 
@@ -109,10 +149,10 @@ Then share the raw GitHub URLs for the batch. Review related files together, cit
 
 ## Status discipline
 
-- **Completed:** evidence and outputs are present and checked.
+- **Completed (repository-verified):** required evidence and outputs are present in GitHub and cross-checked.
 - **Reported by user:** execution output supplied by the user; not independently rerun in this environment.
 - **In progress:** active investigation.
 - **Blocked:** missing evidence or tooling limitation.
 - **Not started:** future work.
 
-This document is the project roadmap, not proof that future layers are already implemented or verified.
+This document is the project roadmap, not proof that future layers are already implemented or verified. V24 C# source recovery is a completed source-recovery checkpoint; it does **not** mean Mission 3 binary decoding, terrain reconstruction, coordinate validation, or final Godot integration is complete.
