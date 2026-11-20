@@ -24,22 +24,55 @@ RVA: 0x1ae88 SIZE: 72
 0001: 03
 0002: 72 String: 'localPosition'
 0007: 6F MethodDef: GetField
-000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 0011: 6F MemberRef: set_localPosition
 0016: 04
 0017: 03
 0018: 72 String: 'localRotation'
 001D: 6F MethodDef: GetField
-0022: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x75a889fe90>
+0022: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99fef0>
 0027: 6F MemberRef: set_localRotation
 002C: 04
 002D: 03
 002E: 72 String: 'localScale'
 0033: 6F MethodDef: GetField
-0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 003D: 28 MethodDef: Truncate
 0042: 6F MemberRef: set_localScale
 0047: 2A
+
+===========================================================================
+METHOD: <Save>b__0
+TOKEN: 0x6005b83
+SIGNATURE: 20010112a2cc
+RVA: 0x1030f4 SIZE: 102
+---------------------------------------------------------------------------
+0000: 03
+0001: 72 String: 'localPosition'
+0006: 02
+0007: 7B Field: instance
+000C: 6F MemberRef: get_localPosition
+0011: 8C 0x100000e
+0016: 28 MethodDef: Serialize
+001B: 6F MethodDef: AddField
+0020: 03
+0021: 72 String: 'localRotation'
+0026: 02
+0027: 7B Field: instance
+002C: 6F MemberRef: get_localRotation
+0031: 8C 0x100000c
+0036: 28 MethodDef: Serialize
+003B: 6F MethodDef: AddField
+0040: 03
+0041: 72 String: 'localScale'
+0046: 02
+0047: 7B Field: instance
+004C: 6F MemberRef: get_localScale
+0051: 28 MethodDef: Truncate
+0056: 8C 0x100000e
+005B: 28 MethodDef: Serialize
+0060: 6F MethodDef: AddField
+0065: 2A
 
 ===========================================================================
 METHOD: <Save>b__0
@@ -101,26 +134,26 @@ RVA: 0x1af04 SIZE: 328
 000B: 03
 000C: 72 String: 'isKinematic'
 0011: 6F MethodDef: GetField
-0016: 28 MethodSpec RID 140: <dnfile.codedindex.MethodDefOrRef object at 0x75a889fef0>
+0016: 28 MethodSpec RID 140: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99ff50>
 001B: 60
 001C: 6F MemberRef: set_isKinematic
 0021: 04
 0022: 03
 0023: 72 String: 'useGravity'
 0028: 6F MethodDef: GetField
-002D: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+002D: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 0032: 6F MemberRef: set_useGravity
 0037: 04
 0038: 03
 0039: 72 String: 'position'
 003E: 6F MethodDef: GetField
-0043: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+0043: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 0048: 6F MemberRef: set_position
 004D: 04
 004E: 03
 004F: 72 String: 'rotation'
 0054: 6F MethodDef: GetField
-0059: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x75a889fe90>
+0059: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99fef0>
 005E: 6F MemberRef: set_rotation
 0063: 04
 0064: 6F MemberRef: get_isKinematic
@@ -129,61 +162,61 @@ RVA: 0x1af04 SIZE: 328
 006C: 03
 006D: 72 String: 'velocity'
 0072: 6F MethodDef: GetField
-0077: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+0077: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 007C: 6F MemberRef: set_velocity
 0081: 04
 0082: 03
 0083: 72 String: 'angularVelocity'
 0088: 6F MethodDef: GetField
-008D: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+008D: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 0092: 6F MemberRef: set_angularVelocity
 0097: 04
 0098: 03
 0099: 72 String: 'mass'
 009E: 6F MethodDef: GetField
-00A3: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dcd0>
+00A3: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dd30>
 00A8: 6F MemberRef: set_mass
 00AD: 04
 00AE: 03
 00AF: 72 String: 'drag'
 00B4: 6F MethodDef: GetField
-00B9: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dcd0>
+00B9: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dd30>
 00BE: 6F MemberRef: set_drag
 00C3: 04
 00C4: 03
 00C5: 72 String: 'angularDrag'
 00CA: 6F MethodDef: GetField
-00CF: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dcd0>
+00CF: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dd30>
 00D4: 6F MemberRef: set_angularDrag
 00D9: 04
 00DA: 03
 00DB: 72 String: 'freezeRotation'
 00E0: 6F MethodDef: GetField
-00E5: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+00E5: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 00EA: 6F MemberRef: set_freezeRotation
 00EF: 04
 00F0: 03
 00F1: 72 String: 'detectCollisions'
 00F6: 6F MethodDef: GetField
-00FB: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+00FB: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 0100: 6F MemberRef: set_detectCollisions
 0105: 04
 0106: 03
 0107: 72 String: 'constraints'
 010C: 6F MethodDef: GetField
-0111: 28 MethodSpec RID 141: <dnfile.codedindex.MethodDefOrRef object at 0x75a889ff50>
+0111: 28 MethodSpec RID 141: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99ffb0>
 0116: 6F MemberRef: set_constraints
 011B: 04
 011C: 03
 011D: 72 String: 'collisionDetectionMode'
 0122: 6F MethodDef: GetField
-0127: 28 MethodSpec RID 142: <dnfile.codedindex.MethodDefOrRef object at 0x75a889ffb0>
+0127: 28 MethodSpec RID 142: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e9b8050>
 012C: 6F MemberRef: set_collisionDetectionMode
 0131: 04
 0132: 03
 0133: 72 String: 'interpolation'
 0138: 6F MethodDef: GetField
-013D: 28 MethodSpec RID 143: <dnfile.codedindex.MethodDefOrRef object at 0x75a88b8050>
+013D: 28 MethodSpec RID 143: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e9b80b0>
 0142: 6F MemberRef: set_interpolation
 0147: 2A
 
@@ -212,37 +245,37 @@ RVA: 0x1b080 SIZE: 133
 0001: 03
 0002: 72 String: 'anchor'
 0007: 6F MethodDef: GetField
-000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 0011: 6F MemberRef: set_anchor
 0016: 04
 0017: 03
 0018: 72 String: 'autoConfigureConnectedAnchor'
 001D: 6F MethodDef: GetField
-0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 0027: 6F MemberRef: set_autoConfigureConnectedAnchor
 002C: 04
 002D: 03
 002E: 72 String: 'axis'
 0033: 6F MethodDef: GetField
-0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x75a889d2b0>
+0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99d310>
 003D: 6F MemberRef: set_axis
 0042: 04
 0043: 03
 0044: 72 String: 'breakForce'
 0049: 6F MethodDef: GetField
-004E: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dcd0>
+004E: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dd30>
 0053: 6F MemberRef: set_breakForce
 0058: 04
 0059: 03
 005A: 72 String: 'breakTorque'
 005F: 6F MethodDef: GetField
-0064: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dcd0>
+0064: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dd30>
 0069: 6F MemberRef: set_breakTorque
 006E: 04
 006F: 03
 0070: 72 String: 'enableCollision'
 0075: 6F MethodDef: GetField
-007A: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+007A: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 007F: 6F MemberRef: set_enableCollision
 0084: 2A
 
@@ -271,13 +304,13 @@ RVA: 0x1b13f SIZE: 45
 0001: 03
 0002: 72 String: 'enabled'
 0007: 6F MethodDef: GetField
-000C: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+000C: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 0011: 6F MemberRef: set_enabled
 0016: 04
 0017: 03
 0018: 72 String: 'isTrigger'
 001D: 6F MethodDef: GetField
-0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x75a889dc70>
+0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7d5e99dcd0>
 0027: 6F MemberRef: set_isTrigger
 002C: 2A
 
