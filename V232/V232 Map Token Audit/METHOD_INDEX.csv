@@ -1,0 +1,59 @@
+owner,method,rva,referenced_target_fields,written_target_fields,instruction_count,user_strings
+StrandedWorld,LoadZonePositions,0x20648,,,46,StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions
+StrandedWorld,ApplyWorldToZones,0x20884,0x4002639;0x400263b;0x400263d;0x400263e;0x4002642;0x4002643,,99,
+StrandedWorld,LoadObjects,0x209a4,0x4002639;0x400263a;0x400263d;0x400263e;0x4002643,,278,StrandedWorld | StrandedWorld data is null or empty. | Zones | Zones data is null or empty. | Id | Version | Name | Id | Version | Objects | Discovered | Attributes | Objects | No NML data. Recreating... | Name | Id | Version | Discovered | Objects | Name | Id | Version | Objects
+StrandedWorld,SaveZone,0x210a4,,,254,"Error in SaveZone.HandleOutOfGameBounds:  | 
+ | Name | Id | Version | Discovered | Attributes | Objects"
+StrandedWorld,IsMapViable,0x21578,,,30,INTERNAL_MISSION
+StrandedWorld,FindZone,0x2179c,,,28,
+StrandedWorld,FindEndGameZone,0x217dc,,,28,INTERNAL_MISSION_3
+LE_LevelEditor.LE_ZoneTileGenerator,LoadMap,0x54faf,0x400263b,,11,
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,0x4002639;0x400263d;0x400263e;0x4002643,,317,LegacyUtilities::UpgradeSaveFile:: Upgrading {0} save file... | Root data null. Could not upgrade.. | Persistent data null. Could not upgrade.. | StrandedWorld | StrandedWorld data null. Could not upgrade.. | Zones | Zone data null. Could not upgrade.. | Name | Id | Version | Zones | PlayersData | ZoneId | Position | Position | PlayerRegistry | Movement | Transform | localPosition | Version | Persistent | CustomSettings | CustomSettings | ScreenCapture | ScreenCapture
+Beam.Terrain.Map,.ctor,0xb7fb2,0x4002639,0x4002639,6,
+Beam.Terrain.Map,IsProceduralMap,0xb7fc5,0x4002639;0x400263d,,11,INTERNAL_PROCEDURAL
+Beam.Terrain.Map,IsCustomMap,0xb7fe6,0x4002639,,10,
+Beam.Terrain.Map,IsInternalMap,0xb7ffb,0x4002639;0x400263d,,11,INTERNAL
+Beam.Terrain.Map,IsUserMap,0xb801c,0x4002639,,10,
+Beam.Terrain.MapEditorData,.ctor,0xb8034,0x400263c;0x400263d;0x400263f;0x4002642;0x4002643,0x400263c;0x400263d;0x400263f;0x4002642;0x4002643,38,-- | -- | --
+Beam.Terrain.Maps,GetMapFolderName,0xb8205,0x4002639;0x400263d,,7,MAP_
+Beam.Terrain.Maps,Save,0xb8324,0x4002639;0x400263a;0x400263b,,87,Map::SaveMap:: Error saving map editor data:  | Map::SaveMap:: Error saving map object data:  | Map::SaveMap:: Error saving map heightmap data: 
+Beam.Terrain.Maps,CreateTextures,0xb8534,0x4002639;0x400263b;0x400263c;0x4002642,0x400263c,68,Icons/WorldMap_Icon_Carrier | Icons/WorldMap_Icon_Mission
+Beam.Terrain.Maps,Load,0xb8604,0x4002639;0x400263a;0x400263b;0x400263f;0x4002643,0x4002639;0x400263a;0x400263b,177,"Map::LoadMap:: Error loading map editor data:
+
+ | 
+ | Map [ | ] is out of date and no longer supported. | Map [ | ] is out of date and no longer supported. | Map::LoadMap:: Error loading map [ | ] object data:
+
+ | 
+ | Map::LoadMap:: Error loading map heightmap data:
+
+ | 
+"
+Beam.Terrain.Maps,LoadRemoteMaps,0xb8980,0x4002639;0x4002640,0x4002640,37,
+Beam.Terrain.World,CreateProceduralMap,0xb9070,0x4002639;0x400263a;0x400263b;0x400263d;0x400263e;0x4002642;0x4002643,0x4002639;0x400263a;0x400263b;0x400263d;0x400263e;0x4002642;0x4002643,58,{0}_{1} | INTERNAL_PROCEDURAL | Beam Team | MAP_DESC_PROCEDURAL
+Beam.Terrain.World,CreateWorld,0xb9200,0x4002639;0x4002642,,126,Icons/WorldMap_Icon_Carrier | Icons/WorldMap_Icon_Mission
+Beam.UI.CartographerMenuPresenter,UpdateWorldMap,0xcc424,0x4002639;0x400263e,,56,CARTOGRAPHER_MENU_DB_UPDATE_ZONE_DESC | F1 | F1 | CARTOGRAPHER_MENU_DB_UPDATE_TITLE
+Beam.UI.CartographerMenuPresenter,ReplaceWorldMap,0xcc4e4,0x4002639;0x4002640;0x4002643,,70,CARTOGRAPHER_MENU_DB_REPLACE_MAP_DESC | CARTOGRAPHER_MENU_DB_REPLACE_TITLE
+Beam.UI.CartographerMenuPresenter,RemoveWorldMap,0xcc5c0,0x4002639;0x400263c;0x400263d;0x4002643,,50,INTERNAL_PROCEDURAL | CARTOGRAPHER_MENU_DB_REMOVE_DESC | CARTOGRAPHER_MENU_DB_REMOVE_TITLE
+Beam.UI.CartographerMenuPresenter,CreateWorldMapSlots,0xcc670,0x4002639;0x400263c;0x400263d,0x400263c,128,INTERNAL_MISSION
+Beam.UI.CartographerMenuPresenter,RefreshWorldMapSlots,0xcc820,0x4002639;0x4002641,,26,
+Beam.UI.CartographerMenuPresenter,PopulateMapListElement,0xcc9b0,0x4002639;0x400263e;0x4002643,,41,F1
+Beam.UI.CartographerMenuPresenter,MapListElement_DeleteClick,0xccabc,0x4002639;0x4002643,,37,CARTOGRAPHER_MENU_DB_WARNING_DELETE_MAP_DESC | CARTOGRAPHER_MENU_DB_WARNING_TITLE
+Beam.UI.CartographerMenuPresenter,WorldMapSlot_Drop,0xccc7c,0x4002639;0x400263c;0x400263d;0x400263e;0x4002640;0x4002643,,142,INTERNAL_PROCEDURAL | CARTOGRAPHER_MENU_DB_SORRY_MAP_EXISTS_DESC | CARTOGRAPHER_MENU_DB_SORRY_TITLE | INTERNAL_PROCEDURAL | CARTOGRAPHER_MENU_DB_SORRY_MAP_EXISTS_DESC | CARTOGRAPHER_MENU_DB_SORRY_TITLE
+Beam.UI.CartographerMenuPresenter,UpdateMapStatus,0xcd69c,0x4002639;0x400263d;0x400263e;0x4002641,0x4002641,50,INTERNAL_PROCEDURAL
+Beam.UI.CartographerMenuPresenter,ValidateDuplicateMap,0xcd748,0x4002639;0x400263d;0x4002640,,35,
+Beam.UI.CartographerWorldMapTooltipPresenter,Show,0xcd884,0x4002639;0x400263d;0x400263e;0x4002640;0x4002641;0x4002643,,113,F1 | INTERNAL_PROCEDURAL | INTERNAL_MISSION | A mysterious location... | MAP_DESC_MISSION
+Beam.UI.MapEditor.MapEditorMenuPresenter,InitializeMap,0xe4a44,0x4002639;0x400263a;0x4002643,,45,MAP_EDITOR_NEW_MAP_TITLE
+Beam.UI.MapEditor.MapEditorMenuPresenter,SaveMenuPresenter_Save,0xe4bdd,0x4002639;0x4002643,,9,
+Beam.UI.MapEditor.MapEditorSaveMenuPresenter,Show,0xe50a4,0x4002639;0x4002643,,44,
+Beam.UI.MapEditor.MapEditorSaveMenuPresenter,SaveMap,0xe5324,0x4002639;0x400263a;0x400263b;0x400263e;0x4002643,0x400263a;0x400263b;0x400263e;0x4002643,146,prefab | reference | Transform | MAP_EDITOR_SAVE_MENU_DB_ERROR_SAVING_MAP_DESC | MAP_EDITOR_SAVE_MENU_DB_ERROR_TITLE
+Beam.UI.MapEditor.MapEditorSaveMenuPresenter,<SaveButton_Click>b__25_2,0xe5536,0x4002639;0x400263d,,9,
+Beam.UI.MapEditor.MapEditorSaveMenuPresenter,<OnValidateTextsSucceeded>b__26_0,0xe556b,0x4002639;0x400263d,,9,
+Beam.UI.MapEditor.UWorldMapSlot,SetMap,0xe5dfb,0x4002639;0x4002641,,15,
+<>c__DisplayClass12_0,<UpgradeSaveFile>b__0,0x10e453,0x4002639;0x400263d,,7,
+<>c__DisplayClass14_0,<FixRigidbodyWorldPositions_Pre_72_00>b__0,0x10e473,0x4002639;0x400263d,,7,
+Bundle,ToString,0x111d18,0x400263b,,102,"
+Maps[{0}] {1}x{2} | 
+GenerationZonePositons[{0}] | 
+GeneratedZonePoints[{0}]"
+<>c__DisplayClass47_0,<UpdateWorldMap>b__0,0x116ee8,0x4002639;0x400263d;0x4002640,,22,
+<>c__DisplayClass87_0,<UpdateMapStatus>b__0,0x117410,0x4002639;0x400263d;0x4002640,,20,

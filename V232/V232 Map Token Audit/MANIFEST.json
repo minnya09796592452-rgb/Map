@@ -1,0 +1,124 @@
+{
+  "project": "CASTAWAY-DEPTHS",
+  "audit": "MISSION3_MAP_TOKEN_AUDIT",
+  "timestamp": "20261120_062222",
+  "input": "/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll",
+  "input_bytes": 3432448,
+  "input_sha256": "d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc",
+  "scope": "Assembly-CSharp.dll only; read-only",
+  "target_field_token_range": [
+    "0x4002639",
+    "0x4002643"
+  ],
+  "target_fields": [
+    {
+      "token": "0x4002639",
+      "owner": "Beam.Terrain.Map",
+      "name": "EditorData",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0612a270"
+    },
+    {
+      "token": "0x400263a",
+      "owner": "Beam.Terrain.Map",
+      "name": "ObjectData",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0612a2cc"
+    },
+    {
+      "token": "0x400263b",
+      "owner": "Beam.Terrain.Map",
+      "name": "HeightmapData",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "06140c0200020000"
+    },
+    {
+      "token": "0x400263c",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "Valid",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                             True\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0602"
+    },
+    {
+      "token": "0x400263d",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "Id",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "060e"
+    },
+    {
+      "token": "0x400263e",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "VersionNumber",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0608"
+    },
+    {
+      "token": "0x400263f",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "GameVersionNumber",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "060e"
+    },
+    {
+      "token": "0x4002640",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "Source",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0611b700"
+    },
+    {
+      "token": "0x4002641",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "State",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0611b704"
+    },
+    {
+      "token": "0x4002642",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "Biome",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "0611b0a0"
+    },
+    {
+      "token": "0x4002643",
+      "owner": "Beam.Terrain.MapEditorData",
+      "name": "Name",
+      "flags": "fdAssembly                                 False\nfdFamANDAssem                              False\nfdFamORAssem                               False\nfdFamily                                   False\nfdHasDefault                               False\nfdHasFieldMarshal                          False\nfdHasFieldRVA                              False\nfdInitOnly                                 False\nfdLiteral                                  False\nfdNotSerialized                            False\nfdPinvokeImpl                              False\nfdPrivate                                  False\nfdPrivateScope                             False\nfdPublic                                    True\nfdRTSpecialName                            False\nfdSpecialName                              False\nfdStatic                                   False\nfdUnknown1                                 False",
+      "signature_hex": "060e"
+    }
+  ],
+  "target_owner_types": [
+    "Beam.Terrain.Map",
+    "Beam.Terrain.MapEditorData"
+  ],
+  "scanned_method_count": 23276,
+  "selected_method_count": 45,
+  "method_parse_error_count": 0,
+  "parse_errors": [],
+  "mission3_literal_hits": [
+    {
+      "owner": "StrandedWorld",
+      "method": "FindEndGameZone",
+      "rva": "0x217dc",
+      "offset": 29,
+      "literal": "INTERNAL_MISSION_3"
+    }
+  ],
+  "text_parts": [
+    {
+      "file": "MAP_TOKEN_EVIDENCE_PART_001.txt",
+      "bytes": 597255
+    }
+  ],
+  "jsonl_parts": [
+    {
+      "file": "MAP_TOKEN_EVIDENCE_PART_001.jsonl",
+      "bytes": 782487
+    }
+  ],
+  "token_csv": "TARGET_FIELD_TOKENS.csv",
+  "method_index_csv": "METHOD_INDEX.csv",
+  "max_part_bytes": 15728640
+}
