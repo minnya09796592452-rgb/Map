@@ -1,0 +1,285 @@
+CASTAWAY DEPTHS — MISSION 3 REVERSE-ENGINEERING RECORD
+======================================================
+
+Record date: 2026-11-20
+Repository: minnya09796592452-rgb/Map
+Target file: MISSION3_REVERSE_ENGINEERING_RECORD.txt
+Purpose: Preserve verified Mission 3 Unity data/serialization findings and the remaining investigation plan for the Unity-to-Godot data migration.
+
+EVIDENCE AND STATUS RULES
+-------------------------
+[CONFIRMED] = directly supported by command output or metadata observed in this investigation.
+[PARTIAL]   = some behavior/metadata is known, but important details remain unverified.
+[PENDING]   = not yet investigated or no supporting output has been supplied.
+Do not treat an inferred behavior as confirmed. Keep local-space and world-space coordinates distinct.
+
+1. TRANSFORM SERIALIZATION
+--------------------------
+Status: PARTIAL — Save/Load field mapping is identified; exact Truncate implementation still needs inspection.
+
+Confirmed metadata:
+- TransformSerializer.Save()
+  - MethodDef token: 0x0600059C
+  - RVA: 0x1AE69
+- TransformSerializer.Load()
+  - MethodDef token: 0x0600059D
+  - RVA: 0x1AE88
+- Save callback <Save>b__0
+  - MethodDef token: 0x06005B83
+  - RVA: 0x1030F4
+  - Raw callback IL size reported by callback_dump.py: 102 bytes.
+
+Save-side string keys resolved from UserString tokens:
+- 0x700033BA -> "localPosition"
+- 0x700033D6 -> "localRotation"
+- 0x700033F2 -> "localScale"
+
+Getter MemberRefs:
+- 0x0A000102 -> get_localPosition; signature bytes: 20 01 13 39
+- 0x0A000074 -> get_localRotation; signature bytes: 20 01 13 31
+- 0x0A000152 -> get_localScale; signature bytes: 20 01 13 39
+
+The corresponding Unity value types are Vector3, Quaternion, and Vector3 respectively.
+
+Load-side behavior identified:
+- Reads "localPosition" as Vector3 and assigns Transform.localPosition.
+- Reads "localRotation" as Quaternion and assigns Transform.localRotation.
+- Reads "localScale" as Vector3, calls Truncate(), then assigns Transform.localScale.
+
+Important coordinate distinction:
+- localPosition is relative to the object's parent transform.
+- It is NOT automatically a world-space position.
+- World position requires applying the parent transform hierarchy; do not copy localPosition into a Godot world/global position without resolving parent transforms and coordinate-system conversion.
+
+Truncate investigation:
+- callback_resolve.py output resolved MethodDef RID 0x329F as method name "Truncate".
+- Signature bytes reported: 00 01 11 39 11 39.
+- RVA reported: 0x8AF3C.
+- The signature appears consistent with a Vector3-to-Vector3 method, but declaring type and implementation must still be verified from TypeDef ownership and IL.
+- An earlier interpretation that RID 0x329E was Truncate(float) at RVA 0x8AF22 is NOT confirmed and conflicts with the later 0x329F output. Treat 0x329E and 0x329F as separate unresolved metadata entries until both are inspected.
+- truncate_resolve.txt was generated with 28 lines, but its actual contents were not provided in the conversation. Its contents have not been reviewed.
+- Do not claim the numeric truncation/rounding algorithm is known yet.
+
+2. SERIALIZATION OBJECT MODEL
+-----------------------------
+Status: PARTIAL — relevant metadata and known Load fields have been identified.
+
+JObject:
+- TypeDef RID: 2227.
+- _keys: List<string>
+- _children: List<JObject>
+- _data: object
+- _type: EToken
+- _keys and _children are paired lists; they are not a dictionary.
+
+EToken values:
+- NULL = 0
+- NUMBER = 1
+- STRING = 2
+- BOOL = 3
+- ARRAY = 4
+- OBJECT = 5
+
+Related methods/classes identified:
+- JObject.Deserialize(string, int): parser for nested object/list representation.
+- JObject.Serialize(StringBuilder, int): writes serialized output.
+- JSerializer maintains Dictionary<Type, ISerializer> and Dictionary<Type, IComponentSerializer>.
+- ComponentSerializer<T> wraps typed Save/Load methods.
+- Concrete component serializers identified include TransformSerializer, RigidbodySerializer, JointSerializer, and ColliderSerializer.
+
+Known Load-side field names (do not assume all are also Save-side fields without inspecting Save IL):
+Rigidbody:
+- isKinematic
+- useGravity
+- position
+- rotation
+- velocity
+- angularVelocity
+- mass
+- drag
+- angularDrag
+- freezeRotation
+- detectCollisions
+- constraints
+- collisionDetectionMode
+- interpolation
+- velocity and angularVelocity are conditionally loaded when the body is not kinematic.
+
+Joint:
+- anchor
+- autoConfigureConnectedAnchor
+- axis
+- breakForce
+- breakTorque
+- enableCollision
+
+Collider:
+- enabled
+- isTrigger
+
+3. LINUX / PYTHON REVERSE-ENGINEERING WORKFLOW
+----------------------------------------------
+Status: CONFIRMED as a working command-line workflow from the user's reported executions. The exact complete source text of transform_trace.py is not preserved reliably in the conversation because terminal echo was mangled; do not reconstruct it as if it were the original file.
+
+Working directory:
+  cd "/storage/emulated/0/Map Check"
+
+Python interpreter:
+  /root/.venv_mission3/bin/python
+
+DLL argument used:
+  Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+
+The virtual environment has dnfile installed.
+
+Typical script creation/execution pattern:
+  cat > script.py <<'PY'
+  # Python source
+  PY
+  /root/.venv_mission3/bin/python script.py "$DLL"
+
+transform_trace.py — purpose and observed behavior:
+1. Receives the Assembly-CSharp.dll path through sys.argv[1].
+2. Opens the .NET PE/metadata using dnfile.dnPE(dll).
+3. Reads raw DLL bytes.
+4. Resolves MethodDef rows by RID.
+5. Converts a method RVA to a file offset using pe.get_offset_from_rva().
+6. Parses Tiny/Fat method headers to determine IL start and IL size.
+7. Decodes IL opcodes using a one-byte operand-length table.
+8. Resolves metadata tokens for:
+   - 0x06: MethodDef
+   - 0x0A: MemberRef
+   - 0x04: Field
+   - 0x70: UserString
+   - 0x2B: MethodSpec
+9. Decodes branch target offsets.
+10. Writes the trace to transform_trace.txt.
+
+MethodDef RIDs reported as traced:
+  0x59C, 0x59D, 0x59F, 0x5A0, 0x5A2, 0x5A3, 0x5A6, 0x5A7
+  and later-added callback RID 0x5B83.
+
+Most recent reported transform_trace.py execution:
+  DONE
+  Saved: /mnt/sdcard/Map Check/transform_trace.txt
+  Lines: 770
+  File size: 26776 bytes
+
+callback_dump.py:
+- Reads MethodDef RID 0x5B83.
+- Reports method name/token/RVA/signature and declaring TypeDef by scanning TypeDef.MethodList.
+- Parses method header and writes raw IL bytes in 16-byte rows to transform_callback_raw.txt.
+Reported output:
+  DONE
+  Saved: /mnt/sdcard/Map Check/transform_callback_raw.txt
+  Bytes: 102
+
+callback_resolve.py:
+- Resolves user strings, getter MemberRefs, and the Truncate MethodDef metadata.
+- Reported the Transform field keys/getters and Truncate RID 0x329F details listed above.
+
+truncate_resolve.py:
+- Was run against RID 0x329E and generated truncate_resolve.txt with 28 lines.
+- The file contents were not pasted into the conversation, so the result remains unreviewed.
+
+Workflow notes:
+- Pass the DLL path as "$DLL" so the script receives it as argv[1].
+- Keep generated traces and raw dumps in the Map Check working directory.
+- Preserve raw IL dumps alongside decoded traces so token/opcode interpretations can be checked.
+- When reporting results, record MethodDef RID, token, RVA, IL size, metadata token targets, and the exact command output.
+- Do not treat the terminal's mangled echo of a script as a reliable source copy; preserve the actual script file if exact reproducibility is required.
+
+4. MISSION 3 REMAINING INVESTIGATION TRACKER
+--------------------------------------------
+
+4.1 Single Heightmap decoding
+Status: PENDING.
+Required evidence:
+- Determine the exact Mission 3 heightmap payload/file and its boundaries.
+- Identify header fields, width, height, sample count, sample type/bit depth, byte order, compression (if any), scale, and offset.
+- Decode one complete heightmap first.
+- Validate that decoded sample count equals width x height and inspect min/max and representative samples.
+- Keep raw bytes and decoder output for comparison.
+
+4.2 Map file structure
+Status: PENDING.
+Required evidence:
+- Identify outer file header, version/signature, offsets, lengths, section ordering, and payload boundaries.
+- Map each section to its corresponding data.
+- Distinguish confirmed fields from unknown/padding bytes.
+- Do not infer a structure solely from plausible-looking values.
+
+4.3 Transform serialization
+Status: PARTIAL.
+Confirmed Save/Load mappings and local-space semantics are documented in Section 1.
+Remaining:
+- Verify the declaring type and IL body of Truncate at RID 0x329F.
+- Inspect RID 0x329E separately and resolve the discrepancy.
+- Establish the exact numeric behavior of Truncate.
+- Confirm how serialized transform values relate to parent transforms and the eventual world-space positions.
+- Verify the Save-side behavior for other component serializers before assuming parity with Load.
+
+4.4 49 Terrain / Collider component links
+Status: PENDING.
+Required evidence:
+- Build a per-zone mapping of Terrain component, TerrainData reference, Collider component(s), and owning GameObject/entity.
+- Record stable object/file identifiers and source locations.
+- Detect missing, duplicate, shared, or orphan references.
+- Do not infer links from row order alone.
+
+4.5 49 TerrainData full sample arrays
+Status: PENDING.
+Required evidence:
+- Extract the full height/sample arrays for all 49 TerrainData objects.
+- Record dimensions, sample count, element precision/type, byte order, range, and extraction source.
+- Validate each array's element count against its dimensions.
+- Preserve the arrays or lossless exports and record checksums where possible.
+- A small sample or summary is not equivalent to a full array export.
+
+4.6 49-zone world position
+Status: PENDING.
+Required evidence:
+- Obtain each zone's transform and parent hierarchy.
+- Resolve local transforms into world transforms.
+- Establish world origin, axis orientation, zone spacing, and any scale/rotation inheritance.
+- Produce a 49-zone coordinate table.
+- Do not treat serialized localPosition as world position.
+
+4.7 Mission 3 runtime MapList index
+Status: PENDING.
+Required evidence:
+- Trace the runtime MapList construction and Mission 3 selection/load path.
+- Identify the actual entry corresponding to Mission 3.
+- Determine whether the value is an identifier, array/list position, or zero-based index.
+- Confirm the runtime value from code or runtime evidence; do not guess based on display order.
+
+4.8 Godot integration
+Status: PENDING — dependent on source format and coordinate findings.
+Required evidence and integration checks:
+- Map the verified Unity data structures to Godot data structures.
+- Establish coordinate-axis conversion, handedness, origin, units, height scale/offset, sample ordering, and terrain dimensions.
+- Define how heightmap samples and zone transforms are imported.
+- Validate imported output against source samples and known zone positions.
+- Keep this scope limited to data/terrain/transform migration; do not expand into unrelated gameplay or save/load systems unless explicitly requested.
+
+5. CURRENT OVERALL STATUS
+-------------------------
+- Transform serialization: PARTIAL; key Save/Load fields and callback metadata are identified.
+- JObject/JSerializer object model: PARTIAL; core metadata and several Load-side fields are known.
+- Linux/Python workflow: CONFIRMED as executed by the user; exact source script should be preserved from the working directory for reproducibility.
+- Single Heightmap decoding: PENDING.
+- Map file structure: PENDING.
+- 49 Terrain/Collider links: PENDING.
+- 49 TerrainData full arrays: PENDING.
+- 49-zone world positions: PENDING.
+- Mission 3 runtime MapList index: PENDING.
+- Godot integration: PENDING.
+
+6. NEXT EVIDENCE TO COLLECT
+---------------------------
+1. Paste the actual 28-line truncate_resolve.txt output so RID 0x329E can be checked against 0x329F.
+2. Inspect the declaring TypeDef and IL body for Truncate RID 0x329F; inspect RID 0x329E independently.
+3. Continue with the user's chosen Mission 3 investigation order. Do not switch scope without the user's direction.
+
+END OF RECORD
+=============
