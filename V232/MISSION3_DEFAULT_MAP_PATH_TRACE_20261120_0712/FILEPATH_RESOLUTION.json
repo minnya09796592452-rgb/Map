@@ -1,0 +1,114 @@
+{
+  "target": "FilePath",
+  "member_refs": [
+    {
+      "owner": "FilePath",
+      "member": "SAVE_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "GetSlotFolderName",
+      "signature_hex": "00010e08"
+    },
+    {
+      "owner": "FilePath",
+      "member": "GetSaveFileExtension",
+      "signature_hex": "00010e11823d"
+    },
+    {
+      "owner": "FilePath",
+      "member": "WORLD_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "HEIGHTMAPS_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "OPTIONS_FILE",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "ASSET_BUNDLES_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "LEGACY_SAVE_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "LOCAL_MAPS_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "DEFAULT_MAPS_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "GetPrefsSessionKey",
+      "signature_hex": "00020e0811823d"
+    },
+    {
+      "owner": "FilePath",
+      "member": "GetPrefsTotalKey",
+      "signature_hex": "00020e0811823d"
+    },
+    {
+      "owner": "FilePath",
+      "member": "MODS_MAPS_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "MODS_ROOT_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "MODS_LOCALIZATION_FOLDER",
+      "signature_hex": "060e"
+    },
+    {
+      "owner": "FilePath",
+      "member": "CheckFilePermissions",
+      "signature_hex": "000002"
+    },
+    {
+      "owner": "FilePath",
+      "member": "CreateDirectories",
+      "signature_hex": "000002"
+    }
+  ],
+  "type_refs": [
+    {
+      "full_type": "FilePath",
+      "scope_kind": "AssemblyRefRow",
+      "scope_name": "Assembly-CSharp-firstpass",
+      "assembly_name": "Assembly-CSharp-firstpass"
+    }
+  ],
+  "candidate_assemblies": [
+    "Assembly-CSharp-firstpass"
+  ],
+  "inspected_assemblies": [
+    {
+      "name": "Assembly-CSharp.dll",
+      "sha256": "d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc",
+      "type_found": false
+    },
+    {
+      "name": "Assembly-CSharp-firstpass.dll",
+      "sha256": "05dc598d55fcd2440946fceb7a47a829fa23de26f7c05283080013e4c1c588ae",
+      "type_found": true
+    }
+  ],
+  "note": "Only Assembly-CSharp.dll and exact referenced FilePath assemblies were inspected."
+}
