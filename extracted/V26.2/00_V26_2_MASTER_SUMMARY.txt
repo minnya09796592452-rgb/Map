@@ -1,0 +1,111 @@
+CASTAWAY-DEPTHS V26.2
+MISSION 3 TERRAIN OBJECT CORRELATION
+============================================================================
+
+INPUTS
+V23_FIELDS: 99111
+V23_POINTER_REFERENCES: 63510
+V23_EXTERNAL_REFERENCES: 19
+
+UNIQUE SERIALIZED OBJECTS
+ALL: 21100
+GameObject: 11373
+Transform: 9574
+Terrain: 51
+TerrainCollider: 51
+TerrainData: 51
+
+REFERENCE RESULTS
+Terrain objects: 51
+TerrainCollider objects: 51
+TerrainData objects: 51
+Transform objects: 9574
+GameObject-to-Transform links: 9574
+
+HEIGHTMAP
+{
+  "path": "/root/MapRepo/extracted/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map",
+  "size_bytes": 132098,
+  "sha256": "4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5",
+  "expected_sha256": "4694e3cd0d762fcd6fb282df88e0e3873fb1c730c8b8e4a8e35a129eaa7463bcf",
+  "hash_reference_match": false,
+  "status": "VALID",
+  "encoding": "Little-endian UInt16",
+  "width": 257,
+  "height": 257,
+  "sample_count": 66049,
+  "minimum": 0,
+  "maximum": 46128,
+  "unique_values": 15791,
+  "zero_samples": 8275,
+  "mean_ushort": 30474.769867825402,
+  "median_ushort": 39817,
+  "normalized_min": 0.0,
+  "normalized_max": 0.7038681507110596,
+  "normalized_mean": 0.4650151806551349,
+  "maximum_row_i": 119,
+  "maximum_column_j": 128,
+  "minimum_row_i": 0,
+  "minimum_column_j": 0,
+  "row_flip_applied": false,
+  "decoder": "UInt16 -> float32(value) / float32(65535)"
+}
+
+MISSION IDENTITY
+Target: INTERNAL_MISSION_3
+Method: FindEndGameZone()
+Assignment: Zones[i] <- World.MapList[i]
+Terrain height: map.HeightmapData
+Runtime index: UNKNOWN
+
+TRANSFORM LIMITATIONS
+World coordinates are computed only when the full
+parent chain and every local TRS value are resolvable.
+A failed parent reference is not silently treated as root.
+
+HEIGHTMAP CORRELATION
+Binary HEIGHT.map profile is independent evidence.
+Serialized TerrainData height array remains incomplete
+in the available V23.2 value previews.
+Exact numeric TerrainData-vs-HEIGHT.map comparison
+is NOT CLAIMED.
+
+V25 DEPENDENCY: NONE
+
+OUTPUT PART SIZE LIMIT: 15000000
+
+ERRORS
+NONE
+
+WARNINGS
+NONE
+
+SOURCE METHOD RESULTS
+MPExtensions.Compress: FOUND
+MPExtensions.Decompress: FOUND
+MPExtensions.InitializeCompressStableValues: FOUND
+MPExtensions.ToCompressStable: FOUND
+Maps.LoadMap: FOUND
+Maps.SaveMap: FOUND
+StrandedWorld.ApplyWorldToZones: FOUND
+StrandedWorld.FindEndGameZone: FOUND
+StrandedWorld.LoadZonePositions: FOUND
+World.MapList: FOUND
+
+REPORT FILES
+01_V26_2_INPUT_MANIFEST.csv | 687 bytes
+02_V26_2_SERIALIZED_OBJECT_INDEX.csv | 2896906 bytes
+03_V26_2_TERRAIN_COMPONENT_INDEX.csv | 12306 bytes
+04_V26_2_TERRAIN_DATA_LINKS.csv | 10446 bytes
+05_V26_2_TRANSFORM_HIERARCHY.csv | 969913 bytes
+06_V26_2_TRANSFORM_GAMEOBJECT_LINKS.csv | 800117 bytes
+07_V26_2_TERRAIN_WORLD_TRANSFORMS.csv | 3720 bytes
+08_V26_2_TERRAIN_DATA_PROFILE.csv | 6628 bytes
+09_V26_2_EXTERNAL_REFERENCE_AUDIT.csv | 50605 bytes
+11_V26_2_HEIGHTMAP_SAMPLES.csv | 274 bytes
+12_V26_2_HEIGHTMAP_CORRELATION.csv | 8901 bytes
+13_V26_2_RUNTIME_MISSION_MAPPING.csv | 7879 bytes
+14_V26_2_POINTER_AUDIT.csv | 6943027 bytes
+15_V26_2_SOURCE_MANIFEST.csv | 510 bytes
+11A_V26_2_HEIGHTMAP_PROFILE.csv | 744 bytes
+SOURCE: 10_V26_2_SOURCE_METHOD_EVIDENCE.txt
