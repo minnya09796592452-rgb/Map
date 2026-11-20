@@ -1,0 +1,188 @@
+owner,method,rva,offset,literal
+BuoyMultiplayerSync,TryToAttachToBouy,0x16910,12,Mission_Squid
+SceneCallbacks,Awake,0x19923,14,Multiple SceneCallbacks components into the world
+SaveManager,ValidateSaveFileFast,0x1a470,96,Persistent.StrandedWorld
+SaveManager,ValidateSaveFileFast,0x1a470,126,SaveManager:: Error loading save file. Stranded world data was null or empty.
+SaveManager,LoadSaveFile,0x1a57c,126,Persistent/StrandedWorld
+SaveManager,LoadSaveFile,0x1a57c,153,SaveManager::LoadSaveFile:: Error loading save file. Stranded world data was null or empty.
+SaveManager,ChangeCurrentSlot,0x1a9c8,83,World
+LootContainerSpawner,SpawnContainers,0x1caa8,172,LootContainerSpawner :: Error finding zone for Wollie Spawner!
+StrandedWorld,LoadZonePositions,0x20648,29,StrandedWorld::CreateZones:: No Zone Positions Loaded - Creating New World Zone Positions
+StrandedWorld,LoadWorld,0x2084c,33,StrandedWorld:: Error loading world: 
+StrandedWorld,LoadObjects,0x209a4,71,StrandedWorld
+StrandedWorld,LoadObjects,0x209a4,93,StrandedWorld data is null or empty.
+StrandedWorld,LoadObjects,0x209a4,105,Zones
+StrandedWorld,LoadObjects,0x209a4,127,Zones data is null or empty.
+StrandedWorld,LoadShelterData,0x20d18,136,_zone
+StrandedWorld,LoadShelterData,0x20d18,381,StrandedWorld::Load: Old Save Detected. Shelter Data not found.
+StrandedWorld,SaveZone,0x210a4,495,Error in SaveZone.HandleOutOfGameBounds: 
+StrandedWorld,IsMapViable,0x21578,70,INTERNAL_MISSION
+StrandedWorld,FindEndGameZone,0x217dc,29,INTERNAL_MISSION_3
+StrandedWorld,SetWorldSeed,0x21b20,25,StrandedWorld::SetWorldSeed:: Random [
+StrandedWorld,SetWorldSeed,0x21b20,62,StrandedWorld::SetWorldSeed:: Custom [
+StrandedWorld,SetWorldSeed,0x21b80,57,StrandedWorld::SetWorldSeed:: Could not parse seed value. Seed likely contains invalid characters.
+StrandedWorld,Save,0x21c48,19,WorldSeed
+StrandedWorld,Save,0x21c48,112,ZoneId
+StrandedWorld,Save,0x21c48,334,Zones
+StrandedWorld,Save,0x21c48,455,_zone
+StrandedWorld,LoadStartingZone,0x21ebc,36,StrandedWorld::LoadStartingZone:: Something went wrong. No zone was found.
+LE_LevelEditor.UI.LE_ObjectPrefabNode,uMyGUI_TreeBrowser_InitNode,0x58a24,64,WorldEditor/ObjectIcons/
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,109,DISCONNECTED_INTERNAL
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,157,DISCONNECTED_INTERNAL
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,205,DISCONNECTED_INTERNAL
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,253,DISCONNECTED_INTERNAL
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,301,DISCONNECTED_INTERNAL
+Funlabs.DisconnectPayLoad,TryGetDisconnectDialog,0x5f928,349,DISCONNECTED_INTERNAL
+Funlabs.MultiplayerMng,BoltStartBegin,0x5ff0e,22,zone
+Funlabs.MultiplayerMng,BoltStartBegin,0x5ff0e,40,world
+Funlabs.MultiplayerMng,.cctor,0x618a0,108,zone_sync
+Funlabs.MultiplayerMng,.cctor,0x618a0,120,world_sync
+Funlabs.MultiplayerZoneSync,DumpNotCompleted,0x62234,57,{0} {1} data {2} instance {3} zone {4}
+Rewired.Demos.ControlRemappingDemo1,DrawCalibrationWindow,0x698b0,580,Dead Zone: 
+Rewired.Demos.ControlRemappingDemo1,DrawCalibrationWindow,0x698b0,925,Set Dead Zone
+Beam.LegacyUtilities,LoadStrandedWorldPlayerZoneId_PreCoop,0x94afc,20,PlayerZoneId
+Beam.LegacyUtilities,UpgradeLegacyGame,0x94f0c,48,Upgraded world in: {0}ms
+Beam.LegacyUtilities,UpgradeLegacyWorld,0x94f58,12,LegacyUtilities::UpgradeLegacyWorld()
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,101,StrandedWorld
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,123,StrandedWorld data null. Could not upgrade..
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,135,Zones
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,157,Zone data null. Could not upgrade..
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,422,Zones
+Beam.LegacyUtilities,UpgradeSaveFile,0x94fcc,509,ZoneId
+Beam.LegacyUtilities,FixRigidbodyWorldPosition,0x95580,23,FixRigidbodyWorldPosition:: Rigidbody data is null or empty.
+Beam.LegacyUtilities,MigrateSaveDataPre_74_00,0x957c0,210,Editor/World
+Beam.LegacyUtilities,MigrateSaveDataPre_74_00,0x957c0,233,World
+Beam.CraftingCombinationMissionReward,DoReward,0xa2e40,99,MISSIONS_MISSION_CRAFTING_COMBINATION_UNLOCK_NTF
+Beam.MissionAssetLoader,LoadingFailed,0xa355a,1,MissionAssetLoader::LoadingFailed:: [
+Beam.MissionControllerBase,ComputeMissionStarted,0xa3cf0,12,<color=#FF0000>Player {0} starts Mission</color>
+Beam.MissionControllerBase,ComputeMissionFailed,0xa3db0,12,<color=#FF0000>Player {0} failed Mission</color>
+Beam.MissionControllerBase,MissionAssetLoader_LoadFailed,0xa3fb0,39,MISSIONS_MISSION_ASSET_LOADER_FAILED
+Beam.MissionEventBroadcasterRelay,GetMissionEventListener,0xa4238,61,MissionEventBroadcasterRelay::Get:: No MissionEventBroadcasterRelay found!
+Beam.NullMissionEventListener,MissionEventBroadcaster_MissionStarted,0xa43d4,1,NullMissionEventListener:: Not implemented.
+Beam.NullMissionEventListener,MissionEventBroadcaster_MissionCompleted,0xa43e0,1,NullMissionEventListener:: Not implemented.
+Beam.NullMissionEventListener,MissionEventBroadcaster_MissionFailed,0xa43ec,1,NullMissionEventListener:: Not implemented.
+Beam.NullMissionEventListener,MissionEventBroadcaster_MissionEnded,0xa43f8,1,NullMissionEventListener:: Not implemented.
+Beam.NullMissionEventListener,MissionEventBroadcaster_EnteredMissionProximity,0xa4404,1,NullMissionEventListener:: Not implemented.
+Beam.NullMissionEventListener,MissionEventBroadcaster_LeftMissionProximity,0xa4410,1,NullMissionEventListener:: Not implemented.
+Beam.Terrain.Map,IsProceduralMap,0xb7fc5,22,INTERNAL_PROCEDURAL
+Beam.Terrain.Map,IsInternalMap,0xb7ffb,22,INTERNAL
+Beam.Terrain.Maps,CreateTextures,0xb8534,122,Icons/WorldMap_Icon_Carrier
+Beam.Terrain.Maps,CreateTextures,0xb8534,163,Icons/WorldMap_Icon_Mission
+Beam.Terrain.World,PushWorld,0xb8d3d,9,World is already back-up. This is client map flow issue.
+Beam.Terrain.World,CreateWorldFolders,0xb8d94,44,WORLD_MSG_WORLD_DIR_NOT_FOUND 
+Beam.Terrain.World,ValidateWorldFolders,0xb8ec4,52,WORLD_MSG_SEED_FILE_MISSING
+Beam.Terrain.World,ValidateWorldFolders,0xb8ec4,90,WORLD_MSG_EMPTY_WORLD_FOLDER
+Beam.Terrain.World,ValidateWorldFolders,0xb8ec4,268,WORLD_MSG_MISSING_MAP_FOLDER 
+Beam.Terrain.World,ValidateWorldFolders,0xb8ec4,317,WORLD_MSG_MISSING_WORLD_FOLDER
+Beam.Terrain.World,CreateProceduralMap,0xb9070,75,INTERNAL_PROCEDURAL
+Beam.Terrain.World,CreateWorld,0xb9200,217,Icons/WorldMap_Icon_Carrier
+Beam.Terrain.World,CreateWorld,0xb9200,261,Icons/WorldMap_Icon_Mission
+Beam.Terrain.World,SaveWorldSeed,0xb9528,87,WORLD_MSG_SUCCESS
+Beam.Terrain.World,SaveWorldSeed,0xb9528,114,WORLD_MSG_ERROR_SAVING_WORLD_SEED 
+Beam.Terrain.World,SaveWorldSeed,0xb9528,142,World::SaveWorldSeed:: 
+Beam.Terrain.World,SaveWorldMaps,0xb95ec,107,WORLD_MSG_SUCCESS
+Beam.Terrain.World,SaveWorldMaps,0xb95ec,134,WORLD_MSG_ERROR_SAVING_WORLD 
+Beam.Terrain.World,SaveWorldMaps,0xb95ec,162,World::SaveWorldMaps:: 
+Beam.Terrain.World,LoadWorld_,0xb96c0,92,WORLD_MSG_ERROR_VALIDATING_WORLD_STRUCTURE 
+Beam.Terrain.World,LoadWorld_,0xb96c0,120,World::LoadWorld:: 
+Beam.Terrain.World,LoadWorldSeed,0xb9770,94,WORLD_MSG_SUCCESS
+Beam.Terrain.World,LoadWorldSeed,0xb9770,111,World::LoadWorldSeed:: Success.
+Beam.Terrain.World,LoadWorldSeed,0xb9770,131,WORLD_MSG_ERROR_LOADING_WORLD_SEED 
+Beam.Terrain.World,LoadWorldSeed,0xb9770,159,World::LoadWorldSeed:: 
+Beam.Terrain.World,LoadWorldMaps,0xb9848,167,WORLD_MSG_MAP_VERSION_EXCEPTION
+Beam.Terrain.World,LoadWorldMaps,0xb9848,184,World::LoadWorldMaps:: 
+Beam.Terrain.World,LoadWorldMaps,0xb9848,233,WORLD_MSG_ERROR_LOADING_MAP 
+Beam.Terrain.World,LoadWorldMaps,0xb9848,279,World::LoadWorldMaps:: 
+Beam.Terrain.World,LoadWorldMaps,0xb9848,342,WORLD_MSG_SUCCESS
+Beam.Terrain.World,LoadWorldMaps,0xb9848,352,World::LoadWorldMaps:: Success.
+Beam.Terrain.World,LoadWorldMaps,0xb9848,370,WORLD_MSG_ERROR_LOADING_WORLD_MAPS 
+Beam.Terrain.World,LoadWorldMaps,0xb9848,399,World::LoadWorldMaps:: 
+Beam.Terrain.World,ImportHeightmapFromRawFile,0xb9a7c,98,"World::ImportHeightmapFromRawFile::
+
+"
+Beam.Terrain.ZoneEvents,EventManager_CampFirePlacedEvent,0xb9ce4,73,ZoneEvents: '
+Beam.Terrain.ZoneEvents,EventManager_PlantedCropEvent,0xb9d5c,120,ZoneEvents: '
+Beam.Terrain.ZoneLoader,GenerateProceduralObjectsPosition,0xba33c,29,ZoneObjectGenerator::GenerateProceduralObjectsPosition:: Objects to generate was null or empty.
+Beam.Terrain.ZoneLoader,GenerateProceduralObjectsProcedural,0xba490,29,ZoneLoader::GenerateProceduralObjectsProcedural:: Objects to generate was null or empty.
+Beam.Terrain.ZoneLoader,GenerateShelter,0xba864,58,", on Zone :"
+Beam.Terrain.ZoneLoader,CreateLoadedPrefab,0xbae1c,27,ZoneLoader::LoadZoneAsync:: Error loading. No prefab id field found for object data.
+Beam.Terrain.ZoneLoader,CreateLoadedPrefab,0xbae1c,48,ZoneLoader::LoadZoneAsync:: Error loading instantiated object with empty prefab id.
+Beam.Serialization.Prefabs,InitializePrefabPaths,0xbd310,177,Prefabs/StrandedObjects/Missions/
+Beam.UI.CartographerMenuPresenter,Show,0xcbf94,140,CARTOGRAPHER_MENU_DB_LOADING_WORLD_DESC
+Beam.UI.CartographerMenuPresenter,ApplyButton_Click,0xcc324,37,CARTOGRAPHER_MENU_DB_SAVING_WORLD_DESC
+Beam.UI.CartographerMenuPresenter,UpdateWorldMap,0xcc424,73,CARTOGRAPHER_MENU_DB_UPDATE_ZONE_DESC
+Beam.UI.CartographerMenuPresenter,RemoveWorldMap,0xcc5c0,53,INTERNAL_PROCEDURAL
+Beam.UI.CartographerMenuPresenter,CreateWorldMapSlots,0xcc670,246,INTERNAL_MISSION
+Beam.UI.CartographerMenuPresenter,WorldMapSlot_Drop,0xccc7c,109,INTERNAL_PROCEDURAL
+Beam.UI.CartographerMenuPresenter,WorldMapSlot_Drop,0xccc7c,251,INTERNAL_PROCEDURAL
+Beam.UI.CartographerMenuPresenter,LoadWorld,0xccf50,45,CARTOGRAPHER_MENU_DB_ERROR_LOADING_WORLD_DESC
+Beam.UI.CartographerMenuPresenter,ShowCreateNewWorldDialogue,0xcd358,32,CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_TITLE
+Beam.UI.CartographerMenuPresenter,ShowCreateNewWorldDialogue,0xcd358,37,CARTOGRAPHER_MENU_DB_CREATE_NEW_WORLD_DESC
+Beam.UI.CartographerMenuPresenter,LoadPlayerMap,0xcd588,39,StrandedWorld
+Beam.UI.CartographerMenuPresenter,LoadPlayerMap,0xcd588,128,ZoneId
+Beam.UI.CartographerMenuPresenter,UpdateMapStatus,0xcd69c,50,INTERNAL_PROCEDURAL
+Beam.UI.CartographerWorldMapTooltipPresenter,Show,0xcd884,205,INTERNAL_PROCEDURAL
+Beam.UI.CartographerWorldMapTooltipPresenter,Show,0xcd884,233,INTERNAL_MISSION
+Beam.UI.CartographerWorldMapTooltipPresenter,Show,0xcd884,322,MAP_DESC_MISSION
+Beam.UI.ActiveMissionHudPresenter,SetView,0xd698a,38,ActiveMissionHudPresenter:: No view component found!
+Beam.UI.DisplayMissionNamePresenter,Awake,0xd6cfc,26,DisplayMissionNamePresenter::Awake:: No view component found!
+Beam.UI.MissionCompletedPresenter,Awake,0xd6eea,26,MissionCompletedPresenter::Awake:: No view component!
+Beam.UI.MissionRewardElement,Awake,0xd7109,26,MissionRewardElement::Awake:: No view component!
+Beam.UI.MissionRewardElement,Initialize,0xd7130,28,MISSIONS_MISSION_REWARD_QUANTITY_LABEL
+Beam.UI.PermissionPromptPresenter,Show,0xddf58,66,PERMISSION_PROMPT_TITLE
+Beam.UI.PermissionPromptPresenter,Show,0xddf58,83, PERMISSION_PROMPT_MESSAGE
+Beam.UI.WatchScreenViewAdapter,SetBacklight,0xe2728,70,_EMISSION
+Beam.UI.WatchScreenViewAdapter,SetBacklight,0xe2728,93,_EmissionColor
+Beam.Crafting.Interactive_TORCH,UpdateFx,0xf0878,54,_EMISSION
+Beam.Crafting.Interactive_TORCH,UpdateFx,0xf0878,77,_EmissionColor
+Beam.Crafting.Interactive_TORCH,UpdateFx,0xf0878,107,_EMISSION
+Beam.Crafting.Interactive_TORCH,UpdateFx,0xf0878,130,_EmissionColor
+Beam.Utilities.BeamGeometryUtility,CalculateFrustumPlanes,0xfcc54,65,Internal_ExtractPlanes
+Beam.Utilities.BeamGeometryUtility,CalculateFrustumPlanes,0xfcc54,121,Failed to reflect internal method. Your Unity version may not contain the presumed named method in GeometryUtility.
+Beam.Utilities.BeamGeometryUtility,CalculateFrustumPlanes,0xfcc54,165,Failed to reflect internal method. Your Unity version may not contain the presumed named method in GeometryUtility.
+AmplifyImpostors.AmplifyImpostor,RenderImpostor,0xfdaf0,1158,_WorldSpaceCameraPos
+AmplifyImpostors.AmplifyImpostor,RenderImpostor,0xfdaf0,1298,_WorldSpaceCameraPos
+<ServerJoinInProgress_LoadPlayerReplicant>d__67,MoveNext,0x104998,241,StrandedWorld/Zones
+<>c,<SyncWorld_Sequence>b__70_1,0x104c9f,6,LOADING_PROGRESS_SYNC_WORLD
+<>c,<SyncWorld_Sequence>b__70_4,0x104cce,6,LOADING_PROGRESS_SYNC_WORLD
+<SyncWorld_Sequence>d__70,MoveNext,0x104da0,98,StrandedWorld:: Error loading world: 
+<LoadGame_Sequence>d__81,MoveNext,0x105b28,410,StrandedWorld
+<CreateWorld_Sequence>d__70,MoveNext,0x106270,77,LOADING_PROGRESS_TEXT_LOADING_WORLD
+<CreateWorld_Sequence>d__70,MoveNext,0x106270,174,LOADING_PROGRESS_TEXT_LOADING_STARTING_ZONE
+<CreateWorld_Sequence>d__70,MoveNext,0x106270,495,StrandedWorld::LoadAsync:: Something went wrong. No starting zone data was found.
+<CreateWorld_Sequence>d__70,MoveNext,0x106270,507,StrandedWorld::LoadAsync:: Something went wrong. No starting zone was found.
+<CreateWorld_Sequence>d__70,MoveNext,0x106270,583,PollZones
+<LoadWorld_Sequence>d__116,MoveNext,0x1064fc,81,LOADING_PROGRESS_TEXT_LOADING_WORLD
+<LoadWorld_Sequence>d__116,MoveNext,0x1064fc,183,LOADING_PROGRESS_TEXT_LOADING_CURRENT_ZONE
+<LoadWorld_Sequence>d__116,MoveNext,0x1064fc,565,PollZones
+<LoadWorld_Sequence>d__116,MoveNext,0x1064fc,585,StrandedWorld::LoadWorld_Sequence:: Loaded world.
+<LoadStartingZone_Sequence>d__119,MoveNext,0x106780,210,StrandedWorld::LoadStartingZone_Sequence:: Zone [
+<LoadStartingZone_Sequence>d__119,MoveNext,0x106780,243,StrandedWorld::LoadStartingZone_Sequence:: Something went wrong. Zone [
+<SendWorld_Sequence>d__24,MoveNext,0x1090ac,199,world_sync
+<ReceiveWorld_Sequence>d__26,MoveNext,0x109238,236,world_sync
+<SendSave_Sequence>d__28,MoveNext,0x109430,238,world_sync
+<ReceiveSave_Sequence>d__30,MoveNext,0x1095ec,248,world_sync
+<SendZone_Sequence>d__28,MoveNext,0x1097c0,150,Send zone {0} {1} size: {2}
+<SendZone_Sequence>d__28,MoveNext,0x1097c0,215,zone_sync
+<PostZone_Sequence>d__34,MoveNext,0x109960,177,Received zone {0} {1} size: {2}
+<PostZone_Sequence>d__34,MoveNext,0x109960,242,zone_sync
+<Start>d__34,MoveNext,0x10bcf8,202,PollZone
+Bundle,ToString,0x111d18,193,"
+GenerationZonePositons[{0}]"
+Bundle,ToString,0x111d18,236,"
+GeneratedZonePoints[{0}]"
+<LoadZone_Sequence>d__44,MoveNext,0x111e34,442,ZoneLoader::LoadZoneAsync:: Zone [
+<LoadZone_Sequence>d__44,MoveNext,0x111e34,724,ZoneLoader::LoadZoneAsync:: [
+<>c__DisplayClass59_0,<Load>b__0,0x112438,31,ZoneLoader::LoadZoneAsync:: Error loading prefab [
+<>c__DisplayClass59_0,<Load>b__0,0x112438,152,ZoneLoader::LoadZoneAsync:: Error loading editor object [
+<>c__DisplayClass59_0,<Load>b__0,0x112438,230,ZoneLoader::LoadZoneAsync:: Error loading [{0}] [{1}]->Object has now been destroyed.
+<>c__DisplayClass70_0,<SaveWorld>b__0,0x117128,77,CARTOGRAPHER_MENU_DB_ERROR_SAVING_WORLD_DESC
+ReplicateQuitToMenu,OnPeer,0x117b78,23,DISCONNECTED_INTERNAL
+<Initialize_Sequence>d__32,MoveNext,0x117be8,238,MAIN_MENU_DB_FILE_PERMISSIONS_DESC
+<Load_Sequence>d__34,MoveNext,0x118078,115,LOADING_PROGRESS_TEXT_LOADING_WORLD
+<Migrate_Sequence>d__35,MoveNext,0x118250,98,World
+<LoadWorld>d__36,MoveNext,0x118488,57,UPGRADING LEGACY WORLD
+<LoadWorld>d__36,MoveNext,0x118488,140,LOADING_PROGRESS_TEXT_CREATING_WORLD
+<LoadWorld>d__36,MoveNext,0x118488,195,LOADING_PROGRESS_TEXT_LOADING_WORLD
+<LoadWorld>d__36,MoveNext,0x118488,260,MAIN_MENU_DB_ERROR_LOAD_WORLD_DESC
+<Start>d__6,MoveNext,0x118a50,99,ActiveMissionHudPresenter:: No view component found!
