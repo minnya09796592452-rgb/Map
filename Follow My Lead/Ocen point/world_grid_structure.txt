@@ -1,0 +1,1314 @@
+=== DLL WORLD / GRID / ZONE / MAP CLASSES ===
+
+CLASS: <CreateGridObjects_Sequence>d__29
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - grid [INSTANCE]
+  - samplesPerStep [INSTANCE]
+  - <currentBiome>5__2 [INSTANCE]
+  - <>7__wrap2 [INSTANCE]
+  - <>7__wrap3 [INSTANCE]
+  - <biomeGrid>5__5 [INSTANCE]
+  - <>7__wrap5 [INSTANCE]
+  - <>7__wrap6 [INSTANCE]
+  - <gridObject>5__8 [INSTANCE]
+  - <curObjectCount>5__9 [INSTANCE]
+  - <x>5__10 [INSTANCE]
+  - <y>5__11 [INSTANCE]
+  - <pos>5__12 [INSTANCE]
+  - <randRot>5__13 [INSTANCE]
+
+CLASS: <CreateRandomWorld_Sequence>d__89
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - mode [INSTANCE]
+  - <>4__this [INSTANCE]
+  - state [INSTANCE]
+  - scene [INSTANCE]
+  - <>8__1 [INSTANCE]
+
+CLASS: <CreateWorld_Sequence>d__70
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - <zone>5__2 [INSTANCE]
+  - <mode>5__3 [INSTANCE]
+
+CLASS: <CreateZoneObjects_Sequence>d__50
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - zone [INSTANCE]
+
+CLASS: <InputMapper_TimeoutSequence>d__69
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - <message>5__2 [INSTANCE]
+
+CLASS: <LoadMap_Sequence>d__14
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - data [INSTANCE]
+
+CLASS: <LoadStartingZone_Sequence>d__119
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - zone [INSTANCE]
+  - <mode>5__2 [INSTANCE]
+
+CLASS: <LoadWorld>d__36
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+
+CLASS: <LoadWorld_Sequence>d__116
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - rootData [INSTANCE]
+  - data [INSTANCE]
+  - <playersData>5__2 [INSTANCE]
+  - <i>5__3 [INSTANCE]
+
+CLASS: <LoadZone_Sequence>d__44
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - zone [INSTANCE]
+  - data [INSTANCE]
+
+CLASS: <PostZone_Sequence>d__34
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - data [INSTANCE]
+  - <>4__this [INSTANCE]
+  - <>8__1 [INSTANCE]
+
+CLASS: <ReceiveWorld_Sequence>d__26
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - onProgress [INSTANCE]
+  - onAbort [INSTANCE]
+  - onCoroutine [INSTANCE]
+  - <>8__1 [INSTANCE]
+  - <>8__2 [INSTANCE]
+  - onSuccess [INSTANCE]
+
+CLASS: <RecreatePhysicsSetupForPalmLogsIsland>d__27
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - island [INSTANCE]
+
+CLASS: <SendWorld_Sequence>d__24
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - world [INSTANCE]
+  - onProgress [INSTANCE]
+  - <>8__1 [INSTANCE]
+  - <>4__this [INSTANCE]
+  - onSuccess [INSTANCE]
+  - onAbort [INSTANCE]
+  - onCoroutine [INSTANCE]
+
+CLASS: <SendZone_Sequence>d__28
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - zone [INSTANCE]
+  - <>4__this [INSTANCE]
+  - index [INSTANCE]
+  - <>8__1 [INSTANCE]
+
+CLASS: <SyncWorld_Sequence>d__70
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - serverLoadWorld [INSTANCE]
+  - <>4__this [INSTANCE]
+
+CLASS: <UpdateGridObjects_Sequence>d__28
+  - <>1__state [INSTANCE]
+  - <>2__current [INSTANCE]
+  - <>4__this [INSTANCE]
+  - <x>5__2 [INSTANCE]
+  - <y>5__3 [INSTANCE]
+
+CLASS: AmplifyImpostors.RenderingMaps
+  - value__ [INSTANCE]
+  - Standard [STATIC/CONST]
+  - Custom [STATIC/CONST]
+
+CLASS: Beam.BossAudio
+  - _swimCreature [INSTANCE]
+  - _goal [INSTANCE]
+  - _ambientClip [INSTANCE]
+  - _awakenedClip [INSTANCE]
+  - _deathClip [INSTANCE]
+  - _attackedClips [INSTANCE]
+  - _jumpedClips [INSTANCE]
+  - _landedClips [INSTANCE]
+  - _damagedClips [INSTANCE]
+  - _ambientHandle [INSTANCE]
+
+CLASS: Beam.Crafting.ConnectorCheck_CheckDistanceFromZone
+  - MAX_DISTANCE_FROM_ZONE [STATIC/CONST]
+
+CLASS: Beam.Crafting.PlacementModifier_SnapToTerrain
+  - _snapOffset [INSTANCE]
+  - _snapRotation [INSTANCE]
+  - _snapBias [INSTANCE]
+
+CLASS: Beam.EGameWorldMode
+  - value__ [INSTANCE]
+  - Existing [STATIC/CONST]
+  - Random [STATIC/CONST]
+
+CLASS: Beam.Language.ElementGlyphMap
+  - ElementName [INSTANCE]
+  - ElementId [INSTANCE]
+  - SpriteText [INSTANCE]
+
+CLASS: Beam.Ocean.RaftBuoyancy
+  - _collider [INSTANCE]
+  - _density [INSTANCE]
+  - _voxelPerAxisIncrease [INSTANCE]
+
+CLASS: Beam.Ocean.StructureBuoyancy
+  - WATER_DENSITY [STATIC/CONST]
+  - _waveQueries [INSTANCE]
+  - _outOfRange [INSTANCE]
+  - _rigidbody [INSTANCE]
+  - _bouyancyCollider [INSTANCE]
+  - _density [INSTANCE]
+  - _slicesPerAxis [INSTANCE]
+  - _voxelsLimit [INSTANCE]
+  - _damper [INSTANCE]
+  - <RaftBuoyancys>k__BackingField [INSTANCE]
+  - _originalDamper [INSTANCE]
+  - _voxelHalfHeight [INSTANCE]
+  - _localArchimedesForce [INSTANCE]
+  - _voxels [INSTANCE]
+  - _wind [INSTANCE]
+  - _floating [INSTANCE]
+
+CLASS: Beam.OceanWeatherEventEffect
+  - _oceanProperties [INSTANCE]
+  - _previousOceanProperties [INSTANCE]
+  - _spectrum [INSTANCE]
+
+CLASS: Beam.RewiredMapCategory
+  - Default [STATIC/CONST]
+  - Crafting_Menu [STATIC/CONST]
+  - Placing [STATIC/CONST]
+  - Fire_Lighting [STATIC/CONST]
+  - Vehicle [STATIC/CONST]
+  - Map_Editor [STATIC/CONST]
+  - Intro [STATIC/CONST]
+  - Watch [STATIC/CONST]
+  - Inventory [STATIC/CONST]
+  - Quick_Crafting [STATIC/CONST]
+  - Menu [STATIC/CONST]
+  - Dialogue [STATIC/CONST]
+  - Dragging [STATIC/CONST]
+
+CLASS: Beam.Terrain.GeneratedObject
+  - Prefab [INSTANCE]
+  - Position [INSTANCE]
+  - Rotation [INSTANCE]
+  - ImpostorParentPrefab [INSTANCE]
+
+CLASS: Beam.Terrain.GenerationPoints
+  - Position [INSTANCE]
+  - Rotation [INSTANCE]
+  - Occupied [INSTANCE]
+  - steepNess [INSTANCE]
+  - Soilmap [INSTANCE]
+
+CLASS: Beam.Terrain.LoadingResult
+  - Succeeded [INSTANCE]
+  - Message [INSTANCE]
+
+CLASS: Beam.Terrain.Map
+  - EditorData [INSTANCE]
+  - ObjectData [INSTANCE]
+  - HeightmapData [INSTANCE]
+
+CLASS: Beam.Terrain.MapEditorData
+  - Valid [INSTANCE]
+  - Id [INSTANCE]
+  - VersionNumber [INSTANCE]
+  - GameVersionNumber [INSTANCE]
+  - Source [INSTANCE]
+  - State [INSTANCE]
+  - Biome [INSTANCE]
+  - Name [INSTANCE]
+  - Author [INSTANCE]
+  - Description [INSTANCE]
+  - DateCreated [INSTANCE]
+  - DateEdited [INSTANCE]
+  - DateAdded [INSTANCE]
+  - LargePreviewImageBytes [INSTANCE]
+  - LargePreviewImage [INSTANCE]
+  - SmallPreviewImage [INSTANCE]
+
+CLASS: Beam.Terrain.Maps
+  - MAP_EXTENSION [STATIC/CONST]
+  - MAP_PREFIX [STATIC/CONST]
+  - MAP_EDITOR_SUFFIX [STATIC/CONST]
+  - MAP_OBJECT_SUFFIX [STATIC/CONST]
+  - MAP_HEIGHT_SUFFIX [STATIC/CONST]
+  - MAP_INTERNAL_ID [STATIC/CONST]
+  - MAP_PROCEDURAL_ID [STATIC/CONST]
+  - MAP_MISSION_ID [STATIC/CONST]
+  - _defaultMapList [STATIC/CONST]
+  - _remoteMaps [STATIC/CONST]
+  - _userMapList [STATIC/CONST]
+
+CLASS: Beam.Terrain.World
+  - WORLD_SEED_FILENAME [STATIC/CONST]
+  - NUM_MISSIONS [STATIC/CONST]
+  - _worlds [STATIC/CONST]
+  - _currentWorld [STATIC/CONST]
+
+CLASS: Beam.Terrain.ZoneEvents
+  - CampFirePlaced [INSTANCE]
+  - CropPlanted [INSTANCE]
+
+CLASS: Beam.Terrain.ZoneLoader
+  - MIN_PROCESSING_STEPS_PER_FRAME [STATIC/CONST]
+  - MAX_PROCESSING_STEPS_PER_FRAME [STATIC/CONST]
+  - INDEX_SIZE [STATIC/CONST]
+  - _simulateSlowLoad [INSTANCE]
+  - _internalDeferredLoading [INSTANCE]
+  - _deferredLoading [INSTANCE]
+  - _postLoading [INSTANCE]
+  - _physicalLoading [INSTANCE]
+  - _isGenerating [INSTANCE]
+  - <IsLoading>k__BackingField [INSTANCE]
+  - _random [INSTANCE]
+  - _position [INSTANCE]
+  - _processes [INSTANCE]
+  - _timer [INSTANCE]
+  - _timeout [INSTANCE]
+  - <ObjectProcessingMode>k__BackingField [INSTANCE]
+  - CreatedZone [INSTANCE]
+  - LoadedZone [INSTANCE]
+
+CLASS: Beam.Terrain.ZoneObjectGenerator
+  - INDEX_SIZE [STATIC/CONST]
+
+CLASS: Beam.UI.CartographerEventArgs
+  - MapsInserted [INSTANCE]
+
+CLASS: Beam.UI.CartographerMenuPresenter
+  - _mainMenuPresenter [INSTANCE]
+  - _tooltipPresenter [INSTANCE]
+  - _view [INSTANCE]
+  - _parent [INSTANCE]
+  - _validSave [INSTANCE]
+  - _dirty [INSTANCE]
+  - _suspend [INSTANCE]
+  - _currentDraggingMapListElement [INSTANCE]
+  - _currentMapSlot [INSTANCE]
+  - _currentMapElements [INSTANCE]
+  - _reservedZoneIds [INSTANCE]
+  - _mapsInserted [INSTANCE]
+  - _remoteMapPaths [INSTANCE]
+  - _retrievedUGC [INSTANCE]
+  - _loadedUGC [INSTANCE]
+  - _loadingUGCResult [INSTANCE]
+  - WorldApplied [INSTANCE]
+  - ShowView [INSTANCE]
+  - HideView [INSTANCE]
+  - CreatedNewWorld [INSTANCE]
+
+CLASS: Beam.UI.CartographerWorldMapTooltipPresenter
+  - _view [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.MapEditorMenuPresenter
+  - MAP_TO_EDIT [STATIC/CONST]
+  - _saveMenuPresenter [INSTANCE]
+  - _view [INSTANCE]
+  - _currentMap [INSTANCE]
+  - _initialized [INSTANCE]
+  - _childPanelOpen [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.MapEditorSaveMenuPresenter
+  - _view [INSTANCE]
+  - <CurrentMap>k__BackingField [INSTANCE]
+  - ShowView [INSTANCE]
+  - HideView [INSTANCE]
+  - Saved [INSTANCE]
+  - _initialized [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.UMapEditorSaveMenuViewAdapter
+  - _savePanel [INSTANCE]
+  - DefaultPreviewImage [INSTANCE]
+  - PreviewImageSlotPrefab [INSTANCE]
+  - PreviewImageSlotContainer [INSTANCE]
+  - _canvasGroup [INSTANCE]
+  - _saveButton [INSTANCE]
+  - _backButton [INSTANCE]
+  - _nameInputField [INSTANCE]
+  - _descriptionInputField [INSTANCE]
+  - _previewImage [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.UMapEditorViewAdapter
+  - _mapEditorCanvas [INSTANCE]
+  - _canvasGroup [INSTANCE]
+  - _resumeButton [INSTANCE]
+  - _saveButton [INSTANCE]
+  - _quitButton [INSTANCE]
+  - _mapTitleLabel [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.UMapHandle
+  - _handle [INSTANCE]
+  - _handleSprite [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.UMapListElement
+  - <Map>k__BackingField [INSTANCE]
+  - _nameLabel [INSTANCE]
+  - _descriptionLabel [INSTANCE]
+  - _authorLabel [INSTANCE]
+  - _versionLabel [INSTANCE]
+  - _previewImage [INSTANCE]
+  - _editButton [INSTANCE]
+  - _deleteButton [INSTANCE]
+  - _popular [INSTANCE]
+  - _featured [INSTANCE]
+  - EditClick [INSTANCE]
+  - DeleteClick [INSTANCE]
+  - BeginDrag [INSTANCE]
+  - Drag [INSTANCE]
+  - EndDrag [INSTANCE]
+
+CLASS: Beam.UI.MapEditor.UWorldMapSlot
+  - <Map>k__BackingField [INSTANCE]
+  - _previewImage [INSTANCE]
+  - _statusIcon [INSTANCE]
+  - _button [INSTANCE]
+  - Click [INSTANCE]
+  - Enter [INSTANCE]
+  - Leave [INSTANCE]
+  - Drop [INSTANCE]
+
+CLASS: Beam.UI.TMPInputMapCategoryHeader
+  - _label [INSTANCE]
+  - _subheadingsContainer [INSTANCE]
+
+CLASS: Beam.UI.UCartographerMenuViewAdapter
+  - _cartographerPanelGameObject [INSTANCE]
+  - _canvasGroup [INSTANCE]
+  - _mapHandle [INSTANCE]
+  - _mapSlotPrefab [INSTANCE]
+  - _mapSlotsContainer [INSTANCE]
+  - _mapListElementPrefab [INSTANCE]
+  - _localMapListContainer [INSTANCE]
+  - _remoteMapListContainer [INSTANCE]
+  - _searchInputField [INSTANCE]
+  - _retrievingLabel [INSTANCE]
+  - _noMapsLabel [INSTANCE]
+  - _mapsSourceGroup [INSTANCE]
+  - _localMapsButton [INSTANCE]
+  - _remoteMapsButton [INSTANCE]
+  - _randomizeButton [INSTANCE]
+  - _applyButton [INSTANCE]
+  - _createIslandButton [INSTANCE]
+  - _cancelButton [INSTANCE]
+  - _worldSeedLabel [INSTANCE]
+  - _infoLabel [INSTANCE]
+
+CLASS: Beam.UI.UCartographerWorldMapTooltipViewAdapter
+  - _tooltipGameObject [INSTANCE]
+  - _canvasGroup [INSTANCE]
+  - _nameLabel [INSTANCE]
+  - _authorLabel [INSTANCE]
+  - _descriptionLabel [INSTANCE]
+  - _versionNumberLabel [INSTANCE]
+  - _statusLabel [INSTANCE]
+  - _sourceLabel [INSTANCE]
+
+CLASS: BiomeGrid
+  - name [INSTANCE]
+  - allBiomes [INSTANCE]
+  - _biome [INSTANCE]
+  - biomeParameters [INSTANCE]
+
+CLASS: Boss_Eel
+  - _introSetup [INSTANCE]
+  - _introSetupTimer [INSTANCE]
+  - _goalStartPosition [INSTANCE]
+  - _goalStartRotation [INSTANCE]
+
+CLASS: Boss_Shark
+  - _introSetup [INSTANCE]
+  - _IntroBloodParticle [INSTANCE]
+  - _goalStartPosition [INSTANCE]
+  - _goalStartRotation [INSTANCE]
+
+CLASS: Boss_Squid
+  - _introSetup [INSTANCE]
+  - _tentacle [INSTANCE]
+  - _goalStartPosition [INSTANCE]
+  - _goalStartRotation [INSTANCE]
+
+CLASS: Boss_Squid_Environment
+  - _buoy [INSTANCE]
+  - _buoyChain [INSTANCE]
+  - _buoyLight [INSTANCE]
+  - _buoyBellAudio [INSTANCE]
+  - _buoyBellTime [INSTANCE]
+  - _buoyBellTimer [INSTANCE]
+
+CLASS: Boss_Squid_Tentacle
+  - _bossSquid [INSTANCE]
+  - _Grab [INSTANCE]
+  - _renderer [INSTANCE]
+  - _animation [INSTANCE]
+  - _grabTargetPosition [INSTANCE]
+  - _grabSpeed [INSTANCE]
+  - _reachDist [INSTANCE]
+  - _targetGrabbed [INSTANCE]
+  - _tentacleAttacking [INSTANCE]
+  - _animReach [INSTANCE]
+  - _animMiss [INSTANCE]
+  - _animGrab [INSTANCE]
+  - Attacked [INSTANCE]
+  - AttackedGrabbed [INSTANCE]
+  - AttackedPushed [INSTANCE]
+
+CLASS: Ceto.GRID_GROUPS
+  - value__ [INSTANCE]
+  - SINGLE [STATIC/CONST]
+  - LOW [STATIC/CONST]
+  - MEDIUM [STATIC/CONST]
+  - HIGH [STATIC/CONST]
+  - EXTREME [STATIC/CONST]
+
+CLASS: Ceto.OVERLAY_MAP_SIZE
+  - value__ [INSTANCE]
+  - DOUBLE [STATIC/CONST]
+  - FULL_HALF [STATIC/CONST]
+  - FULL [STATIC/CONST]
+  - HALF [STATIC/CONST]
+  - QUARTER [STATIC/CONST]
+
+CLASS: Ceto.Ocean
+  - DISABLE_FOURIER_MULTITHREADING [STATIC/CONST]
+  - DISABLE_PROJECTED_GRID_BORDER [STATIC/CONST]
+  - DISABLE_ALL_MULTITHREADING [STATIC/CONST]
+  - DISABLE_PROJECTION_FLIPPING [STATIC/CONST]
+  - DISABLE_PROJECT_SCENE_VIEW [STATIC/CONST]
+  - VERSION [STATIC/CONST]
+  - <Instance>k__BackingField [STATIC/CONST]
+  - OCEAN_LAYER [STATIC/CONST]
+  - REFLECTION_TEXTURE_NAME0 [STATIC/CONST]
+  - REFLECTION_TEXTURE_NAME1 [STATIC/CONST]
+  - REFRACTION_GRAB_TEXTURE_NAME [STATIC/CONST]
+  - DEPTH_GRAB_TEXTURE_NAME [STATIC/CONST]
+  - OCEAN_DEPTH_TEXTURE_NAME0 [STATIC/CONST]
+  - OCEAN_DEPTH_TEXTURE_NAME1 [STATIC/CONST]
+  - OCEAN_MASK_TEXTURE_NAME0 [STATIC/CONST]
+  - OCEAN_MASK_TEXTURE_NAME1 [STATIC/CONST]
+  - NORMAL_FADE_TEXTURE_NAME [STATIC/CONST]
+  - MAX_SPECTRUM_WAVE_HEIGHT [STATIC/CONST]
+  - MAX_OVERLAY_WAVE_HEIGHT [STATIC/CONST]
+  - disableWarnings [INSTANCE]
+  - disableInfo [INSTANCE]
+  - doublePrecisionProjection [INSTANCE]
+  - tightProjectionFit [INSTANCE]
+  - m_sun [INSTANCE]
+  - level [INSTANCE]
+  - heightOverlaySize [INSTANCE]
+  - normalOverlaySize [INSTANCE]
+  - foamOverlaySize [INSTANCE]
+  - clipOverlaySize [INSTANCE]
+  - heightBlendMode [INSTANCE]
+  - foamBlendMode [INSTANCE]
+  - defaultSkyColor [INSTANCE]
+  - defaultOceanColor [INSTANCE]
+  - windDir [INSTANCE]
+  - <WindDirVector>k__BackingField [INSTANCE]
+  - specularRoughness [INSTANCE]
+  - specularIntensity [INSTANCE]
+  - fresnelPower [INSTANCE]
+  - minFresnel [INSTANCE]
+  - foamTint [INSTANCE]
+  - foamIntensity [INSTANCE]
+  - foamTexture0 [INSTANCE]
+  - foamTexture1 [INSTANCE]
+  - waveOverlaySdr [INSTANCE]
+  - <Grid>k__BackingField [INSTANCE]
+  - <Reflection>k__BackingField [INSTANCE]
+  - <Spectrum>k__BackingField [INSTANCE]
+  - <UnderWater>k__BackingField [INSTANCE]
+  - <OceanTime>k__BackingField [INSTANCE]
+  - <Projection>k__BackingField [INSTANCE]
+  - m_positionOffset [INSTANCE]
+  - m_cameraData [INSTANCE]
+  - m_waveOverlayMat [INSTANCE]
+  - <OverlayManager>k__BackingField [INSTANCE]
+  - m_scheduler [INSTANCE]
+  - m_query [INSTANCE]
+  - <WasError>k__BackingField [INSTANCE]
+
+CLASS: Ceto.OceanCameraSettings
+  - disableAllOverlays [INSTANCE]
+  - heightOverlaySize [INSTANCE]
+  - normalOverlaySize [INSTANCE]
+  - foamOverlaySize [INSTANCE]
+  - clipOverlaySize [INSTANCE]
+  - disableReflections [INSTANCE]
+  - reflectionMask [INSTANCE]
+  - reflectionResolution [INSTANCE]
+  - disableUnderwater [INSTANCE]
+  - oceanDepthsMask [INSTANCE]
+
+CLASS: Ceto.OceanComponent
+  - m_ocean [INSTANCE]
+  - <WasError>k__BackingField [INSTANCE]
+
+CLASS: Ceto.ProjectedGrid
+  - MAX_SCREEN_WIDTH [STATIC/CONST]
+  - MAX_SCREEN_HEIGHT [STATIC/CONST]
+  - resolution [INSTANCE]
+  - gridGroups [INSTANCE]
+  - receiveShadows [INSTANCE]
+  - borderLength [INSTANCE]
+  - reflectionProbes [INSTANCE]
+  - oceanTopSideMat [INSTANCE]
+  - oceanUnderSideMat [INSTANCE]
+  - m_grids [INSTANCE]
+
+CLASS: Ceto.QueryGridScaling
+  - invGridSizes [INSTANCE]
+  - scaleY [INSTANCE]
+  - choppyness [INSTANCE]
+  - offset [INSTANCE]
+  - numGrids [INSTANCE]
+  - result [INSTANCE]
+
+CLASS: DebugInputMaps
+  - ShowGUI [INSTANCE]
+
+CLASS: DeluxeTonemapper
+  - m_MainCurve [INSTANCE]
+  - m_Tint [INSTANCE]
+  - m_MoodAmount [INSTANCE]
+  - m_Sharpness [INSTANCE]
+  - m_SharpnessKernel [INSTANCE]
+  - m_Mode [INSTANCE]
+  - m_EnableLut0 [INSTANCE]
+  - m_Saturation [INSTANCE]
+  - m_DisableColorGrading [INSTANCE]
+  - m_LastDisableColorGrading [INSTANCE]
+  - m_Lut0Amount [INSTANCE]
+  - m_2DLut0 [INSTANCE]
+  - m_3DLut0 [INSTANCE]
+  - m_LutTool [INSTANCE]
+  - m_FilmicCurveOpened [INSTANCE]
+  - m_ColorGradingOpened [INSTANCE]
+  - m_HDREffectsgOpened [INSTANCE]
+  - m_BannerIsOpened [INSTANCE]
+  - m_Use2DLut [INSTANCE]
+  - m_LastUse2DLut [INSTANCE]
+  - m_IsInitialized [INSTANCE]
+  - m_LastMode [INSTANCE]
+  - m_Material [INSTANCE]
+  - m_Shader [INSTANCE]
+
+CLASS: EMapSource
+  - value__ [INSTANCE]
+  - Local [STATIC/CONST]
+  - Community [STATIC/CONST]
+
+CLASS: EMapState
+  - value__ [INSTANCE]
+  - Current [STATIC/CONST]
+  - Older [STATIC/CONST]
+  - Unavailable [STATIC/CONST]
+
+CLASS: ETerrainChangeHeightMode
+  - value__ [INSTANCE]
+  - RAISE [STATIC/CONST]
+  - LOWER [STATIC/CONST]
+
+CLASS: ETerrainUIMode
+  - value__ [INSTANCE]
+  - CREATE [STATIC/CONST]
+  - EDIT [STATIC/CONST]
+
+CLASS: Epic.OnlineServices.Connect.GetExternalAccountMappingsOptions
+  - <LocalUserId>k__BackingField [INSTANCE]
+  - <AccountIdType>k__BackingField [INSTANCE]
+  - <TargetExternalUserId>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.GetExternalAccountMappingsOptionsInternal
+  - m_ApiVersion [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+  - m_AccountIdType [INSTANCE]
+  - m_TargetExternalUserId [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.GetProductUserIdMappingOptions
+  - <LocalUserId>k__BackingField [INSTANCE]
+  - <AccountIdType>k__BackingField [INSTANCE]
+  - <TargetProductUserId>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.GetProductUserIdMappingOptionsInternal
+  - m_ApiVersion [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+  - m_AccountIdType [INSTANCE]
+  - m_TargetProductUserId [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryExternalAccountMappingsCallbackInfo
+  - <ResultCode>k__BackingField [INSTANCE]
+  - <ClientData>k__BackingField [INSTANCE]
+  - <LocalUserId>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryExternalAccountMappingsCallbackInfoInternal
+  - m_ResultCode [INSTANCE]
+  - m_ClientData [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryExternalAccountMappingsOptions
+  - <LocalUserId>k__BackingField [INSTANCE]
+  - <AccountIdType>k__BackingField [INSTANCE]
+  - <ExternalAccountIds>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryExternalAccountMappingsOptionsInternal
+  - m_ApiVersion [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+  - m_AccountIdType [INSTANCE]
+  - m_ExternalAccountIds [INSTANCE]
+  - m_ExternalAccountIdCount [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryProductUserIdMappingsCallbackInfo
+  - <ResultCode>k__BackingField [INSTANCE]
+  - <ClientData>k__BackingField [INSTANCE]
+  - <LocalUserId>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryProductUserIdMappingsCallbackInfoInternal
+  - m_ResultCode [INSTANCE]
+  - m_ClientData [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryProductUserIdMappingsOptions
+  - <LocalUserId>k__BackingField [INSTANCE]
+  - <AccountIdType_DEPRECATED>k__BackingField [INSTANCE]
+  - <ProductUserIds>k__BackingField [INSTANCE]
+
+CLASS: Epic.OnlineServices.Connect.QueryProductUserIdMappingsOptionsInternal
+  - m_ApiVersion [INSTANCE]
+  - m_LocalUserId [INSTANCE]
+  - m_AccountIdType_DEPRECATED [INSTANCE]
+  - m_ProductUserIds [INSTANCE]
+  - m_ProductUserIdCount [INSTANCE]
+
+CLASS: Funlabs.MultiplayerWorldSync
+  - SHOW_UI [STATIC/CONST]
+  - PROGRESS_UPDATE_TIME [INSTANCE]
+  - <Instance>k__BackingField [STATIC/CONST]
+  - _slots [INSTANCE]
+  - _receiving [INSTANCE]
+
+CLASS: Funlabs.MultiplayerZoneSync
+  - CLIENT_LINK_TIME [STATIC/CONST]
+  - SHOW_UI [STATIC/CONST]
+  - <Instance>k__BackingField [STATIC/CONST]
+  - _commands [INSTANCE]
+  - _zoneUploadIndex [INSTANCE]
+  - _zoneDownloadState [INSTANCE]
+  - _zoneDownloadStartTime [INSTANCE]
+  - _zoneDownloadElapsed [INSTANCE]
+  - _zoneDownloadRatio [INSTANCE]
+  - _zoneDownloadIndex [INSTANCE]
+
+CLASS: Funlabs.ZoneDownloadedEvent
+  - ZoneId [INSTANCE]
+  - Zone [INSTANCE]
+
+CLASS: Grid
+  - screenWidth [INSTANCE]
+  - screenHeight [INSTANCE]
+  - resolution [INSTANCE]
+  - groups [INSTANCE]
+  - topFilters [INSTANCE]
+  - topRenderer [INSTANCE]
+  - top [INSTANCE]
+  - underFilters [INSTANCE]
+  - underRenderer [INSTANCE]
+  - under [INSTANCE]
+
+CLASS: GridObject
+  - objectsToSpawn [INSTANCE]
+  - rayCastMasks [INSTANCE]
+  - cycleGrid [INSTANCE]
+  - gridCheckDensity [INSTANCE]
+  - maxObjects [INSTANCE]
+  - rarity [INSTANCE]
+  - align [INSTANCE]
+  - minslope [INSTANCE]
+  - maxslope [INSTANCE]
+  - minHeight [INSTANCE]
+  - maxHeight [INSTANCE]
+  - randomYRotation [INSTANCE]
+  - grass [INSTANCE]
+
+CLASS: Heightmap
+  - Preview [INSTANCE]
+  - Heights [INSTANCE]
+
+CLASS: IslandGen.Center
+  - Index [INSTANCE]
+  - Point [INSTANCE]
+  - Water [INSTANCE]
+  - Ocean [INSTANCE]
+  - Coast [INSTANCE]
+  - Border [INSTANCE]
+  - Biome [INSTANCE]
+  - Elevation [INSTANCE]
+  - Moisture [INSTANCE]
+  - Neighbors [INSTANCE]
+  - Borders [INSTANCE]
+  - Corners [INSTANCE]
+
+CLASS: IslandGen.Corner
+  - Index [INSTANCE]
+  - Point [INSTANCE]
+  - Ocean [INSTANCE]
+  - Water [INSTANCE]
+  - Coast [INSTANCE]
+  - Border [INSTANCE]
+  - Elevation [INSTANCE]
+  - Moisture [INSTANCE]
+  - Touches [INSTANCE]
+  - Protrudes [INSTANCE]
+  - Adjacent [INSTANCE]
+  - River [INSTANCE]
+  - Downslope [INSTANCE]
+  - Watershed [INSTANCE]
+  - WatershedSize [INSTANCE]
+
+CLASS: IslandGen.Edge
+  - Index [INSTANCE]
+  - D0 [INSTANCE]
+  - D1 [INSTANCE]
+  - V0 [INSTANCE]
+  - V1 [INSTANCE]
+  - Midpoint [INSTANCE]
+  - River [INSTANCE]
+
+CLASS: IslandGen.Island
+  - LakeThreshold [STATIC/CONST]
+  - <Points>k__BackingField [INSTANCE]
+  - <Centers>k__BackingField [INSTANCE]
+  - <Corners>k__BackingField [INSTANCE]
+  - <Edges>k__BackingField [INSTANCE]
+  - <Size>k__BackingField [INSTANCE]
+  - <NumPoints>k__BackingField [INSTANCE]
+  - <IslandType>k__BackingField [INSTANCE]
+  - <PointType>k__BackingField [INSTANCE]
+
+CLASS: IslandGen.PointSelector
+  - NumLloydRelaxations [STATIC/CONST]
+
+CLASS: IslandTypes
+  - value__ [INSTANCE]
+  - Radial [STATIC/CONST]
+  - Perlin [STATIC/CONST]
+  - Blob [STATIC/CONST]
+
+CLASS: LE_LevelEditor.Core.LE_ObjectMap
+  - CategoryName [INSTANCE]
+  - ObjectPrefabs [INSTANCE]
+  - SubObjectMaps [INSTANCE]
+
+CLASS: LE_LevelEditor.Core.LE_TerrainManager
+  - m_terrainData [INSTANCE]
+
+CLASS: LE_LevelEditor.Events.LE_TerrainCreatedEvent
+  - m_terrainGameObject [INSTANCE]
+
+CLASS: LE_LevelEditor.LE_ConfigTerrain
+  - m_brushProjector [INSTANCE]
+  - m_brushes [INSTANCE]
+  - _heightmaps [INSTANCE]
+  - m_customDefaultTerrain [INSTANCE]
+  - m_terrainLayer [INSTANCE]
+
+CLASS: LE_LevelEditor.LE_ZoneTileGenerator
+  - terrain [INSTANCE]
+  - _waveOverlay [INSTANCE]
+
+CLASS: LE_LevelEditor.Logic.LE_LogicTerrain
+  - m_confT [INSTANCE]
+  - m_GUI3dTerrain [INSTANCE]
+  - m_doRebuildTerrainTab [INSTANCE]
+  - m_selectedBrushIndex [INSTANCE]
+  - m_selectedHeightmapIndex [INSTANCE]
+  - m_isHeightRaise [INSTANCE]
+
+CLASS: LE_LevelEditor.UI.LE_ETerrainEditMode
+  - value__ [INSTANCE]
+  - CHANGE_HEIGHT [STATIC/CONST]
+  - CHANGE_HEIGHT_TO_TARGET_VALUE [STATIC/CONST]
+  - SMOOTH_HEIGHT [STATIC/CONST]
+  - PROCEDURAL [STATIC/CONST]
+
+CLASS: LE_LevelEditor.UI.LE_GUI3dTerrain
+  - TERRAIN_LAYER [INSTANCE]
+  - m_terrain [INSTANCE]
+  - m_terrainMgr [INSTANCE]
+  - m_defaultTerrainDataPrefab [INSTANCE]
+  - m_brushProjector [INSTANCE]
+  - m_brushAlphaTexture [INSTANCE]
+  - _heightmap [INSTANCE]
+  - m_amount [INSTANCE]
+  - m_size [INSTANCE]
+  - m_targetRelativeValue [INSTANCE]
+  - m_isReadingTerrainSetHeight [INSTANCE]
+  - m_isTerrainSetHeightReadInFrame [INSTANCE]
+  - m_isDirectedSmooth [INSTANCE]
+  - m_directedSmoothAngle [INSTANCE]
+  - m_editMode [INSTANCE]
+  - m_lastCursorActiveScreenCoords [INSTANCE]
+
+CLASS: MapLoader
+  - _deferredLoading [INSTANCE]
+  - _postLoading [INSTANCE]
+  - _physicalLoading [INSTANCE]
+  - <IsLoading>k__BackingField [INSTANCE]
+
+CLASS: MapNameGenerator
+  - Prefixes [STATIC/CONST]
+  - Stems [STATIC/CONST]
+  - Suffixes [STATIC/CONST]
+
+CLASS: NullWorldSpaceAttributeView
+  - <Instance>k__BackingField [STATIC/CONST]
+
+CLASS: OceanProperties
+  - WaveAge [INSTANCE]
+  - WindSpeed [INSTANCE]
+  - FoamAmount [INSTANCE]
+
+CLASS: PlayerGridGroup
+  - PlayerId [INSTANCE]
+  - SpawnGrids [INSTANCE]
+
+CLASS: PlayerMap
+  - rewiredPlayerId [INSTANCE]
+  - gamePlayerId [INSTANCE]
+
+CLASS: Rewired.Demos.ControlRemappingDemo1
+  - defaultModalWidth [STATIC/CONST]
+  - defaultModalHeight [STATIC/CONST]
+  - assignmentTimeout [STATIC/CONST]
+  - dialog [INSTANCE]
+  - inputMapper [INSTANCE]
+  - conflictFoundEventData [INSTANCE]
+  - guiState [INSTANCE]
+  - busy [INSTANCE]
+  - pageGUIState [INSTANCE]
+  - selectedPlayer [INSTANCE]
+  - selectedMapCategoryId [INSTANCE]
+  - selectedController [INSTANCE]
+  - selectedMap [INSTANCE]
+  - showMenu [INSTANCE]
+  - startListening [INSTANCE]
+  - actionScrollPos [INSTANCE]
+  - calibrateScrollPos [INSTANCE]
+  - actionQueue [INSTANCE]
+  - setupFinished [INSTANCE]
+  - initialized [INSTANCE]
+  - isCompiling [INSTANCE]
+  - style_wordWrap [INSTANCE]
+  - style_centeredBox [INSTANCE]
+
+CLASS: Rewired.Demos.SimpleCombinedKeyboardMouseRemapping
+  - category [STATIC/CONST]
+  - layout [STATIC/CONST]
+  - uiCategory [STATIC/CONST]
+  - inputMapper_keyboard [INSTANCE]
+  - inputMapper_mouse [INSTANCE]
+  - buttonPrefab [INSTANCE]
+  - textPrefab [INSTANCE]
+  - fieldGroupTransform [INSTANCE]
+  - actionGroupTransform [INSTANCE]
+  - controllerNameUIText [INSTANCE]
+  - statusUIText [INSTANCE]
+  - rows [INSTANCE]
+  - _replaceTargetMapping [INSTANCE]
+
+CLASS: Rewired.Demos.SimpleControlRemapping
+  - category [STATIC/CONST]
+  - layout [STATIC/CONST]
+  - uiCategory [STATIC/CONST]
+  - inputMapper [INSTANCE]
+  - buttonPrefab [INSTANCE]
+  - textPrefab [INSTANCE]
+  - fieldGroupTransform [INSTANCE]
+  - actionGroupTransform [INSTANCE]
+  - controllerNameUIText [INSTANCE]
+  - statusUIText [INSTANCE]
+  - selectedControllerType [INSTANCE]
+  - selectedControllerId [INSTANCE]
+  - rows [INSTANCE]
+
+CLASS: S_SnapTools.S_SnapToGrid
+  - m_epsilon [INSTANCE]
+  - m_maxVelocity_StillMode [INSTANCE]
+  - m_stillTimeBeforSnap_StillMode [INSTANCE]
+  - m_gridOffset [INSTANCE]
+  - m_gridCellSize [INSTANCE]
+  - m_snapCondition [INSTANCE]
+  - m_isInstantSnap [INSTANCE]
+  - m_isSnapAxisX [INSTANCE]
+  - m_isSnapAxisY [INSTANCE]
+  - m_isSnapAxisZ [INSTANCE]
+  - m_stillTime [INSTANCE]
+  - m_lastPosition [INSTANCE]
+
+CLASS: S_SnapTools.S_SnapToWorld
+  - m_snapToLayers [INSTANCE]
+  - m_snapDirection [INSTANCE]
+  - m_snapFrameRate [INSTANCE]
+  - m_isRotationSnap [INSTANCE]
+  - m_maxSnapDistanceAgainstDirection [INSTANCE]
+  - m_snapCounter [INSTANCE]
+
+CLASS: SpawnGrid
+  - Transform [INSTANCE]
+  - Objects [INSTANCE]
+  - CanGenerate [INSTANCE]
+
+CLASS: StrandedWorld
+  - ZONE_SPACING [STATIC/CONST]
+  - ZONE_SIZE [STATIC/CONST]
+  - ZONE_SIZE_HALF [STATIC/CONST]
+  - ZONE_TERRAIN_SIZE [STATIC/CONST]
+  - ZONE_TERRAIN_SIZE_HALF [STATIC/CONST]
+  - ZONE_TERRAIN_SIZE_HALF_SQR [STATIC/CONST]
+  - ZONE_LOAD_UNLOAD_BUFFER [STATIC/CONST]
+  - ZONE_LOAD_DISTANCE [STATIC/CONST]
+  - ZONE_UNLOAD_DISTANCE [STATIC/CONST]
+  - ZONE_HEIGHTMAP_SIZE [STATIC/CONST]
+  - ZONE_HEIGHTMAP_HEIGHT [STATIC/CONST]
+  - LOCAL_WORLD_SEED [STATIC/CONST]
+  - TERRAIN_Y_POSITION [STATIC/CONST]
+  - TERRAIN_RESOLUTION [STATIC/CONST]
+  - TERRAIN_DETAIL_DISTANCE [STATIC/CONST]
+  - WORLD_ZONES [STATIC/CONST]
+  - WORLD_ZONES_SQUARED [STATIC/CONST]
+  - LEGACY_WORLD_ZONES [STATIC/CONST]
+  - LEGACY_ZONE_SIZE [STATIC/CONST]
+  - LEGACY_ZONE_SIZE_HALF [STATIC/CONST]
+  - IMPOSTOR_VIEW_DISTANCE [STATIC/CONST]
+  - SQR_IMPOSTOR_VIEW_DISTANCE [STATIC/CONST]
+  - SQR_LOADING_BUFFER [STATIC/CONST]
+  - _shelters [STATIC/CONST]
+  - _zones [INSTANCE]
+  - _nmlZone [INSTANCE]
+  - _terrainDatas [INSTANCE]
+  - ZoneEvents [INSTANCE]
+  - ProceduralObjectsManager [INSTANCE]
+  - _zoneLoader [INSTANCE]
+  - <ShelterCount>k__BackingField [INSTANCE]
+  - _lastSavePosition [INSTANCE]
+  - _zoneSavedObjectsLookup [INSTANCE]
+  - _playerPosition [INSTANCE]
+  - WorldGenerated [INSTANCE]
+  - ZoneEntered [INSTANCE]
+  - _zonePrefab [INSTANCE]
+  - _zoneContainer [INSTANCE]
+
+CLASS: TargetMapping
+  - controllerMap [INSTANCE]
+  - actionElementMapId [INSTANCE]
+
+CLASS: TerrainChangeHeightModeEventArgs
+  - ChangeHeightMode [INSTANCE]
+
+CLASS: TerrainEditModeEventArgs
+  - EditMode [INSTANCE]
+
+CLASS: UStaticWorldSpaceAttributeView
+  - _canvasGroup [INSTANCE]
+  - _radialBar [INSTANCE]
+  - _showSequence [INSTANCE]
+
+CLASS: WorldBarrier
+  - _barrierPieces [INSTANCE]
+
+CLASS: WorldSpaceAttributeController
+  - _view [INSTANCE]
+  - _attribute [INSTANCE]
+
+CLASS: WorldTools
+  - heightmapRes [STATIC/CONST]
+  - generatorType [STATIC/CONST]
+  - perlinSeed [STATIC/CONST]
+  - perlinFrequency [STATIC/CONST]
+  - perlinAmplitude [STATIC/CONST]
+  - perlinOctaves [STATIC/CONST]
+  - perlinBlend [STATIC/CONST]
+  - normaliseMin [STATIC/CONST]
+  - normaliseMax [STATIC/CONST]
+  - normaliseBlend [STATIC/CONST]
+  - smoothBlend [STATIC/CONST]
+  - smoothIterations [STATIC/CONST]
+  - Island_Base_Height [STATIC/CONST]
+
+CLASS: Zone
+  - SAVE_BOUNDS_MAX_HEIGHT [STATIC/CONST]
+  - SAVE_BOUNDS_MIN_HEIGHT [STATIC/CONST]
+  - SAVE_BOUNDS_BUFFER [STATIC/CONST]
+  - SAVE_BOUNDS_RADIUS [STATIC/CONST]
+  - SQR_SAVE_BOUNDS_RADIUS [STATIC/CONST]
+  - Attributes [INSTANCE]
+  - _terrain [INSTANCE]
+  - SaveContainer [INSTANCE]
+  - _biome [INSTANCE]
+  - ZoneName [INSTANCE]
+  - Id [INSTANCE]
+  - Version [INSTANCE]
+  - IsStartingIsland [INSTANCE]
+  - <Seed>k__BackingField [INSTANCE]
+  - <Loading>k__BackingField [INSTANCE]
+  - <Loaded>k__BackingField [INSTANCE]
+  - <IsMapEditor>k__BackingField [INSTANCE]
+  - <IsUserMap>k__BackingField [INSTANCE]
+  - <HasObjectsForBillboard>k__BackingField [INSTANCE]
+  - <HasShelter>k__BackingField [INSTANCE]
+  - <ShelterType>k__BackingField [INSTANCE]
+  - <HasWollie>k__BackingField [INSTANCE]
+  - <HasVisited>k__BackingField [INSTANCE]
+  - _generationPoints [INSTANCE]
+  - _generatedObjects [INSTANCE]
+  - <WaveOverlay>k__BackingField [INSTANCE]
+  - _billboarding [INSTANCE]
+  - _activeImposters [INSTANCE]
+
+CLASS: ZoneAttributes
+  - _rain [INSTANCE]
+  - _campFires [INSTANCE]
+  - _crops [INSTANCE]
+
+CLASS: ZoneGenerationType
+  - value__ [INSTANCE]
+  - Procedural [STATIC/CONST]
+  - Position [STATIC/CONST]
+
+CLASS: ZoneObject
+  - _obj [INSTANCE]
+  - _rarity [INSTANCE]
+
+CLASS: ZoneObjects
+  - generationType [INSTANCE]
+  - spawnOnStartingIsland [INSTANCE]
+  - _objects [INSTANCE]
+  - occupyPoint [INSTANCE]
+  - maxObjectCount [INSTANCE]
+  - spawnChance [INSTANCE]
+  - detailAmountFactor [INSTANCE]
+  - minStrength [INSTANCE]
+  - maxStrength [INSTANCE]
+  - minHeight [INSTANCE]
+  - maxHeight [INSTANCE]
+  - maxSteepness [INSTANCE]
+  - minSteepness [INSTANCE]
+  - randomFullRotation [INSTANCE]
+  - randomRotation [INSTANCE]
+  - terrainSnap [INSTANCE]
+  - TerrainSnapBias [INSTANCE]
+  - manualPosition [INSTANCE]
+  - offsetPosition [INSTANCE]
+  - minPositionOffset [INSTANCE]
+  - maxPositionOffset [INSTANCE]
+
+CLASS: ZoneTerrainPointSampler
+  - _zone [INSTANCE]
+
+CLASS: kode80.Effects.FilmicTonemapping
+  - exposure [INSTANCE]
+  - _material [INSTANCE]
+
+
+=== SCENE OBJECTS USING WORLD / GRID / OCEAN SCRIPTS ===
+
+--- level0 ---
+  PathID=306 | Script=DeluxeTonemapper | Bytes=192
+    Values: +036:6.0000, +040:0.0900, +044:int(-2147483648), +048:0.9680, +052:0.9500, +056:int(1), +060:0.3224, +068:int(-2147483648), +072:0.0900, +076:0.6776, +080:0.9680, +084:-0.0610, +088:0.1020, +092:0.3224, +096:1.0000, +100:1.0000, +104:1.0000, +108:1.0000, +120:0.5000, +132:1.0000, +136:int(1), +140:1.0000, +144:int(2), +148:int(111), +160:int(1), +168:int(1), +180:int(1), +188:int(1)
+  PathID=310 | Script=Ceto.Ocean | Bytes=220
+    Values: +040:int(1), +044:int(1), +060:0.0002, +064:int(4), +068:int(3), +072:int(3), +076:int(3), +100:1.0000, +108:0.0765, +112:0.1897, +116:1.0000, +120:60.0000, +124:0.2000, +128:0.3000, +132:5.0000, +136:0.0200, +140:1.0000, +144:1.0000, +148:1.0000, +152:1.0000, +156:1.8000, +160:int(2), +164:int(82), +172:4.0000, +176:4.0000, +180:0.3000, +184:int(2), +188:int(82), +196:20.0000, +200:20.0000
+  PathID=312 | Script=Ceto.ProjectedGrid | Bytes=64
+    Values: +032:int(1), +036:int(1), +040:int(2), +044:int(2), +052:int(2), +056:int(3)
+  PathID=354 | Script=DebugInputMaps | Bytes=36
+    Values: 
+
+--- level1 ---
+  PathID=4218 | Script=Beam.UI.UCartographerWorldMapTooltipViewAdapter | Bytes=128
+    Values: +036:int(281), +048:int(4164), +060:int(4325), +072:int(4335), +084:int(4261), +096:int(4537), +108:int(4739), +120:int(4550)
+  PathID=4223 | Script=Beam.UI.CartographerWorldMapTooltipPresenter | Bytes=32
+  PathID=4302 | Script=Beam.UI.UCartographerMenuViewAdapter | Bytes=272
+    Values: +036:int(66), +048:int(4136), +060:int(5111), +068:int(5), +072:int(556), +084:int(725), +092:int(5), +096:int(511), +108:int(1300), +120:int(192), +132:int(4534), +144:int(5561), +156:int(5137), +168:int(73), +180:int(4777), +192:int(5103), +204:int(4309), +216:int(4482), +228:int(4379), +240:int(4501), +252:int(4531), +264:int(4229)
+  PathID=4308 | Script=Beam.UI.CartographerMenuPresenter | Bytes=68
+    Values: +036:int(4249), +048:int(4223), +060:int(4302)
+  PathID=5036 | Script=Funlabs.MultiplayerZoneSync | Bytes=32
+  PathID=5111 | Script=Beam.UI.MapEditor.UMapHandle | Bytes=56
+    Values: +036:int(3627), +048:int(4890)
+  PathID=5245 | Script=Funlabs.MultiplayerWorldSync | Bytes=32
+  PathID=5794 | Script=DebugInputMaps | Bytes=36
+    Values: 
+
+--- level2 ---
+  PathID=270 | Script=Ceto.ProjectedGrid | Bytes=64
+    Values: +032:int(1), +036:int(1), +040:int(4), +044:int(2), +052:int(4), +056:int(3)
+  PathID=274 | Script=Ceto.Ocean | Bytes=220
+    Values: +040:int(1), +044:int(1), +052:int(57), +060:0.0002, +064:int(4), +068:int(3), +072:int(3), +076:int(3), +100:1.0000, +108:0.0765, +112:0.1897, +116:1.0000, +120:60.0000, +124:0.2000, +128:0.5000, +132:5.0000, +136:0.0200, +140:1.0000, +144:1.0000, +148:1.0000, +152:1.0000, +156:1.8000, +160:int(4), +164:int(82), +172:4.0000, +176:4.0000, +180:0.3000, +184:int(4), +188:int(82), +196:20.0000
+  PathID=291 | Script=Beam.OceanWeatherEventEffect | Bytes=44
+    Values: +032:0.6000, +036:13.0000, +040:3.5000
+  PathID=304 | Script=DebugInputMaps | Bytes=36
+    Values: 
+
+--- level3 ---
+  PathID=1187 | Script=WorldBarrier | Bytes=516
+    Values: +032:int(40), +040:int(271), +052:int(295), +064:int(292), +076:int(269), +088:int(283), +100:int(270), +112:int(267), +124:int(272), +136:int(277), +148:int(293), +160:int(282), +172:int(290), +184:int(294), +196:int(273), +208:int(296), +220:int(260), +232:int(279), +244:int(289), +256:int(287), +268:int(297), +280:int(281), +292:int(288), +304:int(298), +316:int(264), +328:int(261), +340:int(266), +352:int(278), +364:int(275), +376:int(285)
+  PathID=1188 | Script=Zone | Bytes=76
+    Values: +036:int(1008), +048:int(491)
+  PathID=1192 | Script=Zone | Bytes=76
+    Values: +036:int(1026), +048:int(568)
+  PathID=1193 | Script=Zone | Bytes=76
+    Values: +036:int(1042), +048:int(488)
+  PathID=1194 | Script=Zone | Bytes=76
+    Values: +036:int(1036), +048:int(556)
+  PathID=1195 | Script=Zone | Bytes=76
+    Values: +036:int(1024), +048:int(577)
+  PathID=1196 | Script=Beam.Terrain.ZoneEvents | Bytes=32
+  PathID=1197 | Script=StrandedWorld | Bytes=684
+    Values: +032:int(49), +040:int(1270), +052:int(1217), +064:int(1194), +076:int(1209), +088:int(1257), +100:int(1262), +112:int(1244), +124:int(1225), +136:int(1252), +148:int(1254), +160:int(1203), +172:int(1206), +184:int(1216), +196:int(1210), +208:int(1219), +220:int(1268), +232:int(1266), +244:int(1195), +256:int(1200), +268:int(1261), +280:int(1271), +292:int(1267), +304:int(1240), +316:int(1260), +328:int(1223), +340:int(1204), +352:int(1251), +364:int(1263), +376:int(1259)
+  PathID=1198 | Script=Zone | Bytes=76
+    Values: +036:int(1030), +048:int(478)
+  PathID=1199 | Script=Zone | Bytes=76
+    Values: +036:int(1013), +048:int(586)
+  PathID=1200 | Script=Zone | Bytes=76
+    Values: +036:int(1005), +048:int(504)
+  PathID=1201 | Script=Zone | Bytes=76
+    Values: +036:int(1029), +048:int(498)
+  PathID=1202 | Script=Zone | Bytes=76
+    Values: +036:int(1006), +048:int(466)
+  PathID=1203 | Script=Zone | Bytes=76
+    Values: +036:int(1003), +048:int(477)
+  PathID=1204 | Script=Zone | Bytes=76
+    Values: +036:int(1031), +048:int(430)
+  PathID=1206 | Script=Zone | Bytes=76
+    Values: +036:int(1043), +048:int(578)
+  PathID=1207 | Script=ZoneNML | Bytes=104
+    Values: +048:int(566), +060:int(23), +064:int(1293971278), +068:int(544435813), +072:int(1684955468), +076:int(1428172064), +080:int(1936288878), +084:int(6579572), +088:int(3), +092:int(5000526)
+  PathID=1208 | Script=Zone | Bytes=76
+    Values: +036:int(1007), +048:int(553)
+  PathID=1209 | Script=Zone | Bytes=76
+    Values: +036:int(1035), +048:int(505)
+  PathID=1210 | Script=Zone | Bytes=76
+    Values: +036:int(997), +048:int(535)
+  PathID=1216 | Script=Zone | Bytes=76
+    Values: +036:int(1038), +048:int(501)
+  PathID=1217 | Script=Zone | Bytes=76
+    Values: +036:int(1011), +048:int(464)
+  PathID=1218 | Script=Zone | Bytes=76
+    Values: +036:int(1023), +048:int(494)
+  PathID=1219 | Script=Zone | Bytes=76
+    Values: +036:int(1037), +048:int(609)
+  PathID=1221 | Script=Zone | Bytes=76
+    Values: +036:int(1022), +048:int(437)
+  PathID=1222 | Script=Zone | Bytes=76
+    Values: +036:int(1020), +048:int(590)
+  PathID=1223 | Script=Zone | Bytes=76
+    Values: +036:int(1004), +048:int(472)
+  PathID=1224 | Script=Zone | Bytes=76
+    Values: +036:int(1041), +048:int(490)
+  PathID=1225 | Script=Zone | Bytes=76
+    Values: +036:int(998), +048:int(532)
+  PathID=1238 | Script=Zone | Bytes=76
+    Values: +036:int(1002), +048:int(496)
+  PathID=1239 | Script=Zone | Bytes=76
+    Values: +036:int(1016), +048:int(608)
+  PathID=1240 | Script=Zone | Bytes=76
+    Values: +036:int(1010), +048:int(565)
+  PathID=1242 | Script=Zone | Bytes=76
+    Values: +036:int(1039), +048:int(444)
+  PathID=1243 | Script=Zone | Bytes=76
+    Values: +036:int(1000), +048:int(537)
+  PathID=1244 | Script=Zone | Bytes=76
+    Values: +036:int(1032), +048:int(424)
+  PathID=1248 | Script=Ceto.Ocean | Bytes=220
+    Values: +040:int(1), +044:int(1), +052:int(101), +060:0.0002, +064:int(4), +068:int(3), +072:int(3), +076:int(3), +100:1.0000, +108:0.0765, +112:0.1897, +116:1.0000, +120:60.0000, +124:0.2000, +128:0.5000, +132:5.0000, +136:0.0200, +140:1.0000, +144:1.0000, +148:1.0000, +152:1.0000, +156:1.8000, +160:int(3), +164:int(82), +172:4.0000, +176:4.0000, +180:0.3000, +184:int(3), +188:int(82), +196:20.0000
+  PathID=1249 | Script=Ceto.ProjectedGrid | Bytes=64
+    Values: +032:int(1), +036:int(1), +040:int(3), +044:int(2), +052:int(3), +056:int(3)
+  PathID=1251 | Script=Zone | Bytes=76
+    Values: +036:int(1012), +048:int(545)
+  PathID=1252 | Script=Zone | Bytes=76
+    Values: +036:int(1019), +048:int(564)
+  PathID=1254 | Script=Zone | Bytes=76
+    Values: +036:int(996), +048:int(549)
+  PathID=1255 | Script=Zone | Bytes=76
+    Values: +036:int(1001), +048:int(559)
+  PathID=1257 | Script=Zone | Bytes=76
+    Values: +036:int(1018), +048:int(482)
+  PathID=1258 | Script=Zone | Bytes=76
+    Values: +036:int(1021), +048:int(512)
+  PathID=1259 | Script=Zone | Bytes=76
+    Values: +036:int(1034), +048:int(572)
+  PathID=1260 | Script=Zone | Bytes=76
+    Values: +036:int(1025), +048:int(459)
+  PathID=1261 | Script=Zone | Bytes=76
+    Values: +036:int(999), +048:int(599)
+  PathID=1262 | Script=Zone | Bytes=76
+    Values: +036:int(1014), +048:int(531)
+  PathID=1263 | Script=Zone | Bytes=76
+    Values: +036:int(1033), +048:int(433)
+  PathID=1264 | Script=Zone | Bytes=76
+    Values: +036:int(1027), +048:int(445)
+  PathID=1265 | Script=Zone | Bytes=76
+    Values: +036:int(1009), +048:int(555)
+  PathID=1266 | Script=Zone | Bytes=76
+    Values: +036:int(1040), +048:int(443)
+  PathID=1267 | Script=Zone | Bytes=76
+    Values: +036:int(1028), +048:int(598)
+  PathID=1268 | Script=Zone | Bytes=76
+    Values: +036:int(1044), +048:int(551)
+  PathID=1270 | Script=Zone | Bytes=76
+    Values: +036:int(1015), +048:int(538), +072:int(1)
+  PathID=1271 | Script=Zone | Bytes=76
+    Values: +036:int(1017), +048:int(544)
+  PathID=1291 | Script=Beam.OceanWeatherEventEffect | Bytes=44
+    Values: +032:0.6000, +036:13.0000, +040:3.5000
+  PathID=1390 | Script=DebugInputMaps | Bytes=36
+    Values: 
+
+--- level4 ---
+  PathID=5583 | Script=Ceto.Ocean | Bytes=220
+    Values: +040:int(1), +044:int(1), +052:int(21), +060:0.0002, +064:int(4), +068:int(3), +072:int(3), +076:int(3), +100:1.0000, +108:0.0765, +112:0.1897, +116:1.0000, +120:60.0000, +124:0.2000, +128:0.5000, +132:5.0000, +136:0.0200, +140:1.0000, +144:1.0000, +148:1.0000, +152:1.0000, +156:1.8000, +160:int(3), +164:int(82), +172:4.0000, +176:4.0000, +180:0.3000, +184:int(3), +188:int(82), +196:20.0000
+  PathID=5584 | Script=Ceto.ProjectedGrid | Bytes=64
+    Values: +032:int(1), +036:int(1), +040:int(3), +044:int(2), +052:int(3), +056:int(3)
+  PathID=5604 | Script=LE_LevelEditor.LE_ConfigTerrain | Bytes=236
+    Values: +036:int(4660), +044:int(14), +048:int(2), +052:int(12), +060:int(2), +064:int(27), +072:int(2), +076:int(42), +084:int(2), +088:int(37), +096:int(2), +100:int(52), +108:int(2), +112:int(28), +120:int(2), +124:int(9), +132:int(2), +136:int(14), +144:int(2), +148:int(20), +156:int(2), +160:int(36), +168:int(2), +172:int(19), +180:int(2), +184:int(21), +192:int(2), +196:int(33), +204:int(2), +208:int(44)
+  PathID=5606 | Script=LE_LevelEditor.LE_ZoneTileGenerator | Bytes=44
+    Values: +036:int(4859)
+  PathID=5618 | Script=Beam.OceanWeatherEventEffect | Bytes=44
+    Values: +032:0.6000, +036:13.0000, +040:3.5000
+  PathID=5644 | Script=UnityEngine.UI.GridLayoutGroup | Bytes=84
+    Values: +060:300.0000, +064:100.0000, +076:int(1), +080:int(1)
+  PathID=5758 | Script=Beam.UI.MapEditor.MapEditorMenuPresenter | Bytes=44
+    Values: +036:int(5989)
+  PathID=5796 | Script=Beam.UI.MapEditor.UMapEditorSaveMenuViewAdapter | Bytes=152
+    Values: +036:int(1082), +044:int(2), +048:int(32), +084:int(6017), +096:int(5672), +108:int(5699), +120:int(6013), +132:int(5995)
+  PathID=5822 | Script=Beam.UI.MapEditor.UMapEditorViewAdapter | Bytes=104
+    Values: +036:int(1081), +048:int(6002), +060:int(5667), +072:int(5728), +084:int(5742), +096:int(5946)
+  PathID=5886 | Script=UnityEngine.UI.GridLayoutGroup | Bytes=84
+    Values: +048:int(2), +060:400.0000, +064:75.0000, +072:10.0000, +076:int(1), +080:int(1)
+  PathID=5989 | Script=Beam.UI.MapEditor.MapEditorSaveMenuPresenter | Bytes=32
+  PathID=6006 | Script=DebugInputMaps | Bytes=36
+    Values: 
