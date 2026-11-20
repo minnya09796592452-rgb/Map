@@ -1,0 +1,226 @@
+import sys
+import json
+import re
+import hashlib
+from pathlib import Path
+
+ROOT = Path("/storage/emulated/0/Download/Stranded-Deep-Original")
+DATA = ROOT / "Stranded Deep" / "Stranded_Deep_Data"
+MANAGED = DATA / "Managed"
+DLL = MANAGED / "Assembly-CSharp.dll"
+OUT = ROOT / "ocean_point_precise_report.txt"
+
+def write(out, text=""):
+    out.write(str(text) + "\n")
+
+def ptr_id(value):
+    if isinstance(value, dict):
+        return value.get("m_PathID")
+    return None
+
+def safe_tree(obj):
+    try:
+        return obj.read_typetree()
+    except Exception:
+        try:
+            return obj.read().read_typetree()
+        except Exception:
+            return {}
+
+def run_dll(out):
+    write(out, "\n=== ORIGINAL DLL: CETO.OCEAN ===")
+
+    if not DLL.exists():
+        write(out, "DLL NOT FOUND")
+        return
+
+    write(out, f"PATH: {DLL}")
+    write(out, f"SHA256: {hashlib.sha256(DLL.read_bytes()).hexdigest()}")
+
+    try:
+        import dnfile
+        pe = dnfile.dnPE(str(DLL))
+        found = False
+
+        for td in pe.net.mdtables.TypeDef.rows:
+            name = str(td.TypeName)
+            namespace = str(td.TypeNamespace)
+
+            if namespace == "Ceto" and name == "Ocean":
+                found = True
+                write(out, "\nTYPE: Ceto.Ocean")
+                write(out, "--- FIELDS ---")
+
+                for entry in td.FieldList:
+                    field = entry.row
+                    sig = getattr(field.Signature, "value", b"")
+                    write(out, f"{field.Name} | {sig.hex()}")
+
+                write(out, "--- METHODS ---")
+                for entry in td.MethodList:
+                    method = entry.row
+                    write(out, f"{method.Name} | RVA={method.Rva}")
+
+        if not found:
+            write(out, "Ceto.Ocean TYPE NOT FOUND")
+
+    except Exception as exc:
+        write(out, f"DLL PARSE ERROR: {exc}")
+
+def candidate_files():
+    if not DATA.exists():
+        return []
+
+    patterns = re.compile(
+        r"^(level[0-4]|resources\.assets|"
+        r"sharedassets\d+\.assets|globalgamemanagers|"
+        r"globalgamemanagers\.assets|"
+        r".+\.unity3d)$",
+        re.I
+    )
+
+    return sorted(
+        p for p in DATA.rglob("*")
+        if p.is_file() and patterns.match(p.name)
+    )
+
+def run_assets(out):
+    write(out, "\n=== ORIGINAL UNITY SERIALIZED OBJECTS ===")
+
+    try:
+        import UnityPy
+    except Exception as exc:
+        write(out, f"UNITYPY NOT AVAILABLE: {exc}")
+        return
+
+    files = candidate_files()
+    write(out, f"CANDIDATE CONTAINERS: {len(files)}")
+
+    total = 0
+    hits = 0
+
+    for path in files:
+        try:
+            env = UnityPy.load(str(path))
+        except Exception as exc:
+            write(out, f"\n[CONTAINER ERROR] {path.name}: {exc}")
+            continue
+
+        objects = list(env.objects)
+        total += len(objects)
+
+        gameobjects = {}
+        transforms = {}
+        scripts = {}
+        behaviours = []
+
+        for obj in objects:
+            typ = obj.type.name
+
+            if typ == "GameObject":
+                tree = safe_tree(obj)
+                gameobjects[obj.path_id] = tree
+
+            elif typ == "Transform":
+                tree = safe_tree(obj)
+                transforms[obj.path_id] = tree
+
+            elif typ == "MonoScript":
+                tree = safe_tree(obj)
+                scripts[obj.path_id] = tree
+
+            elif typ == "MonoBehaviour":
+                behaviours.append((obj.path_id, safe_tree(obj)))
+
+        # Build Transform -> GameObject map
+        transform_by_go = {}
+
+        for tid, tree in transforms.items():
+            gid = ptr_id(tree.get("m_GameObject"))
+            if gid is not None:
+                transform_by_go[gid] = (tid, tree)
+
+        for bid, tree in behaviours:
+            script_id = ptr_id(tree.get("m_Script"))
+            go_id = ptr_id(tree.get("m_GameObject"))
+
+            script = scripts.get(script_id, {})
+            class_name = str(script.get("m_ClassName", ""))
+            namespace = str(script.get("m_Namespace", ""))
+
+            go = gameobjects.get(go_id, {})
+            go_name = str(go.get("m_Name", ""))
+
+            # Strict identity: Ocean script or explicitly named Ocean object
+            is_ocean = (
+                (class_name == "Ocean" and namespace == "Ceto")
+                or go_name.lower() in ("ocean", "ceto ocean")
+            )
+
+            if not is_ocean:
+                continue
+
+            hits += 1
+            write(out, "\n" + "=" * 75)
+            write(out, f"CONTAINER: {path.name}")
+            write(out, f"MONOBEHAVIOUR PATH ID: {bid}")
+            write(out, f"SCRIPT: {namespace}.{class_name}")
+            write(out, f"GAMEOBJECT PATH ID: {go_id}")
+            write(out, f"GAMEOBJECT NAME: {go_name}")
+
+            if go_id in transform_by_go:
+                tid, tr = transform_by_go[go_id]
+                write(out, f"TRANSFORM PATH ID: {tid}")
+                write(out, "LOCAL POSITION: " +
+                      json.dumps(tr.get("m_LocalPosition"), default=str))
+                write(out, "LOCAL SCALE: " +
+                      json.dumps(tr.get("m_LocalScale"), default=str))
+                write(out, "PARENT: " +
+                      json.dumps(tr.get("m_Father"), default=str))
+            else:
+                write(out, "TRANSFORM: NOT LINKED")
+
+            write(out, "--- OCEAN SERIALIZED FIELDS ---")
+            for key, value in tree.items():
+                if key in (
+                    "m_ObjectHideFlags", "m_CorrespondingSourceObject",
+                    "m_PrefabInstance", "m_PrefabAsset",
+                    "m_GameObject", "m_Enabled", "m_EditorHideFlags",
+                    "m_Script", "m_Name"
+                ):
+                    continue
+                write(out, f"{key}: {json.dumps(value, default=str)}")
+
+        write(out, f"\n[CONTAINER] {path.name}")
+        write(out, f"OBJECTS: {len(objects)}")
+        write(out, f"GAMEOBJECTS: {len(gameobjects)}")
+        write(out, f"TRANSFORMS: {len(transforms)}")
+        write(out, f"MONOBEHAVIOURS: {len(behaviours)}")
+
+    write(out, "\n=== SUMMARY ===")
+    write(out, f"TOTAL UNITY OBJECTS: {total}")
+    write(out, f"OCEAN MATCHES: {hits}")
+
+    if hits == 0:
+        write(out, "RESULT: OCEAN OBJECT NOT LOCATED")
+
+def main():
+    if not ROOT.exists() or not DATA.exists():
+        raise SystemExit("ORIGINAL GAME DATA NOT FOUND")
+
+    with OUT.open("w", encoding="utf-8") as out:
+        write(out, "ORIGINAL OCEAN POINT PRECISE AUDIT")
+        write(out, "MODE: READ ONLY")
+        write(out, f"ROOT: {ROOT}")
+        write(out, f"PYTHON: {sys.executable}")
+
+        run_dll(out)
+        run_assets(out)
+
+    print("AUDIT COMPLETE")
+    print("REPORT:", OUT)
+    print("BYTES:", OUT.stat().st_size)
+    print("PYTHON:", sys.executable)
+
+if __name__ == "__main__":
+    main()

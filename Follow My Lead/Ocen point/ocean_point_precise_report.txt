@@ -1,0 +1,259 @@
+ORIGINAL OCEAN POINT PRECISE AUDIT
+MODE: READ ONLY
+ROOT: /storage/emulated/0/Download/Stranded-Deep-Original
+PYTHON: /root/.venv_mission3/bin/python
+
+=== ORIGINAL DLL: CETO.OCEAN ===
+PATH: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+
+TYPE: Ceto.Ocean
+--- FIELDS ---
+DISABLE_FOURIER_MULTITHREADING | 0602
+DISABLE_PROJECTED_GRID_BORDER | 0602
+DISABLE_ALL_MULTITHREADING | 0602
+DISABLE_PROJECTION_FLIPPING | 0602
+DISABLE_PROJECT_SCENE_VIEW | 0602
+VERSION | 060e
+<Instance>k__BackingField | 06129984
+OCEAN_LAYER | 060e
+REFLECTION_TEXTURE_NAME0 | 060e
+REFLECTION_TEXTURE_NAME1 | 060e
+REFRACTION_GRAB_TEXTURE_NAME | 060e
+DEPTH_GRAB_TEXTURE_NAME | 060e
+OCEAN_DEPTH_TEXTURE_NAME0 | 060e
+OCEAN_DEPTH_TEXTURE_NAME1 | 060e
+OCEAN_MASK_TEXTURE_NAME0 | 060e
+OCEAN_MASK_TEXTURE_NAME1 | 060e
+NORMAL_FADE_TEXTURE_NAME | 060e
+MAX_SPECTRUM_WAVE_HEIGHT | 060c
+MAX_OVERLAY_WAVE_HEIGHT | 060c
+disableWarnings | 0602
+disableInfo | 0602
+doublePrecisionProjection | 0602
+tightProjectionFit | 0602
+m_sun | 061235
+level | 060c
+heightOverlaySize | 061199b8
+normalOverlaySize | 061199b8
+foamOverlaySize | 061199b8
+clipOverlaySize | 061199b8
+heightBlendMode | 061199bc
+foamBlendMode | 061199bc
+defaultSkyColor | 061180f5
+defaultOceanColor | 061180f5
+windDir | 060c
+<WindDirVector>k__BackingField | 061139
+specularRoughness | 060c
+specularIntensity | 060c
+fresnelPower | 060c
+minFresnel | 060c
+foamTint | 061180f5
+foamIntensity | 060c
+foamTexture0 | 061299d8
+foamTexture1 | 061299d8
+waveOverlaySdr | 061280fd
+<Grid>k__BackingField | 0612995c
+<Reflection>k__BackingField | 06129a44
+<Spectrum>k__BackingField | 06129ab8
+<UnderWater>k__BackingField | 06129acc
+<OceanTime>k__BackingField | 0612997c
+<Projection>k__BackingField | 06129980
+m_positionOffset | 061139
+m_cameraData | 0615126902128085129970
+m_waveOverlayMat | 061280f1
+<OverlayManager>k__BackingField | 06129a10
+m_scheduler | 06129b3c
+m_query | 06129a3c
+<WasError>k__BackingField | 0602
+--- METHODS ---
+get_Instance | RVA=458514
+set_Instance | RVA=458521
+get_MAX_WAVE_HEIGHT | RVA=458529
+get_WindDirVector | RVA=458536
+set_WindDirVector | RVA=458544
+get_Grid | RVA=458553
+set_Grid | RVA=458561
+get_Reflection | RVA=458570
+set_Reflection | RVA=458578
+get_Spectrum | RVA=458587
+set_Spectrum | RVA=458595
+get_UnderWater | RVA=458604
+set_UnderWater | RVA=458612
+get_OceanTime | RVA=458621
+set_OceanTime | RVA=458629
+get_Projection | RVA=458638
+set_Projection | RVA=458646
+get_PositionOffset | RVA=458655
+set_PositionOffset | RVA=458663
+get_CameraCount | RVA=458693
+get_OverlayManager | RVA=458706
+set_OverlayManager | RVA=458714
+get_WasError | RVA=458723
+set_WasError | RVA=458731
+Awake | RVA=458740
+Start | RVA=459012
+OnEnable | RVA=459704
+OnDisable | RVA=459752
+DisableOcean | RVA=459801
+Update | RVA=459832
+OnDestroy | RVA=460872
+OnDrawGizmos | RVA=461056
+Register | RVA=461060
+Deregister | RVA=461192
+LogError | RVA=461302
+LogWarning | RVA=461330
+LogInfo | RVA=461384
+RunCoroutine | RVA=461438
+UpdateOceanScheduler | RVA=461448
+CalculateWindDirVector | RVA=461548
+SunDir | RVA=461616
+SunColor | RVA=461694
+FindCameraData | RVA=461752
+RemoveCameraData | RVA=461864
+FindMaxDisplacement | RVA=462036
+SetQueryWavesSampling | RVA=462152
+QueryNormal | RVA=462236
+QueryWaves | RVA=462340
+QueryWaves | RVA=462480
+QueryWaves | RVA=462640
+QueryWaves | RVA=462740
+QueryWavesWithAsyncTask | RVA=462892
+OceanOnPreRender | RVA=463016
+OceanOnPreCull | RVA=463156
+OceanOnPostRender | RVA=463296
+GetDisableAllOverlays | RVA=463434
+RenderWaveOverlays | RVA=463456
+RenderReflection | RVA=464028
+RenderOceanMask | RVA=464065
+RenderOceanDepth | RVA=464102
+.ctor | RVA=464140
+.cctor | RVA=464360
+
+=== ORIGINAL UNITY SERIALIZED OBJECTS ===
+CANDIDATE CONTAINERS: 20
+
+[CONTAINER] carrier.unity3d
+OBJECTS: 3042
+GAMEOBJECTS: 717
+TRANSFORMS: 663
+MONOBEHAVIOURS: 118
+
+[CONTAINER] mission_eel.unity3d
+OBJECTS: 169
+GAMEOBJECTS: 31
+TRANSFORMS: 31
+MONOBEHAVIOURS: 10
+
+[CONTAINER] mission_shark.unity3d
+OBJECTS: 189
+GAMEOBJECTS: 37
+TRANSFORMS: 37
+MONOBEHAVIOURS: 11
+
+[CONTAINER] mission_squid.unity3d
+OBJECTS: 413
+GAMEOBJECTS: 119
+TRANSFORMS: 119
+MONOBEHAVIOURS: 21
+
+[CONTAINER] introscene.unity3d
+OBJECTS: 2479
+GAMEOBJECTS: 849
+TRANSFORMS: 849
+MONOBEHAVIOURS: 12
+
+[CONTAINER] beepi.unity3d
+OBJECTS: 526
+GAMEOBJECTS: 107
+TRANSFORMS: 9
+MONOBEHAVIOURS: 158
+
+[CONTAINER] getbit.unity3d
+OBJECTS: 48
+GAMEOBJECTS: 11
+TRANSFORMS: 6
+MONOBEHAVIOURS: 7
+
+[CONTAINER] globalgamemanagers
+OBJECTS: 18
+GAMEOBJECTS: 0
+TRANSFORMS: 0
+MONOBEHAVIOURS: 0
+
+[CONTAINER] globalgamemanagers.assets
+OBJECTS: 3310
+GAMEOBJECTS: 0
+TRANSFORMS: 0
+MONOBEHAVIOURS: 0
+
+[CONTAINER] level0
+OBJECTS: 354
+GAMEOBJECTS: 118
+TRANSFORMS: 90
+MONOBEHAVIOURS: 71
+
+[CONTAINER] level1
+OBJECTS: 5899
+GAMEOBJECTS: 1525
+TRANSFORMS: 693
+MONOBEHAVIOURS: 2026
+
+[CONTAINER] level2
+OBJECTS: 304
+GAMEOBJECTS: 84
+TRANSFORMS: 84
+MONOBEHAVIOURS: 53
+
+[CONTAINER] level3
+OBJECTS: 1393
+GAMEOBJECTS: 421
+TRANSFORMS: 353
+MONOBEHAVIOURS: 242
+
+[CONTAINER] level4
+OBJECTS: 6019
+GAMEOBJECTS: 1356
+TRANSFORMS: 1074
+MONOBEHAVIOURS: 667
+
+[CONTAINER] resources.assets
+OBJECTS: 27651
+GAMEOBJECTS: 6317
+TRANSFORMS: 5980
+MONOBEHAVIOURS: 3875
+
+[CONTAINER] sharedassets0.assets
+OBJECTS: 501
+GAMEOBJECTS: 21
+TRANSFORMS: 21
+MONOBEHAVIOURS: 209
+
+[CONTAINER] sharedassets1.assets
+OBJECTS: 782
+GAMEOBJECTS: 121
+TRANSFORMS: 0
+MONOBEHAVIOURS: 316
+
+[CONTAINER] sharedassets2.assets
+OBJECTS: 114
+GAMEOBJECTS: 17
+TRANSFORMS: 17
+MONOBEHAVIOURS: 5
+
+[CONTAINER] sharedassets3.assets
+OBJECTS: 1072
+GAMEOBJECTS: 225
+TRANSFORMS: 210
+MONOBEHAVIOURS: 163
+
+[CONTAINER] sharedassets4.assets
+OBJECTS: 163
+GAMEOBJECTS: 14
+TRANSFORMS: 1
+MONOBEHAVIOURS: 21
+
+=== SUMMARY ===
+TOTAL UNITY OBJECTS: 54446
+OCEAN MATCHES: 0
+RESULT: OCEAN OBJECT NOT LOCATED
