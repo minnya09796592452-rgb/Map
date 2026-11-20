@@ -1,0 +1,127 @@
+=== 1. INHERITANCE CHAIN & [SerializeField] CUSTOM ATTRIBUTE PROOF ===
+
+CLASS: Ceto.Ocean (Inherits from -> UnityEngine.MonoBehaviour)
+  Row #6580 | DISABLE_FOURIER_MULTITHREADING      | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6581 | DISABLE_PROJECTED_GRID_BORDER       | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6582 | DISABLE_ALL_MULTITHREADING          | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6583 | DISABLE_PROJECTION_FLIPPING         | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6584 | DISABLE_PROJECT_SCENE_VIEW          | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6585 | VERSION                             | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6586 | <Instance>k__BackingField           | public=False | Attrs=['System.Runtime.CompilerServices.CompilerGeneratedAttribute'] | UNITY_SERIALIZED=False
+  Row #6587 | OCEAN_LAYER                         | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6588 | REFLECTION_TEXTURE_NAME0            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6589 | REFLECTION_TEXTURE_NAME1            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6590 | REFRACTION_GRAB_TEXTURE_NAME        | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6591 | DEPTH_GRAB_TEXTURE_NAME             | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6592 | OCEAN_DEPTH_TEXTURE_NAME0           | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6593 | OCEAN_DEPTH_TEXTURE_NAME1           | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6594 | OCEAN_MASK_TEXTURE_NAME0            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6595 | OCEAN_MASK_TEXTURE_NAME1            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6596 | NORMAL_FADE_TEXTURE_NAME            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6597 | MAX_SPECTRUM_WAVE_HEIGHT            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6598 | MAX_OVERLAY_WAVE_HEIGHT             | public=True  | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6599 | disableWarnings                     | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6600 | disableInfo                         | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6601 | doublePrecisionProjection           | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6602 | tightProjectionFit                  | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6603 | m_sun                               | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6604 | level                               | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6605 | heightOverlaySize                   | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6606 | normalOverlaySize                   | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6607 | foamOverlaySize                     | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6608 | clipOverlaySize                     | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6609 | heightBlendMode                     | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6610 | foamBlendMode                       | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6611 | defaultSkyColor                     | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6612 | defaultOceanColor                   | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6613 | windDir                             | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6614 | <WindDirVector>k__BackingField      | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6615 | specularRoughness                   | public=True  | Attrs=['UnityEngine.RangeAttribute']   | UNITY_SERIALIZED=True
+  Row #6616 | specularIntensity                   | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6617 | fresnelPower                        | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6618 | minFresnel                          | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6619 | foamTint                            | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6620 | foamIntensity                       | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6621 | foamTexture0                        | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6622 | foamTexture1                        | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6623 | waveOverlaySdr                      | public=True  | Attrs=[]                               | UNITY_SERIALIZED=True
+  Row #6624 | <Grid>k__BackingField               | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6625 | <Reflection>k__BackingField         | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6626 | <Spectrum>k__BackingField           | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6627 | <UnderWater>k__BackingField         | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6628 | <OceanTime>k__BackingField          | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6629 | <Projection>k__BackingField         | public=False | Attrs=['System.Runtime.CompilerServices.CompilerGeneratedAttribute'] | UNITY_SERIALIZED=False
+  Row #6630 | m_positionOffset                    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6631 | m_cameraData                        | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6632 | m_waveOverlayMat                    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6633 | <OverlayManager>k__BackingField     | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6634 | m_scheduler                         | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6635 | m_query                             | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6636 | <WasError>k__BackingField           | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+
+CLASS: Ceto.OceanComponent (Inherits from -> UnityEngine.MonoBehaviour)
+  Row #6647 | m_ocean                             | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #6648 | <WasError>k__BackingField           | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+
+CLASS: Beam.CetoSettings (Inherits from -> TypeSpec_83)
+  Row #8710 | _aboveVisibility                    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8711 | _belowVisibility                    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8712 | _aboveVisibilityCurve               | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8713 | _belowVisibilityCurve               | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8714 | _currentWaterColor                  | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8715 | _currentUnderwaterColor             | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8716 | _currentScatterColor                | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8717 | _currentUnderwaterInscatterColor    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8718 | _morningWaterColor                  | public=False | Attrs=['UnityEngine.SerializeField']   | UNITY_SERIALIZED=True
+  Row #8719 | _middayWaterColor                   | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8720 | _morningUnderwaterColor             | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8721 | _middayUnderwaterColor              | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8722 | _morningScatterColor                | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8723 | _middayScatterColor                 | public=False | Attrs=['UnityEngine.SerializeField']   | UNITY_SERIALIZED=True
+  Row #8724 | _morningUnderwaterInscatterColor    | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8725 | _middayUnderwaterInscatterColor     | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8726 | _weatherScatterColor                | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8727 | _weatherUnderwaterColor             | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8728 | _causticsTexture                    | public=False | Attrs=['UnityEngine.SerializeField']   | UNITY_SERIALIZED=True
+  Row #8729 | _underwater                         | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+  Row #8730 | _waveSpectrum                       | public=False | Attrs=[]                               | UNITY_SERIALIZED=False
+
+
+=== 2. COMPLETE 432-BYTE OFFSET TABLE: Beam.CetoSettings (level3 PathID=1342) ===
+  +000..+031 ( 32B) | MonoBehaviour Header                           | m_GameObject, m_Enabled, m_Script, m_Name
+  +032..+103 ( 72B) | _aboveVisibilityCurve (AnimationCurve, 2 keys) | Keys=2, K0=(0.0,15.1583), K1=(1.0,15.1583), Tail=(2, 2, 4)
+  +104..+259 (156B) | _belowVisibilityCurve (AnimationCurve, 5 keys) | Keys=5, K0=(0.000154,6.0022), K2=(0.5,30.0), Tail=(2, 2, 0)
+  +260..+275 ( 16B) | _currentWaterColor (Color)                     | (0.0, 0.0, 0.0, 1.0)
+  +276..+291 ( 16B) | _currentUnderwaterColor (Color)                | (0.0, 0.0001, 0.0118, 1.0)
+  +292..+307 ( 16B) | _currentScatterColor (Color)                   | (0.0, 0.0148, 0.0368, 1.0)
+  +308..+323 ( 16B) | _currentUnderwaterInscatterColor (Color)       | (0.0, 0.4269, 0.521, 1.0)
+  +324..+339 ( 16B) | _morningWaterColor (Color)                     | (1.0, 0.5569, 0.0, 1.0)
+  +340..+355 ( 16B) | _middayWaterColor (Color)                      | (0.0, 0.566, 0.741, 1.0)
+  +356..+371 ( 16B) | _morningUnderwaterColor (Color)                | (0.2172, 0.1371, 0.0936, 1.0)
+  +372..+387 ( 16B) | _middayUnderwaterColor (Color)                 | (0.0, 0.3197, 0.3345, 1.0)
+  +388..+403 ( 16B) | _morningScatterColor (Color)                   | (0.185, 0.4586, 0.3855, 1.0)
+  +404..+419 ( 16B) | _middayScatterColor (Color)                    | (0.0543, 0.1309, 0.1345, 1.0)
+  +420..+431 ( 12B) | _causticsTexture (PPtr<Texture2D>)             | FileID=3, PathID=48 [Total=432B]
+
+
+=== 3. COMPLETE 220-BYTE OFFSET TABLE: Ceto.Ocean (level3 PathID=1248) ===
+  [Note on +036..+059]: Ceto.Ocean inherits from Ceto.OceanComponent (which has 'm_ocean' PPtr<Ocean> at +036..+047; 0x00000001_00000001 = Prefab/Self sentinel), followed by Ceto.Ocean.m_sun at +048..+059 -> GameObject 'Sun' (PathID=101)
+  +000..+031 ( 32B) | MonoBehaviour Header                                 | m_GameObject, m_Enabled, m_Script, m_Name
+  +032..+035 (  4B) | disableWarnings, disableInfo, doublePrecisionProjection, tightProjectionFit | (0, 0, 0, 0)
+  +036..+047 ( 12B) | Inherited Ceto.OceanComponent.m_ocean (PPtr<Ocean>)  | FileID=0, PathID=4294967297 (0x0000000100000001)
+  +048..+059 ( 12B) | m_sun (PPtr<GameObject>)                             | FileID=0, PathID=101 -> GameObject('Sun')
+  +060..+063 (  4B) | level (float)                                        | 0.000201 (Hex 0x3952e038)
+  +064..+079 ( 16B) | height/normal/foam/clipOverlaySize (4 enums)         | (4, 3, 3, 3)
+  +080..+087 (  8B) | heightBlendMode, foamBlendMode (2 enums)             | (0, 0)
+  +088..+103 ( 16B) | defaultSkyColor (Color)                              | (0.0, 0.0, 0.0, 1.0)
+  +104..+119 ( 16B) | defaultOceanColor (Color)                            | (0.0, 0.0765, 0.1897, 1.0)
+  +120..+123 (  4B) | windDir (float)                                      | 60.0
+  +124..+127 (  4B) | specularRoughness (float)                            | 0.2000
+  +128..+131 (  4B) | specularIntensity (float)                            | 0.5000
+  +132..+135 (  4B) | fresnelPower (float)                                 | 5.0000
+  +136..+139 (  4B) | minFresnel (float)                                   | 0.0200
+  +140..+155 ( 16B) | foamTint (Color)                                     | (1.0, 1.0, 1.0, 1.0)
+  +156..+159 (  4B) | foamIntensity (float)                                | 1.8000
+  +160..+183 ( 24B) | foamTexture0 (Ceto.FoamTexture)                      | Tex=(FileID=3,PathID=82), Scale=(4.0, 4.0), Speed=0.30
+  +184..+207 ( 24B) | foamTexture1 (Ceto.FoamTexture)                      | Tex=(FileID=3,PathID=82), Scale=(20.0, 20.0), Speed=0.10
+  +208..+219 ( 12B) | waveOverlaySdr (PPtr<Shader>)                        | FileID=3, PathID=161 [Total=220B]
