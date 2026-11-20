@@ -1,0 +1,62 @@
+=== 1. FULL IL INSTRUCTION DISASSEMBLY OF Tide.Update() ===
+
+Method Tide.Update() [RVA=0x146c6]:
+  IL_0000: call       Method:get_Instance (0x06002e24)
+  IL_0005: call       MemberRef:op_Implicit (0x0a0000be)
+  IL_000a: brfalse.s  -> IL_003c
+  IL_000c: call       Method:get_Instance (0x06002e24)
+  IL_0011: ldarg.0
+  IL_0012: ldfld      Field:_lowTideHeight (0x040002bc)
+  IL_0017: ldarg.0
+  IL_0018: ldfld      Field:_highTideHeight (0x040002bd)
+  IL_001d: ldarg.0
+  IL_001e: ldfld      Field:_tide (0x040002bb)
+  IL_0023: call       MemberRef:get_Instance (0x0a0000df)
+  IL_0028: callvirt   Method:get_NormalizedTime (0x060035ee)
+  IL_002d: callvirt   MemberRef:Evaluate (0x0a0001c5)
+  IL_0032: call       MemberRef:Lerp (0x0a00010b)
+  IL_0037: stfld      Field:level (0x040019cc)
+  IL_003c: ret
+
+Method Tide..ctor() [RVA=0x14704]:
+  IL_0000: ldarg.0
+  IL_0001: call       MemberRef:.ctor (0x0a000080)
+  IL_0006: ret
+
+
+=== 2. EXACT 432-BYTE OFFSET TABLE: Beam.CetoSettings (level3 PathID=1342) ===
+  [Note: _aboveVisibility & _belowVisibility are non-serialized runtime floats; serialization starts at _aboveVisibilityCurve]
+  +032..+091 ( 60B) | _aboveVisibilityCurve (AnimationCurve, 2 keys)   | Keys=2, K0=(0.0000,15.1583), K1=(1.0000,15.1583), Pre/Post/Rot=(2, 2, 4)
+  +104..+263 (160B) | _belowVisibilityCurve (AnimationCurve, 5 keys)   | Keys=5, K0=(0.000154,6.0022), K2=(0.5000,30.0000), Pre/Post/Rot=(2, 2, 0)
+  +260..+275 ( 16B) | _currentWaterColor (Color RGBA)                  | (0.0, 0.0, 0.0, 1.0)
+  +276..+291 ( 16B) | _currentUnderwaterColor (Color RGBA)             | (0.0, 0.0001, 0.0118, 1.0)
+  +292..+307 ( 16B) | _currentScatterColor (Color RGBA)                | (0.0, 0.0148, 0.0368, 1.0)
+  +308..+323 ( 16B) | _currentUnderwaterInscatterColor (Color RGBA)    | (0.0, 0.4269, 0.521, 1.0)
+  +324..+339 ( 16B) | _morningWaterColor (Color RGBA)                  | (1.0, 0.5569, 0.0, 1.0)
+  +340..+355 ( 16B) | _middayWaterColor (Color RGBA)                   | (0.0, 0.566, 0.741, 1.0)
+  +356..+371 ( 16B) | _morningUnderwaterColor (Color RGBA)             | (0.2172, 0.1371, 0.0936, 1.0)
+  +372..+387 ( 16B) | _middayUnderwaterColor (Color RGBA)              | (0.0, 0.3197, 0.3345, 1.0)
+  +388..+403 ( 16B) | _morningScatterColor (Color RGBA)                | (0.185, 0.4586, 0.3855, 1.0)
+  +404..+419 ( 16B) | _middayScatterColor (Color RGBA)                 | (0.0543, 0.1309, 0.1345, 1.0)
+  +420..+431 ( 12B) | _causticsTexture (PPtr<Texture2D>)               | FileID=3, PathID=48 (Exact End = 432 bytes)
+
+
+=== 3. EXACT 220-BYTE OFFSET TABLE: Ceto.Ocean (level3 PathID=1248) ===
+  +032..+035 (  4B) | disableWarnings, disableInfo, doublePrecisionProjection, tightProjectionFit (4 bools) | (0, 0, 0, 0)
+  +036..+047 ( 12B) | m_sun (PPtr<GameObject>)                         | FileID=0, PathID=4294967297
+  +048..+059 ( 12B) | m_sun/Ref PPtr (Scene Light/Sun Target)          | FileID=0, PathID=101
+  +060..+063 (  4B) | level (float - Base Sea Level)                   | 0.000201 (Hex 0x3952e038)
+  +064..+079 ( 16B) | height/normal/foam/clipOverlaySize (4 enums)     | (4, 3, 3, 3)
+  +080..+087 (  8B) | heightBlendMode, foamBlendMode (2 enums)         | (0, 0)
+  +088..+103 ( 16B) | defaultSkyColor (Color RGBA)                     | (0.0, 0.0, 0.0, 1.0)
+  +104..+119 ( 16B) | defaultOceanColor (Color RGBA)                   | (0.0, 0.0765, 0.1897, 1.0)
+  +120..+123 (  4B) | windDir (float)                                  | 60.0
+  +124..+127 (  4B) | specularRoughness (float)                        | 0.2000
+  +128..+131 (  4B) | specularIntensity (float)                        | 0.5000
+  +132..+135 (  4B) | fresnelPower (float)                             | 5.0000
+  +136..+139 (  4B) | minFresnel (float)                               | 0.0200
+  +140..+155 ( 16B) | foamTint (Color RGBA)                            | (1.0, 1.0, 1.0, 1.0)
+  +156..+159 (  4B) | foamIntensity (float)                            | 1.8000
+  +160..+183 ( 24B) | foamTexture0 (FoamTexture: PPtr + scale + speed) | Tex=(FileID=3,PathID=82), Scale=(4.0, 4.0), Speed=0.30
+  +184..+207 ( 24B) | foamTexture1 (FoamTexture: PPtr + scale + speed) | Tex=(FileID=3,PathID=82), Scale=(20.0, 20.0), Speed=0.10
+  +208..+219 ( 12B) | waveOverlaySdr (PPtr<Shader>)                    | FileID=3, PathID=161 (Exact End = 220 bytes)
