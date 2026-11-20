@@ -1,0 +1,105 @@
+=== 1. DLL FIELD SERIALIZATION FLAGS (Beam.CetoSettings & Ceto.Ocean) ===
+
+CLASS: Ceto.Ocean
+  #00 DISABLE_FOURIER_MULTITHREADING      | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #01 DISABLE_PROJECTED_GRID_BORDER       | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #02 DISABLE_ALL_MULTITHREADING          | flags=0x0016 | public=True | static=True | NotSerialized=False
+  #03 DISABLE_PROJECTION_FLIPPING         | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #04 DISABLE_PROJECT_SCENE_VIEW          | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #05 VERSION                             | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #06 <Instance>k__BackingField           | flags=0x0011 | public=False | static=True | NotSerialized=False
+  #07 OCEAN_LAYER                         | flags=0x0016 | public=True | static=True | NotSerialized=False
+  #08 REFLECTION_TEXTURE_NAME0            | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #09 REFLECTION_TEXTURE_NAME1            | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #10 REFRACTION_GRAB_TEXTURE_NAME        | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #11 DEPTH_GRAB_TEXTURE_NAME             | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #12 OCEAN_DEPTH_TEXTURE_NAME0           | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #13 OCEAN_DEPTH_TEXTURE_NAME1           | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #14 OCEAN_MASK_TEXTURE_NAME0            | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #15 OCEAN_MASK_TEXTURE_NAME1            | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #16 NORMAL_FADE_TEXTURE_NAME            | flags=0x0036 | public=True | static=True | NotSerialized=False
+  #17 MAX_SPECTRUM_WAVE_HEIGHT            | flags=0x8056 | public=True | static=True | NotSerialized=False
+  #18 MAX_OVERLAY_WAVE_HEIGHT             | flags=0x8056 | public=True | static=True | NotSerialized=False
+  #19 disableWarnings                     | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #20 disableInfo                         | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #21 doublePrecisionProjection           | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #22 tightProjectionFit                  | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #23 m_sun                               | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #24 level                               | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #25 heightOverlaySize                   | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #26 normalOverlaySize                   | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #27 foamOverlaySize                     | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #28 clipOverlaySize                     | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #29 heightBlendMode                     | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #30 foamBlendMode                       | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #31 defaultSkyColor                     | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #32 defaultOceanColor                   | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #33 windDir                             | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #34 <WindDirVector>k__BackingField      | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #35 specularRoughness                   | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #36 specularIntensity                   | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #37 fresnelPower                        | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #38 minFresnel                          | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #39 foamTint                            | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #40 foamIntensity                       | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #41 foamTexture0                        | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #42 foamTexture1                        | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #43 waveOverlaySdr                      | flags=0x0006 | public=True | static=False | NotSerialized=False
+  #44 <Grid>k__BackingField               | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #45 <Reflection>k__BackingField         | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #46 <Spectrum>k__BackingField           | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #47 <UnderWater>k__BackingField         | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #48 <OceanTime>k__BackingField          | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #49 <Projection>k__BackingField         | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #50 m_positionOffset                    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #51 m_cameraData                        | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #52 m_waveOverlayMat                    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #53 <OverlayManager>k__BackingField     | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #54 m_scheduler                         | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #55 m_query                             | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #56 <WasError>k__BackingField           | flags=0x0001 | public=False | static=False | NotSerialized=False
+
+CLASS: Beam.CetoSettings
+  #00 _aboveVisibility                    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #01 _belowVisibility                    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #02 _aboveVisibilityCurve               | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #03 _belowVisibilityCurve               | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #04 _currentWaterColor                  | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #05 _currentUnderwaterColor             | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #06 _currentScatterColor                | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #07 _currentUnderwaterInscatterColor    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #08 _morningWaterColor                  | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #09 _middayWaterColor                   | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #10 _morningUnderwaterColor             | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #11 _middayUnderwaterColor              | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #12 _morningScatterColor                | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #13 _middayScatterColor                 | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #14 _morningUnderwaterInscatterColor    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #15 _middayUnderwaterInscatterColor     | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #16 _weatherScatterColor                | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #17 _weatherUnderwaterColor             | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #18 _causticsTexture                    | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #19 _underwater                         | flags=0x0001 | public=False | static=False | NotSerialized=False
+  #20 _waveSpectrum                       | flags=0x0001 | public=False | static=False | NotSerialized=False
+
+
+=== 2. RESOLVED SCENE OBJECTS FOR Ceto.Ocean PPtrs IN level3 ===
+  Offset +036..+047 (12B): FileID=0, PathID=4294967297 (0x0000000100000001) -> Unresolved(PathID=4294967297)
+  Offset +048..+059 (12B): FileID=0, PathID=101 -> GameObject('Sun')
+
+
+=== 3. CONTIGUOUS ZERO-OVERLAP 432-BYTE TABLE: Beam.CetoSettings (PathID=1342) ===
+  +000..+031 ( 32B) | MonoBehaviour Header                           | m_GameObject, m_Enabled, m_Script, m_Name
+  +032..+103 ( 72B) | _aboveVisibilityCurve (AnimationCurve, 2 keys) | Count=2, K0=(0.0, 15.1583), K1=(1.0, 15.1583), Tail=(2, 2, 4)
+  +104..+259 (156B) | _belowVisibilityCurve (AnimationCurve, 5 keys) | Count=5, K0=(0.000154, 6.0022), K2=(0.5, 30.0), Tail=(2, 2, 0)
+  +260..+275 ( 16B) | _currentWaterColor (Color)                     | (0.0, 0.0, 0.0, 1.0)
+  +276..+291 ( 16B) | _currentUnderwaterColor (Color)                | (0.0, 0.0001, 0.0118, 1.0)
+  +292..+307 ( 16B) | _currentScatterColor (Color)                   | (0.0, 0.0148, 0.0368, 1.0)
+  +308..+323 ( 16B) | _currentUnderwaterInscatterColor (Color)       | (0.0, 0.4269, 0.521, 1.0)
+  +324..+339 ( 16B) | _morningWaterColor (Color)                     | (1.0, 0.5569, 0.0, 1.0)
+  +340..+355 ( 16B) | _middayWaterColor (Color)                      | (0.0, 0.566, 0.741, 1.0)
+  +356..+371 ( 16B) | _morningUnderwaterColor (Color)                | (0.2172, 0.1371, 0.0936, 1.0)
+  +372..+387 ( 16B) | _middayUnderwaterColor (Color)                 | (0.0, 0.3197, 0.3345, 1.0)
+  +388..+403 ( 16B) | _morningScatterColor (Color)                   | (0.185, 0.4586, 0.3855, 1.0)
+  +404..+419 ( 16B) | _middayScatterColor (Color)                    | (0.0543, 0.1309, 0.1345, 1.0)
+  +420..+431 ( 12B) | _causticsTexture (PPtr<Texture2D>)             | FileID=3, PathID=48 [32+72+156+160+12 = 432B EXACT]
