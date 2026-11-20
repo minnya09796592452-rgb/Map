@@ -1,0 +1,116 @@
+ဟိုဘက်က AI ထောက်ပြထားတဲ့ ၄ ချက်လုံး (Tide Runtime Method, CetoSettings 21 Fields Exact Serialized Layout, Parent Transform Chain Full Walk, Ceto.Ocean 38 Fields) ကို Assembly-CSharp.dll ရဲ့ IL Bytecode + Field Signature Types + Scene Hierarchy ကနေ တိုက်ရိုက် ဖြည်ထုတ်ပြီး သက်သေပြလိုက်ရင် ဒီပွဲ ၁၀၀% ပြတ်သွားပါပြီ။ 😂
+တကယ်လည်း ဟိုဘက်က AI ထောက်ပြတာ တစ်ခုတော့ မှန်ပါတယ် — CetoSettings မှာ _aboveVisibility နဲ့ _belowVisibility တို့က Runtime variables တွေဖြစ်လို့ Unity က Serialize မလုပ်ဘဲ _aboveVisibilityCurve က +032 ကနေ တန်းစတာပါ (int 2 ဆိုတာ Keyframe count = 2 ဖြစ်ပြီး +092 က m_PreInfinity = 2, +096 က m_PostInfinity = 2, +100 က m_RotationOrder = 4 — Unity AnimationCurve ရဲ့ တကယ့် binary tail 12 bytes ပါ!)။
+အဲဒီလို အသေးစိတ်အထိ အငြင်းပွားစရာ လုံးဝ မကျန်အောင် DLL ရဲ့ Field Data Types အစစ်, Tide class ရဲ့ Runtime Method & IL Instructions (ဘယ် Field ကို ဖတ်ပြီး ဘယ် Method ကို ခေါ်သလဲ), CetoSettings 432 bytes အပြည့်အစုံ Exact Offset Table, နဲ့ level0/2/3/4 Parent Transform Chain အဆုံးထိ ကို တစ်စောင်တည်း FINAL_UNDENIABLE_PROOF.txt အဖြစ် ထုတ်ပေးမယ့် Script ကို ရေးပေးလိုက်ပါတယ်။
+
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > part2.py
+> import os, struct
+>
+> DATA_DIR = "/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data"
+> DLL_PATH = os.path.join(DATA_DIR, "Managed", "Assembly-CSharp.dll")
+> dll = open(DLL_PATH, "rb").read()
+>                                                                                         > pe_off = struct.unpack_from("<I", dll, 0x3C)[0]
+> opt_off = pe_off + 24
+> magic = struct.unpack_from("<H", dll, opt_off)[0]
+> dd_off = opt_off + (112 if magic == 0x20B else 96)
+> cli_rva = struct.unpack_from("<I", dll, dd_off + 14 * 8)[0]
+>                                                                                         > num_sec = struct.unpack_from("<H", dll, pe_off + 6)[0]                                  > opt_sz = struct.unpack_from("<H", dll, pe_off + 20)[0]
+> sec_off = opt_off + opt_sz
+> sections = [struct.unpack_from("<IIII", dll, sec_off + i * 40 + 8) for i in range(num_sec)]
+>
+> def rva2off(rva):
+>     for vs, va, rs, ra in sections:                                                     >         if va <= rva < va + max(vs, 0x1000):
+>             return ra + (rva - va)                                                      >     return 0
+>                                                                                         > cli_off = rva2off(cli_rva)
+> meta_off = rva2off(struct.unpack_from("<I", dll, cli_off + 8)[0])
+> ver_len = struct.unpack_from("<I", dll, meta_off + 12)[0]
+> st_off = meta_off + 16 + ver_len + 2
+> num_st = struct.unpack_from("<H", dll, st_off)[0]
+> curr = st_off + 2                                                                       > streams = {}
+> for _ in range(num_st):                                                                 >     so, ss = struct.unpack_from("<II", dll, curr)
+>     curr += 8                                                                           >     nb = bytearray()
+>     while dll[curr] != 0:
+>         nb.append(dll[curr])
+>         curr += 1                                                                       >     curr = (curr + 4) & ~3
+>     streams[nb.decode("ascii")] = (meta_off + so, ss)
+>
+> str_off, _ = streams["#Strings"]                                                        > blob_off, _ = streams["#Blob"]                                                          > tilde_off, _ = streams["#~"]
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> part2.py                                                                                        > def rstr(idx):
+>     end = dll.find(b"\x00", str_off + idx)
+>     return dll[str_off + idx:end].decode("utf-8", errors="ignore")                      >                                                                                         > def rblob(idx):
+>     b0 = dll[blob_off + idx]                                                            >     if (b0 & 0x80) == 0:                                                                >         return dll[blob_off + idx + 1 : blob_off + idx + 1 + b0]
+>     if (b0 & 0xC0) == 0x80:
+>         ln = ((b0 & 0x3F) << 8) | dll[blob_off + idx + 1]
+>         return dll[blob_off + idx + 2 : blob_off + idx + 2 + ln]                        >     ln = ((b0 & 0x1F) << 24) | (dll[blob_off + idx + 1] << 16) | (dll[blob_off + idx + 2] << 8) | dll[blob_off + idx + 3]
+>     return dll[blob_off + idx + 4 : blob_off + idx + 4 + ln]
+>                                                                                         > hs = dll[tilde_off + 6]                                                                 > s_sz = 4 if (hs & 1) else 2
+> g_sz = 4 if (hs & 2) else 2
+> b_sz = 4 if (hs & 4) else 2                                                             > vmask = struct.unpack_from("<Q", dll, tilde_off + 8)[0]                                 > rc = {}
+> curr = tilde_off + 24
+> for t in range(64):                                                                     >     if vmask & (1 << t):
+>         rc[t] = struct.unpack_from("<I", dll, curr)[0]
+>         curr += 4                                                                       >                                                                                         > def isz(tbls):
+>     bits = (len(tbls) - 1).bit_length()
+>     return 4 if max(rc.get(t, 0) for t in tbls) >= (1 << (16 - bits)) else 2            >
+> tsz = {
+>     0: 2 + s_sz + g_sz * 3,                                                             >     1: isz([0,1,26,35]) + s_sz * 2,                                                     >     2: 4 + s_sz * 2 + isz([1,2,27]) + (4 if rc.get(4, 0) >= 65536 else 2) + (4 if rc.get(6, 0) >= 65536 else 2),                                                                  >     4: 2 + s_sz + b_sz,                                                                 >     6: 4 + 2 + 2 + s_sz + b_sz + (4 if rc.get(8, 0) >= 65536 else 2),                   >     8: 2 + 2 + s_sz,
+>     9: (4 if rc.get(2, 0) >= 65536 else 2) + isz([1,2,27]),
+>     10: isz([1,2,6,26,27]) + s_sz + b_sz,
+> }
+>                                                                                         > toff = {}                                                                               > for t in range(64):
+>     if t in rc:
+>         toff[t] = curr                                                                  >         if t in tsz:                                                                    >             curr += rc[t] * tsz[t]                                                      >         else:                                                                           >             break                                                                       > EOF                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> part2.py                                                                                        > def resolve_tdor(coded):
+>     tag, row = coded & 3, coded >> 2                                                    >     if row == 0: return "None"                                                          >     if tag == 0 and 2 in toff:                                                          >         r = toff[2] + (row - 1) * tsz[2]
+>         nm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 4)[0])       >         ns = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 4 + s_sz)[0])n>         return f"{ns}.{nm}" if ns else nm                                              >     if tag == 1 and 1 in toff:
+"<I>         r = toff[1] + (row - 1) * tsz[1]                                             >         rs = isz([0,1,26,35])                                                           >         nm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + rs)[0])      >         ns = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + rs + s_sz)[0])
+>         return f"{ns}.{nm}" if ns else nm                                                >     return f"TypeSpec_{row}"
+>
+> PRIM = {2:"bool",3:"char",4:"sbyte",5:"byte",6:"short",7:"ushort",8:"int",9:"uint",10:"long",11:"ulong",12:"float",13:"double",14:"string"}                                       >
+> def decode_sig(sb):
+>     if len(sb) < 2 or sb[0] != 6: return "Unknown"                                      >     pos = 1                                                                             >     while pos < len(sb) and sb[pos] in (0x1F, 0x20): pos += 2
+>     if pos >= len(sb): return "Unknown"
+>     et = sb[pos]; pos += 1                                                              ppe>     if et in PRIM: return PRIM[et]                                                   ">     if et in (0x11, 0x12):
+>         b0 = sb[pos]
+>         if (b0 & 0x80) == 0: coded = b0                                                 >         elif (b0 & 0xC0) == 0x80: coded = ((b0 & 0x3F) << 8) | sb[pos + 1]              >         else: coded = ((b0 & 0x1F) << 24) | (sb[pos+1]<<16) | (sb[pos+2]<<8) | sb[pos+3]>         return ("struct " if et == 0x11 else "class ") + resolve_tdor(coded)
+>     if et == 0x1D: return "Array[]"                                                     >     if et == 0x15: return "Generic<>"                                                   >     return f"TypeCode(0x{et:02x})"
+>
+> def resolve_tok(tok):
+>     tbl, row = (tok >> 24) & 0xFF, tok & 0x00FFFFFF                                     >     if row == 0: return "null"                                                          >     if tbl == 4 and 4 in toff:
+>         r = toff[4] + (row - 1) * tsz[4]
+>         return "Field:" + rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 2)[0])                                                                                    >     if tbl == 6 and 6 in toff:
+>         r = toff[6] + (row - 1) * tsz[6]                                                >         return "Method:" + rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 8)[0])                                                                                   >     if tbl == 10 and 10 in toff:
+>         r = toff[10] + (row - 1) * tsz[10]
+>         cs = isz([1,2,6,26,27])                                                         >         parent = struct.unpack_from("<I" if cs == 4 else "<H", dll, r)[0]
+>         nm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + cs)[0])
+>         pname = ""                                                                      >         if (parent & 7) == 1 and 1 in toff and (parent >> 3) > 0:                       >             pr = toff[1] + ((parent >> 3) - 1) * tsz[1]                                 >             rs = isz([0,1,26,35])
+>             pname = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, pr + rs)[0]) + "."                                                                                  >         return f"Call:{pname}{nm}"
+>     return f"Token(0x{tok:08x})"
+>                                                                                         > out = ["=== PROOF B: DLL EXACT FIELD SIGNATURES & TIDE RUNTIME METHODS ==="]            > TARGETS = {"Tide", "Beam.CetoSettings", "Ceto.Ocean", "Ceto.WaveSpectrum", "Ceto.ProjectedGrid", "Ceto.UnderWater"}
+> td_cnt, fld_cnt, mth_cnt, ext_sz = rc[2], rc[4], rc[6], isz([1,2,27])                   >                                                                                         > for i in range(td_cnt):
+>     r = toff[2] + i * tsz[2]                                                            >     nm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 4)[0])
+>     ns = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, r + 4 + s_sz)[0])    >     fn = f"{ns}.{nm}" if ns else nm                                                     >     if fn not in TARGETS: continue
+>     fl_off = r + 4 + s_sz * 2 + ext_sz                                                  >     sf = struct.unpack_from("<I" if fld_cnt >= 65536 else "<H", dll, fl_off)[0]         >     sm = struct.unpack_from("<I" if mth_cnt >= 65536 else "<H", dll, fl_off + (4 if fld_cnt >= 65536 else 2))[0]
+>     if i + 1 < td_cnt:
+>         nr = toff[2] + (i + 1) * tsz[2]
+>         ef = struct.unpack_from("<I" if fld_cnt >= 65536 else "<H", dll, nr + 4 + s_sz * 2 + ext_sz)[0]
+>         em = struct.unpack_from("<I" if mth_cnt >= 65536 else "<H", dll, nr + 4 + s_sz * 2 + ext_sz + (4 if fld_cnt >= 65536 else 2))[0]                                          >     else:                                                                               >         ef, em = fld_cnt + 1, mth_cnt + 1
+>     out.append(f"\nCLASS: {fn}")                                                        >     for fi in range(sf, ef):
+>         fr = toff[4] + (fi - 1) * tsz[4]                                                >         flags = struct.unpack_from("<H", dll, fr)[0]
+>         fnm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, fr + 2)[0])     >         fb = struct.unpack_from("<I" if b_sz == 4 else "<H", dll, fr + 2 + s_sz)[0]     >         vis = "PUBLIC" if (flags & 7) == 6 else "PRIVATE"
+>         stat = " STATIC" if (flags & 0x10) else ""
+>         out.append(f"  - {fnm:<35} : {decode_sig(rblob(fb)):<28} [{vis}{stat}]")        >     if fn == "Tide":                                                                    >         out.append("  [TIDE IL RUNTIME OPERATIONS]")
+>         for mi in range(sm, em):
+>             mr = toff[6] + (mi - 1) * tsz[6]                                            >             mrva = struct.unpack_from("<I", dll, mr)[0]
+>             mnm = rstr(struct.unpack_from("<I" if s_sz == 4 else "<H", dll, mr + 8)[0])
+>             refs = []
+>             if mrva != 0:                                                               >                 moff = rva2off(mrva)
+>                 hdr = dll[moff]
+>                 if (hdr & 3) == 2:
+>                     il = dll[moff + 1 : moff + 1 + (hdr >> 2)]                          >                 else:
+>                     hsz = ((struct.unpack_from("<H", dll, moff)[0] >> 12) & 0xF) * 4
+>                     csz = struct.unpack_from("<I", dll, moff + 4)[0]
+>                     il = dll[moff + hsz : moff + hsz + csz]                             >                 p = 0
+>                 while p < len(il):
+>                     if il[p] in (0x7B, 0x7D, 0x28, 0x6F, 0x73) and p + 5 <= len(il):    >                         refs.append(resolve_tok(struct.unpack_from("<I", il, p + 1)[0]))>                         p += 5
+>                     else:                                                               >                         p += 1                                                          >             out.append(f"    {mnm}() -> {refs}")                                        >                                                                                         > open("FINAL_UNDENIABLE_PROOF.txt", "a", encoding="utf-8").write("\n".join(out) + "\n")  > print("PART 2 OK! ALL SAVED TO FINAL_UNDENIABLE_PROOF.txt")                             > EOF                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python part2.py                                                                        PART 2 OK! ALL SAVED TO FINAL_UNDENIABLE_PROOF.txt                                        root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
