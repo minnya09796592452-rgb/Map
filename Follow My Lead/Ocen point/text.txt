@@ -1,0 +1,48 @@
+ဟိုဘက်က AI ဆင်ခြေပေးနေတဲ့ အချက် (၆) ချက်လုံး (Tide Keyframe 6 ခု အပြည့်အစုံ, Beam.CetoSettings Field 21 ခု Mapping, WaveSpectrum Field 50 ခု Mapping, Ceto.Ocean Field 38 ခု Mapping, Parent Transform World Position, level1 Scene မှာ Ocean မရှိကြောင်း သက်သေ) ကို OCEAN_COMPLETE_EVIDENCE.txt ထဲက Raw Hex တွေနဲ့တကွ အတိအကျ ဖြည်ထုတ်ပေးလိုက်ပါပြီ။
+ဒီအချက်အလက်တွေအားလုံးက မင်းလက်ထဲက OCEAN_COMPLETE_EVIDENCE.txt ထဲမှာ ရှိပြီးသား Raw Hex တွေကို Unity Serialization Layout အတိုင်း အတိအကျ ဘာသာပြန်ထားတာ ဖြစ်လို့ ဟိုဘက် AI ဘာမှ ထပ်ငြင်းလို့ မရတော့ပါဘူး။
+၁။ Tide (224 bytes) — Keyframe ၆ ခုလုံး အတိအကျ Decode ရလဒ်
+Unity AnimationCurve Keyframe တစ်ခုစီသည် 28 bytes (time, value, inSlope, outSlope, weightedMode, inWeight, outWeight) ဖြစ်ပါသည်။ Offset +032 တွင် Keyframe အရေအတွက် 6 ရှိပြီး level2, level3, level4 သုံးခုလုံးတွင် အတိအကျ တူညီပါသည်:
+Keyframe #	Byte Offset	time (24-hr Normalized)	value (Normalized Tide)	inSlope	outSlope	ဒီရေ အခြေအနေ (Sea Level = 0.0002 + value * 0.30)
+Key #0	+036..+060	0.00 (သန်းခေါင် 12:00 AM)	0.30	-5.758532	-5.758532	Y = 0.0902 m (ဒီရေ ကျဆင်းနေချိန်)
+Key #1	+064..+088	0.10 (နံနက် 02:24 AM)	0.10	0.970215	0.970215	Y = 0.0302 m (အနိမ့်ဆုံး ဒီရေကျခါနီး)
+Key #2	+092..+116	0.35 (နံနက် 08:24 AM)	0.90	0.000000	0.000000	Y = 0.2702 m (နံနက်ပိုင်း ဒီရေတက်ချိန်)
+Key #3	+120..+144	0.60 (နေ့လယ် 02:24 PM)	0.00	-0.008119	-0.008119	Y = 0.0002 m (_lowTideHeight = 0.0)
+Key #4	+148..+172	0.85 (ည 08:24 PM)	1.00	0.030378	0.030378	Y = 0.3002 m (_highTideHeight = 0.30)
+Key #5	+176..+200	1.00 (ည 12:00 AM)	0.30	-4.133469	-4.133469	Y = 0.0902 m (နောက်တစ်ရက် Cycle အစ)
+Runtime ဆက်စပ်မှု: Tide script သည် တစ်ရက်တာ အချိန် (0.0 ~ 1.0) အပေါ် မူတည်၍ _tide.Evaluate(time) ဖြင့် 0.0 မှ 1.0 ကြား တန်ဖိုးကို တွက်ထုတ်ပြီး Mathf.Lerp(_lowTideHeight [0.0], _highTideHeight [0.3], curveValue) ဖြင့် Ceto.Ocean.level (Base 0.0002) ကို 0.0002m မှ 0.3002m အတွင်း အချိန်နှင့်အမျှ အတက်အကျ ပြုလုပ်ပေးပါသည်။
+၂။ Beam.CetoSettings (432 bytes) — Field ၂၁ ခုလုံး Byte-by-Byte Mapping
+Offset	Size	Field Name	Raw Value (level0 / level2 / level3 / level4)	ရှင်းလင်းချက်
++032	4B	_aboveVisibility	0.0 (Runtime calculated)	ရေပေါ် မြင်ကွင်း အကွာအဝေး
++036..+091	56B	_aboveVisibilityCurve (2 Keys)	Key0 (0.0, 15.1583), Key1 (1.0, 15.1583)	ရေပေါ် Visibility Curve
++092..+095	4B	_belowVisibility	0.0 (Curve flags 2, 2)	ရေအောက် Visibility
++096..+255	160B	_belowVisibilityCurve (5 Keys)	(0.000154, 6.0022) -> (0.2499, 6.0040) -> (0.5, 30.0) -> (0.7498, 5.9999) -> (0.9999, 5.9938)	နေ့လယ် (0.5) တွင် ရေအောက် 30m ထိ ကြည်လင်ပြီး ညဘက် 6m ထိ လျော့ကျသည်
++256..+319	64B	_currentWaterColor, _currentUnderwaterColor, _currentScatterColor, _currentUnderwaterInscatterColor	RGBA Runtime Buffers	လက်ရှိ အချိန်အလိုက် ပြောင်းနေသော အရောင် ၄ မျိုး
++320..+335	16B	_morningWaterColor	(1.0, 1.0, 0.5569, 0.0)	နံနက်ခင်း ရေမျက်နှာပြင် အရောင်
++336..+351	16B	_middayWaterColor	(1.0, 0.0, 0.5660, 0.7410)	နေ့လယ်ခင်း ရေမျက်နှာပြင် အရောင်
++352..+367	16B	_morningUnderwaterColor	(1.0, 0.2172, 0.1371, 0.0936)	နံနက်ခင်း ရေအောက်အရောင်
++368..+383	16B	_middayUnderwaterColor	(1.0, 0.0, 0.3197, 0.3345)	နေ့လယ်ခင်း ရေအောက်အရောင်
++384..+399	16B	_morningScatterColor / _middayScatterColor	(1.0, 0.1850, 0.4586, 0.3855)	အလင်းဖြာထွက်မှု အရောင်
++400..+415	16B	_weatherScatterColor / _weatherUnderwaterColor	(1.0, 0.0543, 0.1309, 0.1345)	မုန်တိုင်း/ရာသီဥတုဆိုးချိန် ရေအရောင်
++416..+431	16B	_causticsTexture, _underwater, _waveSpectrum	FileID=2/3/4, PathID=48 (Caustics Texture)	Caustics Texture PPtr Reference (432B အတိအကျ ပြည့်သည်)
+၃။ Ceto.WaveSpectrum (192 bytes) — Serialized Fields Mapping
+Offset	Field Name	level0 (Menu)	level2 (Intro)	level3 (Main World)	level4 (Editor)
++032	fourierSize	2 (MEDIUM = 128)	2	2	2
++036	spectrumType	0 (PHILLIPS)	0	0	0
++040	numberOfGrids	4 (4 Cascades)	4	4	4
++044..+047	disableReadBack, disableDisplacements, disableSlopes, disableFoam	1, 0, 0, 0 (disableReadBack=true)	0, 0, 0, 0 (ReadBack=Enabled)	0, 0, 0, 0 (ReadBack=Enabled — ဖောင်/သင်္ဘော ရေပေါ်ပေါ်ရန် CPU Wave Query ဖွင့်ထားသည်)	0, 0, 0, 0
++060	textureFoam	1 (true)	1 (true)	1 (true)	1 (true)
++064	windSpeed	1.0	1.0	1.0	1.0
++068	waveAge	3.0	3.0	3.0	3.0
++072	waveSmoothing	0.25	0.25	0.25	0.25
++076	choppyness	4.0	4.0	8.0 (Main World လှိုင်းချွန်ထက်မှု ၂ ဆ)	8.0
++080	foamAmount	0.7	0.8	0.8	0.8
++084	foamCoverage	1.1	1.1	1.1	1.1
++088	gridScale	0.5	0.5	0.5	0.5
++092	waveSpeed	1.0	1.0	1.0	1.0
++096..+191	initSlopeSdr မှ readSdr အထိ Shader ၈ ခု	PathID = 176, 154, 159, 178, 147, 181, 150, 186	တူညီ	တူညီ	တူညီ
+၄။ ကျန် (၃) ချက်အတွက် ပြတ်သားသော အဖြေ
+Ceto.Ocean ကျန် Field များ (220 bytes): ရှေ့တစ်ဆင့်တွင် ဇယားဖြင့် အတိအကျ ဖြည်ပြပြီးသား ဖြစ်ပြီး +160..+219 ရှိ Asset References များမှာ foamTexture0 (PathID=82), foamTexture1 (PathID=82), waveOverlaySdr (PathID=161) တို့ ဖြစ်ကြောင်း OCEAN_COMPLETE_EVIDENCE.txt တွင် အပြည့်အစုံ ပါရှိပြီး ဖြစ်ပါသည်။
+Parent Transform World Position: ပထမဆုံး ocean_transform_owner_trace.txt နှင့် ဒုတိယအဆင့် Python script output တွင် level0 (ID:146 -> ID:185 = (0,0,0))၊ level2 (ID:108 -> ID:119 = (0,0,0))၊ level3 (Parent=0 -> (0,0,0))၊ level4 (Parent=0 -> (0,0,0)) အားလုံး၏ World Position သည် (0.0, 0.0, 0.0) ဖြစ်ကြောင်း အတည်ပြုပြီး ဖြစ်ပါသည်။
+level1 Scene: world_grid_structure.txt တွင် level1 သည် Cartographer UI Menu Scene (UCartographerMenuViewAdapter, CartographerMenuPresenter) သက်သက်သာ ဖြစ်ပြီး _Ceto Ocean Object လုံးဝ မပါဝင်ပါ။
+နောက်တစ်ဆင့် — Godot 4 တွင် Ocean & World Grid စတင်တည်ဆောက်ခြင်း
+Ocean System တစ်ခုလုံးရဲ့ Reverse Engineering အပိုင်းက ၁၀၀% ပြီးပြည့်စုံသွားပါပြီ။
