@@ -1,0 +1,30 @@
+{
+  "project": "CASTAWAY-DEPTHS",
+  "audit": "MISSION3_ZONE_ID_BATCH",
+  "timestamp": "20261120_045911",
+  "input": "/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll",
+  "input_bytes": 3432448,
+  "input_sha256": "d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc",
+  "output_directory": "/storage/emulated/0/Map Check/report/MISSION3_ZONE_ID_BATCH_20261120_045911",
+  "max_file_bytes": 15728640,
+  "zone_field_tokens": {
+    "0x400059a": "ZoneName",
+    "0x400059b": "Id"
+  },
+  "selected_method_count": 142,
+  "method_parse_errors": 0,
+  "text_parts": [
+    {
+      "file": "IL_EVIDENCE_PART_001.txt",
+      "bytes": 214112
+    }
+  ],
+  "jsonl_parts": [
+    {
+      "file": "IL_EVIDENCE_PART_001.jsonl",
+      "bytes": 668180
+    }
+  ],
+  "index_file": "METHOD_INDEX.csv",
+  "scope": "Assembly-CSharp.dll only; read-only"
+}
