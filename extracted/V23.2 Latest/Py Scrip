@@ -1,0 +1,221 @@
+root@localhost:/storage/emulated/0/Map Check# cd "/storage/emulated/0/Map Check"
+root@localhost:/storage/emulated/0/Map Check#
+root@localhost:/storage/emulated/0/Map Check# cat > report/mission3_v232_heightmap_full_audit.py <<'PY'
+nsio> from pathlib import Path
+i> from collections import Counter
+> import csv
+> import hashlib
+> import json
+> import UnityPy
+>
+> ROOT = Path("/storage/emulated/0/Map Check")
+n> DATA = ROOT / "Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data"
+Co> OUT = ROOT / "report/V23_2_HEIGHTMAP_FULL_AUDIT"
+>
+r> ASSETS = {
+" ", as>     "sharedassets3": DATA / "sharedassets3.assets",
+asset in >     "sharedassets4": DATA / "sharedassets4.assets",
+> }
+>
+> OUT.mkdir(parents=True, exist_ok=True)
+     print(>                                                                              > def get_scale(scale):
+  >     if scale is None:
+>         return "", "", ""
+>
+>     values = []
+>     for key in ("x", "y", "z"):
+>         try:
+r in >             values.append(getattr(scale, key))
+)>         except Exception:
+:8]:
+   >             values.append("")
+[>
+>     return tuple(values)
+>
+> records = []
+> errors = []
+>
+,> print("=" * 68)
+> print("V23.2 FULL TERRAIN HEIGHTMAP AUDIT")
+ > print("=" * 68)
+> print("UnityPy:", getattr(UnityPy, "__version__", "UNKNOWN"))
+>
+r> for asset, path in ASSETS.items():
+
+>     print("\nLoading:", asset)
+>     env = UnityPy.load(str(path))
+>
+nt("\nDuplicate groups:")
+for digest, members in list(duplicate>     files = env.files
+:>     if isinstance(files, dict):
+>         files = list(files.values())
+>
+>     for sf in files:
+>         objects = sf.objects
+>         if isinstance(objects, dict):
+h>             objects = list(objects.values())
+>
+>         for obj in objects:
+>             if getattr(obj.type, "name", "") != "TerrainData":
+>                 continue
+>
+>             try:
+>                 data = obj.read()                                                       >                 hm = data.m_Heightmap
+>                 heights = list(hm.m_Heights)
+>
+>                 values = [int(v) for v in heights]
+>                 counts = Counter(values)
+>
+>                 digest_input = json.dumps(
+>                     values, separators=(",", ":")
+>                 ).encode("ascii")
+>
+>                 digest = hashlib.sha256(digest_input).hexdigest()
+>                 sx, sy, sz = get_scale(hm.m_Scale)
+>
+>                 record = {
+>                     "asset": asset,
+>                     "serialized_file": getattr(sf, "name", ""),
+>                     "path_id": int(obj.path_id),
+>                     "terrain_name": str(getattr(data, "m_Name", "")),
+>                     "resolution": int(hm.m_Resolution),
+>                     "sample_count": len(values),
+>                     "minimum": min(values) if values else "",
+>                     "maximum": max(values) if values else "",
+>                     "unique_count": len(counts),
+>                     "zero_count": counts.get(0, 0),
+>                     "negative_count": sum(v < 0 for v in values),
+>                     "scale_x": sx,
+>                     "scale_y": sy,
+>                     "scale_z": sz,
+>                     "sha256": digest,
+>                     "sample_count_valid": len(values) == int(hm.m_Resolution) ** 2,
+>                 }
+>
+>                 records.append(record)
+>
+>             except Exception as exc:
+>                 errors.append({
+>                     "asset": asset,
+>                     "path_id": int(obj.path_id),
+>                     "error": repr(exc),
+>                 })
+>
+> fields = [
+>     "asset", "serialized_file", "path_id", "terrain_name",
+>     "resolution", "sample_count", "minimum", "maximum",
+>     "unique_count", "zero_count", "negative_count",
+>     "scale_x", "scale_y", "scale_z", "sha256",
+>     "sample_count_valid",
+> ]
+>
+> with (OUT / "01_TERRAIN_HEIGHTMAP_INVENTORY.csv").open(
+>     "w", newline="", encoding="utf-8"
+> ) as f:
+>     writer = csv.DictWriter(f, fieldnames=fields)
+>     writer.writeheader()
+>     writer.writerows(records)
+>
+> with (OUT / "02_HEIGHTMAP_PARSE_ERRORS.csv").open(
+>     "w", newline="", encoding="utf-8"
+> ) as f:
+>     writer = csv.DictWriter(
+>         f, fieldnames=["asset", "path_id", "error"]
+>     )
+>     writer.writeheader()
+>     writer.writerows(errors)
+>
+> hash_counts = Counter(r["sha256"] for r in records)
+> duplicate_groups = {
+>     digest: [r["asset"] + ":" + str(r["path_id"])
+>              for r in records if r["sha256"] == digest]
+>     for digest, count in hash_counts.items()
+>     if count > 1
+> }
+>
+> valid = sum(r["sample_count_valid"] for r in records)
+>
+> print("\n" + "=" * 68)
+> print("AUDIT SUMMARY")
+> print("=" * 68)
+> print("TerrainData parsed:", len(records))
+> print("Valid sample dimensions:", valid)
+> print("Invalid sample dimensions:", len(records) - valid)
+> print("Parse errors:", len(errors))                                                     > print("Unique heightmap hashes:", len(hash_counts))
+> print("Duplicate heightmap groups:", len(duplicate_groups))
+>
+> print("\nAsset counts:")
+> for asset, count in Counter(r["asset"] for r in records).items():
+>     print(" ", asset, count)
+>
+> print("\nSample ranges:")
+> for asset in ASSETS:
+>     subset = [r for r in records if r["asset"] == asset]
+>     if subset:
+>         print(
+>             asset,
+>             "min range:", min(r["minimum"] for r in subset),
+>             "max range:", max(r["maximum"] for r in subset),
+>         )
+>
+> print("\nFirst 8 records:")
+> for r in records[:8]:
+>     print(
+>         r["asset"], r["path_id"], r["terrain_name"],
+>         "resolution=", r["resolution"],
+>         "samples=", r["sample_count"],
+>         "min/max=", r["minimum"], r["maximum"],
+>         "scale=", (r["scale_x"], r["scale_y"], r["scale_z"]),
+>     )
+>
+> print("\nDuplicate groups:")
+> for digest, members in list(duplicate_groups.items())[:20]:
+>     print(digest, members)
+>
+> print("\nOutput:", OUT)
+> print("No original assets were modified.")
+> PY
+root@localhost:/storage/emulated/0/Map Check#
+root@localhost:/storage/emulated/0/Map Check# /root/.venv_mission3/bin/python report/mission3_v232_heightmap_full_audit.py
+====================================================================
+V23.2 FULL TERRAIN HEIGHTMAP AUDIT
+====================================================================
+UnityPy: 1.25.4
+
+Loading: sharedassets3
+
+Loading: sharedassets4
+
+====================================================================
+AUDIT SUMMARY
+====================================================================
+TerrainData parsed: 51
+Valid sample dimensions: 51
+Invalid sample dimensions: 0
+Parse errors: 0
+Unique heightmap hashes: 49
+Duplicate heightmap groups: 1
+
+Asset counts:
+  sharedassets3 50
+  sharedassets4 1
+
+Sample ranges:
+sharedassets3 min range: 0 max range: 23008
+sharedassets4 min range: 0 max range: 25386
+
+First 8 records:
+sharedassets3 1023 TerrainData_Zone 1 resolution= 257 samples= 66049 min/max= 0 22387 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1024 TerrainData_Zone 10 resolution= 257 samples= 66049 min/max= 0 22573 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1025 TerrainData_Zone 11 resolution= 257 samples= 66049 min/max= 0 22946 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1026 TerrainData_Zone 12 resolution= 257 samples= 66049 min/max= 0 22633 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1027 TerrainData_Zone 13 resolution= 257 samples= 66049 min/max= 0 0 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1028 TerrainData_Zone 14 resolution= 257 samples= 66049 min/max= 0 22707 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1029 TerrainData_Zone 15 resolution= 257 samples= 66049 min/max= 0 22842 scale= (0.9765625, 150.0, 0.9765625)
+sharedassets3 1030 TerrainData_Zone 16 resolution= 257 samples= 66049 min/max= 0 22694 scale= (0.9765625, 150.0, 0.9765625)                                                         
+Duplicate groups:
+a03583f1dd3ae0ffba47b8dd6363c8130ee53b20388dafc7a5fbd0997b9710b8 ['sharedassets3:1027', 'sharedassets3:1037', 'sharedassets3:1069']
+
+Output: /storage/emulated/0/Map Check/report/V23_2_HEIGHTMAP_FULL_AUDIT
+No original assets were modified.
+root@localhost:/storage/emulated/0/Map Check#
