@@ -1,0 +1,683 @@
+
+===========================================================================
+METHOD: Save
+TOKEN: 0x600059c
+SIGNATURE: 200112a2cc128089
+RVA: 0x1ae69 SIZE: 29
+---------------------------------------------------------------------------
+0000: 73 MethodDef: .ctor
+0005: 25
+0006: 03
+0007: 7D Field: instance
+000C: FE 06 MethodDef: <Save>b__0
+0012: 73 MemberRef: .ctor
+0017: 73 MethodDef: .ctor
+001C: 2A
+
+===========================================================================
+METHOD: Load
+TOKEN: 0x600059d
+SIGNATURE: 20020112a2cc128089
+RVA: 0x1ae88 SIZE: 72
+---------------------------------------------------------------------------
+0000: 04
+0001: 03
+0002: 72 String: 'localPosition'
+0007: 6F MethodDef: GetField
+000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+0011: 6F MemberRef: set_localPosition
+0016: 04
+0017: 03
+0018: 72 String: 'localRotation'
+001D: 6F MethodDef: GetField
+0022: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599fef0>
+0027: 6F MemberRef: set_localRotation
+002C: 04
+002D: 03
+002E: 72 String: 'localScale'
+0033: 6F MethodDef: GetField
+0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+003D: 28 MethodDef: Truncate
+0042: 6F MemberRef: set_localScale
+0047: 2A
+
+===========================================================================
+METHOD: Save
+TOKEN: 0x600059f
+SIGNATURE: 200112a2cc1280c1
+RVA: 0x1aee4 SIZE: 29
+---------------------------------------------------------------------------
+0000: 73 MethodDef: .ctor
+0005: 25
+0006: 03
+0007: 7D Field: instance
+000C: FE 06 MethodDef: <Save>b__0
+0012: 73 MemberRef: .ctor
+0017: 73 MethodDef: .ctor
+001C: 2A
+
+===========================================================================
+METHOD: Load
+TOKEN: 0x60005a0
+SIGNATURE: 20020112a2cc1280c1
+RVA: 0x1af04 SIZE: 328
+---------------------------------------------------------------------------
+0000: 04
+0001: 28 MemberRef: get_Mode
+0006: 28 MethodDef: IsClient
+000B: 03
+000C: 72 String: 'isKinematic'
+0011: 6F MethodDef: GetField
+0016: 28 MethodSpec RID 140: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599ff50>
+001B: 60
+001C: 6F MemberRef: set_isKinematic
+0021: 04
+0022: 03
+0023: 72 String: 'useGravity'
+0028: 6F MethodDef: GetField
+002D: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+0032: 6F MemberRef: set_useGravity
+0037: 04
+0038: 03
+0039: 72 String: 'position'
+003E: 6F MethodDef: GetField
+0043: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+0048: 6F MemberRef: set_position
+004D: 04
+004E: 03
+004F: 72 String: 'rotation'
+0054: 6F MethodDef: GetField
+0059: 28 MethodSpec RID 139: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599fef0>
+005E: 6F MemberRef: set_rotation
+0063: 04
+0064: 6F MemberRef: get_isKinematic
+0069: BRANCH 2D -> 0097
+006B: 04
+006C: 03
+006D: 72 String: 'velocity'
+0072: 6F MethodDef: GetField
+0077: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+007C: 6F MemberRef: set_velocity
+0081: 04
+0082: 03
+0083: 72 String: 'angularVelocity'
+0088: 6F MethodDef: GetField
+008D: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+0092: 6F MemberRef: set_angularVelocity
+0097: 04
+0098: 03
+0099: 72 String: 'mass'
+009E: 6F MethodDef: GetField
+00A3: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dd30>
+00A8: 6F MemberRef: set_mass
+00AD: 04
+00AE: 03
+00AF: 72 String: 'drag'
+00B4: 6F MethodDef: GetField
+00B9: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dd30>
+00BE: 6F MemberRef: set_drag
+00C3: 04
+00C4: 03
+00C5: 72 String: 'angularDrag'
+00CA: 6F MethodDef: GetField
+00CF: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dd30>
+00D4: 6F MemberRef: set_angularDrag
+00D9: 04
+00DA: 03
+00DB: 72 String: 'freezeRotation'
+00E0: 6F MethodDef: GetField
+00E5: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+00EA: 6F MemberRef: set_freezeRotation
+00EF: 04
+00F0: 03
+00F1: 72 String: 'detectCollisions'
+00F6: 6F MethodDef: GetField
+00FB: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+0100: 6F MemberRef: set_detectCollisions
+0105: 04
+0106: 03
+0107: 72 String: 'constraints'
+010C: 6F MethodDef: GetField
+0111: 28 MethodSpec RID 141: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599ffb0>
+0116: 6F MemberRef: set_constraints
+011B: 04
+011C: 03
+011D: 72 String: 'collisionDetectionMode'
+0122: 6F MethodDef: GetField
+0127: 28 MethodSpec RID 142: <dnfile.codedindex.MethodDefOrRef object at 0x7dc59b8050>
+012C: 6F MemberRef: set_collisionDetectionMode
+0131: 04
+0132: 03
+0133: 72 String: 'interpolation'
+0138: 6F MethodDef: GetField
+013D: 28 MethodSpec RID 143: <dnfile.codedindex.MethodDefOrRef object at 0x7dc59b80b0>
+0142: 6F MemberRef: set_interpolation
+0147: 2A
+
+===========================================================================
+METHOD: Save
+TOKEN: 0x60005a2
+SIGNATURE: 200112a2cc12826d
+RVA: 0x1b060 SIZE: 29
+---------------------------------------------------------------------------
+0000: 73 MethodDef: .ctor
+0005: 25
+0006: 03
+0007: 7D Field: instance
+000C: FE 06 MethodDef: <Save>b__0
+0012: 73 MemberRef: .ctor
+0017: 73 MethodDef: .ctor
+001C: 2A
+
+===========================================================================
+METHOD: Load
+TOKEN: 0x60005a3
+SIGNATURE: 20020112a2cc12826d
+RVA: 0x1b080 SIZE: 133
+---------------------------------------------------------------------------
+0000: 04
+0001: 03
+0002: 72 String: 'anchor'
+0007: 6F MethodDef: GetField
+000C: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+0011: 6F MemberRef: set_anchor
+0016: 04
+0017: 03
+0018: 72 String: 'autoConfigureConnectedAnchor'
+001D: 6F MethodDef: GetField
+0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+0027: 6F MemberRef: set_autoConfigureConnectedAnchor
+002C: 04
+002D: 03
+002E: 72 String: 'axis'
+0033: 6F MethodDef: GetField
+0038: 28 MethodSpec RID 22: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599d310>
+003D: 6F MemberRef: set_axis
+0042: 04
+0043: 03
+0044: 72 String: 'breakForce'
+0049: 6F MethodDef: GetField
+004E: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dd30>
+0053: 6F MemberRef: set_breakForce
+0058: 04
+0059: 03
+005A: 72 String: 'breakTorque'
+005F: 6F MethodDef: GetField
+0064: 28 MethodSpec RID 49: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dd30>
+0069: 6F MemberRef: set_breakTorque
+006E: 04
+006F: 03
+0070: 72 String: 'enableCollision'
+0075: 6F MethodDef: GetField
+007A: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+007F: 6F MemberRef: set_enableCollision
+0084: 2A
+
+===========================================================================
+METHOD: Save
+TOKEN: 0x60005a6
+SIGNATURE: 200112a2cc1280a9
+RVA: 0x1b121 SIZE: 29
+---------------------------------------------------------------------------
+0000: 73 MethodDef: .ctor
+0005: 25
+0006: 03
+0007: 7D Field: instance
+000C: FE 06 MethodDef: <Save>b__0
+0012: 73 MemberRef: .ctor
+0017: 73 MethodDef: .ctor
+001C: 2A
+
+===========================================================================
+METHOD: Load
+TOKEN: 0x60005a7
+SIGNATURE: 20020112a2cc1280a9
+RVA: 0x1b13f SIZE: 45
+---------------------------------------------------------------------------
+0000: 04
+0001: 03
+0002: 72 String: 'enabled'
+0007: 6F MethodDef: GetField
+000C: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+0011: 6F MemberRef: set_enabled
+0016: 04
+0017: 03
+0018: 72 String: 'isTrigger'
+001D: 6F MethodDef: GetField
+0022: 28 MethodSpec RID 48: <dnfile.codedindex.MethodDefOrRef object at 0x7dc599dcd0>
+0027: 6F MemberRef: set_isTrigger
+002C: 2A
+
+===========================================================================
+SEARCHING TRANSFORM SAVE CALLBACK
+0x6000061 Save RVA 0x3b70
+0x600006f Save RVA 0x486c
+0x6000084 Save RVA 0x4e2c
+0x6000165 Save RVA 0xa510
+0x60001c4 Save RVA 0xbc38
+0x6000292 Save RVA 0xe7f2
+0x60002a9 Save RVA 0xeea4
+0x60002b5 Save RVA 0xf04d
+0x60002df Save RVA 0xfa83
+0x6000302 Save RVA 0x10254
+0x6000315 Save RVA 0x10360
+0x600031a SaveRagdoll RVA 0x10418
+0x600033b Save RVA 0x10c98
+0x6000476 Save RVA 0x16c10
+0x60004f9 Save RVA 0x18e44
+0x600051d Save RVA 0x0
+0x600052d Save RVA 0x0
+0x6000532 Save RVA 0x19ba8
+0x6000552 Save RVA 0x19fc4
+0x6000556 add_PreSave RVA 0x1a008
+0x6000557 remove_PreSave RVA 0x1a03c
+0x600055a add_DeletedSaveFile RVA 0x1a0d8
+0x600055b remove_DeletedSaveFile RVA 0x1a10c
+0x600055d GetSaveFolderPath RVA 0x1a188
+0x600055e GetSaveFilePath RVA 0x1a1af
+0x600055f TryGetSaveFilePath RVA 0x1a1d8
+0x6000560 CheckSaveFileVersion RVA 0x1a238
+0x6000561 CompareSaveFileVersion RVA 0x1a2d8
+0x6000562 GetSaveFileVersion RVA 0x1a30c
+0x6000564 ValidateSaveFile RVA 0x1a45e
+0x6000565 ValidateSaveFileFast RVA 0x1a470
+0x6000566 LoadSaveFile RVA 0x1a57c
+0x6000567 LoadSaveFileFast RVA 0x1a678
+0x6000568 BackupSaveFiles RVA 0x1a748
+0x6000569 DeleteSaveFile RVA 0x1a7b4
+0x600056a DeleteSaveFiles RVA 0x1a7e9
+0x600056c SaveGame RVA 0x1a804
+0x600056f Save RVA 0x1a8af
+0x6000570 Save_Sequence RVA 0x1a8bd
+0x6000571 AfterSave_Sequence RVA 0x1a8d3
+0x6000572 GenerateSave_Sequence RVA 0x1a8e9
+0x6000573 SaveToFile RVA 0x1a900
+0x6000574 Save RVA 0x1a9b8
+0x6000576 ReplicateSaveErrorDialogue RVA 0x1aa58
+0x6000577 SaveInternal RVA 0x1ab39
+0x600057f Save RVA 0x0
+0x6000582 Save RVA 0x1abbc
+0x6000585 Save RVA 0x1ac09
+0x6000588 Save RVA 0x1ac66
+0x600058b Save RVA 0x1acde
+0x600058e Save RVA 0x1ad56
+0x6000591 Save RVA 0x1ad92
+0x6000599 Save RVA 0x0
+0x600059c Save RVA 0x1ae69
+0x600059f Save RVA 0x1aee4
+0x60005a2 Save RVA 0x1b060
+0x60005a6 Save RVA 0x1b121
+0x60005a9 Save RVA 0x1b178
+0x60005ac Save RVA 0x1b214
+0x60005af Save RVA 0x1b2b0
+0x60005b2 Save RVA 0x1b3cd
+0x60005b5 Save RVA 0x1b424
+0x60005b9 Save RVA 0x1b660
+0x60005bc Save RVA 0x1b854
+0x60005bf Save RVA 0x1bd18
+0x60005cc add_PreSave RVA 0x1c0c0
+0x60005cd remove_PreSave RVA 0x1c0f4
+0x60005ce add_Saved RVA 0x1c128
+0x60005cf remove_Saved RVA 0x1c15c
+0x60005d3 Save RVA 0x1c20c
+0x60005ee Save RVA 0x1ce7c
+0x60006c8 SyncSave_Async RVA 0x1fa64
+0x60006c9 SyncSave_Sequence RVA 0x1fa87
+0x60006d7 <SyncSave_Sequence>b__72_0 RVA 0x1fbf3
+0x60006d8 <SyncSave_Sequence>b__72_2 RVA 0x1fbfc
+0x6000725 SaveZone RVA 0x210a4
+0x6000740 Save RVA 0x21c48
+0x600076f Save RVA 0x23b0c
+0x6000772 InSaveBounds RVA 0x23ce4
+0x6000773 InSaveBoundsRadius RVA 0x23cf8
+0x6000774 InSaveBoundsHeight RVA 0x23d17
+0x60007a1 InSaveBounds RVA 0x24375
+0x6002538 SaveToFile RVA 0x4fb08
+0x600264e SaveMapHeightMapFile RVA 0x54960
+0x6002821 ReadSaveablePrefab RVA 0x5d925
+0x6002827 WriteSaveablePrefab RVA 0x5daa0
+0x60028f9 UpdateSessionToken_BeforeWriteSave RVA 0x61518
+0x6002928 SendSave_Async RVA 0x61eec
+0x6002929 SendSave_Sequence RVA 0x61f05
+0x600292a ReceiveSave_Async RVA 0x61f39
+0x600292b ReceiveSave_Sequence RVA 0x61f50
+0x600298c Save RVA 0x62dbb
+0x6002c0e Save RVA 0x6424f
+0x6002c0f SaveControllerData RVA 0x6426b
+0x6002c10 SaveControllerData RVA 0x6428a
+0x6002c11 SavePlayerData RVA 0x642a8
+0x6002c12 SaveInputBehavior RVA 0x642c5
+0x6002c1c SaveControllerMap RVA 0x6445c
+0x6002c31 SaveAll RVA 0x64ddc
+0x6002c32 SavePlayerDataNow RVA 0x64e2c
+0x6002c33 SavePlayerDataNow RVA 0x64e44
+0x6002c34 SaveAllJoystickCalibrationData RVA 0x64e70
+0x6002c35 SaveJoystickCalibrationData RVA 0x64ea6
+0x6002c36 SaveJoystickCalibrationData RVA 0x64ebc
+0x6002c37 SaveJoystickData RVA 0x64eec
+0x6002c38 SaveControllerDataNow RVA 0x64f41
+0x6002c39 SaveControllerDataNow RVA 0x64f59
+0x6002c3a SaveControllerMaps RVA 0x64f6c
+0x6002c3b SaveControllerMaps RVA 0x64fc0
+0x6002c3c SaveControllerMap RVA 0x65024
+0x6002c3d SaveInputBehaviors RVA 0x65088
+0x6002c3e SaveInputBehaviorNow RVA 0x650bc
+0x6002c3f SaveInputBehaviorNow RVA 0x650f7
+0x6002c40 SaveControllerAssignments RVA 0x65118
+0x6002c41 ControllerAssignmentSaveDataExists RVA 0x65258
+0x6002dd7 Save RVA 0x6e5c3
+0x60032c8 Save RVA 0x8b1f0
+0x600331d Save RVA 0x8c03e
+0x6003374 Save RVA 0x8d26c
+0x60035db Save RVA 0x93c64
+0x6003610 Save RVA 0x94847
+0x600361d IsLegacySaveFile RVA 0x94d6c
+0x6003622 UpgradeLegacySaveFiles RVA 0x94f78
+0x6003623 UpgradeSaveFile RVA 0x94fcc
+0x600362b HasSaveFilePre_74_00 RVA 0x9573c
+0x600362c MigrateSaveDataPre_74_00 RVA 0x957c0
+0x600366b SaveManager_BeforeWrite RVA 0x96828
+0x600378c Save RVA 0x98804
+0x60037ab Save RVA 0x98b80
+0x60037c8 Save RVA 0x990fc
+0x60037e8 Save RVA 0x994f7
+0x600380b Save RVA 0x9983c
+0x6003821 Save RVA 0x99cfb
+0x6003886 Save RVA 0x9a6c0
+0x60038c0 Save RVA 0x9b108
+0x60038d5 Save RVA 0x9b686
+0x6003910 Save RVA 0x9be18
+0x600391e Save RVA 0x9bf79
+0x6003933 Save RVA 0x9c276
+0x6003952 Save RVA 0x9ce9c
+0x6003964 Save RVA 0x9d3c0
+0x600396a Save RVA 0x9d58d
+0x600399b Save RVA 0x9d978
+0x60039c0 Save RVA 0x9dea1
+0x60039e4 Save RVA 0x9df90
+0x60039ec SaveSkinnable RVA 0x9e0e4
+0x6003a61 Save RVA 0xa00f4
+0x6003ac8 SaveCellObjects RVA 0xa1464
+0x6003acb Save RVA 0xa1627
+0x6003ae9 Options_PreSave RVA 0xa1975
+0x6003aeb SaveRewiredSettings RVA 0xa1988
+0x6003bac Save RVA 0xa419c
+0x6003cf3 Save RVA 0xa918c
+0x6003d66 GetAchivementSaveFieldName RVA 0xa9c22
+0x6003d67 Save RVA 0xa9c34
+0x6003d7d Save RVA 0xa9fd4
+0x6003da4 Save RVA 0xaa988
+0x6003dca Save RVA 0xab4b8
+0x6003e7e Save RVA 0xae6a0
+0x6003e82 Save RVA 0x0
+0x6003e96 Save RVA 0xaef9f
+0x6003ea3 Save RVA 0xaf2f4
+0x6003eab Options_Saved RVA 0xaf612
+0x6003ee5 Save RVA 0xb08c0
+0x6003f20 Save RVA 0xb0a60
+0x6003f34 Save RVA 0xb0e48
+0x6003f94 Save RVA 0xb1ecc
+0x6004075 FormatNameForSave RVA 0xb5cf1
+0x60040b9 Save RVA 0xb6f38
+0x6004113 SaveMap RVA 0xb8224
+0x6004114 Save RVA 0xb8324
+0x6004139 SaveWorld RVA 0xb941c
+0x600413b SaveWorldSeed RVA 0xb9528
+0x600413c SaveWorldMaps RVA 0xb95ec
+0x60041ae Save RVA 0xbc91b
+0x60041fd Save RVA 0xbd90c
+0x60041fe SavePrefabToJObject RVA 0xbd984
+0x600427f SaveToPrefs RVA 0xc04ac
+0x6004280 SaveToPrefs RVA 0xc04e4
+0x600428b Save RVA 0xc0948
+0x6004290 SaveStats RVA 0xc0da2
+0x6004291 SaveAndPushStats RVA 0xc0dae
+0x6004292 SaveManager_PreSave RVA 0xc0dbb
+0x6004296 MapEditorSaveMenuPresenter_Saved RVA 0xc0e4e
+0x6004298 SaveManager_DeletedSaveFile RVA 0xc0e80
+0x6004299 SaveSessionStats RVA 0xc0edc
+0x600429a SaveGlobalStats RVA 0xc0f64
+0x60043d9 Save RVA 0xc48d0
+0x60043e9 Save RVA 0xc4ac0
+0x60043fb Save RVA 0xc4f10
+0x600443d Save RVA 0xc5d8e
+0x600446a SaveGame RVA 0xc63cd
+0x60044a1 Save RVA 0xc66e8
+0x60044c4 Save RVA 0xc6a1e
+0x6004705 SaveWorld RVA 0xccff1
+0x6004718 DeleteSave RVA 0xcd7a5
+0x60047dd ChangeSaveSlotMenuPresenter_SlotChanged RVA 0xd1567
+0x60047df SaveManager_DeletedSaveFile RVA 0xd158e
+0x60047ed ChangeSaveSlotButton_Click RVA 0xd1950
+0x600482e LoadSavedControlsSelections RVA 0xd2d50
+0x60048b6 get_ChangeSaveSlotButton RVA 0x0
+0x60049c8 get_ChangeSaveSlotButton RVA 0xd58ca
+0x6004c1b Save RVA 0xdc9ba
+0x6005137 SaveMenuPresenter_Save RVA 0xe4bdd
+0x6005138 SaveMenuPresenter_ShowView RVA 0xe4bff
+0x6005139 SaveMenuPresenter_HideView RVA 0xe4c08
+0x600513e SaveButton_Click RVA 0xe4c84
+0x600514b add_Saved RVA 0xe4ea4
+0x600514c remove_Saved RVA 0xe4edc
+0x600514d OnSaved RVA 0xe4f11
+0x6005155 SaveButton_Click RVA 0xe5178
+0x600515a SaveMap RVA 0xe5324
+0x600515c <SaveButton_Click>b__25_0 RVA 0xe5510
+0x600515d <SaveButton_Click>b__25_1 RVA 0xe5523
+0x600515e <SaveButton_Click>b__25_2 RVA 0xe5536
+0x600515f <SaveButton_Click>b__25_3 RVA 0xe5558
+0x6005165 get_SaveButton RVA 0x0
+0x600516b get_SaveButton RVA 0xe55d4
+0x6005177 get_SaveButton RVA 0x0
+0x600517c get_SaveButton RVA 0xe566b
+0x60052f8 Save RVA 0xe8914
+0x6005334 Save RVA 0xe98bc
+0x600534a Save RVA 0xea165
+0x6005368 Save RVA 0xea698
+0x600537e Save RVA 0xeabb8
+0x60053a9 Save RVA 0xeb524
+0x60053d1 Save RVA 0xebe3c
+0x60053dd CheckCanSave RVA 0xec0e4
+0x60053df DoSave RVA 0xec234
+0x60053eb Save RVA 0xec7cc
+0x60053ed SaveOnMaster RVA 0xec88f
+0x600543d Save RVA 0xed7ec
+0x6005468 Save RVA 0xee040
+0x600549f Save RVA 0xee8f4
+0x60054c7 Save RVA 0xeeef8
+0x60054f7 Save RVA 0xef5ac
+0x6005520 Save RVA 0xefec6
+0x6005560 Save RVA 0xf072c
+0x6005580 <Load>b__0_0 RVA 0xf0d92
+0x600559c Save RVA 0xf1154
+0x60055cc Save RVA 0xf18dc
+0x60055d6 Save RVA 0xf1aa8
+0x6005606 Save RVA 0xf24cc
+0x6005658 Save RVA 0xf410c
+0x60056d3 Save RVA 0xf56d0
+0x600576c Save RVA 0xf6f88
+0x6005779 Save RVA 0xf73e8
+0x6005786 Save RVA 0xf7af4
+0x6005788 Save RVA 0xf7c74
+0x6005794 Save RVA 0xf7fa1
+0x60057a5 Save RVA 0xf8288
+0x60057c8 Save RVA 0xf89fc
+0x6005800 Save RVA 0xf9348
+0x600582e Save RVA 0xf954b
+0x6005834 ISaveablePrefab.get_IsValidPrefab RVA 0xf95da
+0x6005835 ISaveablePrefab.get_IsMultiplayerEntity RVA 0xf95dd
+0x6005836 ISaveablePrefab.get_IsOwner RVA 0xf95e0
+0x6005837 ISaveablePrefab.get_Entity RVA 0xf95e3
+0x6005838 ISaveablePrefab.get_AllColliders RVA 0xf95ea
+0x6005839 ISaveablePrefab.set_AllColliders RVA 0xf95f1
+0x600583a ISaveablePrefab.get_AllRigidbodies RVA 0xf95f8
+0x600583b ISaveablePrefab.set_AllRigidbodies RVA 0xf95ff
+0x600583c ISaveablePrefab.GetColliderId RVA 0xf9606
+0x600583d ISaveablePrefab.GetRigidbodyId RVA 0xf960d
+0x6005849 Save RVA 0xf9873
+0x6005868 Save RVA 0xf9e68
+0x6005891 Save RVA 0xfa348
+0x600596a ISaveable.Save RVA 0xfc7d9
+0x600596b ISaveable.Load RVA 0xfc804
+0x60059ff <Load>b__0 RVA 0xffebc
+0x6005a95 <Stop>b__0 RVA 0x101073
+0x6005a98 <GetAudioSource>b__0 RVA 0x1010a1
+0x6005ace <Load>b__0 RVA 0x101906
+0x6005ad0 <Load>b__0 RVA 0x101921
+0x6005aee <GetOtherPlayers>b__0 RVA 0x101bfa
+0x6005af0 <IsActionEnabled>b__0 RVA 0x101c1a
+0x6005af2 <MapCategoryHasAction>b__0 RVA 0x101c3f
+0x6005b05 <GetRandomWithTag>b__0 RVA 0x101e8a
+0x6005b58 <SaveGame>b__0 RVA 0x10283c
+0x6005b5a <Save_Sequence>b__0 RVA 0x102897
+0x6005b5b <Save_Sequence>b__1 RVA 0x1028b9
+0x6005b69 <GenerateSave_Sequence>b__2 RVA 0x102b78
+0x6005b6c <GenerateSave_Sequence>b__36_0 RVA 0x102bd5
+0x6005b6d <GenerateSave_Sequence>b__36_1 RVA 0x102be0
+0x6005b75 <ReplicateSaveErrorDialogue>b__0 RVA 0x102dd4
+0x6005b77 <Save>b__0 RVA 0x102e2f
+0x6005b79 <Save>b__0 RVA 0x102e68
+0x6005b7b <Save>b__0 RVA 0x102ec0
+0x6005b7d <Save>b__0 RVA 0x102f30
+0x6005b7f <Save>b__0 RVA 0x102fa0
+0x6005b81 <Save>b__0 RVA 0x103058
+0x6005b83 <Save>b__0 RVA 0x1030f4
+0x6005b85 <Save>b__0 RVA 0x103170
+0x6005b87 <Save>b__0 RVA 0x103348
+0x6005b89 <Save>b__0 RVA 0x103420
+0x6005b8f <CheckScavenged>b__0 RVA 0x1034bc
+0x6005bc1 <OnDisconnect_Sequence>b__0 RVA 0x104347
+0x6005bcf <ServerJoinInProgress>b__0 RVA 0x104588
+0x6005bea <SyncSave_Sequence>b__72_1 RVA 0x104d0d
+0x6005beb <SyncSave_Sequence>b__72_3 RVA 0x104d3a
+0x6005bfa <LoadScene_Sequence>b__0 RVA 0x1050e7
+0x6005c7a <TryRemoveCallbackByNotificationId>b__0 RVA 0x106f34
+0x6005c7c <CopyProperties>b__0 RVA 0x106f87
+0x6005c83 <BuildGraph>b__0 RVA 0x107088
+0x6005c8a <SelectEdgesForSitePoint>b__0 RVA 0x10729c
+0x6005ca2 <SetTextures>b__0 RVA 0x1073fb
+0x6005ca7 <SetupInnerNode>b__0 RVA 0x10746e
+0x6005caa <SetupLeafNode>b__0 RVA 0x10749c
+0x6005cad <CreatePrefabPreview>b__0 RVA 0x1074ca
+0x6005cb3 <AddTerrainSnapping>b__0 RVA 0x10751c
+0x6005cc7 <SetupTexturePickerEvents>b__0 RVA 0x1077e5
+0x6005cca <ShowPopupConfirmDeleteObject>b__0 RVA 0x107838
+0x6005cdf <GetRegionIndex>b__0 RVA 0x107b5b
+0x6005ce1 <GetZoneData>b__0 RVA 0x107b6e
+0x6005d0e <ConnectToCloud>b__0 RVA 0x10825c
+0x6005d23 <UpdateDestroyCommands>b__0 RVA 0x108768
+0x6005d25 <AddListener>b__0 RVA 0x108782
+0x6005d52 <SendWorld_Sequence>b__0 RVA 0x109087
+0x6005d5a <ReceiveWorld_Sequence>b__0 RVA 0x1091fb
+0x6005d64 <SendSave_Sequence>b__0 RVA 0x1093f3
+0x6005d65 <SendSave_Sequence>b__1 RVA 0x109407
+0x6005d6d <ReceiveSave_Sequence>b__0 RVA 0x1095b1
+0x6005d6f <ReceiveSave_Sequence>b__1 RVA 0x1095c2
+0x6005d78 <SendZone_Sequence>b__0 RVA 0x109798
+0x6005d80 <PostZone_Sequence>b__0 RVA 0x109938
+0x6005da4 <ReplicatedDisconnect>b__0 RVA 0x109dec
+0x6005dac <LoadJoystickAssignmentsNow>b__0 RVA 0x109efa
+0x6005e26 <HandleTouchpad>b__0 RVA 0x10a8fa
+0x6005e2a <RedrawUI>b__0 RVA 0x10a930
+0x6005e33 <RedrawUI>b__0 RVA 0x10aadd
+0x6005eee <Load>b__0 RVA 0x10c16c
+0x6005fa2 <GetDelegate>b__0 RVA 0x10d1f8
+0x6005fbf <GetChannel>b__0 RVA 0x10d6c0
+0x6005fc7 <GetMaterialAudioClip>b__0 RVA 0x10d712
+0x6005fdb <GetTrack>b__0 RVA 0x10da60
+0x6006027 <UpgradeSaveFile>b__0 RVA 0x10e453
+0x6006029 <FixRigidbodyWorldPositions_Pre_72_00>b__0 RVA 0x10e473
+0x600603f <Load>b__0 RVA 0x10e6d4
+0x6006049 <Load>b__0 RVA 0x10e7f0
+0x600604b <Load>b__0 RVA 0x10e831
+0x600605e <GenerateFruit>b__0 RVA 0x10ea92
+0x6006060 <Load>b__0 RVA 0x10eab8
+0x6006062 <Load>b__0 RVA 0x10eb28
+0x6006082 <Play>b__0 RVA 0x10efa2
+0x6006166 <Select>b__0 RVA 0x11121f
+0x600616b <Get>b__0 RVA 0x111265
+0x600616d <Get>b__0 RVA 0x111280
+0x6006199 <FindObject>b__0 RVA 0x11181b
+0x600619b <FindObjectRanged>b__0 RVA 0x111837
+0x60061a7 Save RVA 0x111938
+0x60061c3 <GenerateObjects>b__0 RVA 0x11240a
+0x60061c5 <Load>b__0 RVA 0x112438
+0x60061e2 <GetSuggestions>b__0 RVA 0x112830
+0x60061e7 <Save>b__16_0 RVA 0x1128d6
+0x60061e9 <LoadPrefabFromJData>b__0 RVA 0x1128e0
+0x60061ec <Deserialize>b__0 RVA 0x11290f
+0x60061ee <AddPayloadEntry>b__0 RVA 0x112944
+0x60061f3 <UnlockAchievement>b__0 RVA 0x112983
+0x60061f5 <IsAchievementUnlocked>b__0 RVA 0x11299b
+0x60061f8 <DownloadLeaderboardEntryForUser>b__0 RVA 0x1129bb
+0x60061fa <DownloadLeaderboardEntries>b__0 RVA 0x1129d6
+0x60061fc <SubmitScore>b__0 RVA 0x1129f1
+0x60061fe <OnLeaderboardFindResult>b__0 RVA 0x112a0c
+0x6006202 <UnityEngine.ISerializationCallbackReceiver.OnBeforeSerialize>b__0_0 RVA 0x112a3c
+0x6006208 <MergeEntries>b__0 RVA 0x112a90
+0x600621a <CompleteObjective>b__0 RVA 0x112d35
+0x6006220 <Load>b__0 RVA 0x112d71
+0x600627e <DisplayDialogue>b__0 RVA 0x11489d
+0x6006283 <SetupCharacterDummy>b__0 RVA 0x114920
+0x6006303 <Show>b__0 RVA 0x116dfe
+0x6006305 <SearchInputField_ValueChanged>b__0 RVA 0x116e24
+0x600630d <ApplyButton_Click>b__0 RVA 0x116eb6
+0x600630f <UpdateWorldMap>b__0 RVA 0x116ee8
+0x6006312 <ReplaceWorldMap>b__0 RVA 0x116f82
+0x6006314 <RemoveWorldMap>b__0 RVA 0x116fc4
+0x6006318 <MapListElement_EditClick>b__0 RVA 0x11708d
+0x600631a <MapListElement_DeleteClick>b__0 RVA 0x1170a8
+0x600631c <Load>b__0 RVA 0x1170c4
+0x600631f <SaveWorld>b__0 RVA 0x117128
+0x6006321 <ShowCreateNewWorldDialogue>b__0 RVA 0x1171b8
+0x6006325 <ShowRandomizeWorldDialogue>b__0 RVA 0x11726c
+0x6006329 <ShowRandomizeWorldDialogue_NoInput>b__0 RVA 0x11733c
+0x600632f <UpdateMapStatus>b__0 RVA 0x117410
+0x600634a <SameVisualSessions>b__0 RVA 0x1177a6
+0x6006358 <JoinSession_Sequence>b__0 RVA 0x117924
+0x6006382 <Migrate_Sequence>b__0 RVA 0x118234
+0x6006390 <CreateRandomWorld_Sequence>b__0 RVA 0x1185d0
+0x6006399 <StartGame>b__0 RVA 0x118752
+0x600639b <StartScene>b__0 RVA 0x11877d
+0x60063a3 <CheckOnlineAvailable>b__0 RVA 0x11881e
+0x60063b9 <FadeIn>b__0 RVA 0x118c15
+0x60063bb <FadeOut>b__0 RVA 0x118c30
+0x60063fd <SetResolutionControlSelection>b__0 RVA 0x119445
+0x600640a <InputFieldButton_Click>b__0 RVA 0x119595
+0x600640d <RemapMatchingElementMapsInControllers>b__0 RVA 0x1195e5
+0x600640f <ClearMatchingElementMapsFromControllers>b__0 RVA 0x119617
+0x6006418 <ResetControls>b__0 RVA 0x11971c
+0x600641d <SelectPanel>b__0 RVA 0x1197b5
+0x6006444 <SubcategoryButton_Click>b__0 RVA 0x119dc4
+0x6006446 <SetNavigation>b__0 RVA 0x119e2c
+0x600644b <Load>b__0 RVA 0x119e7c
+0x600645a <Load>b__0 RVA 0x11a11c
+0x6006462 <Load>b__0 RVA 0x11a2c0
+0x6006469 <Detach>b__0 RVA 0x11a349
+0x6006471 <Load>b__0 RVA 0x11a438
+0x6006475 <Load>b__0 RVA 0x11a5fc
+0x600647c <ShowDialogue>b__0 RVA 0x11a715
+0x600648d <Load>b__0 RVA 0x11ac6c
+0x6006491 <CountRaftBasesConnected>b__0 RVA 0x11ada5
+0x6006496 <Load>b__0 RVA 0x11ade8
+0x600649c <Load>b__0 RVA 0x11af05
+0x60064ab <Load>b__0 RVA 0x11b100
+0x60064ad <Load>b__0 RVA 0x11b15c
+0x60064af <Load>b__0 RVA 0x11b230
+0x60064ca <PlaceCraftable_Sequence>b__0 RVA 0x11b548
+0x60064d2 <DoRefills>b__0 RVA 0x11c0c2
+0x60064da <Craft>b__0 RVA 0x11c1dc
+0x60064dc <ReplicatedSetActive>b__0 RVA 0x11c269
+0x60064de <ReplicatedCraft>b__0 RVA 0x11c298
+0x600654e <Use_Sequence>b__0 RVA 0x11e038
+0x6006556 <UseOnObject_Sequence>b__0 RVA 0x11e188
+0x6006570 <SecondaryCommand_Use_Post>b__0 RVA 0x11e952
+0x6006578 <SecondaryCommand_Reload>b__0 RVA 0x11ea89
+0x600659e <GetCombinationIcon>b__0 RVA 0x11f0c4
+0x60065a0 <GetCombinationTerm>b__0 RVA 0x11f0df
+0x60065a6 <GetCombination>b__0 RVA 0x11f11e
+0x60065a8 <Load>b__0 RVA 0x11f139
+0x60065c0 <Load>b__0 RVA 0x11f4a7
+0x60065ca <AddListener_>b__0 RVA 0x11f4c2
+0x60065e7 <ReduceLeastSignificantVertice>b__0 RVA 0x11f7ad
+0x6006601 <.ctor>b__0 RVA 0x11f8e4
