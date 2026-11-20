@@ -1,0 +1,40 @@
+CSV SCHEMA AND INTEGRITY
+============================================================
+Expected headers: container, container_path, serialized_file, type, path_id, field_path, value_preview
+Actual headers: container, container_path, serialized_file, type, path_id, field_path, value_preview
+Header match: YES
+Data rows: 99111
+Unique objects: 21100
+Duplicate field rows within an object: 0
+Source size bytes: 27037457
+Source SHA256: 5f25d105378e20b3eca2988c96369071d0ed3668303ba67794b3a5d3cd1cf974
+
+Container paths recorded in CSV:
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d::assets/resources asset bundles/missions/mission_eel/environment.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d::assets/resources asset bundles/missions/mission_eel/goal_eel.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d::assets/resources asset bundles/missions/mission_shark/environment.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d::assets/resources asset bundles/missions/mission_shark/goal_shark.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d::assets/resources asset bundles/missions/mission_squid/environment.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d::assets/resources asset bundles/missions/mission_squid/goal_squid.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d::assets/resources asset bundles/scenes/intro/intro_assets.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d::assets/resources asset bundles/watches/beepi/ui - watch.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d::assets/resources asset bundles/watches/beepi/view - 3d watch.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d::assets/resources asset bundles/watches/getbit/ui - watch.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d::assets/resources asset bundles/watches/getbit/view - 3d watch.prefab
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/level0
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/level1
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/level2
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/level3
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/level4
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/resources.assets
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/sharedassets0.assets
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/sharedassets1.assets
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/sharedassets2.assets
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/sharedassets3.assets
+/storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep/Stranded_Deep_Data/sharedassets4.assets

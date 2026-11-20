@@ -1,0 +1,35 @@
+CASTAWAY-DEPTHS V23.2 FIELD AUDIT
+============================================================
+Run time: 2026-11-20T03:40:49.664572
+Runtime platform: Linux-6.17.0-PRoot-Distro-aarch64-with-glibc2.41
+Python version: 3.13.5
+Termux version variable: NOT_EXPOSED
+
+READ SCOPE: Map Check only
+WRITE SCOPE: Map Check/report only
+Input file: reports/V23_2_UNITYPY_TERRAIN_RECOVERY/03_V23_2_TERRAIN_TRANSFORM_FIELDS.csv
+Input bytes: 27037457
+Input SHA256: 5f25d105378e20b3eca2988c96369071d0ed3668303ba67794b3a5d3cd1cf974
+CSV data rows: 99111
+Unique indexed objects: 21100
+
+TYPE ROW COUNTS:
+  Transform: 56747
+  GameObject: 41956
+  TerrainCollider: 153
+  Terrain: 153
+  TerrainData: 102
+
+UNIQUE OBJECT COUNTS:
+  GameObject: 11373
+  Transform: 9574
+  TerrainCollider: 51
+  Terrain: 51
+  TerrainData: 51
+
+Important:
+- CSV rows are field rows, not object counts.
+- Terrain world positions are not calculated.
+- External file references are not assumed resolved.
+- Truncated previews are not treated as complete source data.
+- Original files are not modified.
