@@ -21,6 +21,13 @@ https://www.google.com/search?smstk=ChhuV2R6VGx5ZVBqcFN0UEYwN2o2RXphRT0QARgAKAA%
 
 https://gemini.google.com/share/65695bdf8e2f?social_preview=true&skid=219613c3-d3eb-4059-8e6f-ec1f4262d746&pli=1
 
+https://chatgpt.com/share/6b00cee0-6b78-83ec-a463-6dd03853ec89?ogimg=plain
+
+
+
+
+
+
 root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > power_proof.py                                                                                   > import os, struct, UnityPy
 >                                                                                         > DATA_DIR = "/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data"
 > DLL_PATH = os.path.join(DATA_DIR, "Managed", "Assembly-CSharp.dll")                     > dll = open(DLL_PATH, "rb").read()                                                       >
