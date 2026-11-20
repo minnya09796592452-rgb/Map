@@ -1,0 +1,88 @@
+OCEAN TRANSFORM OWNER TRACE
+MODE: READ ONLY
+ROOT: /storage/emulated/0/Download/Stranded-Deep-Original
+DATA: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data
+TOTAL OBJECTS: 54574
+CETO.OCEAN FOUND: 4
+TRANSFORM OBJECTS: 12090
+
+============================================================
+OCEAN #1
+FILE: level0
+OCEAN PATH ID: 310
+GAMEOBJECT: _Ceto
+GAMEOBJECT PATH ID: 29
+GAMEOBJECT COMPONENT COUNT: 7
+
+--- MATCHED TRANSFORM ---
+TYPE: Transform
+TRANSFORM PATH ID: 146
+OWNER PATH ID: 29
+LOCAL POSITION: (0.0, 0.0, 0.0)
+LOCAL ROTATION: {'x': -0.0, 'y': -0.0, 'z': -0.0, 'w': 1.0}
+LOCAL SCALE: (1.0, 1.0, 1.0)
+PARENT FILE ID: 0
+PARENT PATH ID: 185
+TRANSFORM MATCHES: 1
+
+============================================================
+OCEAN #2
+FILE: level2
+OCEAN PATH ID: 274
+GAMEOBJECT: _Ceto
+GAMEOBJECT PATH ID: 24
+GAMEOBJECT COMPONENT COUNT: 8
+
+--- MATCHED TRANSFORM ---
+TYPE: Transform
+TRANSFORM PATH ID: 108
+OWNER PATH ID: 24
+LOCAL POSITION: (0.0, 0.0, 0.0)
+LOCAL ROTATION: {'x': -0.0, 'y': -0.0, 'z': -0.0, 'w': 1.0}
+LOCAL SCALE: (1.0, 1.0, 1.0)
+PARENT FILE ID: 0
+PARENT PATH ID: 119
+TRANSFORM MATCHES: 1
+
+============================================================
+OCEAN #3
+FILE: level3
+OCEAN PATH ID: 1248
+GAMEOBJECT: _Ceto
+GAMEOBJECT PATH ID: 139
+GAMEOBJECT COMPONENT COUNT: 8
+
+--- MATCHED TRANSFORM ---
+TYPE: Transform
+TRANSFORM PATH ID: 557
+OWNER PATH ID: 139
+LOCAL POSITION: (0.0, 0.0, 0.0)
+LOCAL ROTATION: {'x': 0.0, 'y': 0.0, 'z': 0.0, 'w': 1.0}
+LOCAL SCALE: (1.0, 1.0, 1.0)
+PARENT FILE ID: 0
+PARENT PATH ID: 0
+TRANSFORM MATCHES: 1
+
+============================================================
+OCEAN #4
+FILE: level4
+OCEAN PATH ID: 5583
+GAMEOBJECT: _Ceto
+GAMEOBJECT PATH ID: 5
+GAMEOBJECT COMPONENT COUNT: 8
+
+--- MATCHED TRANSFORM ---
+TYPE: Transform
+TRANSFORM PATH ID: 1361
+OWNER PATH ID: 5
+LOCAL POSITION: (0.0, 0.0, 0.0)
+LOCAL ROTATION: {'x': 0.0, 'y': 0.0, 'z': 0.0, 'w': 1.0}
+LOCAL SCALE: (1.0, 1.0, 1.0)
+PARENT FILE ID: 0
+PARENT PATH ID: 0
+TRANSFORM MATCHES: 1
+
+============================================================
+TRACE SUMMARY
+CETO.OCEAN: 4
+TRANSFORM OBJECTS SCANNED: 12090
