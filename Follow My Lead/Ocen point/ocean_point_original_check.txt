@@ -1,0 +1,342 @@
+ORIGINAL OCEAN POINT VERIFICATION
+MODE: READ ONLY
+ORIGINAL ROOT: /storage/emulated/0/Download/Stranded-Deep-Original
+
+================================================================================
+FILE: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/MonoBleedingEdge/etc/mono/browscap.ini
+[LINE 153] Browser=Google Search Appliance
+[LINE 216] [Mozilla/5.0 (compatible; Yahoo! DE Slurp; http://help.yahoo.com/help/us/ysearch/slurp)]
+[LINE 224] [Mozilla/5.0 (compatible; Yahoo! Slurp/3.0; http://help.yahoo.com/help/us/ysearch/slurp)]
+[LINE 231] [Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)]
+[LINE 333] [YahooVideoSearch*]
+[LINE 335] Browser=YahooVideoSearch
+[LINE 350] [adidxbot/1.1 (?http://search.msn.com/msnbot.htm)]
+[LINE 411] [msnbot-webmaster/1.0 (*http://search.msn.com/msnbot.htm)]
+[LINE 440] [renlifangbot/1.0 (?http://search.msn.com/msnbot.htm)]
+[LINE 468] [mp3Spider cn-search-devel at yahoo-inc dot com]
+[LINE 735] [FAST Data Search Document Retriever/4.0*]
+[LINE 737] Browser=FAST Data Search Document Retriever
+[LINE 739] [FAST MetaWeb Crawler (helpdesk at fastsearch dot com)]
+[LINE 767] [FastSearch Web Crawler for*]
+[LINE 769] Browser=FastSearch Web Crawler
+[LINE 784] [GigabotSiteSearch/*]
+[LINE 786] Browser=GigabotSiteSearch
+[LINE 1004] [NG-Search/*]
+[LINE 1006] Browser=NG-SearchBot
+[LINE 1158] [Lsearch/sondeur]
+[LINE 1160] Browser=Lsearch/sondeur
+[LINE 1290] [Mozilla/5.0 (compatible; FirstSearchBot/1.0; *)]
+[LINE 1292] Browser=FirstSearchBot
+[LINE 1398] [Oracle Enterprise Search]
+[LINE 1400] Browser=Oracle Enterprise Search
+[LINE 1403] [Oracle Ultra Search]
+[LINE 1405] Browser=Oracle Ultra Search
+[LINE 1486] [Search Fst]
+[LINE 1488] Browser=Search Fst
+[LINE 1490] [searchbot admin@google.com]
+[LINE 1492] Browser=searchbot
+[LINE 1541] Browser=sohu-search
+[LINE 1573] [SynapticSearch/AI Crawler 1.?]
+[LINE 1575] Browser=SynapticSearch
+[LINE 1720] ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Search Engines
+[LINE 1722] [Search Engines]
+[LINE 1724] Browser=Search Engines
+[LINE 1728] Parent=Search Engines
+[LINE 1732] Parent=Search Engines
+[LINE 1733] Browser=SearchHippo
+[LINE 1736] Parent=Search Engines
+[LINE 1740] Parent=Search Engines
+[LINE 1744] Parent=Search Engines
+[LINE 1748] Parent=Search Engines
+[LINE 1752] Parent=Search Engines
+[LINE 1756] Parent=Search Engines
+[LINE 1759] Parent=Search Engines
+[LINE 1763] Parent=Search Engines
+[LINE 1767] Parent=Search Engines
+[LINE 1771] Parent=Search Engines
+[LINE 1775] Parent=Search Engines
+[LINE 1779] Parent=Search Engines
+[LINE 1780] Browser=Bit Torrent Search Engine
+[LINE 1783] Parent=Search Engines
+[LINE 1788] Parent=Search Engines
+[LINE 1795] Parent=Search Engines
+[LINE 1799] Parent=Search Engines
+[LINE 1803] Parent=Search Engines
+[LINE 1807] Parent=Search Engines
+[LINE 1811] Parent=Search Engines
+[LINE 1815] Parent=Search Engines
+[LINE 1819] Parent=Search Engines
+[LINE 1827] Parent=Search Engines
+[LINE 1831] Parent=Search Engines
+[LINE 1835] Parent=Search Engines
+[LINE 1839] Parent=Search Engines
+[LINE 1843] Parent=Search Engines
+[LINE 1848] Parent=Search Engines
+[LINE 1853] Parent=Search Engines
+[LINE 1857] Parent=Search Engines
+[LINE 1861] Parent=Search Engines
+[LINE 1865] Parent=Search Engines
+[LINE 1869] Parent=Search Engines
+[LINE 1873] Parent=Search Engines
+[LINE 1877] Parent=Search Engines
+[LINE 1882] Parent=Search Engines
+[LINE 1886] Parent=Search Engines
+[LINE 1890] Parent=Search Engines
+[LINE 1894] Parent=Search Engines
+[LINE 1898] [i1searchbot/*]
+[LINE 1899] Parent=Search Engines
+[LINE 1900] Browser=i1searchbot
+[LINE 1903] Parent=Search Engines
+[LINE 1904] Browser=Indian Language Web Search Engine
+[LINE 1907] Parent=Search Engines
+[LINE 1911] Parent=Search Engines
+[LINE 1916] Parent=Search Engines
+[LINE 1920] Parent=Search Engines
+[LINE 1924] Parent=Search Engines
+[LINE 1927] [Kolinka Forum Search (www.kolinka.com)]
+[LINE 1928] Parent=Search Engines
+[LINE 1929] Browser=Kolinka Forum Search
+[LINE 1933] Parent=Search Engines
+[LINE 1938] Parent=Search Engines
+[LINE 1942] Parent=Search Engines
+[LINE 1946] Parent=Search Engines
+[LINE 1950] Parent=Search Engines
+[LINE 1954] Parent=Search Engines
+[LINE 1961] Parent=Search Engines
+[LINE 1964] [Mnogosearch*]
+[LINE 1965] Parent=Search Engines
+[LINE 1966] Browser=Mnogosearch
+[LINE 1969] Parent=Search Engines
+[LINE 1974] Parent=Search Engines
+[LINE 1977] [Mozilla/4.0 (compatible; http://search.thunderstone.com/texis/websearch/about.html)]
+[LINE 1978] Parent=Search Engines
+[LINE 1983] Parent=Search Engines
+[LINE 1988] Parent=Search Engines
+[LINE 1992] Parent=Search Engines
+[LINE 1996] Parent=Search Engines
+[LINE 2000] Parent=Search Engines
+[LINE 2005] Parent=Search Engines
+[LINE 2009] Parent=Search Engines
+[LINE 2013] Parent=Search Engines
+[LINE 2019] Parent=Search Engines
+[LINE 2023] Parent=Search Engines
+[LINE 2030] Parent=Search Engines
+[LINE 2034] Parent=Search Engines
+[LINE 2038] Parent=Search Engines
+[LINE 2042] Parent=Search Engines
+[LINE 2043] Browser=Northern Light Web Search
+[LINE 2046] Parent=Search Engines
+[LINE 2051] Parent=Search Engines
+[LINE 2055] Parent=Search Engines
+[LINE 2059] Parent=Search Engines
+[LINE 2063] Parent=Search Engines
+[LINE 2068] Parent=Search Engines
+[LINE 2075] Parent=Search Engines
+[LINE 2079] [Mozilla/5.0 CostaCider Search*]
+[LINE 2080] Parent=Search Engines
+[LINE 2081] Browser=CostaCider Search
+[LINE 2084] Parent=Search Engines
+[LINE 2088] Parent=Search Engines
+[LINE 2091] [NextGenSearchBot*(for information visit *)]
+[LINE 2092] Parent=Search Engines
+[LINE 2097] Parent=Search Engines
+[LINE 2100] [NuSearch Spider*]
+[LINE 2101] Parent=Search Engines
+[LINE 2102] Browser=nuSearch
+[LINE 2104] [ObjectsSearch/*]
+[LINE 2105] Parent=Search Engines
+[LINE 2106] Browser=ObjectsSearch
+[LINE 2108] [OpenISearch/1.*]
+[LINE 2109] Parent=Search Engines
+[LINE 2110] Browser=OpenISearch (Amazon)
+[LINE 2113] Parent=Search Engines
+[LINE 2117] Parent=Search Engines
+[LINE 2121] Parent=Search Engines
+[LINE 2125] Parent=Search Engines
+[LINE 2129] Parent=Search Engines
+[LINE 2133] Parent=Search Engines
+[LINE 2137] Parent=Search Engines
+[LINE 2140] [Search-10/*]
+[LINE 2141] Parent=Search Engines
+[LINE 2142] Browser=Search-10
+[LINE 2144] [search.ch*]
+[LINE 2145] Parent=Search Engines
+[LINE 2146] Browser=Swiss Search Engine
+[LINE 2148] [Searchmee! Spider*]
+[LINE 2149] Parent=Search Engines
+[LINE 2150] Browser=Searchmee!
+[LINE 2153] Parent=Search Engines
+[LINE 2157] Parent=Search Engines
+[LINE 2161] Parent=Search Engines
+[LINE 2165] Parent=Search Engines
+[LINE 2169] Parent=Search Engines
+[LINE 2174] Parent=Search Engines
+[LINE 2179] Parent=Search Engines
+[LINE 2183] Parent=Search Engines
+[LINE 2187] Parent=Search Engines
+[LINE 2191] Parent=Search Engines
+[LINE 2195] Parent=Search Engines
+[LINE 2200] Parent=Search Engines
+[LINE 2205] Parent=Search Engines
+[LINE 2209] Parent=Search Engines
+[LINE 2214] Parent=Search Engines
+[LINE 2219] Parent=Search Engines
+[LINE 2223] Parent=Search Engines
+[LINE 2227] Parent=Search Engines
+[LINE 2228] Browser=Innerprise Enterprise Search
+[LINE 2231] Parent=Search Engines
+[LINE 2235] Parent=Search Engines
+[LINE 2239] Parent=Search Engines
+[LINE 2244] Parent=Search Engines
+[LINE 2249] Parent=Search Engines
+[LINE 2254] Parent=Search Engines
+[LINE 2258] Parent=Search Engines
+[LINE 2263] Parent=Search Engines
+[LINE 2267] Parent=Search Engines
+[LINE 2271] Parent=Search Engines
+[LINE 2275] Parent=Search Engines
+[LINE 2279] Parent=Search Engines
+[LINE 2284] Parent=Search Engines
+[LINE 2288] Parent=Search Engines
+[LINE 2292] Parent=Search Engines
+[LINE 2502] [SlySearch/*]
+[LINE 2504] Browser=SlySearch
+[LINE 2712] [sEasyDL/*]
+[LINE 2807] [EMAILsearcher]
+[LINE 2809] Browser=EMAILsearcher
+[LINE 2883] [blogsearchbot-pumpkin-2]
+[LINE 2885] Browser=blogsearchbot-pumpkin
+[LINE 3207] [(HTML Validator http://www.searchengineworld.com/validator/)]
+[LINE 3209] Browser=Search Engine World HTML Validator
+[LINE 3222] [Search Engine World Robots.txt Validator*]
+[LINE 3224] Browser=Search Engine World Robots.txt Validator
+[LINE 3274] Browser=Cydral Web Image Search
+[LINE 3392] [Bookmark search tool*]
+[LINE 3394] Browser=Bookmark search tool
+[LINE 3983] ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Research Projects
+[LINE 3985] [Research Projects]
+[LINE 3987] Browser=Research Projects
+[LINE 3991] [*research*]
+[LINE 3992] Parent=Research Projects
+[LINE 3995] Parent=Research Projects
+[LINE 3999] Parent=Research Projects
+[LINE 4003] Parent=Research Projects
+[LINE 4007] Parent=Research Projects
+[LINE 4010] Parent=Research Projects
+[LINE 4014] Parent=Research Projects
+[LINE 4018] Parent=Research Projects
+[LINE 4022] Parent=Research Projects
+[LINE 4026] Parent=Research Projects
+[LINE 4029] Parent=Research Projects
+[LINE 4033] Parent=Research Projects
+[LINE 4037] Parent=Research Projects
+[LINE 4041] Parent=Research Projects
+[LINE 4048] Parent=Research Projects
+[LINE 4052] Parent=Research Projects
+[LINE 4056] Parent=Research Projects
+[LINE 4060] Parent=Research Projects
+[LINE 4064] Parent=Research Projects
+[LINE 4068] Parent=Research Projects
+[LINE 4072] Parent=Research Projects
+[LINE 4076] Parent=Research Projects
+[LINE 4080] Parent=Research Projects
+[LINE 4084] Parent=Research Projects
+[LINE 4088] Parent=Research Projects
+[LINE 4092] Parent=Research Projects
+[LINE 4096] Parent=Research Projects
+[LINE 4101] Parent=Research Projects
+[LINE 4105] Parent=Research Projects
+[LINE 4217] [eStyleSearch * (compatible; MSIE 6.0; Windows NT 5.0)]
+[LINE 4219] Browser=eStyleSearch
+[LINE 4842] [TherapeuticResearch]
+[LINE 4844] Browser=TherapeuticResearch
+[LINE 13975] ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SeaMonkey 1.0
+[LINE 13977] [SeaMonkey 1.0]
+[LINE 13979] Browser=SeaMonkey
+[LINE 13992] [Mozilla/5.0 (Macintosh; ?; *Mac OS X*; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 13993] Parent=SeaMonkey 1.0
+[LINE 13996] [Mozilla/5.0 (Windows; ?; Win 9x 4.90; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 13997] Parent=SeaMonkey 1.0
+[LINE 14000] [Mozilla/5.0 (Windows; ?; Win98; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14001] Parent=SeaMonkey 1.0
+[LINE 14004] [Mozilla/5.0 (Windows; ?; Windows NT 5.0; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14005] Parent=SeaMonkey 1.0
+[LINE 14008] [Mozilla/5.0 (Windows; ?; Windows NT 5.1; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14009] Parent=SeaMonkey 1.0
+[LINE 14012] [Mozilla/5.0 (Windows; ?; Windows NT 5.2; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14013] Parent=SeaMonkey 1.0
+[LINE 14016] [Mozilla/5.0 (Windows; ?; Windows NT 6.0; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14017] Parent=SeaMonkey 1.0
+[LINE 14020] [Mozilla/5.0 (Windows; ?; Windows NT 6.1; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14021] Parent=SeaMonkey 1.0
+[LINE 14024] [Mozilla/5.0 (X11; ?; FreeBSD*; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14025] Parent=SeaMonkey 1.0
+[LINE 14028] [Mozilla/5.0 (X11; ?; Linux*; *; rv:1.8*) Gecko/20060221 SeaMonkey/1.0*]
+[LINE 14029] Parent=SeaMonkey 1.0
+[LINE 14032] [Mozilla/5.0 (X11; ?; SunOS*; *; rv:1.8*) Gecko/* SeaMonkey/1.0*]
+[LINE 14033] Parent=SeaMonkey 1.0
+[LINE 14036] ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SeaMonkey 1.1
+[LINE 14038] [SeaMonkey 1.1]
+[LINE 14040] Browser=SeaMonkey
+[LINE 14054] [Mozilla/5.0 (Macintosh; ?; *Mac OS X*; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14055] Parent=SeaMonkey 1.1
+[LINE 14058] [Mozilla/5.0 (Windows; ?; Win 9x 4.90; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14059] Parent=SeaMonkey 1.1
+[LINE 14062] [Mozilla/5.0 (Windows; ?; Win98; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14063] Parent=SeaMonkey 1.1
+[LINE 14066] [Mozilla/5.0 (Windows; ?; Windows NT 5.0; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14067] Parent=SeaMonkey 1.1
+[LINE 14070] [Mozilla/5.0 (Windows; ?; Windows NT 5.1; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14071] Parent=SeaMonkey 1.1
+[LINE 14074] [Mozilla/5.0 (Windows; ?; Windows NT 5.2; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14075] Parent=SeaMonkey 1.1
+[LINE 14078] [Mozilla/5.0 (Windows; ?; Windows NT 6.0; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14079] Parent=SeaMonkey 1.1
+[LINE 14082] [Mozilla/5.0 (Windows; ?; Windows NT 6.1; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14083] Parent=SeaMonkey 1.1
+[LINE 14086] [Mozilla/5.0 (X11; ?; FreeBSD*; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14087] Parent=SeaMonkey 1.1
+[LINE 14090] [Mozilla/5.0 (X11; ?; Linux*; *; rv:1.8*) Gecko/20060221 SeaMonkey/1.1*]
+[LINE 14091] Parent=SeaMonkey 1.1
+[LINE 14094] [Mozilla/5.0 (X11; ?; SunOS*; *; rv:1.8*) Gecko/* SeaMonkey/1.1*]
+[LINE 14095] Parent=SeaMonkey 1.1
+[LINE 14098] ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SeaMonkey 2.0
+[LINE 14100] [SeaMonkey 2.0]
+[LINE 14102] Browser=SeaMonkey
+[LINE 14116] [Mozilla/5.0 (Macintosh; ?; *Mac OS X*; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14117] Parent=SeaMonkey 2.0
+[LINE 14120] [Mozilla/5.0 (Windows; ?; Win 9x 4.90; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14121] Parent=SeaMonkey 2.0
+[LINE 14124] [Mozilla/5.0 (Windows; ?; Win98; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14125] Parent=SeaMonkey 2.0
+[LINE 14128] [Mozilla/5.0 (Windows; ?; Windows NT 5.0; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14129] Parent=SeaMonkey 2.0
+[LINE 14132] [Mozilla/5.0 (Windows; ?; Windows NT 5.1; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14133] Parent=SeaMonkey 2.0
+[LINE 14136] [Mozilla/5.0 (Windows; ?; Windows NT 5.2; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14137] Parent=SeaMonkey 2.0
+[LINE 14140] [Mozilla/5.0 (Windows; ?; Windows NT 6.0; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14141] Parent=SeaMonkey 2.0
+[LINE 14144] [Mozilla/5.0 (Windows; ?; Windows NT 6.1; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14145] Parent=SeaMonkey 2.0
+[LINE 14148] [Mozilla/5.0 (X11; ?; FreeBSD*; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14149] Parent=SeaMonkey 2.0
+[LINE 14152] [Mozilla/5.0 (X11; ?; Linux*; *; rv:1.9*) Gecko/20060221 SeaMonkey/2.0*]
+[LINE 14153] Parent=SeaMonkey 2.0
+[LINE 14156] [Mozilla/5.0 (X11; ?; SunOS*; *; rv:1.9*) Gecko/* SeaMonkey/2.0*]
+[LINE 14157] Parent=SeaMonkey 2.0
+
+================================================================================
+FILE: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/MonoBleedingEdge/etc/mono/mconfig/config.xml
+[LINE 77] file in the top-level directory of your ASP.NET application.
+[LINE 213] <compiler language="c#;cs;csharp" extension=".cs" warningLevel="4"
+[LINE 218] <compiler language="vb;vbs;visualbasic;vbscript" extension=".vb" warningLevel="4"
+
+================================================================================
+FILE: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Data/Licences/SMAA.txt
+[LINE 16] 1. The origin of this software must not be misrepresented; you must not
+[LINE 17] claim that you wrote the original software. If you use this software
+[LINE 23] misrepresented as being the original software.
+
+================================================================================
+ORIGINAL FILES WITH MATCHES: 3
