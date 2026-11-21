@@ -1,0 +1,396 @@
+========================================================================
+V5 INDEPENDENT VERIFICATION FULL REPORT (ECMA-335 DECODER FIXED)
+========================================================================
+Target DLL        : /mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+Fat Header Offset : 0x0007689c..0x000768a7 (13300600b7030000d6040011)
+IL Code Offset    : 0x000768a8 (951 bytes)
+Decoded Insns     : 321 (Unknown opcodes: 0)
+Actual SHA-256    : 4afeda02c441d6a2d19bfb2b523ac4043173e05422d42eeece67667efe07a756
+Expected SHA-256  : 4afeda02c441d6a2d19bfb2b523ac4043173e05422d42eeece67667efe07a756
+Exact Byte Match  : True (951/951)
+
+--- SECTION 1: DNFILE METADATA TABLE OFFSETS & ROW SPANS ---
+TID | Rows   | Offset     | SpanBytes | Bytes/Row | Rem
+  0 |      1 | 0x0011e070 |        12 |        12 | 0
+  1 |    780 | 0x0011e07c |      7800 |        10 | 0
+  2 |   3859 | 0x0011fef4 |     69462 |        18 | 0
+  4 |  16992 | 0x00130e4a |    169920 |        10 | 0
+  6 |  26143 | 0x0015a60a |    470574 |        18 | 0
+  8 |  15584 | 0x001cd438 |    124672 |         8 | 0
+  9 |   2375 | 0x001ebb38 |      9500 |         4 | 0
+ 10 |   6078 | 0x001ee054 |     72936 |        12 | 0
+ 11 |   4904 | 0x001ffd3c |     49040 |        10 | 0
+ 12 |  11822 | 0x0020bccc |    141864 |        12 | 0
+ 13 |    233 | 0x0022e6f4 |      1398 |         6 | 0
+ 15 |    408 | 0x0022ec6a |      3264 |         8 | 0
+ 16 |     16 | 0x0022f92a |        96 |         6 | 0
+ 17 |   2439 | 0x0022f98a |      9756 |         4 | 0
+ 18 |    127 | 0x00231fa6 |       508 |         4 | 0
+ 20 |    306 | 0x002321a2 |      2448 |         8 | 0
+ 21 |   1943 | 0x00232b32 |      7772 |         4 | 0
+ 23 |   6936 | 0x0023498e |     69360 |        10 | 0
+ 24 |  10450 | 0x0024587e |     62700 |         6 | 0
+ 25 |   2085 | 0x00254d6a |     12510 |         6 | 0
+ 26 |      1 | 0x00257e48 |         4 |         4 | 0
+ 27 |   1289 | 0x00257e4c |      5156 |         4 | 0
+ 28 |    360 | 0x00259270 |      3600 |        10 | 0
+ 29 |     23 | 0x0025a080 |       138 |         6 | 0
+ 32 |      1 | 0x0025a10a |        28 |        28 | 0
+ 35 |     40 | 0x0025a126 |      1120 |        28 | 0
+ 41 |    912 | 0x0025a586 |      3648 |         4 | 0
+ 42 |    285 | 0x0025b3c6 |      2850 |        10 | 0
+ 43 |   1973 | 0x0025bee8 |     11838 |         6 | 0
+ 44 |    180 | 0x0025ed26 |       N/A |       N/A | N/A
+
+--- SECTION 2: V5 FULL ECMA-335 IL DISASSEMBLY (321 INSNS) ---
+IL_0000 [0x0768a8]: 04             | ldarg.2      
+IL_0001 [0x0768a9]: 6fde0b000a     | callvirt     0x0a000bde [List<InterpolatedArray2f>.get_Count]
+IL_0006 [0x0768ae]: 7e5c1b0004     | ldsfld       0x04001b5c [Ceto.QueryDisplacements.GRIDS]
+IL_0011 [0x0768b3]: 2e22           | beq.s        IL_0047 (+34)
+IL_0013 [0x0768b5]: 72f7520170     | ldstr        0x700152f7 [tid=112,rid=86775]
+IL_0018 [0x0768ba]: 7e5c1b0004     | ldsfld       0x04001b5c [Ceto.QueryDisplacements.GRIDS]
+IL_0023 [0x0768bf]: 0c             | stloc.2      
+IL_0024 [0x0768c0]: 1202           | ldloca.s     2
+IL_0026 [0x0768c2]: 28eb00000a     | call         0x0a0000eb [System.Int32.ToString]
+IL_0031 [0x0768c7]: 7280530170     | ldstr        0x70015380 [tid=112,rid=86912]
+IL_0036 [0x0768cc]: 284b01000a     | call         0x0a00014b [System.String.Concat]
+IL_0041 [0x0768d1]: 735c0b000a     | newobj       0x0a000b5c [System.InvalidOperationException..ctor]
+IL_0046 [0x0768d6]: 7a             | throw        
+IL_0047 [0x0768d7]: 04             | ldarg.2      
+IL_0048 [0x0768d8]: 16             | ldc.i4.0     
+IL_0049 [0x0768d9]: 6fdf0b000a     | callvirt     0x0a000bdf [List<InterpolatedArray2f>.get_Item]
+IL_0054 [0x0768de]: 6fd3310006     | callvirt     0x060031d3 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels]
+IL_0059 [0x0768e3]: 7e5b1b0004     | ldsfld       0x04001b5b [Ceto.QueryDisplacements.CHANNELS]
+IL_0064 [0x0768e8]: 2e22           | beq.s        IL_0100 (+34)
+IL_0066 [0x0768ea]: 7290530170     | ldstr        0x70015390 [tid=112,rid=86928]
+IL_0071 [0x0768ef]: 7e5b1b0004     | ldsfld       0x04001b5b [Ceto.QueryDisplacements.CHANNELS]
+IL_0076 [0x0768f4]: 0c             | stloc.2      
+IL_0077 [0x0768f5]: 1202           | ldloca.s     2
+IL_0079 [0x0768f7]: 28eb00000a     | call         0x0a0000eb [System.Int32.ToString]
+IL_0084 [0x0768fc]: 7200540170     | ldstr        0x70015400 [tid=112,rid=87040]
+IL_0089 [0x076901]: 284b01000a     | call         0x0a00014b [System.String.Concat]
+IL_0094 [0x076906]: 735c0b000a     | newobj       0x0a000b5c [System.InvalidOperationException..ctor]
+IL_0099 [0x07690b]: 7a             | throw        
+IL_0100 [0x07690c]: 02             | ldarg.0      
+IL_0101 [0x07690d]: 7b331b0004     | ldfld        0x04001b33 [Ceto.WaveQuery.mode]
+IL_0106 [0x076912]: 17             | ldc.i4.1     
+IL_0107 [0x076913]: 2e09           | beq.s        IL_0118 (+9)
+IL_0109 [0x076915]: 02             | ldarg.0      
+IL_0110 [0x076916]: 7b331b0004     | ldfld        0x04001b33 [Ceto.WaveQuery.mode]
+IL_0115 [0x07691b]: 2c01           | brfalse.s    IL_0118 (+1)
+IL_0117 [0x07691d]: 2a             | ret          
+IL_0118 [0x07691e]: 02             | ldarg.0      
+IL_0119 [0x07691f]: 7b2e1b0004     | ldfld        0x04001b2e [Ceto.WaveQuery.posX]
+IL_0124 [0x076924]: 05             | ldarg.3      
+IL_0125 [0x076925]: 7c561a0004     | ldflda       0x04001a56 [Ceto.QueryGridScaling.offset]
+IL_0130 [0x07692a]: 7b8800000a     | ldfld        0x0a000088 [UnityEngine.Vector3.x]
+IL_0135 [0x07692f]: 58             | add          
+IL_0136 [0x076930]: 0a             | stloc.0      
+IL_0137 [0x076931]: 02             | ldarg.0      
+IL_0138 [0x076932]: 7b2f1b0004     | ldfld        0x04001b2f [Ceto.WaveQuery.posZ]
+IL_0143 [0x076937]: 05             | ldarg.3      
+IL_0144 [0x076938]: 7c561a0004     | ldflda       0x04001a56 [Ceto.QueryGridScaling.offset]
+IL_0149 [0x07693d]: 7b8900000a     | ldfld        0x0a000089 [UnityEngine.Vector3.z]
+IL_0154 [0x076942]: 58             | add          
+IL_0155 [0x076943]: 0b             | stloc.1      
+IL_0156 [0x076944]: 05             | ldarg.3      
+IL_0157 [0x076945]: 7b581a0004     | ldfld        0x04001a58 [Ceto.QueryGridScaling.result]
+IL_0162 [0x07694a]: 2d10           | brtrue.s     IL_0180 (+16)
+IL_0164 [0x07694c]: 05             | ldarg.3      
+IL_0165 [0x07694d]: 7e5b1b0004     | ldsfld       0x04001b5b [Ceto.QueryDisplacements.CHANNELS]
+IL_0170 [0x076952]: 8ddb010001     | newarr       0x010001db [tid=1,rid=475]
+IL_0175 [0x076957]: 7d581a0004     | stfld        0x04001a58 [Ceto.QueryGridScaling.result]
+IL_0180 [0x07695c]: 03             | ldarg.1      
+IL_0181 [0x07695d]: 2d01           | brtrue.s     IL_0184 (+1)
+IL_0183 [0x07695f]: 2a             | ret          
+IL_0184 [0x076960]: 03             | ldarg.1      
+IL_0185 [0x076961]: 17             | ldc.i4.1     
+IL_0186 [0x076962]: 2e0c           | beq.s        IL_0200 (+12)
+IL_0188 [0x076964]: 02             | ldarg.0      
+IL_0189 [0x076965]: 7b331b0004     | ldfld        0x04001b33 [Ceto.WaveQuery.mode]
+IL_0194 [0x07696a]: 17             | ldc.i4.1     
+IL_0195 [0x07696b]: 40e2000000     | bne.un       IL_0426 (+226)
+IL_0200 [0x076970]: 02             | ldarg.0      
+IL_0201 [0x076971]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0206 [0x076976]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0211 [0x07697b]: 04             | ldarg.2      
+IL_0212 [0x07697c]: 02             | ldarg.0      
+IL_0213 [0x07697d]: 7b301b0004     | ldfld        0x04001b30 [Ceto.WaveQuery.sampleSpectrum]
+IL_0218 [0x076982]: 06             | ldloc.0      
+IL_0219 [0x076983]: 07             | ldloc.1      
+IL_0220 [0x076984]: 05             | ldarg.3      
+IL_0221 [0x076985]: 288e2f0006     | call         0x06002f8e [Ceto.QueryDisplacements.SampleHeightOnly]
+IL_0226 [0x07698a]: 02             | ldarg.0      
+IL_0227 [0x07698b]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0232 [0x076990]: 02             | ldarg.0      
+IL_0233 [0x076991]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0238 [0x076996]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0243 [0x07699b]: 16             | ldc.i4.0     
+IL_0244 [0x07699c]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0249 [0x0769a1]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0254 [0x0769a6]: 02             | ldarg.0      
+IL_0255 [0x0769a7]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0260 [0x0769ac]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0265 [0x0769b1]: 17             | ldc.i4.1     
+IL_0266 [0x0769b2]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0271 [0x0769b7]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0276 [0x0769bc]: 58             | add          
+IL_0277 [0x0769bd]: 02             | ldarg.0      
+IL_0278 [0x0769be]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0283 [0x0769c3]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0288 [0x0769c8]: 18             | ldc.i4.2     
+IL_0289 [0x0769c9]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0294 [0x0769ce]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0299 [0x0769d3]: 58             | add          
+IL_0300 [0x0769d4]: 02             | ldarg.0      
+IL_0301 [0x0769d5]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0306 [0x0769da]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0311 [0x0769df]: 19             | ldc.i4.3     
+IL_0312 [0x0769e0]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0317 [0x0769e5]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0322 [0x0769ea]: 58             | add          
+IL_0323 [0x0769eb]: 7d8e3b0004     | stfld        0x04003b8e [WaveQueryResult.height]
+IL_0328 [0x0769f0]: 02             | ldarg.0      
+IL_0329 [0x0769f1]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0334 [0x0769f6]: 2200000000     | ldc.r4       0
+IL_0339 [0x0769fb]: 7d8f3b0004     | stfld        0x04003b8f [WaveQueryResult.displacementX]
+IL_0344 [0x076a00]: 02             | ldarg.0      
+IL_0345 [0x076a01]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0350 [0x076a06]: 2200000000     | ldc.r4       0
+IL_0355 [0x076a0b]: 7d903b0004     | stfld        0x04003b90 [WaveQueryResult.displacementZ]
+IL_0360 [0x076a10]: 02             | ldarg.0      
+IL_0361 [0x076a11]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0366 [0x076a16]: 16             | ldc.i4.0     
+IL_0367 [0x076a17]: 7d933b0004     | stfld        0x04003b93 [WaveQueryResult.iterations]
+IL_0372 [0x076a1c]: 02             | ldarg.0      
+IL_0373 [0x076a1d]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0378 [0x076a22]: 2200000000     | ldc.r4       0
+IL_0383 [0x076a27]: 7d943b0004     | stfld        0x04003b94 [WaveQueryResult.error]
+IL_0388 [0x076a2c]: 02             | ldarg.0      
+IL_0389 [0x076a2d]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0394 [0x076a32]: 02             | ldarg.0      
+IL_0395 [0x076a33]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0400 [0x076a38]: 7b8e3b0004     | ldfld        0x04003b8e [WaveQueryResult.height]
+IL_0405 [0x076a3d]: 22000020c2     | ldc.r4       -40
+IL_0410 [0x076a42]: 2200002042     | ldc.r4       40
+IL_0415 [0x076a47]: 286e00000a     | call         0x0a00006e [UnityEngine.Mathf.Clamp(float, float, float)]
+IL_0420 [0x076a4c]: 7d8e3b0004     | stfld        0x04003b8e [WaveQueryResult.height]
+IL_0425 [0x076a51]: 2a             | ret          
+IL_0426 [0x076a52]: 06             | ldloc.0      
+IL_0427 [0x076a53]: 1304           | stloc.s      4
+IL_0429 [0x076a55]: 07             | ldloc.1      
+IL_0430 [0x076a56]: 1305           | stloc.s      5
+IL_0432 [0x076a58]: 06             | ldloc.0      
+IL_0433 [0x076a59]: 1306           | stloc.s      6
+IL_0435 [0x076a5b]: 07             | ldloc.1      
+IL_0436 [0x076a5c]: 1307           | stloc.s      7
+IL_0438 [0x076a5e]: 02             | ldarg.0      
+IL_0439 [0x076a5f]: 7b2d1b0004     | ldfld        0x04001b2d [Ceto.WaveQuery.minError]
+IL_0444 [0x076a64]: 130a           | stloc.s      10
+IL_0446 [0x076a66]: 110a           | ldloc.s      10
+IL_0448 [0x076a68]: 7e2b1b0004     | ldsfld       0x04001b2b [Ceto.WaveQuery.MIN_ERROR]
+IL_0453 [0x076a6d]: 3407           | bge.un.s     IL_0462 (+7)
+IL_0455 [0x076a6f]: 7e2b1b0004     | ldsfld       0x04001b2b [Ceto.WaveQuery.MIN_ERROR]
+IL_0460 [0x076a74]: 130a           | stloc.s      10
+IL_0462 [0x076a76]: 110a           | ldloc.s      10
+IL_0464 [0x076a78]: 110a           | ldloc.s      10
+IL_0466 [0x076a7a]: 5a             | mul          
+IL_0467 [0x076a7b]: 130a           | stloc.s      10
+IL_0469 [0x076a7d]: 16             | ldc.i4.0     
+IL_0470 [0x076a7e]: 130c           | stloc.s      12
+IL_0472 [0x076a80]: 1106           | ldloc.s      6
+IL_0474 [0x076a82]: 06             | ldloc.0      
+IL_0475 [0x076a83]: 1104           | ldloc.s      4
+IL_0477 [0x076a85]: 59             | sub          
+IL_0478 [0x076a86]: 58             | add          
+IL_0479 [0x076a87]: 1306           | stloc.s      6
+IL_0481 [0x076a89]: 1107           | ldloc.s      7
+IL_0483 [0x076a8b]: 07             | ldloc.1      
+IL_0484 [0x076a8c]: 1105           | ldloc.s      5
+IL_0486 [0x076a8e]: 59             | sub          
+IL_0487 [0x076a8f]: 58             | add          
+IL_0488 [0x076a90]: 1307           | stloc.s      7
+IL_0490 [0x076a92]: 02             | ldarg.0      
+IL_0491 [0x076a93]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0496 [0x076a98]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0501 [0x076a9d]: 04             | ldarg.2      
+IL_0502 [0x076a9e]: 02             | ldarg.0      
+IL_0503 [0x076a9f]: 7b301b0004     | ldfld        0x04001b30 [Ceto.WaveQuery.sampleSpectrum]
+IL_0508 [0x076aa4]: 1106           | ldloc.s      6
+IL_0510 [0x076aa6]: 1107           | ldloc.s      7
+IL_0512 [0x076aa8]: 05             | ldarg.3      
+IL_0513 [0x076aa9]: 288f2f0006     | call         0x06002f8f [Ceto.QueryDisplacements.Sample]
+IL_0518 [0x076aae]: 02             | ldarg.0      
+IL_0519 [0x076aaf]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0524 [0x076ab4]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0529 [0x076ab9]: 16             | ldc.i4.0     
+IL_0530 [0x076aba]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0535 [0x076abf]: 7b8800000a     | ldfld        0x0a000088 [UnityEngine.Vector3.x]
+IL_0540 [0x076ac4]: 02             | ldarg.0      
+IL_0541 [0x076ac5]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0546 [0x076aca]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0551 [0x076acf]: 17             | ldc.i4.1     
+IL_0552 [0x076ad0]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0557 [0x076ad5]: 7b8800000a     | ldfld        0x0a000088 [UnityEngine.Vector3.x]
+IL_0562 [0x076ada]: 58             | add          
+IL_0563 [0x076adb]: 02             | ldarg.0      
+IL_0564 [0x076adc]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0569 [0x076ae1]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0574 [0x076ae6]: 18             | ldc.i4.2     
+IL_0575 [0x076ae7]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0580 [0x076aec]: 7b8800000a     | ldfld        0x0a000088 [UnityEngine.Vector3.x]
+IL_0585 [0x076af1]: 58             | add          
+IL_0586 [0x076af2]: 02             | ldarg.0      
+IL_0587 [0x076af3]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0592 [0x076af8]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0597 [0x076afd]: 19             | ldc.i4.3     
+IL_0598 [0x076afe]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0603 [0x076b03]: 7b8800000a     | ldfld        0x0a000088 [UnityEngine.Vector3.x]
+IL_0608 [0x076b08]: 58             | add          
+IL_0609 [0x076b09]: 1308           | stloc.s      8
+IL_0611 [0x076b0b]: 02             | ldarg.0      
+IL_0612 [0x076b0c]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0617 [0x076b11]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0622 [0x076b16]: 16             | ldc.i4.0     
+IL_0623 [0x076b17]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0628 [0x076b1c]: 7b8900000a     | ldfld        0x0a000089 [UnityEngine.Vector3.z]
+IL_0633 [0x076b21]: 02             | ldarg.0      
+IL_0634 [0x076b22]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0639 [0x076b27]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0644 [0x076b2c]: 17             | ldc.i4.1     
+IL_0645 [0x076b2d]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0650 [0x076b32]: 7b8900000a     | ldfld        0x0a000089 [UnityEngine.Vector3.z]
+IL_0655 [0x076b37]: 58             | add          
+IL_0656 [0x076b38]: 02             | ldarg.0      
+IL_0657 [0x076b39]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0662 [0x076b3e]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0667 [0x076b43]: 18             | ldc.i4.2     
+IL_0668 [0x076b44]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0673 [0x076b49]: 7b8900000a     | ldfld        0x0a000089 [UnityEngine.Vector3.z]
+IL_0678 [0x076b4e]: 58             | add          
+IL_0679 [0x076b4f]: 02             | ldarg.0      
+IL_0680 [0x076b50]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0685 [0x076b55]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0690 [0x076b5a]: 19             | ldc.i4.3     
+IL_0691 [0x076b5b]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0696 [0x076b60]: 7b8900000a     | ldfld        0x0a000089 [UnityEngine.Vector3.z]
+IL_0701 [0x076b65]: 58             | add          
+IL_0702 [0x076b66]: 1309           | stloc.s      9
+IL_0704 [0x076b68]: 1106           | ldloc.s      6
+IL_0706 [0x076b6a]: 1108           | ldloc.s      8
+IL_0708 [0x076b6c]: 58             | add          
+IL_0709 [0x076b6d]: 1304           | stloc.s      4
+IL_0711 [0x076b6f]: 1107           | ldloc.s      7
+IL_0713 [0x076b71]: 1109           | ldloc.s      9
+IL_0715 [0x076b73]: 58             | add          
+IL_0716 [0x076b74]: 1305           | stloc.s      5
+IL_0718 [0x076b76]: 110c           | ldloc.s      12
+IL_0720 [0x076b78]: 17             | ldc.i4.1     
+IL_0721 [0x076b79]: 58             | add          
+IL_0722 [0x076b7a]: 130c           | stloc.s      12
+IL_0724 [0x076b7c]: 06             | ldloc.0      
+IL_0725 [0x076b7d]: 1104           | ldloc.s      4
+IL_0727 [0x076b7f]: 59             | sub          
+IL_0728 [0x076b80]: 07             | ldloc.1      
+IL_0729 [0x076b81]: 1105           | ldloc.s      5
+IL_0731 [0x076b83]: 59             | sub          
+IL_0732 [0x076b84]: 0d             | stloc.3      
+IL_0733 [0x076b85]: 25             | dup          
+IL_0734 [0x076b86]: 5a             | mul          
+IL_0735 [0x076b87]: 09             | ldloc.3      
+IL_0736 [0x076b88]: 09             | ldloc.3      
+IL_0737 [0x076b89]: 5a             | mul          
+IL_0738 [0x076b8a]: 58             | add          
+IL_0739 [0x076b8b]: 130b           | stloc.s      11
+IL_0741 [0x076b8d]: 110b           | ldloc.s      11
+IL_0743 [0x076b8f]: 110a           | ldloc.s      10
+IL_0745 [0x076b91]: 360c           | ble.un.s     IL_0759 (+12)
+IL_0747 [0x076b93]: 110c           | ldloc.s      12
+IL_0749 [0x076b95]: 7e2c1b0004     | ldsfld       0x04001b2c [Ceto.WaveQuery.MAX_ITERATIONS]
+IL_0754 [0x076b9a]: 3ee1feffff     | ble          IL_0472 (-287)
+IL_0759 [0x076b9f]: 02             | ldarg.0      
+IL_0760 [0x076ba0]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0765 [0x076ba5]: 02             | ldarg.0      
+IL_0766 [0x076ba6]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0771 [0x076bab]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0776 [0x076bb0]: 16             | ldc.i4.0     
+IL_0777 [0x076bb1]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0782 [0x076bb6]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0787 [0x076bbb]: 02             | ldarg.0      
+IL_0788 [0x076bbc]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0793 [0x076bc1]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0798 [0x076bc6]: 17             | ldc.i4.1     
+IL_0799 [0x076bc7]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0804 [0x076bcc]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0809 [0x076bd1]: 58             | add          
+IL_0810 [0x076bd2]: 02             | ldarg.0      
+IL_0811 [0x076bd3]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0816 [0x076bd8]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0821 [0x076bdd]: 18             | ldc.i4.2     
+IL_0822 [0x076bde]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0827 [0x076be3]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0832 [0x076be8]: 58             | add          
+IL_0833 [0x076be9]: 02             | ldarg.0      
+IL_0834 [0x076bea]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0839 [0x076bef]: 7b923b0004     | ldfld        0x04003b92 [WaveQueryResult.displacement]
+IL_0844 [0x076bf4]: 19             | ldc.i4.3     
+IL_0845 [0x076bf5]: 8f0e000001     | ldelema      0x0100000e [tid=1,rid=14]
+IL_0850 [0x076bfa]: 7b9200000a     | ldfld        0x0a000092 [UnityEngine.Vector3.y]
+IL_0855 [0x076bff]: 58             | add          
+IL_0856 [0x076c00]: 7d8e3b0004     | stfld        0x04003b8e [WaveQueryResult.height]
+IL_0861 [0x076c05]: 02             | ldarg.0      
+IL_0862 [0x076c06]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0867 [0x076c0b]: 1108           | ldloc.s      8
+IL_0869 [0x076c0d]: 7d8f3b0004     | stfld        0x04003b8f [WaveQueryResult.displacementX]
+IL_0874 [0x076c12]: 02             | ldarg.0      
+IL_0875 [0x076c13]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0880 [0x076c18]: 1109           | ldloc.s      9
+IL_0882 [0x076c1a]: 7d903b0004     | stfld        0x04003b90 [WaveQueryResult.displacementZ]
+IL_0887 [0x076c1f]: 02             | ldarg.0      
+IL_0888 [0x076c20]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0893 [0x076c25]: 110c           | ldloc.s      12
+IL_0895 [0x076c27]: 7d933b0004     | stfld        0x04003b93 [WaveQueryResult.iterations]
+IL_0900 [0x076c2c]: 02             | ldarg.0      
+IL_0901 [0x076c2d]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0906 [0x076c32]: 110b           | ldloc.s      11
+IL_0908 [0x076c34]: 7d943b0004     | stfld        0x04003b94 [WaveQueryResult.error]
+IL_0913 [0x076c39]: 02             | ldarg.0      
+IL_0914 [0x076c3a]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0919 [0x076c3f]: 02             | ldarg.0      
+IL_0920 [0x076c40]: 7c351b0004     | ldflda       0x04001b35 [Ceto.WaveQuery.result]
+IL_0925 [0x076c45]: 7b8e3b0004     | ldfld        0x04003b8e [WaveQueryResult.height]
+IL_0930 [0x076c4a]: 22000020c2     | ldc.r4       -40
+IL_0935 [0x076c4f]: 2200002042     | ldc.r4       40
+IL_0940 [0x076c54]: 286e00000a     | call         0x0a00006e [UnityEngine.Mathf.Clamp(float, float, float)]
+IL_0945 [0x076c59]: 7d8e3b0004     | stfld        0x04003b8e [WaveQueryResult.height]
+IL_0950 [0x076c5e]: 2a             | ret          
+
+
+
+--------
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > build_v5_full_report.py                                                                          > import hashlib                                                                          > import os                                                                               > import struct                                                                           No> from typing import Dict, List, Optional, Tuple                                        > import dnfile                                                                           >
+> DLL_PATH = "/mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll"                                                             ,> HDR_OFF = 0x7689C                                                                      > CODE_OFF = HDR_OFF + 12  # 0x768A8
+> CODE_SIZE = 951                                                                         > MAX_PART_BYTES = 10 * 1024 * 1024                                                       >                                                                                         > EXPECTED_HEX = (                                                                        ">     "046fde0b000a7e5c1b00042e2272f75201707e5c1b00040c120228eb00000a7280530170284b01000a35c0b000a7a04166fdf0b000a6fd33100067e5b1b00042e2272905301707e5b1b00040c120228eb00000a7200540170284b01000a735c0b000a7a027b331b0004172e09027b331b00042c012a027b2e1b0004057c561a00047b8800000a580a027b2f1b0004057c561a00047b8900000a580b057b581a00042d10057e5b1b00048ddb0100017d581a0004032d012a03172e0c027b331b00041740e2000000027c351b00047b923b000404027b301b0004060705288e2f0006027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000422000000007d8f3b0004027c351b000422000000007d903b0004027c351b0004167d933b0004027c351b000422000000007d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a061304071305061306071307027b2d1b0004130a110a7e2b1b000434077e2b1b0004130a110a110a5a130a16130c110606110459581306110707110559581307027c351b00047b923b000404027b301b00041106110705288f2f0006027c351b00047b923b0004168f0e0000017b8800000a027c351b00047b923b0004178f0e0000017b8800000a58027c351b00047b923b0004188f0e0000017b8800000a58027c351b00047b923b0004198f0e0000017b8800000a581308027c351b00047b923b0004168f0e0000017b8900000a027c351b00047b923b0004178f0e0000017b8900000a58027c351b00047b923b0004188f0e0000017b8900000a58027c351b00047b923b0004198f0e0000017b8900000a5813091106110858130411071109581305110c1758130c06110459071105590d255a09095a58130b110b110a360c110c7e2c1b00043ee1feffff027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000411087d8f3b0004027c351b000411097d903b0004027c351b0004110c7d933b0004027c351b0004110b7d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a"                                                                      > )                                                                                       >
+> KNOWN_TOKENS: Dict[int, str] = {                                                        >     0x04001A53: "Ceto.QueryGridScaling.invGridSizes",                                   >     0x04001A54: "Ceto.QueryGridScaling.scaleY",                                         >     0x04001A55: "Ceto.QueryGridScaling.choppyness",                                     >     0x04001A56: "Ceto.QueryGridScaling.offset",                                          >     0x04001A57: "Ceto.QueryGridScaling.numGrids",                                      >     0x04001A58: "Ceto.QueryGridScaling.result",                                         >     0x04001B2B: "Ceto.WaveQuery.MIN_ERROR",                                             >     0x04001B2C: "Ceto.WaveQuery.MAX_ITERATIONS",
+>     0x04001B2D: "Ceto.WaveQuery.minError",                                              >     0x04001B2E: "Ceto.WaveQuery.posX",
+>     0x04001B2F: "Ceto.WaveQuery.posZ",                                                  >     0x04001B30: "Ceto.WaveQuery.sampleSpectrum",                                        >     0x04001B33: "Ceto.WaveQuery.mode",                                                  >     0x04001B35: "Ceto.WaveQuery.result",                                                >     0x04001B5B: "Ceto.QueryDisplacements.CHANNELS",                                     >     0x04001B5C: "Ceto.QueryDisplacements.GRIDS",                                        >     0x04003B8E: "WaveQueryResult.height",                                               r4>     0x04003B8F: "WaveQueryResult.displacementX",                                      >     0x04003B90: "WaveQueryResult.displacementZ",
++ 4 + d>     0x04003B92: "WaveQueryResult.displacement",                                  >     0x04003B93: "WaveQueryResult.iterations",                                           _fro>     0x04003B94: "WaveQueryResult.error",
+>     0x06002F8E: "Ceto.QueryDisplacements.SampleHeightOnly",                             >     0x06002F8F: "Ceto.QueryDisplacements.Sample",                                       >     0x060031D3: "Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels",>     0x0A00006E: "UnityEngine.Mathf.Clamp(float, float, float)",                         >     0x0A000088: "UnityEngine.Vector3.x",                                                >     0x0A000089: "UnityEngine.Vector3.z",
+>     0x0A000092: "UnityEngine.Vector3.y",                                                 >     0x0A0000EB: "System.Int32.ToString",
+>     0x0A00014B: "System.String.Concat",                                                 >     0x0A000B5C: "System.InvalidOperationException..ctor",
+>     0x0A000BDE: "List<InterpolatedArray2f>.get_Count",                                  >     0x0A000BDF: "List<InterpolatedArray2f>.get_Item",                                   > }                                                                                       >                                                                                         > OP1: Dict[int, Tuple[str, Optional[str]]] = {                                           >     0x00: ("nop", None), 0x01: ("break", None), 0x02: ("ldarg.0", None), 0x03: ("ldarg.1", None),                                                                                 >     0x04: ("ldarg.2", None), 0x05: ("ldarg.3", None), 0x06: ("ldloc.0", None), 0x07: ("ldloc.1", None),                                                                           >     0x08: ("ldloc.2", None), 0x09: ("ldloc.3", None), 0x0A: ("stloc.0", None), 0x0B: ("stloc.1", None),                                                                           at>     0x0C: ("stloc.2", None), 0x0D: ("stloc.3", None), 0x0E: ("ldarg.s", "u1"), 0x0F: (darga.s", "u1"),                                                                          >     0x10: ("starg.s", "u1"), 0x11: ("ldloc.s", "u1"), 0x12: ("ldloca.s", "u1"), 0x13: ("stloc.s", "u1"),                                                                          O>     0x14: ("ldnull", None), 0x15: ("ldc.i4.m1", None), 0x16: ("ldc.i4.0", None), 0x17: "ldc.i4.1", None),                                                                        >     0x18: ("ldc.i4.2", None), 0x19: ("ldc.i4.3", None), 0x1A: ("ldc.i4.4", None), 0x1B: ("ldc.i4.5", None),
+>     0x1C: ("ldc.i4.6", None), 0x1D: ("ldc.i4.7", None), 0x1E: ("ldc.i4.8", None), 0x1F: ("ldc.i4.s", "i1"),                                                                       >     0x20: ("ldc.i4", "i4"), 0x21: ("ldc.i8", "i8"), 0x22: ("ldc.r4", "r4"), 0x23: ("ldc.r8", "r8"),                                                                               >     0x25: ("dup", None), 0x26: ("pop", None), 0x27: ("jmp", "tok"), 0x28: ("call", "tok"),                                                                                        >     0x29: ("calli", "tok"), 0x2A: ("ret", None), 0x2B: ("br.s", "br1"), 0x2C: ("brfalse.s", "br1"),
+>     0x2D: ("brtrue.s", "br1"), 0x2E: ("beq.s", "br1"), 0x2F: ("bge.s", "br1"), 0x30: ("bgt.s", "br1"),                                                                            >     0x31: ("ble.s", "br1"), 0x32: ("blt.s", "br1"), 0x33: ("bne.un.s", "br1"), 0x34: ("bge.un.s", "br1"),                                                                         >     0x35: ("bgt.un.s", "br1"), 0x36: ("ble.un.s", "br1"), 0x37: ("blt.un.s", "br1"), 0x38: ("br", "br4"),                                                                         >     0x39: ("brfalse", "br4"), 0x3A: ("brtrue", "br4"), 0x3B: ("beq", "br4"), 0x3C: ("bge", "br4"),                                                                                >     0x3D: ("bgt", "br4"), 0x3E: ("ble", "br4"), 0x3F: ("blt", "br4"), 0x40: ("bne.un", "br4"),                                                                                    >     0x41: ("bge.un", "br4"), 0x42: ("bgt.un", "br4"), 0x43: ("ble.un", "br4"), 0x44: ("blt.un", "br4"),                                                                           >     0x52: ("stind.i1", None), 0x58: ("add", None), 0x59: ("sub", None), 0x5A: ("mul", None),                                                                                      >     0x5B: ("div", None), 0x6F: ("callvirt", "tok"), 0x72: ("ldstr", "tok"), 0x73: ("newobj", "tok"),                                                                              >     0x7A: ("throw", None), 0x7B: ("ldfld", "tok"), 0x7C: ("ldflda", "tok"), 0x7D: ("stfld", "tok"),                                                                               )}">     0x7E: ("ldsfld", "tok"), 0x7F: ("ldsflda", "tok"), 0x80: ("stsfld", "tok"), 0x8D:newarr", "tok"),                                                                          >     0x8E: ("ldlen", None), 0x8F: ("ldelema", "tok"), 0x91: ("ldelem.u1", None), 0x98: ("ldelem.r4", None),                                                                        >     0xC2: ("refanyval", "tok"), 0xD3: ("conv.i", None), 0xDB: ("sub.ovf.un", None),     > }                                                                                       >                                                                                         > OP_FE: Dict[int, Tuple[str, Optional[str]]] = {                                         >     0x00: ("ceq", None), 0x01: ("cgt", None), 0x02: ("cgt.un", None), 0x03: ("clt", None), 0x04: ("clt.un", None),
+> }                                                                                       >
+> def read_op(il: bytes, ip: int, otype: Optional[str]) -> Tuple[str, int]:               >     n = len(il)                                                                         >     if otype is None:                                                                   >         return "", ip                                                                   d>     if otype == "i1" and ip + 1 <= n:                                                  >         return str(struct.unpack_from("<b", il, ip)[0]), ip + 1                         ->     if otype == "u1" and ip + 1 <= n:                                                  S>         return str(il[ip]), ip + 1                                                     >     if otype == "i4" and ip + 4 <= n:                                                   w>         return str(struct.unpack_from("<i", il, ip)[0]), ip + 4                        >     if otype == "r4" and ip + 4 <= n:                                                   >         return f"{struct.unpack_from('<f', il, ip)[0]:g}", ip + 4                       >     if otype == "br1" and ip + 1 <= n:                                                  >         d = struct.unpack_from("<b", il, ip)[0]                                         >         return f"IL_{ip + 1 + d:04d} ({d:+d})", ip + 1                                  >     if otype == "br4" and ip + 4 <= n:                                                  >         d = struct.unpack_from("<i", il, ip)[0]                                         >         return f"IL_{ip + 4 + d:04d} ({d:+d})", ip + 4                                  >     if otype == "tok" and ip + 4 <= n:                                                  >         tok = struct.unpack_from("<I", il, ip)[0]                                       >         return f"0x{tok:08x}", ip + 4                                                   >     return "<TRUNC>", n                                                                 >                                                                                         > def write_with_split(prefix: str, text: str, max_bytes: int = MAX_PART_BYTES) -> List[str]:                                                                                       >     raw = text.encode("utf-8")                                                          >     if len(raw) <= max_bytes:                                                           >         p = f"{prefix}_FULL.txt"                                                        >         with open(p, "wb") as f:                                                        >             f.write(raw)                                                                >         return [p]                                                                      >     paths: List[str] = []                                                               >     idx, off = 1, 0                                                                     >     while off < len(raw):                                                               >         p = f"{prefix}_PART{idx}.txt"                                                   >         with open(p, "wb") as f:
+>             f.write(raw[off : off + max_bytes])                                         >         paths.append(p)
+>         off += max_bytes                                                                >         idx += 1                                                                        >     return paths                                                                        >                                                                                         > def main() -> None:                                                                     >     pe = dnfile.dnPE(DLL_PATH)                                                          >     mdtables = pe.net.mdtables                                                          >     active = []                                                                         >     for tid in range(45):                                                               >         tbl = getattr(mdtables, "tables", {}).get(tid) or getattr(mdtables, f"table_{tid}", None)                                                                                 >         if tbl is None:                                                                 >             continue                                                                    >         rows = getattr(tbl, "row_count", getattr(tbl, "num_rows", getattr(tbl, "rows", None)))                                                                                    >         off = getattr(tbl, "table_offset", getattr(tbl, "file_offset", getattr(tbl, "offset", None)))                                                                             >         if rows and rows > 0 and isinstance(off, int):                                  >             active.append((tid, rows, off))                                             >                                                                                         >     with open(DLL_PATH, "rb") as f:                                                     >         f.seek(HDR_OFF)
+>         hdr_12 = f.read(12)                                                             >         f.seek(CODE_OFF)
+>         il = f.read(CODE_SIZE)                                                          >                                                                                         >     ip, n = 0, len(il)                                                                  >     insns: List[str] = []
+>     unknowns = 0                                                                        >     while ip < n:                                                                       >         s_ip = ip                                                                       >         b0 = il[ip]; ip += 1                                                            >         if b0 == 0xFE and ip < n:                                                       >             b1 = il[ip]; ip += 1                                                        >             mnem, otype = OP_FE.get(b1, (f"fe_{b1:02x}", None))                         >         else:                                                                           >             mnem, otype = OP1.get(b0, (f"op_{b0:02x}", None))                           >         if mnem.startswith(("op_", "fe_")):
+>             unknowns += 1                                                               >         arg_s, n_ip = read_op(il, ip, otype)                                            >         if otype == "tok" and arg_s.startswith("0x"):                                   >             t_val = int(arg_s, 16)                                                      >             sym = KNOWN_TOKENS.get(t_val, f"tid={(t_val>>24)&0xFF},rid={t_val&0xFFFFFF}")                                                                                         >             arg_s = f"{arg_s} [{sym}]"                                                  >         insns.append(f"IL_{s_ip:04d} [0x{CODE_OFF+s_ip:06x}]: {il[s_ip:n_ip].hex():14s} | {mnem:12s} {arg_s}")                                                                    >         ip = n_ip                                                                       >                                                                                         >     exp = bytes.fromhex(EXPECTED_HEX)                                                   >     lines = [                                                                           >         "========================================================================",     >         "V5 INDEPENDENT VERIFICATION FULL REPORT (ECMA-335 DECODER FIXED)",             >         "========================================================================",     >         f"Target DLL        : {DLL_PATH}",                                              >         f"Fat Header Offset : 0x{HDR_OFF:08x}..0x{HDR_OFF+11:08x} ({hdr_12.hex()})",    >         f"IL Code Offset    : 0x{CODE_OFF:08x} ({CODE_SIZE} bytes)",                    >         f"Decoded Insns     : {len(insns)} (Unknown opcodes: {unknowns})",              >         f"Actual SHA-256    : {hashlib.sha256(il).hexdigest()}",                        >         f"Expected SHA-256  : {hashlib.sha256(exp).hexdigest()}",                       >         f"Exact Byte Match  : {il == exp} ({sum(a==b for a,b in zip(il, exp))}/{CODE_SIZE})",                                                                                     >         "",                                                                             >         "--- SECTION 1: DNFILE METADATA TABLE OFFSETS & ROW SPANS ---",                 >         "TID | Rows   | Offset     | SpanBytes | Bytes/Row | Rem",                      >     ]                                                                                   >     for i, (tid, rows, off) in enumerate(active):                                       >         if i + 1 < len(active):                                                         >             span = active[i + 1][2] - off                                               >             lines.append(f"{tid:3d} | {rows:6d} | 0x{off:08x} | {span:9d} | {span//rows:9d} | {span%rows}")                                                                       >         else:
+>             lines.append(f"{tid:3d} | {rows:6d} | 0x{off:08x} |       N/A |       N/A | N/A")                                                                                     >                                                                                         >     lines.append("")                                                                    >     lines.append("--- SECTION 2: V5 FULL ECMA-335 IL DISASSEMBLY (321 INSNS) ---")      >     lines.extend(insns)                                                                 >
+>     out_files = write_with_split("V5_REPORT", "\n".join(lines) + "\n")                  >     for fp in out_files:                                                                >         print(f"Generated: {fp} ({os.path.getsize(fp)} bytes)")
+>                                                                                         > if __name__ == "__main__":
+>     main()                                                                              > EOF                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python build_v5_full_report.py                                                         Generated: V5_REPORT_FULL.txt (23994 bytes)                                               root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
