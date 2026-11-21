@@ -1,0 +1,1357 @@
+=== DISPLACEMENT SOURCE & BUFFER TRACE ===
+
+DLL_PATH: /mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+DLL_SIZE: 3432448
+DLL_SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+TYPEDEF_COUNT: 3859
+METHODDEF_COUNT: 26143
+SELECTED_METHODS: 36
+
+NOTE: Unknown or unsupported IL instructions stop decoding
+for that method. No zero-unknown claim is assumed.
+
+[RID 12148] Ceto.DisplacementBufferCPU..ctor
+RVA=0x00078404 FILE=0x00076604
+HEADER=Fat(stack=6,localsig=0x11000060,more_sections=False) IL_SIZE=126
+IL_SHA256: e1599750c8c294e78325b51edcf2c359a72b7e95d4169d686b9cabcf3bcfcd5c
+INSTRUCTIONS=56 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 03                       | ldarg.1          
+IL_0002: 19                       | ldc.i4.3         
+IL_0003: 04                       | ldarg.2          
+IL_0004: 28b12f0006               | call             0x06002fb1 [MethodDef#12209 .ctor]
+IL_0009: 7e5c1b0004               | ldsfld           0x04001b5c [Field#7004 GRIDS]
+IL_0014: 0a                       | stloc.0          
+IL_0015: 7e5b1b0004               | ldsfld           0x04001b5b [Field#7003 CHANNELS]
+IL_0020: 0b                       | stloc.1          
+IL_0021: 02                       | ldarg.0          
+IL_0022: 18                       | ldc.i4.2         
+IL_0023: 73da0b000a               | newobj           0x0a000bda [MemberRef#3034 .ctor]
+IL_0028: 7d581b0004               | stfld            0x04001b58 [Field#7000 m_displacements]
+IL_0033: 02                       | ldarg.0          
+IL_0034: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0039: 06                       | ldloc.0          
+IL_0040: 8dd3060002               | newarr           0x020006d3 [TypeDef#1747 Ceto.Common.Containers.Interpolation.InterpolatedArray2f]
+IL_0045: 6fdb0b000a               | callvirt         0x0a000bdb [MemberRef#3035 Add]
+IL_0050: 02                       | ldarg.0          
+IL_0051: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0056: 06                       | ldloc.0          
+IL_0057: 8dd3060002               | newarr           0x020006d3 [TypeDef#1747 Ceto.Common.Containers.Interpolation.InterpolatedArray2f]
+IL_0062: 6fdb0b000a               | callvirt         0x0a000bdb [MemberRef#3035 Add]
+IL_0067: 16                       | ldc.i4.0         
+IL_0068: 0c                       | stloc.2          
+IL_0069: 2b32                     | br.s             IL_0121 (+50)
+IL_0071: 02                       | ldarg.0          
+IL_0072: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0077: 16                       | ldc.i4.0         
+IL_0078: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0083: 08                       | ldloc.2          
+IL_0084: 03                       | ldarg.1          
+IL_0085: 03                       | ldarg.1          
+IL_0086: 07                       | ldloc.1          
+IL_0087: 17                       | ldc.i4.1         
+IL_0088: 73d4310006               | newobj           0x060031d4 [MethodDef#12756 .ctor]
+IL_0093: a2                       | stelem.ref       
+IL_0094: 02                       | ldarg.0          
+IL_0095: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0100: 17                       | ldc.i4.1         
+IL_0101: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0106: 08                       | ldloc.2          
+IL_0107: 03                       | ldarg.1          
+IL_0108: 03                       | ldarg.1          
+IL_0109: 07                       | ldloc.1          
+IL_0110: 17                       | ldc.i4.1         
+IL_0111: 73d4310006               | newobj           0x060031d4 [MethodDef#12756 .ctor]
+IL_0116: a2                       | stelem.ref       
+IL_0117: 08                       | ldloc.2          
+IL_0118: 17                       | ldc.i4.1         
+IL_0119: 58                       | add              
+IL_0120: 0c                       | stloc.2          
+IL_0121: 08                       | ldloc.2          
+IL_0122: 06                       | ldloc.0          
+IL_0123: 32ca                     | blt.s            IL_0071 (-54)
+IL_0125: 2a                       | ret              
+
+[RID 12149] Ceto.DisplacementBufferCPU.Initilize
+RVA=0x00078490 FILE=0x00076690
+HEADER=Fat(stack=4,localsig=0x00000000,more_sections=False) IL_SIZE=137
+IL_SHA256: 4f4e4aa8255102c3708f30f0c34625e85b0eb476117909f975f1ebc0d484c02d
+INSTRUCTIONS=54 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28762f0006               | call             0x06002f76 [MethodDef#12150 GetWriteDisplacements]
+IL_0006: 25                       | dup              
+IL_0007: 16                       | ldc.i4.0         
+IL_0008: 9a                       | ldelem.ref       
+IL_0009: 6fd7310006               | callvirt         0x060031d7 [MethodDef#12759 Clear]
+IL_0014: 25                       | dup              
+IL_0015: 17                       | ldc.i4.1         
+IL_0016: 9a                       | ldelem.ref       
+IL_0017: 6fd7310006               | callvirt         0x060031d7 [MethodDef#12759 Clear]
+IL_0022: 25                       | dup              
+IL_0023: 18                       | ldc.i4.2         
+IL_0024: 9a                       | ldelem.ref       
+IL_0025: 6fd7310006               | callvirt         0x060031d7 [MethodDef#12759 Clear]
+IL_0030: 19                       | ldc.i4.3         
+IL_0031: 9a                       | ldelem.ref       
+IL_0032: 6fd7310006               | callvirt         0x060031d7 [MethodDef#12759 Clear]
+IL_0037: 02                       | ldarg.0          
+IL_0038: 7b691b0004               | ldfld            0x04001b69 [Field#7017 m_initTask]
+IL_0043: 2d0f                     | brtrue.s         IL_0060 (+15)
+IL_0045: 02                       | ldarg.0          
+IL_0046: 03                       | ldarg.1          
+IL_0047: 02                       | ldarg.0          
+IL_0048: 04                       | ldarg.2          
+IL_0049: 6f08300006               | callvirt         0x06003008 [MethodDef#12296 GetInitSpectrumDisplacementsTask]
+IL_0054: 7d691b0004               | stfld            0x04001b69 [Field#7017 m_initTask]
+IL_0059: 2a                       | ret              
+IL_0060: 02                       | ldarg.0          
+IL_0061: 7b691b0004               | ldfld            0x04001b69 [Field#7017 m_initTask]
+IL_0066: 6f54300006               | callvirt         0x06003054 [MethodDef#12372 get_SpectrumType]
+IL_0071: 03                       | ldarg.1          
+IL_0072: 6ff42f0006               | callvirt         0x06002ff4 [MethodDef#12276 get_Key]
+IL_0077: 6f13300006               | callvirt         0x06003013 [MethodDef#12307 get_SpectrumType]
+IL_0082: 3318                     | bne.un.s         IL_0108 (+24)
+IL_0084: 02                       | ldarg.0          
+IL_0085: 7b691b0004               | ldfld            0x04001b69 [Field#7017 m_initTask]
+IL_0090: 6f4c300006               | callvirt         0x0600304c [MethodDef#12364 get_NumGrids]
+IL_0095: 03                       | ldarg.1          
+IL_0096: 6ff42f0006               | callvirt         0x06002ff4 [MethodDef#12276 get_Key]
+IL_0101: 6f0f300006               | callvirt         0x0600300f [MethodDef#12303 get_NumGrids]
+IL_0106: 2e0f                     | beq.s            IL_0123 (+15)
+IL_0108: 02                       | ldarg.0          
+IL_0109: 03                       | ldarg.1          
+IL_0110: 02                       | ldarg.0          
+IL_0111: 04                       | ldarg.2          
+IL_0112: 6f08300006               | callvirt         0x06003008 [MethodDef#12296 GetInitSpectrumDisplacementsTask]
+IL_0117: 7d691b0004               | stfld            0x04001b69 [Field#7017 m_initTask]
+IL_0122: 2a                       | ret              
+IL_0123: 02                       | ldarg.0          
+IL_0124: 7b691b0004               | ldfld            0x04001b69 [Field#7017 m_initTask]
+IL_0129: 03                       | ldarg.1          
+IL_0130: 04                       | ldarg.2          
+IL_0131: 6f5f300006               | callvirt         0x0600305f [MethodDef#12383 Reset]
+IL_0136: 2a                       | ret              
+
+[RID 12150] Ceto.DisplacementBufferCPU.GetWriteDisplacements
+RVA=0x00078525 FILE=0x00076725
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: ab75fa92b1d84880db9e251aae4f73f51bad318cc405948ac21582089412532c
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0006: 16                       | ldc.i4.0         
+IL_0007: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0012: 2a                       | ret              
+
+[RID 12151] Ceto.DisplacementBufferCPU.GetReadDisplacements
+RVA=0x00078533 FILE=0x00076733
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: 5c18884ecd33a553b190840288d1c409fe11bc5d8c761a9f40a31d75c8c6a51b
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0006: 17                       | ldc.i4.1         
+IL_0007: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0012: 2a                       | ret              
+
+[RID 12152] Ceto.DisplacementBufferCPU.Run
+RVA=0x00078541 FILE=0x00076741
+HEADER=Tiny IL_SIZE=15
+IL_SHA256: 6f99275d85a6e36518ae80d64c1d4b9e11c10e4edd9355f04eb37ca50e430d8c
+INSTRUCTIONS=7 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 287b2f0006               | call             0x06002f7b [MethodDef#12155 SwapDisplacements]
+IL_0006: 02                       | ldarg.0          
+IL_0007: 03                       | ldarg.1          
+IL_0008: 04                       | ldarg.2          
+IL_0009: 28bd2f0006               | call             0x06002fbd [MethodDef#12221 Run]
+IL_0014: 2a                       | ret              
+
+[RID 12153] Ceto.DisplacementBufferCPU.CopyAndCreateDisplacements
+RVA=0x00078551 FILE=0x00076751
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: 36d04af3fde12db491b3ae04d4824be2f18b4e6e3a563192e2350cc313d178bb
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28772f0006               | call             0x06002f77 [MethodDef#12151 GetReadDisplacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 28912f0006               | call             0x06002f91 [MethodDef#12177 CopyAndCreateDisplacements]
+IL_0012: 2a                       | ret              
+
+[RID 12154] Ceto.DisplacementBufferCPU.CopyDisplacements
+RVA=0x0007855f FILE=0x0007675f
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: c12a4e15d5748ecdbdc7ae118a9b6cbcc2fa3e5feda579ea9b738a39b1d50c20
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28772f0006               | call             0x06002f77 [MethodDef#12151 GetReadDisplacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 28922f0006               | call             0x06002f92 [MethodDef#12178 CopyDisplacements]
+IL_0012: 2a                       | ret              
+
+[RID 12155] Ceto.DisplacementBufferCPU.SwapDisplacements
+RVA=0x00078570 FILE=0x00076770
+HEADER=Fat(stack=4,localsig=0x110004d4,more_sections=False) IL_SIZE=51
+IL_SHA256: 9b59c4f4aa98f4ca0a73f66d3a313b0ca3b5a8490ed9dce2349c3405cb46a37f
+INSTRUCTIONS=19 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0006: 16                       | ldc.i4.0         
+IL_0007: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0012: 0a                       | stloc.0          
+IL_0013: 02                       | ldarg.0          
+IL_0014: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0019: 16                       | ldc.i4.0         
+IL_0020: 02                       | ldarg.0          
+IL_0021: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0026: 17                       | ldc.i4.1         
+IL_0027: 6fdc0b000a               | callvirt         0x0a000bdc [MemberRef#3036 get_Item]
+IL_0032: 6fdd0b000a               | callvirt         0x0a000bdd [MemberRef#3037 set_Item]
+IL_0037: 02                       | ldarg.0          
+IL_0038: 7b581b0004               | ldfld            0x04001b58 [Field#7000 m_displacements]
+IL_0043: 17                       | ldc.i4.1         
+IL_0044: 06                       | ldloc.0          
+IL_0045: 6fdd0b000a               | callvirt         0x0a000bdd [MemberRef#3037 set_Item]
+IL_0050: 2a                       | ret              
+
+[RID 12156] Ceto.DisplacementBufferCPU.MaxRange
+RVA=0x000785af FILE=0x000767af
+HEADER=Tiny IL_SIZE=15
+IL_SHA256: c18fca4d1ae8c65d6a0909b7cba48ca4145973a816c483df0c5278eabd85801e
+INSTRUCTIONS=7 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28772f0006               | call             0x06002f77 [MethodDef#12151 GetReadDisplacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 14                       | ldnull           
+IL_0009: 28902f0006               | call             0x06002f90 [MethodDef#12176 MaxRange]
+IL_0014: 2a                       | ret              
+
+[RID 12157] Ceto.DisplacementBufferCPU.QueryWaves
+RVA=0x000785c0 FILE=0x000767c0
+HEADER=Fat(stack=4,localsig=0x110004d5,more_sections=False) IL_SIZE=28
+IL_SHA256: fd6aa984090c2360fc2f4cd00a530dbb070fdf8b64a86b34e9bc089447296f7a
+INSTRUCTIONS=15 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 6fa72f0006               | callvirt         0x06002fa7 [MethodDef#12199 EnabledBuffers]
+IL_0006: 0a                       | stloc.0          
+IL_0007: 06                       | ldloc.0          
+IL_0008: 2d01                     | brtrue.s         IL_0011 (+1)
+IL_0010: 2a                       | ret              
+IL_0011: 02                       | ldarg.0          
+IL_0012: 28772f0006               | call             0x06002f77 [MethodDef#12151 GetReadDisplacements]
+IL_0017: 0b                       | stloc.1          
+IL_0018: 03                       | ldarg.1          
+IL_0019: 06                       | ldloc.0          
+IL_0020: 07                       | ldloc.1          
+IL_0021: 04                       | ldarg.2          
+IL_0022: 288d2f0006               | call             0x06002f8d [MethodDef#12173 QueryWaves]
+IL_0027: 2a                       | ret              
+
+[RID 12158] Ceto.DisplacementBufferGPU..ctor
+RVA=0x000785e8 FILE=0x000767e8
+HEADER=Fat(stack=6,localsig=0x11000060,more_sections=False) IL_SIZE=67
+IL_SHA256: 5154096c54371e584b761e1471d22a64a2aea3507dce9eb604ff1146b2393f35
+INSTRUCTIONS=33 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 03                       | ldarg.1          
+IL_0002: 04                       | ldarg.2          
+IL_0003: 7e591b0004               | ldsfld           0x04001b59 [Field#7001 NUM_BUFFERS]
+IL_0008: 28c12f0006               | call             0x06002fc1 [MethodDef#12225 .ctor]
+IL_0013: 7e5c1b0004               | ldsfld           0x04001b5c [Field#7004 GRIDS]
+IL_0018: 0a                       | stloc.0          
+IL_0019: 7e5b1b0004               | ldsfld           0x04001b5b [Field#7003 CHANNELS]
+IL_0024: 0b                       | stloc.1          
+IL_0025: 02                       | ldarg.0          
+IL_0026: 06                       | ldloc.0          
+IL_0027: 8dd3060002               | newarr           0x020006d3 [TypeDef#1747 Ceto.Common.Containers.Interpolation.InterpolatedArray2f]
+IL_0032: 7d5a1b0004               | stfld            0x04001b5a [Field#7002 m_displacements]
+IL_0037: 16                       | ldc.i4.0         
+IL_0038: 0c                       | stloc.2          
+IL_0039: 2b15                     | br.s             IL_0062 (+21)
+IL_0041: 02                       | ldarg.0          
+IL_0042: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0047: 08                       | ldloc.2          
+IL_0048: 03                       | ldarg.1          
+IL_0049: 03                       | ldarg.1          
+IL_0050: 07                       | ldloc.1          
+IL_0051: 17                       | ldc.i4.1         
+IL_0052: 73d4310006               | newobj           0x060031d4 [MethodDef#12756 .ctor]
+IL_0057: a2                       | stelem.ref       
+IL_0058: 08                       | ldloc.2          
+IL_0059: 17                       | ldc.i4.1         
+IL_0060: 58                       | add              
+IL_0061: 0c                       | stloc.2          
+IL_0062: 08                       | ldloc.2          
+IL_0063: 06                       | ldloc.0          
+IL_0064: 32e7                     | blt.s            IL_0041 (-25)
+IL_0066: 2a                       | ret              
+
+[RID 12159] Ceto.DisplacementBufferGPU.GetReadDisplacements
+RVA=0x00078637 FILE=0x00076837
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: 3327d4bfa0270b5b94d5e6d987512da016537c2d257fe1127b68a5b4404e61a6
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0006: 2a                       | ret              
+
+[RID 12160] Ceto.DisplacementBufferGPU.CopyAndCreateDisplacements
+RVA=0x0007863f FILE=0x0007683f
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: e09ed8decbe830ffd0c558b714a80aee1fe13d58c379ae1401fb50f10f59fe24
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 28912f0006               | call             0x06002f91 [MethodDef#12177 CopyAndCreateDisplacements]
+IL_0012: 2a                       | ret              
+
+[RID 12161] Ceto.DisplacementBufferGPU.CopyDisplacements
+RVA=0x0007864d FILE=0x0007684d
+HEADER=Tiny IL_SIZE=13
+IL_SHA256: 194c309752b4f79fb1a16575b4a39a136fc0d10d8f948ed0fcee3dfe7e9f9ee4
+INSTRUCTIONS=5 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 28922f0006               | call             0x06002f92 [MethodDef#12178 CopyDisplacements]
+IL_0012: 2a                       | ret              
+
+[RID 12162] Ceto.DisplacementBufferGPU.MaxRange
+RVA=0x0007865b FILE=0x0007685b
+HEADER=Tiny IL_SIZE=15
+IL_SHA256: c6706d2018a813a5338a4ec2fe58a7422efd9d3944ee51a7492be2c20ed58af3
+INSTRUCTIONS=7 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 14                       | ldnull           
+IL_0009: 28902f0006               | call             0x06002f90 [MethodDef#12176 MaxRange]
+IL_0014: 2a                       | ret              
+
+[RID 12163] Ceto.DisplacementBufferGPU.QueryWaves
+RVA=0x0007866c FILE=0x0007686c
+HEADER=Fat(stack=4,localsig=0x11000042,more_sections=False) IL_SIZE=26
+IL_SHA256: a4479d320dbe00d03b7534c988029b54d4e2af3f942f4023466b77f827c1e489
+INSTRUCTIONS=13 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 6fa72f0006               | callvirt         0x06002fa7 [MethodDef#12199 EnabledBuffers]
+IL_0006: 0a                       | stloc.0          
+IL_0007: 06                       | ldloc.0          
+IL_0008: 2d01                     | brtrue.s         IL_0011 (+1)
+IL_0010: 2a                       | ret              
+IL_0011: 03                       | ldarg.1          
+IL_0012: 06                       | ldloc.0          
+IL_0013: 02                       | ldarg.0          
+IL_0014: 7b5a1b0004               | ldfld            0x04001b5a [Field#7002 m_displacements]
+IL_0019: 04                       | ldarg.2          
+IL_0020: 288d2f0006               | call             0x06002f8d [MethodDef#12173 QueryWaves]
+IL_0025: 2a                       | ret              
+
+[RID 12164] Ceto.DisplacementBufferGPU..cctor
+RVA=0x00078692 FILE=0x00076892
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: d56e7cc58ed053d7a165ffcb39deae01bb83aa7c146093849358ff8de92449ca
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 19                       | ldc.i4.3         
+IL_0001: 80591b0004               | stsfld           0x04001b59 [Field#7001 NUM_BUFFERS]
+IL_0006: 2a                       | ret              
+
+[RID 12173] Ceto.QueryDisplacements.QueryWaves
+RVA=0x0007869c FILE=0x0007689c
+HEADER=Fat(stack=6,localsig=0x110004d6,more_sections=False) IL_SIZE=951
+IL_SHA256: 4afeda02c441d6a2d19bfb2b523ac4043173e05422d42eeece67667efe07a756
+INSTRUCTIONS=321 UNKNOWN=0
+IL_0000: 04                       | ldarg.2          
+IL_0001: 6fde0b000a               | callvirt         0x0a000bde [MemberRef#3038 get_Count]
+IL_0006: 7e5c1b0004               | ldsfld           0x04001b5c [Field#7004 GRIDS]
+IL_0011: 2e22                     | beq.s            IL_0047 (+34)
+IL_0013: 72f7520170               | ldstr            0x700152f7 [TABLE_0x70 RID=86775]
+IL_0018: 7e5c1b0004               | ldsfld           0x04001b5c [Field#7004 GRIDS]
+IL_0023: 0c                       | stloc.2          
+IL_0024: 1202                     | ldloca.s         2
+IL_0026: 28eb00000a               | call             0x0a0000eb [MemberRef#235 System.Int32.ToString]
+IL_0031: 7280530170               | ldstr            0x70015380 [TABLE_0x70 RID=86912]
+IL_0036: 284b01000a               | call             0x0a00014b [MemberRef#331 System.String.Concat]
+IL_0041: 735c0b000a               | newobj           0x0a000b5c [MemberRef#2908 System.InvalidOperationException..ctor]
+IL_0046: 7a                       | throw            
+IL_0047: 04                       | ldarg.2          
+IL_0048: 16                       | ldc.i4.0         
+IL_0049: 6fdf0b000a               | callvirt         0x0a000bdf [MemberRef#3039 get_Item]
+IL_0054: 6fd3310006               | callvirt         0x060031d3 [MethodDef#12755 get_Channels]
+IL_0059: 7e5b1b0004               | ldsfld           0x04001b5b [Field#7003 CHANNELS]
+IL_0064: 2e22                     | beq.s            IL_0100 (+34)
+IL_0066: 7290530170               | ldstr            0x70015390 [TABLE_0x70 RID=86928]
+IL_0071: 7e5b1b0004               | ldsfld           0x04001b5b [Field#7003 CHANNELS]
+IL_0076: 0c                       | stloc.2          
+IL_0077: 1202                     | ldloca.s         2
+IL_0079: 28eb00000a               | call             0x0a0000eb [MemberRef#235 System.Int32.ToString]
+IL_0084: 7200540170               | ldstr            0x70015400 [TABLE_0x70 RID=87040]
+IL_0089: 284b01000a               | call             0x0a00014b [MemberRef#331 System.String.Concat]
+IL_0094: 735c0b000a               | newobj           0x0a000b5c [MemberRef#2908 System.InvalidOperationException..ctor]
+IL_0099: 7a                       | throw            
+IL_0100: 02                       | ldarg.0          
+IL_0101: 7b331b0004               | ldfld            0x04001b33 [Field#6963 mode]
+IL_0106: 17                       | ldc.i4.1         
+IL_0107: 2e09                     | beq.s            IL_0118 (+9)
+IL_0109: 02                       | ldarg.0          
+IL_0110: 7b331b0004               | ldfld            0x04001b33 [Field#6963 mode]
+IL_0115: 2c01                     | brfalse.s        IL_0118 (+1)
+IL_0117: 2a                       | ret              
+IL_0118: 02                       | ldarg.0          
+IL_0119: 7b2e1b0004               | ldfld            0x04001b2e [Field#6958 posX]
+IL_0124: 05                       | ldarg.3          
+IL_0125: 7c561a0004               | ldflda           0x04001a56 [Field#6742 offset]
+IL_0130: 7b8800000a               | ldfld            0x0a000088 [MemberRef#136 UnityEngine.Vector3.x]
+IL_0135: 58                       | add              
+IL_0136: 0a                       | stloc.0          
+IL_0137: 02                       | ldarg.0          
+IL_0138: 7b2f1b0004               | ldfld            0x04001b2f [Field#6959 posZ]
+IL_0143: 05                       | ldarg.3          
+IL_0144: 7c561a0004               | ldflda           0x04001a56 [Field#6742 offset]
+IL_0149: 7b8900000a               | ldfld            0x0a000089 [MemberRef#137 UnityEngine.Vector3.z]
+IL_0154: 58                       | add              
+IL_0155: 0b                       | stloc.1          
+IL_0156: 05                       | ldarg.3          
+IL_0157: 7b581a0004               | ldfld            0x04001a58 [Field#6744 result]
+IL_0162: 2d10                     | brtrue.s         IL_0180 (+16)
+IL_0164: 05                       | ldarg.3          
+IL_0165: 7e5b1b0004               | ldsfld           0x04001b5b [Field#7003 CHANNELS]
+IL_0170: 8ddb010001               | newarr           0x010001db [TypeRef#475 System.Single]
+IL_0175: 7d581a0004               | stfld            0x04001a58 [Field#6744 result]
+IL_0180: 03                       | ldarg.1          
+IL_0181: 2d01                     | brtrue.s         IL_0184 (+1)
+IL_0183: 2a                       | ret              
+IL_0184: 03                       | ldarg.1          
+IL_0185: 17                       | ldc.i4.1         
+IL_0186: 2e0c                     | beq.s            IL_0200 (+12)
+IL_0188: 02                       | ldarg.0          
+IL_0189: 7b331b0004               | ldfld            0x04001b33 [Field#6963 mode]
+IL_0194: 17                       | ldc.i4.1         
+IL_0195: 40e2000000               | bne.un           IL_0426 (+226)
+IL_0200: 02                       | ldarg.0          
+IL_0201: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0206: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0211: 04                       | ldarg.2          
+IL_0212: 02                       | ldarg.0          
+IL_0213: 7b301b0004               | ldfld            0x04001b30 [Field#6960 sampleSpectrum]
+IL_0218: 06                       | ldloc.0          
+IL_0219: 07                       | ldloc.1          
+IL_0220: 05                       | ldarg.3          
+IL_0221: 288e2f0006               | call             0x06002f8e [MethodDef#12174 SampleHeightOnly]
+IL_0226: 02                       | ldarg.0          
+IL_0227: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0232: 02                       | ldarg.0          
+IL_0233: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0238: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0243: 16                       | ldc.i4.0         
+IL_0244: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0249: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0254: 02                       | ldarg.0          
+IL_0255: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0260: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0265: 17                       | ldc.i4.1         
+IL_0266: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0271: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0276: 58                       | add              
+IL_0277: 02                       | ldarg.0          
+IL_0278: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0283: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0288: 18                       | ldc.i4.2         
+IL_0289: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0294: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0299: 58                       | add              
+IL_0300: 02                       | ldarg.0          
+IL_0301: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0306: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0311: 19                       | ldc.i4.3         
+IL_0312: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0317: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0322: 58                       | add              
+IL_0323: 7d8e3b0004               | stfld            0x04003b8e [Field#15246 height]
+IL_0328: 02                       | ldarg.0          
+IL_0329: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0334: 2200000000               | ldc.r4           0
+IL_0339: 7d8f3b0004               | stfld            0x04003b8f [Field#15247 displacementX]
+IL_0344: 02                       | ldarg.0          
+IL_0345: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0350: 2200000000               | ldc.r4           0
+IL_0355: 7d903b0004               | stfld            0x04003b90 [Field#15248 displacementZ]
+IL_0360: 02                       | ldarg.0          
+IL_0361: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0366: 16                       | ldc.i4.0         
+IL_0367: 7d933b0004               | stfld            0x04003b93 [Field#15251 iterations]
+IL_0372: 02                       | ldarg.0          
+IL_0373: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0378: 2200000000               | ldc.r4           0
+IL_0383: 7d943b0004               | stfld            0x04003b94 [Field#15252 error]
+IL_0388: 02                       | ldarg.0          
+IL_0389: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0394: 02                       | ldarg.0          
+IL_0395: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0400: 7b8e3b0004               | ldfld            0x04003b8e [Field#15246 height]
+IL_0405: 22000020c2               | ldc.r4           -40
+IL_0410: 2200002042               | ldc.r4           40
+IL_0415: 286e00000a               | call             0x0a00006e [MemberRef#110 UnityEngine.Mathf.Clamp]
+IL_0420: 7d8e3b0004               | stfld            0x04003b8e [Field#15246 height]
+IL_0425: 2a                       | ret              
+IL_0426: 06                       | ldloc.0          
+IL_0427: 1304                     | stloc.s          4
+IL_0429: 07                       | ldloc.1          
+IL_0430: 1305                     | stloc.s          5
+IL_0432: 06                       | ldloc.0          
+IL_0433: 1306                     | stloc.s          6
+IL_0435: 07                       | ldloc.1          
+IL_0436: 1307                     | stloc.s          7
+IL_0438: 02                       | ldarg.0          
+IL_0439: 7b2d1b0004               | ldfld            0x04001b2d [Field#6957 minError]
+IL_0444: 130a                     | stloc.s          10
+IL_0446: 110a                     | ldloc.s          10
+IL_0448: 7e2b1b0004               | ldsfld           0x04001b2b [Field#6955 MIN_ERROR]
+IL_0453: 3407                     | bge.un.s         IL_0462 (+7)
+IL_0455: 7e2b1b0004               | ldsfld           0x04001b2b [Field#6955 MIN_ERROR]
+IL_0460: 130a                     | stloc.s          10
+IL_0462: 110a                     | ldloc.s          10
+IL_0464: 110a                     | ldloc.s          10
+IL_0466: 5a                       | mul              
+IL_0467: 130a                     | stloc.s          10
+IL_0469: 16                       | ldc.i4.0         
+IL_0470: 130c                     | stloc.s          12
+IL_0472: 1106                     | ldloc.s          6
+IL_0474: 06                       | ldloc.0          
+IL_0475: 1104                     | ldloc.s          4
+IL_0477: 59                       | sub              
+IL_0478: 58                       | add              
+IL_0479: 1306                     | stloc.s          6
+IL_0481: 1107                     | ldloc.s          7
+IL_0483: 07                       | ldloc.1          
+IL_0484: 1105                     | ldloc.s          5
+IL_0486: 59                       | sub              
+IL_0487: 58                       | add              
+IL_0488: 1307                     | stloc.s          7
+IL_0490: 02                       | ldarg.0          
+IL_0491: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0496: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0501: 04                       | ldarg.2          
+IL_0502: 02                       | ldarg.0          
+IL_0503: 7b301b0004               | ldfld            0x04001b30 [Field#6960 sampleSpectrum]
+IL_0508: 1106                     | ldloc.s          6
+IL_0510: 1107                     | ldloc.s          7
+IL_0512: 05                       | ldarg.3          
+IL_0513: 288f2f0006               | call             0x06002f8f [MethodDef#12175 Sample]
+IL_0518: 02                       | ldarg.0          
+IL_0519: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0524: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0529: 16                       | ldc.i4.0         
+IL_0530: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0535: 7b8800000a               | ldfld            0x0a000088 [MemberRef#136 UnityEngine.Vector3.x]
+IL_0540: 02                       | ldarg.0          
+IL_0541: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0546: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0551: 17                       | ldc.i4.1         
+IL_0552: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0557: 7b8800000a               | ldfld            0x0a000088 [MemberRef#136 UnityEngine.Vector3.x]
+IL_0562: 58                       | add              
+IL_0563: 02                       | ldarg.0          
+IL_0564: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0569: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0574: 18                       | ldc.i4.2         
+IL_0575: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0580: 7b8800000a               | ldfld            0x0a000088 [MemberRef#136 UnityEngine.Vector3.x]
+IL_0585: 58                       | add              
+IL_0586: 02                       | ldarg.0          
+IL_0587: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0592: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0597: 19                       | ldc.i4.3         
+IL_0598: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0603: 7b8800000a               | ldfld            0x0a000088 [MemberRef#136 UnityEngine.Vector3.x]
+IL_0608: 58                       | add              
+IL_0609: 1308                     | stloc.s          8
+IL_0611: 02                       | ldarg.0          
+IL_0612: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0617: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0622: 16                       | ldc.i4.0         
+IL_0623: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0628: 7b8900000a               | ldfld            0x0a000089 [MemberRef#137 UnityEngine.Vector3.z]
+IL_0633: 02                       | ldarg.0          
+IL_0634: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0639: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0644: 17                       | ldc.i4.1         
+IL_0645: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0650: 7b8900000a               | ldfld            0x0a000089 [MemberRef#137 UnityEngine.Vector3.z]
+IL_0655: 58                       | add              
+IL_0656: 02                       | ldarg.0          
+IL_0657: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0662: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0667: 18                       | ldc.i4.2         
+IL_0668: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0673: 7b8900000a               | ldfld            0x0a000089 [MemberRef#137 UnityEngine.Vector3.z]
+IL_0678: 58                       | add              
+IL_0679: 02                       | ldarg.0          
+IL_0680: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0685: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0690: 19                       | ldc.i4.3         
+IL_0691: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0696: 7b8900000a               | ldfld            0x0a000089 [MemberRef#137 UnityEngine.Vector3.z]
+IL_0701: 58                       | add              
+IL_0702: 1309                     | stloc.s          9
+IL_0704: 1106                     | ldloc.s          6
+IL_0706: 1108                     | ldloc.s          8
+IL_0708: 58                       | add              
+IL_0709: 1304                     | stloc.s          4
+IL_0711: 1107                     | ldloc.s          7
+IL_0713: 1109                     | ldloc.s          9
+IL_0715: 58                       | add              
+IL_0716: 1305                     | stloc.s          5
+IL_0718: 110c                     | ldloc.s          12
+IL_0720: 17                       | ldc.i4.1         
+IL_0721: 58                       | add              
+IL_0722: 130c                     | stloc.s          12
+IL_0724: 06                       | ldloc.0          
+IL_0725: 1104                     | ldloc.s          4
+IL_0727: 59                       | sub              
+IL_0728: 07                       | ldloc.1          
+IL_0729: 1105                     | ldloc.s          5
+IL_0731: 59                       | sub              
+IL_0732: 0d                       | stloc.3          
+IL_0733: 25                       | dup              
+IL_0734: 5a                       | mul              
+IL_0735: 09                       | ldloc.3          
+IL_0736: 09                       | ldloc.3          
+IL_0737: 5a                       | mul              
+IL_0738: 58                       | add              
+IL_0739: 130b                     | stloc.s          11
+IL_0741: 110b                     | ldloc.s          11
+IL_0743: 110a                     | ldloc.s          10
+IL_0745: 360c                     | ble.un.s         IL_0759 (+12)
+IL_0747: 110c                     | ldloc.s          12
+IL_0749: 7e2c1b0004               | ldsfld           0x04001b2c [Field#6956 MAX_ITERATIONS]
+IL_0754: 3ee1feffff               | ble              IL_0472 (-287)
+IL_0759: 02                       | ldarg.0          
+IL_0760: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0765: 02                       | ldarg.0          
+IL_0766: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0771: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0776: 16                       | ldc.i4.0         
+IL_0777: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0782: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0787: 02                       | ldarg.0          
+IL_0788: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0793: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0798: 17                       | ldc.i4.1         
+IL_0799: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0804: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0809: 58                       | add              
+IL_0810: 02                       | ldarg.0          
+IL_0811: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0816: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0821: 18                       | ldc.i4.2         
+IL_0822: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0827: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0832: 58                       | add              
+IL_0833: 02                       | ldarg.0          
+IL_0834: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0839: 7b923b0004               | ldfld            0x04003b92 [Field#15250 displacement]
+IL_0844: 19                       | ldc.i4.3         
+IL_0845: 8f0e000001               | ldelema          0x0100000e [TypeRef#14 UnityEngine.Vector3]
+IL_0850: 7b9200000a               | ldfld            0x0a000092 [MemberRef#146 UnityEngine.Vector3.y]
+IL_0855: 58                       | add              
+IL_0856: 7d8e3b0004               | stfld            0x04003b8e [Field#15246 height]
+IL_0861: 02                       | ldarg.0          
+IL_0862: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0867: 1108                     | ldloc.s          8
+IL_0869: 7d8f3b0004               | stfld            0x04003b8f [Field#15247 displacementX]
+IL_0874: 02                       | ldarg.0          
+IL_0875: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0880: 1109                     | ldloc.s          9
+IL_0882: 7d903b0004               | stfld            0x04003b90 [Field#15248 displacementZ]
+IL_0887: 02                       | ldarg.0          
+IL_0888: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0893: 110c                     | ldloc.s          12
+IL_0895: 7d933b0004               | stfld            0x04003b93 [Field#15251 iterations]
+IL_0900: 02                       | ldarg.0          
+IL_0901: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0906: 110b                     | ldloc.s          11
+IL_0908: 7d943b0004               | stfld            0x04003b94 [Field#15252 error]
+IL_0913: 02                       | ldarg.0          
+IL_0914: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0919: 02                       | ldarg.0          
+IL_0920: 7c351b0004               | ldflda           0x04001b35 [Field#6965 result]
+IL_0925: 7b8e3b0004               | ldfld            0x04003b8e [Field#15246 height]
+IL_0930: 22000020c2               | ldc.r4           -40
+IL_0935: 2200002042               | ldc.r4           40
+IL_0940: 286e00000a               | call             0x0a00006e [MemberRef#110 UnityEngine.Mathf.Clamp]
+IL_0945: 7d8e3b0004               | stfld            0x04003b8e [Field#15246 height]
+IL_0950: 2a                       | ret              
+
+[RID 12421] Ceto.WaveSpectrum.get_DisplacementBuffer
+RVA=0x0007f9ee FILE=0x0007dbee
+HEADER=Tiny IL_SIZE=12
+IL_SHA256: dd9be09ee4a8efd549224ff1a74abf203da3ac3c04bd6ccdcd60af89fa6bb94c
+INSTRUCTIONS=4 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7b1c1c0004               | ldfld            0x04001c1c [Field#7196 m_displacementBuffer]
+IL_0006: 7596060002               | isinst           0x02000696 [TypeDef#1686 Ceto.IDisplacementBuffer]
+IL_0011: 2a                       | ret              
+
+[RID 12752] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Data
+RVA=0x00086e7a FILE=0x0008507a
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: b9fcb86f3878f4a70df1db7874cfce2f2b769bebcce8e8d96073b27b3bdf6111
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 2a                       | ret              
+
+[RID 12753] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_SX
+RVA=0x00086e82 FILE=0x00085082
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: b28698f3b98047132f30b267a68402d1fbba9b89c0d664e058bc9307d0e7ac7d
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0006: 2a                       | ret              
+
+[RID 12754] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_SY
+RVA=0x00086e8a FILE=0x0008508a
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: 854efdb5b4dc445a2d21096ef72004cb0b9c9b8a03b4099f8fa329e7ec3725e2
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0006: 2a                       | ret              
+
+[RID 12755] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels
+RVA=0x00086e92 FILE=0x00085092
+HEADER=Tiny IL_SIZE=7
+IL_SHA256: 01c3fbe68463ce19e37339c6612cd0b590bff882bfb26e5f99db989dd68fbba4
+INSTRUCTIONS=3 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0006: 2a                       | ret              
+
+[RID 12756] Ceto.Common.Containers.Interpolation.InterpolatedArray2f..ctor
+RVA=0x00086e9a FILE=0x0008509a
+HEADER=Tiny IL_SIZE=61
+IL_SHA256: c90751fd2ce9209ab0d9216275c8a88d18a117e88882a8611d2f286bf0dd183f
+INSTRUCTIONS=24 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 0e04                     | ldarg.s          4
+IL_0003: 28cd310006               | call             0x060031cd [MethodDef#12749 .ctor]
+IL_0008: 02                       | ldarg.0          
+IL_0009: 03                       | ldarg.1          
+IL_0010: 7dc11c0004               | stfld            0x04001cc1 [Field#7361 m_sx]
+IL_0015: 02                       | ldarg.0          
+IL_0016: 04                       | ldarg.2          
+IL_0017: 7dc21c0004               | stfld            0x04001cc2 [Field#7362 m_sy]
+IL_0022: 02                       | ldarg.0          
+IL_0023: 05                       | ldarg.3          
+IL_0024: 7dc31c0004               | stfld            0x04001cc3 [Field#7363 m_c]
+IL_0029: 02                       | ldarg.0          
+IL_0030: 02                       | ldarg.0          
+IL_0031: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0036: 02                       | ldarg.0          
+IL_0037: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0042: 5a                       | mul              
+IL_0043: 02                       | ldarg.0          
+IL_0044: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0049: 5a                       | mul              
+IL_0050: 8ddb010001               | newarr           0x010001db [TypeRef#475 System.Single]
+IL_0055: 7dc01c0004               | stfld            0x04001cc0 [Field#7360 m_data]
+IL_0060: 2a                       | ret              
+
+[RID 12757] Ceto.Common.Containers.Interpolation.InterpolatedArray2f..ctor
+RVA=0x00086ed8 FILE=0x000850d8
+HEADER=Fat(stack=3,localsig=0x00000000,more_sections=False) IL_SIZE=69
+IL_SHA256: e19fba66f5ec15e91ed2dca61196f63e5fefad0cd5d5e5bed7bb17a31e92354f
+INSTRUCTIONS=27 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 0e05                     | ldarg.s          5
+IL_0003: 28cd310006               | call             0x060031cd [MethodDef#12749 .ctor]
+IL_0008: 02                       | ldarg.0          
+IL_0009: 04                       | ldarg.2          
+IL_0010: 7dc11c0004               | stfld            0x04001cc1 [Field#7361 m_sx]
+IL_0015: 02                       | ldarg.0          
+IL_0016: 05                       | ldarg.3          
+IL_0017: 7dc21c0004               | stfld            0x04001cc2 [Field#7362 m_sy]
+IL_0022: 02                       | ldarg.0          
+IL_0023: 0e04                     | ldarg.s          4
+IL_0025: 7dc31c0004               | stfld            0x04001cc3 [Field#7363 m_c]
+IL_0030: 02                       | ldarg.0          
+IL_0031: 02                       | ldarg.0          
+IL_0032: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0037: 02                       | ldarg.0          
+IL_0038: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0043: 5a                       | mul              
+IL_0044: 02                       | ldarg.0          
+IL_0045: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0050: 5a                       | mul              
+IL_0051: 8ddb010001               | newarr           0x010001db [TypeRef#475 System.Single]
+IL_0056: 7dc01c0004               | stfld            0x04001cc0 [Field#7360 m_data]
+IL_0061: 02                       | ldarg.0          
+IL_0062: 03                       | ldarg.1          
+IL_0063: 28d8310006               | call             0x060031d8 [MethodDef#12760 Copy]
+IL_0068: 2a                       | ret              
+
+[RID 12758] Ceto.Common.Containers.Interpolation.InterpolatedArray2f..ctor
+RVA=0x00086f2c FILE=0x0008512c
+HEADER=Fat(stack=3,localsig=0x00000000,more_sections=False) IL_SIZE=85
+IL_SHA256: 2f30f7496284c9a04e0b8e6b62770dc0fc2990c28fb6b8a49daf8b9eed57c8fd
+INSTRUCTIONS=33 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 04                       | ldarg.2          
+IL_0002: 28cd310006               | call             0x060031cd [MethodDef#12749 .ctor]
+IL_0007: 02                       | ldarg.0          
+IL_0008: 03                       | ldarg.1          
+IL_0009: 16                       | ldc.i4.0         
+IL_0010: 6f0f05000a               | callvirt         0x0a00050f [MemberRef#1295 System.Array.GetLength]
+IL_0015: 7dc11c0004               | stfld            0x04001cc1 [Field#7361 m_sx]
+IL_0020: 02                       | ldarg.0          
+IL_0021: 03                       | ldarg.1          
+IL_0022: 17                       | ldc.i4.1         
+IL_0023: 6f0f05000a               | callvirt         0x0a00050f [MemberRef#1295 System.Array.GetLength]
+IL_0028: 7dc21c0004               | stfld            0x04001cc2 [Field#7362 m_sy]
+IL_0033: 02                       | ldarg.0          
+IL_0034: 03                       | ldarg.1          
+IL_0035: 18                       | ldc.i4.2         
+IL_0036: 6f0f05000a               | callvirt         0x0a00050f [MemberRef#1295 System.Array.GetLength]
+IL_0041: 7dc31c0004               | stfld            0x04001cc3 [Field#7363 m_c]
+IL_0046: 02                       | ldarg.0          
+IL_0047: 02                       | ldarg.0          
+IL_0048: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0053: 02                       | ldarg.0          
+IL_0054: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0059: 5a                       | mul              
+IL_0060: 02                       | ldarg.0          
+IL_0061: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0066: 5a                       | mul              
+IL_0067: 8ddb010001               | newarr           0x010001db [TypeRef#475 System.Single]
+IL_0072: 7dc01c0004               | stfld            0x04001cc0 [Field#7360 m_data]
+IL_0077: 02                       | ldarg.0          
+IL_0078: 03                       | ldarg.1          
+IL_0079: 28d8310006               | call             0x060031d8 [MethodDef#12760 Copy]
+IL_0084: 2a                       | ret              
+
+[RID 12759] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Clear
+RVA=0x00086f8d FILE=0x0008518d
+HEADER=Tiny IL_SIZE=21
+IL_SHA256: f28fcfbb56c56e697be6a65e51ec0bff1f0043e0e49fe1dc266feae7f77c50bd
+INSTRUCTIONS=9 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 16                       | ldc.i4.0         
+IL_0007: 02                       | ldarg.0          
+IL_0008: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0013: 8e                       | ldlen            
+IL_0014: 69                       | conv.i4          
+IL_0015: 284f0a000a               | call             0x0a000a4f [MemberRef#2639 System.Array.Clear]
+IL_0020: 2a                       | ret              
+
+[RID 12760] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Copy
+RVA=0x00086fa3 FILE=0x000851a3
+HEADER=Tiny IL_SIZE=21
+IL_SHA256: 8616500f2b03f582ba2849f47f95cd0ba91e1aae879e4e49aeee1125e602ddeb
+INSTRUCTIONS=9 UNKNOWN=0
+IL_0000: 03                       | ldarg.1          
+IL_0001: 02                       | ldarg.0          
+IL_0002: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0007: 02                       | ldarg.0          
+IL_0008: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0013: 8e                       | ldlen            
+IL_0014: 69                       | conv.i4          
+IL_0015: 28f80b000a               | call             0x0a000bf8 [MemberRef#3064 System.Array.Copy]
+IL_0020: 2a                       | ret              
+
+[RID 12761] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Item
+RVA=0x00086fb9 FILE=0x000851b9
+HEADER=Tiny IL_SIZE=27
+IL_SHA256: 7b12fc5607591f82c0145fe76a235b5f2cffc9997f7d13ca6af87dae61434af2
+INSTRUCTIONS=15 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 02                       | ldarg.0          
+IL_0009: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0014: 5a                       | mul              
+IL_0015: 58                       | add              
+IL_0016: 02                       | ldarg.0          
+IL_0017: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0022: 5a                       | mul              
+IL_0023: 05                       | ldarg.3          
+IL_0024: 58                       | add              
+IL_0025: 98                       | ldelem.r4        
+IL_0026: 2a                       | ret              
+
+[RID 12762] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.set_Item
+RVA=0x00086fd5 FILE=0x000851d5
+HEADER=Tiny IL_SIZE=29
+IL_SHA256: 0d392570a473213ec41702cb3e2d1d8253a723b24651a2a41b70f43237ea8467
+INSTRUCTIONS=16 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 02                       | ldarg.0          
+IL_0009: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0014: 5a                       | mul              
+IL_0015: 58                       | add              
+IL_0016: 02                       | ldarg.0          
+IL_0017: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0022: 5a                       | mul              
+IL_0023: 05                       | ldarg.3          
+IL_0024: 58                       | add              
+IL_0025: 0e04                     | ldarg.s          4
+IL_0027: a0                       | stelem.r4        
+IL_0028: 2a                       | ret              
+
+[RID 12763] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get
+RVA=0x00086ff3 FILE=0x000851f3
+HEADER=Tiny IL_SIZE=27
+IL_SHA256: 7b12fc5607591f82c0145fe76a235b5f2cffc9997f7d13ca6af87dae61434af2
+INSTRUCTIONS=15 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 02                       | ldarg.0          
+IL_0009: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0014: 5a                       | mul              
+IL_0015: 58                       | add              
+IL_0016: 02                       | ldarg.0          
+IL_0017: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0022: 5a                       | mul              
+IL_0023: 05                       | ldarg.3          
+IL_0024: 58                       | add              
+IL_0025: 98                       | ldelem.r4        
+IL_0026: 2a                       | ret              
+
+[RID 12764] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Set
+RVA=0x0008700f FILE=0x0008520f
+HEADER=Tiny IL_SIZE=29
+IL_SHA256: 0d392570a473213ec41702cb3e2d1d8253a723b24651a2a41b70f43237ea8467
+INSTRUCTIONS=16 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0006: 03                       | ldarg.1          
+IL_0007: 04                       | ldarg.2          
+IL_0008: 02                       | ldarg.0          
+IL_0009: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0014: 5a                       | mul              
+IL_0015: 58                       | add              
+IL_0016: 02                       | ldarg.0          
+IL_0017: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0022: 5a                       | mul              
+IL_0023: 05                       | ldarg.3          
+IL_0024: 58                       | add              
+IL_0025: 0e04                     | ldarg.s          4
+IL_0027: a0                       | stelem.r4        
+IL_0028: 2a                       | ret              
+
+[RID 12765] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Set
+RVA=0x00087030 FILE=0x00085230
+HEADER=Fat(stack=4,localsig=0x11000042,more_sections=False) IL_SIZE=47
+IL_SHA256: a63e0bb2f9ffa177944e641868f216c87ffb19d98ac6aa15ceed96ef8c3fa832
+INSTRUCTIONS=29 UNKNOWN=0
+IL_0000: 16                       | ldc.i4.0         
+IL_0001: 0a                       | stloc.0          
+IL_0002: 2b21                     | br.s             IL_0037 (+33)
+IL_0004: 02                       | ldarg.0          
+IL_0005: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0010: 03                       | ldarg.1          
+IL_0011: 04                       | ldarg.2          
+IL_0012: 02                       | ldarg.0          
+IL_0013: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0018: 5a                       | mul              
+IL_0019: 58                       | add              
+IL_0020: 02                       | ldarg.0          
+IL_0021: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0026: 5a                       | mul              
+IL_0027: 06                       | ldloc.0          
+IL_0028: 58                       | add              
+IL_0029: 05                       | ldarg.3          
+IL_0030: 06                       | ldloc.0          
+IL_0031: 98                       | ldelem.r4        
+IL_0032: a0                       | stelem.r4        
+IL_0033: 06                       | ldloc.0          
+IL_0034: 17                       | ldc.i4.1         
+IL_0035: 58                       | add              
+IL_0036: 0a                       | stloc.0          
+IL_0037: 06                       | ldloc.0          
+IL_0038: 02                       | ldarg.0          
+IL_0039: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0044: 32d6                     | blt.s            IL_0004 (-42)
+IL_0046: 2a                       | ret              
+
+[RID 12766] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get
+RVA=0x0008706c FILE=0x0008526c
+HEADER=Fat(stack=6,localsig=0x11000042,more_sections=False) IL_SIZE=47
+IL_SHA256: 769cbfc734a6537942cacecdf37e80917b4a4a00bd2a7724724f276966735b30
+INSTRUCTIONS=29 UNKNOWN=0
+IL_0000: 16                       | ldc.i4.0         
+IL_0001: 0a                       | stloc.0          
+IL_0002: 2b21                     | br.s             IL_0037 (+33)
+IL_0004: 05                       | ldarg.3          
+IL_0005: 06                       | ldloc.0          
+IL_0006: 02                       | ldarg.0          
+IL_0007: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0012: 03                       | ldarg.1          
+IL_0013: 04                       | ldarg.2          
+IL_0014: 02                       | ldarg.0          
+IL_0015: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0020: 5a                       | mul              
+IL_0021: 58                       | add              
+IL_0022: 02                       | ldarg.0          
+IL_0023: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0028: 5a                       | mul              
+IL_0029: 06                       | ldloc.0          
+IL_0030: 58                       | add              
+IL_0031: 98                       | ldelem.r4        
+IL_0032: a0                       | stelem.r4        
+IL_0033: 06                       | ldloc.0          
+IL_0034: 17                       | ldc.i4.1         
+IL_0035: 58                       | add              
+IL_0036: 0a                       | stloc.0          
+IL_0037: 06                       | ldloc.0          
+IL_0038: 02                       | ldarg.0          
+IL_0039: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0044: 32d6                     | blt.s            IL_0004 (-42)
+IL_0046: 2a                       | ret              
+
+[RID 12767] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get
+RVA=0x000870a8 FILE=0x000852a8
+HEADER=Fat(stack=5,localsig=0x1100052c,more_sections=False) IL_SIZE=320
+IL_SHA256: 1b459b66ff89ef56569e21676fe797ad65cee493a057b13b8ec33f4d91f4e311
+INSTRUCTIONS=166 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28cb310006               | call             0x060031cb [MethodDef#12747 get_HalfPixelOffset]
+IL_0006: 2c2a                     | brfalse.s        IL_0050 (+42)
+IL_0008: 03                       | ldarg.1          
+IL_0009: 02                       | ldarg.0          
+IL_0010: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0015: 6b                       | conv.r4          
+IL_0016: 5a                       | mul              
+IL_0017: 1001                     | starg.s          1
+IL_0019: 04                       | ldarg.2          
+IL_0020: 02                       | ldarg.0          
+IL_0021: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0026: 6b                       | conv.r4          
+IL_0027: 5a                       | mul              
+IL_0028: 1002                     | starg.s          2
+IL_0030: 03                       | ldarg.1          
+IL_0031: 220000003f               | ldc.r4           0.5
+IL_0036: 59                       | sub              
+IL_0037: 1001                     | starg.s          1
+IL_0039: 04                       | ldarg.2          
+IL_0040: 220000003f               | ldc.r4           0.5
+IL_0045: 59                       | sub              
+IL_0046: 1002                     | starg.s          2
+IL_0048: 2b1a                     | br.s             IL_0076 (+26)
+IL_0050: 03                       | ldarg.1          
+IL_0051: 02                       | ldarg.0          
+IL_0052: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0057: 17                       | ldc.i4.1         
+IL_0058: 59                       | sub              
+IL_0059: 6b                       | conv.r4          
+IL_0060: 5a                       | mul              
+IL_0061: 1001                     | starg.s          1
+IL_0063: 04                       | ldarg.2          
+IL_0064: 02                       | ldarg.0          
+IL_0065: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0070: 17                       | ldc.i4.1         
+IL_0071: 59                       | sub              
+IL_0072: 6b                       | conv.r4          
+IL_0073: 5a                       | mul              
+IL_0074: 1002                     | starg.s          2
+IL_0076: 03                       | ldarg.1          
+IL_0077: 03                       | ldarg.1          
+IL_0078: 69                       | conv.i4          
+IL_0079: 6b                       | conv.r4          
+IL_0080: 59                       | sub              
+IL_0081: 281502000a               | call             0x0a000215 [MemberRef#533 System.Math.Abs]
+IL_0086: 0c                       | stloc.2          
+IL_0087: 02                       | ldarg.0          
+IL_0088: 03                       | ldarg.1          
+IL_0089: 6c                       | conv.r8          
+IL_0090: 02                       | ldarg.0          
+IL_0091: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0096: 1200                     | ldloca.s         0
+IL_0098: 1201                     | ldloca.s         1
+IL_0100: 28cf310006               | call             0x060031cf [MethodDef#12751 Index]
+IL_0105: 04                       | ldarg.2          
+IL_0106: 04                       | ldarg.2          
+IL_0107: 69                       | conv.i4          
+IL_0108: 6b                       | conv.r4          
+IL_0109: 59                       | sub              
+IL_0110: 281502000a               | call             0x0a000215 [MemberRef#533 System.Math.Abs]
+IL_0115: 1305                     | stloc.s          5
+IL_0117: 02                       | ldarg.0          
+IL_0118: 04                       | ldarg.2          
+IL_0119: 6c                       | conv.r8          
+IL_0120: 02                       | ldarg.0          
+IL_0121: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0126: 1203                     | ldloca.s         3
+IL_0128: 1204                     | ldloca.s         4
+IL_0130: 28cf310006               | call             0x060031cf [MethodDef#12751 Index]
+IL_0135: 16                       | ldc.i4.0         
+IL_0136: 1306                     | stloc.s          6
+IL_0138: 38a3000000               | br               IL_0306 (+163)
+IL_0143: 02                       | ldarg.0          
+IL_0144: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0149: 06                       | ldloc.0          
+IL_0150: 09                       | ldloc.3          
+IL_0151: 02                       | ldarg.0          
+IL_0152: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0157: 5a                       | mul              
+IL_0158: 58                       | add              
+IL_0159: 02                       | ldarg.0          
+IL_0160: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0165: 5a                       | mul              
+IL_0166: 1106                     | ldloc.s          6
+IL_0168: 58                       | add              
+IL_0169: 98                       | ldelem.r4        
+IL_0170: 220000803f               | ldc.r4           1
+IL_0175: 08                       | ldloc.2          
+IL_0176: 59                       | sub              
+IL_0177: 5a                       | mul              
+IL_0178: 02                       | ldarg.0          
+IL_0179: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0184: 07                       | ldloc.1          
+IL_0185: 09                       | ldloc.3          
+IL_0186: 02                       | ldarg.0          
+IL_0187: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0192: 5a                       | mul              
+IL_0193: 58                       | add              
+IL_0194: 02                       | ldarg.0          
+IL_0195: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0200: 5a                       | mul              
+IL_0201: 1106                     | ldloc.s          6
+IL_0203: 58                       | add              
+IL_0204: 98                       | ldelem.r4        
+IL_0205: 08                       | ldloc.2          
+IL_0206: 5a                       | mul              
+IL_0207: 58                       | add              
+IL_0208: 1307                     | stloc.s          7
+IL_0210: 02                       | ldarg.0          
+IL_0211: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0216: 06                       | ldloc.0          
+IL_0217: 1104                     | ldloc.s          4
+IL_0219: 02                       | ldarg.0          
+IL_0220: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0225: 5a                       | mul              
+IL_0226: 58                       | add              
+IL_0227: 02                       | ldarg.0          
+IL_0228: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0233: 5a                       | mul              
+IL_0234: 1106                     | ldloc.s          6
+IL_0236: 58                       | add              
+IL_0237: 98                       | ldelem.r4        
+IL_0238: 220000803f               | ldc.r4           1
+IL_0243: 08                       | ldloc.2          
+IL_0244: 59                       | sub              
+IL_0245: 5a                       | mul              
+IL_0246: 02                       | ldarg.0          
+IL_0247: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0252: 07                       | ldloc.1          
+IL_0253: 1104                     | ldloc.s          4
+IL_0255: 02                       | ldarg.0          
+IL_0256: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0261: 5a                       | mul              
+IL_0262: 58                       | add              
+IL_0263: 02                       | ldarg.0          
+IL_0264: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0269: 5a                       | mul              
+IL_0270: 1106                     | ldloc.s          6
+IL_0272: 58                       | add              
+IL_0273: 98                       | ldelem.r4        
+IL_0274: 08                       | ldloc.2          
+IL_0275: 5a                       | mul              
+IL_0276: 58                       | add              
+IL_0277: 1308                     | stloc.s          8
+IL_0279: 05                       | ldarg.3          
+IL_0280: 1106                     | ldloc.s          6
+IL_0282: 1107                     | ldloc.s          7
+IL_0284: 220000803f               | ldc.r4           1
+IL_0289: 1105                     | ldloc.s          5
+IL_0291: 59                       | sub              
+IL_0292: 5a                       | mul              
+IL_0293: 1108                     | ldloc.s          8
+IL_0295: 1105                     | ldloc.s          5
+IL_0297: 5a                       | mul              
+IL_0298: 58                       | add              
+IL_0299: a0                       | stelem.r4        
+IL_0300: 1106                     | ldloc.s          6
+IL_0302: 17                       | ldc.i4.1         
+IL_0303: 58                       | add              
+IL_0304: 1306                     | stloc.s          6
+IL_0306: 1106                     | ldloc.s          6
+IL_0308: 02                       | ldarg.0          
+IL_0309: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0314: 3f50ffffff               | blt              IL_0143 (-176)
+IL_0319: 2a                       | ret              
+
+[RID 12768] Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get
+RVA=0x000871f4 FILE=0x000853f4
+HEADER=Fat(stack=6,localsig=0x1100052d,more_sections=False) IL_SIZE=281
+IL_SHA256: 9f58d39c595098c32f645f96266d58433950ec146cb67abc5ad509efeacd103c
+INSTRUCTIONS=150 UNKNOWN=0
+IL_0000: 02                       | ldarg.0          
+IL_0001: 28cb310006               | call             0x060031cb [MethodDef#12747 get_HalfPixelOffset]
+IL_0006: 2c2a                     | brfalse.s        IL_0050 (+42)
+IL_0008: 03                       | ldarg.1          
+IL_0009: 02                       | ldarg.0          
+IL_0010: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0015: 6b                       | conv.r4          
+IL_0016: 5a                       | mul              
+IL_0017: 1001                     | starg.s          1
+IL_0019: 04                       | ldarg.2          
+IL_0020: 02                       | ldarg.0          
+IL_0021: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0026: 6b                       | conv.r4          
+IL_0027: 5a                       | mul              
+IL_0028: 1002                     | starg.s          2
+IL_0030: 03                       | ldarg.1          
+IL_0031: 220000003f               | ldc.r4           0.5
+IL_0036: 59                       | sub              
+IL_0037: 1001                     | starg.s          1
+IL_0039: 04                       | ldarg.2          
+IL_0040: 220000003f               | ldc.r4           0.5
+IL_0045: 59                       | sub              
+IL_0046: 1002                     | starg.s          2
+IL_0048: 2b1a                     | br.s             IL_0076 (+26)
+IL_0050: 03                       | ldarg.1          
+IL_0051: 02                       | ldarg.0          
+IL_0052: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0057: 17                       | ldc.i4.1         
+IL_0058: 59                       | sub              
+IL_0059: 6b                       | conv.r4          
+IL_0060: 5a                       | mul              
+IL_0061: 1001                     | starg.s          1
+IL_0063: 04                       | ldarg.2          
+IL_0064: 02                       | ldarg.0          
+IL_0065: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0070: 17                       | ldc.i4.1         
+IL_0071: 59                       | sub              
+IL_0072: 6b                       | conv.r4          
+IL_0073: 5a                       | mul              
+IL_0074: 1002                     | starg.s          2
+IL_0076: 03                       | ldarg.1          
+IL_0077: 03                       | ldarg.1          
+IL_0078: 69                       | conv.i4          
+IL_0079: 6b                       | conv.r4          
+IL_0080: 59                       | sub              
+IL_0081: 281502000a               | call             0x0a000215 [MemberRef#533 System.Math.Abs]
+IL_0086: 0c                       | stloc.2          
+IL_0087: 02                       | ldarg.0          
+IL_0088: 03                       | ldarg.1          
+IL_0089: 6c                       | conv.r8          
+IL_0090: 02                       | ldarg.0          
+IL_0091: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0096: 1200                     | ldloca.s         0
+IL_0098: 1201                     | ldloca.s         1
+IL_0100: 28cf310006               | call             0x060031cf [MethodDef#12751 Index]
+IL_0105: 04                       | ldarg.2          
+IL_0106: 04                       | ldarg.2          
+IL_0107: 69                       | conv.i4          
+IL_0108: 6b                       | conv.r4          
+IL_0109: 59                       | sub              
+IL_0110: 281502000a               | call             0x0a000215 [MemberRef#533 System.Math.Abs]
+IL_0115: 1305                     | stloc.s          5
+IL_0117: 02                       | ldarg.0          
+IL_0118: 04                       | ldarg.2          
+IL_0119: 6c                       | conv.r8          
+IL_0120: 02                       | ldarg.0          
+IL_0121: 7bc21c0004               | ldfld            0x04001cc2 [Field#7362 m_sy]
+IL_0126: 1203                     | ldloca.s         3
+IL_0128: 1204                     | ldloca.s         4
+IL_0130: 28cf310006               | call             0x060031cf [MethodDef#12751 Index]
+IL_0135: 02                       | ldarg.0          
+IL_0136: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0141: 06                       | ldloc.0          
+IL_0142: 09                       | ldloc.3          
+IL_0143: 02                       | ldarg.0          
+IL_0144: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0149: 5a                       | mul              
+IL_0150: 58                       | add              
+IL_0151: 02                       | ldarg.0          
+IL_0152: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0157: 5a                       | mul              
+IL_0158: 05                       | ldarg.3          
+IL_0159: 58                       | add              
+IL_0160: 98                       | ldelem.r4        
+IL_0161: 220000803f               | ldc.r4           1
+IL_0166: 08                       | ldloc.2          
+IL_0167: 59                       | sub              
+IL_0168: 5a                       | mul              
+IL_0169: 02                       | ldarg.0          
+IL_0170: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0175: 07                       | ldloc.1          
+IL_0176: 09                       | ldloc.3          
+IL_0177: 02                       | ldarg.0          
+IL_0178: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0183: 5a                       | mul              
+IL_0184: 58                       | add              
+IL_0185: 02                       | ldarg.0          
+IL_0186: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0191: 5a                       | mul              
+IL_0192: 05                       | ldarg.3          
+IL_0193: 58                       | add              
+IL_0194: 98                       | ldelem.r4        
+IL_0195: 08                       | ldloc.2          
+IL_0196: 5a                       | mul              
+IL_0197: 58                       | add              
+IL_0198: 02                       | ldarg.0          
+IL_0199: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0204: 06                       | ldloc.0          
+IL_0205: 1104                     | ldloc.s          4
+IL_0207: 02                       | ldarg.0          
+IL_0208: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0213: 5a                       | mul              
+IL_0214: 58                       | add              
+IL_0215: 02                       | ldarg.0          
+IL_0216: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0221: 5a                       | mul              
+IL_0222: 05                       | ldarg.3          
+IL_0223: 58                       | add              
+IL_0224: 98                       | ldelem.r4        
+IL_0225: 220000803f               | ldc.r4           1
+IL_0230: 08                       | ldloc.2          
+IL_0231: 59                       | sub              
+IL_0232: 5a                       | mul              
+IL_0233: 02                       | ldarg.0          
+IL_0234: 7bc01c0004               | ldfld            0x04001cc0 [Field#7360 m_data]
+IL_0239: 07                       | ldloc.1          
+IL_0240: 1104                     | ldloc.s          4
+IL_0242: 02                       | ldarg.0          
+IL_0243: 7bc11c0004               | ldfld            0x04001cc1 [Field#7361 m_sx]
+IL_0248: 5a                       | mul              
+IL_0249: 58                       | add              
+IL_0250: 02                       | ldarg.0          
+IL_0251: 7bc31c0004               | ldfld            0x04001cc3 [Field#7363 m_c]
+IL_0256: 5a                       | mul              
+IL_0257: 05                       | ldarg.3          
+IL_0258: 58                       | add              
+IL_0259: 98                       | ldelem.r4        
+IL_0260: 08                       | ldloc.2          
+IL_0261: 5a                       | mul              
+IL_0262: 58                       | add              
+IL_0263: 1306                     | stloc.s          6
+IL_0265: 220000803f               | ldc.r4           1
+IL_0270: 1105                     | ldloc.s          5
+IL_0272: 59                       | sub              
+IL_0273: 5a                       | mul              
+IL_0274: 1106                     | ldloc.s          6
+IL_0276: 1105                     | ldloc.s          5
+IL_0278: 5a                       | mul              
+IL_0279: 58                       | add              
+IL_0280: 2a                       | ret              
+
+=== TRACE SUMMARY ===
+SELECTED_METHODS: 36
+DECODED_METHODS: 36
+UNKNOWN_INSTRUCTIONS: 0
+DLL_SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+
+END OF REPORT
