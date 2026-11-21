@@ -1,0 +1,92 @@
+&#x20;Memory ရယူပြီးပါပြီ
+
+GitHub ရဲ့ `Google Team/GPT Memory ` Folder ထဲက မှတ်တမ်း ၃ ခုကို ဖတ်ရှုပြီး CASTAWAY-DEPTHS ရဲ့ လက်ရှိလုပ်ငန်းအခြေအနေနဲ့ ပြန်လည်ချိတ်ဆက်ထားပါတယ်။
+
+**ဖတ်ရှုထားတဲ့ဖိုင်များ**
+
+1. `Conversation 1`
+2. `Conversation 2`
+3. `Full Ocen to Godot 4.7.2 Stable Apk`
+
+## **1. မူလပန်းတိုင်ကို ပြန်လည်သတ်မှတ်ခြင်း**
+
+**အဓိကပန်းတိုင်**
+
+Stranded Deep ရဲ့ မူရင်း Unity Ceto Ocean System ကို Godot 4.7.2 Stable မှာ နည်းပညာအထောက်အထားအပေါ် အခြေခံပြီး တိကျစွာ Reconstruction လုပ်ရန်။
+
+**အဓိကဦးစားပေး**
+
+- Original C# IL
+- QueryWaves / Sampling
+- CPU Displacement Pipeline
+- GPU Displacement Pipeline
+- Buffer Generation / Readback / Interpolation
+- Shader / FFT
+
+Gameplay၊ Save/Load နဲ့ မသက်ဆိုင်တဲ့အပိုင်းတွေကို လက်ရှိ Scope ထဲ မထည့်ပါဘူး။ Mission 3 Terrain နဲ့လည်း မရောပါဘူး။
+
+## **2. ပြန်လည်ရရှိထားတဲ့ အရေးကြီးဆုံး Technical Facts**
+
+| အကြောင်းအရာ               | မှတ်တမ်းအရ အခြေအနေ         |
+| ------------------------- | -------------------------- |
+| GRIDS                     | 4                          |
+| CHANNELS                  | 3                          |
+| CPU Double Buffer         | Slot 0 Write / Slot 1 Read |
+| CPU Swap                  | FFT မတိုင်မီ               |
+| QueryWaves                | Slot 1 ဖတ်သည်              |
+| GPU Displacement Maps     | 0–3                        |
+| GPU Readback              | 0–2                        |
+| Grid 3 Shader Consumption | UNVERIFIED                 |
+| FFT Numerical Correctness | UNVERIFIED                 |
+
+အထူးသဖြင့် Grid 3 ကို ဆက်လက်စုံစမ်းရမယ်။ GPU Texture Binding ရှိခြင်း၊ Shader Sampling၊ CPU Readback နဲ့ Query Data Validity တို့ဟာ သီးခြားအဆင့်တွေဖြစ်တယ်။
+
+## **3. V1 → V4 အခြေအနေကို ပြန်လည်ချိတ်ဆက်ထားခြင်း**
+
+မှတ်တမ်းထဲမှာ V4 အတွက် အရေးကြီးတဲ့ ပြဿနာတွေကိုလည်း တွေ့ရှိထားပါတယ်။
+
+V4 — Critical defects recorded
+
+- Fat Method Header ကို `<HII` နဲ့ မှားယွင်းဖတ်ထားခြင်း။
+- Metadata Table Row Size တွက်ချက်မှု မပြည့်စုံခြင်း။
+- `metadata_tables_ok = True` ကို Error ရှိသော်လည်း သတ်မှတ်နိုင်ခြင်း။
+- Method Body နဲ့ EH Boundary Validation မပြည့်စုံခြင်း။
+- Decoder A/B ကို 3 Instructions သာ စမ်းသပ်ထားခြင်း။
+- Adversarial Test 6 ခုသာရှိခြင်း။
+- Default Output Path က V3 Folder ကို ညွှန်နေခြင်း။
+
+ဒါကြောင့် V4 ကို ယုံကြည်စိတ်ချရတဲ့ Final Verification Engine အဖြစ် မသတ်မှတ်ရသေးပါဘူး။
+
+မှတ်တမ်းမှာ V4 ကို စစ်ထားတဲ့ Commit က `bd25a514...` ဖြစ်ပါတယ်။ ဒါဟာ မှတ်တမ်းထဲက Audit Snapshot ဖြစ်ပြီး လက်ရှိ GitHub အခြေအနေကို ထပ်စစ်ပြီးသားလို့ မဆိုလိုပါဘူး။
+
+## **4. နောက်ဆုံးထားခဲ့တဲ့ လုပ်ငန်းအစီအစဉ်**
+
+1. **Grid 3 Full Trace**
+
+   Shader Consumption၊ Query Buffer Population၊ Sample Index 3 နဲ့ Alternate Path။
+2. **CPU Buffer State Verification**
+
+   Swap၊ Task Completion၊ Initialization နဲ့ Buffer Data Validity။
+3. **Independent Decoder**
+
+   Method 1,028 ခုကို Raw Byte Decoder နဲ့ ပြန်စစ်ရန်။
+4. **Compiled Shader / FFT**
+
+   Shader Source နဲ့ GPU Compute အလုပ်လုပ်ပုံကို အတည်ပြုရန်။
+5. **Godot 4.7.2 Reconstruction**
+
+   အထက်ပါ Evidence တွေ ပြည့်စုံပြီးမှ ဆက်လုပ်ရန်။
+
+## **5. လိုက်နာမယ့် စည်းမျဉ်းများ**
+
+- မင်းရဲ့ လမ်းညွှန်ချက်အတိုင်း ဆက်လုပ်မယ်။
+- ရှိပြီးသား Python Script ကို အခြေခံပြီး အလုပ်လုပ်မယ်။
+- မင်းမတောင်းဆိုဘဲ Code၊ GitHub File တွေကို မပြင်ဘူး။
+- Original Evidence မဖျက်ဘူး၊ မပြင်ဘူး။
+- စစ်ဆေးချက်နဲ့ ခန့်မှန်းချက်ကို ခွဲပြမယ်။
+- Script ကို မ Run နိုင်ရင် Run ပြီးပြီလို့ မပြောဘူး။
+- ပြင်ဆင်မှုတိုင်းမှာ ဘာပြောင်းတယ်၊ ဘာကျန်တယ်ဆိုတာ ရှင်းပြမယ်။
+
+**Memory Retrieval အခြေအနေ:** မှတ်တမ်း ၃ ခုကို ဖတ်ရှုရရှိပြီးပါပြီ။ GitHub မှာ ဘာဖိုင်မှ ပြင်ဆင်ခြင်း၊ Commit လုပ်ခြင်း မရှိပါဘူး။
+
+အခု CASTAWAY-DEPTHS ရဲ့ Ocean Displacement လုပ်ငန်းအဆက်ကို ဒီမှတ်တမ်းတွေအပေါ် အခြေခံပြီး ဆက်လက်လုပ်ဆောင်နိုင်ပါပြီ။ 🌊
