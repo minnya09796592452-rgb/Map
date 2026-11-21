@@ -1,0 +1,214 @@
+CASTAWAY-DEPTHS — GODOT PROJECT INSPECTION
+============================================================
+Source (READ-ONLY): /storage/emulated/0/Download/Stranded-Deep-Original/Godot Project
+Total Files: 88
+Extensions: {'<none>': 7, '.md': 1, '.cfg': 11, '.svg': 1, '.import': 1, '.tscn': 2, '.godot': 1, '.bin': 1, '.node': 2, '.ctex': 1, '.md5': 1, '.cache': 49, '.glb': 5, '.gd': 1, '.uid': 1, '.map': 3}
+
+1. PROJECT FOLDER STRUCTURE
+----------------------------------------
+  res://.editorconfig (33 B)
+  res://.gitattributes (80 B)
+  res://.gitignore (46 B)
+  res://.nomedia (65 B)
+  res://PROJECT_NOTES.md (1184 B)
+  res://export_presets.cfg (7486 B)
+  res://icon.svg (995 B)
+  res://icon.svg.import (1013 B)
+  res://node.tscn (1731 B)
+  res://project.godot (646 B)
+  res://.godot/.gdignore (1 B)
+  res://.godot/export_credentials.cfg (200 B)
+  res://.godot/global_script_class_cache.cfg (8 B)
+  res://.godot/scene_groups_cache.cfg (0 B)
+  res://.godot/uid_cache.bin (101 B)
+  res://.godot/editor/create_recent.Node (237 B)
+  res://.godot/editor/editor_layout.cfg (1515 B)
+  res://.godot/editor/favorites.Node (0 B)
+  res://.godot/editor/filesystem_cache10 (798 B)
+  res://.godot/editor/node.tscn-editstate-5c1b5421b3a3843354800198f9326b19.cfg (4341 B)
+  res://.godot/editor/node.tscn-folding-5c1b5421b3a3843354800198f9326b19.cfg (90 B)
+  res://.godot/editor/project_metadata.cfg (346 B)
+  res://.godot/editor/recent_dirs (21 B)
+  res://.godot/editor/script_editor_cache.cfg (0 B)
+  res://.godot/editor/terrain_preview.tscn-editstate-85ed94e97e55cf8416426239a8bb4c4a.cfg (4390 B)
+  res://.godot/editor/terrain_preview.tscn-folding-85ed94e97e55cf8416426239a8bb4c4a.cfg (136 B)
+  res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex (3426 B)
+  res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.md5 (91 B)
+  res://.godot/shader_cache/BlitShaderRD/ae4daaa7a60bb17ebd7e9de5db9422fb448b52ad89776ae7aa53fee442f7cc60/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (6484 B)
+  res://.godot/shader_cache/BlurRasterShaderRD/9c5ce6c282305d452850250d675e75b5784d4bd5843cfef7c8c782a789f8ed56/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (7384 B)
+  res://.godot/shader_cache/BokehDofRasterShaderRD/8641c53aea67ee360fd91fe57abfedf8e7ff723cb62ccf7a29ced875fbf9649b/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (11320 B)
+  res://.godot/shader_cache/CanvasOcclusionShaderRD/606df5c981910bc4bc719cf497719273e80d1f314f65e68820bf8e2111368cdb/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (2920 B)
+  res://.godot/shader_cache/CanvasSdfShaderRD/a4f6d732dba9a4cc0c37a1ca52936369e2ee148e9d03efe1b81bfed822adb1eb/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (4776 B)
+  res://.godot/shader_cache/CanvasShaderRD/5454ca85157b6953b76bf324ebe90594c466e36301bf1b3e6adcce117d705c79/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (39424 B)
+  res://.godot/shader_cache/CanvasShaderRD/5454ca85157b6953b76bf324ebe90594c466e36301bf1b3e6adcce117d705c79/89e0c5a264d1558e7bc2ca0dc3d0afd834fbe7b6.vulkan.cache (23900 B)
+  res://.godot/shader_cache/CanvasShaderRD/5454ca85157b6953b76bf324ebe90594c466e36301bf1b3e6adcce117d705c79/8f9335de72e837eeead40640cc01fddc5baf5a7c.vulkan.cache (23584 B)
+  res://.godot/shader_cache/CanvasShaderRD/5454ca85157b6953b76bf324ebe90594c466e36301bf1b3e6adcce117d705c79/b7f8864ed1b8040a3456125a335ae926e257bf47.vulkan.cache (40564 B)
+  res://.godot/shader_cache/CanvasShaderRD/5454ca85157b6953b76bf324ebe90594c466e36301bf1b3e6adcce117d705c79/ddf1c2fb49f2d96e42d4ffa10cbbb808b4b14063.vulkan.cache (41580 B)
+  res://.godot/shader_cache/CopyShaderRD/c374588e7ae9bf64919d0186bea3104b4f721cc0691d284a9998e1e7d06c5eb8/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (13948 B)
+  res://.godot/shader_cache/CopyToFbShaderRD/72456b3a82af4da12c412275d4c8ffa4a6a5447d9daffeeef86bc16965803813/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (5464 B)
+  res://.godot/shader_cache/CubeToDpShaderRD/da14e2c9b701a4bd7336b87667bf4f3b4f645de09781824763d2bbceead56c83/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (1312 B)
+  res://.godot/shader_cache/CubeToOctmapShaderRD/7a5a6871c4fae131d3fef2e125ac23cbe81a1a042028f8c294461282de463c9a/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (1080 B)
+  res://.godot/shader_cache/LuminanceReduceRasterShaderRD/64ab628341e9cf29ef6194796669b84730634d7b0838d39615342160fa4bcea2/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (3432 B)
+  res://.godot/shader_cache/MotionVectorsShaderRD/4d3ba0c01e8b64c74a0f2f0fd20ddc8099d56cfbb3ee9e7dbe6dc3c54c174725/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (1628 B)
+  res://.godot/shader_cache/OctmapDownsamplerShaderRD/17404978f453a0a0388dfb81b2d08f173476d2c3b680e2e6aa35bcf438e24f11/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (2896 B)
+  res://.godot/shader_cache/OctmapFilterShaderRD/cd03c4ea34362e2724f4d4536156039ee5ca21c31167b8840dfc65dad2d6bb11/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (23104 B)
+  res://.godot/shader_cache/OctmapRoughnessShaderRD/8470960c68b74292e24251e3b7e41d28e9a5054dce0cd1d77c2a2a865a10af43/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (5208 B)
+  res://.godot/shader_cache/ParticlesCopyShaderRD/ce2b95c8a6b9e21f14c989c3ca095de77d9bb5e86213ae4180fb97cbd2c02a10/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (44972 B)
+  res://.godot/shader_cache/ParticlesShaderRD/f645828ab356b17f1478c77373935ecd2417e1c227a96b62417396293d13970e/07b5904b662900d90454c39c46885098de79aa4c.vulkan.cache (6256 B)
+  res://.godot/shader_cache/ResolveRasterShaderRD/137533f5cd9053770129104644f24ab1233ba842cf0fab2a907f5680ea22aa2d/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (892 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/02c86814035a46b723fc63849c963fa909ca1d53.vulkan.cache (75712 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/264740c9e52d30fdf72eb09ac389c8c05d7e3e52.vulkan.cache (74280 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/281632020e3bb50b51c579792ed09cba55ca9e61.vulkan.cache (77244 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/2dc1b5cfff090b77444337c6816f834532bf6711.vulkan.cache (75560 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/347259af253e6bbec7ad5c69332af5ca731015aa.vulkan.cache (68572 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/4aa5dd261de3fdc556b6e1bb6dde860628f12626.vulkan.cache (73500 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/58be0ecb4a3734a94c5fe4a3f1dd8f5bfcbe3a1a.vulkan.cache (74016 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/89e8fba0d7acd47b3a26f6e80d5b4f5113808a81.vulkan.cache (73080 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/8b5b4dbe3b644851d29f825ca63d090c7903e1c8.vulkan.cache (73340 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/a57de43d7037044db256520aedcde521c5d7211c.vulkan.cache (75608 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/a784797763b72ce058effad41b273eb697df9814.vulkan.cache (142088 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/b600e18e20b53d8932999d48838b29553c586934.vulkan.cache (145368 B)
+  res://.godot/shader_cache/SceneForwardMobileShaderRD/d62fbfd5b17269ffddb9a426006ac3f57e497a0754625bd6193e29bf42f3f7a4/faba017f3680b49e2024b66cc6d194f77217733d.vulkan.cache (75896 B)
+  res://.godot/shader_cache/ShadowFrustumShaderRD/248bc9deb54d10af912f2da1bd4b006bc43cfe08659a206fa573baf48e4050e0/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (696 B)
+  res://.godot/shader_cache/SkeletonShaderRD/e6bc641e2a094416c99b1294ac5e453c55d24e0b62c1da47c8f7f93ae7877bfa/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (5140 B)
+  res://.godot/shader_cache/SkyShaderRD/25c4162ba5ed1f15e722f73bf07201837a6ae7b301288dd32ff9f71634118d9c/0fa1946a11e1cca806ebfe4b3b4ac7f723d8b701.vulkan.cache (15384 B)
+  res://.godot/shader_cache/SkyShaderRD/25c4162ba5ed1f15e722f73bf07201837a6ae7b301288dd32ff9f71634118d9c/9247dd7bf98483a15ebb05f8c580a398614a07d8.vulkan.cache (20160 B)
+  res://.godot/shader_cache/SkyShaderRD/25c4162ba5ed1f15e722f73bf07201837a6ae7b301288dd32ff9f71634118d9c/d7d7b98c36a8d3a2f21f0aa98936e605ade9ea42.vulkan.cache (21708 B)
+  res://.godot/shader_cache/SkyShaderRD/25c4162ba5ed1f15e722f73bf07201837a6ae7b301288dd32ff9f71634118d9c/ff1961ca0c4c55a79eb12f819a7b6345801bbbaf.vulkan.cache (15696 B)
+  res://.godot/shader_cache/SmaaBlendingShaderRD/d7b7c8cec00f24f9aa8db356b4df88c5fe032d38ce38673bd520c280c936fb80/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (1940 B)
+  res://.godot/shader_cache/SmaaEdgeDetectionShaderRD/8879d099a2601bd01d4582b1e86a091c5f89a7bc46aecc9e805410f75bcda245/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (1400 B)
+  res://.godot/shader_cache/SmaaWeightCalculationShaderRD/de1d49d5ff947e8b8382f43a79f57c4cceb02eed6f86d5175093ca63e94052bf/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (4496 B)
+  res://.godot/shader_cache/SortShaderRD/d8d77897b86870d358bf870233e14233981c2db9ff06641cd8f405379ac8872f/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (3020 B)
+  res://.godot/shader_cache/SpecularMergeShaderRD/70920fc883de48dd253fbc2503dd8f4e65941df0da07e074541df12df090de98/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (3268 B)
+  res://.godot/shader_cache/TexBlitShaderRD/fd9c885eab1da0d330a04ebfd7796019cde57f82208202f3bfc96cae74155212/1e8995c9eb0e9b0b053035999de68595c521a33e.vulkan.cache (6316 B)
+  res://.godot/shader_cache/TonemapMobileShaderRD/d0219d249e06a0fe50412897cc24a137b74c0423bc660911325fe01a359a8273/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (16732 B)
+  res://.godot/shader_cache/VrsShaderRD/fa59a74699f8241cd3f8174eaef045dc8d40f3b29bf36af5414713c289f82717/8305c75c1294a9f00656f0f14344bb8bedcfe4e7.vulkan.cache (2560 B)
+  res://Glb/Stranded_Deep_Data.glb (141477420 B)
+  res://Glb/beepi.glb (6407752 B)
+  res://Glb/introscene.glb (24825584 B)
+  res://Glb/mission_eel.glb (16970940 B)
+  res://Glb/mission_shark.glb (9932640 B)
+  res://scenes/terrain_preview.tscn (180 B)
+  res://scripts/terrain_preview.gd (2685 B)
+  res://scripts/terrain_preview.gd.uid (20 B)
+  res://terrain/source/MAP_INTERNAL_MISSION_3_EDITOR.map (681 B)
+  res://terrain/source/MAP_INTERNAL_MISSION_3_HEIGHT.map (132098 B)
+  res://terrain/source/MAP_INTERNAL_MISSION_3_OBJECT.map (31135 B)
+
+2. PROJECT.GODOT CONFIG
+----------------------------------------
+  config/name="Godot Project"
+  run/main_scene="res://scenes/terrain_preview.tscn"
+  config/features=PackedStringArray("4.7", "Mobile")
+
+3. SCENE & RESOURCE DEPENDENCIES
+----------------------------------------
+  res://node.tscn
+  res://scenes/terrain_preview.tscn
+    -> [OK] res://scripts/terrain_preview.gd
+  res://scripts/terrain_preview.gd
+    -> [OK] res://terrain/source/MAP_INTERNAL_MISSION_3_HEIGHT.map
+
+4. SCENE HIERARCHY & NODES
+----------------------------------------
+  === res://node.tscn ===
+    [gd_scene format=3 uid="uid://dcrueayrv0ld8"]
+    [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_nxiqb"]
+    [node name="Node" type="Node" unique_id=544108827]
+    [node name="Node3D" type="Node3D" parent="." unique_id=1447654359]
+    [node name="Node2D" type="Node2D" parent="." unique_id=1499847470]
+    [node name="Control" type="Control" parent="." unique_id=788729718]
+    [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=43386931]
+    [node name="AnimationTree" type="AnimationTree" parent="." unique_id=1337304553]
+    [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=768719250]
+    [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=623480516]
+    [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1320326025]
+    [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=857460957]
+    [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1153838559]
+    [node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=910350029]
+    [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=530289332]
+    [node name="ResourcePreloader" type="ResourcePreloader" parent="." unique_id=2017052320]
+    [node name="ShaderGlobalsOverride" type="ShaderGlobalsOverride" parent="." unique_id=1928931050]
+    [node name="StatusIndicator" type="StatusIndicator" parent="." unique_id=542848564]
+    [node name="Timer" type="Timer" parent="." unique_id=167391704]
+    [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1959860224]
+  === res://scenes/terrain_preview.tscn ===
+    [gd_scene load_steps=2 format=3]
+    [ext_resource type="Script" path="res://scripts/terrain_preview.gd" id="1"]
+    [node name="TerrainPreview" type="Node3D"]
+
+5. SCRIPTS & SHADERS SUMMARY
+----------------------------------------
+  === res://scripts/terrain_preview.gd (94 lines) ===
+    extends Node3D
+    
+    const MAP_PATH := "res://terrain/source/MAP_INTERNAL_MISSION_3_HEIGHT.map"
+    const SIZE := 257
+    
+    # Provisional visual scale. Not confirmed Unity world units.
+    const HORIZONTAL_SPACING := 0.5
+    const HEIGHT_SCALE := 0.0015
+    const HEIGHT_OFFSET := 30000.0
+    
+    func _ready() -> void:
+        build_terrain()
+        create_camera()
+        create_sun()
+    
+    func build_terrain() -> void:
+        if not FileAccess.file_exists(MAP_PATH):
+            push_error("Mission 3 heightmap not found: " + MAP_PATH)
+            return
+    
+        var bytes := FileAccess.get_file_as_bytes(MAP_PATH)
+    
+        if bytes.size() != SIZE * SIZE * 2:
+            push_error("Invalid heightmap size: %d bytes" % bytes.size())
+            return
+
+6. GLB ASSET ANALYSIS
+----------------------------------------
+  === res://Glb/Stranded_Deep_Data.glb (141477420 B) ===
+    valid=True v=2 err=None
+    nodes(832): ['Stranded_Deep_Data', 'STATION_WATER', 'LOD0', 'ub-mesh-0', 'View - 3D Attribute', 'Group - Item Action', 'Group - Radial Bar', 'Image - Bar Background', 'Image - Bar Fill', 'Image - Icon']
+    meshes(106): ['mesh_0(prims=1)', 'mesh_1(prims=1)', 'mesh_2(prims=1)', 'mesh_3(prims=1)', 'mesh_4(prims=1)', 'mesh_5(prims=1)', 'mesh_6(prims=1)', 'mesh_7(prims=1)']
+    mats(74): ['SeaPlaneInterior', 'RubberDuck_material', 'SeaPlanePedals', 'SeaPlaneConsole1', 'SeaplaneParts', 'Seaplane_Glass', 'Seaplane', 'SeaPlanePanells']
+    textures=38 skins=0 anims=[]
+    images=['img_0(bv=499,mime=image/png,uri=)', 'img_1(bv=500,mime=image/png,uri=)', 'img_2(bv=501,mime=image/png,uri=)', 'img_3(bv=502,mime=image/png,uri=)', 'img_4(bv=503,mime=image/png,uri=)', 'img_5(bv=504,mime=image/png,uri=)']
+    ext_uris=[]
+  === res://Glb/beepi.glb (6407752 B) ===
+    valid=True v=2 err=None
+    nodes(10): ['beepi', 'View - 3D Watch', 'Watch_Male', 'ub-mesh-0', 'ScreenPos_Male', 'Watch_Female', 'ub-mesh-1', 'ScreenPos_Female', 'Screen', 'Light']
+    meshes(2): ['mesh_0(prims=1)', 'mesh_1(prims=1)']
+    mats(1): ['Beepi_Watch_MAT']
+    textures=4 skins=0 anims=[]
+    images=['img_0(bv=8,mime=image/png,uri=)', 'img_1(bv=9,mime=image/png,uri=)', 'img_2(bv=10,mime=image/png,uri=)', 'img_3(bv=11,mime=image/png,uri=)']
+    ext_uris=[]
+  === res://Glb/introscene.glb (24825584 B) ===
+    valid=True v=2 err=None
+    nodes(409): ['introscene', 'Intro_Assets', 'Setup', 'ExplosionPos', 'ExplosionPos1', 'ExplosionPos2', 'ExplosionPos3', 'P1 Position', 'P1 Camera Target', 'P2 Position']
+    meshes(33): ['mesh_0(prims=1)', 'mesh_1(prims=1)', 'mesh_2(prims=1)', 'mesh_3(prims=1)', 'mesh_4(prims=1)', 'mesh_5(prims=1)', 'mesh_6(prims=1)', 'mesh_7(prims=4)']
+    mats(18): ['Default', 'survivor_lowerBody_albedo', 'upper_body_clean', 'Glass', 'Cokpit_Diff', 'Metal', 'Interior1', 'Carpet']
+    textures=30 skins=0 anims=[]
+    images=['img_0(bv=146,mime=image/png,uri=)', 'img_1(bv=147,mime=image/png,uri=)', 'img_2(bv=148,mime=image/png,uri=)', 'img_3(bv=149,mime=image/png,uri=)', 'img_4(bv=150,mime=image/png,uri=)', 'img_5(bv=151,mime=image/png,uri=)']
+    ext_uris=[]
+  === res://Glb/mission_eel.glb (16970940 B) ===
+    valid=True v=2 err=None
+    nodes(34): ['mission_eel', 'ENVIRONMENT', 'Submarine', 'Details', 'ub-mesh-0', 'Submarine', 'ub-mesh-1', 'Submarine_Terrain', 'ub-mesh-2', 'Triggercollider_FollowSpawn']
+    meshes(4): ['mesh_0(prims=2)', 'mesh_1(prims=3)', 'mesh_2(prims=1)', 'mesh_3(prims=1)']
+    mats(7): ['Barnacles_MAT', 'Bones_MAT', 'Submarine_MAT1', 'Submarine_MAT2', 'Ledge', 'Terrain_MAT1', 'Eel_MAT']
+    textures=20 skins=0 anims=[]
+    images=['img_0(bv=19,mime=image/png,uri=)', 'img_1(bv=20,mime=image/png,uri=)', 'img_2(bv=21,mime=image/png,uri=)', 'img_3(bv=22,mime=image/png,uri=)', 'img_4(bv=23,mime=image/png,uri=)', 'img_5(bv=24,mime=image/png,uri=)']
+    ext_uris=[]
+  === res://Glb/mission_shark.glb (9932640 B) ===
+    valid=True v=2 err=None
+    nodes(44): ['mission_shark', 'GOAL_SHARK', 'Movement_Collider', 'GW_Model', 'Great_White_Rig_Final:Great_White_Body_Mesh', 'ub-mesh-0', 'Great_White_Rig_Final:Great_White_Upper_Teeth_Mesh', 'ub-mesh-1', 'Great_White_Rig_Final:GW_Head', 'PlayerPos']
+    meshes(9): ['mesh_0(prims=3)', 'mesh_1(prims=2)', 'mesh_2(prims=1)', 'mesh_3(prims=1)', 'mesh_4(prims=1)', 'mesh_5(prims=1)', 'mesh_6(prims=1)', 'mesh_7(prims=1)']
+    mats(4): ['GW_BOSS_MAT', 'Dead_Whale_MAT', 'Details_MAT', 'Net_MAT']
+    textures=11 skins=0 anims=[]
+    images=['img_0(bv=39,mime=image/png,uri=)', 'img_1(bv=40,mime=image/png,uri=)', 'img_2(bv=41,mime=image/png,uri=)', 'img_3(bv=42,mime=image/png,uri=)', 'img_4(bv=43,mime=image/png,uri=)', 'img_5(bv=44,mime=image/png,uri=)']
+    ext_uris=[]
+
+7. BROKEN / MISSING REFS
+----------------------------------------
+  NONE (0 broken refs)
