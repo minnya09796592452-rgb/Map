@@ -1,66 +1,28 @@
-1. Phase 1 — Evidence Reconciliation
-   စတင်နိုင်ပြီ
-    • Google Team Folder နဲ့ Canonical Ocean Evidence ကို နှိုင်းယှဉ်မယ်။
-    • Report တစ်ခုချင်းစီရဲ့ အချက်အလက်၊ Source၊ Timestamp၊ Version ကို စစ်မယ်။
-    • Contradiction တွေကို စာရင်းပြုစုမယ်။
-    • အဟောင်း၊ အသစ်၊ အတည်ပြုပြီး၊ မအတည်ပြုရသေး ဆိုပြီး ခွဲမယ်။
-   ရလဒ်: တစ်ခုတည်းသော ယုံကြည်စိတ်ချရတဲ့ Evidence Baseline။
-2. Phase 2 — Grid 3 Full Trace
-   မစစ်ရသေး
-    • Grid 3 GPU Texture ကို Shader က တကယ်အသုံးပြုသလား။
-    • CPU Readback မရှိတာကို အတည်ပြုမယ်။
-    • GPU Query Buffer ထဲ Grid 3 Data ရှိသလား။
-    • sampleSpectrum[3] false ဖြစ်ရင် ဘာဖြစ်သလဲ။
-    • numGrids = 3 နဲ့ numGrids = 4 ရဲ့ သက်ရောက်မှု။
-    • Alternate GPU Sampling Path ရှိသလား။
-   Visual Rendering နဲ့ CPU Query ကို Diagram နှစ်ခုခွဲပြီး တည်ဆောက်မယ်။
-   ရလဒ်: Grid 3 ရဲ့ Data Flow ကို အထောက်အထားနဲ့ ပြနိုင်မယ်။
-3. Phase 3 — CPU Buffer Lifecycle
-   မစစ်ရသေး
-   စစ်မယ့်အစီအစဉ်က —
-    a. Constructor
-    b. GetWrite / GetRead
-    c. SwapDisplacements
-    d. Initialize
-    e. Run
-    f. QueryWaves
-    g. WaveSpectrumBufferCPU.Run
-    h. FourierTask.ProcessData
-   Method တစ်ခုချင်းစီရဲ့ IL Call Order နဲ့ Buffer State Before/After ကို မှတ်တမ်းတင်မယ်။
-   ရလဒ်: Buffer lifecycle အမှန်တကယ် ဘယ်လိုအလုပ်လုပ်သလဲ သိနိုင်မယ်။
-4. Phase 4 — Independent Decoder Verification
-   မစစ်ရသေး
-    • Opcode / Operand Coverage
-    • Unknown Opcode Hard Stop
-    • Branch / Switch Target Validation
-    • Tiny / Fat Method Header
-    • Code Size နဲ့ Raw Byte Length
-    • Local Signature Token
-    • MoreSects / EH Section
-    • Exception Handler Boundary
-    • leave Instructions
-    • Metadata Token Resolution
-    • Independent Raw-Byte Decoder
-   252/252 VERIFIED ဆိုတဲ့ အဆိုကို အထောက်အထားအသစ်နဲ့ ပြန်စစ်မယ်။
-   ရလဒ်: Method တစ်ခုချင်းစီရဲ့ Verification Status။
-5. Phase 5 — Compiled Shader / FFT Verification
-   Source လိုအပ်
-    • Unity Shader Assets
-    • ComputeShader Assets
-    • Compiled Shader Data
-    • FFT Processing
-    • Displacement Texture Generation
-    • GPU Sampling
-   C# ထဲက Method Name တွေကိုကြည့်ပြီး Shader Math ကို ခန့်မှန်းမထားဘူး။
-   ရလဒ်: GPU နဲ့ FFT လုပ်ဆောင်ချက်အတွက် တကယ့် Source Evidence။
-6. Phase 6 — Godot 4.7.2 Migration Readiness
-   အထက်ပါအဆင့်များပြီးမှ
-    • Unity API Dependency စာရင်း
-    • CPU/GPU Architecture
-    • Texture Format Mapping
-    • Compute Pipeline Mapping
-    • FFT Implementation Requirements
-    • C# Compatibility
-    • Godot Implementation Specification
-   ရလဒ်: Godot ဘက်ကို ပြောင်းလဲအကောင်အထည်ဖော်နိုင်မယ့် Technical Specification။
+Grid 3 Full Trace
+နောက်တစ်ဆင့်
+Shader Consumption, Query Buffer Population, Sample Index 3 နဲ့ Alternate Path။
+
+
+
+CPU Buffer State Verification
+
+Swap နဲ့ Task Completion အကြား Caller Order၊ Initialization နဲ့ Buffer Data Validity။
+
+
+
+Independent Decoder
+
+1,028 Method တွေကို Raw Byte Decoder နဲ့ ပြန်တိုက်စစ်ရန်။
+
+
+
+Compiled Shader / FFT
+
+Shader Source နဲ့ GPU Compute အလုပ်လုပ်ပုံကို သီးခြားအတည်ပြုရန်။
+
+
+
+Godot 4.7.2 Reconstruction Specification
+
+အထက်ပါအထောက်အထားတွေ ပြည့်စုံပြီးမှ ဆက်လုပ်ရန်။
 
