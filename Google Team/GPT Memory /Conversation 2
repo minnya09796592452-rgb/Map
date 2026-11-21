@@ -769,5 +769,195 @@ Harden the independent PE/CLI/Metadata/IL decoder and validate its existing 980-
 **အရေးကြီးတာ:** ဒီနှစ်ခုဟာ တာဝန်မတူဘူး။ Gemini က Audit orchestration/reporting ပိုင်း၊ Google က forensic decoder ပိုင်း ဖြစ်တယ်။ တစ်ခုကိုတစ်ခု အစားထိုးမလုပ်ရဘူး။
 ------------
 
+V2 နှစ်ခုလုံးကို GitHub ရဲ့ လက်ရှိ `main` branch ကနေ စစ်ဆေးနေပါတယ်။ ဒီတစ်ကြိမ်မှာ V1 ရဲ့ အဟောင်းရလဒ်တွေကို အခြေခံပြီး မဆုံးဖြတ်ဘဲ **V2 ရဲ့ Script၊ Manifest၊ Report တွေကို တစ်ခုချင်းစီ တိုက်စစ်မယ်။**
 
+စစ်ဆေးထားတဲ့ commit: 0dfbee5676a8b6c970df3b148b9e6e281ff39a61
+
+စစ်ဆေးပြီးပါပြီ။ V2 နှစ်ခုလုံးမှာ V1 ထက် တိုးတက်မှုရှိတယ်။ ဒါပေမဲ့ **အရေးကြီးတဲ့ Verification အားနည်းချက်တွေ ကျန်နေသေးတယ်။** အထူးသဖြင့် Google V2 ရဲ့ `980 VERIFIED` ဆိုတဲ့ရလဒ်ကို အပြည့်အဝ အတည်ပြုချက်အဖြစ် လက်မခံသင့်သေးဘူး။
+
+# **1. Gemini Ai Core V2**
+
+V1 ထက် တိုးတက်
+
+PARTIALLY VERIFIED
+
+**စစ်ဆေးထားတဲ့ဖိုင် ၃ ခု**
+
+- `run_audit_v1_fixed.py`
+- `audit_manifest_v1.json`
+- `audit_report_v1.txt`
+
+### **ကောင်းမွန်လာတဲ့အချက်များ**
+
+1. `BASE_DIR` နဲ့ `DATA_DIR` ကို သီးခြားစီ စစ်ဆေးလာတယ်။
+2. File path အမှား၊ ပျောက်နေတဲ့ဖိုင်နဲ့ Duplicate filename တွေကို ခွဲပြထားတယ်။
+3. SHA256 Hash တွေ ထုတ်ပေးတယ်။
+4. `VERIFIED_TOKENS` နဲ့ `METHOD_BODY_SIZES` ကို စစ်ဆေးတဲ့ Logic ထည့်ထားတယ်။
+5. CORE + PIPE + COMBINED Union စစ်ဆေးမှု ထည့်ထားတယ်။
+6. Grid 3 ရဲ့ Bandwidth-saving အကြောင်းပြချက်ကို အတည်ပြုထားတဲ့အချက်အဖြစ် မရေးတော့ဘူး။
+
+### **ကျန်နေတဲ့ ပြဿနာများ**
+
+HIGH
+
+**1. Directory Scan က Recursive မဟုတ်သေးဘူး**
+
+`dpath.iterdir()` ကို အသုံးပြုပြီး Folder တစ်ခုရဲ့ အပေါ်ဆုံးအဆင့်ကိုပဲ စစ်တယ်။ အောက်ခံ Subfolder တွေထဲက Evidence ကို အလိုအလျောက် မရှာနိုင်ဘူး။
+
+HIGH
+
+**2. Token ရှိရုံနဲ့ Method ကို Verified လုပ်နေတယ်**
+
+Token တစ်ခုကို စာသားထဲမှာ တွေ့ရုံနဲ့ Method ရဲ့ IL Body မှန်ကန်ကြောင်း မသက်သေပြနိုင်ဘူး။ Token နဲ့ Method association ကို ပိုမိုတိကျစွာ စစ်ရမယ်။
+
+HIGH
+
+**3. Technical Claim တွေကို အလွန်လွယ်ကူစွာ အတည်ပြုနေတယ်**
+
+`GRID3_READBACK_OBSERVATION` ကို `0x06003091` ရှိရုံနဲ့ VERIFIED လုပ်ထားတယ်။ Method Body ထဲက Grid 0–3 Readback လုပ်ဆောင်ချက်တွေကို ဒီ Script ကိုယ်တိုင် မစစ်ဘူး။
+
+CPU Buffer Swap Order နဲ့ Sampling/Clamp Claim တွေမှာလည်း အလားတူ အားနည်းချက်ရှိတယ်။
+
+MEDIUM
+
+**4. Method Body Size စစ်ဆေးမှု မအောင်မြင်သေးဘူး**
+
+Report ထဲမှာ သတ်မှတ်ထားတဲ့ Method Size ၈ ခုလုံး `UNVERIFIED` ဖြစ်နေတယ်။
+
+MEDIUM
+
+**5. Combined Evidence စစ်ဆေးမှု မပြီးသေးဘူး**
+
+CORE၊ PIPE၊ COMBINED သုံးဖိုင်လုံး မတွေ့တဲ့အတွက် `MISSING_INPUTS` ဖြစ်နေတယ်။ နောက်ပြီး Union စစ်ဆေးမှုက Token နဲ့ Method Key ကိုသာ နှိုင်းယှဉ်တယ်။ Method Body တစ်ခုချင်းစီရဲ့ အကြောင်းအရာကို မနှိုင်းယှဉ်သေးဘူး။
+
+Report ထဲက Scan ရလဒ် — Selected Files 8 ခု၊ Missing Files 3 ခု၊ Path Errors 0 ခု။ Scan timestamp: 2026-11-21 18:58:33 UTC။
+
+**Gemini V2 ဆုံးဖြတ်ချက်:** V1 မှာရှိတဲ့ Path နဲ့ Input Discovery ပြဿနာတွေကို တစ်စိတ်တစ်ပိုင်း ပြင်ထားတယ်။ ဒါပေမဲ့ Technical Verification ကို Token ရှိ/မရှိအဆင့်ကနေ Method Body အဆင့်အထိ မြှင့်တင်ဖို့ လိုနေသေးတယ်။
+
+# **2. Google Ai Core V2**
+
+Decoder Hardening တိုးတက်
+
+PARTIALLY VERIFIED
+
+**စစ်ဆေးထားတဲ့ဖိုင် ၄ ခု**
+
+- `run_hardened_v2_audit.py`
+- `PHASE1_HARDENED_FORENSIC_REPORT.txt`
+- `PER_METHOD_VALIDATION_MANIFEST.json`
+- `DECODER_AB_COMPARISON_REPORT.txt`
+
+### **V1 ထက် တိုးတက်လာတဲ့အချက်များ**
+
+1. PE Signature နဲ့ Optional Header စစ်ဆေးမှု ထည့်ထားတယ်။
+2. Section Table နဲ့ RVA Mapping စစ်ဆေးမှု ထည့်ထားတယ်။
+3. CLI Metadata Stream နဲ့ String Heap စစ်ဆေးမှုတွေ တိုးတက်လာတယ်။
+4. Tiny/Fat Method Header ခွဲခြားစစ်ဆေးတယ်။
+5. IL Opcode နဲ့ Operand အရွယ်အစားတွေကို သတ်မှတ်ထားတယ်။
+6. Truncated Operand တွေကို ဖမ်းနိုင်တယ်။
+7. Branch နဲ့ Switch Target စစ်ဆေးမှု ထည့်ထားတယ်။
+8. Small/Fat Exception Handling Section တွေကို Parse လုပ်တယ်။
+9. Per-Method Validation Manifest ထုတ်ပေးတယ်။
+10. Decoder A/B နှိုင်းယှဉ်မှု ထည့်ထားတယ်။
+
+### **လက်ရှိ Report ရလဒ်**
+
+# **1,064**
+
+Total Scanned Methods — Report အရ
+
+980
+
+VERIFIED
+
+92.1%
+
+84
+
+ABSTRACT / EXTERN
+
+7.9%
+
+Manifest အရ PARTIAL 0၊ UNVERIFIED 0 ဖြစ်တယ်။ သို့သော် အောက်ပါ Decoder ပြဿနာကြောင့် ဒီ VERIFIED အရေအတွက်ကို အပြည့်အဝ လက်မခံနိုင်သေးဘူး။
+
+### **အရေးကြီးဆုံး ပြဿနာများ**
+
+CRITICAL
+
+**1. Decoder B က အမှန်တကယ် Independent Decoder မဟုတ်ဘူး**
+
+`decoder_b_independent()` က Decoder A နဲ့ တူညီတဲ့ `ONE_BYTE` နဲ့ `TWO_BYTE` Opcode Table တွေကို ပြန်သုံးထားတယ်။
+
+Decoder B က Operand အရွယ်အစားအလိုက် Byte တွေကို ကျော်သွားပြီး Trace ထုတ်ပေးတာသာ ဖြစ်တယ်။
+
+အဲဒီအပြင် နှိုင်းယှဉ်တဲ့အခါ Instruction Offset နဲ့ Mnemonic ကိုသာ စစ်တယ်။ Operand တန်ဖိုး၊ Branch Destination နဲ့ Switch Destination တွေကို Decoder B နဲ့ သီးခြားအတည်မပြုဘူး။
+
+**ဒါကြောင့်&#x20;**`0 disagreements`**&#x20;ဆိုတာ Independent Decoder နှစ်ခုက အမှန်တကယ် သဘောတူညီတယ်လို့ မဆိုနိုင်ဘူး။**
+
+HIGH
+
+**2. PE/CLI Bounds Validation မပြည့်စုံသေးဘူး**
+
+Metadata Stream တွေကို File Size နဲ့သာ နှိုင်းယှဉ်ထားတဲ့နေရာတွေရှိတယ်။ Metadata Root ရဲ့ သတ်မှတ်ထားတဲ့အရွယ်အစားအတွင်း ရှိ/မရှိကို အပြည့်အဝ မစစ်ထားဘူး။
+
+CLI Directory Size၊ Metadata Stream Header Bounds နဲ့ Table Stream Bounds တွေကို ပိုမိုတင်းကျပ်စွာ စစ်ရမယ်။
+
+HIGH
+
+**3. Exception Handling Validation မပြည့်စုံသေးဘူး**
+
+Try/Handler Start နဲ့ End Bounds တွေကို စစ်ထားပေမဲ့ Filter Offset၊ EH Clause Flags နဲ့ Protected Region စည်းမျဉ်းတွေကို အပြည့်အဝ မစစ်ရသေးဘူး။
+
+MEDIUM
+
+**4. Abstract Method Evidence မပြည့်စုံဘူး**
+
+Manifest ထဲမှာ Abstract Method 84 ခုကို `ABSTRACT_EXCLUDED` လုပ်ထားပေမဲ့ RVA၊ Method Flags နဲ့ Implementation Flags တွေကို Method တစ်ခုချင်းစီအတွက် မသိမ်းထားဘူး။
+
+နောက်ပိုင်း Independent Audit လုပ်တဲ့အခါ ဒီဆုံးဖြတ်ချက်ကို Manifest တစ်ခုတည်းနဲ့ ပြန်စစ်ဖို့ ခက်ခဲတယ်။
+
+MEDIUM
+
+**5. Output Directory နဲ့ Reproducibility**
+
+DLL Path ကို Hardcode လုပ်ထားပြီး Output Directory ကို Relative Path သတ်မှတ်ထားတယ်။ Script ကို ဘယ် Working Directory ကနေ Run လုပ်သလဲပေါ် မူတည်ပြီး Output နေရာ ပြောင်းနိုင်တယ်။
+
+### **အရေးကြီးတဲ့ Evidence သတိပြုချက်**
+
+Google V2 Report ထဲက DLL SHA256 က အရင် V1 စစ်ဆေးမှုမှာ အသုံးပြုခဲ့တဲ့ DLL Hash နဲ့ တူညီတယ်။
+
+`d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc`
+
+ဒါကြောင့် V2 ဟာ Decoder နဲ့ Validation ပိုင်း တိုးတက်လာတာဖြစ်ပြီး DLL အသစ်တစ်ခုကို စစ်ထားတာတော့ မဟုတ်ဘူး။
+
+Compiled Shader / ComputeShader နဲ့ Serialized Scene Parameters တွေကိုလည်း Report ကိုယ်တိုင်က `UNVERIFIED` လို့ သတ်မှတ်ထားတယ်။
+
+**Google V2 ဆုံးဖြတ်ချက်:** V1 ထက် Parser အများကြီး တိုးတက်လာတယ်။ ဒါပေမဲ့ Independent Decoder မဖြစ်သေးတာက အကြီးဆုံးပြဿနာဖြစ်တယ်။
+
+# **3. နှစ်ခုလုံးအတွက် နောက်ဆုံးဆုံးဖြတ်ချက်**
+
+| စစ်ဆေးချက်               | Gemini V2   | Google V2   |
+| ------------------------ | ----------- | ----------- |
+| Path / File Discovery    | Partial     | N/A         |
+| Token / Metadata         | Partial     | Partial     |
+| Method Body              | မပြည့်စုံ   | Partial     |
+| Independent Verification | မရှိ        | မပြည့်စုံ   |
+| Report / Manifest        | ရှိ         | ရှိ         |
+| လက်ရှိအခြေအနေ            | ပြင်ရန်ကျန် | ပြင်ရန်ကျန် |
+
+## **4. ပြင်ဆင်ရမယ့် အစီအစဉ်**
+
+ကျွန်တော် အကြံပြုတဲ့ အစီအစဉ်က ဒီလိုပါ။
+
+1. **Google V2 — Decoder B ကို အမှန်တကယ် Independent ဖြစ်အောင် ပြန်တည်ဆောက်ရန်။** Shared Opcode Table မသုံးရ၊ Operand နဲ့ Branch/Switch တွေကို သီးခြား Decode လုပ်ရမယ်။
+2. **Google V2 — PE/CLI/EH Validation ကို ပိုမိုတင်းကျပ်ရန်။**
+3. **Google V2 — Per-Method Manifest ထဲမှာ Abstract Method တွေရဲ့ မူရင်း Metadata ကိုပါ သိမ်းရန်။**
+4. **Gemini V2 — Recursive File Discovery ထည့်ရန်။**
+5. **Gemini V2 — Token Presence စစ်ဆေးမှုကို Method-Level Evidence စစ်ဆေးမှုအဖြစ် ပြောင်းရန်။**
+6. **Gemini V2 — CORE/PIPE/COMBINED သုံးဖိုင်လုံးကို ရှာဖွေပြီး Method Body အဆင့်အထိ နှိုင်းယှဉ်ရန်။**
+7. နှစ်ခုလုံးကို ပြင်ပြီးတဲ့အခါ မူရင်း DLL နဲ့ Evidence တွေကို အသုံးပြုပြီး ပြန်လည်စစ်ဆေးရန်။
+
+**မပြောင်းလဲထားတဲ့အရာများ:** GitHub ဖိုင်တွေကို Read-only နဲ့ စစ်ဆေးခဲ့တာဖြစ်ပြီး Repo ထဲမှာ ဘာမှမပြင်ခဲ့ဘူး။ Script တွေကိုလည်း ဒီနေရာမှာ မ Run နိုင်ခဲ့ဘူး။ မူရင်း DLL နဲ့ Android စက်ထဲက Runtime Environment မရှိတဲ့အတွက် Fresh Execution ကို အတည်မပြုနိုင်သေးဘူး။
+
+နောက်တစ်ဆင့်မှာ ဒီတွေ့ရှိချက်တွေကို အခြေခံပြီး V2 နှစ်ခုအတွက် **သီးခြား One-Click ပြင်ဆင်ရေးညွှန်ကြားချက်** ရေးနိုင်တယ်။
 
