@@ -2637,3 +2637,308 @@ The goal is to move the existing Stranded Deep project into Godot, preserve what
 ဒီ Plan မှာ APK မပါဘူး။ Unity ကနေ Godot ကို ရွှေ့ပြောင်းနိုင်ဖို့ပဲ အာရုံစိုက်ထားတယ်။
 
 **ငါ့အမြင်အရ အခုအရေးကြီးဆုံးက လေယာဉ်၊ ဝေလငါး၊ ငါးမန်းထဲက တစ်ခုကို Godot ထဲ အရင်ဆုံး တကယ်မြင်အောင်လုပ်ဖို့ပဲ။** အဲဒီကနေ ရလဒ်ကိုမြင်ပြီး ဆက်တိုးမယ်။ 🤝
+
+အခုတော့ လုပ်ငန်းအတွက် လိုအပ်တဲ့ အချက်အလက်တွေ ရပြီ။ ဒီတစ်ခါ ငါတို့ရဲ့လုပ်ငန်းကို Read-Only Parallel Audit → Godot Migration ပုံစံနဲ့ စမယ်။
+
+အထူးသဖြင့် မင်းပြောတဲ့ သင်္ဘောကို အဓိကထားမယ်။ အဲဒါက လက်ရှိ Godot ထဲမှာ မြင်ရပြီးသား၊ Colour နဲ့ Texture တွေ မပျက်မစီးရှိနေတဲ့ အောင်မြင်ပြီးသား Reference ဖြစ်တယ်။ အသစ်ကနေ ပြန်တည်ဆောက်မယ့်အရာ မဟုတ်ဘူး။
+
+### 1\. လုပ်ငန်းခွဲဝေမှု
+
+Agent 01 — Godot Project
+
+Read Only
+
+စစ်ဆေးရန်: `Stranded-Deep-Original/Godot Project/`
+
+လက်ရှိ Project Structure၊ Scene၊ Resource၊ Shader၊ Material၊ Script နဲ့ လက်ရှိအလုပ်လုပ်နေတဲ့ သင်္ဘော Scene ကို စစ်ဆေးရန်။
+
+Agent 02 — Ship
+
+အဓိက Reference
+
+![Survive a Hostile, Tropical Island in Stranded Deep, Out Tomorrow on PS4 | Push Square](https://images.openai.com/static-rsc-4/be7S19-ReXnBZjojpOspCCOgFB6K_5dU7X6xnOu1TTSoQokJGkArA3wf2BwRR052YdMkDw8NxmoCzb4pWRBwFc1dTM-U8XE282EusqhCYYOSfKW49vVhtnjnhd1nGlOlaNcGvAK5wpny-8CQZImhKn6duL7nuc4gxH9XuYo54dvXBIukGyBDKX-FW_ZJARVr?purpose=fullsize)
+
+`mission_eel.glb` ကို စစ်ဆေးရန်။ Mesh၊ Material၊ Texture၊ Colour၊ Node Hierarchy၊ Transform တွေကို လက်ရှိ Godot သင်္ဘောနဲ့ နှိုင်းယှဉ်ရန်။
+
+Agent 03 — Shark & Whale
+
+Read Only
+
+![Stranded Deep купить ключ](https://images.openai.com/static-rsc-4/uDfrFG_z0YPT8ymqHX77xv1nQz9YOro80lq9yxhJsoLYLkw_QjO2uG31hzhNpxVf1b1rjBQKuSA-8rMqH5ZM9bwwZidE6WZRuJ9-E8PpNBO4Y-AnwNqLiCFjgR5JEWXprosyjaOCmfbwhjCsxGoUGENOU2NZy3Xd__KwF9iVvjcrU0nYewapqmwirlL0yo0b?purpose=fullsize)
+
+`mission_shark.glb` ထဲက ငါးမန်းနဲ့ ဝေလငါးကို သီးခြားခွဲခြားပြီး စစ်ဆေးရန်။
+
+Agent 04 — Intro Scene
+
+Read Only
+
+![Steam Community :: Stranded Deep](https://images.openai.com/static-rsc-4/T2qs3mj1f9vWYba83XANkYaCO6dfuzqdpdCS0A4jMq_SclZkLVZJUH7BYeIjnINh0IfBf-sdx2BUVeg486qpnzhoUa0z-kBvCjYcta8q6Vp8yIkPVGBSTDOO4MEcQgiUBWMuvdvd7_TXaQ983tKf22_wyYhksra7g5zlHOIlz3u4PSNJX8Qa2a1ExYMLyEGv?purpose=fullsize)
+
+`introscene.glb` ထဲက လေယာဉ်၊ အတွင်းခန်း၊ ထိုင်ခုံပေါ်က Player နဲ့ ဆက်စပ် Mesh တွေကို စစ်ဆေးရန်။
+
+Agent 05 — Wristwatch
+
+Read Only
+
+![Steam Community :: Guide :: Vitals & the Watch](https://images.openai.com/static-rsc-4/9C1TogXCMuC4b9XiYP4-pcuhQGr0rIs5HX49jDDfF7Eh7D2n0-7cSKU2hLSDvLi_o5esdbV5VR0zXCj0TI1tgVh9i0yLeh1DmNy2hg9UiVFdsIBvKFBj0Q2F_LuSJOQqez-np-5cX7ez5mkUgE2zw6MQTXBZTqfWYabrMeA9XJmYibBSbsXeEZ5ocoF8jZwD?purpose=fullsize)
+
+`beepi.glb` ထဲက Player ရဲ့ လက်ပတ်နာရီနဲ့ ဆက်စပ် Components တွေကို စစ်ဆေးရန်။
+
+Agent တစ်ယောက်ကို တစ်မျိုးတည်း တာဝန်ပေးမယ်။ ထပ်တူစစ်ဆေးမှုတွေ မဖြစ်စေရဘူး။
+
+### 2\. Gemini အတွက် လုပ်ငန်းညွှန်ကြားချက်
+
+အောက်ကစာကို Gemini ဆီ တိုက်ရိုက်ပို့ပါ။
+
+# CASTAWAY-DEPTHS — PARALLEL READ-ONLY AUDIT
+
+## ROOT DIRECTORY
+
+```bash
+cd "/storage/emulated/0/Download/Stranded-Deep-Original"
+```
+
+Main target:
+
+```text
+Stranded-Deep-Original/
+└── Godot Project/
+```
+
+## ABSOLUTE SOURCE PROTECTION
+
+The entire `Stranded-Deep-Original` directory is the ORIGINAL SOURCE.
+
+Treat it as strictly READ-ONLY.
+
+NO:
+- File modification
+- File deletion
+- Renaming
+- Moving
+- Overwriting
+- Reimporting assets into the original directory
+- Editing project settings
+- Modifying scenes or scripts
+- Running tools that generate files inside the original directory
+
+IMPORTANT: Opening the original project in Godot Editor can generate import caches and editor metadata. Do not open or import the original project directly.
+
+All inspection must be non-destructive.
+
+If a visual test is needed later, use a separate working copy outside the original directory.
+
+Do not claim the filesystem is technically write-locked unless that has actually been enforced and verified.
+
+## PARALLEL TASK ASSIGNMENT
+
+Each agent receives exactly ONE independent assignment.
+
+### AGENT 01 — GODOT PROJECT AUDIT
+
+Inspect:
+
+`Stranded-Deep-Original/Godot Project/`
+
+Identify:
+- project.godot
+- Existing scenes
+- Existing GLB imports and source references
+- Materials and textures
+- Shader resources
+- Scene hierarchy
+- Current ship scene
+- Resource dependencies
+- Existing working Ocean resources
+
+Find the scene corresponding to the ship visible in the supplied Godot screenshots.
+
+This ship scene is the MAIN REFERENCE.
+
+Do not change its meshes, colors, materials, textures, or settings.
+
+### AGENT 02 — SHIP ASSET AUDIT
+
+Target:
+
+`mission_eel.glb`
+
+This file contains the ship asset.
+
+Inspect:
+- Meshes
+- Materials
+- Base colors
+- Textures
+- Normal maps
+- Metallic/roughness information
+- Node hierarchy
+- Transforms
+- Embedded resources
+- Missing external dependencies
+
+Compare it with the existing working ship scene inside Godot Project.
+
+Determine whether the existing Godot ship already contains the same recovered asset or a related representation.
+
+Do not replace or reimport anything.
+
+### AGENT 03 — SHARK AND WHALE AUDIT
+
+Target:
+
+`mission_shark.glb`
+
+Inspect both the shark and dead whale.
+
+Determine:
+- Whether both assets are present
+- Separate mesh names
+- Material assignments
+- Texture references
+- Geometry integrity
+- Node hierarchy
+- Transforms
+- Animation data, if any
+- Import compatibility considerations
+
+Do not modify the GLB.
+
+### AGENT 04 — INTRO AIRPLANE AUDIT
+
+Target:
+
+`introscene.glb`
+
+Inspect:
+- Airplane exterior
+- Airplane interior
+- Cockpit
+- Player seated inside
+- Seats and related objects
+- Mesh and material assignments
+- Textures
+- Hierarchy
+- Animations
+- Dependencies
+
+Determine how much of the original opening scene is recoverable.
+
+Do not modify the GLB.
+
+### AGENT 05 — WRISTWATCH AUDIT
+
+Target:
+
+`beepi.glb`
+
+Inspect the player's wristwatch.
+
+Determine:
+- Watch geometry
+- Materials
+- Textures
+- Display components
+- Mesh hierarchy
+- Transform structure
+- Animation data
+- Dependencies
+
+Do not modify the GLB.
+
+## REPORTING RULES
+
+Every agent must provide:
+
+1. Exact inspected file paths.
+2. Actual discovered node and mesh names.
+3. Material and texture information.
+4. External dependencies.
+5. Missing or broken resources.
+6. Godot 4.7.2 compatibility assessment.
+7. What is already usable.
+8. What requires conversion or reconstruction.
+
+Use these separate statuses:
+
+- FOUND
+- EXTRACTED
+- IMPORTABLE
+- IMPORTED
+- VISUALLY VERIFIED
+- BLOCKED
+- NOT YET TESTED
+
+Never confuse these stages.
+
+Do not invent missing evidence.
+
+Do not turn a successful extraction into a failure just because another component is incomplete.
+
+## COORDINATION
+
+After the five independent inspections, combine their results into one migration map.
+
+Do not start modifying the original project.
+
+Do not start APK development.
+
+Do not start unnecessary gameplay or Save/Load development.
+
+## FIRST IMPLEMENTATION TARGET
+
+The existing working ship inside Godot is the anchor.
+
+Preserve its current appearance, colors, materials, and textures.
+
+The first implementation phase must build upon this already-visible result rather than replacing it.
+
+The objective is practical progression into Godot 4.7.2, not endless forensic reporting.
+
+**READ-ONLY FIRST. PARALLEL INSPECTION. PRESERVE SUCCESSFUL WORK. GODOT MIGRATION NEXT.**
+
+### 3\. Source Protection နဲ့ပတ်သက်ပြီး အရေးကြီးတဲ့အချက်
+
+မင်းပြောတဲ့ Original Folder ကို Lock ချတာကို ငါ အလေးထားတယ်။
+
+Android ရဲ့ `/storage/emulated/0/` ဟာ shared storage ဖြစ်တာကြောင့် `chmod` တစ်ခုတည်းနဲ့ တကယ် Write-Protected ဖြစ်ပြီလို့ အာမမခံနိုင်ဘူး။
+
+ဒါကြောင့်—
+
+* Original Folder ကို Godot Editor နဲ့ တိုက်ရိုက်မဖွင့်ရ။
+
+* Import Cache များကို Original ထဲ မထုတ်ရ။
+
+* အနာဂတ်မှာ ပြင်ဆင်မှုအားလုံးကို သီးခြား Working Copy ထဲမှာသာ လုပ်ရမယ်။
+
+* မူရင်းဖိုင်တွေရဲ့ SHA-256 Hash တွေကို မှတ်တမ်းတင်ထားရမယ်။
+
+### 4\. နောက်ဆုံးရည်မှန်းချက်
+
+### Godot 4.7.2 Migration
+
+Existing Success Preserved
+
+![Epaves de bateau - Astuces et guides Stranded Deep - jeuxvideo.com](https://images.openai.com/static-rsc-4/w9sQZNRuCwkdJ1nYgUQzkVnkLn5OtSl1c3ZG_fhyogYexHZwpQ2OMBfRSk63aI3ITSHAB6Ac6OyNzN6mm9ZsSmfGb_hp8pfIRYQZHtidAF0_aY4TnReaE8A_FB8qeMZ2a_BBbx3sD-lGk3GR1SGYOzTLRvGmtYL6QepfnKCD-zqm7obhUvajjSQuzX-4S_4W?purpose=fullsize)
+
+Ship
+
+အဓိက Reference
+
+![Steam Community :: Stranded Deep](https://images.openai.com/static-rsc-4/xuOeFoMWwb7Jd73APgQYCZjOuDsrvQMUwZJMueygT5TIB_eZGqKRGz88FTAeBGvcF0_hQRYFeQs-VR9Nl0Wb3S-cDQCOjzvTN1PdVZJdYun1CnaHWbM6lfm1jpgfFa9ZXbx5QyVCzGE4gLguYe5O-ZHUIk_KXfk9Yt88Mhn0dyhBxhmTLH3Ff0PBLjYslJmP?purpose=fullsize)
+
+Shark & Whale
+
+![Steam Community :: Stranded Deep](https://images.openai.com/static-rsc-4/fixZ2DHcJ0y0op9dHtNhhikyFwrbFE71aVTKkts9iVOfiRyIXV5Eqp5Sb-MZSfuwFi5fUQZfAscB23ToLT3iWpBk0mNuaPHP9NXbjTIAwAH9S4XKmCWQuroeBKR5Pv8cnW9fhPx9fRqzheWquxVXFBXTVvbq0u04litYlQRa3VIM5wojNG83BImu2V0C4FCH?purpose=fullsize)
+
+Intro Airplane
+
+![Stranded Deep: the Water World Routine – PlayLab! Magazine](https://images.openai.com/static-rsc-4/C2NvgS9cW7umZ8I-PIGrsArwGRH27-bzULgxWmo1wa10ryfNLJnbgv49pxW8eQDCrkLS-l_u9mAVR7nDyNb5S-1AYDdse8M1UkT1ks1nay9xv9AdZv0Ev-YrpSwIJQbvmGXOQdR7XMD8jj7LNRzwzcUxM7Xon-rMSRsRMQr2AOFqhU18oi4qqBPixlSom1uF?purpose=fullsize)
+
+Wristwatch
+
+Destination: ရှိပြီးသား Godot Project ကို အခြေခံပြီး Unity Assets တွေကို မပျက်မစီး ရွှေ့ပြောင်းအသုံးပြုနိုင်သော Godot Project ဖြစ်လာရန်။
+
+ငါ့ရဲ့ဆုံးဖြတ်ချက်တစ်ခုကတော့ သင်္ဘောကို အရင်ဆုံး ကာကွယ်ထားမယ်။ အဲဒါက ငါတို့ရဲ့ အောင်မြင်ပြီးသား Baseline ဖြစ်တယ်။ ကျန်တဲ့ GLB လေးခုနဲ့ Project Structure ကို တစ်ပြိုင်တည်း စစ်မယ်။ စစ်ဆေးမှု ပြီးတာနဲ့ Report ထုတ်ရုံတင်မဟုတ်ဘဲ Working Copy ထဲမှာ Godot ကို တကယ်ရွှေ့ပြောင်းမယ်။
+
+ဒီတစ်ခါ အရင်ရထားတဲ့ ရတနာတွေကို ကာကွယ်ရင်း ရှေ့ကို တိုးမယ်။ 🌊
