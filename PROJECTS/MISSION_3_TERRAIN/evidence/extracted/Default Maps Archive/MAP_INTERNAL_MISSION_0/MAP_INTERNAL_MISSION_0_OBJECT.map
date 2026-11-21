@@ -1,0 +1,23 @@
+[
+	{
+		"prefab": "6047f88f-0c0b-4c19-8206-26711be30687",
+		"Transform": {
+			"localPosition": {
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"localRotation": {
+				"x": 0,
+				"y": 0,
+				"z": 0,
+				"w": 1
+			},
+			"localScale": {
+				"x": 1,
+				"y": 1,
+				"z": 1
+			}
+		}
+	}
+]
