@@ -1,0 +1,454 @@
+
+==================== QueryWaves_RID_11988 (738B) @ 0x071d58 (738B, 275 insns, unk=2) ====================
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7bc51a0004     | ldfld        0x04001ac5
+  IL_0006: 6f980b000a     | callvirt     0x0a000b98
+  IL_0011: 2d01           | brtrue.s     IL_0014 (+1)
+  IL_0013: 2a             | ret          
+  IL_0014: 03             | ldarg.1      
+  IL_0015: 7b311b0004     | ldfld        0x04001b31
+  IL_0020: 2d01           | brtrue.s     IL_0023 (+1)
+  IL_0022: 2a             | ret          
+  IL_0023: 03             | ldarg.1      
+  IL_0024: 7b331b0004     | ldfld        0x04001b33
+  IL_0029: 18             | ldc.i4.2     
+  IL_0030: fe01           | cgt          
+  IL_0032: 0a             | stloc.0      
+  IL_0033: 03             | ldarg.1      
+  IL_0034: 7b2e1b0004     | ldfld        0x04001b2e
+  IL_0039: 0b             | stloc.1      
+  IL_0040: 03             | ldarg.1      
+  IL_0041: 7b2f1b0004     | ldfld        0x04001b2f
+  IL_0046: 0c             | stloc.2      
+  IL_0047: 02             | ldarg.0      
+  IL_0048: 07             | ldloc.1      
+  IL_0049: 08             | ldloc.2      
+  IL_0050: 03             | ldarg.1      
+  IL_0051: 7b321b0004     | ldfld        0x04001b32
+  IL_0056: 06             | ldloc.0      
+  IL_0057: 28d32e0006     | call         0x06002ed3
+  IL_0062: 2200000000     | ldc.r4       0
+  IL_0067: 0d             | stloc.3      
+  IL_0068: 2200000000     | ldc.r4       0
+  IL_0073: 1304           | stloc.s      4
+  IL_0075: 2200000000     | ldc.r4       0
+  IL_0080: 1305           | stloc.s      5
+  IL_0082: 14             | ldnull       
+  IL_0083: 1306           | stloc.s      6
+  IL_0085: 14             | ldnull       
+  IL_0086: 1307           | stloc.s      7
+  IL_0088: 16             | ldc.i4.0     
+  IL_0089: 1308           | stloc.s      8
+  IL_0091: 38ee010000     | br           IL_0590 (+494)
+  IL_0096: 02             | ldarg.0      
+  IL_0097: 7bc71a0004     | ldfld        0x04001ac7
+  IL_0102: 1108           | ldloc.s      8
+  IL_0104: 6fb70b000a     | callvirt     0x0a000bb7
+  IL_0109: 1309           | stloc.s      9
+  IL_0111: 1109           | ldloc.s      9
+  IL_0113: 7b591a0004     | ldfld        0x04001a59
+  IL_0118: 6f012f0006     | callvirt     0x06002f01
+  IL_0123: 1306           | stloc.s      6
+  IL_0125: 1109           | ldloc.s      9
+  IL_0127: 7b591a0004     | ldfld        0x04001a59
+  IL_0132: 6ffb2e0006     | callvirt     0x06002efb
+  IL_0137: 1307           | stloc.s      7
+  IL_0139: 1106           | ldloc.s      6
+  IL_0141: 6fe72e0006     | callvirt     0x06002ee7
+  IL_0146: 2c4b           | brfalse.s    IL_0223 (+75)
+  IL_0148: 1106           | ldloc.s      6
+  IL_0150: 7be71a0004     | ldfld        0x04001ae7
+  IL_0155: 753a000001     | isinst       0x0100003a
+  IL_0160: 2c3d           | brfalse.s    IL_0223 (+61)
+  IL_0162: 1106           | ldloc.s      6
+  IL_0164: 7be71a0004     | ldfld        0x04001ae7
+  IL_0169: 753a000001     | isinst       0x0100003a
+  IL_0174: 1109           | ldloc.s      9
+  IL_0176: 7b5a1a0004     | ldfld        0x04001a5a
+  IL_0181: 1109           | ldloc.s      9
+  IL_0183: 7b5b1a0004     | ldfld        0x04001a5b
+  IL_0188: 6f1c08000a     | callvirt     0x0a00081c
+  IL_0193: 7bae05000a     | ldfld        0x0a0005ae
+  IL_0198: 130a           | stloc.s      10
+  IL_0200: 09             | ldloc.3      
+  IL_0201: 110a           | ldloc.s      10
+  IL_0203: 2200000000     | ldc.r4       0
+  IL_0208: 1106           | ldloc.s      6
+  IL_0210: 7bea1a0004     | ldfld        0x04001aea
+  IL_0215: 28d801000a     | call         0x0a0001d8
+  IL_0220: 5a             | mul          
+  IL_0221: 58             | add          
+  IL_0222: 0d             | stloc.3      
+  IL_0223: 06             | ldloc.0      
+  IL_0224: 3a5e010000     | brtrue       IL_0579 (+350)
+  IL_0229: 1107           | ldloc.s      7
+  IL_0231: 6fe52e0006     | callvirt     0x06002ee5
+  IL_0236: 3952010000     | brfalse      IL_0579 (+338)
+  IL_0241: 1107           | ldloc.s      7
+  IL_0243: 7be21a0004     | ldfld        0x04001ae2
+  IL_0248: 130b           | stloc.s      11
+  IL_0250: 2200000000     | ldc.r4       0
+  IL_0255: 1107           | ldloc.s      7
+  IL_0257: 7be51a0004     | ldfld        0x04001ae5
+  IL_0262: 28d801000a     | call         0x0a0001d8
+  IL_0267: 130c           | stloc.s      12
+  IL_0269: 2200000000     | ldc.r4       0
+  IL_0274: 130d           | stloc.s      13
+  IL_0276: 2200000000     | ldc.r4       0
+  IL_0281: 130e           | stloc.s      14
+  IL_0283: 1107           | ldloc.s      7
+  IL_0285: 7bdf1a0004     | ldfld        0x04001adf
+  IL_0290: 14             | ldnull       
+  IL_0291: 288c00000a     | call         0x0a00008c
+  IL_0296: 2c34           | brfalse.s    IL_0350 (+52)
+  IL_0298: 1107           | ldloc.s      7
+  IL_0300: 7bdf1a0004     | ldfld        0x04001adf
+  IL_0305: 753a000001     | isinst       0x0100003a
+  IL_0310: 2c26           | brfalse.s    IL_0350 (+38)
+  IL_0312: 1107           | ldloc.s      7
+  IL_0314: 7bdf1a0004     | ldfld        0x04001adf
+  IL_0319: 753a000001     | isinst       0x0100003a
+  IL_0324: 1109           | ldloc.s      9
+  IL_0326: 7b5a1a0004     | ldfld        0x04001a5a
+  IL_0331: 1109           | ldloc.s      9
+  IL_0333: 7b5b1a0004     | ldfld        0x04001a5b
+  IL_0338: 6f1c08000a     | callvirt     0x0a00081c
+  IL_0343: 7bae05000a     | ldfld        0x0a0005ae
+  IL_0348: 130d           | stloc.s      13
+  IL_0350: 1107           | ldloc.s      7
+  IL_0352: 7be31a0004     | ldfld        0x04001ae3
+  IL_0357: 14             | ldnull       
+  IL_0358: 288c00000a     | call         0x0a00008c
+  IL_0363: 2c40           | brfalse.s    IL_0429 (+64)
+  IL_0365: 1107           | ldloc.s      7
+  IL_0367: 7be31a0004     | ldfld        0x04001ae3
+  IL_0372: 753a000001     | isinst       0x0100003a
+  IL_0377: 2c32           | brfalse.s    IL_0429 (+50)
+  IL_0379: 1107           | ldloc.s      7
+  IL_0381: 7be31a0004     | ldfld        0x04001ae3
+  IL_0386: 753a000001     | isinst       0x0100003a
+  IL_0391: 1109           | ldloc.s      9
+  IL_0393: 7b5a1a0004     | ldfld        0x04001a5a
+  IL_0398: 1109           | ldloc.s      9
+  IL_0400: 7b5b1a0004     | ldfld        0x04001a5b
+  IL_0405: 6f1c08000a     | callvirt     0x0a00081c
+  IL_0410: 7bae05000a     | ldfld        0x0a0005ae
+  IL_0415: 130e           | stloc.s      14
+  IL_0417: 110e           | ldloc.s      14
+  IL_0419: 110c           | ldloc.s      12
+  IL_0421: 5a             | mul          
+  IL_0422: 289300000a     | call         0x0a000093
+  IL_0427: 130e           | stloc.s      14
+  IL_0429: 1107           | ldloc.s      7
+  IL_0431: 7be41a0004     | ldfld        0x04001ae4
+  IL_0436: 2d09           | brtrue.s     IL_0447 (+9)
+  IL_0438: 110d           | ldloc.s      13
+  IL_0440: 110b           | ldloc.s      11
+  IL_0442: 5a             | mul          
+  IL_0443: 130d           | stloc.s      13
+  IL_0445: 2b4d           | br.s         IL_0524 (+77)
+  IL_0447: 1107           | ldloc.s      7
+  IL_0449: 7be41a0004     | ldfld        0x04001ae4
+  IL_0454: 17             | ldc.i4.1     
+  IL_0455: 3313           | bne.un.s     IL_0476 (+19)
+  IL_0457: 110d           | ldloc.s      13
+  IL_0459: 110b           | ldloc.s      11
+  IL_0461: 110e           | ldloc.s      14
+  IL_0463: 5a             | mul          
+  IL_0464: 5a             | mul          
+  IL_0465: 130d           | stloc.s      13
+  IL_0467: 2200000000     | ldc.r4       0
+  IL_0472: 130e           | stloc.s      14
+  IL_0474: 2b30           | br.s         IL_0524 (+48)
+  IL_0476: 1107           | ldloc.s      7
+  IL_0478: 7be41a0004     | ldfld        0x04001ae4
+  IL_0483: 18             | ldc.i4.2     
+  IL_0484: 3312           | bne.un.s     IL_0504 (+18)
+  IL_0486: 110d           | ldloc.s      13
+  IL_0488: 110b           | ldloc.s      11
+  IL_0490: 220000803f     | ldc.r4       1
+  IL_0495: 110e           | ldloc.s      14
+  IL_0497: 59             | sub          
+  IL_0498: 5a             | mul          
+  IL_0499: 5a             | mul          
+  IL_0500: 130d           | stloc.s      13
+  IL_0502: 2b14           | br.s         IL_0524 (+20)
+  IL_0504: 1107           | ldloc.s      7
+  IL_0506: 7be41a0004     | ldfld        0x04001ae4
+  IL_0511: 19             | ldc.i4.3     
+  IL_0512: 330a           | bne.un.s     IL_0524 (+10)
+  IL_0514: 110d           | ldloc.s      13
+  IL_0516: 110b           | ldloc.s      11
+  IL_0518: 110e           | ldloc.s      14
+  IL_0520: 5a             | mul          
+  IL_0521: 5a             | mul          
+  IL_0522: 130d           | stloc.s      13
+  IL_0524: 02             | ldarg.0      
+  IL_0525: 28c62e0006     | call         0x06002ec6
+  IL_0530: 2d10           | brtrue.s     IL_0548 (+16)
+  IL_0532: 1104           | ldloc.s      4
+  IL_0534: 110d           | ldloc.s      13
+  IL_0536: 58             | add          
+  IL_0537: 1304           | stloc.s      4
+  IL_0539: 1105           | ldloc.s      5
+  IL_0541: 110e           | ldloc.s      14
+  IL_0543: 58             | add          
+  IL_0544: 1305           | stloc.s      5
+  IL_0546: 2b1f           | br.s         IL_0579 (+31)
+  IL_0548: 02             | ldarg.0      
+  IL_0549: 28c62e0006     | call         0x06002ec6
+  IL_0554: 17             | ldc.i4.1     
+  IL_0555: 3316           | bne.un.s     IL_0579 (+22)
+  IL_0557: 110d           | ldloc.s      13
+  IL_0559: 1104           | ldloc.s      4
+  IL_0561: 28d801000a     | call         0x0a0001d8
+  IL_0566: 1304           | stloc.s      4
+  IL_0568: 110e           | ldloc.s      14
+  IL_0570: 1105           | ldloc.s      5
+  IL_0572: 28d801000a     | call         0x0a0001d8
+  IL_0577: 1305           | stloc.s      5
+  IL_0579: de             | op_de        
+  IL_0580: 03             | ldarg.1      
+  IL_0581: 26             | pop          
+  IL_0582: de             | op_de        
+  IL_0583: 00             | nop          
+  IL_0584: 1108           | ldloc.s      8
+  IL_0586: 17             | ldc.i4.1     
+  IL_0587: 58             | add          
+  IL_0588: 1308           | stloc.s      8
+  IL_0590: 1108           | ldloc.s      8
+  IL_0592: 02             | ldarg.0      
+  IL_0593: 7bc71a0004     | ldfld        0x04001ac7
+  IL_0598: 6fb80b000a     | callvirt     0x0a000bb8
+  IL_0603: 3f00feffff     | blt          IL_0096 (-512)
+  IL_0608: 09             | ldloc.3      
+  IL_0609: 289300000a     | call         0x0a000093
+  IL_0614: 0d             | stloc.3      
+  IL_0615: 220000003f     | ldc.r4       0.5
+  IL_0620: 09             | ldloc.3      
+  IL_0621: 59             | sub          
+  IL_0622: 2200000000     | ldc.r4       0
+  IL_0627: 340c           | bge.un.s     IL_0641 (+12)
+  IL_0629: 03             | ldarg.1      
+  IL_0630: 7c351b0004     | ldflda       0x04001b35
+  IL_0635: 17             | ldc.i4.1     
+  IL_0636: 7d953b0004     | stfld        0x04003b95
+  IL_0641: 220000803f     | ldc.r4       1
+  IL_0646: 1105           | ldloc.s      5
+  IL_0648: 289300000a     | call         0x0a000093
+  IL_0653: 59             | sub          
+  IL_0654: 1305           | stloc.s      5
+  IL_0656: 03             | ldarg.1      
+  IL_0657: 7c351b0004     | ldflda       0x04001b35
+  IL_0662: 7c8e3b0004     | ldflda       0x04003b8e
+  IL_0667: 25             | dup          
+  IL_0668: 4e             | ldind.r4     
+  IL_0669: 1105           | ldloc.s      5
+  IL_0671: 5a             | mul          
+  IL_0672: 56             | stind.r4     
+  IL_0673: 03             | ldarg.1      
+  IL_0674: 7c351b0004     | ldflda       0x04001b35
+  IL_0679: 7c8f3b0004     | ldflda       0x04003b8f
+  IL_0684: 25             | dup          
+  IL_0685: 4e             | ldind.r4     
+  IL_0686: 1105           | ldloc.s      5
+  IL_0688: 5a             | mul          
+  IL_0689: 56             | stind.r4     
+  IL_0690: 03             | ldarg.1      
+  IL_0691: 7c351b0004     | ldflda       0x04001b35
+  IL_0696: 7c903b0004     | ldflda       0x04003b90
+  IL_0701: 25             | dup          
+  IL_0702: 4e             | ldind.r4     
+  IL_0703: 1105           | ldloc.s      5
+  IL_0705: 5a             | mul          
+  IL_0706: 56             | stind.r4     
+  IL_0707: 03             | ldarg.1      
+  IL_0708: 7c351b0004     | ldflda       0x04001b35
+  IL_0713: 7c8e3b0004     | ldflda       0x04003b8e
+  IL_0718: 25             | dup          
+  IL_0719: 4e             | ldind.r4     
+  IL_0720: 1104           | ldloc.s      4
+  IL_0722: 58             | add          
+  IL_0723: 56             | stind.r4     
+  IL_0724: 03             | ldarg.1      
+  IL_0725: 7c351b0004     | ldflda       0x04001b35
+  IL_0730: 1104           | ldloc.s      4
+  IL_0732: 7d913b0004     | stfld        0x04003b91
+  IL_0737: 2a             | ret          
+
+==================== QueryWaves_RID_11859 (128B) @ 0x06f010 (128B, 41 insns, unk=0) ====================
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7beb190004     | ldfld        0x040019eb
+  IL_0006: 7c351b0004     | ldflda       0x04001b35
+  IL_0011: 286c5e0006     | call         0x06005e6c
+  IL_0016: 02             | ldarg.0      
+  IL_0017: 7beb190004     | ldfld        0x040019eb
+  IL_0022: 03             | ldarg.1      
+  IL_0023: 7d2e1b0004     | stfld        0x04001b2e
+  IL_0028: 02             | ldarg.0      
+  IL_0029: 7beb190004     | ldfld        0x040019eb
+  IL_0034: 04             | ldarg.2      
+  IL_0035: 7d2f1b0004     | stfld        0x04001b2f
+  IL_0040: 02             | ldarg.0      
+  IL_0041: 28ab00000a     | call         0x0a0000ab
+  IL_0046: 2c38           | brfalse.s    IL_0104 (+56)
+  IL_0048: 02             | ldarg.0      
+  IL_0049: 282d2e0006     | call         0x06002e2d
+  IL_0054: 14             | ldnull       
+  IL_0055: 288c00000a     | call         0x0a00008c
+  IL_0060: 2c11           | brfalse.s    IL_0079 (+17)
+  IL_0062: 02             | ldarg.0      
+  IL_0063: 282d2e0006     | call         0x06002e2d
+  IL_0068: 02             | ldarg.0      
+  IL_0069: 7beb190004     | ldfld        0x040019eb
+  IL_0074: 6f94300006     | callvirt     0x06003094
+  IL_0079: 02             | ldarg.0      
+  IL_0080: 28382e0006     | call         0x06002e38
+  IL_0085: 2c11           | brfalse.s    IL_0104 (+17)
+  IL_0087: 02             | ldarg.0      
+  IL_0088: 28382e0006     | call         0x06002e38
+  IL_0093: 02             | ldarg.0      
+  IL_0094: 7beb190004     | ldfld        0x040019eb
+  IL_0099: 6fd42e0006     | callvirt     0x06002ed4
+  IL_0104: 02             | ldarg.0      
+  IL_0105: 7beb190004     | ldfld        0x040019eb
+  IL_0110: 7c351b0004     | ldflda       0x04001b35
+  IL_0115: 7b8e3b0004     | ldfld        0x04003b8e
+  IL_0120: 02             | ldarg.0      
+  IL_0121: 7bcc190004     | ldfld        0x040019cc
+  IL_0126: 58             | add          
+  IL_0127: 2a             | ret          
+
+==================== QueryWaves_RID_11860 (146B) @ 0x06f09c (146B, 47 insns, unk=0) ====================
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7beb190004     | ldfld        0x040019eb
+  IL_0006: 7c351b0004     | ldflda       0x04001b35
+  IL_0011: 286c5e0006     | call         0x06005e6c
+  IL_0016: 02             | ldarg.0      
+  IL_0017: 7beb190004     | ldfld        0x040019eb
+  IL_0022: 03             | ldarg.1      
+  IL_0023: 7d2e1b0004     | stfld        0x04001b2e
+  IL_0028: 02             | ldarg.0      
+  IL_0029: 7beb190004     | ldfld        0x040019eb
+  IL_0034: 04             | ldarg.2      
+  IL_0035: 7d2f1b0004     | stfld        0x04001b2f
+  IL_0040: 02             | ldarg.0      
+  IL_0041: 28ab00000a     | call         0x0a0000ab
+  IL_0046: 2c38           | brfalse.s    IL_0104 (+56)
+  IL_0048: 02             | ldarg.0      
+  IL_0049: 282d2e0006     | call         0x06002e2d
+  IL_0054: 14             | ldnull       
+  IL_0055: 288c00000a     | call         0x0a00008c
+  IL_0060: 2c11           | brfalse.s    IL_0079 (+17)
+  IL_0062: 02             | ldarg.0      
+  IL_0063: 282d2e0006     | call         0x06002e2d
+  IL_0068: 02             | ldarg.0      
+  IL_0069: 7beb190004     | ldfld        0x040019eb
+  IL_0074: 6f94300006     | callvirt     0x06003094
+  IL_0079: 02             | ldarg.0      
+  IL_0080: 28382e0006     | call         0x06002e38
+  IL_0085: 2c11           | brfalse.s    IL_0104 (+17)
+  IL_0087: 02             | ldarg.0      
+  IL_0088: 28382e0006     | call         0x06002e38
+  IL_0093: 02             | ldarg.0      
+  IL_0094: 7beb190004     | ldfld        0x040019eb
+  IL_0099: 6fd42e0006     | callvirt     0x06002ed4
+  IL_0104: 05             | ldarg.3      
+  IL_0105: 02             | ldarg.0      
+  IL_0106: 7beb190004     | ldfld        0x040019eb
+  IL_0111: 7c351b0004     | ldflda       0x04001b35
+  IL_0116: 7b953b0004     | ldfld        0x04003b95
+  IL_0121: 52             | stind.i1     
+  IL_0122: 02             | ldarg.0      
+  IL_0123: 7beb190004     | ldfld        0x040019eb
+  IL_0128: 7c351b0004     | ldflda       0x04001b35
+  IL_0133: 7b8e3b0004     | ldfld        0x04003b8e
+  IL_0138: 02             | ldarg.0      
+  IL_0139: 7bcc190004     | ldfld        0x040019cc
+  IL_0144: 58             | add          
+  IL_0145: 2a             | ret          
+
+==================== QueryWaves_RID_11861 (87B) @ 0x06f13c (87B, 32 insns, unk=0) ====================
+  IL_0000: 03             | ldarg.1      
+  IL_0001: 7c351b0004     | ldflda       0x04001b35
+  IL_0006: 286c5e0006     | call         0x06005e6c
+  IL_0011: 02             | ldarg.0      
+  IL_0012: 28ab00000a     | call         0x0a0000ab
+  IL_0017: 2c2e           | brfalse.s    IL_0065 (+46)
+  IL_0019: 02             | ldarg.0      
+  IL_0020: 282d2e0006     | call         0x06002e2d
+  IL_0025: 14             | ldnull       
+  IL_0026: 288c00000a     | call         0x0a00008c
+  IL_0031: 2c0c           | brfalse.s    IL_0045 (+12)
+  IL_0033: 02             | ldarg.0      
+  IL_0034: 282d2e0006     | call         0x06002e2d
+  IL_0039: 03             | ldarg.1      
+  IL_0040: 6f94300006     | callvirt     0x06003094
+  IL_0045: 02             | ldarg.0      
+  IL_0046: 28382e0006     | call         0x06002e38
+  IL_0051: 2c0c           | brfalse.s    IL_0065 (+12)
+  IL_0053: 02             | ldarg.0      
+  IL_0054: 28382e0006     | call         0x06002e38
+  IL_0059: 03             | ldarg.1      
+  IL_0060: 6fd42e0006     | callvirt     0x06002ed4
+  IL_0065: 03             | ldarg.1      
+  IL_0066: 7c351b0004     | ldflda       0x04001b35
+  IL_0071: 7c8e3b0004     | ldflda       0x04003b8e
+  IL_0076: 25             | dup          
+  IL_0077: 4e             | ldind.r4     
+  IL_0078: 02             | ldarg.0      
+  IL_0079: 7bcc190004     | ldfld        0x040019cc
+  IL_0084: 58             | add          
+  IL_0085: 56             | stind.r4     
+  IL_0086: 2a             | ret          
+
+==================== QueryWaves_RID_11862 (123B) @ 0x06f1a0 (123B, 49 insns, unk=2) ====================
+  IL_0000: 03             | ldarg.1      
+  IL_0001: 6f930b000a     | callvirt     0x0a000b93
+  IL_0006: 0a             | stloc.0      
+  IL_0007: 2b5d           | br.s         IL_0102 (+93)
+  IL_0009: 06             | ldloc.0      
+  IL_0010: 6f940b000a     | callvirt     0x0a000b94
+  IL_0015: 0b             | stloc.1      
+  IL_0016: 07             | ldloc.1      
+  IL_0017: 7c351b0004     | ldflda       0x04001b35
+  IL_0022: 286c5e0006     | call         0x06005e6c
+  IL_0027: 02             | ldarg.0      
+  IL_0028: 28ab00000a     | call         0x0a0000ab
+  IL_0033: 2c2e           | brfalse.s    IL_0081 (+46)
+  IL_0035: 02             | ldarg.0      
+  IL_0036: 282d2e0006     | call         0x06002e2d
+  IL_0041: 14             | ldnull       
+  IL_0042: 288c00000a     | call         0x0a00008c
+  IL_0047: 2c0c           | brfalse.s    IL_0061 (+12)
+  IL_0049: 02             | ldarg.0      
+  IL_0050: 282d2e0006     | call         0x06002e2d
+  IL_0055: 07             | ldloc.1      
+  IL_0056: 6f94300006     | callvirt     0x06003094
+  IL_0061: 02             | ldarg.0      
+  IL_0062: 28382e0006     | call         0x06002e38
+  IL_0067: 2c0c           | brfalse.s    IL_0081 (+12)
+  IL_0069: 02             | ldarg.0      
+  IL_0070: 28382e0006     | call         0x06002e38
+  IL_0075: 07             | ldloc.1      
+  IL_0076: 6fd42e0006     | callvirt     0x06002ed4
+  IL_0081: 07             | ldloc.1      
+  IL_0082: 7c351b0004     | ldflda       0x04001b35
+  IL_0087: 7c8e3b0004     | ldflda       0x04003b8e
+  IL_0092: 25             | dup          
+  IL_0093: 4e             | ldind.r4     
+  IL_0094: 02             | ldarg.0      
+  IL_0095: 7bcc190004     | ldfld        0x040019cc
+  IL_0100: 58             | add          
+  IL_0101: 56             | stind.r4     
+  IL_0102: 06             | ldloc.0      
+  IL_0103: 6f0b00000a     | callvirt     0x0a00000b
+  IL_0108: 2d9b           | brtrue.s     IL_0009 (-101)
+  IL_0110: de             | op_de        
+  IL_0111: 0a             | stloc.0      
+  IL_0112: 06             | ldloc.0      
+  IL_0113: 2c06           | brfalse.s    IL_0121 (+6)
+  IL_0115: 06             | ldloc.0      
+  IL_0116: 6f0a00000a     | callvirt     0x0a00000a
+  IL_0121: dc             | op_dc        
+  IL_0122: 2a             | ret          

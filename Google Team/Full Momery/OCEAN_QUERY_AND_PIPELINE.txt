@@ -1,0 +1,45 @@
+========================================================================
+OCEAN QUERY & SAMPLING PIPELINE REPORT (GODOT 4.7.2 REFERENCE)
+Generated : 2026-11-21T16:51:02
+Status    : VERIFIED (Core Query/Sampling/Scaling) | PARTIAL (Tide.Update)
+========================================================================
+
+[1. CALL CHAIN & ENTRY POINTS]
+- Ceto.Ocean.QueryWaves (RID 11859 @ 0x06f010 / RID 11860 @ 0x06f09c) [VERIFIED]
+  -> Clears query state, sets posX/posZ, calls WaveSpectrum.QueryWaves (0x06003094 / RID 12436 @ 0x07ecd8)
+  -> Optionally calls OverlayManager.QueryWaves (0x06002ed4 / RID 11988 @ 0x071d58)
+  -> Returns WaveQueryResult.height (0x04003b8e) + Ocean.level (0x040019cc)
+  -> RID 11860 also outputs isClipped (0x04003b95)
+- WaveSpectrum.QueryWaves (RID 12436 @ 0x07ecd8) [VERIFIED]
+  -> Calls get_DisplacementBuffer (0x06003085)
+  -> Calls virtual IDisplacementBuffer.QueryWaves (0x06002f8b / RID 12171) passing m_queryScaling (0x04001c21)
+- Ceto.QueryDisplacements.QueryWaves (RID 12173 @ 0x0768a8, 951B, 321 insns, gaps=0, overlaps=0) [VERIFIED]
+  -> Calls SampleHeightOnly (0x06002f8e / RID 12174 @ 0x076c6c, 345B, 152 insns) or Sample (0x06002f8f / RID 12175 @ 0x076dd4, 581B, 240 insns)
+
+[2. SCALING & COORDINATE TRANSFORM (UpdateQueryScaling RID 12430 @ 0x07e2c8)]
+- m_choppyness = m_conditions[0].get_Choppyness() * Clamp(this.choppyness, 0, 1.2)
+- m_gridSizes = m_conditions[0].get_GridSizes()
+- invGridSizes (0x04001a53): For axis c in {x, y, z, w}, invGridSizes.c = 1.0f / (get_GridSizes().c * this.gridScale) [gridScale once]
+- scaleY (0x04001a54): this.gridScale
+- choppyness (0x04001a55): get_Choppyness() * this.gridScale [gridScale once]
+- offset (0x04001a56): m_ocean.get_PositionOffset() (0x06002e35)
+- numGrids (0x04001a57): m_conditions[0].get_Key().get_NumGrids() (0x06002ff4 -> 0x0600300f)
+- Local query coordinates: loc0 = posX + offset.x ; loc1 = posZ + offset.z
+
+[3. SAMPLE() VS SAMPLEHEIGHTONLY() & ITERATION PROOF]
+- Grids 0..3 unrolled, gated by sampleSpectrum[i] != 0 and numGrids > i
+- UV transform per grid i: u = x * invGridSizes.<axis>, v = z * invGridSizes.<axis>
+- Sample(): computes X, Y, Z; scales X/Z by choppyness.<axis> and Y by scaleY; combines 4 grids (sumX, sumZ)
+- SampleHeightOnly(): computes Y only; skips horizontal iterative correction; sets dispX=0, dispZ=0, iter=0, err=0; clamps height to [-40, 40]
+- Iteration pass count in QueryDisplacements.QueryWaves (RID 12173):
+  * Counter starts at 0 before loop header (IL_0472)
+  * Incremented by +1 (IL_0718..IL_0722) per pass BEFORE checking loc12 <= MAX_ITERATIONS (IL_0747..IL_0754)
+  * Exits early if errSq <= errSqThr (IL_0745)
+  * Maximum passes = MAX_ITERATIONS + 1 (e.g., 1 pass when MAX_ITERATIONS == 0; up to 21+ passes per documented cap)
+
+[4. INTERPOLATION (InterpolatedArray2f.Get / Index)]
+- Half-pixel offset: u * SX - 0.5f, periodic modulo wrap ((ix % SX) + SX) % SX (wrap=true), 4-corner bilinear blend across channels 0..2
+
+[5. TIDE & REMAINING GAPS]
+- Tide.Update (RVA=0x000146c6, FileOff=0x000128c6) writes Ceto.Ocean.level (0x040019cc) [PARTIALLY VERIFIED - full IL dump pending]
+- UNVERIFIED: Unity scene/runtime overrides, independent non-dnfile raw metadata table cross-check

@@ -1,0 +1,24 @@
+
+🎯 အဓိက Target (ရည်ရွယ်ချက်)
+
+• Stranded Deep ဂိမ်းရဲ့ မူရင်း Unity Ceto Ocean System (ရေလှိုင်းနဲ့ ပေါလောပေါ်မှု တွက်ချက်စနစ်) ကို Godot 4 အင်ဂျင်ပေါ်သို့ တိကျစွာ ပြန်လည်တည်ဆောက် (Reconstruction) ရန်။
+• မှန်းဆချက် (Guesswork) လုံးဝမပါဘဲ Assembly-CSharp.dll ထဲက မူရင်း IL ကုဒ်တွေကို 100% Byte-Verified Evidence အဖြစ် ဆွဲထုတ်အတည်ပြုရန်။
+
+----
+
+
+📅 Timeline အလိုက် လုပ်ဆောင်ခဲ့မှုများ (One-Click Links)
+
+1. အဆင့် (၁) - မူရင်း IL Bytecode များ ဆွဲထုတ်စစ်ဆေးခြင်း (Forensic Disassembly)
+	• လုပ်ဆောင်ချက်: Python script (generate_final_directive.py) ရေးသားပြီး Assembly-CSharp.dll ထဲက Ceto Ocean System ရဲ့ Method ပေါင်း ၂၅၂ ခုစလုံး ကို RVA, Offset, Token, Raw IL နဲ့ Decoded IL အတိအကျ ဆွဲထုတ်ခဲ့တယ်။
+	• ရလဒ်: Total=252, Verified=252, Partial=0 အဖြစ် 100% Byte Coverage အတည်ပြုနိုင်ခဲ့တယ်။
+	• 🔗 Evidence Link: DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt (Method IL Trace & Verification) | Script Execution Log (PDF)
+
+----
+
+2. အဆင့် (၂) - CPU vs GPU Displacement Output Structure ခွဲခြမ်းစိတ်ဖြာခြင်း
+	• လုပ်ဆောင်ချက်: Ocean update loop (Ceto.Ocean.Update), Spectrum တွက်ချက်မှု (InitSpectrumDisplacementsTask) နဲ့ GPU RenderTexture (MultiTargetBlit) တွေရဲ့ ဒေတာစီးဆင်းပုံကို ခွဲခြမ်းစိတ်ဖြာခဲ့တယ်။
+	• ရလဒ်: CPU မှာ Double-Buffer (InterpolatedArray2f Slot 0/1) သုံးပုံ၊ GPU မှာ ARGBHalf 4 ခု ထုတ်ပြီး Bandwidth သက်သာအောင် Grid 0, 1, 2 ကိုပဲ CPU ပြန်ဖတ် (Readback) ပုံနဲ့ QueryDisplacements ရဲ့ Interpolation ([-40, 40] clamp) တို့ကို အတည်ပြုနိုင်ခဲ့တယ်။
+	• 🔗 Evidence Link: DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt (Buffer & Readback Structure) | Ocean Update & Spectrum IL
+
+----
