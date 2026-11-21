@@ -1,0 +1,528 @@
+
+Gemini's Power Scope Sources
+
+
+
+
+===================================================================================
+STRANDED DEEP - FULL EVIDENCE REPORT (ASSETS + .NET METADATA + IL BYTECODE)
+====================================================================================
+Generated At : 2026-11-21T06:44:17
+Data Dir     : /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data
+Managed Dir  : /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed
+
+[1] EXECUTIVE EVIDENCE CONCLUSION
+------------------------------------------------------------------------------------
+- Scene asset files do NOT store static ocean point coordinate arrays or child
+  point GameObjects under `_Ceto`.
+- `_Ceto` transforms initialize at origin `(0.0, 0.0, 0.0)` with rotation
+  `(0.0, 0.0, 0.0, 1.0)` and scale `(1.0, 1.0, 1.0)`.
+- Ocean surface height, wave displacement, tide level, and buoyancy are
+  computed dynamically at runtime via `.Tide.Update` -> `Ceto.Ocean.level`,
+  `Ceto.Ocean.QueryWaves` / `QueryWavesWithAsyncTask`,
+  `Ceto.WaveSpectrum.UpdateQueryScaling` -> `Ceto.QueryGridScaling`,
+  `Ceto.DisplacementBufferCPU/GPU.QueryWaves`,
+  `Ceto.QueryDisplacements.SampleHeightOnly/Sample`, and
+  `Beam.BuoyancyManager.DoQueries`.
+
+[2] ASSET FILES SCAN EVIDENCE
+------------------------------------------------------------------------------------
+  level0                         : size=     81548 bytes | strings_found=['_Ceto']
+  level1                         : size=    763840 bytes | strings_found=[]
+  level2                         : size=     75924 bytes | strings_found=['_Ceto']
+  level3                         : size=    222128 bytes | strings_found=['_Ceto']
+  level4                         : size=    741992 bytes | strings_found=['_Ceto']
+  globalgamemanagers.assets      : size=    928516 bytes | strings_found=['Tide', 'BuoyancyManager', 'WaveSpectrum', 'ProjectedGrid']
+  resources.assets               : size= 184519152 bytes | strings_found=[]
+  sharedassets0.assets           : size=  12027872 bytes | strings_found=['ProjectedGrid']
+
+[3] MANAGED ASSEMBLIES PE / .NET METADATA EVIDENCE
+------------------------------------------------------------------------------------
+File: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll (exists=True, size=3432448B, parsed=True)
+  Sections  : .text[vaddr=0x2000,raw=0x200,sz=0x345800], .rsrc[vaddr=0x348000,raw=0x345a00,sz=0x400], .reloc[vaddr=0x34a000,raw=0x345e00,sz=0x200]
+File: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp-firstpass.dll (exists=True, size=642048B, parsed=True)
+  Sections  : .text[vaddr=0x2000,raw=0x200,sz=0x9c400], .rsrc[vaddr=0xa0000,raw=0x9c600,sz=0x400], .reloc[vaddr=0xa2000,raw=0x9ca00,sz=0x200]
+
+[4] TARGET TYPE DEFINITIONS, FIELDS & METHODS (Assembly-CSharp.dll)
+------------------------------------------------------------------------------------
+Type: Ceto.ProjectedGrid
+  Fields (10) : ['MAX_SCREEN_WIDTH', 'MAX_SCREEN_HEIGHT', 'resolution', 'gridGroups', 'receiveShadows', 'borderLength', 'reflectionProbes', 'oceanTopSideMat', 'oceanUnderSideMat', 'm_grids']
+  Methods (24): ['Start', 'OnEnable', 'OnDisable', 'OnDestroy', 'Update', 'OceanOnPostRender', 'Activate', 'UpdateGrid', 'ResetBounds', 'UpdateBounds', 'UnderSideNeeded', 'TopSideNeeded', 'ScreenWidth', 'ScreenHeight', 'ApplyProjection', 'CreateGrid', 'ClearGrid', 'ResolutionToNumber', 'GroupToNumber', 'ChooseGroupSize', 'CreateScreenQuads', 'CreateQuad', '.ctor', '.cctor']
+Type: Ceto.Buoyancy
+  Fields (15) : ['DENSITY_WATER', 'radius', 'density', 'stickyness', 'unit', 'dragCoefficient', '<PartOfStructure>k__BackingField', '<Volume>k__BackingField', '<SubmergedVolume>k__BackingField', '<SurfaceArea>k__BackingField', '<Mass>k__BackingField', '<WaterHeight>k__BackingField', '<BuoyantForce>k__BackingField', '<DragForce>k__BackingField', '<Stickyness>k__BackingField']
+  Methods (28): ['get_PartOfStructure', 'set_PartOfStructure', 'get_Volume', 'set_Volume', 'get_SubmergedVolume', 'set_SubmergedVolume', 'get_PercentageSubmerged', 'get_SurfaceArea', 'set_SurfaceArea', 'get_Mass', 'set_Mass', 'get_WaterHeight', 'set_WaterHeight', 'get_BuoyantForce', 'set_BuoyantForce', 'get_DragForce', 'set_DragForce', 'get_Stickyness', 'set_Stickyness', 'get_TotalForces', 'Start', 'FixedUpdate', 'UpdateProperties', 'UpdateForces', 'CalculateSubmersion', 'GetUnitScale', 'OnDrawGizmos', '.ctor']
+Type: Ceto.Ocean
+  Fields (57) : ['DISABLE_FOURIER_MULTITHREADING', 'DISABLE_PROJECTED_GRID_BORDER', 'DISABLE_ALL_MULTITHREADING', 'DISABLE_PROJECTION_FLIPPING', 'DISABLE_PROJECT_SCENE_VIEW', 'VERSION', '<Instance>k__BackingField', 'OCEAN_LAYER', 'REFLECTION_TEXTURE_NAME0', 'REFLECTION_TEXTURE_NAME1', 'REFRACTION_GRAB_TEXTURE_NAME', 'DEPTH_GRAB_TEXTURE_NAME', 'OCEAN_DEPTH_TEXTURE_NAME0', 'OCEAN_DEPTH_TEXTURE_NAME1', 'OCEAN_MASK_TEXTURE_NAME0', 'OCEAN_MASK_TEXTURE_NAME1', 'NORMAL_FADE_TEXTURE_NAME', 'MAX_SPECTRUM_WAVE_HEIGHT', 'MAX_OVERLAY_WAVE_HEIGHT', 'disableWarnings', 'disableInfo', 'doublePrecisionProjection', 'tightProjectionFit', 'm_sun', 'level', 'heightOverlaySize', 'normalOverlaySize', 'foamOverlaySize', 'clipOverlaySize', 'heightBlendMode', 'foamBlendMode', 'defaultSkyColor', 'defaultOceanColor', 'windDir', '<WindDirVector>k__BackingField', 'specularRoughness', 'specularIntensity', 'fresnelPower', 'minFresnel', 'foamTint', 'foamIntensity', 'foamTexture0', 'foamTexture1', 'waveOverlaySdr', '<Grid>k__BackingField', '<Reflection>k__BackingField', '<Spectrum>k__BackingField', '<UnderWater>k__BackingField', '<OceanTime>k__BackingField', '<Projection>k__BackingField', 'm_positionOffset', 'm_cameraData', 'm_waveOverlayMat', '<OverlayManager>k__BackingField', 'm_scheduler', 'm_query', '<WasError>k__BackingField']
+  Methods (62): ['get_Instance', 'set_Instance', 'get_MAX_WAVE_HEIGHT', 'get_WindDirVector', 'set_WindDirVector', 'get_Grid', 'set_Grid', 'get_Reflection', 'set_Reflection', 'get_Spectrum', 'set_Spectrum', 'get_UnderWater', 'set_UnderWater', 'get_OceanTime', 'set_OceanTime', 'get_Projection', 'set_Projection', 'get_PositionOffset', 'set_PositionOffset', 'get_CameraCount', 'get_OverlayManager', 'set_OverlayManager', 'get_WasError', 'set_WasError', 'Awake', 'Start', 'OnEnable', 'OnDisable', 'DisableOcean', 'Update', 'OnDestroy', 'OnDrawGizmos', 'Register', 'Deregister', 'LogError', 'LogWarning', 'LogInfo', 'RunCoroutine', 'UpdateOceanScheduler', 'CalculateWindDirVector', 'SunDir', 'SunColor', 'FindCameraData', 'RemoveCameraData', 'FindMaxDisplacement', 'SetQueryWavesSampling', 'QueryNormal', 'QueryWaves', 'QueryWaves', 'QueryWaves', 'QueryWaves', 'QueryWavesWithAsyncTask', 'OceanOnPreRender', 'OceanOnPreCull', 'OceanOnPostRender', 'GetDisableAllOverlays', 'RenderWaveOverlays', 'RenderReflection', 'RenderOceanMask', 'RenderOceanDepth', '.ctor', '.cctor']
+Type: Ceto.QueryGridScaling
+  Fields (6) : ['invGridSizes', 'scaleY', 'choppyness', 'offset', 'numGrids', 'result']
+  Methods (1): ['.ctor']
+Type: Ceto.WaveQuery
+  Fields (11) : ['MIN_ERROR', 'MAX_ITERATIONS', 'minError', 'posX', 'posZ', 'sampleSpectrum', 'sampleOverlay', 'overrideIgnoreQuerys', 'mode', 'tag', 'result']
+  Methods (4): ['.ctor', '.ctor', '.ctor', '.cctor']
+Type: Ceto.DisplacementBufferCPU
+  Fields (2) : ['NUM_BUFFERS', 'm_displacements']
+  Methods (10): ['.ctor', 'Initilize', 'GetWriteDisplacements', 'GetReadDisplacements', 'Run', 'CopyAndCreateDisplacements', 'CopyDisplacements', 'SwapDisplacements', 'MaxRange', 'QueryWaves']
+Type: Ceto.DisplacementBufferGPU
+  Fields (2) : ['NUM_BUFFERS', 'm_displacements']
+  Methods (7): ['.ctor', 'GetReadDisplacements', 'CopyAndCreateDisplacements', 'CopyDisplacements', 'MaxRange', 'QueryWaves', '.cctor']
+Type: Ceto.QueryDisplacements
+  Fields (2) : ['CHANNELS', 'GRIDS']
+  Methods (7): ['QueryWaves', 'SampleHeightOnly', 'Sample', 'MaxRange', 'CopyAndCreateDisplacements', 'CopyDisplacements', '.cctor']
+Type: Ceto.WaveSpectrum
+  Fields (65) : ['MAX_CHOPPYNESS', 'MAX_FOAM_AMOUNT', 'MAX_FOAM_COVERAGE', 'MAX_WIND_SPEED', 'MIN_WAVE_AGE', 'MAX_WAVE_AGE', 'MAX_WAVE_SPEED', 'MIN_GRID_SCALE', 'MAX_GRID_SCALE', 'MAX_WAVE_SMOOTHING', 'MIN_WAVE_SMOOTHING', 'MAX_SLOPE_SMOOTHING', 'MIN_SLOPE_SMOOTHING', 'MAX_FOAM_SMOOTHING', 'MIN_FOAM_SMOOTHING', 'fourierSize', 'spectrumType', 'numberOfGrids', 'disableReadBack', 'disableDisplacements', 'disableSlopes', 'disableFoam', 'textureFoam', 'choppyness', 'foamAmount', 'foamCoverage', 'windSpeed', 'waveAge', 'waveSpeed', 'gridScale', 'waveSmoothing', 'slopeSmoothing', 'foamSmoothing', 'm_displacementMaps', 'm_slopeMaps', 'm_foamMaps', '<MaxDisplacement>k__BackingField', 'm_slopeCopyMat', 'm_displacementCopyMat', 'm_foamCopyMat', 'm_slopeInitMat', 'm_displacementInitMat', 'm_foamInitMat', 'm_gridSizes', 'm_choppyness', 'm_scheduler', 'm_conditions', 'm_displacementBuffer', 'm_slopeBuffer', 'm_jacobianBuffer', 'm_findRangeTask', 'm_readBuffer', 'm_queryScaling', 'm_bufferSettings', 'm_conditionCache', 'm_maxConditionCacheSize', '<CustomWaveSpectrum>k__BackingField', 'initSlopeSdr', 'initDisplacementSdr', 'initJacobianSdr', 'fourierSdr', 'slopeCopySdr', 'displacementCopySdr', 'foamCopySdr', 'readSdr']
+  Methods (36): ['get_DisplacementMaps', 'get_SlopeMaps', 'get_FoamMaps', 'get_MaxDisplacement', 'set_MaxDisplacement', 'get_IsCreatingNewCondition', 'get_GridSizes', 'get_Choppyness', 'get_MaxConditionCacheSize', 'set_MaxConditionCacheSize', 'get_DisplacementBuffer', 'get_CustomWaveSpectrum', 'set_CustomWaveSpectrum', 'Start', 'OnDisable', 'OnDestroy', 'Release', 'Update', 'UpdateSpectrumScheduler', 'UpdateQueryScaling', 'GenerateSlopes', 'GenerateDisplacement', 'ReadFromGPU', 'FindRanges', 'GenerateFoam', 'QueryWaves', 'CreateBuffers', 'CreateRenderTextures', 'CreateMap', 'CreateConditions', 'CacheCondition', 'CreateAndCacheCondition', 'NewSpectrumCondition', 'NewSpectrumConditionKey', 'GetFourierSize', '.ctor']
+Type: Beam.CetoSettings
+  Fields (21) : ['_aboveVisibility', '_belowVisibility', '_aboveVisibilityCurve', '_belowVisibilityCurve', '_currentWaterColor', '_currentUnderwaterColor', '_currentScatterColor', '_currentUnderwaterInscatterColor', '_morningWaterColor', '_middayWaterColor', '_morningUnderwaterColor', '_middayUnderwaterColor', '_morningScatterColor', '_middayScatterColor', '_morningUnderwaterInscatterColor', '_middayUnderwaterInscatterColor', '_weatherScatterColor', '_weatherUnderwaterColor', '_causticsTexture', '_underwater', '_waveSpectrum']
+  Methods (24): ['get_BelowVisibility', 'get_CurrentWaterColor', 'get_CurrentUnderwaterColor', 'get_CurrentScatterColor', 'get_CurrentUnderwaterInscatterColor', 'get_MorningWaterColor', 'get_MiddayWaterColor', 'get_MorningUnderwaterColor', 'get_MiddayUnderwaterColor', 'get_MorningScatterColor', 'get_MiddayScatterColor', 'get_MorningUnderwaterInscatterColor', 'get_MiddayUnderwaterInscatterColor', 'get_Underwater', 'get_WaveSpectrum', 'Start', 'OnDestroy', 'OnOptionsApplied', 'LoadOptions', 'SetCaustics', 'Update', 'UpdateWaterVisibility', 'UpdateWaterColor', '.ctor']
+Type: Beam.BuoyancyManager
+  Fields (5) : ['POLL_INTERVAL_SECONDS', 'OUT_OF_RANGE_DISTANCE', '_queries', '_stepCount', '_queriesDoneThisFrame']
+  Methods (11): ['Add', 'Remove', 'Start', 'OnDestroy', 'FixedUpdate', 'LateUpdate', 'DoQueries', 'Poll_InvokeRepeating', 'CheckInRangeOfPlayer', 'CheckInRangeOfActiveZone', '.ctor']
+
+[5] METHOD RVAs, FILE OFFSETS, RAW IL HEX & FIELD/CALL EVIDENCE
+------------------------------------------------------------------------------------
+Method: Ceto.Ocean.SetQueryWavesSampling (row#11857) | RVA=0x00070d48 | FileOff=0x6ef48 | Fat (stack=3, 71B)
+  IL Hex : 027beb190004037d311b0004027beb1900047b301b000416049c027beb1900047b301b000417059c027beb1900047b301b0004180e049c027beb1900047b301b0004190e059c2a
+    @  1 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @  7 stfld  Ceto.WaveQuery.sampleOverlay (tok=0x04001b31)
+    @ 13 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 18 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 27 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 32 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 41 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 46 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 56 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 61 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+Method: Ceto.Ocean.QueryWaves (row#11859) | RVA=0x00070e04 | FileOff=0x6f004 | Fat (stack=2, 128B)
+  IL Hex : 027beb1900047c351b0004286c5e0006027beb190004037d2e1b0004027beb190004047d2f1b00040228ab00000a2c3802282d2e000614288c00000a2c1102282d2e0006027beb1900046f943000060228382e00062c110228382e0006027beb1900046fd42e0006027beb1900047c351b00047b8e3b0004027bcc190004582a
+    @  1 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @  6 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @ 11 call     WaveQueryResult.Clear (tok=0x06005e6c)
+    @ 17 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 23 stfld  Ceto.WaveQuery.posX (tok=0x04001b2e)
+    @ 29 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 35 stfld  Ceto.WaveQuery.posZ (tok=0x04001b2f)
+    @ 49 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 63 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 69 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 74 callvirt Ceto.WaveSpectrum.QueryWaves (tok=0x06003094)
+    @ 80 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 88 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 94 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 99 callvirt Ceto.OverlayManager.QueryWaves (tok=0x06002ed4)
+    @105 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @110 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @115 ldfld  WaveQueryResult.height (tok=0x04003b8e)
+    @121 ldfld  Ceto.Ocean.level (tok=0x040019cc)
+Method: Ceto.Ocean.QueryWaves (row#11860) | RVA=0x00070e90 | FileOff=0x6f090 | Fat (stack=2, 146B)
+  IL Hex : 027beb1900047c351b0004286c5e0006027beb190004037d2e1b0004027beb190004047d2f1b00040228ab00000a2c3802282d2e000614288c00000a2c1102282d2e0006027beb1900046f943000060228382e00062c110228382e0006027beb1900046fd42e000605027beb1900047c351b00047b953b000452027beb1900047c351b00047b8e3b0004027bcc190004582a
+    @  1 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @  6 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @ 11 call     WaveQueryResult.Clear (tok=0x06005e6c)
+    @ 17 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 23 stfld  Ceto.WaveQuery.posX (tok=0x04001b2e)
+    @ 29 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 35 stfld  Ceto.WaveQuery.posZ (tok=0x04001b2f)
+    @ 49 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 63 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 69 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 74 callvirt Ceto.WaveSpectrum.QueryWaves (tok=0x06003094)
+    @ 80 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 88 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 94 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @ 99 callvirt Ceto.OverlayManager.QueryWaves (tok=0x06002ed4)
+    @106 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @111 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @116 ldfld  WaveQueryResult.isClipped (tok=0x04003b95)
+    @123 ldfld  Ceto.Ocean.m_query (tok=0x040019eb)
+    @128 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @133 ldfld  WaveQueryResult.height (tok=0x04003b8e)
+    @139 ldfld  Ceto.Ocean.level (tok=0x040019cc)
+Method: Ceto.Ocean.QueryWaves (row#11861) | RVA=0x00070f30 | FileOff=0x6f130 | Fat (stack=3, 87B)
+  IL Hex : 037c351b0004286c5e00060228ab00000a2c2e02282d2e000614288c00000a2c0c02282d2e0006036f943000060228382e00062c0c0228382e0006036fd42e0006037c351b00047c8e3b0004254e027bcc19000458562a
+    @  1 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @  6 call     WaveQueryResult.Clear (tok=0x06005e6c)
+    @ 20 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 34 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 40 callvirt Ceto.WaveSpectrum.QueryWaves (tok=0x06003094)
+    @ 46 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 54 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 60 callvirt Ceto.OverlayManager.QueryWaves (tok=0x06002ed4)
+    @ 66 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @ 71 ldsfld WaveQueryResult.height (tok=0x04003b8e)
+    @ 79 ldfld  Ceto.Ocean.level (tok=0x040019cc)
+Method: Ceto.Ocean.QueryWaves (row#11862) | RVA=0x00070f94 | FileOff=0x6f194 | Fat (stack=3, 123B)
+  IL Hex : 036f930b000a0a2b5d066f940b000a0b077c351b0004286c5e00060228ab00000a2c2e02282d2e000614288c00000a2c0c02282d2e0006076f943000060228382e00062c0c0228382e0006076fd42e0006077c351b00047c8e3b0004254e027bcc1900045856066f0b00000a2d9bde0a062c06066f0a00000adc2a
+    @ 17 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @ 22 call     WaveQueryResult.Clear (tok=0x06005e6c)
+    @ 36 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 50 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 56 callvirt Ceto.WaveSpectrum.QueryWaves (tok=0x06003094)
+    @ 62 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 70 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 76 callvirt Ceto.OverlayManager.QueryWaves (tok=0x06002ed4)
+    @ 82 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @ 87 ldsfld WaveQueryResult.height (tok=0x04003b8e)
+    @ 95 ldfld  Ceto.Ocean.level (tok=0x040019cc)
+Method: Ceto.Ocean.QueryWavesWithAsyncTask (row#11863) | RVA=0x0007102c | FileOff=0x6f22c | Fat (stack=4, 110B)
+  IL Hex : 032c08027bea1900042d012a036f4b2f00062c09036f563100062d012a0228ab00000a2c480302282d2e00060228352e0006027bcc1900046f5a2f0006036f482f00062c0e030228382e00066f4a2f00062b0703146f4a2f000603176f4c2f0006027bea190004036fa03100062a
+    @  4 ldfld  Ceto.Ocean.m_scheduler (tok=0x040019ea)
+    @ 13 callvirt Ceto.WaveQueryTask.get_IsScheduled (tok=0x06002f4b)
+    @ 21 callvirt Ceto.Common.Threading.Tasks.ThreadedTask.get_Done (tok=0x06003156)
+    @ 39 call     Ceto.Ocean.get_Spectrum (tok=0x06002e2d)
+    @ 45 call     Ceto.Ocean.get_PositionOffset (tok=0x06002e35)
+    @ 51 ldfld  Ceto.Ocean.level (tok=0x040019cc)
+    @ 56 callvirt Ceto.WaveQueryTask.Reset (tok=0x06002f5a)
+    @ 62 callvirt Ceto.WaveQueryTask.get_SupportsOverlays (tok=0x06002f48)
+    @ 71 call     Ceto.Ocean.get_OverlayManager (tok=0x06002e38)
+    @ 76 callvirt Ceto.WaveQueryTask.set_OverlaySampler (tok=0x06002f4a)
+    @ 85 callvirt Ceto.WaveQueryTask.set_OverlaySampler (tok=0x06002f4a)
+    @ 92 callvirt Ceto.WaveQueryTask.set_IsScheduled (tok=0x06002f4c)
+    @ 98 ldfld  Ceto.Ocean.m_scheduler (tok=0x040019ea)
+    @104 callvirt Ceto.Common.Threading.Scheduling.Scheduler.Run (tok=0x060031a0)
+Method: Ceto.QueryGridScaling..ctor (row#11890) | RVA=0x0007184c | FileOff=0x6fa4c | Tiny (7B)
+  IL Hex : 02286300000a2a
+Method: Ceto.DisplacementBufferCPU.QueryWaves (row#12157) | RVA=0x000785c0 | FileOff=0x767c0 | Fat (stack=4, 28B)
+  IL Hex : 026fa72f00060a062d012a0228772f00060b03060704288d2f00062a
+    @  1 callvirt Ceto.WaveSpectrumBuffer.EnabledBuffers (tok=0x06002fa7)
+    @ 12 call     Ceto.DisplacementBufferCPU.GetReadDisplacements (tok=0x06002f77)
+    @ 22 call     Ceto.QueryDisplacements.QueryWaves (tok=0x06002f8d)
+Method: Ceto.DisplacementBufferGPU.QueryWaves (row#12163) | RVA=0x0007866c | FileOff=0x7686c | Fat (stack=4, 26B)
+  IL Hex : 026fa72f00060a062d012a0306027b5a1b000404288d2f00062a
+    @  1 callvirt Ceto.WaveSpectrumBuffer.EnabledBuffers (tok=0x06002fa7)
+    @ 14 ldfld  Ceto.DisplacementBufferGPU.m_displacements (tok=0x04001b5a)
+    @ 20 call     Ceto.QueryDisplacements.QueryWaves (tok=0x06002f8d)
+Method: Ceto.QueryDisplacements.QueryWaves (row#12173) | RVA=0x0007869c | FileOff=0x7689c | Fat (stack=6, 951B)
+  IL Hex : 046fde0b000a7e5c1b00042e2272f75201707e5c1b00040c120228eb00000a7280530170284b01000a735c0b000a7a04166fdf0b000a6fd33100067e5b1b00042e2272905301707e5b1b00040c120228eb00000a7200540170284b01000a735c0b000a7a027b331b0004172e09027b331b00042c012a027b2e1b0004057c561a00047b8800000a580a027b2f1b0004057c561a00047b8900000a580b057b581a00042d10057e5b1b00048ddb0100017d581a0004032d012a03172e0c027b331b00041740e2000000027c351b00047b923b000404027b301b0004060705288e2f0006027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000422000000007d8f3b0004027c351b000422000000007d903b0004027c351b0004167d933b0004027c351b000422000000007d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a061304071305061306071307027b2d1b0004130a110a7e2b1b000434077e2b1b0004130a110a110a5a130a16130c110606110459581306110707110559581307027c351b00047b923b000404027b301b00041106110705288f2f0006027c351b00047b923b0004168f0e0000017b8800000a027c351b00047b923b0004178f0e0000017b8800000a58027c351b00047b923b0004188f0e0000017b8800000a58027c351b00047b923b0004198f0e0000017b8800000a581308027c351b00047b923b0004168f0e0000017b8900000a027c351b00047b923b0004178f0e0000017b8900000a58027c351b00047b923b0004188f0e0000017b8900000a58027c351b00047b923b0004198f0e0000017b8900000a5813091106110858130411071109581305110c1758130c06110459071105590d255a09095a58130b110b110a360c110c7e2c1b00043ee1feffff027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000411087d8f3b0004027c351b000411097d903b0004027c351b0004110c7d933b0004027c351b0004110b7d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a
+  ldc.r4 : ['@ 12 ldc.r4 3.874844169139855e-38', '@ 65 ldc.r4 3.88582138078999e-38', '@334 ldc.r4 0.0', '@350 ldc.r4 0.0', '@378 ldc.r4 0.0', '@405 ldc.r4 -40.0', '@410 ldc.r4 40.0', '@930 ldc.r4 -40.0', '@935 ldc.r4 40.0']
+    @ 54 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels (tok=0x060031d3)
+    @101 ldfld  Ceto.WaveQuery.mode (tok=0x04001b33)
+    @110 ldfld  Ceto.WaveQuery.mode (tok=0x04001b33)
+    @119 ldfld  Ceto.WaveQuery.posX (tok=0x04001b2e)
+    @125 ldsfld Ceto.QueryGridScaling.offset (tok=0x04001a56)
+    @138 ldfld  Ceto.WaveQuery.posZ (tok=0x04001b2f)
+    @144 ldsfld Ceto.QueryGridScaling.offset (tok=0x04001a56)
+    @157 ldfld  Ceto.QueryGridScaling.result (tok=0x04001a58)
+    @175 stfld  Ceto.QueryGridScaling.result (tok=0x04001a58)
+    @189 ldfld  Ceto.WaveQuery.mode (tok=0x04001b33)
+    @201 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @206 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @213 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @221 call     Ceto.QueryDisplacements.SampleHeightOnly (tok=0x06002f8e)
+    @227 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @233 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @238 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @255 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @260 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @278 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @283 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @301 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @306 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @323 stfld  WaveQueryResult.height (tok=0x04003b8e)
+    @329 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @339 stfld  WaveQueryResult.displacementX (tok=0x04003b8f)
+    @345 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @355 stfld  WaveQueryResult.displacementZ (tok=0x04003b90)
+    @361 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @367 stfld  WaveQueryResult.iterations (tok=0x04003b93)
+    @373 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @383 stfld  WaveQueryResult.error (tok=0x04003b94)
+    @389 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @395 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @400 ldfld  WaveQueryResult.height (tok=0x04003b8e)
+    @420 stfld  WaveQueryResult.height (tok=0x04003b8e)
+    @439 ldfld  Ceto.WaveQuery.minError (tok=0x04001b2d)
+    @491 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @496 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @503 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @513 call     Ceto.QueryDisplacements.Sample (tok=0x06002f8f)
+    @519 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @524 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @541 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @546 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @564 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @569 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @587 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @592 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @612 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @617 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @634 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @639 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @657 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @662 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @680 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @685 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @760 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @766 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @771 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @788 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @793 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @811 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @816 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @834 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @839 ldfld  WaveQueryResult.displacement (tok=0x04003b92)
+    @856 stfld  WaveQueryResult.height (tok=0x04003b8e)
+    @862 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @869 stfld  WaveQueryResult.displacementX (tok=0x04003b8f)
+    @875 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @882 stfld  WaveQueryResult.displacementZ (tok=0x04003b90)
+    @888 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @895 stfld  WaveQueryResult.iterations (tok=0x04003b93)
+    @901 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @908 stfld  WaveQueryResult.error (tok=0x04003b94)
+    @914 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @920 ldsfld Ceto.WaveQuery.result (tok=0x04001b35)
+    @925 ldfld  WaveQueryResult.height (tok=0x04003b8e)
+    @945 stfld  WaveQueryResult.height (tok=0x04003b8e)
+Method: Ceto.QueryDisplacements.SampleHeightOnly (row#12174) | RVA=0x00078a60 | FileOff=0x76c60 | Fat (stack=4, 345B)
+  IL Hex : 0e057b581a00040c0416912c4f0e057b571a0004163145050e057c531a00047ba702000a5a0a0e040e057c531a00047ba702000a5a0b03166fdf0b000a0607086fdf31000602168f0e0000010817980e057b541a00045a7d9200000a0417912c4f0e057b571a0004173145050e057c531a00047ba802000a5a0a0e040e057c531a00047ba802000a5a0b03176fdf0b000a0607086fdf31000602178f0e0000010817980e057b541a00045a7d9200000a0418912c4f0e057b571a0004183145050e057c531a00047ba902000a5a0a0e040e057c531a00047ba902000a5a0b03186fdf0b000a0607086fdf31000602188f0e0000010817980e057b541a00045a7d9200000a0419912c4f0e057b571a0004193145050e057c531a00047ba502000a5a0a0e040e057c531a00047ba502000a5a0b03196fdf0b000a0607086fdf31000602198f0e0000010817980e057b541a00045a7d9200000a2a
+    @  2 ldfld  Ceto.QueryGridScaling.result (tok=0x04001a58)
+    @ 15 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @ 26 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @ 42 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @ 64 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @ 81 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @ 99 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @110 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @126 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @148 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @165 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @183 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @194 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @210 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @232 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @249 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @267 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @278 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @294 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @316 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @333 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+Method: Ceto.QueryDisplacements.Sample (row#12175) | RVA=0x00078bc8 | FileOff=0x76dc8 | Fat (stack=4, 581B)
+  IL Hex : 0e057b581a00040c04169139870000000e057b571a000416317d050e057c531a00047ba702000a5a0a0e040e057c531a00047ba702000a5a0b03166fdf0b000a0607086fdf31000602168f0e0000010816980e057c551a00047ba702000a5a7d8800000a02168f0e0000010817980e057b541a00045a7d9200000a02168f0e0000010818980e057c551a00047ba702000a5a7d8900000a04179139870000000e057b571a000417317d050e057c531a00047ba802000a5a0a0e040e057c531a00047ba802000a5a0b03176fdf0b000a0607086fdf31000602178f0e0000010816980e057c551a00047ba802000a5a7d8800000a02178f0e0000010817980e057b541a00045a7d9200000a02178f0e0000010818980e057c551a00047ba802000a5a7d8900000a04189139870000000e057b571a000418317d050e057c531a00047ba902000a5a0a0e040e057c531a00047ba902000a5a0b03186fdf0b000a0607086fdf31000602188f0e0000010816980e057c551a00047ba902000a5a7d8800000a02188f0e0000010817980e057b541a00045a7d9200000a02188f0e0000010818980e057c551a00047ba902000a5a7d8900000a04199139870000000e057b571a000419317d050e057c531a00047ba502000a5a0a0e040e057c531a00047ba502000a5a0b03196fdf0b000a0607086fdf31000602198f0e0000010816980e057c551a00047ba502000a5a7d8800000a02198f0e0000010817980e057b541a00045a7d9200000a02198f0e0000010818980e057c551a00047ba502000a5a7d8900000a2a
+    @  2 ldfld  Ceto.QueryGridScaling.result (tok=0x04001a58)
+    @ 18 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @ 29 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @ 45 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @ 67 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @ 84 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @112 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @135 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @161 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @172 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @188 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @210 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @227 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @255 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @278 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @304 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @315 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @331 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @353 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @370 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @398 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @421 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @447 ldfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+    @458 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @474 ldsfld Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @496 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (tok=0x060031df)
+    @513 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @541 ldfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @564 ldsfld Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+Method: Ceto.QueryDisplacements.MaxRange (row#12176) | RVA=0x00078e1c | FileOff=0x7701c | Fat (stack=5, 875B)
+  IL Hex : 026fde0b000a7e5c1b00042e2372f75201707e5c1b00041308120828eb00000a7280530170284b01000a735c0b000a7a02166fdf0b000a6fd33100067e5b1b00042e2372905301707e5b1b00041308120828eb00000a7200540170284b01000a735c0b000a7a02166fdf0b000a6fd13100060a120122000080ff22000080ff22000080ff288300000a1202220000807f220000807f220000807f288300000a1a8d0e000001251607a40e000001251707a40e000001251807a40e000001251907a40e0000010d1a8d0e000001251608a40e000001251708a40e000001251808a40e000001251908a40e00000113047e5b1b00048ddb01000113057e5c1b00041306191306161309385e0100000211096fdf0b000a6fd0310006130a16130b383901000016130c3823010000052c0e056f3a3100062c06285005000a2a110c110b065a587e5b1b00045a130d110516110a110d98a0110517110a110d175898a0110518110a110d185898a011051698110411098f0e0000017b8800000a3412110411098f0e000001110516987d8800000a110516980911098f0e0000017b8800000a36110911098f0e000001110516987d8800000a11051798110411098f0e0000017b9200000a3412110411098f0e000001110517987d9200000a110517980911098f0e0000017b9200000a36110911098f0e000001110517987d9200000a11051898110411098f0e0000017b8900000a3412110411098f0e000001110518987d8900000a110518980911098f0e0000017b8900000a36110911098f0e000001110518987d8900000a110c1758130c110c063fd5feffff110b1758130b110b063fbffeffff110917581309110911063f99feffff285005000a130716130e38aa00000012077ca702000a254e09110e8f0e0000017b8800000a1104110e8f0e0000017b8800000a280301000a28d801000a0f01110e28d90b000a5a585612077ca802000a254e09110e8f0e0000017b9200000a1104110e8f0e0000017b9200000a280301000a28d801000a585612077ca902000a254e09110e8f0e0000017b8900000a1104110e8f0e0000017b8900000a280301000a28d801000a0f01110e28d90b000a5a5856110e1758130e110e11063f4dffffff12077ca702000a254e047b2b01000a5a5612077ca802000a254e047b2c01000a5a5612077ca902000a254e047b2b01000a5a5611072a
+    @ 55 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels (tok=0x060031d3)
+    @109 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_SX (tok=0x060031d1)
+    @276 callvirt Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Data (tok=0x060031d0)
+    @303 callvirt Ceto.Common.Threading.Tasks.ICancelToken.get_Cancelled (tok=0x0600313a)
+Method: Ceto.WaveSpectrum.UpdateQueryScaling (row#12430) | RVA=0x000800bc | FileOff=0x7e2bc | Fat (stack=5, 305B)
+  IL Hex : 02027b1b1c0004169a6ff02f0006027b041c00042200000000229a99993f286e00000a288d01000a7d191c000402027b1b1c0004169a6fee2f00067d181c00041200fe15730000011200220000803f0228813000067ba702000a027b0a1c00045a5b7da702000a1200220000803f0228813000067ba802000a027b0a1c00045a5b7da802000a1200220000803f0228813000067ba902000a027b0a1c00045a5b7da902000a1200220000803f0228813000067ba502000a027b0a1c00045a5b7da502000a027b211c0004067d531a0004027b211c0004027b0a1c00047d541a0004027b211c0004022882300006027b0a1c0004288d01000a7d551a0004027b211c0004027bf71900046f352e00067d561a0004027b211c0004027b1b1c0004169a6ff42f00066f0f3000067d571a00042a
+  ldc.r4 : ['@ 20 ldc.r4 0.0', '@ 25 ldc.r4 1.2000000476837158', '@ 74 ldc.r4 1.0', '@105 ldc.r4 1.0', '@136 ldc.r4 1.0', '@167 ldc.r4 1.0']
+    @  2 ldfld  Ceto.WaveSpectrum.m_conditions (tok=0x04001c1b)
+    @  9 callvirt Ceto.WaveSpectrumCondition.get_Choppyness (tok=0x06002ff0)
+    @ 15 ldfld  Ceto.WaveSpectrum.choppyness (tok=0x04001c04)
+    @ 40 stfld  Ceto.WaveSpectrum.m_choppyness (tok=0x04001c19)
+    @ 47 ldfld  Ceto.WaveSpectrum.m_conditions (tok=0x04001c1b)
+    @ 54 callvirt Ceto.WaveSpectrumCondition.get_GridSizes (tok=0x06002fee)
+    @ 59 stfld  Ceto.WaveSpectrum.m_gridSizes (tok=0x04001c18)
+    @ 80 call     Ceto.WaveSpectrum.get_GridSizes (tok=0x06003081)
+    @ 91 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @111 call     Ceto.WaveSpectrum.get_GridSizes (tok=0x06003081)
+    @122 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @142 call     Ceto.WaveSpectrum.get_GridSizes (tok=0x06003081)
+    @153 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @173 call     Ceto.WaveSpectrum.get_GridSizes (tok=0x06003081)
+    @184 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @197 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @203 stfld  Ceto.QueryGridScaling.invGridSizes (tok=0x04001a53)
+    @209 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @215 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @220 stfld  Ceto.QueryGridScaling.scaleY (tok=0x04001a54)
+    @226 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @232 call     Ceto.WaveSpectrum.get_Choppyness (tok=0x06003082)
+    @238 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @248 stfld  Ceto.QueryGridScaling.choppyness (tok=0x04001a55)
+    @254 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @260 ldfld  Ceto.OceanComponent.m_ocean (tok=0x040019f7)
+    @265 callvirt Ceto.Ocean.get_PositionOffset (tok=0x06002e35)
+    @270 stfld  Ceto.QueryGridScaling.offset (tok=0x04001a56)
+    @276 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @282 ldfld  Ceto.WaveSpectrum.m_conditions (tok=0x04001c1b)
+    @289 callvirt Ceto.WaveSpectrumCondition.get_Key (tok=0x06002ff4)
+    @294 callvirt Ceto.WaveSpectrumConditionKey.get_NumGrids (tok=0x0600300f)
+    @299 stfld  Ceto.QueryGridScaling.numGrids (tok=0x04001a57)
+Method: Ceto.WaveSpectrum.FindRanges (row#12434) | RVA=0x00080810 | FileOff=0x7ea10 | Fat (stack=4, 120B)
+  IL Hex : 027bff1b00042c2a0228853000066f852f00062c1d0222000000002200002042027b0a1c00045a732a01000a287f3000062a027b1f1c00042c0d027b1f1c00046f563100062c30027b1f1c00042d0c020273413000067d1f1c0004027b1f1c00046f64310006027b1a1c0004027b1f1c00046fa03100062a
+  ldc.r4 : ['@ 22 ldc.r4 0.0', '@ 27 ldc.r4 40.0']
+    @  1 ldfld  Ceto.WaveSpectrum.disableReadBack (tok=0x04001bff)
+    @  9 call     Ceto.WaveSpectrum.get_DisplacementBuffer (tok=0x06003085)
+    @ 14 callvirt Ceto.IDisplacementBuffer.get_IsGPU (tok=0x06002f85)
+    @ 33 ldfld  Ceto.WaveSpectrum.gridScale (tok=0x04001c0a)
+    @ 44 call     Ceto.WaveSpectrum.set_MaxDisplacement (tok=0x0600307f)
+    @ 51 ldfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @ 59 ldfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @ 64 callvirt Ceto.Common.Threading.Tasks.ThreadedTask.get_Done (tok=0x06003156)
+    @ 72 ldfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @ 86 stfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @ 92 ldfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @ 97 callvirt Ceto.Common.Threading.Tasks.ThreadedTask.Reset (tok=0x06003164)
+    @103 ldfld  Ceto.WaveSpectrum.m_scheduler (tok=0x04001c1a)
+    @109 ldfld  Ceto.WaveSpectrum.m_findRangeTask (tok=0x04001c1f)
+    @114 callvirt Ceto.Common.Threading.Scheduling.Scheduler.Run (tok=0x060031a0)
+Method: Ceto.WaveSpectrum.QueryWaves (row#12436) | RVA=0x00080acc | FileOff=0x7eccc | Fat (stack=3, 110B)
+  IL Hex : 0228ab00000a2d012a0228853000060a062d012a027bff1b00042c09066f852f00062c012a037b331b0004172e09037b331b00042c012a037b301b000416912d1f037b301b000417912d15037b301b000418912d0b037b301b000419912d012a0603027b211c00046f8b2f00062a
+    @ 10 call     Ceto.WaveSpectrum.get_DisplacementBuffer (tok=0x06003085)
+    @ 21 ldfld  Ceto.WaveSpectrum.disableReadBack (tok=0x04001bff)
+    @ 29 callvirt Ceto.IDisplacementBuffer.get_IsGPU (tok=0x06002f85)
+    @ 38 ldfld  Ceto.WaveQuery.mode (tok=0x04001b33)
+    @ 47 ldfld  Ceto.WaveQuery.mode (tok=0x04001b33)
+    @ 56 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 66 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 76 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 86 ldfld  Ceto.WaveQuery.sampleSpectrum (tok=0x04001b30)
+    @ 99 ldfld  Ceto.WaveSpectrum.m_queryScaling (tok=0x04001c21)
+    @104 callvirt Ceto.IDisplacementBuffer.QueryWaves (tok=0x06002f8b)
+Method: Beam.BuoyancyManager.DoQueries (row#15150) | RVA=0x000a2c2c | FileOff=0xa0e2c | Fat (stack=2, 115B)
+  IL Hex : 027bb72200046fc30e000a0a2b44120028c40e000a0b076f243b00062c34076f253b00066f930b000a0c2b12086f940b000a0d28242e0006096f552e0006086f0b00000a2de6de0a082c06086f0a00000adc120028c50e000a2db3de0e1200fe160803001b6f0a00000adc02177db92200042a
+  ldc.r4 : ['@  3 ldc.r4 -239.015625']
+    @  1 ldfld  Beam.BuoyancyManager._queries (tok=0x040022b7)
+    @ 23 callvirt Beam.IQueryWaves.get_Active (tok=0x06003b24)
+    @ 31 callvirt Beam.IQueryWaves.get_WaveQueries (tok=0x06003b25)
+    @ 51 call     Ceto.Ocean.get_Instance (tok=0x06002e24)
+    @ 57 callvirt Ceto.Ocean.QueryWaves (tok=0x06002e55)
+    @109 stfld  Beam.BuoyancyManager._queriesDoneThisFrame (tok=0x040022b9)
+Method: Beam.BuoyancyManager.CheckInRangeOfPlayer (row#15152) | RVA=0x000a2d6c | FileOff=0xa0f6c | Fat (stack=2, 83B)
+  IL Hex : 289b3d00066fa804000a0a2b2e066f4f00000a6f103d00066f7800000a03287e00000a0b1201282601000a220000f042286d5900063404170cde16066f0b00000a2dcade0a062c06066f0a00000adc162a082a
+  ldc.r4 : ['@ 43 ldc.r4 120.0']
+    @  0 call     Beam.PlayerRegistry.get_AllPlayers (tok=0x06003d9b)
+    @ 19 callvirt Beam.IPlayer.get_transform (tok=0x06003d10)
+    @ 48 call     Beam.Utilities.BeamMath.Sqr (tok=0x0600596d)
+Method: Beam.BuoyancyManager.CheckInRangeOfActiveZone (row#15153) | RVA=0x000a2ddc | FileOff=0xa0fdc | Fat (stack=2, 37B)
+  IL Hex : 031628070700060a0614288c00000a2c12066f7a0700062d08066f7c0700062c02172a162a
+    @  2 call     StrandedWorld.GetZone (tok=0x06000707)
+    @ 18 callvirt Zone.get_Loading (tok=0x0600077a)
+    @ 26 callvirt Zone.get_Loaded (tok=0x0600077c)
+
+[6] CETO.OCEAN.LEVEL CROSS-REFERENCES ACROSS ENTIRE ASSEMBLY
+------------------------------------------------------------------------------------
+  Piscus_Creature.ClampToBounds                    @IL+111 (FileOff=0x61b4): ldfld Ceto.Ocean.level
+  Tide.Update                                      @IL+ 55 (FileOff=0x128c6): stfld Ceto.Ocean.level
+  Ceto.ProjectedGrid.ResetBounds                   @IL+  6 (FileOff=0x6cdb0): ldfld Ceto.Ocean.level
+  Ceto.ProjectedGrid.UpdateBounds                  @IL+ 35 (FileOff=0x6ce60): ldfld Ceto.Ocean.level
+  Ceto.Ocean.Update                                @IL+265 (FileOff=0x6e638): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+121 (FileOff=0x6f004): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+139 (FileOff=0x6f090): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+ 79 (FileOff=0x6f130): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+ 95 (FileOff=0x6f194): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWavesWithAsyncTask               @IL+ 51 (FileOff=0x6f22c): ldfld Ceto.Ocean.level
+  Ceto.AddAutoShoreMask.CreateShoreMasks           @IL+137 (FileOff=0x6fe18): ldfld Ceto.Ocean.level
+  Ceto.WaveOverlay.CalculateBounds                 @IL+ 58 (FileOff=0x73244): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.AimProjector                   @IL+ 70 (FileOff=0x73ae0): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.AimProjector                   @IL+319 (FileOff=0x73ae0): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.CreateRangeMatrix              @IL+ 78 (FileOff=0x73c70): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.HProject                       @IL+ 58 (FileOff=0x740ec): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.AimProjector                   @IL+ 50 (FileOff=0x74ce8): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.AimProjector                   @IL+255 (FileOff=0x74ce8): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.CreateRangeMatrix              @IL+ 58 (FileOff=0x74e0c): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.HProject                       @IL+ 45 (FileOff=0x75164): ldfld Ceto.Ocean.level
+  Ceto.PlanarReflection.RenderReflection           @IL+345 (FileOff=0x75b18): ldfld Ceto.Ocean.level
+  Ceto.PlanarReflection.RenderReflection           @IL+ 52 (FileOff=0x76194): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.Update                           @IL+699 (FileOff=0x7fe90): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.FitBottomToCamera                @IL+117 (FileOff=0x802ac): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.UpdateBottomBounds               @IL+ 12 (FileOff=0x80348): ldfld Ceto.Ocean.level
+  Beam.PostEffects.AtmosphericFogController.OnPreRender @IL+ 19 (FileOff=0xbd414): ldfld Ceto.Ocean.level
+  Beam.PostEffects.UnderwaterEffectController.UnderWaterIsVisible @IL+133 (FileOff=0xbe15c): ldfld Ceto.Ocean.level
+  Beam.Crafting.Constructing_ANCHOR.CanDeploy      @IL+ 43 (FileOff=0xe8250): ldfld Ceto.Ocean.level
+
+====================================================================================
+END OF REPORT
+====================================================================================
+
+
+
+
+
+
+`stranded_deep_ocean_evidence_full.txt` ထဲက အချက်အလက်တွေနဲ့ ကျွန်တော်တို့ စစ်ဆေးခဲ့သမျှ သက်သေတွေကို ပေါင်းစပ်ပြီး **အပြည့်အစုံ ခြုံငုံချုပ်** (Full Summary with Evidence) ကို အောက်မှာ ရှင်းရှင်းလင်းလင်း စုစည်းပေးလိုက်ပါတယ်။
+
+---
+
+### ၁။ အဓိက နိဂုံးချုပ် (Executive Evidence Conclusion)
+
+* **Scene Asset ထဲမှာ Static Ocean "Point" တွေ မရှိပါ:** `level0`၊ `level2`၊ `level3`၊ `level4` တို့မှာ static ocean point coordinates (`x, y, z`) စာရင်း သို့မဟုတ် `_Ceto` ရဲ့ child point GameObject တွေ မပါဝင်ပါ。
+* **`_Ceto` Transform အခြေအနေ:** `_Ceto` GameObject တွေရဲ့ Transform ဟာ `(0.0, 0.0, 0.0)` မှာ စတင်ပြီး rotation `(0.0, 0.0, 0.0, 1.0)`၊ scale `(1.0, 1.0, 1.0)` ရှိပါတယ်。
+* **Runtime မှာ ဘယ်လို တွက်ထုတ်လဲ:** Ocean surface height၊ wave displacement၊ tide level နဲ့ buoyancy တို့ကို static data ကနေ ဖတ်တာ မဟုတ်ဘဲ **runtime မှာ dynamic တွက်ချက်တာ** ဖြစ်ပါတယ်。
+
+---
+
+### ၂။ Asset Files နဲ့ Component Mapping သက်သေများ
+
+* **Asset Scan ရလဒ်:**
+* `level0` (`81,548B`), `level2` (`75,924B`), `level3` (`222,128B`), `level4` (`741,992B`) ထဲမှာ `_Ceto` ပါဝင်ပြီး `level1` (`763,840B`) နဲ့ `resources.assets` (`184,519,152B`) မှာ မတွေ့ရပါ。
+* `globalgamemanagers.assets` (`928,516B`) မှာ `Tide`၊ `BuoyancyManager`၊ `WaveSpectrum`၊ `ProjectedGrid` တို့ ပါဝင်ပြီး `sharedassets0.assets` (`12,027,872B`) မှာ `ProjectedGrid` ပါဝင်ပါတယ်。
+
+
+* **Script PathID ကိုက်ညီမှု:**
+* `2100` -> `Beam.CetoSettings`
+* `3179` -> `Ceto.Ocean` (`level0` မှာ offset `128` float က `0.3` ဖြစ်ပြီး `level2/3/4` မှာ `0.5` ပြောင်း)
+* `227` -> `Ceto.WaveSpectrum`
+* `1198` -> `Ceto.ProjectedGrid`
+* `790` -> `Ceto.UnderWater`
+* `3056` -> `Ceto.PlanarReflection`
+* `977` -> `Tide` (`level2/3/4` မှာ ပါဝင်ပြီး `AnimationCurve` float တွေ၊ `0.333333` (`1/3`) တန်ဖိုးတွေ ပါရှိ)
+* `1313` -> `Beam.BuoyancyManager`
+
+
+
+---
+
+### ၃။ `.NET` Metadata & IL Bytecode Execution Flow (`Assembly-CSharp.dll` - `3,432,448B`)
+
+1. **Tide ကနေ Ocean Level တွက်ခြင်း:**
+* `.Tide.Update` (`RVA=0x000146c6`, `FileOff=0x128c6`) မှာ `Tide._lowTideHeight` (`@18`)၊ `Tide._highTideHeight` (`@24`)၊ `Tide._tide` (`@30`) တို့ကို ဖတ်ပြီး `Ceto.Ocean.level` (`@55`, `stfld`) ကို update လုပ်ပါတယ်。
+
+
+2. **Wave Query စတင်ခြင်း (`(posX, posZ)` Point Height):**
+* `Ceto.Ocean.SetQueryWavesSampling` (`RVA=0x00070d48`, `FileOff=0x6ef48`) က `m_query` ရဲ့ `sampleOverlay` နဲ့ `sampleSpectrum` ကို ချိန်ညှိပေးပါတယ်。
+* `Ceto.Ocean.QueryWaves` (`#1` @ `0x6f004` / `#2` @ `0x6f090`) နဲ့ `QueryWavesWithAsyncTask` (`@0x6f22c`) တို့က `WaveQueryResult.Clear` ခေါ်ပြီး `posX` (`@23`) နဲ့ `posZ` (`@35`) ကို ထည့်သွင်းကာ `WaveSpectrum.QueryWaves` (`@74`) နဲ့ `OverlayManager.QueryWaves` (`@99`) ကို ခေါ်ပြီး `WaveQueryResult.height` နဲ့ `Ceto.Ocean.level` (`@121` / `@139`) တို့ကို ပေါင်းစပ် တွက်ချက်ပါတယ်。
+
+
+3. **Grid Scaling & Displacement Buffer တွက်ချက်မှု:**
+* `Ceto.WaveSpectrum.UpdateQueryScaling` (`RVA=0x000800bc`, `FileOff=0x7e2bc`) က `m_conditions` (`get_Choppyness`, `get_GridSizes`)၊ `choppyness`၊ `gridScale`၊ `Ocean.get_PositionOffset`၊ `WaveSpectrumConditionKey.get_NumGrids` တို့ကို ယူပြီး `Ceto.QueryGridScaling` (`invGridSizes` `@203`၊ `scaleY` `@220`၊ `choppyness` `@248`၊ `offset` `@270`၊ `numGrids` `@299`) ထဲ ထည့်ပါတယ်。
+* `Ceto.WaveSpectrum.QueryWaves` (`RVA=0x00080acc`, `FileOff=0x7eccc`) က `IDisplacementBuffer.QueryWaves` (`@104`) ကို ခေါ်ပြီး `Ceto.DisplacementBufferCPU.QueryWaves` (`@0x767c0`) သို့မဟုတ် `Ceto.DisplacementBufferGPU.QueryWaves` (`@0x7686c`) မှတစ်ဆင့် `Ceto.QueryDisplacements.QueryWaves` (`@0x7689c`)၊ `SampleHeightOnly` (`@0x76c60`)၊ `Sample` (`@0x76dc8`) တို့က `InterpolatedArray2f.Get` ဖြင့် height / displacement ကို တွက်ထုတ်ပါတယ်。
+
+
+4. **Buoyancy Query စီမံခန့်ခွဲမှု:**
+* `Beam.BuoyancyManager.DoQueries` (`RVA=0x000a2c2c`, `FileOff=0xa0e2c`) က `_queries` (`@1`) ကို ဖတ်ပြီး `_queriesDoneThisFrame` (`@109`) ကို update လုပ်ပါတယ်。
+
+
+
+---
+
+### ၄။ `Ceto.Ocean.level` ဖတ်/ရေး နေရာများ (Cross-Reference)
+
+* **တစ်ခုတည်းသော ရေးသွင်းမှု (`stfld`):** `Tide.Update @IL+55` (`FileOff=0x128c6`)。
+* **အဓိက ဖတ်ယူမှုများ (`ldfld`):** `Ceto.Ocean.QueryWaves` (`@IL+79`, `@IL+95`, `@IL+121`, `@IL+139`)၊ `Ceto.Ocean.QueryWavesWithAsyncTask` (`@IL+51`)၊ `Ceto.Ocean.Update` (`@IL+265`)၊ `Ceto.ProjectedGrid.ResetBounds` / `UpdateBounds`၊ `Ceto.Projection3d` / `Projection3f`၊ `Ceto.UnderWater` / `UnderwaterEffectController.UnderWaterIsVisible`၊ `Ceto.PlanarReflection.RenderReflection`၊ `Piscus_Creature.ClampToBounds` (`@IL+111`)၊ နဲ့ `Constructing_ANCHOR.CanDeploy` (`@IL+43`)。
+
+---
+
+အခု `stranded_deep_ocean_evidence_full.txt` ထဲက အချက်အလက်အားလုံးကို ပြည့်စုံစွာ ချုပ်ပြပြီးပါပြီ။ ဒီ report ထဲက ဘယ် method ရဲ့ IL byte အသေးစိတ်ကို ထပ်ခွဲကြည့်ချင်သေးလဲ၊ ဒါမှမဟုတ် တခြား ဘာဆက်စစ်ချင်လဲ ပြောပြပါ။
