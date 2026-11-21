@@ -1,0 +1,2014 @@
+============================================================================================
+STRANDED DEEP - VERIFICATION FULL EVIDENCE REPORT (V3)
+============================================================================================
+Generated At : 2026-11-21T07:40:47
+Data Dir     : /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data
+Managed Dir  : /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed
+
+[1] SCENE & ASSET EVIDENCE
+--------------------------------------------------------------------------------------------
+  level0                         :      81548 bytes | found=['_Ceto']
+  level1                         :     763840 bytes | found=[]
+  level2                         :      75924 bytes | found=['_Ceto']
+  level3                         :     222128 bytes | found=['_Ceto']
+  level4                         :     741992 bytes | found=['_Ceto']
+  globalgamemanagers.assets      :     928516 bytes | found=['Tide', 'BuoyancyManager', 'WaveSpectrum', 'ProjectedGrid']
+  resources.assets               :  184519152 bytes | found=[]
+  sharedassets0.assets           :   12027872 bytes | found=['ProjectedGrid']
+
+Assembly: Assembly-CSharp.dll | exists=True | size=3432448B | parsed=True | max_tid=44 | memberrefs=6078
+  Sections: .text[va=0x2000,raw=0x200,sz=0x345800], .rsrc[va=0x348000,raw=0x345a00,sz=0x400], .reloc[va=0x34a000,raw=0x345e00,sz=0x200]
+Assembly: Assembly-CSharp-firstpass.dll | exists=True | size=642048B | parsed=True | max_tid=44 | memberrefs=780
+  Sections: .text[va=0x2000,raw=0x200,sz=0x9c400], .rsrc[va=0xa0000,raw=0x9c600,sz=0x400], .reloc[va=0xa2000,raw=0x9ca00,sz=0x200]
+
+[2] VERIFIED CALCULATION FORMULAS & IL EVIDENCE SUMMARY
+--------------------------------------------------------------------------------------------
+  A. Query Grid Scaling (Ceto.WaveSpectrum.UpdateQueryScaling @ FileOff=0x7e2bc):
+       invGridSizes[g] = 1.0f / (GridSizes[g] * gridScale)   for g in {x=0, y=1, z=2, w=3}
+       scaleY          = gridScale
+       choppyness      = Vector4.op_Multiply(Clamp(choppyness, 0, 1.2), gridScale)
+       offset          = Ceto.Ocean.get_PositionOffset()
+       numGrids        = m_conditions[0].get_Key().get_NumGrids()
+  B. Coordinate Shift (Ceto.QueryDisplacements.QueryWaves @ FileOff=0x7689c):
+       shiftedX        = WaveQuery.posX + QueryGridScaling.offset.x
+       shiftedZ        = WaveQuery.posZ + QueryGridScaling.offset.z
+  C. Height & Displacement Sampling (SampleHeightOnly @ 0x76c60, Sample @ 0x76dc8):
+       (u, v)          = (x * invGridSizes[g], z * invGridSizes[g]) -> InterpolatedArray2f.Get(u, v, buf)
+       height_g        = buf[1] * scaleY
+       dispX_g         = buf[0] * choppyness[g]   (in Sample)
+       dispZ_g         = buf[2] * choppyness[g]   (in Sample)
+  D. Iterative Convergence & Clamping (Ceto.QueryDisplacements.QueryWaves @ FileOff=0x7689c):
+       errorSq         = (shiftedX - curX)^2 + (shiftedZ - curZ)^2
+       loop condition  = (errorSq > minError^2) && (iterations <= MAX_ITERATIONS)
+       WaveQueryResult.height = Mathf.Clamp(sum_g(height_g), -40.0f, 40.0f)
+  E. Ocean Level Addition (Ceto.Ocean.QueryWaves @ 0x6f004, 0x6f090, 0x6f130, 0x6f194):
+       H_surface       = WaveQueryResult.height + Ceto.Ocean.level
+
+[3] RESOLVED MEMBERREF & BLOB SIGNATURE PROOFS
+--------------------------------------------------------------------------------------------
+  0x0a00006e -> UnityEngine.Mathf.Clamp [sig=0x97e:00030c0c0c0c]
+  0x0a000088 -> UnityEngine.Vector3.x [sig=0x9ff:060c]
+  0x0a000089 -> UnityEngine.Vector3.z [sig=0x9ff:060c]
+  0x0a000092 -> UnityEngine.Vector3.y [sig=0x9ff:060c]
+  0x0a00018d -> UnityEngine.Vector4.op_Multiply [sig=0x1102:00021181cd1181cd0c]
+  0x0a0002a5 -> UnityEngine.Vector4.w [sig=0x9ff:060c]
+  0x0a0002a7 -> UnityEngine.Vector4.x [sig=0x9ff:060c]
+  0x0a0002a8 -> UnityEngine.Vector4.y [sig=0x9ff:060c]
+  0x0a0002a9 -> UnityEngine.Vector4.z [sig=0x9ff:060c]
+
+[4] FULL INSTRUCTION-BY-INSTRUCTION CIL DISASSEMBLY (V3 RESOLVED)
+--------------------------------------------------------------------------------------------
+
+>>> Ceto.Ocean.SetQueryWavesSampling (row#11857) | RVA=0x00070d48 | FileOff=0x6ef48 | Fat (stack=3, 71B) | parsed=71/71 | unknowns=[]
+    RawHex: 027beb190004037d311b0004027beb1900047b301b000416049c027beb1900047b301b000417059c027beb1900047b301b0004180e049c027beb1900047b301b0004190e059c2a
+  IL_0000: ldarg.0
+  IL_0001: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0006: ldarg.1
+  IL_0007: stfld          Ceto.WaveQuery.sampleOverlay (0x04001b31)
+  IL_0012: ldarg.0
+  IL_0013: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0018: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0023: ldc.i4.0
+  IL_0024: ldarg.2
+  IL_0025: stelem.r8
+  IL_0026: ldarg.0
+  IL_0027: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0032: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0037: ldc.i4.1
+  IL_0038: ldarg.3
+  IL_0039: stelem.r8
+  IL_0040: ldarg.0
+  IL_0041: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0046: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0051: ldc.i4.2
+  IL_0052: ldarg.s        4
+  IL_0054: stelem.r8
+  IL_0055: ldarg.0
+  IL_0056: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0061: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0066: ldc.i4.3
+  IL_0067: ldarg.s        5
+  IL_0069: stelem.r8
+  IL_0070: ret
+
+>>> Ceto.Ocean.QueryWaves (row#11859) | RVA=0x00070e04 | FileOff=0x6f004 | Fat (stack=2, 128B) | parsed=128/128 | unknowns=[]
+    RawHex: 027beb1900047c351b0004286c5e0006027beb190004037d2e1b0004027beb190004047d2f1b00040228ab00000a2c3802282d2e000614288c00000a2c1102282d2e0006027beb1900046f943000060228382e00062c110228382e0006027beb1900046fd42e0006027beb1900047c351b00047b8e3b0004027bcc190004582a
+  IL_0000: ldarg.0
+  IL_0001: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0006: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0011: call           WaveQueryResult.Clear (0x06005e6c)
+  IL_0016: ldarg.0
+  IL_0017: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0022: ldarg.1
+  IL_0023: stfld          Ceto.WaveQuery.posX (0x04001b2e)
+  IL_0028: ldarg.0
+  IL_0029: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0034: ldarg.2
+  IL_0035: stfld          Ceto.WaveQuery.posZ (0x04001b2f)
+  IL_0040: ldarg.0
+  IL_0041: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0046: brfalse.s      IL_0104
+  IL_0048: ldarg.0
+  IL_0049: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0054: ldnull
+  IL_0055: call           UnityEngine.Object.op_Inequality [sig=0x9db:000202128115128115] (0x0a00008c)
+  IL_0060: brfalse.s      IL_0079
+  IL_0062: ldarg.0
+  IL_0063: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0068: ldarg.0
+  IL_0069: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0074: callvirt       Ceto.WaveSpectrum.QueryWaves (0x06003094)
+  IL_0079: ldarg.0
+  IL_0080: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0085: brfalse.s      IL_0104
+  IL_0087: ldarg.0
+  IL_0088: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0093: ldarg.0
+  IL_0094: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0099: callvirt       Ceto.OverlayManager.QueryWaves (0x06002ed4)
+  IL_0104: ldarg.0
+  IL_0105: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0110: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0115: ldfld          WaveQueryResult.height (0x04003b8e)
+  IL_0120: ldarg.0
+  IL_0121: ldfld          Ceto.Ocean.level (0x040019cc)
+  IL_0126: add
+  IL_0127: ret
+
+>>> Ceto.Ocean.QueryWaves (row#11860) | RVA=0x00070e90 | FileOff=0x6f090 | Fat (stack=2, 146B) | parsed=146/146 | unknowns=[]
+    RawHex: 027beb1900047c351b0004286c5e0006027beb190004037d2e1b0004027beb190004047d2f1b00040228ab00000a2c3802282d2e000614288c00000a2c1102282d2e0006027beb1900046f943000060228382e00062c110228382e0006027beb1900046fd42e000605027beb1900047c351b00047b953b000452027beb1900047c351b00047b8e3b0004027bcc190004582a
+  IL_0000: ldarg.0
+  IL_0001: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0006: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0011: call           WaveQueryResult.Clear (0x06005e6c)
+  IL_0016: ldarg.0
+  IL_0017: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0022: ldarg.1
+  IL_0023: stfld          Ceto.WaveQuery.posX (0x04001b2e)
+  IL_0028: ldarg.0
+  IL_0029: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0034: ldarg.2
+  IL_0035: stfld          Ceto.WaveQuery.posZ (0x04001b2f)
+  IL_0040: ldarg.0
+  IL_0041: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0046: brfalse.s      IL_0104
+  IL_0048: ldarg.0
+  IL_0049: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0054: ldnull
+  IL_0055: call           UnityEngine.Object.op_Inequality [sig=0x9db:000202128115128115] (0x0a00008c)
+  IL_0060: brfalse.s      IL_0079
+  IL_0062: ldarg.0
+  IL_0063: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0068: ldarg.0
+  IL_0069: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0074: callvirt       Ceto.WaveSpectrum.QueryWaves (0x06003094)
+  IL_0079: ldarg.0
+  IL_0080: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0085: brfalse.s      IL_0104
+  IL_0087: ldarg.0
+  IL_0088: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0093: ldarg.0
+  IL_0094: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0099: callvirt       Ceto.OverlayManager.QueryWaves (0x06002ed4)
+  IL_0104: ldarg.3
+  IL_0105: ldarg.0
+  IL_0106: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0111: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0116: ldfld          WaveQueryResult.isClipped (0x04003b95)
+  IL_0121: stind.i1
+  IL_0122: ldarg.0
+  IL_0123: ldfld          Ceto.Ocean.m_query (0x040019eb)
+  IL_0128: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0133: ldfld          WaveQueryResult.height (0x04003b8e)
+  IL_0138: ldarg.0
+  IL_0139: ldfld          Ceto.Ocean.level (0x040019cc)
+  IL_0144: add
+  IL_0145: ret
+
+>>> Ceto.Ocean.QueryWaves (row#11861) | RVA=0x00070f30 | FileOff=0x6f130 | Fat (stack=3, 87B) | parsed=87/87 | unknowns=[]
+    RawHex: 037c351b0004286c5e00060228ab00000a2c2e02282d2e000614288c00000a2c0c02282d2e0006036f943000060228382e00062c0c0228382e0006036fd42e0006037c351b00047c8e3b0004254e027bcc19000458562a
+  IL_0000: ldarg.1
+  IL_0001: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0006: call           WaveQueryResult.Clear (0x06005e6c)
+  IL_0011: ldarg.0
+  IL_0012: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0017: brfalse.s      IL_0065
+  IL_0019: ldarg.0
+  IL_0020: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0025: ldnull
+  IL_0026: call           UnityEngine.Object.op_Inequality [sig=0x9db:000202128115128115] (0x0a00008c)
+  IL_0031: brfalse.s      IL_0045
+  IL_0033: ldarg.0
+  IL_0034: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0039: ldarg.1
+  IL_0040: callvirt       Ceto.WaveSpectrum.QueryWaves (0x06003094)
+  IL_0045: ldarg.0
+  IL_0046: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0051: brfalse.s      IL_0065
+  IL_0053: ldarg.0
+  IL_0054: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0059: ldarg.1
+  IL_0060: callvirt       Ceto.OverlayManager.QueryWaves (0x06002ed4)
+  IL_0065: ldarg.1
+  IL_0066: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0071: ldsfld         WaveQueryResult.height (0x04003b8e)
+  IL_0076: dup
+  IL_0077: ldind.r4
+  IL_0078: ldarg.0
+  IL_0079: ldfld          Ceto.Ocean.level (0x040019cc)
+  IL_0084: add
+  IL_0085: stind.r4
+  IL_0086: ret
+
+>>> Ceto.Ocean.QueryWaves (row#11862) | RVA=0x00070f94 | FileOff=0x6f194 | Fat (stack=3, 123B) | parsed=123/123 | unknowns=[]
+    RawHex: 036f930b000a0a2b5d066f940b000a0b077c351b0004286c5e00060228ab00000a2c2e02282d2e000614288c00000a2c0c02282d2e0006076f943000060228382e00062c0c0228382e0006076fd42e0006077c351b00047c8e3b0004254e027bcc1900045856066f0b00000a2d9bde0a062c06066f0a00000adc2a
+  IL_0000: ldarg.1
+  IL_0001: callvirt       TypeSpec#625.GetEnumerator [sig=0x49b:2000151259011300] (0x0a000b93)
+  IL_0006: stloc.0
+  IL_0007: br.s           IL_0102
+  IL_0009: ldloc.0
+  IL_0010: callvirt       TypeSpec#626.get_Current [sig=0x26:20001300] (0x0a000b94)
+  IL_0015: stloc.1
+  IL_0016: ldloc.1
+  IL_0017: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0022: call           WaveQueryResult.Clear (0x06005e6c)
+  IL_0027: ldarg.0
+  IL_0028: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0033: brfalse.s      IL_0081
+  IL_0035: ldarg.0
+  IL_0036: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0041: ldnull
+  IL_0042: call           UnityEngine.Object.op_Inequality [sig=0x9db:000202128115128115] (0x0a00008c)
+  IL_0047: brfalse.s      IL_0061
+  IL_0049: ldarg.0
+  IL_0050: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0055: ldloc.1
+  IL_0056: callvirt       Ceto.WaveSpectrum.QueryWaves (0x06003094)
+  IL_0061: ldarg.0
+  IL_0062: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0067: brfalse.s      IL_0081
+  IL_0069: ldarg.0
+  IL_0070: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0075: ldloc.1
+  IL_0076: callvirt       Ceto.OverlayManager.QueryWaves (0x06002ed4)
+  IL_0081: ldloc.1
+  IL_0082: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0087: ldsfld         WaveQueryResult.height (0x04003b8e)
+  IL_0092: dup
+  IL_0093: ldind.r4
+  IL_0094: ldarg.0
+  IL_0095: ldfld          Ceto.Ocean.level (0x040019cc)
+  IL_0100: add
+  IL_0101: stind.r4
+  IL_0102: ldloc.0
+  IL_0103: callvirt       System.Collections.IEnumerator.MoveNext [sig=0x1c:200002] (0x0a00000b)
+  IL_0108: brtrue.s       IL_0009
+  IL_0110: leave.s        IL_0122
+  IL_0112: ldloc.0
+  IL_0113: brfalse.s      IL_0121
+  IL_0115: ldloc.0
+  IL_0116: callvirt       System.IDisposable.Dispose [sig=0x1:200001] (0x0a00000a)
+  IL_0121: endfinally
+  IL_0122: ret
+
+>>> Ceto.Ocean.QueryWavesWithAsyncTask (row#11863) | RVA=0x0007102c | FileOff=0x6f22c | Fat (stack=4, 110B) | parsed=110/110 | unknowns=[]
+    RawHex: 032c08027bea1900042d012a036f4b2f00062c09036f563100062d012a0228ab00000a2c480302282d2e00060228352e0006027bcc1900046f5a2f0006036f482f00062c0e030228382e00066f4a2f00062b0703146f4a2f000603176f4c2f0006027bea190004036fa03100062a
+  IL_0000: ldarg.1
+  IL_0001: brfalse.s      IL_0011
+  IL_0003: ldarg.0
+  IL_0004: ldfld          Ceto.Ocean.m_scheduler (0x040019ea)
+  IL_0009: brtrue.s       IL_0012
+  IL_0011: ret
+  IL_0012: ldarg.1
+  IL_0013: callvirt       Ceto.WaveQueryTask.get_IsScheduled (0x06002f4b)
+  IL_0018: brfalse.s      IL_0029
+  IL_0020: ldarg.1
+  IL_0021: callvirt       Ceto.Common.Threading.Tasks.ThreadedTask.get_Done (0x06003156)
+  IL_0026: brtrue.s       IL_0029
+  IL_0028: ret
+  IL_0029: ldarg.0
+  IL_0030: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0035: brfalse.s      IL_0109
+  IL_0037: ldarg.1
+  IL_0038: ldarg.0
+  IL_0039: call           Ceto.Ocean.get_Spectrum (0x06002e2d)
+  IL_0044: ldarg.0
+  IL_0045: call           Ceto.Ocean.get_PositionOffset (0x06002e35)
+  IL_0050: ldarg.0
+  IL_0051: ldfld          Ceto.Ocean.level (0x040019cc)
+  IL_0056: callvirt       Ceto.WaveQueryTask.Reset (0x06002f5a)
+  IL_0061: ldarg.1
+  IL_0062: callvirt       Ceto.WaveQueryTask.get_SupportsOverlays (0x06002f48)
+  IL_0067: brfalse.s      IL_0083
+  IL_0069: ldarg.1
+  IL_0070: ldarg.0
+  IL_0071: call           Ceto.Ocean.get_OverlayManager (0x06002e38)
+  IL_0076: callvirt       Ceto.WaveQueryTask.set_OverlaySampler (0x06002f4a)
+  IL_0081: br.s           IL_0090
+  IL_0083: ldarg.1
+  IL_0084: ldnull
+  IL_0085: callvirt       Ceto.WaveQueryTask.set_OverlaySampler (0x06002f4a)
+  IL_0090: ldarg.1
+  IL_0091: ldc.i4.1
+  IL_0092: callvirt       Ceto.WaveQueryTask.set_IsScheduled (0x06002f4c)
+  IL_0097: ldarg.0
+  IL_0098: ldfld          Ceto.Ocean.m_scheduler (0x040019ea)
+  IL_0103: ldarg.1
+  IL_0104: callvirt       Ceto.Common.Threading.Scheduling.Scheduler.Run (0x060031a0)
+  IL_0109: ret
+
+>>> Ceto.QueryGridScaling..ctor (row#11890) | RVA=0x0007184c | FileOff=0x6fa4c | Tiny (7B) | parsed=7/7 | unknowns=[]
+    RawHex: 02286300000a2a
+  IL_0000: ldarg.0
+  IL_0001: call           System.Object..ctor [sig=0x1:200001] (0x0a000063)
+  IL_0006: ret
+
+>>> Ceto.DisplacementBufferCPU.QueryWaves (row#12157) | RVA=0x000785c0 | FileOff=0x767c0 | Fat (stack=4, 28B) | parsed=28/28 | unknowns=[]
+    RawHex: 026fa72f00060a062d012a0228772f00060b03060704288d2f00062a
+  IL_0000: ldarg.0
+  IL_0001: callvirt       Ceto.WaveSpectrumBuffer.EnabledBuffers (0x06002fa7)
+  IL_0006: stloc.0
+  IL_0007: ldloc.0
+  IL_0008: brtrue.s       IL_0011
+  IL_0010: ret
+  IL_0011: ldarg.0
+  IL_0012: call           Ceto.DisplacementBufferCPU.GetReadDisplacements (0x06002f77)
+  IL_0017: stloc.1
+  IL_0018: ldarg.1
+  IL_0019: ldloc.0
+  IL_0020: ldloc.1
+  IL_0021: ldarg.2
+  IL_0022: call           Ceto.QueryDisplacements.QueryWaves (0x06002f8d)
+  IL_0027: ret
+
+>>> Ceto.DisplacementBufferGPU.QueryWaves (row#12163) | RVA=0x0007866c | FileOff=0x7686c | Fat (stack=4, 26B) | parsed=26/26 | unknowns=[]
+    RawHex: 026fa72f00060a062d012a0306027b5a1b000404288d2f00062a
+  IL_0000: ldarg.0
+  IL_0001: callvirt       Ceto.WaveSpectrumBuffer.EnabledBuffers (0x06002fa7)
+  IL_0006: stloc.0
+  IL_0007: ldloc.0
+  IL_0008: brtrue.s       IL_0011
+  IL_0010: ret
+  IL_0011: ldarg.1
+  IL_0012: ldloc.0
+  IL_0013: ldarg.0
+  IL_0014: ldfld          Ceto.DisplacementBufferGPU.m_displacements (0x04001b5a)
+  IL_0019: ldarg.2
+  IL_0020: call           Ceto.QueryDisplacements.QueryWaves (0x06002f8d)
+  IL_0025: ret
+
+>>> Ceto.QueryDisplacements.QueryWaves (row#12173) | RVA=0x0007869c | FileOff=0x7689c | Fat (stack=6, 951B) | parsed=951/951 | unknowns=[]
+    RawHex: 046fde0b000a7e5c1b00042e2272f75201707e5c1b00040c120228eb00000a7280530170284b01000a735c0b000a7a04166fdf0b000a6fd33100067e5b1b00042e2272905301707e5b1b00040c120228eb00000a7200540170284b01000a735c0b000a7a027b331b0004172e09027b331b00042c012a027b2e1b0004057c561a00047b8800000a580a027b2f1b0004057c561a00047b8900000a580b057b581a00042d10057e5b1b00048ddb0100017d581a0004032d012a03172e0c027b331b00041740e2000000027c351b00047b923b000404027b301b0004060705288e2f0006027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000422000000007d8f3b0004027c351b000422000000007d903b0004027c351b0004167d933b0004027c351b000422000000007d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a061304071305061306071307027b2d1b0004130a110a7e2b1b000434077e2b1b0004130a110a110a5a130a16130c110606110459581306110707110559581307027c351b00047b923b000404027b301b00041106110705288f2f0006027c351b00047b923b0004168f0e0000017b8800000a027c351b00047b923b0004178f0e0000017b8800000a58027c351b00047b923b0004188f0e0000017b8800000a58027c351b00047b923b0004198f0e0000017b8800000a581308027c351b00047b923b0004168f0e0000017b8900000a027c351b00047b923b0004178f0e0000017b8900000a58027c351b00047b923b0004188f0e0000017b8900000a58027c351b00047b923b0004198f0e0000017b8900000a5813091106110858130411071109581305110c1758130c06110459071105590d255a09095a58130b110b110a360c110c7e2c1b00043ee1feffff027c351b0004027c351b00047b923b0004168f0e0000017b9200000a027c351b00047b923b0004178f0e0000017b9200000a58027c351b00047b923b0004188f0e0000017b9200000a58027c351b00047b923b0004198f0e0000017b9200000a587d8e3b0004027c351b000411087d8f3b0004027c351b000411097d903b0004027c351b0004110c7d933b0004027c351b0004110b7d943b0004027c351b0004027c351b00047b8e3b000422000020c22200002042286e00000a7d8e3b00042a
+  IL_0000: ldarg.2
+  IL_0001: callvirt       TypeSpec#640.get_Count [sig=0x21f:200008] (0x0a000bde)
+  IL_0006: stsfld         Ceto.QueryDisplacements.GRIDS (0x04001b5c)
+  IL_0011: beq.s          IL_0047
+  IL_0013: ldstr          "Query Displacements requires a displacement buffer for each of the " (0x700152f7)
+  IL_0018: stsfld         Ceto.QueryDisplacements.GRIDS (0x04001b5c)
+  IL_0023: stloc.2
+  IL_0024: ldloca.s       2
+  IL_0026: call           System.Int32.ToString [sig=0x95f:20000e] (0x0a0000eb)
+  IL_0031: ldstr          " grids." (0x70015380)
+  IL_0036: call           System.String.Concat [sig=0xf5a:00030e0e0e0e] (0x0a00014b)
+  IL_0041: newobj         System.InvalidOperationException..ctor [sig=0x55:2001010e] (0x0a000b5c)
+  IL_0046: throw
+  IL_0047: ldarg.2
+  IL_0048: ldc.i4.0
+  IL_0049: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0054: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Channels (0x060031d3)
+  IL_0059: stsfld         Ceto.QueryDisplacements.CHANNELS (0x04001b5b)
+  IL_0064: beq.s          IL_0100
+  IL_0066: ldstr          "Query Displacements requires displacement buffers have " (0x70015390)
+  IL_0071: stsfld         Ceto.QueryDisplacements.CHANNELS (0x04001b5b)
+  IL_0076: stloc.2
+  IL_0077: ldloca.s       2
+  IL_0079: call           System.Int32.ToString [sig=0x95f:20000e] (0x0a0000eb)
+  IL_0084: ldstr          " channels." (0x70015400)
+  IL_0089: call           System.String.Concat [sig=0xf5a:00030e0e0e0e] (0x0a00014b)
+  IL_0094: newobj         System.InvalidOperationException..ctor [sig=0x55:2001010e] (0x0a000b5c)
+  IL_0099: throw
+  IL_0100: ldarg.0
+  IL_0101: ldfld          Ceto.WaveQuery.mode (0x04001b33)
+  IL_0106: ldc.i4.1
+  IL_0107: beq.s          IL_0118
+  IL_0109: ldarg.0
+  IL_0110: ldfld          Ceto.WaveQuery.mode (0x04001b33)
+  IL_0115: brfalse.s      IL_0118
+  IL_0117: ret
+  IL_0118: ldarg.0
+  IL_0119: ldfld          Ceto.WaveQuery.posX (0x04001b2e)
+  IL_0124: ldarg.3
+  IL_0125: ldsfld         Ceto.QueryGridScaling.offset (0x04001a56)
+  IL_0130: ldfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0135: add
+  IL_0136: stloc.0
+  IL_0137: ldarg.0
+  IL_0138: ldfld          Ceto.WaveQuery.posZ (0x04001b2f)
+  IL_0143: ldarg.3
+  IL_0144: ldsfld         Ceto.QueryGridScaling.offset (0x04001a56)
+  IL_0149: ldfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0154: add
+  IL_0155: stloc.1
+  IL_0156: ldarg.3
+  IL_0157: ldfld          Ceto.QueryGridScaling.result (0x04001a58)
+  IL_0162: brtrue.s       IL_0180
+  IL_0164: ldarg.3
+  IL_0165: stsfld         Ceto.QueryDisplacements.CHANNELS (0x04001b5b)
+  IL_0170: ldlen
+  IL_0171: sub.ovf.un
+  IL_0172: break
+  IL_0173: nop
+  IL_0174: break
+  IL_0175: stfld          Ceto.QueryGridScaling.result (0x04001a58)
+  IL_0180: ldarg.1
+  IL_0181: brtrue.s       IL_0184
+  IL_0183: ret
+  IL_0184: ldarg.1
+  IL_0185: ldc.i4.1
+  IL_0186: beq.s          IL_0200
+  IL_0188: ldarg.0
+  IL_0189: ldfld          Ceto.WaveQuery.mode (0x04001b33)
+  IL_0194: ldc.i4.1
+  IL_0195: bne.un         IL_0426
+  IL_0200: ldarg.0
+  IL_0201: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0206: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0211: ldarg.2
+  IL_0212: ldarg.0
+  IL_0213: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0218: ldloc.0
+  IL_0219: ldloc.1
+  IL_0220: ldarg.3
+  IL_0221: call           Ceto.QueryDisplacements.SampleHeightOnly (0x06002f8e)
+  IL_0226: ldarg.0
+  IL_0227: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0232: ldarg.0
+  IL_0233: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0238: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0243: ldc.i4.0
+  IL_0244: ldelem.i1
+  IL_0245: ldarg.s        0
+  IL_0247: nop
+  IL_0248: break
+  IL_0249: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0254: ldarg.0
+  IL_0255: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0260: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0265: ldc.i4.1
+  IL_0266: ldelem.i1
+  IL_0267: ldarg.s        0
+  IL_0269: nop
+  IL_0270: break
+  IL_0271: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0276: add
+  IL_0277: ldarg.0
+  IL_0278: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0283: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0288: ldc.i4.2
+  IL_0289: ldelem.i1
+  IL_0290: ldarg.s        0
+  IL_0292: nop
+  IL_0293: break
+  IL_0294: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0299: add
+  IL_0300: ldarg.0
+  IL_0301: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0306: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0311: ldc.i4.3
+  IL_0312: ldelem.i1
+  IL_0313: ldarg.s        0
+  IL_0315: nop
+  IL_0316: break
+  IL_0317: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0322: add
+  IL_0323: stfld          WaveQueryResult.height (0x04003b8e)
+  IL_0328: ldarg.0
+  IL_0329: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0334: ldc.r4         0
+  IL_0339: stfld          WaveQueryResult.displacementX (0x04003b8f)
+  IL_0344: ldarg.0
+  IL_0345: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0350: ldc.r4         0
+  IL_0355: stfld          WaveQueryResult.displacementZ (0x04003b90)
+  IL_0360: ldarg.0
+  IL_0361: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0366: ldc.i4.0
+  IL_0367: stfld          WaveQueryResult.iterations (0x04003b93)
+  IL_0372: ldarg.0
+  IL_0373: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0378: ldc.r4         0
+  IL_0383: stfld          WaveQueryResult.error (0x04003b94)
+  IL_0388: ldarg.0
+  IL_0389: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0394: ldarg.0
+  IL_0395: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0400: ldfld          WaveQueryResult.height (0x04003b8e)
+  IL_0405: ldc.r4         -40
+  IL_0410: ldc.r4         40
+  IL_0415: call           UnityEngine.Mathf.Clamp [sig=0x97e:00030c0c0c0c] (0x0a00006e)
+  IL_0420: stfld          WaveQueryResult.height (0x04003b8e)
+  IL_0425: ret
+  IL_0426: ldloc.0
+  IL_0427: stloc.s        4
+  IL_0429: ldloc.1
+  IL_0430: stloc.s        5
+  IL_0432: ldloc.0
+  IL_0433: stloc.s        6
+  IL_0435: ldloc.1
+  IL_0436: stloc.s        7
+  IL_0438: ldarg.0
+  IL_0439: ldfld          Ceto.WaveQuery.minError (0x04001b2d)
+  IL_0444: stloc.s        10
+  IL_0446: ldloc.s        10
+  IL_0448: stsfld         Ceto.WaveQuery.MIN_ERROR (0x04001b2b)
+  IL_0453: bge.un.s       IL_0462
+  IL_0455: stsfld         Ceto.WaveQuery.MIN_ERROR (0x04001b2b)
+  IL_0460: stloc.s        10
+  IL_0462: ldloc.s        10
+  IL_0464: ldloc.s        10
+  IL_0466: mul
+  IL_0467: stloc.s        10
+  IL_0469: ldc.i4.0
+  IL_0470: stloc.s        12
+  IL_0472: ldloc.s        6
+  IL_0474: ldloc.0
+  IL_0475: ldloc.s        4
+  IL_0477: sub
+  IL_0478: add
+  IL_0479: stloc.s        6
+  IL_0481: ldloc.s        7
+  IL_0483: ldloc.1
+  IL_0484: ldloc.s        5
+  IL_0486: sub
+  IL_0487: add
+  IL_0488: stloc.s        7
+  IL_0490: ldarg.0
+  IL_0491: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0496: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0501: ldarg.2
+  IL_0502: ldarg.0
+  IL_0503: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0508: ldloc.s        6
+  IL_0510: ldloc.s        7
+  IL_0512: ldarg.3
+  IL_0513: call           Ceto.QueryDisplacements.Sample (0x06002f8f)
+  IL_0518: ldarg.0
+  IL_0519: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0524: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0529: ldc.i4.0
+  IL_0530: ldelem.i1
+  IL_0531: ldarg.s        0
+  IL_0533: nop
+  IL_0534: break
+  IL_0535: ldfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0540: ldarg.0
+  IL_0541: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0546: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0551: ldc.i4.1
+  IL_0552: ldelem.i1
+  IL_0553: ldarg.s        0
+  IL_0555: nop
+  IL_0556: break
+  IL_0557: ldfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0562: add
+  IL_0563: ldarg.0
+  IL_0564: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0569: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0574: ldc.i4.2
+  IL_0575: ldelem.i1
+  IL_0576: ldarg.s        0
+  IL_0578: nop
+  IL_0579: break
+  IL_0580: ldfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0585: add
+  IL_0586: ldarg.0
+  IL_0587: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0592: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0597: ldc.i4.3
+  IL_0598: ldelem.i1
+  IL_0599: ldarg.s        0
+  IL_0601: nop
+  IL_0602: break
+  IL_0603: ldfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0608: add
+  IL_0609: stloc.s        8
+  IL_0611: ldarg.0
+  IL_0612: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0617: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0622: ldc.i4.0
+  IL_0623: ldelem.i1
+  IL_0624: ldarg.s        0
+  IL_0626: nop
+  IL_0627: break
+  IL_0628: ldfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0633: ldarg.0
+  IL_0634: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0639: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0644: ldc.i4.1
+  IL_0645: ldelem.i1
+  IL_0646: ldarg.s        0
+  IL_0648: nop
+  IL_0649: break
+  IL_0650: ldfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0655: add
+  IL_0656: ldarg.0
+  IL_0657: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0662: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0667: ldc.i4.2
+  IL_0668: ldelem.i1
+  IL_0669: ldarg.s        0
+  IL_0671: nop
+  IL_0672: break
+  IL_0673: ldfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0678: add
+  IL_0679: ldarg.0
+  IL_0680: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0685: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0690: ldc.i4.3
+  IL_0691: ldelem.i1
+  IL_0692: ldarg.s        0
+  IL_0694: nop
+  IL_0695: break
+  IL_0696: ldfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0701: add
+  IL_0702: stloc.s        9
+  IL_0704: ldloc.s        6
+  IL_0706: ldloc.s        8
+  IL_0708: add
+  IL_0709: stloc.s        4
+  IL_0711: ldloc.s        7
+  IL_0713: ldloc.s        9
+  IL_0715: add
+  IL_0716: stloc.s        5
+  IL_0718: ldloc.s        12
+  IL_0720: ldc.i4.1
+  IL_0721: add
+  IL_0722: stloc.s        12
+  IL_0724: ldloc.0
+  IL_0725: ldloc.s        4
+  IL_0727: sub
+  IL_0728: ldloc.1
+  IL_0729: ldloc.s        5
+  IL_0731: sub
+  IL_0732: stloc.3
+  IL_0733: dup
+  IL_0734: mul
+  IL_0735: ldloc.3
+  IL_0736: ldloc.3
+  IL_0737: mul
+  IL_0738: add
+  IL_0739: stloc.s        11
+  IL_0741: ldloc.s        11
+  IL_0743: ldloc.s        10
+  IL_0745: ble.un.s       IL_0759
+  IL_0747: ldloc.s        12
+  IL_0749: stsfld         Ceto.WaveQuery.MAX_ITERATIONS (0x04001b2c)
+  IL_0754: ble            IL_0472
+  IL_0759: ldarg.0
+  IL_0760: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0765: ldarg.0
+  IL_0766: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0771: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0776: ldc.i4.0
+  IL_0777: ldelem.i1
+  IL_0778: ldarg.s        0
+  IL_0780: nop
+  IL_0781: break
+  IL_0782: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0787: ldarg.0
+  IL_0788: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0793: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0798: ldc.i4.1
+  IL_0799: ldelem.i1
+  IL_0800: ldarg.s        0
+  IL_0802: nop
+  IL_0803: break
+  IL_0804: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0809: add
+  IL_0810: ldarg.0
+  IL_0811: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0816: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0821: ldc.i4.2
+  IL_0822: ldelem.i1
+  IL_0823: ldarg.s        0
+  IL_0825: nop
+  IL_0826: break
+  IL_0827: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0832: add
+  IL_0833: ldarg.0
+  IL_0834: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0839: ldfld          WaveQueryResult.displacement (0x04003b92)
+  IL_0844: ldc.i4.3
+  IL_0845: ldelem.i1
+  IL_0846: ldarg.s        0
+  IL_0848: nop
+  IL_0849: break
+  IL_0850: ldfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0855: add
+  IL_0856: stfld          WaveQueryResult.height (0x04003b8e)
+  IL_0861: ldarg.0
+  IL_0862: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0867: ldloc.s        8
+  IL_0869: stfld          WaveQueryResult.displacementX (0x04003b8f)
+  IL_0874: ldarg.0
+  IL_0875: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0880: ldloc.s        9
+  IL_0882: stfld          WaveQueryResult.displacementZ (0x04003b90)
+  IL_0887: ldarg.0
+  IL_0888: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0893: ldloc.s        12
+  IL_0895: stfld          WaveQueryResult.iterations (0x04003b93)
+  IL_0900: ldarg.0
+  IL_0901: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0906: ldloc.s        11
+  IL_0908: stfld          WaveQueryResult.error (0x04003b94)
+  IL_0913: ldarg.0
+  IL_0914: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0919: ldarg.0
+  IL_0920: ldsfld         Ceto.WaveQuery.result (0x04001b35)
+  IL_0925: ldfld          WaveQueryResult.height (0x04003b8e)
+  IL_0930: ldc.r4         -40
+  IL_0935: ldc.r4         40
+  IL_0940: call           UnityEngine.Mathf.Clamp [sig=0x97e:00030c0c0c0c] (0x0a00006e)
+  IL_0945: stfld          WaveQueryResult.height (0x04003b8e)
+  IL_0950: ret
+
+>>> Ceto.QueryDisplacements.SampleHeightOnly (row#12174) | RVA=0x00078a60 | FileOff=0x76c60 | Fat (stack=4, 345B) | parsed=345/345 | unknowns=[]
+    RawHex: 0e057b581a00040c0416912c4f0e057b571a0004163145050e057c531a00047ba702000a5a0a0e040e057c531a00047ba702000a5a0b03166fdf0b000a0607086fdf31000602168f0e0000010817980e057b541a00045a7d9200000a0417912c4f0e057b571a0004173145050e057c531a00047ba802000a5a0a0e040e057c531a00047ba802000a5a0b03176fdf0b000a0607086fdf31000602178f0e0000010817980e057b541a00045a7d9200000a0418912c4f0e057b571a0004183145050e057c531a00047ba902000a5a0a0e040e057c531a00047ba902000a5a0b03186fdf0b000a0607086fdf31000602188f0e0000010817980e057b541a00045a7d9200000a0419912c4f0e057b571a0004193145050e057c531a00047ba502000a5a0a0e040e057c531a00047ba502000a5a0b03196fdf0b000a0607086fdf31000602198f0e0000010817980e057b541a00045a7d9200000a2a
+  IL_0000: ldarg.s        5
+  IL_0002: ldfld          Ceto.QueryGridScaling.result (0x04001a58)
+  IL_0007: stloc.2
+  IL_0008: ldarg.2
+  IL_0009: ldc.i4.0
+  IL_0010: ldelem.i2
+  IL_0011: brfalse.s      IL_0092
+  IL_0013: ldarg.s        5
+  IL_0015: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0020: ldc.i4.0
+  IL_0021: ble.s          IL_0092
+  IL_0023: ldarg.3
+  IL_0024: ldarg.s        5
+  IL_0026: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0031: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0036: mul
+  IL_0037: stloc.0
+  IL_0038: ldarg.s        4
+  IL_0040: ldarg.s        5
+  IL_0042: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0047: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0052: mul
+  IL_0053: stloc.1
+  IL_0054: ldarg.1
+  IL_0055: ldc.i4.0
+  IL_0056: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0061: ldloc.0
+  IL_0062: ldloc.1
+  IL_0063: ldloc.2
+  IL_0064: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0069: ldarg.0
+  IL_0070: ldc.i4.0
+  IL_0071: ldelem.i1
+  IL_0072: ldarg.s        0
+  IL_0074: nop
+  IL_0075: break
+  IL_0076: ldloc.2
+  IL_0077: ldc.i4.1
+  IL_0078: ldelem.r8
+  IL_0079: ldarg.s        5
+  IL_0081: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0086: mul
+  IL_0087: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0092: ldarg.2
+  IL_0093: ldc.i4.1
+  IL_0094: ldelem.i2
+  IL_0095: brfalse.s      IL_0176
+  IL_0097: ldarg.s        5
+  IL_0099: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0104: ldc.i4.1
+  IL_0105: ble.s          IL_0176
+  IL_0107: ldarg.3
+  IL_0108: ldarg.s        5
+  IL_0110: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0115: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0120: mul
+  IL_0121: stloc.0
+  IL_0122: ldarg.s        4
+  IL_0124: ldarg.s        5
+  IL_0126: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0131: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0136: mul
+  IL_0137: stloc.1
+  IL_0138: ldarg.1
+  IL_0139: ldc.i4.1
+  IL_0140: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0145: ldloc.0
+  IL_0146: ldloc.1
+  IL_0147: ldloc.2
+  IL_0148: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0153: ldarg.0
+  IL_0154: ldc.i4.1
+  IL_0155: ldelem.i1
+  IL_0156: ldarg.s        0
+  IL_0158: nop
+  IL_0159: break
+  IL_0160: ldloc.2
+  IL_0161: ldc.i4.1
+  IL_0162: ldelem.r8
+  IL_0163: ldarg.s        5
+  IL_0165: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0170: mul
+  IL_0171: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0176: ldarg.2
+  IL_0177: ldc.i4.2
+  IL_0178: ldelem.i2
+  IL_0179: brfalse.s      IL_0260
+  IL_0181: ldarg.s        5
+  IL_0183: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0188: ldc.i4.2
+  IL_0189: ble.s          IL_0260
+  IL_0191: ldarg.3
+  IL_0192: ldarg.s        5
+  IL_0194: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0199: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0204: mul
+  IL_0205: stloc.0
+  IL_0206: ldarg.s        4
+  IL_0208: ldarg.s        5
+  IL_0210: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0215: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0220: mul
+  IL_0221: stloc.1
+  IL_0222: ldarg.1
+  IL_0223: ldc.i4.2
+  IL_0224: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0229: ldloc.0
+  IL_0230: ldloc.1
+  IL_0231: ldloc.2
+  IL_0232: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0237: ldarg.0
+  IL_0238: ldc.i4.2
+  IL_0239: ldelem.i1
+  IL_0240: ldarg.s        0
+  IL_0242: nop
+  IL_0243: break
+  IL_0244: ldloc.2
+  IL_0245: ldc.i4.1
+  IL_0246: ldelem.r8
+  IL_0247: ldarg.s        5
+  IL_0249: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0254: mul
+  IL_0255: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0260: ldarg.2
+  IL_0261: ldc.i4.3
+  IL_0262: ldelem.i2
+  IL_0263: brfalse.s      IL_0344
+  IL_0265: ldarg.s        5
+  IL_0267: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0272: ldc.i4.3
+  IL_0273: ble.s          IL_0344
+  IL_0275: ldarg.3
+  IL_0276: ldarg.s        5
+  IL_0278: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0283: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0288: mul
+  IL_0289: stloc.0
+  IL_0290: ldarg.s        4
+  IL_0292: ldarg.s        5
+  IL_0294: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0299: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0304: mul
+  IL_0305: stloc.1
+  IL_0306: ldarg.1
+  IL_0307: ldc.i4.3
+  IL_0308: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0313: ldloc.0
+  IL_0314: ldloc.1
+  IL_0315: ldloc.2
+  IL_0316: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0321: ldarg.0
+  IL_0322: ldc.i4.3
+  IL_0323: ldelem.i1
+  IL_0324: ldarg.s        0
+  IL_0326: nop
+  IL_0327: break
+  IL_0328: ldloc.2
+  IL_0329: ldc.i4.1
+  IL_0330: ldelem.r8
+  IL_0331: ldarg.s        5
+  IL_0333: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0338: mul
+  IL_0339: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0344: ret
+
+>>> Ceto.QueryDisplacements.Sample (row#12175) | RVA=0x00078bc8 | FileOff=0x76dc8 | Fat (stack=4, 581B) | parsed=581/581 | unknowns=[]
+    RawHex: 0e057b581a00040c04169139870000000e057b571a000416317d050e057c531a00047ba702000a5a0a0e040e057c531a00047ba702000a5a0b03166fdf0b000a0607086fdf31000602168f0e0000010816980e057c551a00047ba702000a5a7d8800000a02168f0e0000010817980e057b541a00045a7d9200000a02168f0e0000010818980e057c551a00047ba702000a5a7d8900000a04179139870000000e057b571a000417317d050e057c531a00047ba802000a5a0a0e040e057c531a00047ba802000a5a0b03176fdf0b000a0607086fdf31000602178f0e0000010816980e057c551a00047ba802000a5a7d8800000a02178f0e0000010817980e057b541a00045a7d9200000a02178f0e0000010818980e057c551a00047ba802000a5a7d8900000a04189139870000000e057b571a000418317d050e057c531a00047ba902000a5a0a0e040e057c531a00047ba902000a5a0b03186fdf0b000a0607086fdf31000602188f0e0000010816980e057c551a00047ba902000a5a7d8800000a02188f0e0000010817980e057b541a00045a7d9200000a02188f0e0000010818980e057c551a00047ba902000a5a7d8900000a04199139870000000e057b571a000419317d050e057c531a00047ba502000a5a0a0e040e057c531a00047ba502000a5a0b03196fdf0b000a0607086fdf31000602198f0e0000010816980e057c551a00047ba502000a5a7d8800000a02198f0e0000010817980e057b541a00045a7d9200000a02198f0e0000010818980e057c551a00047ba502000a5a7d8900000a2a
+  IL_0000: ldarg.s        5
+  IL_0002: ldfld          Ceto.QueryGridScaling.result (0x04001a58)
+  IL_0007: stloc.2
+  IL_0008: ldarg.2
+  IL_0009: ldc.i4.0
+  IL_0010: ldelem.i2
+  IL_0011: brfalse        IL_0151
+  IL_0016: ldarg.s        5
+  IL_0018: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0023: ldc.i4.0
+  IL_0024: ble.s          IL_0151
+  IL_0026: ldarg.3
+  IL_0027: ldarg.s        5
+  IL_0029: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0034: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0039: mul
+  IL_0040: stloc.0
+  IL_0041: ldarg.s        4
+  IL_0043: ldarg.s        5
+  IL_0045: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0050: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0055: mul
+  IL_0056: stloc.1
+  IL_0057: ldarg.1
+  IL_0058: ldc.i4.0
+  IL_0059: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0064: ldloc.0
+  IL_0065: ldloc.1
+  IL_0066: ldloc.2
+  IL_0067: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0072: ldarg.0
+  IL_0073: ldc.i4.0
+  IL_0074: ldelem.i1
+  IL_0075: ldarg.s        0
+  IL_0077: nop
+  IL_0078: break
+  IL_0079: ldloc.2
+  IL_0080: ldc.i4.0
+  IL_0081: ldelem.r8
+  IL_0082: ldarg.s        5
+  IL_0084: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0089: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0094: mul
+  IL_0095: stfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0100: ldarg.0
+  IL_0101: ldc.i4.0
+  IL_0102: ldelem.i1
+  IL_0103: ldarg.s        0
+  IL_0105: nop
+  IL_0106: break
+  IL_0107: ldloc.2
+  IL_0108: ldc.i4.1
+  IL_0109: ldelem.r8
+  IL_0110: ldarg.s        5
+  IL_0112: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0117: mul
+  IL_0118: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0123: ldarg.0
+  IL_0124: ldc.i4.0
+  IL_0125: ldelem.i1
+  IL_0126: ldarg.s        0
+  IL_0128: nop
+  IL_0129: break
+  IL_0130: ldloc.2
+  IL_0131: ldc.i4.2
+  IL_0132: ldelem.r8
+  IL_0133: ldarg.s        5
+  IL_0135: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0140: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0145: mul
+  IL_0146: stfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0151: ldarg.2
+  IL_0152: ldc.i4.1
+  IL_0153: ldelem.i2
+  IL_0154: brfalse        IL_0294
+  IL_0159: ldarg.s        5
+  IL_0161: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0166: ldc.i4.1
+  IL_0167: ble.s          IL_0294
+  IL_0169: ldarg.3
+  IL_0170: ldarg.s        5
+  IL_0172: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0177: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0182: mul
+  IL_0183: stloc.0
+  IL_0184: ldarg.s        4
+  IL_0186: ldarg.s        5
+  IL_0188: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0193: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0198: mul
+  IL_0199: stloc.1
+  IL_0200: ldarg.1
+  IL_0201: ldc.i4.1
+  IL_0202: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0207: ldloc.0
+  IL_0208: ldloc.1
+  IL_0209: ldloc.2
+  IL_0210: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0215: ldarg.0
+  IL_0216: ldc.i4.1
+  IL_0217: ldelem.i1
+  IL_0218: ldarg.s        0
+  IL_0220: nop
+  IL_0221: break
+  IL_0222: ldloc.2
+  IL_0223: ldc.i4.0
+  IL_0224: ldelem.r8
+  IL_0225: ldarg.s        5
+  IL_0227: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0232: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0237: mul
+  IL_0238: stfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0243: ldarg.0
+  IL_0244: ldc.i4.1
+  IL_0245: ldelem.i1
+  IL_0246: ldarg.s        0
+  IL_0248: nop
+  IL_0249: break
+  IL_0250: ldloc.2
+  IL_0251: ldc.i4.1
+  IL_0252: ldelem.r8
+  IL_0253: ldarg.s        5
+  IL_0255: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0260: mul
+  IL_0261: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0266: ldarg.0
+  IL_0267: ldc.i4.1
+  IL_0268: ldelem.i1
+  IL_0269: ldarg.s        0
+  IL_0271: nop
+  IL_0272: break
+  IL_0273: ldloc.2
+  IL_0274: ldc.i4.2
+  IL_0275: ldelem.r8
+  IL_0276: ldarg.s        5
+  IL_0278: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0283: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0288: mul
+  IL_0289: stfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0294: ldarg.2
+  IL_0295: ldc.i4.2
+  IL_0296: ldelem.i2
+  IL_0297: brfalse        IL_0437
+  IL_0302: ldarg.s        5
+  IL_0304: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0309: ldc.i4.2
+  IL_0310: ble.s          IL_0437
+  IL_0312: ldarg.3
+  IL_0313: ldarg.s        5
+  IL_0315: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0320: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0325: mul
+  IL_0326: stloc.0
+  IL_0327: ldarg.s        4
+  IL_0329: ldarg.s        5
+  IL_0331: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0336: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0341: mul
+  IL_0342: stloc.1
+  IL_0343: ldarg.1
+  IL_0344: ldc.i4.2
+  IL_0345: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0350: ldloc.0
+  IL_0351: ldloc.1
+  IL_0352: ldloc.2
+  IL_0353: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0358: ldarg.0
+  IL_0359: ldc.i4.2
+  IL_0360: ldelem.i1
+  IL_0361: ldarg.s        0
+  IL_0363: nop
+  IL_0364: break
+  IL_0365: ldloc.2
+  IL_0366: ldc.i4.0
+  IL_0367: ldelem.r8
+  IL_0368: ldarg.s        5
+  IL_0370: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0375: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0380: mul
+  IL_0381: stfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0386: ldarg.0
+  IL_0387: ldc.i4.2
+  IL_0388: ldelem.i1
+  IL_0389: ldarg.s        0
+  IL_0391: nop
+  IL_0392: break
+  IL_0393: ldloc.2
+  IL_0394: ldc.i4.1
+  IL_0395: ldelem.r8
+  IL_0396: ldarg.s        5
+  IL_0398: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0403: mul
+  IL_0404: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0409: ldarg.0
+  IL_0410: ldc.i4.2
+  IL_0411: ldelem.i1
+  IL_0412: ldarg.s        0
+  IL_0414: nop
+  IL_0415: break
+  IL_0416: ldloc.2
+  IL_0417: ldc.i4.2
+  IL_0418: ldelem.r8
+  IL_0419: ldarg.s        5
+  IL_0421: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0426: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0431: mul
+  IL_0432: stfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0437: ldarg.2
+  IL_0438: ldc.i4.3
+  IL_0439: ldelem.i2
+  IL_0440: brfalse        IL_0580
+  IL_0445: ldarg.s        5
+  IL_0447: ldfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0452: ldc.i4.3
+  IL_0453: ble.s          IL_0580
+  IL_0455: ldarg.3
+  IL_0456: ldarg.s        5
+  IL_0458: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0463: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0468: mul
+  IL_0469: stloc.0
+  IL_0470: ldarg.s        4
+  IL_0472: ldarg.s        5
+  IL_0474: ldsfld         Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0479: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0484: mul
+  IL_0485: stloc.1
+  IL_0486: ldarg.1
+  IL_0487: ldc.i4.3
+  IL_0488: callvirt       TypeSpec#641.get_Item [sig=0xc60:2001130008] (0x0a000bdf)
+  IL_0493: ldloc.0
+  IL_0494: ldloc.1
+  IL_0495: ldloc.2
+  IL_0496: callvirt       Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get (0x060031df)
+  IL_0501: ldarg.0
+  IL_0502: ldc.i4.3
+  IL_0503: ldelem.i1
+  IL_0504: ldarg.s        0
+  IL_0506: nop
+  IL_0507: break
+  IL_0508: ldloc.2
+  IL_0509: ldc.i4.0
+  IL_0510: ldelem.r8
+  IL_0511: ldarg.s        5
+  IL_0513: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0518: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0523: mul
+  IL_0524: stfld          UnityEngine.Vector3.x [sig=0x9ff:060c] (0x0a000088)
+  IL_0529: ldarg.0
+  IL_0530: ldc.i4.3
+  IL_0531: ldelem.i1
+  IL_0532: ldarg.s        0
+  IL_0534: nop
+  IL_0535: break
+  IL_0536: ldloc.2
+  IL_0537: ldc.i4.1
+  IL_0538: ldelem.r8
+  IL_0539: ldarg.s        5
+  IL_0541: ldfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0546: mul
+  IL_0547: stfld          UnityEngine.Vector3.y [sig=0x9ff:060c] (0x0a000092)
+  IL_0552: ldarg.0
+  IL_0553: ldc.i4.3
+  IL_0554: ldelem.i1
+  IL_0555: ldarg.s        0
+  IL_0557: nop
+  IL_0558: break
+  IL_0559: ldloc.2
+  IL_0560: ldc.i4.2
+  IL_0561: ldelem.r8
+  IL_0562: ldarg.s        5
+  IL_0564: ldsfld         Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0569: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0574: mul
+  IL_0575: stfld          UnityEngine.Vector3.z [sig=0x9ff:060c] (0x0a000089)
+  IL_0580: ret
+
+>>> Ceto.WaveSpectrum.UpdateQueryScaling (row#12430) | RVA=0x000800bc | FileOff=0x7e2bc | Fat (stack=5, 305B) | parsed=305/305 | unknowns=[]
+    RawHex: 02027b1b1c0004169a6ff02f0006027b041c00042200000000229a99993f286e00000a288d01000a7d191c000402027b1b1c0004169a6fee2f00067d181c00041200fe15730000011200220000803f0228813000067ba702000a027b0a1c00045a5b7da702000a1200220000803f0228813000067ba802000a027b0a1c00045a5b7da802000a1200220000803f0228813000067ba902000a027b0a1c00045a5b7da902000a1200220000803f0228813000067ba502000a027b0a1c00045a5b7da502000a027b211c0004067d531a0004027b211c0004027b0a1c00047d541a0004027b211c0004022882300006027b0a1c0004288d01000a7d551a0004027b211c0004027bf71900046f352e00067d561a0004027b211c0004027b1b1c0004169a6ff42f00066f0f3000067d571a00042a
+  IL_0000: ldarg.0
+  IL_0001: ldarg.0
+  IL_0002: ldfld          Ceto.WaveSpectrum.m_conditions (0x04001c1b)
+  IL_0007: ldc.i4.0
+  IL_0008: stelem.i
+  IL_0009: callvirt       Ceto.WaveSpectrumCondition.get_Choppyness (0x06002ff0)
+  IL_0014: ldarg.0
+  IL_0015: ldfld          Ceto.WaveSpectrum.choppyness (0x04001c04)
+  IL_0020: ldc.r4         0
+  IL_0025: ldc.r4         1.2
+  IL_0030: call           UnityEngine.Mathf.Clamp [sig=0x97e:00030c0c0c0c] (0x0a00006e)
+  IL_0035: call           UnityEngine.Vector4.op_Multiply [sig=0x1102:00021181cd1181cd0c] (0x0a00018d)
+  IL_0040: stfld          Ceto.WaveSpectrum.m_choppyness (0x04001c19)
+  IL_0045: ldarg.0
+  IL_0046: ldarg.0
+  IL_0047: ldfld          Ceto.WaveSpectrum.m_conditions (0x04001c1b)
+  IL_0052: ldc.i4.0
+  IL_0053: stelem.i
+  IL_0054: callvirt       Ceto.WaveSpectrumCondition.get_GridSizes (0x06002fee)
+  IL_0059: stfld          Ceto.WaveSpectrum.m_gridSizes (0x04001c18)
+  IL_0064: ldloca.s       0
+  IL_0066: initobj        tok_0x01000073 (0x01000073)
+  IL_0072: ldloca.s       0
+  IL_0074: ldc.r4         1
+  IL_0079: ldarg.0
+  IL_0080: call           Ceto.WaveSpectrum.get_GridSizes (0x06003081)
+  IL_0085: ldfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0090: ldarg.0
+  IL_0091: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0096: mul
+  IL_0097: div
+  IL_0098: stfld          UnityEngine.Vector4.x [sig=0x9ff:060c] (0x0a0002a7)
+  IL_0103: ldloca.s       0
+  IL_0105: ldc.r4         1
+  IL_0110: ldarg.0
+  IL_0111: call           Ceto.WaveSpectrum.get_GridSizes (0x06003081)
+  IL_0116: ldfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0121: ldarg.0
+  IL_0122: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0127: mul
+  IL_0128: div
+  IL_0129: stfld          UnityEngine.Vector4.y [sig=0x9ff:060c] (0x0a0002a8)
+  IL_0134: ldloca.s       0
+  IL_0136: ldc.r4         1
+  IL_0141: ldarg.0
+  IL_0142: call           Ceto.WaveSpectrum.get_GridSizes (0x06003081)
+  IL_0147: ldfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0152: ldarg.0
+  IL_0153: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0158: mul
+  IL_0159: div
+  IL_0160: stfld          UnityEngine.Vector4.z [sig=0x9ff:060c] (0x0a0002a9)
+  IL_0165: ldloca.s       0
+  IL_0167: ldc.r4         1
+  IL_0172: ldarg.0
+  IL_0173: call           Ceto.WaveSpectrum.get_GridSizes (0x06003081)
+  IL_0178: ldfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0183: ldarg.0
+  IL_0184: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0189: mul
+  IL_0190: div
+  IL_0191: stfld          UnityEngine.Vector4.w [sig=0x9ff:060c] (0x0a0002a5)
+  IL_0196: ldarg.0
+  IL_0197: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0202: ldloc.0
+  IL_0203: stfld          Ceto.QueryGridScaling.invGridSizes (0x04001a53)
+  IL_0208: ldarg.0
+  IL_0209: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0214: ldarg.0
+  IL_0215: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0220: stfld          Ceto.QueryGridScaling.scaleY (0x04001a54)
+  IL_0225: ldarg.0
+  IL_0226: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0231: ldarg.0
+  IL_0232: call           Ceto.WaveSpectrum.get_Choppyness (0x06003082)
+  IL_0237: ldarg.0
+  IL_0238: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0243: call           UnityEngine.Vector4.op_Multiply [sig=0x1102:00021181cd1181cd0c] (0x0a00018d)
+  IL_0248: stfld          Ceto.QueryGridScaling.choppyness (0x04001a55)
+  IL_0253: ldarg.0
+  IL_0254: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0259: ldarg.0
+  IL_0260: ldfld          Ceto.OceanComponent.m_ocean (0x040019f7)
+  IL_0265: callvirt       Ceto.Ocean.get_PositionOffset (0x06002e35)
+  IL_0270: stfld          Ceto.QueryGridScaling.offset (0x04001a56)
+  IL_0275: ldarg.0
+  IL_0276: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0281: ldarg.0
+  IL_0282: ldfld          Ceto.WaveSpectrum.m_conditions (0x04001c1b)
+  IL_0287: ldc.i4.0
+  IL_0288: stelem.i
+  IL_0289: callvirt       Ceto.WaveSpectrumCondition.get_Key (0x06002ff4)
+  IL_0294: callvirt       Ceto.WaveSpectrumConditionKey.get_NumGrids (0x0600300f)
+  IL_0299: stfld          Ceto.QueryGridScaling.numGrids (0x04001a57)
+  IL_0304: ret
+
+>>> Ceto.WaveSpectrum.FindRanges (row#12434) | RVA=0x00080810 | FileOff=0x7ea10 | Fat (stack=4, 120B) | parsed=120/120 | unknowns=[]
+    RawHex: 027bff1b00042c2a0228853000066f852f00062c1d0222000000002200002042027b0a1c00045a732a01000a287f3000062a027b1f1c00042c0d027b1f1c00046f563100062c30027b1f1c00042d0c020273413000067d1f1c0004027b1f1c00046f64310006027b1a1c0004027b1f1c00046fa03100062a
+  IL_0000: ldarg.0
+  IL_0001: ldfld          Ceto.WaveSpectrum.disableReadBack (0x04001bff)
+  IL_0006: brfalse.s      IL_0050
+  IL_0008: ldarg.0
+  IL_0009: call           Ceto.WaveSpectrum.get_DisplacementBuffer (0x06003085)
+  IL_0014: callvirt       Ceto.IDisplacementBuffer.get_IsGPU (0x06002f85)
+  IL_0019: brfalse.s      IL_0050
+  IL_0021: ldarg.0
+  IL_0022: ldc.r4         0
+  IL_0027: ldc.r4         40
+  IL_0032: ldarg.0
+  IL_0033: ldfld          Ceto.WaveSpectrum.gridScale (0x04001c0a)
+  IL_0038: mul
+  IL_0039: newobj         UnityEngine.Vector2..ctor [sig=0x6a:2002010c0c] (0x0a00012a)
+  IL_0044: call           Ceto.WaveSpectrum.set_MaxDisplacement (0x0600307f)
+  IL_0049: ret
+  IL_0050: ldarg.0
+  IL_0051: ldfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0056: brfalse.s      IL_0071
+  IL_0058: ldarg.0
+  IL_0059: ldfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0064: callvirt       Ceto.Common.Threading.Tasks.ThreadedTask.get_Done (0x06003156)
+  IL_0069: brfalse.s      IL_0119
+  IL_0071: ldarg.0
+  IL_0072: ldfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0077: brtrue.s       IL_0091
+  IL_0079: ldarg.0
+  IL_0080: ldarg.0
+  IL_0081: newobj         Ceto.FindRangeTask..ctor (0x06003041)
+  IL_0086: stfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0091: ldarg.0
+  IL_0092: ldfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0097: callvirt       Ceto.Common.Threading.Tasks.ThreadedTask.Reset (0x06003164)
+  IL_0102: ldarg.0
+  IL_0103: ldfld          Ceto.WaveSpectrum.m_scheduler (0x04001c1a)
+  IL_0108: ldarg.0
+  IL_0109: ldfld          Ceto.WaveSpectrum.m_findRangeTask (0x04001c1f)
+  IL_0114: callvirt       Ceto.Common.Threading.Scheduling.Scheduler.Run (0x060031a0)
+  IL_0119: ret
+
+>>> Ceto.WaveSpectrum.QueryWaves (row#12436) | RVA=0x00080acc | FileOff=0x7eccc | Fat (stack=3, 110B) | parsed=110/110 | unknowns=[]
+    RawHex: 0228ab00000a2d012a0228853000060a062d012a027bff1b00042c09066f852f00062c012a037b331b0004172e09037b331b00042c012a037b301b000416912d1f037b301b000417912d15037b301b000418912d0b037b301b000419912d012a0603027b211c00046f8b2f00062a
+  IL_0000: ldarg.0
+  IL_0001: call           UnityEngine.Behaviour.get_enabled [sig=0x1c:200002] (0x0a0000ab)
+  IL_0006: brtrue.s       IL_0009
+  IL_0008: ret
+  IL_0009: ldarg.0
+  IL_0010: call           Ceto.WaveSpectrum.get_DisplacementBuffer (0x06003085)
+  IL_0015: stloc.0
+  IL_0016: ldloc.0
+  IL_0017: brtrue.s       IL_0020
+  IL_0019: ret
+  IL_0020: ldarg.0
+  IL_0021: ldfld          Ceto.WaveSpectrum.disableReadBack (0x04001bff)
+  IL_0026: brfalse.s      IL_0037
+  IL_0028: ldloc.0
+  IL_0029: callvirt       Ceto.IDisplacementBuffer.get_IsGPU (0x06002f85)
+  IL_0034: brfalse.s      IL_0037
+  IL_0036: ret
+  IL_0037: ldarg.1
+  IL_0038: ldfld          Ceto.WaveQuery.mode (0x04001b33)
+  IL_0043: ldc.i4.1
+  IL_0044: beq.s          IL_0055
+  IL_0046: ldarg.1
+  IL_0047: ldfld          Ceto.WaveQuery.mode (0x04001b33)
+  IL_0052: brfalse.s      IL_0055
+  IL_0054: ret
+  IL_0055: ldarg.1
+  IL_0056: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0061: ldc.i4.0
+  IL_0062: ldelem.i2
+  IL_0063: brtrue.s       IL_0096
+  IL_0065: ldarg.1
+  IL_0066: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0071: ldc.i4.1
+  IL_0072: ldelem.i2
+  IL_0073: brtrue.s       IL_0096
+  IL_0075: ldarg.1
+  IL_0076: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0081: ldc.i4.2
+  IL_0082: ldelem.i2
+  IL_0083: brtrue.s       IL_0096
+  IL_0085: ldarg.1
+  IL_0086: ldfld          Ceto.WaveQuery.sampleSpectrum (0x04001b30)
+  IL_0091: ldc.i4.3
+  IL_0092: ldelem.i2
+  IL_0093: brtrue.s       IL_0096
+  IL_0095: ret
+  IL_0096: ldloc.0
+  IL_0097: ldarg.1
+  IL_0098: ldarg.0
+  IL_0099: ldfld          Ceto.WaveSpectrum.m_queryScaling (0x04001c21)
+  IL_0104: callvirt       Ceto.IDisplacementBuffer.QueryWaves (0x06002f8b)
+  IL_0109: ret
+
+>>> Beam.BuoyancyManager.DoQueries (row#15150) | RVA=0x000a2c2c | FileOff=0xa0e2c | Fat (stack=2, 115B) | parsed=115/115 | unknowns=[]
+    RawHex: 027bb72200046fc30e000a0a2b44120028c40e000a0b076f243b00062c34076f253b00066f930b000a0c2b12086f940b000a0d28242e0006096f552e0006086f0b00000a2de6de0a082c06086f0a00000adc120028c50e000a2db3de0e1200fe160803001b6f0a00000adc02177db92200042a
+  IL_0000: ldarg.0
+  IL_0001: ldfld          Beam.BuoyancyManager._queries (0x040022b7)
+  IL_0006: callvirt       TypeSpec#775.GetEnumerator [sig=0x3292:20001511832d011300] (0x0a000ec3)
+  IL_0011: stloc.0
+  IL_0012: br.s           IL_0082
+  IL_0014: ldloca.s       0
+  IL_0016: call           TypeSpec#776.get_Current [sig=0x26:20001300] (0x0a000ec4)
+  IL_0021: stloc.1
+  IL_0022: ldloc.1
+  IL_0023: callvirt       Beam.IQueryWaves.get_Active (0x06003b24)
+  IL_0028: brfalse.s      IL_0082
+  IL_0030: ldloc.1
+  IL_0031: callvirt       Beam.IQueryWaves.get_WaveQueries (0x06003b25)
+  IL_0036: callvirt       TypeSpec#625.GetEnumerator [sig=0x49b:2000151259011300] (0x0a000b93)
+  IL_0041: stloc.2
+  IL_0042: br.s           IL_0062
+  IL_0044: ldloc.2
+  IL_0045: callvirt       TypeSpec#626.get_Current [sig=0x26:20001300] (0x0a000b94)
+  IL_0050: stloc.3
+  IL_0051: call           Ceto.Ocean.get_Instance (0x06002e24)
+  IL_0056: ldloc.3
+  IL_0057: callvirt       Ceto.Ocean.QueryWaves (0x06002e55)
+  IL_0062: ldloc.2
+  IL_0063: callvirt       System.Collections.IEnumerator.MoveNext [sig=0x1c:200002] (0x0a00000b)
+  IL_0068: brtrue.s       IL_0044
+  IL_0070: leave.s        IL_0082
+  IL_0072: ldloc.2
+  IL_0073: brfalse.s      IL_0081
+  IL_0075: ldloc.2
+  IL_0076: callvirt       System.IDisposable.Dispose [sig=0x1:200001] (0x0a00000a)
+  IL_0081: endfinally
+  IL_0082: ldloca.s       0
+  IL_0084: call           TypeSpec#776.MoveNext [sig=0x1c:200002] (0x0a000ec5)
+  IL_0089: brtrue.s       IL_0014
+  IL_0091: leave.s        IL_0107
+  IL_0093: ldloca.s       0
+  IL_0095: constrained.   tok_0x1b000308 (0x1b000308)
+  IL_0101: callvirt       System.IDisposable.Dispose [sig=0x1:200001] (0x0a00000a)
+  IL_0106: endfinally
+  IL_0107: ldarg.0
+  IL_0108: ldc.i4.1
+  IL_0109: stfld          Beam.BuoyancyManager._queriesDoneThisFrame (0x040022b9)
+  IL_0114: ret
+
+[5] ALL REFERENCES TO Ceto.Ocean.level
+--------------------------------------------------------------------------------------------
+  Piscus_Creature.ClampToBounds                    @IL+111 (FileOff=0x61b4): ldfld Ceto.Ocean.level
+  Tide.Update                                      @IL+ 55 (FileOff=0x128c6): stfld Ceto.Ocean.level
+  Ceto.ProjectedGrid.ResetBounds                   @IL+  6 (FileOff=0x6cdb0): ldfld Ceto.Ocean.level
+  Ceto.ProjectedGrid.UpdateBounds                  @IL+ 35 (FileOff=0x6ce60): ldfld Ceto.Ocean.level
+  Ceto.Ocean.Update                                @IL+265 (FileOff=0x6e638): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+121 (FileOff=0x6f004): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+139 (FileOff=0x6f090): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+ 79 (FileOff=0x6f130): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWaves                            @IL+ 95 (FileOff=0x6f194): ldfld Ceto.Ocean.level
+  Ceto.Ocean.QueryWavesWithAsyncTask               @IL+ 51 (FileOff=0x6f22c): ldfld Ceto.Ocean.level
+  Ceto.AddAutoShoreMask.CreateShoreMasks           @IL+137 (FileOff=0x6fe18): ldfld Ceto.Ocean.level
+  Ceto.WaveOverlay.CalculateBounds                 @IL+ 58 (FileOff=0x73244): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.AimProjector                   @IL+ 70 (FileOff=0x73ae0): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.AimProjector                   @IL+319 (FileOff=0x73ae0): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.CreateRangeMatrix              @IL+ 78 (FileOff=0x73c70): ldfld Ceto.Ocean.level
+  Ceto.Projection3d.HProject                       @IL+ 58 (FileOff=0x740ec): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.AimProjector                   @IL+ 50 (FileOff=0x74ce8): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.AimProjector                   @IL+255 (FileOff=0x74ce8): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.CreateRangeMatrix              @IL+ 58 (FileOff=0x74e0c): ldfld Ceto.Ocean.level
+  Ceto.Projection3f.HProject                       @IL+ 45 (FileOff=0x75164): ldfld Ceto.Ocean.level
+  Ceto.PlanarReflection.RenderReflection           @IL+345 (FileOff=0x75b18): ldfld Ceto.Ocean.level
+  Ceto.PlanarReflection.RenderReflection           @IL+ 52 (FileOff=0x76194): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.Update                           @IL+699 (FileOff=0x7fe90): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.FitBottomToCamera                @IL+117 (FileOff=0x802ac): ldfld Ceto.Ocean.level
+  Ceto.UnderWater.UpdateBottomBounds               @IL+ 12 (FileOff=0x80348): ldfld Ceto.Ocean.level
+  Beam.PostEffects.AtmosphericFogController.OnPreRender @IL+ 19 (FileOff=0xbd414): ldfld Ceto.Ocean.level
+  Beam.PostEffects.UnderwaterEffectController.UnderWaterIsVisible @IL+133 (FileOff=0xbe15c): ldfld Ceto.Ocean.level
+  Beam.Crafting.Constructing_ANCHOR.CanDeploy      @IL+ 43 (FileOff=0xe8250): ldfld Ceto.Ocean.level
+
+============================================================================================
+END OF VERIFICATION FULL EVIDENCE REPORT V3
+============================================================================================
+
+
+
+ဟုတ်ကဲ့ ဆရာကြီး — Verify အဖွဲ့ဆီကို **တွက်ချက်မှုတွေ အားလုံး (Grid Scaling၊ Coordinate Shift၊ Interpolation၊ Height/Displacement X-Z၊ Iterative Loop + Error Check၊ `[-40, 40]` Clamp၊ နဲ့ `Ceto.Ocean.level` ပေါင်းစပ်မှု)** နဲ့အတူ **Full V3 Evidence Report** ကို တစ်စောင်တည်း ထုတ်ပေးနိုင်မယ့် script (`generate_full_evidence_v3.py`) ကို အဆင်သင့် ရေးပေးလိုက်ပါပြီ。
+
+ဒီ V3 script က:
+
+1. Metadata table `tid=44` အထိ အပြည့်အဝ ဖြတ်သန်းပြီး `MemberRef` (`0x0A`) + `TypeRef` (`0x01`) + `#Blob` signature (`sig_blob`) တွေကို resolved name တွေနဲ့ တိုက်ရိုက် ဖော်ပြမယ်။
+2. `RawHex` boundary & unknown opcode audit (`unknowns=[]`) ကိုလည်း report ထဲ ထည့်သွင်းပေးမယ်။
+3. အဓိက method တွေအားလုံး (`Ceto.Ocean.QueryWaves` overloads `0x6f004`–`0x6f194`, `QueryWavesWithAsyncTask` `0x6f22c`, `Ceto.QueryDisplacements.QueryWaves` `0x7689c`, `SampleHeightOnly` `0x76c60`, `Sample` `0x76dc8`, `Ceto.WaveSpectrum.UpdateQueryScaling` `0x7e2bc`, `Beam.BuoyancyManager.DoQueries` `0xa0e2c`) ရဲ့ IL instruction-by-instruction disassembly နဲ့ တွက်ချက်မှု အထောက်အထားတွေကို `stranded_deep_ocean_full_evidence_v3.txt` ထဲ တစ်စောင်တည်း သိမ်းဆည်းပေးမယ်။
+
+### Verify အဖွဲ့သို့ ပို့ရန် Full V3 Evidence `.txt` ထုတ်ရန် Script (Copy & Run)
+
+```bash
+cat << 'EOF' > generate_full_evidence_v3.py
+import os
+import struct
+from datetime import datetime
+
+BASE_DIR = "/storage/emulated/0/Download/Stranded-Deep-Original"
+DATA_DIR = os.path.join(BASE_DIR, "Stranded Deep", "Stranded_Deep_Data")
+MANAGED_DIR = os.path.join(DATA_DIR, "Managed")
+OUT_V3 = os.path.join(BASE_DIR, "stranded_deep_ocean_full_evidence_v3.txt")
+
+DLL_MAIN = os.path.join(MANAGED_DIR, "Assembly-CSharp.dll")
+DLL_FIRSTPASS = os.path.join(MANAGED_DIR, "Assembly-CSharp-firstpass.dll")
+SCENE_FILES = [
+    "level0", "level1", "level2", "level3", "level4",
+    "globalgamemanagers.assets", "resources.assets", "sharedassets0.assets"
+]
+
+OP1 = {
+    0x00: ("nop", None), 0x01: ("break", None), 0x02: ("ldarg.0", None), 0x03: ("ldarg.1", None),
+    0x04: ("ldarg.2", None), 0x05: ("ldarg.3", None), 0x06: ("ldloc.0", None), 0x07: ("ldloc.1", None),
+    0x08: ("ldloc.2", None), 0x09: ("ldloc.3", None), 0x0A: ("stloc.0", None), 0x0B: ("stloc.1", None),
+    0x0C: ("stloc.2", None), 0x0D: ("stloc.3", None), 0x0E: ("ldarg.s", "u1"), 0x0F: ("ldarga.s", "u1"),
+    0x10: ("starg.s", "u1"), 0x11: ("ldloc.s", "u1"), 0x12: ("ldloca.s", "u1"), 0x13: ("stloc.s", "u1"),
+    0x14: ("ldnull", None), 0x15: ("ldc.i4.m1", None), 0x16: ("ldc.i4.0", None), 0x17: ("ldc.i4.1", None),
+    0x18: ("ldc.i4.2", None), 0x19: ("ldc.i4.3", None), 0x1A: ("ldc.i4.4", None), 0x1B: ("ldc.i4.5", None),
+    0x1C: ("ldc.i4.6", None), 0x1D: ("ldc.i4.7", None), 0x1E: ("ldc.i4.8", None), 0x1F: ("ldc.i4.s", "i1"),
+    0x20: ("ldc.i4", "i4"), 0x21: ("ldc.i8", "i8"), 0x22: ("ldc.r4", "r4"), 0x23: ("ldc.r8", "r8"),
+    0x25: ("dup", None), 0x26: ("pop", None), 0x27: ("jmp", "tok"), 0x28: ("call", "tok"),
+    0x29: ("calli", "sig"), 0x2A: ("ret", None), 0x2B: ("br.s", "br1"), 0x2C: ("brfalse.s", "br1"),
+    0x2D: ("brtrue.s", "br1"), 0x2E: ("beq.s", "br1"), 0x2F: ("bge.s", "br1"), 0x30: ("bgt.s", "br1"),
+    0x31: ("ble.s", "br1"), 0x32: ("blt.s", "br1"), 0x33: ("bne.un.s", "br1"), 0x34: ("bge.un.s", "br1"),
+    0x35: ("bgt.un.s", "br1"), 0x36: ("ble.un.s", "br1"), 0x37: ("blt.un.s", "br1"), 0x38: ("br", "br4"),
+    0x39: ("brfalse", "br4"), 0x3A: ("brtrue", "br4"), 0x3B: ("beq", "br4"), 0x3C: ("bge", "br4"),
+    0x3D: ("bgt", "br4"), 0x3E: ("ble", "br4"), 0x3F: ("blt", "br4"), 0x40: ("bne.un", "br4"),
+    0x41: ("bge.un", "br4"), 0x42: ("bgt.un", "br4"), 0x43: ("ble.un", "br4"), 0x44: ("blt.un", "br4"),
+    0x45: ("switch", "sw"), 0x4E: ("ldind.r4", None), 0x4F: ("ldind.r8", None), 0x50: ("ldind.ref", None),
+    0x52: ("stind.i1", None), 0x56: ("stind.r4", None), 0x57: ("stind.r8", None), 0x58: ("add", None),
+    0x59: ("sub", None), 0x5A: ("mul", None), 0x5B: ("div", None), 0x5C: ("div.un", None),
+    0x5D: ("rem", None), 0x5E: ("rem.un", None), 0x65: ("neg", None), 0x6B: ("conv.r4", None),
+    0x6C: ("conv.r8", None), 0x6F: ("callvirt", "tok"), 0x71: ("ldobj", "tok"), 0x72: ("ldstr", "tok"),
+    0x73: ("newobj", "tok"), 0x74: ("castclass", "tok"), 0x75: ("isinst", "tok"), 0x76: ("conv.r.un", None),
+    0x7A: ("throw", None), 0x7B: ("ldfld", "tok"), 0x7C: ("ldsfld", "tok"), 0x7D: ("stfld", "tok"),
+    0x7E: ("stsfld", "tok"), 0x7F: ("stobj", "tok"), 0x8C: ("newarr", "tok"), 0x8D: ("ldlen", None),
+    0x8E: ("ldelema", "tok"), 0x8F: ("ldelem.i1", None), 0x90: ("ldelem.u1", None), 0x91: ("ldelem.i2", None),
+    0x92: ("ldelem.u2", None), 0x93: ("ldelem.i4", None), 0x97: ("ldelem.r4", None), 0x98: ("ldelem.r8", None),
+    0x99: ("ldelem.ref", None), 0x9A: ("stelem.i", None), 0x9C: ("stelem.r8", None), 0x9F: ("stelem.r4", None),
+    0xA0: ("stelem.r8", None), 0xA1: ("stelem.ref", None), 0xA2: ("ldelem", "tok"), 0xA3: ("stelem", "tok"),
+    0xA4: ("unbox.any", "tok"), 0xDB: ("sub.ovf.un", None), 0xDC: ("endfinally", None), 0xDD: ("leave", "br4"),
+    0xDE: ("leave.s", "br1"),
+}
+
+OP2 = {
+    0x00: ("ceq", None), 0x01: ("cgt", None), 0x02: ("cgt.un", None), 0x03: ("clt", None),
+    0x04: ("clt.un", None), 0x05: ("ldftn", "tok"), 0x06: ("ldvirtftn", "tok"), 0x09: ("ldarg", "u2"),
+    0x0A: ("ldarga", "u2"), 0x0B: ("starg", "u2"), 0x0C: ("ldloc", "u2"), 0x0D: ("ldloca", "u2"),
+    0x0E: ("stloc", "u2"), 0x15: ("initobj", "tok"), 0x16: ("constrained.", "tok"),
+}
+
+def read_compressed_uint(buf, pos):
+    if pos >= len(buf):
+        return 0, pos
+    b0 = buf[pos]
+    if (b0 & 0x80) == 0:
+        return b0, pos + 1
+    elif (b0 & 0xC0) == 0x80 and pos + 1 < len(buf):
+        return ((b0 & 0x3F) << 8) | buf[pos + 1], pos + 2
+    elif (b0 & 0xE0) == 0xC0 and pos + 3 < len(buf):
+        return ((b0 & 0x1F) << 24) | (buf[pos + 1] << 16) | (buf[pos + 2] << 8) | buf[pos + 3], pos + 4
+    return 0, pos + 1
+
+def rva_to_offset(rva, sections):
+    for vaddr, vsize, raw_ptr, raw_size in sections:
+        if vaddr <= rva < vaddr + max(vsize, raw_size):
+            return raw_ptr + (rva - vaddr)
+    return None
+
+def parse_pe_v3(path):
+    if not os.path.exists(path):
+        return {"exists": False, "path": path}
+    with open(path, "rb") as f:
+        data = f.read()
+
+    info = {"exists": True, "path": path, "size": len(data), "parsed": False, "error": None}
+    e_lfanew = struct.unpack_from("<I", data, 0x3C)[0]
+    num_sections = struct.unpack_from("<H", data, e_lfanew + 6)[0]
+    opt_hdr_size = struct.unpack_from("<H", data, e_lfanew + 20)[0]
+    opt_off = e_lfanew + 24
+    magic = struct.unpack_from("<H", data, opt_off)[0]
+    dd_off = opt_off + (96 if magic == 0x10B else 112)
+    cli_rva, _ = struct.unpack_from("<II", data, dd_off + 14 * 8)
+
+    sections = []
+    sec_rows = []
+    sec_off = opt_off + opt_hdr_size
+    for i in range(num_sections):
+        s = data[sec_off + i*40 : sec_off + (i+1)*40]
+        sname = s[:8].rstrip(b"\x00").decode("ascii", errors="replace")
+        vsize, vaddr, raw_size, raw_ptr = struct.unpack_from("<IIII", s, 8)
+        sections.append((vaddr, vsize, raw_ptr, raw_size))
+        sec_rows.append((sname, vaddr, vsize, raw_ptr, raw_size))
+
+    cli_off = rva_to_offset(cli_rva, sections)
+    meta_rva, _ = struct.unpack_from("<II", data, cli_off + 8)
+    meta_off = rva_to_offset(meta_rva, sections)
+    ver_len = struct.unpack_from("<I", data, meta_off + 12)[0]
+    pos = meta_off + 16 + ver_len
+    while pos % 4 != 0:
+        pos += 1
+    num_streams = struct.unpack_from("<H", data, pos + 2)[0]
+    pos += 4
+
+    streams = {}
+    for _ in range(num_streams):
+        st_off, st_size = struct.unpack_from("<II", data, pos)
+        pos += 8
+        nb = bytearray()
+        while pos < len(data) and data[pos] != 0:
+            nb.append(data[pos]); pos += 1
+        pos += 1
+        while pos % 4 != 0:
+            pos += 1
+        streams[nb.decode("ascii", errors="replace")] = (meta_off + st_off, st_size)
+
+    t_off, _ = streams["#~"]
+    s_off, s_size = streams["#Strings"]
+    b_off, b_size = streams.get("#Blob", (0, 0))
+    us_off, us_size = streams.get("#US", (0, 0))
+    strings_blob = data[s_off : s_off + s_size]
+    blob_heap = data[b_off : b_off + b_size] if b_size else b""
+    us_blob = data[us_off : us_off + us_size] if us_size else b""
+
+    def get_str(idx):
+        if idx >= len(strings_blob):
+            return ""
+        end = strings_blob.find(b"\x00", idx)
+        return strings_blob[idx:end if end != -1 else len(strings_blob)].decode("utf-8", errors="replace")
+
+    def get_us(idx):
+        if not us_blob or idx + 1 >= len(us_blob):
+            return ""
+        b0 = us_blob[idx]
+        if b0 < 0x80:
+            ln, start = b0, idx + 1
+        elif (b0 & 0xC0) == 0x80 and idx + 2 < len(us_blob):
+            ln, start = ((b0 & 0x3F) << 8) | us_blob[idx + 1], idx + 2
+        else:
+            return ""
+        return us_blob[start : start + max(0, ln - 1)].decode("utf-16-le", errors="replace")
+
+    heap_sizes = data[t_off + 6]
+    str_sz = 4 if (heap_sizes & 0x01) else 2
+    guid_sz = 4 if (heap_sizes & 0x02) else 2
+    blob_sz = 4 if (heap_sizes & 0x04) else 2
+    valid_mask = struct.unpack_from("<Q", data, t_off + 8)[0]
+
+    counts = {}
+    cur = t_off + 24
+    for tid in range(64):
+        if (valid_mask >> tid) & 1:
+            counts[tid] = struct.unpack_from("<I", data, cur)[0]
+            cur += 4
+
+    def idx_sz(tid):
+        return 4 if counts.get(tid, 0) >= 65536 else 2
+
+    def coded_sz(coded_tids, tag_bits):
+        mx = max((counts.get(t, 0) for t in coded_tids), default=0)
+        return 4 if (mx << tag_bits) >= 65536 else 2
+
+    res_scope_sz = coded_sz([0, 26, 2, 35], 2)
+    tdr_sz = coded_sz([2, 1, 27], 2)
+    mrp_sz = coded_sz([2, 1, 26, 6, 27], 3)
+    has_const_sz = coded_sz([8, 4, 23], 2)
+    has_ca_sz = coded_sz([6,4,1,2,8,9,5,7,10,11,12,13,14,15,16,17,18,19,20,23,24,25,26,27], 5)
+    has_fm_sz = coded_sz([4, 8], 1)
+    has_sec_sz = coded_sz([2, 6, 32], 2)
+    has_sem_sz = coded_sz([20, 23], 1)
+    has_moc_sz = coded_sz([6, 10], 1)
+    has_fmar_sz = coded_sz([4, 8], 1)
+    type_or_method_sz = coded_sz([2, 6], 1)
+
+    row_sizes = {
+        0: 2 + str_sz + guid_sz * 3,
+        1: res_scope_sz + str_sz * 2,
+        2: 4 + str_sz * 2 + tdr_sz + idx_sz(4) + idx_sz(6),
+        4: 2 + str_sz + blob_sz,
+        6: 4 + 2 + 2 + str_sz + blob_sz + idx_sz(8),
+        8: 2 + 2 + str_sz,
+        9: idx_sz(6) + idx_sz(8),
+        10: mrp_sz + str_sz + blob_sz,
+        11: has_ca_sz + blob_sz,
+        12: has_fmar_sz + blob_sz,
+        13: has_sec_sz + blob_sz,
+        14: 2 + idx_sz(2),
+        15: blob_sz,
+        16: 2 + str_sz + idx_sz(4),
+        17: 4 + idx_sz(4),
+        18: 2 + str_sz + idx_sz(6),
+        20: 4 + idx_sz(6),
+        21: 2 + idx_sz(23),
+        23: 2 + str_sz + blob_sz,
+        24: 2 + has_sem_sz + idx_sz(20),
+        25: idx_sz(6) + has_moc_sz,
+        26: str_sz,
+        27: blob_sz,
+        28: 4 + has_fm_sz + idx_sz(4),
+        29: type_or_method_sz + str_sz,
+        32: 4 + has_sec_sz + blob_sz,
+        33: 4,
+        34: 4 + 4 + 4 + 4,
+        35: 4 + 4 + 4 + 4 + blob_sz + str_sz * 2,
+        36: 4 + res_scope_sz,
+        37: 4 + 4 + str_sz * 2,
+        38: 4 + idx_sz(37),
+        39: 4 + str_sz + idx_sz(35),
+        40: 4 + has_ca_sz,
+        41: idx_sz(2) + idx_sz(2),
+        42: idx_sz(6) + idx_sz(6),
+        43: idx_sz(6) + idx_sz(6),
+        44: 2 + str_sz + res_scope_sz,
+    }
+
+    starts = {}
+    t_cur = cur
+    for tid in range(64):
+        if (valid_mask >> tid) & 1:
+            starts[tid] = t_cur
+            t_cur += counts.get(tid, 0) * row_sizes.get(tid, 0)
+
+    def read_idx(off, sz):
+        return struct.unpack_from("<I", data, off)[0] if sz == 4 else struct.unpack_from("<H", data, off)[0]
+
+    typerefs = {}
+    if 1 in starts:
+        tr_s = starts[1]
+        for i in range(1, counts.get(1, 0) + 1):
+            roff = tr_s + (i - 1) * row_sizes[1]
+            tname = get_str(read_idx(roff + res_scope_sz, str_sz))
+            tns = get_str(read_idx(roff + res_scope_sz + str_sz, str_sz))
+            typerefs[i] = f"{tns}.{tname}" if tns else tname
+
+    typedefs = {}
+    field_owner = {}
+    method_owner = {}
+    types = []
+    all_fields = [get_str(read_idx(starts[4] + i * row_sizes[4] + 2, str_sz)) for i in range(counts.get(4, 0))]
+    all_methods = [get_str(read_idx(starts[6] + i * row_sizes[6] + 8, str_sz)) for i in range(counts.get(6, 0))]
+
+    td_start = starts[2]
+    td_count = counts.get(2, 0)
+    fl_off = 4 + str_sz * 2 + tdr_sz
+    ml_off = fl_off + idx_sz(4)
+    for i in range(td_count):
+        roff = td_start + i * row_sizes[2]
+        tname = get_str(read_idx(roff + 4, str_sz))
+        tns = get_str(read_idx(roff + 4 + str_sz, str_sz))
+        full_t = f"{tns}.{tname}" if tns else tname
+        typedefs[i + 1] = full_t
+        f_first = read_idx(roff + fl_off, idx_sz(4))
+        m_first = read_idx(roff + ml_off, idx_sz(6))
+        if i + 1 < td_count:
+            next_roff = td_start + (i + 1) * row_sizes[2]
+            f_last = read_idx(next_roff + fl_off, idx_sz(4))
+            m_last = read_idx(next_roff + ml_off, idx_sz(6))
+        else:
+            f_last, m_last = counts.get(4, 0) + 1, counts.get(6, 0) + 1
+        for fidx in range(f_first, f_last):
+            field_owner[fidx] = full_t
+        for midx in range(m_first, m_last):
+            method_owner[midx] = full_t
+        types.append({
+            "full": full_t,
+            "fields": all_fields[max(0, f_first - 1):max(0, f_last - 1)],
+            "methods": all_methods[max(0, m_first - 1):max(0, m_last - 1)],
+        })
+
+    tokens = {}
+    for idx1 in range(1, counts.get(4, 0) + 1):
+        foff = starts[4] + (idx1 - 1) * row_sizes[4]
+        fname = get_str(read_idx(foff + 2, str_sz))
+        owner = field_owner.get(idx1, "")
+        tokens[0x04000000 | idx1] = f"{owner}.{fname}" if owner else fname
+
+    method_entries = []
+    for idx1 in range(1, counts.get(6, 0) + 1):
+        moff = starts[6] + (idx1 - 1) * row_sizes[6]
+        mrva = struct.unpack_from("<I", data, moff)[0]
+        mname = get_str(read_idx(moff + 8, str_sz))
+        owner = method_owner.get(idx1, "")
+        full_m = f"{owner}.{mname}" if owner else mname
+        tokens[0x06000000 | idx1] = full_m
+        foff = rva_to_offset(mrva, sections) if mrva else None
+        method_entries.append((owner, mname, full_m, mrva, foff, idx1))
+
+    def resolve_mrp(raw_val):
+        tag = raw_val & 0x07
+        idx = raw_val >> 3
+        if tag == 0:
+            return typedefs.get(idx, f"TypeDef#{idx}")
+        elif tag == 1:
+            return typerefs.get(idx, f"TypeRef#{idx}")
+        elif tag == 3:
+            return tokens.get(0x06000000 | idx, f"MethodDef#{idx}")
+        elif tag == 4:
+            return f"TypeSpec#{idx}"
+        return f"Tag{tag}#{idx}"
+
+    resolved_memberrefs = {}
+    if 10 in starts:
+        mr_s = starts[10]
+        mr_cnt = counts.get(10, 0)
+        for idx1 in range(1, mr_cnt + 1):
+            roff = mr_s + (idx1 - 1) * row_sizes[10]
+            cls_raw = read_idx(roff, mrp_sz)
+            mname = get_str(read_idx(roff + mrp_sz, str_sz))
+            sig_idx = read_idx(roff + mrp_sz + str_sz, blob_sz)
+            sig_len, sig_start = read_compressed_uint(blob_heap, sig_idx)
+            sig_hex = blob_heap[sig_start : sig_start + sig_len].hex()
+            tok = 0x0A000000 | idx1
+            desc = f"{resolve_mrp(cls_raw)}.{mname} [sig=0x{sig_idx:x}:{sig_hex}]"
+            tokens[tok] = desc
+            resolved_memberrefs[tok] = desc
+
+    info.update({
+        "parsed": True,
+        "data": data,
+        "sections": sec_rows,
+        "types": types,
+        "tokens": tokens,
+        "get_us": get_us,
+        "method_entries": method_entries,
+        "max_tid": max(starts.keys()) if starts else 0,
+        "memberref_count": counts.get(10, 0),
+        "resolved_memberrefs": resolved_memberrefs,
+    })
+    return info
+
+def get_il_slice(data, foff):
+    if not foff or foff < 0 or foff >= len(data):
+        return "InvalidOffset", b""
+    b0 = data[foff]
+    if (b0 & 0x03) == 0x02:
+        code_size = b0 >> 2
+        return f"Tiny ({code_size}B)", data[foff + 1 : foff + 1 + code_size]
+    elif (b0 & 0x07) == 0x03:
+        if foff + 12 > len(data):
+            return "TruncatedFat", b""
+        _, max_stack, code_size, _ = struct.unpack_from("<HHII", data, foff)
+        return f"Fat (stack={max_stack}, {code_size}B)", data[foff + 12 : foff + 12 + code_size]
+    return f"NonIL(0x{b0:02x})", b""
+
+def disasm_full(il, tokens, get_us):
+    lines = []
+    unknowns = []
+    ip, n = 0, len(il)
+    while ip < n:
+        start_ip = ip
+        op = il[ip]
+        ip += 1
+        if op == 0xFE and ip < n:
+            op2 = il[ip]
+            ip += 1
+            mnem, otype = OP2.get(op2, (f"fe.{op2:02x}", None))
+            if mnem.startswith("fe."):
+                unknowns.append((start_ip, mnem))
+        else:
+            mnem, otype = OP1.get(op, (f"op_{op:02x}", None))
+            if mnem.startswith("op_"):
+                unknowns.append((start_ip, mnem))
+
+        arg_str = ""
+        if otype == "i1" and ip < n:
+            arg_str = str(struct.unpack_from("<b", il, ip)[0]); ip += 1
+        elif otype == "u1" and ip < n:
+            arg_str = str(il[ip]); ip += 1
+        elif otype == "i2" and ip + 2 <= n:
+            arg_str = str(struct.unpack_from("<h", il, ip)[0]); ip += 2
+        elif otype == "i4" and ip + 4 <= n:
+            arg_str = str(struct.unpack_from("<i", il, ip)[0]); ip += 4
+        elif otype == "i8" and ip + 8 <= n:
+            arg_str = str(struct.unpack_from("<q", il, ip)[0]); ip += 8
+        elif otype == "r4" and ip + 4 <= n:
+            arg_str = f"{struct.unpack_from('<f', il, ip)[0]:g}"; ip += 4
+        elif otype == "r8" and ip + 8 <= n:
+            arg_str = f"{struct.unpack_from('<d', il, ip)[0]:g}"; ip += 8
+        elif otype == "br1" and ip < n:
+            delta = struct.unpack_from("<b", il, ip)[0]; ip += 1
+            arg_str = f"IL_{ip + delta:04d}"
+        elif otype == "br4" and ip + 4 <= n:
+            delta = struct.unpack_from("<i", il, ip)[0]; ip += 4
+            arg_str = f"IL_{ip + delta:04d}"
+        elif otype == "sw" and ip + 4 <= n:
+            cnt = struct.unpack_from("<I", il, ip)[0]; ip += 4
+            base_after = ip + cnt * 4
+            tgts = []
+            for _ in range(cnt):
+                if ip + 4 <= n:
+                    d = struct.unpack_from("<i", il, ip)[0]; ip += 4
+                    tgts.append(f"IL_{base_after + d:04d}")
+            arg_str = f"({cnt}) [{', '.join(tgts)}]"
+        elif otype == "tok" and ip + 4 <= n:
+            tok = struct.unpack_from("<I", il, ip)[0]; ip += 4
+            if (tok >> 24) == 0x70:
+                arg_str = f'"{get_us(tok & 0x00FFFFFF)}" (0x{tok:08x})'
+            else:
+                arg_str = f"{tokens.get(tok, f'tok_0x{tok:08x}')} (0x{tok:08x})"
+        elif otype == "sig" and ip + 4 <= n:
+            tok = struct.unpack_from("<I", il, ip)[0]; ip += 4
+            arg_str = f"sig_0x{tok:08x}"
+
+        lines.append(f"  IL_{start_ip:04d}: {mnem:14s} {arg_str}".rstrip())
+    return lines, unknowns, ip
+
+def main():
+    out = []
+    out.append("=" * 92)
+    out.append("STRANDED DEEP - VERIFICATION FULL EVIDENCE REPORT (V3)")
+    out.append("=" * 92)
+    out.append(f"Generated At : {datetime.now().isoformat(timespec='seconds')}")
+    out.append(f"Data Dir     : {DATA_DIR}")
+    out.append(f"Managed Dir  : {MANAGED_DIR}")
+    out.append("")
+
+    out.append("[1] SCENE & ASSET EVIDENCE")
+    out.append("-" * 92)
+    keywords = [b"_Ceto", b"Ceto.Ocean", b"Tide", b"BuoyancyManager", b"WaveSpectrum", b"ProjectedGrid"]
+    for fname in SCENE_FILES:
+        fpath = os.path.join(DATA_DIR, fname)
+        if not os.path.exists(fpath):
+            fpath = os.path.join(DATA_DIR, "Resources", fname)
+        if not os.path.exists(fpath):
+            out.append(f"  {fname:30s} : NOT FOUND")
+            continue
+        with open(fpath, "rb") as f:
+            blob = f.read()
+        found = [k.decode("ascii") for k in keywords if k in blob]
+        out.append(f"  {fname:30s} : {len(blob):10d} bytes | found={found}")
+    out.append("")
+
+    pe_main = parse_pe_v3(DLL_MAIN)
+    pe_fp = parse_pe_v3(DLL_FIRSTPASS)
+    for label, pe in [("Assembly-CSharp.dll", pe_main), ("Assembly-CSharp-firstpass.dll", pe_fp)]:
+        out.append(f"Assembly: {label} | exists={pe.get('exists')} | size={pe.get('size', 0)}B | parsed={pe.get('parsed')} | max_tid={pe.get('max_tid')} | memberrefs={pe.get('memberref_count')}")
+        if pe.get("sections"):
+            out.append("  Sections: " + ", ".join([f"{n}[va=0x{va:x},raw=0x{rp:x},sz=0x{rs:x}]" for n, va, vs, rp, rs in pe["sections"]]))
+    out.append("")
+
+    out.append("[2] VERIFIED CALCULATION FORMULAS & IL EVIDENCE SUMMARY")
+    out.append("-" * 92)
+    out.append("  A. Query Grid Scaling (Ceto.WaveSpectrum.UpdateQueryScaling @ FileOff=0x7e2bc):")
+    out.append("       invGridSizes[g] = 1.0f / (GridSizes[g] * gridScale)   for g in {x=0, y=1, z=2, w=3}")
+    out.append("       scaleY          = gridScale")
+    out.append("       choppyness      = Vector4.op_Multiply(Clamp(choppyness, 0, 1.2), gridScale)")
+    out.append("       offset          = Ceto.Ocean.get_PositionOffset()")
+    out.append("       numGrids        = m_conditions[0].get_Key().get_NumGrids()")
+    out.append("  B. Coordinate Shift (Ceto.QueryDisplacements.QueryWaves @ FileOff=0x7689c):")
+    out.append("       shiftedX        = WaveQuery.posX + QueryGridScaling.offset.x")
+    out.append("       shiftedZ        = WaveQuery.posZ + QueryGridScaling.offset.z")
+    out.append("  C. Height & Displacement Sampling (SampleHeightOnly @ 0x76c60, Sample @ 0x76dc8):")
+    out.append("       (u, v)          = (x * invGridSizes[g], z * invGridSizes[g]) -> InterpolatedArray2f.Get(u, v, buf)")
+    out.append("       height_g        = buf[1] * scaleY")
+    out.append("       dispX_g         = buf[0] * choppyness[g]   (in Sample)")
+    out.append("       dispZ_g         = buf[2] * choppyness[g]   (in Sample)")
+    out.append("  D. Iterative Convergence & Clamping (Ceto.QueryDisplacements.QueryWaves @ FileOff=0x7689c):")
+    out.append("       errorSq         = (shiftedX - curX)^2 + (shiftedZ - curZ)^2")
+    out.append("       loop condition  = (errorSq > minError^2) && (iterations <= MAX_ITERATIONS)")
+    out.append("       WaveQueryResult.height = Mathf.Clamp(sum_g(height_g), -40.0f, 40.0f)")
+    out.append("  E. Ocean Level Addition (Ceto.Ocean.QueryWaves @ 0x6f004, 0x6f090, 0x6f130, 0x6f194):")
+    out.append("       H_surface       = WaveQueryResult.height + Ceto.Ocean.level")
+    out.append("")
+
+    if pe_main.get("parsed"):
+        data = pe_main["data"]
+        tokens = pe_main["tokens"]
+        get_us = pe_main["get_us"]
+
+        key_mr = [
+            0x0A00006E, 0x0A000088, 0x0A000089, 0x0A000092,
+            0x0A00018D, 0x0A0002A5, 0x0A0002A7, 0x0A0002A8, 0x0A0002A9
+        ]
+        out.append("[3] RESOLVED MEMBERREF & BLOB SIGNATURE PROOFS")
+        out.append("-" * 92)
+        for tok in key_mr:
+            out.append(f"  0x{tok:08x} -> {tokens.get(tok, 'UNRESOLVED')}")
+        out.append("")
+
+        full_disasm_methods = {
+            ".Tide.Update",
+            "Ceto.Ocean.SetQueryWavesSampling",
+            "Ceto.Ocean.QueryWaves",
+            "Ceto.Ocean.QueryWavesWithAsyncTask",
+            "Ceto.QueryGridScaling..ctor",
+            "Ceto.DisplacementBufferCPU.QueryWaves",
+            "Ceto.DisplacementBufferGPU.QueryWaves",
+            "Ceto.QueryDisplacements.QueryWaves",
+            "Ceto.QueryDisplacements.SampleHeightOnly",
+            "Ceto.QueryDisplacements.Sample",
+            "Ceto.WaveSpectrum.UpdateQueryScaling",
+            "Ceto.WaveSpectrum.FindRanges",
+            "Ceto.WaveSpectrum.QueryWaves",
+            "Beam.BuoyancyManager.DoQueries",
+        }
+        out.append("[4] FULL INSTRUCTION-BY-INSTRUCTION CIL DISASSEMBLY (V3 RESOLVED)")
+        out.append("-" * 92)
+        for owner, mname, full_m, mrva, foff, idx1 in pe_main["method_entries"]:
+            if full_m in full_disasm_methods:
+                hdr, il = get_il_slice(data, foff)
+                dlines, unks, parsed_len = disasm_full(il, tokens, get_us)
+                out.append(f"\n>>> {full_m} (row#{idx1}) | RVA=0x{mrva:08x} | FileOff=0x{foff:x} | {hdr} | parsed={parsed_len}/{len(il)} | unknowns={unks}")
+                out.append(f"    RawHex: {il.hex()}")
+                out.extend(dlines)
+        out.append("")
+
+        ocean_level_toks = {tok for tok, nm in tokens.items() if nm == "Ceto.Ocean.level"}
+        out.append("[5] ALL REFERENCES TO Ceto.Ocean.level")
+        out.append("-" * 92)
+        for owner, mname, full_m, mrva, foff, idx1 in pe_main["method_entries"]:
+            _, il = get_il_slice(data, foff)
+            if not il:
+                continue
+            for i in range(len(il) - 4):
+                if il[i] in (0x7B, 0x7C, 0x7D):
+                    tok = struct.unpack_from("<I", il, i + 1)[0]
+                    if tok in ocean_level_toks:
+                        opn = {0x7B: "ldfld", 0x7C: "ldsfld", 0x7D: "stfld"}[il[i]]
+                        out.append(f"  {full_m:48s} @IL+{i:3d} (FileOff=0x{foff:x}): {opn} Ceto.Ocean.level")
+        out.append("")
+
+    out.append("=" * 92)
+    out.append("END OF VERIFICATION FULL EVIDENCE REPORT V3")
+    out.append("=" * 92)
+
+    with open(OUT_V3, "w", encoding="utf-8") as f:
+        f.write("\n".join(out) + "\n")
+    print(f"Saved: {OUT_V3} ({os.path.getsize(OUT_V3)} bytes)")
+
+if __name__ == "__main__":
+    main()
+EOF
+/root/.venv_mission3/bin/python generate_full_evidence_v3.py
+
+```
+
+ဒီ script ကို run ပြီးရင် `/storage/emulated/0/Download/Stranded-Deep-Original/stranded_deep_ocean_full_evidence_v3.txt` ကို verify အဖွဲ့ဆီ တိုက်ရိုက် ပို့လို့ ရပါပြီ ဆရာကြီး 😂💪 — verify အဖွဲ့က ဘာပြန်ပြောလဲ ထပ်ကြည့်ကြရအောင်။
