@@ -1,0 +1,103 @@
+# GOOGLE AI CORE V1 — REQUIRED FIXES
+
+## Mission
+Harden the independent PE/CLI/Metadata/IL decoder and validate its existing 980-method result without discarding the original forensic evidence.
+
+## Required Fixes
+
+1. **Harden PE Parsing**
+   - Validate DOS and PE signatures.
+   - Validate PE optional-header format and bounds.
+   - Validate section-table boundaries.
+   - Validate CLI directory location and size.
+   - Reject invalid RVA-to-file mappings instead of returning offset 0.
+   - Distinguish abstract methods from invalid or unmapped method RVAs.
+
+2. **Harden CLI Metadata Parsing**
+   - Validate metadata root and stream headers.
+   - Validate stream offsets and sizes against file boundaries.
+   - Validate table-stream boundaries and row counts.
+   - Validate string and user-string heap access.
+   - Reject invalid metadata references with explicit diagnostics.
+
+3. **Harden Method Headers**
+   - Validate Tiny and Fat method headers.
+   - Validate header size, flags, MaxStack, code size, and local-signature token.
+   - Validate MoreSects and method-body alignment.
+   - Confirm that the available method body matches the declared code size exactly.
+
+4. **Fix IL Opcode and Operand Coverage**
+   - Build an explicit opcode-to-operand-size table.
+   - Do not assume an unlisted opcode has zero operands.
+   - Reject unknown opcodes.
+   - Reject known opcodes with missing operand definitions.
+   - Check remaining bytes before every operand read.
+   - Handle truncated operands as structured validation failures, not uncaught exceptions.
+
+5. **Harden Branch and Switch Validation**
+   - Validate branch targets against actual instruction-start offsets.
+   - Reject targets outside the method body.
+   - Validate switch table length before reading entries.
+   - Validate every switch destination.
+   - Do not accept the method-end offset as an ordinary instruction target.
+
+6. **Implement Exception-Handling Validation**
+   - Parse MoreSects sections.
+   - Parse small and fat EH sections.
+   - Validate section sizes and flags.
+   - Validate try, handler, and filter offsets and lengths.
+   - Validate complete protected-region boundaries.
+   - Validate catch-type metadata tokens.
+   - Validate leave and leave.s instructions against the method structure.
+
+7. **Harden Metadata Token Resolution**
+   - Validate token table identifiers and row IDs.
+   - Resolve method, field, type, string, and signature references where applicable.
+   - Report unresolved references.
+   - Do not silently accept invalid tokens.
+
+8. **Add an Independent Decoder Comparison**
+   - Keep the existing custom decoder as Decoder A.
+   - Implement or use a genuinely independent raw-byte Decoder B.
+   - Compare method boundaries, decoded instructions, operands, branch targets, and EH regions.
+   - Record every disagreement.
+   - Do not let Decoder A validate itself.
+
+9. **Recalculate Verification Results**
+   - Re-scan all 1,064 reported methods.
+   - Revalidate the 980 previously decoded methods.
+   - Preserve the 84 abstract/interface methods as a separate category only after confirming RVA and metadata status.
+   - Recalculate all mismatches after structural validation.
+   - Do not retain the old 100% Byte-Verified claim without new evidence.
+
+10. **Use Four Verification Statuses**
+   - VERIFIED: all applicable structural and independent checks passed.
+   - PARTIALLY VERIFIED: some checks passed, but important validation remains incomplete.
+   - INFERRED: conclusion is based on indirect evidence.
+   - UNVERIFIED: evidence is absent or insufficient.
+
+## Acceptance Criteria
+- Invalid PE/CLI structures fail safely with explicit diagnostics.
+- Every opcode has an explicit operand definition.
+- Declared method code size is checked exactly.
+- Branch and switch targets are validated.
+- EH sections and protected regions are validated.
+- Metadata token errors are reported.
+- Two independent decoders agree on verified methods.
+- Final method counts are recalculated from fresh execution.
+
+## Scope Protection
+- Preserve `PHASE1_DEEP_FORENSIC_AUDIT.txt` and `Scrpic.txt` as original evidence.
+- Do not modify Gemini Ai Core 1.
+- Do not modify the original DLL.
+- Do not invent missing shader or FFT source.
+- Do not start Godot migration.
+- Do not introduce unrelated gameplay or save/load work.
+
+## Final Deliverables
+- Hardened forensic decoder.
+- Independent decoder comparison report.
+- Per-method validation manifest.
+- Updated phase-one forensic report.
+- Exact PASS/FAIL/PARTIAL/UNVERIFIED counts.
+- Remaining structural and evidence gaps.
