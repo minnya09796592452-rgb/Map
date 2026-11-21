@@ -578,7 +578,195 @@ SUBSTANTIAL RAW IL EVIDENCE
 
 -------------
 
+အခု **Gemini Ai Core 1** နဲ့ **Google Ai Core V1** နှစ်ခုအတွက် ပြင်ဆင်ရမယ့်အချက်တွေကို သီးခြားခွဲပြီး One-Click ပုံစံနဲ့ ရေးပေးမယ်။ အဓိကက မူရင်း Evidence မပျက်စေဘဲ Audit နဲ့ Verification အားနည်းချက်တွေကို ပြင်ဖို့ပါ။
 
+## **1. Gemini Ai Core 1**
+
+PARTIALLY VERIFIED
+
+# GEMINI AI CORE 1 — REQUIRED FIXES
+
+## Mission
+
+Strengthen the existing audit system without deleting, rewriting, or fabricating existing evidence.
+
+## Required Fixes
+
+1. **Fix Path Resolution**
+   - Separate `BASE_DIR` and `DATA_DIR` responsibilities.
+   - Ensure every checked file is resolved against its intended directory.
+   - Record the absolute resolved path for each file.
+   - Detect duplicate filenames in different directories.
+   - Report missing files separately from path-resolution errors.
+2. **Fix Input Discovery**
+   - Explicitly locate:
+     - `1_OCEAN_CORE_PART_01.txt`
+     - `2_GPU_CPU_PIPELINE_PART_01.txt`
+     - `3_COMBINED_OCEAN_GPU_CPU_PART_01.txt`
+   - Do not silently treat missing files as empty inputs.
+   - Record every scanned directory and every selected input file.
+3. **Fix Token Verification**
+   - Actually use `VERIFIED_TOKENS` and `METHOD_BODY_SIZES`.
+   - Compare extracted tokens against the expected token set.
+   - Validate method body sizes against the source evidence.
+   - Report missing, additional, duplicate, and mismatched tokens individually.
+4. **Fix Combined Evidence Validation**
+   - Verify that the Combined file equals the union of CORE and PIPE.
+   - Compare token sets and method-level content.
+   - Report whether it is an exact union, partial union, or contains conflicting content.
+   - Never describe the Combined file as an independent source if it is only a merge.
+5. **Remove Unsupported Assertions**
+   - Remove the hardcoded claim that Grid 3 readback is skipped to save GPU-to-CPU bandwidth.
+   - Mark the reason as UNVERIFIED unless supported by direct evidence.
+   - Separate observed IL behavior from inferred explanations.
+6. **Fix Report Generation**
+   - Generate reports only from actual scan results.
+   - Include input hashes, file paths, scan timestamps, and validation results.
+   - Never print VERIFIED for a check that was not executed.
+   - Distinguish missing inputs from failed validation.
+7. **Add Explicit Verification Status**
+   - VERIFIED
+   - PARTIALLY VERIFIED
+   - INFERRED
+   - UNVERIFIED
+
+## Acceptance Criteria
+
+- All intended source files are discovered correctly.
+- No missing input is silently treated as an empty file.
+- Token and method-size checks execute rather than relying on unused constants.
+- Combined evidence is compared against both source collections.
+- Unsupported Grid 3 explanations are removed.
+- Reports are reproducible from the actual input files.
+
+## Scope Protection
+
+- Preserve all original evidence.
+- Do not modify the Google Ai Core V1 folder.
+- Do not change Ocean implementation code.
+- Do not start Godot migration.
+- Do not introduce gameplay, save/load, or unrelated features.
+
+## Final Deliverables
+
+- Corrected audit scripts.
+- Reproducible audit report.
+- Input manifest with hashes.
+- Explicit PASS/FAIL/PARTIAL results.
+- A list of unresolved evidence gaps.
+
+## **2. Google Ai Core V1**
+
+SUBSTANTIAL RAW IL EVIDENCE — STRUCTURAL VALIDATION INCOMPLETE
+
+# GOOGLE AI CORE V1 — REQUIRED FIXES
+
+## Mission
+
+Harden the independent PE/CLI/Metadata/IL decoder and validate its existing 980-method result without discarding the original forensic evidence.
+
+## Required Fixes
+
+1. **Harden PE Parsing**
+   - Validate DOS and PE signatures.
+   - Validate PE optional-header format and bounds.
+   - Validate section-table boundaries.
+   - Validate CLI directory location and size.
+   - Reject invalid RVA-to-file mappings instead of returning offset 0.
+   - Distinguish abstract methods from invalid or unmapped method RVAs.
+2. **Harden CLI Metadata Parsing**
+   - Validate metadata root and stream headers.
+   - Validate stream offsets and sizes against file boundaries.
+   - Validate table-stream boundaries and row counts.
+   - Validate string and user-string heap access.
+   - Reject invalid metadata references with explicit diagnostics.
+3. **Harden Method Headers**
+   - Validate Tiny and Fat method headers.
+   - Validate header size, flags, MaxStack, code size, and local-signature token.
+   - Validate MoreSects and method-body alignment.
+   - Confirm that the available method body matches the declared code size exactly.
+4. **Fix IL Opcode and Operand Coverage**
+   - Build an explicit opcode-to-operand-size table.
+   - Do not assume an unlisted opcode has zero operands.
+   - Reject unknown opcodes.
+   - Reject known opcodes with missing operand definitions.
+   - Check remaining bytes before every operand read.
+   - Handle truncated operands as structured validation failures, not uncaught exceptions.
+5. **Harden Branch and Switch Validation**
+   - Validate branch targets against actual instruction-start offsets.
+   - Reject targets outside the method body.
+   - Validate switch table length before reading entries.
+   - Validate every switch destination.
+   - Do not accept the method-end offset as an ordinary instruction target.
+6. **Implement Exception-Handling Validation**
+   - Parse MoreSects sections.
+   - Parse small and fat EH sections.
+   - Validate section sizes and flags.
+   - Validate try, handler, and filter offsets and lengths.
+   - Validate complete protected-region boundaries.
+   - Validate catch-type metadata tokens.
+   - Validate leave and leave.s instructions against the method structure.
+7. **Harden Metadata Token Resolution**
+   - Validate token table identifiers and row IDs.
+   - Resolve method, field, type, string, and signature references where applicable.
+   - Report unresolved references.
+   - Do not silently accept invalid tokens.
+8. **Add an Independent Decoder Comparison**
+   - Keep the existing custom decoder as Decoder A.
+   - Implement or use a genuinely independent raw-byte Decoder B.
+   - Compare method boundaries, decoded instructions, operands, branch targets, and EH regions.
+   - Record every disagreement.
+   - Do not let Decoder A validate itself.
+9. **Recalculate Verification Results**
+   - Re-scan all 1,064 reported methods.
+   - Revalidate the 980 previously decoded methods.
+   - Preserve the 84 abstract/interface methods as a separate category only after confirming RVA and metadata status.
+   - Recalculate all mismatches after structural validation.
+   - Do not retain the old 100% Byte-Verified claim without new evidence.
+10. **Use Four Verification Statuses**
+
+- VERIFIED: all applicable structural and independent checks passed.
+- PARTIALLY VERIFIED: some checks passed, but important validation remains incomplete.
+- INFERRED: conclusion is based on indirect evidence.
+- UNVERIFIED: evidence is absent or insufficient.
+
+## Acceptance Criteria
+
+- Invalid PE/CLI structures fail safely with explicit diagnostics.
+- Every opcode has an explicit operand definition.
+- Declared method code size is checked exactly.
+- Branch and switch targets are validated.
+- EH sections and protected regions are validated.
+- Metadata token errors are reported.
+- Two independent decoders agree on verified methods.
+- Final method counts are recalculated from fresh execution.
+
+## Scope Protection
+
+- Preserve `PHASE1_DEEP_FORENSIC_AUDIT.txt` and `Scrpic.txt` as original evidence.
+- Do not modify Gemini Ai Core 1.
+- Do not modify the original DLL.
+- Do not invent missing shader or FFT source.
+- Do not start Godot migration.
+- Do not introduce unrelated gameplay or save/load work.
+
+## Final Deliverables
+
+- Hardened forensic decoder.
+- Independent decoder comparison report.
+- Per-method validation manifest.
+- Updated phase-one forensic report.
+- Exact PASS/FAIL/PARTIAL/UNVERIFIED counts.
+- Remaining structural and evidence gaps.
+
+## **အလုပ်လုပ်မယ့်အစီအစဉ်**
+
+1. Gemini Ai Core 1 — **Path + Input + Token Audit** ကို အရင်ပြင်။
+2. Google Ai Core V1 — **PE/CLI + IL Decoder** ကို ပြည့်စုံအောင် Harden လုပ်။
+3. နှစ်ခုလုံးရဲ့ မူရင်း Evidence ကို မပြင်ဘဲထား။
+4. ပြင်ပြီးတိုင်း သက်ဆိုင်ရာ Script ကို Run လုပ်ပြီး ရလဒ်ကို ပြန်စစ်။
+
+**အရေးကြီးတာ:** ဒီနှစ်ခုဟာ တာဝန်မတူဘူး။ Gemini က Audit orchestration/reporting ပိုင်း၊ Google က forensic decoder ပိုင်း ဖြစ်တယ်။ တစ်ခုကိုတစ်ခု အစားထိုးမလုပ်ရဘူး။
 ------------
 
 
