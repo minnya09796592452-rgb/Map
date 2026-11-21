@@ -1,0 +1,335 @@
+စစ်ဆေးနေတဲ့ Folder က Ocean Team ရဲ့ အဓိကမှတ်တမ်းစုဖြစ်တယ်။ အရင် Ocean Report တွေကို ထပ်စုထားရုံမဟုတ်ဘဲ **Query Pipeline၊ CPU/GPU Displacement၊ IL Decoder Script နဲ့ Team Leader ရဲ့ Verification Summary** ပါဝင်တယ်။
+
+အရေးကြီးဆုံးတွေ့ရှိချက်ကတော့ ဒီ Folder ထဲမှာ နောက်ဆုံးအသစ်တင်ထားတဲ့ Evidence တွေ ရှိနေပြီး၊ အရင် Audit လုပ်ခဲ့တဲ့ Repo HEAD ထက် နောက်ထပ် Commit ၇ ခု တိုးထားတာပဲ။ လက်ရှိစစ်ဆေးထားတဲ့ HEAD က `043563e2beccf461ae5a295f421c1c5da9afc4c2` ဖြစ်တယ်။
+
+**ဘာမှပြင်ဆင်ခြင်း၊ ဖျက်ခြင်း မလုပ်ထားဘူး။** အခုက Read-only စစ်ဆေးမှုပါ။
+
+# **1. Folder ထဲမှာ ဘာတွေပါလဲ**
+
+12 files တွေ့ရှိ
+
+`Google Team/Full Momery/` ထဲမှာ ဖိုင် ၁၂ ဖိုင် ရှိတယ်။
+
+| ဖိုင်                                  | အရွယ်အစား | ရည်ရွယ်ချက်                  |
+| -------------------------------------- | --------- | ---------------------------- |
+| `1_OCEAN_CORE_PART_01.txt`             | 1.50 MB   | Ocean Core Memory            |
+| `2_GPU_CPU_PIPELINE_PART_01.txt`       | 1.31 MB   | CPU/GPU Pipeline Memory      |
+| `3_COMBINED_OCEAN_GPU_CPU_PART_01.txt` | 2.82 MB   | Combined Pipeline Memory     |
+| `COMBINED_OCEAN_CPU_GPU_PIPELINE.txt`  | 6.97 KB   | Pipeline Report              |
+| `Gemini Ai Team Leader.txt`            | 10.38 KB  | Team Leader Summary          |
+| `Google Ai.txt`                        | 2.63 KB   | Project Objective / Timeline |
+| `OCEAN_QUERYWAVES_IL.txt`              | 21.29 KB  | QueryWaves IL                |
+| `OCEAN_QUERY_AND_PIPELINE.txt`         | 3.22 KB   | Query / Sampling Report      |
+| `Scrpic`                               | 7.99 KB   | Report Generator Script      |
+| `Scrpic.txt`                           | 9.95 KB   | Decoder Script Extension     |
+| `gen_final.py`                         | 14.68 KB  | Main IL Extraction Script    |
+| `generate_three_pipeline_reports.py`   | 7.88 KB   | Report Generator             |
+
+အရေးကြီးတဲ့ဖိုင်တွေကို အပြည့်အစုံဖတ်ပြီး Static Code Review လုပ်ခဲ့တယ်။ သို့သော် ပထမဆုံး Memory Part သုံးခုက ဖိုင်အရွယ်အစားကြီးလွန်းလို့ GitHub Connector က Content ကို ပြန်မပေးနိုင်ခဲ့ဘူး။ Metadata နဲ့ SHA တွေကိုတော့ ရရှိထားတယ်။ အဲဒီသုံးဖိုင်ရဲ့ အတွင်းပိုင်းကို စစ်ပြီးပြီလို့ မပြောနိုင်သေးဘူး။
+
+## **2. Team ရဲ့ မူလရည်ရွယ်ချက်**
+
+`Google Ai.txt` နဲ့ `Gemini Ai Team Leader.txt` အရ Team ရဲ့ အဓိကရည်ရွယ်ချက်က—
+
+**Stranded Deep ရဲ့ မူရင်း Unity Ceto Ocean System ကို Godot 4.7.2 Stable မှာ တိကျစွာ Reconstruction လုပ်ရန်။**
+
+အဓိကလိုအပ်ချက်တွေက -
+
+1. Guesswork မပါဘဲ Original C# IL ကို အခြေခံရန်။
+2. QueryWaves နဲ့ Sampling ကို အရင်ဆုံး ချိတ်ဆက်ရန်။
+3. CPU နဲ့ GPU Pipeline ကို သီးခြားစစ်ရန်။
+4. Buffer Generation / Readback / Interpolation ကို အတည်ပြုရန်။
+5. Shader နဲ့ Runtime Values မပြည့်စုံသေးရင် Verified မသတ်မှတ်ရန်။
+6. Godot မကူးခင် Gameplay / Save / Load ကို Scope ထဲမထည့်ရန်။
+
+ဒါက Ocean Team ရဲ့ အလုပ်ရည်ရွယ်ချက်ဖြစ်တယ်။ Mission 3 Terrain နဲ့ မရောရဘူး။
+
+## **3. ရရှိထားတဲ့ Technical Evidence**
+
+Report ထဲတွင် IL Evidence ရှိ
+
+### **A. QueryWaves Pipeline**
+
+`OCEAN_QUERY_AND_PIPELINE.txt` မှာ အောက်ပါ Call Chain ကို ဖော်ပြထားတယ်။
+
+**Ceto.Ocean.QueryWaves**
+
+**WaveSpectrum.QueryWaves**
+
+**IDisplacementBuffer.QueryWaves**
+
+**QueryDisplacements.QueryWaves**
+
+**Sample()**
+
+X / Y / Z
+
+**SampleHeightOnly()**
+
+Y only
+
+နောက်ဆုံး Height တွက်ချက်မှုမှာ `WaveQueryResult.height + Ocean.level` ကို အသုံးပြုတယ်လို့ Report က ဖော်ပြထားတယ်။
+
+### **B. CPU Displacement**
+
+Evidence အရ—
+
+- `m_displacements` က List အရွယ်အစား 2။
+- Slot 0 = Write Buffer။
+- Slot 1 = Read Buffer။
+- Grid 4 ခု။
+- Channel 3 ခု။
+- Channel 0 = X။
+- Channel 1 = Height Y။
+- Channel 2 = Z။
+
+CPU လုပ်ဆောင်မှုအစဉ်က—
+
+```
+SwapDisplacements()
+       ↓
+Initialize Write Buffer
+       ↓
+InitSpectrumDisplacementsTask
+       ↓
+FourierTask
+       ↓
+ProcessData()
+       ↓
+QueryWaves() reads Slot 1
+```
+
+ဒီအချက်က CPU Pipeline ကို ပြန်တည်ဆောက်ရာမှာ အရေးကြီးတယ်။
+
+### **C. GPU Displacement**
+
+Report တွေထဲမှာ—
+
+- GPU Displacement Map 4 ခု။
+- `ARGBHalf` RenderTexture။
+- `ComputeBuffer(size * size, stride=12)`။
+- GPU FFT။
+- `GenerateDisplacement()`။
+- `ReadFromGPU()`။
+
+ဆိုပြီး ဖော်ပြထားတယ်။
+
+အထူးသဖြင့် Grid 3 က အရေးကြီးတယ်။
+
+**Grid 3 အခြေအနေ**
+
+GPU Map 0–3
+
+Evidence ရှိ
+
+CPU Readback 0–2
+
+Evidence ရှိ
+
+Grid 3 CPU Readback
+
+မတွေ့ရှိ
+
+Grid 3 ကို Shader က အမှန်တကယ် အသုံးပြုမှု
+
+မအတည်ပြုရသေး
+
+Grid 3 မဖတ်ရတဲ့ အကြောင်းရင်း
+
+INFERRED
+
+အဓိကက Grid 3 ကို CPU Readback မလုပ်တာနဲ့ GPU မှာ မရှိတော့တာ မတူဘူး။
+
+အခုအချိန်မှာ အောက်ပါအချက်တွေကို ခွဲစစ်ဖို့ လိုတယ်။
+
+- GPU မှာ Texture ရှိခြင်း။
+- GPU Shader က Texture ကို သုံးခြင်း။
+- CPU Buffer မှာ Array ရှိခြင်း။
+- Array ထဲကို Data ရောက်ရှိခြင်း။
+- Query က Array ကို Sample လုပ်ခြင်း။
+
+ဒီအဆင့်ငါးခုကို တစ်ခုတည်းအဖြစ် မယူဆရဘူး။
+
+## **4. IL Decoder — အရေးအကြီးဆုံး ပြဿနာ**
+
+Critical verification gap
+
+`gen_final.py` နဲ့ `Scrpic.txt` ကို စစ်ကြည့်တဲ့အခါ အရေးကြီးတဲ့အချက်တစ်ခု တွေ့တယ်။
+
+`gen_final.py` မှာ—
+
+```
+ZERO_OPS = {    op for op in list(OP.values()) + list(FE.values())    if op and op not in SZ}
+```
+
+ဒီနည်းလမ်းက `SZ` ထဲမပါလာတဲ့ Known Opcode အားလုံးကို Operand မလိုတဲ့ Instruction အဖြစ် အလိုအလျောက် သတ်မှတ်ထားတယ်။
+
+အဲဒါကြောင့် Opcode တစ်ခုရဲ့ Operand Size ကို မေ့ထားမိရင် Zero-Operand လို့ မှားယွင်းသတ်မှတ်နိုင်တဲ့ အန္တရာယ်ရှိတယ်။
+
+နောက်ထပ်တွေ့ရှိချက်တွေ—
+
+| စစ်ဆေးချက်                               | လက်ရှိ Script                          |
+| ---------------------------------------- | -------------------------------------- |
+| Unknown Opcode                           | Stop လုပ်နိုင်                         |
+| Unknown Size Mapping                     | Guard ရှိသော်လည်း ZERO_OPS အပေါ် မူတည် |
+| Branch Target                            | Instruction Start စစ်တယ်               |
+| Switch Target                            | Target စစ်တယ်                          |
+| Tiny/Fat Header                          | အခြေခံဖတ်နိုင်                         |
+| Declared Code Size နဲ့ Actual Slice Size | အပြည့်အစုံ မစစ်                        |
+| Local Signature Token                    | အပြည့်အစုံ မစစ်                        |
+| EH Section                               | အခြေခံသာ ဖတ်                           |
+| EH Region Start/End                      | အပြည့်အစုံ မစစ်                        |
+| Raw Independent Decoder                  | မရှိသေး                                |
+
+အထူးသဖြင့် `ok` သတ်မှတ်ချက်မှာ—
+
+```
+ok = (    dec == len(code)    and not errs    and not bad_b    and not bad_e)
+```
+
+ဆိုပြီး စစ်ထားတယ်။
+
+ဒါပေမဲ့ `len(code)` ဟာ Method Header မှာ သတ်မှတ်ထားတဲ့ `cs` နဲ့ တူမတူကို မစစ်ထားဘူး။ EH အတွက်လည်း Start Offset တွေကိုသာ အဓိကစစ်ပြီး Protected Region အပြည့်အစုံကို မစစ်ထားဘူး။
+
+**အဲဒါကြောင့်&#x20;**`252 Verified`**&#x20;ဆိုတာကို Full Structural Verification 252 ခုလို့ လက်မခံနိုင်သေးဘူး။**
+
+သို့သော် Raw IL Byte Coverage အတွက် ရရှိထားတဲ့ Evidence ကို လုံးဝပယ်ဖျက်ရမယ်လို့လည်း မဆိုလိုဘူး။ အဲဒီအချက်နဲ့ Decoder ရဲ့ မှန်ကန်မှုကို သီးခြားစီ စစ်ရမယ်။
+
+## **5. Report တွေကြားက မကိုက်ညီမှုများ**
+
+ဒီအပိုင်းက အရေးကြီးဆုံးတွေထဲက တစ်ခုပါ။
+
+| အကြောင်းအရာ         | Report A               | Report B / Leader               | ဆုံးဖြတ်ချက်               |
+| ------------------- | ---------------------- | ------------------------------- | -------------------------- |
+| Grid 3              | Confirmed Optimization | INFERRED rationale              | မညီညွတ်                    |
+| Grid 3 Shader Usage | Active shader ဟု ဆို   | Shader consumption မသက်သေပြရသေး | မပြီးသေး                   |
+| Decoder             | 252 Verified           | Structural validation လိုသေး    | 252 ကို ပြန်ခွဲစစ်         |
+| Iteration           | MAX_ITERATIONS + 1     | MAX = 20, Pass = 21             | Constant နဲ့ IL ပြန်ညှိရန် |
+| Shader Math         | Pipeline calls ရှိ     | Compiled shader မစစ်ရသေး        | UNVERIFIED                 |
+
+အထူးသဖြင့် `COMBINED_OCEAN_CPU_GPU_PIPELINE.txt` မှာ Grid 3 ကို Bandwidth Optimization လို့ အတည်ပြုထားပေမဲ့ Canonical Ocean Project ရဲ့ `PROJECT.md` နဲ့ `Leader` က အဲဒီအကြောင်းရင်းကို INFERRED အဖြစ်သာ ထားဖို့ ညွှန်ကြားထားတယ်။
+
+ဒီမှာ Leader ရဲ့ Verification Rule ကို ဦးစားပေးရမယ်။
+
+## **6. Script တွေကို စစ်ဆေးတွေ့ရှိချက်**
+
+`gen_final.py`
+
+Extraction Script
+
+- DLL ကို ဖတ်တယ်။
+- SHA256 တွက်တယ်။
+- MethodDef 26,143 ကို ဖတ်တယ်။
+- Ceto ဆိုင်ရာ Method 252 ခု ရွေးတယ်။
+- Raw IL နဲ့ Decoded IL ထုတ်တယ်။
+- လက်ရှိ Decoder Verification က အပြည့်အဝ မလုံလောက်သေးဘူး။
+
+`generate_three_pipeline_reports.py`
+
+Static Report Generator
+
+- Query Pipeline Report ထုတ်တယ်။
+- CPU/GPU Report ထုတ်တယ်။
+- Combined Report ထုတ်တယ်။
+- ဒါပေမဲ့ DLL ကို မဖတ်ဘူး။
+- Report ထဲက VERIFIED Status တွေကို အလိုအလျောက် စစ်ဆေးအတည်ပြုတာ မရှိဘူး။
+
+ထို့အပြင် Generator က ဖိုင်သုံးဖိုင် ထုတ်မယ်လို့ ရေးထားပေမဲ့ Folder ထဲမှာ `CPU_GPU_DISPLACEMENT_PIPELINE.txt` ကို သီးခြားမတွေ့ရဘူး။ Combined Report ထဲမှာတော့ CPU/GPU အပိုင်း ပါနေတယ်။
+
+ဒါဟာ Report Packaging အပိုင်းမှာ ပြန်စစ်ရမယ့်အချက်ဖြစ်တယ်။
+
+## **7. အဟောင်းနဲ့ အသစ် ဘယ်ဟာလဲ**
+
+လက်ရှိ Git မှတ်တမ်းအရ—
+
+- ယခင် Audit HEAD: `f75d5ce...`
+- လက်ရှိ HEAD: `043563e...`
+- အဲဒီနှစ်ခုကြား Commit 7 ခုရှိတယ်။
+- နောက်ဆုံး Commit က `2026-11-21 16:59:11 UTC` မှာ `Add files via upload` ဖြစ်တယ်။
+- ဒီ Folder ထဲက ဖိုင် ၁၂ ဖိုင်ဟာ ယခင် Audit နောက်ပိုင်းမှာ ထည့်သွင်းထားတာဖြစ်တယ်။
+
+သတိထားရမယ့်အချက်က Git Commit Time ဟာ Report ကို မူလရေးသားခဲ့တဲ့အချိန်နဲ့ မတူနိုင်ဘူး။
+
+လက်ရှိ Report ထဲက `COMBINED_OCEAN_CPU_GPU_PIPELINE.txt` မှာ Generation Time `2026-11-21T16:51:02` လို့ ရှိတယ်။
+
+ထို့အပြင် Canonical Ocean Timeline မှာ ယခင် HEAD `9580472...` ကိုပဲ Last Snapshot အဖြစ် ဖော်ပြထားတယ်။ လက်ရှိ HEAD နဲ့ မကိုက်တော့ဘူး။
+
+## **8. Folder တည်နေရာဆိုင်ရာ ပြဿနာ**
+
+ဒီအချက်ကိုလည်း သတိပြုရမယ်။
+
+`CONTEXT_LOCK.md` က Canonical Ocean Evidence Root ကို—
+
+```
+PROJECTS/OCEAN_DISPLACEMENT/evidence/
+```
+
+လို့ သတ်မှတ်ထားတယ်။
+
+ဒါပေမဲ့ အသစ်တင်ထားတဲ့ Folder က—
+
+```
+Google Team/Full Momery/
+```
+
+ဆိုပြီး Repository Root မှာ ရှိနေတယ်။
+
+အတွင်းပိုင်း Content အရ Ocean Team Evidence ဖြစ်တာ ရှင်းပေမဲ့ Canonical Evidence Folder နဲ့ Timeline ထဲကို မှတ်တမ်းမသွင်းရသေးဘူး။
+
+အခုအချိန်မှာ မရွှေ့သေးဘူး။ မဖျက်သေးဘူး။ မူရင်းဖိုင်တွေကို ထိန်းထားရမယ်။
+
+# **9. ငါ့ရဲ့ နောက်ဆုံး Technical Assessment**
+
+အသုံးဝင်တဲ့ Evidence အများကြီး ရှိပြီးသား
+
+ဒီ Folder ကို စစ်ပြီးနောက် Ocean Team ရဲ့ Research ဟာ အရင်ထင်ထားတာထက် ပိုမိုပြည့်စုံနေတယ်။
+
+အထူးသဖြင့် CPU FFT၊ GPU FFT၊ QueryWaves၊ Buffer Lifecycle နဲ့ Interpolation အတွက် အထောက်အထားတွေ ရှိပြီးသားဖြစ်တယ်။
+
+ဒါကြောင့် အစကနေ ပြန်မလုပ်သင့်ဘူး။
+
+**ကျန်ရှိတဲ့ အလုပ်တွေကို ဒီအစဉ်အတိုင်း ဆက်လုပ်သင့်တယ်။**
+
+1. **Report Reconciliation**
+
+   Grid 3 နဲ့ Iteration Count အပါအဝင် Report အားလုံးရဲ့ Status ကို တစ်ညီတစ်ညွတ်ဖြစ်အောင် ပြန်စစ်ရန်။
+2. **Grid 3 Investigation**
+
+   GPU Visual Path နဲ့ GPU CPU-Query Path ကို သီးခြားစစ်ရန်။
+3. **Decoder Structural Verification**
+
+   Method Header, Operand, Branch, Switch, EH နဲ့ Raw Bytes ကို အတည်ပြုရန်။
+4. **CPU Buffer Lifecycle**
+
+   Swap → Clear → Generate → Query အစဉ်ကို IL နဲ့ အပြည့်အစုံချိတ်ရန်။
+5. **Compiled Shader Analysis**
+
+   မူရင်း Unity Shader / ComputeShader Data ကို စစ်ရန်။
+6. **Godot 4.7.2 C# Reconstruction**
+
+   အထက်ပါ Evidence တွေ အတည်ပြုပြီးမှ Reconstruction ကို ဆက်လုပ်ရန်။
+
+## **10. ဘာတွေ မစစ်ရသေးလဲ**
+
+- 1_OCEAN_CORE_PART_01.txt
+- 2_GPU_CPU_PIPELINE_PART_01.txt
+- 3_COMBINED_OCEAN_GPU_CPU_PART_01.txt
+
+ဒီဖိုင်ကြီးသုံးခုရဲ့ Content အပြည့်အစုံကို Connector က ပြန်မပေးနိုင်ခဲ့လို့ အတွင်းပိုင်းအချက်အလက်တွေ မစစ်ရသေးဘူး။
+
+- Original DLL ကို ယခုစစ်ဆေးမှုအတွင်း ပြန်လည် Run မလုပ်ထားဘူး။
+- Unity Shader Assets ကို ပြန်မထုတ်ထားဘူး။
+- Decoder Test မလုပ်ထားဘူး။
+- Godot Project ကို မတည်ဆောက်ထားဘူး။
+
+**Code Change: 0။ Tests Run: 0။** ဒီအဖြေက GitHub ဖိုင်နဲ့ Code ကို ဖတ်ရှုသုံးသပ်ထားတဲ့ Read-only Audit ဖြစ်တယ်။
+
+**ငါ့အမြင်နဲ့ အရေးကြီးဆုံးဆုံးဖြတ်ချက်တစ်ခုက — Ocean Team က Research အများကြီးပြီးနေပြီ။ အခုလိုအပ်တာက Research အသစ်တစ်ခု စဖို့မဟုတ်ဘဲ ရှိပြီးသား Evidence တွေကို အတည်ပြုချက်အဆင့်အလိုက် ပြန်ညှိပြီး Godot Reconstruction အတွက် ယုံကြည်စိတ်ချရတဲ့ Technical Baseline တစ်ခု ဖန်တီးဖို့ပဲ။**
+
+စစ်ဆေးခဲ့တဲ့ အဓိကဖိုင်တွေကို တိုက်ရိုက်ကြည့်နိုင်တယ်။
+
+- [Google Team Leader Summary](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/Gemini%20Ai%20Team%20Leader.txt?utm_source=chatgpt.com)
+- [Main IL Extraction Script](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/gen_final.py?utm_source=chatgpt.com)
+- [Decoder Extension](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/Scrpic.txt?utm_source=chatgpt.com)
+- [Combined Pipeline Report](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/COMBINED_OCEAN_CPU_GPU_PIPELINE.txt?utm_source=chatgpt.com)
+- [Ocean Leader's Technical Instructions](https://github.com/minnya09796592452-rgb/Map/blob/main/PROJECTS/OCEAN_DISPLACEMENT/evidence/BATTLE%20CODEX%20OF%20AIS/OCEN/Leader?utm_source=chatgpt.com)
