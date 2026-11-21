@@ -1,3 +1,4 @@
+1.
 စစ်ဆေးနေတဲ့ Folder က Ocean Team ရဲ့ အဓိကမှတ်တမ်းစုဖြစ်တယ်။ အရင် Ocean Report တွေကို ထပ်စုထားရုံမဟုတ်ဘဲ **Query Pipeline၊ CPU/GPU Displacement၊ IL Decoder Script နဲ့ Team Leader ရဲ့ Verification Summary** ပါဝင်တယ်။
 
 အရေးကြီးဆုံးတွေ့ရှိချက်ကတော့ ဒီ Folder ထဲမှာ နောက်ဆုံးအသစ်တင်ထားတဲ့ Evidence တွေ ရှိနေပြီး၊ အရင် Audit လုပ်ခဲ့တဲ့ Repo HEAD ထက် နောက်ထပ် Commit ၇ ခု တိုးထားတာပဲ။ လက်ရှိစစ်ဆေးထားတဲ့ HEAD က `043563e2beccf461ae5a295f421c1c5da9afc4c2` ဖြစ်တယ်။
@@ -333,3 +334,130 @@ Google Team/Full Momery/
 - [Decoder Extension](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/Scrpic.txt?utm_source=chatgpt.com)
 - [Combined Pipeline Report](https://github.com/minnya09796592452-rgb/Map/blob/main/Google%20Team/Full%20Momery/COMBINED_OCEAN_CPU_GPU_PIPELINE.txt?utm_source=chatgpt.com)
 - [Ocean Leader's Technical Instructions](https://github.com/minnya09796592452-rgb/Map/blob/main/PROJECTS/OCEAN_DISPLACEMENT/evidence/BATTLE%20CODEX%20OF%20AIS/OCEN/Leader?utm_source=chatgpt.com)
+
+
+–----
+
+2.
+ကောင်းပြီ။ အခုကစပြီး Google Team Folder ကို Ocean Displacement အတွက် နောက်ဆုံးလုပ်ငန်းအစီအစဉ် (Last Plan) အဖြစ် သတ်မှတ်မယ်။ အရင် Canonical Report တွေ၊ ယခင် Timeline တွေထက် Google Team ရဲ့ Leader ညွှန်ကြားချက်ကို ဦးစားပေးပြီး အထောက်အထားနဲ့ တိုက်စစ်မယ်။
+
+အရေးကြီးတာတစ်ခုက — ပြီးခဲ့တဲ့အလုပ်၊ စစ်ဆေးပြီးသားအလုပ်နဲ့ မပြီးသေးတဲ့အလုပ်ကို သီးခြားခွဲမယ်။ Report ထဲမှာ VERIFIED လို့ရေးထားတာတစ်ခုတည်းနဲ့ ငါ့ဘက်က အတည်ပြုပြီးပြီလို့ မသတ်မှတ်ဘူး။
+CASTAWAY-DEPTHS — Ocean Displacement Master Plan
+Audit ပြီး
+Technical verification ဆက်လုပ်ရန်
+Read-only အဆင့်
+
+1. ငါ့ဘက်က ပြီးထားတဲ့အလုပ်များ
+အလုပ်	လက်ရှိအခြေအနေ
+Google Team Folder ဖွဲ့စည်းပုံ စစ်ဆေးခြင်း	ပြီး
+ဖိုင် ၁၂ ခု စာရင်းပြုစုခြင်း	ပြီး
+Ocean QueryWaves Call Chain စစ်ဆေးခြင်း	ပြီး
+CPU/GPU Pipeline အချက်အလက် စုစည်းခြင်း	ပြီး
+Grid 3 Readback အခြေအနေ ခွဲခြားခြင်း	ပြီး
+gen_final.py Decoder Code Review	ပြီး
+Report များအကြား Contradiction ရှာဖွေခြင်း	ပြီး
+Canonical Evidence နဲ့ Google Team Folder နှိုင်းယှဉ်ခြင်း	ပြီး
+Godot Migration အတွက် အထောက်အထားလိုအပ်ချက် သတ်မှတ်ခြင်း	ပြီး
+
+မပြီးသေးတဲ့အပိုင်းများ
+- Google Team Folder ထဲက အရွယ်အစားကြီးတဲ့ File ၃ ခုရဲ့ အတွင်းပိုင်းအကြောင်းအရာကို အပြည့်အစုံ မဖတ်နိုင်သေးဘူး။
+- Original DLL နဲ့ Unity Shader/ComputeShader Assets ကို လက်ရှိအထောက်အထားထဲမှာ အပြည့်အစုံ မရရှိသေးဘူး။
+- Decoder ကို Independent Decoder နဲ့ ထပ်မံတိုက်စစ်ရသေးဘူး။
+- CPU Buffer Lifecycle ကို IL Call Order အတိုင်း အတည်မပြုရသေးဘူး။
+- Grid 3 ရဲ့ GPU Shader သုံးစွဲပုံကို သက်သေမပြနိုင်သေးဘူး။
+2. ဆက်လုပ်မယ့်အစီအစဉ်
+ဒီအစီအစဉ်မှာ အရေးကြီးဆုံးက အထောက်အထားတစ်ခုကို မပြီးသေးခင် နောက်အဆင့်ကောက်ချက်ကို မကြိုတင်ချဖို့ပဲ။
+1. Phase 1 — Evidence Reconciliation
+   စတင်နိုင်ပြီ
+   - Google Team Folder နဲ့ Canonical Ocean Evidence ကို နှိုင်းယှဉ်မယ်။
+   - Report တစ်ခုချင်းစီရဲ့ အချက်အလက်၊ Source၊ Timestamp၊ Version ကို စစ်မယ်။
+   - Contradiction တွေကို စာရင်းပြုစုမယ်။
+   - အဟောင်း၊ အသစ်၊ အတည်ပြုပြီး၊ မအတည်ပြုရသေး ဆိုပြီး ခွဲမယ်။
+   ရလဒ်: တစ်ခုတည်းသော ယုံကြည်စိတ်ချရတဲ့ Evidence Baseline။
+2. Phase 2 — Grid 3 Full Trace
+   မစစ်ရသေး
+   - Grid 3 GPU Texture ကို Shader က တကယ်အသုံးပြုသလား။
+   - CPU Readback မရှိတာကို အတည်ပြုမယ်။
+   - GPU Query Buffer ထဲ Grid 3 Data ရှိသလား။
+   - sampleSpectrum[3] false ဖြစ်ရင် ဘာဖြစ်သလဲ။
+   - numGrids = 3 နဲ့ numGrids = 4 ရဲ့ သက်ရောက်မှု။
+   - Alternate GPU Sampling Path ရှိသလား။
+   Visual Rendering နဲ့ CPU Query ကို Diagram နှစ်ခုခွဲပြီး တည်ဆောက်မယ်။
+   
+   ရလဒ်: Grid 3 ရဲ့ Data Flow ကို အထောက်အထားနဲ့ ပြနိုင်မယ်။
+3. Phase 3 — CPU Buffer Lifecycle
+   မစစ်ရသေး
+   စစ်မယ့်အစီအစဉ်က —
+   1. Constructor
+   2. GetWrite / GetRead
+   3. SwapDisplacements
+   4. Initialize
+   5. Run
+   6. QueryWaves
+   7. WaveSpectrumBufferCPU.Run
+   8. FourierTask.ProcessData
+   Method တစ်ခုချင်းစီရဲ့ IL Call Order နဲ့ Buffer State Before/After ကို မှတ်တမ်းတင်မယ်။
+   
+   ရလဒ်: Buffer lifecycle အမှန်တကယ် ဘယ်လိုအလုပ်လုပ်သလဲ သိနိုင်မယ်။
+4. Phase 4 — Independent Decoder Verification
+   မစစ်ရသေး
+   - Opcode / Operand Coverage
+   - Unknown Opcode Hard Stop
+   - Branch / Switch Target Validation
+   - Tiny / Fat Method Header
+   - Code Size နဲ့ Raw Byte Length
+   - Local Signature Token
+   - MoreSects / EH Section
+   - Exception Handler Boundary
+   - leave Instructions
+   - Metadata Token Resolution
+   - Independent Raw-Byte Decoder
+   252/252 VERIFIED ဆိုတဲ့ အဆိုကို အထောက်အထားအသစ်နဲ့ ပြန်စစ်မယ်။
+   
+   ရလဒ်: Method တစ်ခုချင်းစီရဲ့ Verification Status။
+5. Phase 5 — Compiled Shader / FFT Verification
+   Source လိုအပ်
+   - Unity Shader Assets
+   - ComputeShader Assets
+   - Compiled Shader Data
+   - FFT Processing
+   - Displacement Texture Generation
+   - GPU Sampling
+   C# ထဲက Method Name တွေကိုကြည့်ပြီး Shader Math ကို ခန့်မှန်းမထားဘူး။
+   
+   ရလဒ်: GPU နဲ့ FFT လုပ်ဆောင်ချက်အတွက် တကယ့် Source Evidence။
+6. Phase 6 — Godot 4.7.2 Migration Readiness
+   အထက်ပါအဆင့်များပြီးမှ
+   - Unity API Dependency စာရင်း
+   - CPU/GPU Architecture
+   - Texture Format Mapping
+   - Compute Pipeline Mapping
+   - FFT Implementation Requirements
+   - C# Compatibility
+   - Godot Implementation Specification
+   ရလဒ်: Godot ဘက်ကို ပြောင်းလဲအကောင်အထည်ဖော်နိုင်မယ့် Technical Specification။
+
+3. Verification Status စံနှုန်း
+နောက်ထပ် Report တွေအားလုံးမှာ ဒီအဆင့်လေးခုကိုပဲ သုံးမယ်။
+Status	အဓိပ္ပာယ်
+VERIFIED	Raw Evidence နဲ့ အတည်ပြုပြီး
+PARTIALLY VERIFIED	တစ်စိတ်တစ်ပိုင်းသာ အတည်ပြုပြီး
+INFERRED	ရရှိထားတဲ့အချက်အလက်အပေါ် အခြေခံကောက်ချက်ချထား
+UNVERIFIED	သက်သေမလုံလောက်သေး
+
+Coverage 100% ရှိတယ်ဆိုတာနဲ့ အလုပ်လုပ်ပုံ 100% မှန်တယ်လို့ မဆိုလိုဘူး။
+4. လက်ရှိ Repo နဲ့ Evidence စည်းမျဉ်း
+- Google Team Folder ကို Last Plan အဖြစ် ထိန်းသိမ်းမယ်။
+- Canonical Evidence ကို မဖျက်၊ မရွှေ့၊ မပြင်ဘဲ နှိုင်းယှဉ်မယ်။
+- Git Timeline ကို လက်ရှိ HEAD နဲ့ ပြန်ညှိမယ်။
+- Evidence အသစ်တွေကို မူရင်း Source နဲ့ ချိတ်ဆက်မယ်။
+- Report Generator က ထုတ်ပေးတဲ့စာသားကို Independent Verification အဖြစ် မသတ်မှတ်ဘူး။
+- မင်းခွင့်ပြုချက်မရခင် GitHub Repo ထဲက ဘာဖိုင်မှ မပြင်ဘူး။
+5. ငါ့ရဲ့ အခုချက်ချင်းလုပ်မယ့်အလုပ်
+NEXT: PHASE 1
+အရင်ဆုံး Google Team Folder ထဲက အထောက်အထားတွေကို Canonical Ocean Evidence နဲ့ ပြန်ညှိမယ်။ အဲဒီအချိန်မှာ ဖတ်မရသေးတဲ့ File ၃ ခုကိုလည်း မေ့မထားဘူး။ လိုအပ်တဲ့အပိုင်းတွေကို သီးခြားရယူပြီး စစ်မယ်။
+
+အခုအချိန်မှာ အလုပ်ပြီးသွားပြီလို့ မကြေညာနိုင်သေးတဲ့အရာက Ocean Pipeline ရဲ့ အတွင်းပိုင်းလုပ်ဆောင်ပုံကို အပြည့်အဝ အတည်ပြုနိုင်ခြင်းပဲ။ အဲဒါကို အထောက်အထားနဲ့ ပြီးအောင်လုပ်ပြီးမှ Godot Migration ကို ဆက်သွားမယ်။
+
+ဒီ Plan အတိုင်း ဆက်လုပ်မယ်။
+
