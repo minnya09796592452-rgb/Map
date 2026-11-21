@@ -1,0 +1,41 @@
+{
+  "base_dir": "/storage/emulated/0/Download/Stranded-Deep-Original",
+  "data_dir": "/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data",
+  "data_dir_exists": true,
+  "files": {
+    "DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt": {
+      "path": "/storage/emulated/0/Download/Stranded-Deep-Original/DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt",
+      "size_bytes": 982630,
+      "sha256": "629cebbaaea57c750fd3b1099f8fb75c05161c7c0e53d6637abae7536c4dd692"
+    },
+    "key_ocean_details.json": {
+      "path": "/storage/emulated/0/Download/Stranded-Deep-Original/key_ocean_details.json",
+      "size_bytes": 3594,
+      "sha256": "ef3c8e266e11216f8ce7d8327d971de49968cd6f334d3543e92897df9e82beef"
+    },
+    "key_ocean_v3.json": {
+      "path": "/storage/emulated/0/Download/Stranded-Deep-Original/key_ocean_v3.json",
+      "size_bytes": 4579,
+      "sha256": "6f3415bc9a5ae726bca9d395678db63a19190b1198ce3f83d7914ac19ca545c5"
+    },
+    "stranded_deep_ocean_evidence_full.txt": {
+      "path": "/storage/emulated/0/Download/Stranded-Deep-Original/stranded_deep_ocean_evidence_full.txt",
+      "size_bytes": 51404,
+      "sha256": "4f1e214bb9aff6a1896aad3fee735b37d619fc1b2196c222675037ef8510b8d6"
+    },
+    "stranded_deep_ocean_full_evidence_v2.txt": {
+      "path": "/storage/emulated/0/Download/Stranded-Deep-Original/stranded_deep_ocean_full_evidence_v2.txt",
+      "size_bytes": 90766,
+      "sha256": "8377199c7f24f27f6df98ad47d8ad2bc070d483365a4c3b3f237e1b56ff29623"
+    },
+    "1_OCEAN_CORE_PART_01.txt": {
+      "exists": false
+    },
+    "2_GPU_CPU_PIPELINE_PART_01.txt": {
+      "exists": false
+    },
+    "3_COMBINED_OCEAN_GPU_CPU_PART_01.txt": {
+      "exists": false
+    }
+  }
+}

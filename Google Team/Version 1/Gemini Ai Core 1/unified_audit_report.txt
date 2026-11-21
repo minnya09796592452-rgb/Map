@@ -1,0 +1,42 @@
+============================================================================
+GEMINI AI CORE — UNIFIED FORENSIC AUDIT & STRUCTURE REPORT
+Notebook : Battle (notebooks/45ebf19d-d9cc-4715-8509-4f9777fc3bee)
+Output   : Gemini Ai Core/unified_audit_report.txt & structure_summary.json
+============================================================================
+
+[1. GRID 3 FULL TRACE]
+- Constants: Ceto.QueryDisplacements..cctor (0x06002F93) sets GRIDS = 4, CHANNELS = 3.
+- GPU Blit & Global Textures: Ceto.WaveSpectrum.GenerateDisplacement (0x06003090) blits 4 ARGBHalf RenderTextures (m_displacementMaps[0..3]) and sets global textures Ceto_DisplacementMap0..3 (including Grid 3).
+- GPU Readback Gap: Ceto.WaveSpectrum.ReadFromGPU(numGrids) (0x06003091) reads back Grids 0..2 via CBUtility.ReadFromRenderTexture (0x060030F7, 'readNames2D') + ComputeBuffer.GetData; Grid 3 is skipped to save GPU->CPU bandwidth.
+- Query Selection & Index 3: Ceto.WaveQuery..ctor (0x06002F44) creates 4-element sampleSpectrum ([true, true, false, false] default), and Ceto.WaveSpectrum.QueryWaves (0x06003094) checks indices 0..3. Grid 3 shader consumption & CPU query data validity when index 3 is enabled remain UNVERIFIED / CRITICAL.
+
+[2. CPU BUFFER STATE VERIFICATION]
+- Double Buffering: DisplacementBufferCPU..ctor (0x06002F74) creates m_displacements[0..1], each with 4 InterpolatedArray2f(size, size, channels=3, wrap=true) grids stored as flat float[] m_data with interleaved index (x + y * SX) * 3 + ch (ch0=X, ch1=Y, ch2=Z).
+- Execution Order: DisplacementBufferCPU.Run (0x06002F78) calls SwapDisplacements() (0x06002F7B) FIRST (swapping slot 0 <-> slot 1), then WaveSpectrumBufferCPU.Run (0x06002FBD) -> Initilize() (0x06002F75, clears slot 0) -> InitSpectrumDisplacementsTask (0x06003060) -> FourierTask (0x06003048) -> ProcessData (0x0600304B).
+- Task Write Mapping: m_index==0 -> Height Y into ch1 of grids 0..3; m_index==1 -> Horizontal X,Z into ch0 & ch2 of grids 0..1; m_index==2 -> Horizontal X,Z into ch0 & ch2 of grids 2..3. QueryWaves reads slot 1 via GetReadDisplacements() (0x06002F77).
+- State Risk: Verify caller scheduling vs IsDone() / unfinished tasks so SwapDisplacements() cannot swap ahead of incomplete tasks.
+
+[3. INDEPENDENT DECODER & FILE INTEGRITY]
+- Target Method Body Sizes: {'QueryDisplacements.QueryWaves': 951, 'QueryDisplacements.SampleHeightOnly': 345, 'QueryDisplacements.Sample': 581, 'FourierTask.ProcessData': 1636}
+- Token Audit: {
+  "core_tokens": 0,
+  "pipeline_tokens": 0,
+  "combined_tokens": 0,
+  "overlap_core_and_pipeline": [],
+  "missing_in_combined": [],
+  "extra_in_combined": []
+}
+  * VERIFY_SUBMISSION_REPORT.txt: 93752 bytes | sha256=0929870c887c6d7cdea0c85c1c03c3c42f317d21237faef070dc0c2abb90476c | tokens=32
+  * VERIFY_SUBMISSION_REPORT_V2.txt: 53519 bytes | sha256=a572a353573ba1aa83c6c65eca61ad110bca6c4be16e43fe07cedd22f6d22314 | tokens=14
+  * DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt: 398336 bytes | sha256=056c52ccf537c6814436fd815958ab7fd3c59a092580c66e39a61070c27008c8 | tokens=139
+
+[4. COMPILED SHADER / FFT & SAMPLING PIPELINE]
+- GPU Spectrum & FFT: WaveSpectrumBufferGPU.Initilize (0x06002FC5) binds spectrum/grid/time uniforms onto m_displacementInitMat; FourierGPU.PeformFFT (0x06003037..3A) runs horizontal/vertical 1D butterfly passes ('Ceto_ButterFlyLookUp', 'Ceto_ReadBuffer0..3').
+- Sampling & Clamp: QueryDisplacements.Sample (0x06002F8F) computes u=(posX+offset.x)*invGridSizes[i], v=(posZ+offset.z)*invGridSizes[i], calls InterpolatedArray2f.Get (0x060031DF), scales X/Z by choppyness and Y by scaleY, iterates horizontal inversion, and clamps height to [-40.0f, 40.0f]; SampleHeightOnly (0x06002F8E) skips horizontal iteration/displacement X,Z.
+
+[5. EXTRACTED CLASSES / FIELDS / METHODS]
+- Classes (18): Ceto.Common.Containers.Interpolation.InterpolatedArray, Ceto.Common.Containers.Interpolation.InterpolatedArray2f, Ceto.Common.Unity.Utility.CBUtility, Ceto.DisplacementBufferCPU, Ceto.DisplacementBufferCPU.QueryWaves, Ceto.DisplacementBufferGPU, Ceto.DisplacementBufferGPU.QueryWaves, Ceto.FourierGPU, Ceto.FourierTask, Ceto.InitSpectrumDisplacementsTask, Ceto.Ocean.QueryWaves, Ceto.Ocean.level, Ceto.Ocean.m_query, Ceto.QueryDisplacements, Ceto.QueryDisplacements.QueryWaves, Ceto.WaveSpectrum, Ceto.WaveSpectrumBufferCPU, Ceto.WaveSpectrumBufferGPU
+- Fields (21): CHANNELS, GRIDS, MAX_ITERATIONS, MIN_ERROR, m_choppyness, m_conditions, m_containingOverlays, m_data, m_disp, m_displacementMaps, m_displacements, m_gridSizes, m_name, m_ocean, m_query, m_queryScaling, m_queryableOverlays, m_readBuffer, m_rows, sampleOverlay, sampleSpectrum
+- Methods (13): CreateBuffers, GenerateDisplacement, GetFourierSize, Initilize, PeformFFT, ProcessData, QueryWaves, ReadFromGPU, ReadFromRenderTexture, Sample, SampleHeightOnly, SwapDisplacements, UpdateQueryScaling
+
+EOF_AUDIT_REPORT

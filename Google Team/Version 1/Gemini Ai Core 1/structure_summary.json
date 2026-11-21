@@ -1,0 +1,99 @@
+{
+  "found_files": {
+    "VERIFY_SUBMISSION_REPORT.txt": {
+      "path": "VERIFY_SUBMISSION_REPORT.txt",
+      "size_bytes": 93752,
+      "sha256": "0929870c887c6d7cdea0c85c1c03c3c42f317d21237faef070dc0c2abb90476c",
+      "token_count_found": 32,
+      "classes_found": 2,
+      "fields_found": 16,
+      "methods_found": 4
+    },
+    "VERIFY_SUBMISSION_REPORT_V2.txt": {
+      "path": "VERIFY_SUBMISSION_REPORT_V2.txt",
+      "size_bytes": 53519,
+      "sha256": "a572a353573ba1aa83c6c65eca61ad110bca6c4be16e43fe07cedd22f6d22314",
+      "token_count_found": 14,
+      "classes_found": 5,
+      "fields_found": 11,
+      "methods_found": 6
+    },
+    "DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt": {
+      "path": "DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt",
+      "size_bytes": 398336,
+      "sha256": "056c52ccf537c6814436fd815958ab7fd3c59a092580c66e39a61070c27008c8",
+      "token_count_found": 139,
+      "classes_found": 12,
+      "fields_found": 5,
+      "methods_found": 12
+    }
+  },
+  "token_audit": {
+    "core_tokens": 0,
+    "pipeline_tokens": 0,
+    "combined_tokens": 0,
+    "overlap_core_and_pipeline": [],
+    "missing_in_combined": [],
+    "extra_in_combined": []
+  },
+  "symbols": {
+    "classes": [
+      "Ceto.Common.Containers.Interpolation.InterpolatedArray",
+      "Ceto.Common.Containers.Interpolation.InterpolatedArray2f",
+      "Ceto.Common.Unity.Utility.CBUtility",
+      "Ceto.DisplacementBufferCPU",
+      "Ceto.DisplacementBufferCPU.QueryWaves",
+      "Ceto.DisplacementBufferGPU",
+      "Ceto.DisplacementBufferGPU.QueryWaves",
+      "Ceto.FourierGPU",
+      "Ceto.FourierTask",
+      "Ceto.InitSpectrumDisplacementsTask",
+      "Ceto.Ocean.QueryWaves",
+      "Ceto.Ocean.level",
+      "Ceto.Ocean.m_query",
+      "Ceto.QueryDisplacements",
+      "Ceto.QueryDisplacements.QueryWaves",
+      "Ceto.WaveSpectrum",
+      "Ceto.WaveSpectrumBufferCPU",
+      "Ceto.WaveSpectrumBufferGPU"
+    ],
+    "fields": [
+      "CHANNELS",
+      "GRIDS",
+      "MAX_ITERATIONS",
+      "MIN_ERROR",
+      "m_choppyness",
+      "m_conditions",
+      "m_containingOverlays",
+      "m_data",
+      "m_disp",
+      "m_displacementMaps",
+      "m_displacements",
+      "m_gridSizes",
+      "m_name",
+      "m_ocean",
+      "m_query",
+      "m_queryScaling",
+      "m_queryableOverlays",
+      "m_readBuffer",
+      "m_rows",
+      "sampleOverlay",
+      "sampleSpectrum"
+    ],
+    "methods": [
+      "CreateBuffers",
+      "GenerateDisplacement",
+      "GetFourierSize",
+      "Initilize",
+      "PeformFFT",
+      "ProcessData",
+      "QueryWaves",
+      "ReadFromGPU",
+      "ReadFromRenderTexture",
+      "Sample",
+      "SampleHeightOnly",
+      "SwapDisplacements",
+      "UpdateQueryScaling"
+    ]
+  }
+}
