@@ -1,0 +1,24 @@
+========================================================================
+VERIFICATION_GAPS.txt — CASTAWAY-DEPTHS
+Generated : 2026-11-21T09:36:09
+========================================================================
+
+1. InterpolatedArray2f.Get (token 0x060031df) internal implementation — UNVERIFIED
+   Why unresolved: Method RVA/body was not dumped in the verification report.
+   Evidence needed: Disassemble method body for token 0x060031df from Assembly-CSharp.dll.
+
+2. DisplacementBufferCPU / DisplacementBufferGPU generation & readback mechanics — UNVERIFIED
+   Why unresolved: Only the QueryWaves wrappers (0x0767c0 and 0x07686c) are evidenced; Run/Initilize/SwapDisplacements bodies are not yet dumped.
+   Evidence needed: Disassemble DisplacementBufferCPU.Run, SwapDisplacements, and DisplacementBufferGPU readback methods.
+
+3. Helper scaling methods (0x06003081, 0x06003082, 0x06002e35, 0x06002ff4, 0x0600300f) & Tide.Update (0x000128c6) — PARTIALLY VERIFIED
+   Why unresolved: Token names/RVAs appear in call sites, but their full IL bodies are not yet included in the report.
+   Evidence needed: Disassemble IL bodies for tokens 0x06003081, 0x06003082, 0x06002e35, 0x06002ff4, 0x0600300f, and Tide.Update.
+
+4. Independent non-dnfile metadata validation (raw table row sizes, MethodDef/Field/TypeRef/MemberRef/InterfaceImpl) — UNVERIFIED
+   Why unresolved: Current token table relies on dnfile parser output.
+   Evidence needed: Standalone binary parser reading #~ heap header and table rows directly without dnfile.
+
+5. Runtime / scene values — UNVERIFIED
+   Why unresolved: Static IL analysis does not execute Unity runtime or scene assets.
+   Evidence needed: Controlled inspection of serialized scene data / runtime values (distinct from static IL evidence).

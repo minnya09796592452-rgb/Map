@@ -1,0 +1,22 @@
+========================================================================
+OCEAN_DISPLACEMENT_PIPELINE.txt — CASTAWAY-DEPTHS
+Generated : 2026-11-21T09:36:09
+========================================================================
+
+[Call Chain]
+1. Ceto.Ocean.QueryWaves (RID 11859 @ 0x06f010 / RID 11860 @ 0x06f09c) [VERIFIED]
+   -> calls WaveSpectrum.QueryWaves (0x06003094 / RID 12436 @ 0x07ecd8)
+   -> calls OverlayManager.QueryWaves (0x06002ed4 / RID 11988 @ 0x071d58)
+2. WaveSpectrum.QueryWaves (RID 12436 @ 0x07ecd8) [VERIFIED]
+   -> calls get_DisplacementBuffer (0x06003085)
+   -> callsvirt IDisplacementBuffer.QueryWaves (0x06002f8b / RID 12171) passing m_queryScaling (0x04001c21)
+3. Concrete IDisplacementBuffer Implementations [PARTIALLY VERIFIED]
+   -> Ceto.DisplacementBufferCPU.QueryWaves @ FileOff=0x000767c0 (RID 12157): calls GetReadDisplacements (0x06002f77) -> QueryDisplacements.QueryWaves (0x06002f8d)
+   -> Ceto.DisplacementBufferGPU.QueryWaves @ FileOff=0x0007686c (RID 12163): reads m_displacements (0x04001b5a) -> QueryDisplacements.QueryWaves (0x06002f8d)
+   -> Note: Exact internal body/IL dump of DisplacementBufferCPU.Run / CopyAndCreateDisplacements / SwapDisplacements is UNVERIFIED.
+4. Ceto.QueryDisplacements.QueryWaves (RID 12173 @ 0x0768a8) [VERIFIED]
+   -> calls SampleHeightOnly (0x06002f8e / RID 12174 @ 0x076c6c) or Sample (0x06002f8f / RID 12175 @ 0x076dd4)
+5. Grid Data Retrieval via InterpolatedArray2f.Get (0x060031df) [PARTIALLY VERIFIED]
+   -> Called in SampleHeightOnly and Sample; internal interpolation math inside 0x060031df is UNVERIFIED.
+6. Final Surface Height [VERIFIED]
+   -> Ocean.QueryWaves returns WaveQueryResult.height (0x04003b8e) + Ocean.level (0x040019cc); RID 11860 also outputs isClipped (0x04003b95).
