@@ -1,0 +1,333 @@
+Memory ကို ပြန်ရယူပြီးပါပြီ။ Google Team/GPT Memory  Folder ထဲက မှတ်တမ်းနှစ်ခုကို ဖတ်ပြီး Ocean Team ရဲ့ နောက်ဆုံး Plan နဲ့ လုပ်ငန်းအခြေအနေကို ပြန်လည်ချိတ်ဆက်ထားတယ်။
+
+အခု ပျောက်နေတဲ့ File သုံးခုကို နည်းလမ်းပြောင်းပြီး ထပ်စမ်းခဲ့တယ်။
+File	ပြန်လည်ရယူမှု
+1_OCEAN_CORE_PART_01.txt	မရသေး
+2_GPU_CPU_PIPELINE_PART_01.txt	မရသေး
+3_COMBINED_OCEAN_GPU_CPU_PART_01.txt	မရသေး
+
+စမ်းသပ်ခဲ့တာ
+- GitHub fetch_file
+- Line range ဖြင့် အပိုင်းလိုက်ဖတ်ခြင်း
+- Raw GitHub URL
+- Web မှ တိုက်ရိုက်ဖတ်ခြင်း
+ဖိုင်အရွယ်အစားကြောင့် Connector က Content ကို မပေးနိုင်သေးဘူး။ SHA နဲ့ Metadata ရတာကို Content ရတယ်လို့ မယူဆထားဘူး။
+
+လက်ရှိအခြေအနေ
+- Memory ပြန်ရယူပြီးပြီ။
+- Last Plan ကို ဆက်လက်လိုက်နာမယ်။
+- ဖိုင်သုံးခုကို မစစ်ရသေးတဲ့အဖြစ်ပဲ ထားမယ်။
+- Repo ကို ဘာမှမပြင်ထားဘူး။
+အရင် Plan အတိုင်း ဆက်သွားမယ်။
+
+
+-------------
+
+
+အခု Raw GitHub Blob ကနေ ဖိုင်သုံးခုလုံးကို အောင်မြင်စွာ ပြန်ဖတ်နိုင်ပြီ။ အရင်က Connector က အရွယ်အစားကြောင့် မပေးနိုင်ခဲ့တာကို Git Blob API နည်းလမ်းနဲ့ ဖြေရှင်းနိုင်ခဲ့တယ်။
+ဖိုင် ၃ ခုလုံး Content ရရှိပြီ
+ဖိုင်	ရရှိသောစာသားအရွယ်အစား	ပါဝင်သော Method
+1_OCEAN_CORE_PART_01.txt	1,504,989 bytes	545
+2_GPU_CPU_PIPELINE_PART_01.txt	1,313,703 bytes	483
+3_COMBINED_OCEAN_GPU_CPU_PART_01.txt	2,818,165 bytes	1,028
+
+ဖိုင်သုံးခုမှာ DLL တစ်ခုတည်းကို အခြေခံထားပြီး DLL SHA256 က ယခင်မှတ်တမ်းနဲ့ ကိုက်ညီတယ်။
+
+d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+
+အခု စာတမ်းတွေကို အရင် Report တွေနဲ့သာမက Raw IL Method တွေ၊ Token တွေ၊ Call Chain တွေနဲ့ပါ တိုက်စစ်နေတယ်။
+Google Team — Full Memory Files Technical Audit
+
+Raw Content အပြည့်အစုံရရှိပြီး
+ Technical Audit ဆက်လက်လုပ်ဆောင်ရန်
+
+ဒီတစ်ကြိမ်မှာ အရေးကြီးတဲ့အချက်တွေကို IL အဆင့်အထိ တိုက်စစ်နိုင်ခဲ့တယ်။ အရင် Audit ထဲက ယူဆချက်အချို့ကိုလည်း ပြင်ဆင်နိုင်ခဲ့တယ်။
+1. ဖိုင်သုံးခုရဲ့ အပြန်အလှန်ကိုက်ညီမှု
+အဓိကတွေ့ရှိချက်က ဖိုင်သုံးခုဟာ သီးခြားအထောက်အထားတွေကို စုစည်းထားတဲ့ပုံစံဖြစ်တယ်။
+စစ်ဆေးချက်	ရလဒ်
+Ocean Core Methods	545
+GPU/CPU Methods	483
+Combined Methods	1,028
+Core နဲ့ Pipeline Token ထပ်နေမှု	0
+Combined ထဲမှာ ပျောက်နေတဲ့ Token	0
+Combined ထဲမှာ အပို Token	0
+
+အတိအကျကိုက်ညီ
+Combined ဖိုင်ဟာ ပထမဖိုင်နဲ့ ဒုတိယဖိုင်က Method 1,028 ခုကို စုစည်းထားတာဖြစ်ကြောင်း Token အဆင့်နဲ့ အတည်ပြုနိုင်ခဲ့တယ်။
+
+ဒါကြောင့် Combined ဖိုင်ကို တတိယမြောက် Independent Evidence လို့ သတ်မှတ်လို့မရဘူး။ ပထမနှစ်ဖိုင်ရဲ့ စုစည်းထားသော Version ဖြစ်တယ်။
+2. အရေးကြီးဆုံး — Grid 3 Investigation
+C# IL အဆင့်တွင် အချက်အလက်အသစ် အတည်ပြုပြီး
+အရင် Audit မှာ Grid 3 အကြောင်း မပြည့်စုံသေးတဲ့ အချက်တွေကို ပြန်စစ်ခဲ့တယ်။
+A. Grid နဲ့ Channel အရေအတွက်
+Ceto.QueryDisplacements..cctor
+
+Method Token:
+
+0x06002F93
+
+IL မှာ အောက်ပါအတိုင်း တိုက်ရိုက်သတ်မှတ်ထားတယ်။
+IL_0000: ldc.i4.3
+IL_0001: stsfld CHANNELS
+
+IL_0006: ldc.i4.4
+IL_0007: stsfld GRIDS
+
+
+အဓိပ္ပာယ်က —
+- GRIDS = 4
+- CHANNELS = 3
+ဒါဟာ Report ထဲက ခန့်မှန်းချက်မဟုတ်ဘဲ IL မှာ တိုက်ရိုက်ပါဝင်တဲ့ Constant ဖြစ်တယ်။
+B. GPU Readback
+Ceto.WaveSpectrum.ReadFromGPU
+
+Token:
+
+0x06003091
+
+ဒီ Method ကို အသေးစိတ်စစ်တဲ့အခါ အောက်ပါအတိုင်း တွေ့ရတယ်။
+Grid	Readback လုပ်ဆောင်မှု
+Grid 0	ရှိ
+Grid 1	ရှိ
+Grid 2	ရှိ
+Grid 3	မရှိ
+
+IL ထဲမှာ Grid 0၊ 1၊ 2 အတွက် ReadFromRenderTexture ကို သီးခြားခေါ်ထားတယ်။
+
+Grid 3 အတွက် အလားတူ Readback Call မရှိဘူး။
+
+ထို့အပြင် Readback လုပ်ဆောင်မှုမတိုင်ခင် —
+- disableReadBack
+- readSdr
+- m_readBuffer
+- Compute Shader Support
+- Graphics Shader Level
+တို့ကို စစ်ထားတယ်။
+
+အတည်ပြုနိုင်တဲ့အချက်: GPU Readback Method က Grid 0–2 ကိုသာ CPU ဘက်သို့ ဖတ်ပေးတယ်။
+
+မအတည်ပြုနိုင်သေးတဲ့အချက်: Grid 3 ကို မဖတ်တဲ့ အကြောင်းရင်း။
+C. GPU Visual Texture Path
+Ceto.WaveSpectrum.GenerateDisplacement
+
+Token:
+
+0x06003090
+
+ဒီ Method ထဲမှာ —
+Ceto_DisplacementMap0
+Ceto_DisplacementMap1
+Ceto_DisplacementMap2
+Ceto_DisplacementMap3
+
+
+ဆိုတဲ့ Texture Name လေးခုလုံးကို တွေ့ရတယ်။
+
+Grid 3 အတွက်လည်း —
+- Displacement Buffer ရဲ့ Texture Index 3 ကို ရယူတယ်။
+- Blit ခေါ်တယ်။
+- Ceto_DisplacementMap3 အမည်နဲ့ SetGlobalTexture ခေါ်တယ်။
+ဒီအချက်က အရင် Audit ထက် ပိုမိုခိုင်မာတဲ့ သက်သေဖြစ်တယ်။
+
+သို့သော် SetGlobalTexture လုပ်ထားတာနဲ့ Shader က တကယ် Sample လုပ်တယ်လို့ မသတ်မှတ်နိုင်သေးဘူး။
+Shader Consumption — UNVERIFIED
+D. sampleSpectrum[3]
+Ceto.WaveQuery Constructor Token:
+
+0x06002F44
+
+IL က Boolean Array အရွယ်အစား 4 ကို ဖန်တီးထားတယ်။
+
+ပထမဆုံး Constructor မှာ —
+- sampleSpectrum[0] = true
+- sampleSpectrum[1] = true
+- sampleSpectrum[2] = false
+- sampleSpectrum[3] = false
+ကျန်တဲ့ Boolean နှစ်ခုဟာ Array ရဲ့ Default Value ဖြစ်တယ်။
+
+နောက်ထပ် Ceto.WaveSpectrum.QueryWaves Token 0x06003094 မှာ index 0၊ 1၊ 2၊ 3 လေးခုစလုံးကို စစ်ထားတယ်။
+
+ဒါကြောင့် Grid 3 ကို Query Selection ထဲ ထည့်နိုင်တဲ့ လမ်းကြောင်းရှိတယ်။
+
+သို့သော် GPU Readback က Grid 3 ကို မဖြည့်ပေးတာကြောင့် Grid 3 ကို Query အတွက် Enable လုပ်တဲ့အခြေအနေမှာ Data Validity ကို သီးခြားစစ်ဖို့ လိုလာတယ်။
+
+ဒီနေရာက အရေးကြီးတဲ့ စုံစမ်းရမယ့်အချက်အသစ်ဖြစ်တယ်။
+
+3. CPU Buffer Lifecycle — အရေးကြီးတဲ့ ပြင်ဆင်ချက်
+Method Call Order အတည်ပြုပြီး
+အရင် Plan မှာ Swap → Initialize → FFT → Query ဆိုတဲ့ အစီအစဉ်ကို ယူထားခဲ့တယ်။
+
+အခုတော့ IL နဲ့ ပိုမိုတိကျစွာ ချိတ်ဆက်နိုင်ပြီ။
+A. Constructor
+Ceto.DisplacementBufferCPU..ctor
+
+Token:
+
+0x06002F74
+
+အောက်ပါလုပ်ဆောင်ချက်တွေ ရှိတယ်။
+- m_displacements ကို List အရွယ်အစား 2 နဲ့ ဖန်တီးတယ်။
+- Slot 0 အတွက် Array ဖန်တီးတယ်။
+- Slot 1 အတွက် Array ဖန်တီးတယ်။
+- Array တစ်ခုချင်းစီမှာ GRIDS အရေအတွက်အတိုင်း Element တွေ ဖန်တီးတယ်။
+- InterpolatedArray2f တွေမှာ CHANNELS အရေအတွက် 3 ကို အသုံးပြုတယ်။
+B. Buffer Index
+Method	အမှန်တကယ် Index
+GetWriteDisplacements	0
+GetReadDisplacements	1
+
+C. အရေးကြီးဆုံး Call Chain
+Ceto.DisplacementBufferCPU.Run
+
+Token:
+
+0x06002F78
+
+IL မှာ တိုက်ရိုက်တွေ့ရတဲ့ Call Order က —
+DisplacementBufferCPU.Run()
+          |
+          v
+SwapDisplacements()
+          |
+          v
+WaveSpectrumBufferCPU.Run()
+          |
+          v
+Initilize()
+          |
+          v
+Init Task
+          |
+          v
+FourierTask
+          |
+          v
+ProcessData()
+          |
+          v
+Write Buffer (Slot 0)
+
+
+ပြီးတော့ Query လုပ်တဲ့အခါ —
+DisplacementBufferCPU.QueryWaves()
+          |
+          v
+GetReadDisplacements()
+          |
+          v
+Slot 1
+          |
+          v
+QueryDisplacements.QueryWaves()
+
+
+ဒီနေရာမှာ သတိထားရမယ့်အချက်က Swap ကို FFT မလုပ်ခင် ခေါ်ထားတာပဲ။
+
+ဒါဟာ Double Buffering လုပ်ဆောင်ပုံဖြစ်တယ်။ ယခင်ရေးသားပြီးသော Buffer ကို Read ဘက်သို့ ပြောင်းပြီး အသစ်ကို Write ဘက်မှာ ထုတ်လုပ်တဲ့ပုံစံဖြစ်တယ်။
+D. Buffer Lifecycle မှာ ကျန်နေတဲ့ Risk
+DisplacementBufferCPU.Run က Swap အရင်လုပ်တယ်။
+
+ဒါပေမဲ့ WaveSpectrumBufferCPU.Run ထဲမှာ IsDone() ကို စစ်ပြီး မပြီးသေးတဲ့ Task ရှိရင် Exception ပစ်တယ်။
+
+ဒီအချက်နှစ်ခုကို ချိတ်ကြည့်ရင် —
+
+Task မပြီးသေးတဲ့အခြေအနေမှာ Run ကို ခေါ်မိရင် Buffer Swap ဖြစ်ပြီးမှ Exception ဖြစ်နိုင်တယ်။
+
+ဒါက လက်ရှိ IL ကနေ တွေ့ရတဲ့ Potential State Risk ဖြစ်တယ်။ Runtime မှာ အမှန်တကယ် ဖြစ်ပွားသလားဆိုတာ Caller နဲ့ Scheduling အခြေအနေကို ထပ်စစ်ရမယ်။
+
+4. FourierTask
+Ceto.FourierTask.ProcessData
+
+Token:
+
+0x0600304B
+
+Method Size: 1,636 bytes
+
+အရေးကြီးတဲ့အချက်တွေ —
+- CHANNELS ကို အသုံးပြုတယ်။
+- Buffer Size ကို ရယူတယ်။
+- GetWriteDisplacements() ကနေ Write Buffer ရယူတယ်။
+- Grid အလိုက် Loop လုပ်တယ်။
+- Channel အလိုက် Data တွေကို ရေးတယ်။
+ဒါကြောင့် CPU Pipeline ဟာ Grid 4 ခု၊ Channel 3 ခုကို ကိုင်တွယ်နိုင်တဲ့ Structure ဖြစ်ကြောင်း အထောက်အထားရှိတယ်။
+
+သို့သော် Fourier Math အပြည့်အစုံကို မှန်ကန်ကြောင်း အတည်ပြုဖို့ သီးခြား Numerical Verification လိုသေးတယ်။
+
+5. QueryWaves
+Ceto.Ocean.QueryWaves နဲ့ Ceto.WaveSpectrum.QueryWaves ကို ချိတ်ဆက်စစ်ခဲ့တယ်။
+
+အဓိက Flow က —
+Ocean.QueryWaves
+       |
+       v
+WaveSpectrum.QueryWaves
+       |
+       v
+IDisplacementBuffer.QueryWaves
+       |
+       +------ CPU Buffer
+       |
+       +------ GPU Buffer
+                    |
+                    v
+          QueryDisplacements.QueryWaves
+                    |
+                    v
+                 Sampling
+
+
+Ocean.QueryWaves က Spectrum ရှိမရှိ၊ Ocean Enabled ဖြစ်မဖြစ်နဲ့ Overlay Manager ရှိမရှိ စစ်တယ်။
+
+Final Height မှာ Ocean Level ကို ထပ်ပေါင်းတဲ့ IL ကိုလည်း တွေ့ရတယ်။
+
+ဒါကြောင့် အရင် Report ထဲက Height Calculation အချက်အလက်ကို ဆက်လက်ထိန်းသိမ်းနိုင်တယ်။
+
+6. နောက်ဆုံး Technical Assessment
+အခုအထောက်အထားနဲ့ အတည်ပြုနိုင်သောအချက်များ
+အကြောင်းအရာ	Status
+Core/Pipeline Method Coverage	VERIFIED
+Combined File Token Union	VERIFIED
+GRIDS = 4	VERIFIED
+CHANNELS = 3	VERIFIED
+CPU Double Buffer Structure	VERIFIED
+CPU Swap Call Order	VERIFIED
+CPU Query Reads Slot 1	VERIFIED
+GPU Readback Grid 0–2	VERIFIED
+GPU Readback Grid 3	မရှိ
+Grid 3 Global Texture Binding	VERIFIED
+Grid 3 Shader Sampling	UNVERIFIED
+Grid 3 Query Data Validity	UNVERIFIED
+FFT Numerical Correctness	UNVERIFIED
+
+မှတ်ချက် — ဒီ Status တွေဟာ ယခုဖတ်ရရှိတဲ့ IL Extraction Evidence အပေါ် အခြေခံတာဖြစ်ပြီး Independent Raw DLL Decoder Verification ပြီးဆုံးပြီလို့ မဆိုလိုဘူး။
+7. ဆက်လက်လုပ်ဆောင်မယ့် Plan
+အခုတော့ Phase 1 ကို အရင်ထက် ပိုမိုတိကျစွာ ဆက်လုပ်နိုင်ပြီ။
+1. Grid 3 Full Trace
+   နောက်တစ်ဆင့်
+   Shader Consumption, Query Buffer Population, Sample Index 3 နဲ့ Alternate Path။
+2. CPU Buffer State Verification
+   
+   Swap နဲ့ Task Completion အကြား Caller Order၊ Initialization နဲ့ Buffer Data Validity။
+3. Independent Decoder
+   
+   1,028 Method တွေကို Raw Byte Decoder နဲ့ ပြန်တိုက်စစ်ရန်။
+4. Compiled Shader / FFT
+   
+   Shader Source နဲ့ GPU Compute အလုပ်လုပ်ပုံကို သီးခြားအတည်ပြုရန်။
+5. Godot 4.7.2 Reconstruction Specification
+   
+   အထက်ပါအထောက်အထားတွေ ပြည့်စုံပြီးမှ ဆက်လုပ်ရန်။
+
+အခုအရေးကြီးဆုံးတွေ့ရှိချက်က Grid 3 ဟာ C# ဘက်မှာ Texture Binding လုပ်ထားပြီး Query Selection မှာလည်း Index 3 အထိ ရှိတယ်။ ဒါပေမဲ့ GPU Readback မှာတော့ Grid 3 မပါဘူး။
+
+ဒီသုံးချက်ကို ချိတ်ဆက်ပြီး စစ်ဆေးရမယ့်အလုပ်က နောက်ထပ်အဓိကဦးစားပေးဖြစ်လာပြီ။
+
+ပြင်ဆင်ထားသောဖိုင်: 0။ GitHub Changes: 0။ Runtime Tests: 0။
+
+
+
+------------
+
+
+
