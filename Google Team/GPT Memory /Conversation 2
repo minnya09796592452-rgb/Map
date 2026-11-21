@@ -1940,3 +1940,206 @@ Accuracy, structural correctness, independent validation, and traceable evidence
 3. **Ocean Shader နဲ့ FFT ကို သီးခြားသက်သေပြရမယ်။** C# မှာ Texture Bind လုပ်ထားတာတစ်ခုတည်းနဲ့ GPU ဘက်အလုပ်လုပ်ပုံကို အတည်မပြုနိုင်ပါဘူး။
 
 **အရေးကြီး:** ဒီညွှန်ကြားချက်က အကောင်အထည်ဖော်ရန် Specification ဖြစ်ပြီး Code ပြင်ဆင်ပြီးသွားပြီလို့ မဆိုလိုပါဘူး။ လက်ရှိ Google V3 ရဲ့ မူရင်းဖိုင်တွေကို မထိခိုက်စေဘဲ အဆင့်လိုက်လုပ်ဆောင်ဖို့ ရည်ရွယ်ထားတာပါ။
+
+
+
+
+စစ်ဆေးမှုအရ Google Team V4 မှာ V3 ထက် တိုးတက်လာတဲ့အချက်တွေရှိပေမဲ့ လက်ရှိအခြေအနေကို အောင်မြင်ပြီးသား Forensic Engine လို့ မသတ်မှတ်နိုင်သေးပါဘူး။ အထူးသဖြင့် V4 ရဲ့ ကိုယ်ပိုင် Report တွေထဲမှာပဲ အရေးကြီးတဲ့ Validation Failure တစ်ခု ပေါ်နေပါတယ်။
+လက်ရှိအခြေအနေ — PARTIAL / BLOCKED
+- PE/CLI/Metadata Validation: False
+- Key Ocean Methods: 9/34 VERIFIED
+- Metadata Error: Table 0x11 (StandAloneSig) exceeds #~ boundary
+- Decoder A/B Report: စမ်းသပ်ထားတာ 3 instructions သာ ဖော်ပြထားတယ်။
+- Adversarial Report: 6/6 Passed လို့ဆိုထားပေမဲ့ စမ်းသပ်မှုအကျယ်အဝန်းက အလွန်နည်းနေသေးတယ်။
+ဒီအချက်တွေက V4 ကို အပြည့်အဝအတည်ပြုဖို့ မလုံလောက်သေးကြောင်း တိုက်ရိုက်ပြနေပါတယ်။ အောက်မှာ Script ကိုပါ ဆက်စစ်ပြီး Report ထဲက ရလဒ်တွေဟာ တကယ့် Code နဲ့ ကိုက်ညီသလား ခွဲခြမ်းစိတ်ဖြာထားပါတယ်။
+1. အရေးကြီးဆုံးတွေ့ရှိချက်များ
+Finding 1 — Fat Method Header Parsing မှားနေသည်
+CRITICAL
+
+run_v3_full_100.py ရဲ့ Method Body ဖတ်တဲ့နေရာမှာ ဒီ Code ကို တွေ့ရတယ်။
+fat_flags, code_sz, local_sig = struct.unpack_from("<HII", pe_bytes, f_off)
+
+
+
+.NET Fat Method Header ရဲ့ Field အစီအစဉ်က—
+- Flags + Header Size: 2 bytes
+- MaxStack: 2 bytes
+- CodeSize: 4 bytes
+- LocalVarSigTok: 4 bytes
+ဖြစ်ပါတယ်။ လက်ရှိ <HII က MaxStack ကို CodeSize ထဲမှာ ရောဖတ်ပြီး နောက် Field တွေကိုလည်း မှားယွင်းစေပါတယ်။ ဒီနေရာမှာ Header ကို <HHII နဲ့ သက်ဆိုင်ရာ Field Offset တွေအတိုင်း ဖတ်ရပါမယ်။
+
+သက်သေ: Manifest ထဲမှာ QueryDisplacements.QueryWaves ရဲ့ Expected Code Size က 951 bytes ဖြစ်ပေမဲ့ ဖတ်ထုတ်ထားတဲ့ Code Size က 62,324,742 bytes ဖြစ်နေတယ်။ FourierTask.ProcessData ကလည်း Expected 1,636 bytes ဖြစ်ပေမဲ့ 107,216,900 bytes လို့ ထွက်နေတယ်။
+
+ဒါဟာ သာမန် Mismatch မဟုတ်ပါဘူး။ Fat Method Body Parser ရဲ့ အခြေခံဖတ်ရှုမှု မှားနေကြောင်း ပြသတဲ့ အထောက်အထားပါ။
+
+Source: run_v3_full_100.py, PER_METHOD_VALIDATION_MANIFEST.json
+
+Finding 2 — Metadata Table Size တွက်ချက်မှု မပြည့်စုံ
+CRITICAL
+
+Script မှာ Table အမျိုးအစားတချို့အတွက် Row Size ကို မှန်ကန်စွာ မသတ်မှတ်ဘဲ Default Formula သုံးထားတယ်။
+else:    rsz = 6 + str_idx_sz + blob_idx_sz
+
+
+
+ဒါပေမဲ့ Metadata Table တစ်ခုနဲ့တစ်ခု Row Structure မတူပါဘူး။
+
+ဥပမာ StandAloneSig (Table 0x11) ရဲ့ Row က Blob Heap Index တစ်ခုသာ ပါဝင်ပါတယ်။ လက်ရှိ Default Formula က ပိုကြီးတဲ့ Size တွက်နေပါတယ်။
+
+အဲဒီကြောင့် Report မှာ—
+Table 0x11 (StandAloneSig) exceeds #~ boundary
+
+
+ဆိုတဲ့ Error ထွက်နေပါတယ်။
+
+ထို့အပြင် Table Loop ပြီးတာနဲ့ metadata_tables_ok = True ကို အခြေအနေမစစ်ဘဲ သတ်မှတ်ထားတယ်။ Table Validation မှာ Error ဖြစ်ခဲ့သော်လည်း Manifest က metadata_tables_ok: true လို့ ပြနိုင်ပါတယ်။
+
+အကျိုးဆက်: Metadata Validation Result ကို ယုံကြည်လို့မရသေးပါဘူး။
+
+Finding 3 — Method Body Boundary မပြည့်စုံ
+CRITICAL
+
+Method RVA ကို စစ်တဲ့အခါ—
+f_off, map_err = rva_to_file_range(m_rva, 1)
+
+
+
+ပထမ Byte တစ်ခုတည်းကိုသာ Mapping လုပ်တယ်။ နောက်ပိုင်း Code Size အတိုင်း DLL ထဲက Byte တွေကို တိုက်ရိုက် Slice လုပ်တယ်။
+il_data = pe_bytes[f_off + hdr_sz : f_off + hdr_sz + code_sz]
+
+
+
+ဒီနေရာမှာ Method Body တစ်ခုလုံးဟာ သက်ဆိုင်ရာ PE Section ရဲ့ Raw Data Boundary အတွင်း ရှိနေကြောင်း မစစ်ဆေးထားပါဘူး။
+
+EH Parsing မှာလည်း—
+parse_eh_clauses(pe_bytes[eh_off:], ...)
+
+
+
+လို့ Method ရဲ့ EH Section အရွယ်အစားကို သီးခြားကန့်သတ်မထားဘဲ DLL ကျန်ရှိသမျှကို ပေးထားပါတယ်။
+
+အကျိုးဆက်: Method Body နဲ့ EH Data တို့ရဲ့ အမှန်တကယ် Boundary ကို အတည်ပြုထားတယ်လို့ မဆိုနိုင်ပါဘူး။
+
+2. Decoder A/B စစ်ဆေးမှု
+PARTIALLY VERIFIED
+ကောင်းမွန်တဲ့ ပြောင်းလဲမှုတစ်ခုက Decoder A နဲ့ Decoder B တို့မှာ Opcode Table သီးခြားစီ ရှိနေခြင်းပါ။ V3 ထက် တိုးတက်မှုရှိပါတယ်။
+
+ဒါပေမဲ့ အားနည်းချက်တွေ ကျန်နေပါသေးတယ်။
+1. Opcode Table နှစ်ခုစလုံးမှာ .NET IL Opcode အားလုံး မပါဝင်သေးဘူး။ Valid Opcode တစ်ခုကို မသိရင် Method ကို မှားယွင်းစွာ CONFLICTING သတ်မှတ်နိုင်တယ်။
+2. diff_ab() က offset, end, mnemonic, raw_operand_hex, targets ကိုသာ နှိုင်းယှဉ်တယ်။ optype နဲ့ decoded_value ကို မနှိုင်းယှဉ်ဘူး။
+3. EH Parser ကို Decoder A/B နှစ်ခုလုံးက သီးခြားလုပ်ဆောင်တာ မဟုတ်ဘူး။ Method Validation လမ်းကြောင်းထဲမှာ Parser တစ်ခုတည်းကိုသာ ခေါ်ထားတယ်။
+4. Decoder Report က Fixed Sample တစ်ခုတည်းကို စစ်ထားတယ်။
+အဲဒီ Sample က 3 instructions ပါဝင်တဲ့—
+ldarg.0
+ldfld
+ret
+
+
+ဖြစ်တယ်။ 3 instructions အောင်မြင်တာနဲ့ Ocean Pipeline ထဲက Method အားလုံးကို Decoder A/B နှစ်ခုက အတည်ပြုနိုင်တယ်လို့ မဆိုနိုင်ပါဘူး။
+3. Adversarial Test နဲ့ Self-Audit
+INSUFFICIENT COVERAGE
+Adversarial Test Report
+6/6
+
+Report ထဲမှာ ဖော်ပြထားတဲ့ Test အရေအတွက်
+
+စမ်းသပ်ထားတာတွေက—
+- Invalid PE Signature
+- Truncated PE Section Table
+- Truncated IL Operand
+- Branch Into Operand
+- Decoder A/B Valid Sample
+- EH Out-of-Range Handler
+ဒီ Test ခြောက်ခုဟာ အခြေခံအဆင့်အတွက် ကောင်းပါတယ်။ ဒါပေမဲ့ Metadata Stream Boundary၊ Method Body Cross-Section၊ Invalid Token၊ Malformed Signature၊ EH Section Chaining စတဲ့ အရေးကြီးတဲ့ အခြေအနေတွေ မပါသေးပါဘူး။
+
+နောက်ထပ် အရေးကြီးတဲ့ ပြဿနာတစ်ခုက Self-Audit ဖြစ်ပါတယ်။
+"Status: VERIFIED" if adv_suite["failed"] == 0 else "FAILED"
+
+
+
+Self-Audit Status ကို Adversarial Test အောင်မြင်မှုတစ်ခုတည်းနဲ့ ဆုံးဖြတ်ထားတယ်။ PE/CLI Validation ပျက်နေတာ၊ Ocean Method 25 ခု CONFLICTING ဖြစ်နေတာတို့ကို Self-Audit Status မှာ ထည့်မတွက်ထားပါဘူး။
+
+ထို့အပြင်—
+V2 Isolation: ENFORCED
+
+
+ဆိုတာကိုလည်း Code ထဲမှာ Hardcode လုပ်ထားတယ်။ V2 ကို မထိခိုက်ကြောင်း စမ်းသပ်အတည်ပြုထားတဲ့ Test မဟုတ်ပါဘူး။
+4. V4 အမည်နဲ့ Version Isolation ပြဿနာ
+CRITICAL
+ဒီအချက်ကို အထူးသတိထားပါ။
+
+သင်ပေးထားတဲ့ Folder က Google Team V4 ဖြစ်ပေမဲ့ Script ရဲ့—
+DEFAULT_V3_DIR = Path(    "/storage/emulated/0/Download/Stranded-Deep-Original/Google Ai Core V3")
+
+
+
+ဆိုတဲ့ Default Output Path က V3 Folder ကို ညွှန်နေတယ်။
+
+ထို့အပြင် Script နဲ့ Report တွေထဲမှာ—
+- GOOGLE AI CORE V3
+- google-ai-core-v3-full-100-final
+- Google Ai Core V3 Forensic Engine
+ဆိုတဲ့ V3 အမည်တွေကို ဆက်သုံးထားတယ်။
+
+ဒါကြောင့် လက်ရှိ Default Argument နဲ့ Script ကို Run လုပ်လိုက်ရင် V4 Folder အစား V3 Folder ထဲက Report တွေကို ရေးသားနိုင်ပါတယ်။
+
+ဒီပြဿနာကို မပြင်မချင်း မူရင်း V3 Evidence ကို ထိခိုက်စေနိုင်တဲ့ အန္တရာယ်ရှိပါတယ်။ လက်ရှိအတိုင်း Default နဲ့ မ Run သင့်သေးပါဘူး။
+
+5. V4 ရဲ့ လက်ရှိ Report တွေကို စုစည်းသုံးသပ်ခြင်း
+စစ်ဆေးမှု	V4 ရဲ့ Report	ကျွန်တော့်သုံးသပ်ချက်
+PE / CLI / Metadata	False	Failed
+Metadata Tables	Boundary Error	Failed
+Ocean Methods	9/34 Verified	Partial
+Decoder A/B	3 Instructions	Partial
+Adversarial Tests	6/6 Passed	Limited
+Self-Audit	Verified	Overstated
+Ocean / Ceto	Partially Verified	Partial
+
+အရေးကြီးတဲ့ သတိပြုချက်: 9/34 VERIFIED ထဲက Method 9 ခုကိုလည်း အားလုံး အပြည့်အဝမှန်ကန်ကြောင်း မသတ်မှတ်သင့်သေးပါဘူး။ Metadata Parser နဲ့ Overall Validation မှာ ပြဿနာရှိနေတဲ့အတွက် Method တစ်ခုချင်းစီကို ပြန်စစ်ဖို့ လိုပါတယ်။
+6. V4 ကို ဘယ်လိုပြင်ဆင်သင့်သလဲ
+ကျွန်တော် အကြံပြုတဲ့ ပြင်ဆင်မှုအစီအစဉ်က အောက်ပါအတိုင်းပါ။
+1. Fat Method Header ကို အရင်ပြင်ပါ။
+   
+   <HII ဖတ်ရှုမှုကို မှန်ကန်တဲ့ Fat Header Layout နဲ့ အစားထိုးပြီး Method Code Size၊ Local Signature Token ကို ပြန်ဖတ်ပါ။
+2. Metadata Table Layout အားလုံးကို ပြည့်စုံစေပါ။
+   
+   Default Row Size Formula ကို ဖယ်ရှားပြီး ECMA-335 Table Schema အတိုင်း Table တစ်ခုချင်းစီကို မှန်ကန်စွာတွက်ပါ။
+3. Boundary Validation ကို အပြည့်အဝထည့်ပါ။
+   
+   Method Body နဲ့ EH Data တို့ကို သက်ဆိုင်ရာ Section နဲ့ Method Boundary အတွင်းမှာသာ ဖတ်ခွင့်ပြုပါ။
+4. Decoder A/B ကို တိုးချဲ့ပါ။
+   
+   Opcode Coverage၊ Operand Type၊ Decoded Value၊ Branch၊ Switch နဲ့ EH Structure တို့ကို သီးခြားနှိုင်းယှဉ်ပါ။
+5. Adversarial Test ကို တိုးချဲ့ပါ။
+   
+   အနည်းဆုံး Metadata၊ Signature၊ PE Section၊ Method Body နဲ့ EH အပိုင်းတွေကို Negative Test ထည့်ပါ။
+6. Version Isolation ကို ပြင်ပါ။
+   
+   V4 ရဲ့ Default Input/Output Path၊ Schema၊ Report Title နဲ့ Self-Audit တို့ကို V4 အဖြစ် သီးခြားသတ်မှတ်ပါ။ V3 ကို မထိခိုက်စေရပါ။
+7. Ocean/Ceto ကို ပြန်လည်စစ်ဆေးပါ။
+   
+   အထက်ပါ Parser အားလုံး ပြည့်စုံမှသာ Method 34 ခုနဲ့ CPU/GPU Pipeline ကို ပြန်လည်အတည်ပြုပါ။
+7. နောက်ဆုံးဆုံးဖြတ်ချက်
+Google Team V4
+NOT READY FOR TRUSTED VERIFICATION
+V3 ထက် တိုးတက်မှုရှိသလား?
+
+ရှိပါတယ်။ Adversarial Test၊ သီးခြား Decoder Table နဲ့ PE/CLI Boundary စစ်ဆေးမှုတွေကို ပိုမိုထည့်သွင်းလာပါတယ်။
+
+ပန်းတိုင်နဲ့ နီးစပ်ပြီလား?
+
+V4 ရဲ့ ရည်ရွယ်ချက်နဲ့ နီးစပ်လာပေမဲ့ Fat Method Header Parser မှားနေခြင်းက အခြေခံအကျဆုံး အတားအဆီးဖြစ်နေပါတယ်။ ဒီအမှားကြောင့် Method Body နဲ့ Decoder Result အများစုကို ယုံကြည်လို့မရသေးပါဘူး။
+
+လက်ရှိအဆင့်: PARTIALLY VERIFIED — CRITICAL PARSER DEFECTS
+
+စစ်ဆေးမှုအကျယ်အဝန်းနှင့် အထောက်အထား
+- Repo: Map — Google Team V4
+- လက်ရှိ Commit: bd25a51438899887b879b5ff1682dbdafa32b96e
+- Main Script: run_v3_full_100.py
+- Method Manifest: PER_METHOD_VALIDATION_MANIFEST.json
+- Main Report: PHASE1_HARDENED_FORENSIC_REPORT.txt
+- Decoder Report: DECODER_AB_COMPARISON_REPORT.txt
+- Adversarial Report: ADVERSARIAL_TEST_REPORT.txt
+စစ်ဆေးမှုကန့်သတ်ချက်: GitHub ရှိ V4 ဖိုင် 8 ခုနဲ့ Report/Manifest/Script တွေကို Source-Level စစ်ဆေးခဲ့တာပါ။ DLL ကို ဒီနေရာမှာ မရရှိတဲ့အတွက် Script ကို ပြန် Run မလုပ်နိုင်ခဲ့ပါဘူး။ Repo ဖိုင်တွေကိုလည်း မပြင်ဆင်ထားပါဘူး။ Report ထဲက 6/6 ကိုလည်း ကျွန်တော် သီးခြားပြန် Run လုပ်ပြီး အတည်ပြုထားတာ မဟုတ်ပါဘူး။
+
+ကျွန်တော့်အကြံပြုချက်က V4 ကို ချက်ချင်း V5 တိုးမသွားဘဲ အရင်ဆုံး ဒီ Fat Header Parsing နဲ့ Metadata Table Parsing အမှားတွေကို ပိတ်ဖို့ပါ။ ဒီနှစ်ခု မမှန်သေးဘဲ Report အရေအတွက်နဲ့ VERIFIED အရေအတွက်ကို တိုးတာက ပန်းတိုင်နဲ့ ပိုဝေးသွားစေနိုင်ပါတယ်။
