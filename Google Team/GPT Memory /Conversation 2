@@ -1114,3 +1114,128 @@ Runtime behavior	UNVERIFIED	လိုအပ်တဲ့ runtime evidence ရရ�
 - DLL ကို ဒီ runtime မှာ မရရှိတဲ့အတွက် V3 Python script ကို DLL နဲ့ ပြန်မ run နိုင်ခဲ့ဘူး။
 - Repo ထဲက files တစ်ခုမှ ပြင်ဆင်ခြင်း၊ commit လုပ်ခြင်း မရှိပါ။
 အရေးကြီးတဲ့ နောက်ဆုံးအကြံပြုချက်: အခုချိန်မှာ Godot migration ကို မစသေးဘဲ Google V3 ရဲ့ structural verification gap တွေကို အရင်ပိတ်ပြီး Gemini V3 ရဲ့ combined method comparison ကို မှန်ကန်တဲ့ method identity နဲ့ ပြန်စစ်သင့်ပါတယ်။
+
+
+လက်ရှိ V3 စစ်ဆေးချက်အပေါ် အခြေခံပြီး အကြံပြုချက်တွေကို **Gemini V3 နဲ့ Google V3 သီးခြားခွဲပြီး** ရေးပေးမယ်။ အဓိကရည်ရွယ်ချက်က စစ်ဆေးမှုရလဒ်တွေကို `VERIFIED` လို့ အလွန်အကျွံမကြေညာဘဲ၊ တကယ်အတည်ပြုနိုင်တဲ့ forensic evidence ဖြစ်လာစေဖို့ပါ။
+
+# **CASTAWAY-DEPTHS — V3 အကြံပြုချက်များ**
+
+## **1. Gemini Ai Core V3**
+
+PARTIALLY VERIFIED
+
+**ဦးစားပေးပြင်ဆင်ရန်**
+
+1. **Regex နည်းလမ်းကို အစားထိုးပါ။** လက်ရှိ text report ထဲက Method Name နဲ့ IL စာသားတွေကို Regex နဲ့ရှာဖွေတာအစား DLL Metadata နဲ့ Method Body ကို တကယ်ဖတ်ရှုနိုင်တဲ့ Parser အသုံးပြုပါ။
+2. **Method Identity ကို အပြည့်အစုံသတ်မှတ်ပါ။** Method Name တစ်ခုတည်းနဲ့ မခွဲဘဲ အောက်ပါအချက်တွေကို တွဲသုံးပါ။
+   - Declaring Type
+   - Method Name
+   - Metadata Token
+   - Method Signature
+   - Generic Arity
+3. **Method Body Hash ကို အတိအကျတွက်ပါ။** 4,000-character window နဲ့ စာသားစစ်ထုတ်တဲ့နည်းကို ဖယ်ရှားပြီး Method Body ရဲ့ သတ်မှတ်ထားတဲ့ Byte Range ကိုသာ Hash လုပ်ပါ။
+4. **Duplicate Method များကို မပျောက်စေပါနှင့်။** Dictionary ထဲမှာ Method တစ်ခုက အခြားတစ်ခုကို Overwrite လုပ်သွားတာမျိုး မဖြစ်စေရပါ။
+5. **CORE / PIPE / COMBINED ကို သီးခြားစစ်ဆေးပါ။** Method တူညီမှု၊ Method Body တူညီမှု၊ Duplicate၊ Missing နဲ့ Extra Content တို့ကို သီးခြား Report ထုတ်ပါ။
+6. **Method Size 8 ခုကို အမှန်တကယ် Validate လုပ်ပါ။** လက်ရှိ `UNVERIFIED` ဖြစ်နေတဲ့ 8 ခုကို အထောက်အထားမရှိဘဲ PASS မပြောင်းပါနှင့်။
+7. **Recursive Scan ကို ပိုမိုခိုင်မာစေပါ။** Depth ကန့်သတ်ချက်ကြောင့် ဖိုင်တွေ လွတ်ကျန်နိုင်တဲ့အခြေအနေကို ကာကွယ်ပါ။
+
+**မျှော်မှန်းရလဒ်**
+
+- Method Identity မရှုပ်ထွေးတော့ခြင်း
+- Hash Mismatch ကို အကြောင်းရင်းအလိုက် ခွဲခြားနိုင်ခြင်း
+- CORE / PIPE / COMBINED တို့ရဲ့ အမှန်တကယ်တူညီမှုကို သက်သေပြနိုင်ခြင်း
+
+## **2. Google Ai Core V3**
+
+PARTIALLY VERIFIED
+
+**ဦးစားပေးပြင်ဆင်ရန်**
+
+1. **PE Section Boundary ကို ပြည့်စုံစွာစစ်ပါ။** Method Body နဲ့ EH Data တို့ဟာ သက်ဆိုင်ရာ PE Section ရဲ့ Raw Data Boundary အတွင်းမှာ အပြည့်အဝရှိကြောင်း Validate လုပ်ပါ။
+2. **Metadata Bounds ကို ပိုမိုခိုင်မာစေပါ။** Metadata Root၊ Stream Header၊ Stream Size၊ Table Data နဲ့ Blob Data တို့ကို သက်ဆိုင်ရာ Boundary အတွင်းမှာပဲ ဖတ်ရှုခွင့်ပြုပါ။
+3. **Metadata Token Resolution ကို ပြည့်စုံစေပါ။** TypeSpec၊ MethodSpec၊ StandAloneSig အပါအဝင် Token များကို Row Count စစ်ရုံနဲ့ မပြီးစေဘဲ Signature နဲ့ Blob Structure ကိုပါ စစ်ဆေးပါ။
+4. **EH Validation ကို တိုးချဲ့ပါ။**
+   - Catch Token
+   - Filter Offset
+   - Try / Handler Range
+   - Clause Flags
+   - Overlap / Nesting
+   - Section Chaining
+   - Protected Region Structure
+5. **Decoder B ကို EH အပိုင်းအထိ Independent ဖြစ်စေပါ။** လက်ရှိ Decoder B က Instruction Decode အပိုင်းမှာသာ သီးခြားစစ်ဆေးနိုင်ပြီး EH Validation ကို Decoder A နဲ့ မျှဝေနေသေးပါတယ်။
+6. **Malformed IL Test Corpus တည်ဆောက်ပါ။** Truncated Operand၊ Invalid Branch၊ Invalid Switch၊ Corrupted EH၊ Invalid Metadata Token နဲ့ Out-of-Section Method Body တို့ကို စမ်းသပ်ပါ။
+7. **Self-Audit ကို ပြင်ဆင်ပါ။** `check_v2_weaknesses.py` ကို V3 အတွက် Version-local ဖြစ်အောင် ပြင်ပြီး Source Code ထဲက စာသားတွေကို ရှာရုံမဟုတ်ဘဲ တကယ် Run လုပ်ပြီး Behavior ကို စမ်းသပ်ပါ။
+
+**မျှော်မှန်းရလဒ်**
+
+- Decoder A/B နှစ်ခုရဲ့ အမှန်တကယ် လွတ်လပ်တဲ့ အတည်ပြုမှု
+- PE၊ CLI၊ Metadata၊ IL နဲ့ EH အပိုင်းတွေမှာ Structural Validation ပိုမိုပြည့်စုံလာခြင်း
+- မမှန်ကန်တဲ့ Data တွေကို PASS ဖြစ်သွားစေမယ့် အန္တရာယ် လျော့နည်းခြင်း
+
+## **3. Ocean Displacement Technical Evidence**
+
+Gemini နဲ့ Google V3 ပြင်ဆင်မှုတွေပြီးရင် Ocean နည်းပညာဆိုင်ရာ အထောက်အထားကို သီးခြားအတည်ပြုဖို့ လိုပါတယ်။
+
+| စစ်ဆေးရမည့်အပိုင်း    | လက်ရှိအခြေအနေ        | အကြံပြုချက်               |
+| --------------------- | -------------------- | ------------------------- |
+| CPU Double Buffer     | IL Evidence ရှိ      | Runtime Sequence စစ်ရန်   |
+| Grid 0–3 Readback     | Grid 3 မပါဝင်        | Readback Path စစ်ရန်      |
+| GPU Texture Binding   | Binding Evidence ရှိ | Shader Consumption စစ်ရန် |
+| WaveQuery             | C# Evidence ရှိ      | Grid Sampling စစ်ရန်      |
+| FFT Computation       | မပြည့်စုံ            | Compute Shader စစ်ရန်     |
+| Serialized Parameters | မပြည့်စုံ            | Actual Asset Data စစ်ရန်  |
+
+အရေးကြီးတာက **Grid 3 Readback မရှိတာကို Grid 3 အသုံးမဝင်ဘူးလို့ မသတ်မှတ်ရပါ။** GPU Rendering အတွက် အသုံးပြုနေနိုင်ခြေကို Shader Source သို့မဟုတ် Compiled Shader Evidence နဲ့ ထပ်စစ်ဆေးရပါမယ်။
+
+## **4. Verification Standard တစ်ခုတည်း သတ်မှတ်ပါ**
+
+V3 နှစ်ခုစလုံးအတွက် အောက်ပါ Status သတ်မှတ်ချက်တွေကို အသုံးပြုဖို့ အကြံပြုပါတယ်။
+
+| Status               | သတ်မှတ်ချက်                                               |
+| -------------------- | --------------------------------------------------------- |
+| `VERIFIED`           | သတ်မှတ်ထားတဲ့ စစ်ဆေးမှုအားလုံး အောင်မြင်ပြီး Evidence ရှိ |
+| `PARTIALLY VERIFIED` | အချို့စစ်ဆေးမှု အောင်မြင်သော်လည်း အရေးကြီးတဲ့ Gap ရှိ     |
+| `UNVERIFIED`         | လိုအပ်တဲ့ စစ်ဆေးမှု မလုပ်ရသေး                             |
+| `FAILED`             | သတ်မှတ်ချက်ကို မအောင်မြင်                                 |
+| `CONFLICTING`        | အထောက်အထားများ အချင်းချင်း မကိုက်ညီ                       |
+
+ထို့အပြင် Report တစ်ခုချင်းစီမှာ အောက်ပါတို့ ပါသင့်ပါတယ်။
+
+- DLL SHA256
+- Script SHA256
+- Input File SHA256
+- Method Token နဲ့ Method Identity
+- Raw Method Body Hash
+- Decoder A/B Results
+- PE / CLI / Metadata / EH Validation Results
+- Test Cases နဲ့ Failure Details
+- Unverified Items
+
+## **5. လုပ်ဆောင်မှုဦးစားပေးအစီအစဉ်**
+
+1. **Google V3 — Structural Validation**
+
+   PE Section Boundary၊ Metadata Bounds၊ EH Validation နဲ့ Independent Decoder B ကို အရင်ပြည့်စုံအောင်လုပ်ပါ။
+2. **Google V3 — Adversarial Testing**
+
+   Malformed DLL/IL Test များနဲ့ Parser ရဲ့ အမှားရှာဖွေနိုင်စွမ်းကို စစ်ပါ။
+3. **Gemini V3 — True Method Parser**
+
+   Regex အခြေပြု Method Detection ကို Metadata/IL အခြေပြု စစ်ဆေးမှုနဲ့ အစားထိုးပါ။
+4. **Gemini V3 — Exact CORE/PIPE/COMBINED Comparison**
+
+   Method Identity နဲ့ Raw Body Hash ကို အသုံးပြုပြီး 7 ခုသော Mismatch ကို ပြန်လည်စစ်ဆေးပါ။
+5. **Ocean Evidence Verification**
+
+   CPU/GPU Pipeline၊ Shader၊ FFT နဲ့ Grid Sampling ကို သက်ဆိုင်ရာ Raw Evidence နဲ့ အတည်ပြုပါ။
+6. **Final Independent Audit**
+
+   ယခင် Report တွေကို ပြန်လည်စစ်ဆေးပြီး အတည်ပြုနိုင်တဲ့အချက်နဲ့ မရသေးတဲ့အချက်ကို သီးခြားထုတ်ပြန်ပါ။
+
+## **နောက်ဆုံးအကြံပြုချက်**
+
+ကျွန်တော့်အမြင်အရ **Google V3 ကို ပထမဦးစားပေး၊ Gemini V3 ကို ဒုတိယဦးစားပေး** ပြင်ဆင်သင့်ပါတယ်။ Google V3 မှာ Raw DLL Parser နဲ့ Decoder Structure ပိုမိုခိုင်မာလာပြီးသားဖြစ်လို့ အရေးကြီးတဲ့ Structural Gap တွေကို ပိတ်နိုင်ရင် ပိုမိုယုံကြည်စိတ်ချရတဲ့ Foundation ရရှိနိုင်ပါတယ်။
+
+**Scope သတ်မှတ်ချက်:** လက်ရှိအကြံပြုချက်တွေဟာ V3 နှစ်ခုအတွက်သာ ဖြစ်ပါတယ်။ V1၊ V2၊ Original Evidence နဲ့ DLL များကို မပြင်ဆင်ဘဲ ထိန်းသိမ်းထားသင့်ပါတယ်။
+
+ဒီအကြံပြုချက်တွေကို လက်တွေ့အကောင်အထည်ဖော်မယ်ဆိုရင် ပထမဆုံး Google V3 ရဲ့ လက်ရှိ Code ကို ပြန်စစ်ပြီး ပြင်ဆင်ရမယ့်နေရာတွေကို သီးခြားသတ်မှတ်တာက အကောင်းဆုံးပါ။
