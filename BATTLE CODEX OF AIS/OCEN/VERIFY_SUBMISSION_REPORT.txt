@@ -1,0 +1,1308 @@
+========================================================================
+STRANDED DEEP - INDEPENDENT IL BYTECODE VERIFICATION REPORT
+Generated : 2026-11-21T09:25:17
+DLL Path  : /mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+DLL Size  : 3432448 bytes
+========================================================================
+
+[1] VERIFIED TARGET METHODS
+RID    | Name                           | RVA        | FileOff    | Body & CodeSize
+--------------------------------------------------------------------------------------------
+ 11859 | QueryWaves                     | 0x00070e04 | 0x0006f004 | Fat(stack=2,loc=0x00000000), 128B @ 0x06f010
+ 11860 | QueryWaves                     | 0x00070e90 | 0x0006f090 | Fat(stack=2,loc=0x00000000), 146B @ 0x06f09c
+ 11988 | QueryWaves                     | 0x00073b4c | 0x00071d4c | Fat(stack=5,loc=0x110004be), 738B @ 0x071d58
+ 12173 | QueryWaves                     | 0x0007869c | 0x0007689c | Fat(stack=6,loc=0x110004d6), 951B @ 0x0768a8
+ 12174 | SampleHeightOnly               | 0x00078a60 | 0x00076c60 | Fat(stack=4,loc=0x110004d7), 345B @ 0x076c6c
+ 12175 | Sample                         | 0x00078bc8 | 0x00076dc8 | Fat(stack=4,loc=0x110004d7), 581B @ 0x076dd4
+ 12430 | UpdateQueryScaling             | 0x000800bc | 0x0007e2bc | Fat(stack=5,loc=0x110004f5), 305B @ 0x07e2c8
+ 12436 | QueryWaves                     | 0x00080acc | 0x0007eccc | Fat(stack=3,loc=0x110004f8), 110B @ 0x07ecd8
+
+[2] RESOLVED METADATA TOKENS
+--------------------------------------------------------------------------------------------
+  0x040019cc -> T04#6604 | level
+  0x040019eb -> T04#6635 | m_query
+  0x04001a53 -> T04#6739 | invGridSizes
+  0x04001a54 -> T04#6740 | scaleY
+  0x04001a55 -> T04#6741 | choppyness
+  0x04001a56 -> T04#6742 | offset
+  0x04001a57 -> T04#6743 | numGrids
+  0x04001b2e -> T04#6958 | posX
+  0x04001b2f -> T04#6959 | posZ
+  0x04001b30 -> T04#6960 | sampleSpectrum
+  0x04001b31 -> T04#6961 | sampleOverlay
+  0x04001b33 -> T04#6963 | mode
+  0x04001b35 -> T04#6965 | result
+  0x04003b8e -> T04#15246 | height
+  0x04003b8f -> T04#15247 | displacementX
+  0x04003b90 -> T04#15248 | displacementZ
+  0x04003b95 -> T04#15253 | isClipped
+  0x06002e2d -> T06#11821 | get_Spectrum | RVA=0x0006ff5b
+  0x06002e38 -> T06#11832 | get_OverlayManager | RVA=0x0006ffd2
+  0x06002ed4 -> T06#11988 | QueryWaves | RVA=0x00073b4c
+  0x06002f8b -> T06#12171 | QueryWaves
+  0x06002f8e -> T06#12174 | SampleHeightOnly | RVA=0x00078a60
+  0x06002f8f -> T06#12175 | Sample | RVA=0x00078bc8
+  0x06003094 -> T06#12436 | QueryWaves | RVA=0x00080acc
+  0x06005e6c -> T06#24172 | Clear | RVA=0x0010aef8
+
+[3] IL BYTECODE DISASSEMBLY
+--------------------------------------------------------------------------------------------
+
+--- RID 11859: QueryWaves @ 0x06f010 (128B, 41 insns, unk=0) ---
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0006: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0011: 286c5e0006     | call         0x06005e6c [T06#24172 | Clear | RVA=0x0010aef8]
+  IL_0016: 02             | ldarg.0      
+  IL_0017: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0022: 03             | ldarg.1      
+  IL_0023: 7d2e1b0004     | stfld        0x04001b2e [T04#6958 | posX]
+  IL_0028: 02             | ldarg.0      
+  IL_0029: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0034: 04             | ldarg.2      
+  IL_0035: 7d2f1b0004     | stfld        0x04001b2f [T04#6959 | posZ]
+  IL_0040: 02             | ldarg.0      
+  IL_0041: 28ab00000a     | call         0x0a0000ab [T0a#171 | get_enabled]
+  IL_0046: 2c38           | brfalse.s    IL_0104 (+56)
+  IL_0048: 02             | ldarg.0      
+  IL_0049: 282d2e0006     | call         0x06002e2d [T06#11821 | get_Spectrum | RVA=0x0006ff5b]
+  IL_0054: 14             | ldnull       
+  IL_0055: 288c00000a     | call         0x0a00008c [T0a#140 | op_Inequality]
+  IL_0060: 2c11           | brfalse.s    IL_0079 (+17)
+  IL_0062: 02             | ldarg.0      
+  IL_0063: 282d2e0006     | call         0x06002e2d [T06#11821 | get_Spectrum | RVA=0x0006ff5b]
+  IL_0068: 02             | ldarg.0      
+  IL_0069: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0074: 6f94300006     | callvirt     0x06003094 [T06#12436 | QueryWaves | RVA=0x00080acc]
+  IL_0079: 02             | ldarg.0      
+  IL_0080: 28382e0006     | call         0x06002e38 [T06#11832 | get_OverlayManager | RVA=0x0006ffd2]
+  IL_0085: 2c11           | brfalse.s    IL_0104 (+17)
+  IL_0087: 02             | ldarg.0      
+  IL_0088: 28382e0006     | call         0x06002e38 [T06#11832 | get_OverlayManager | RVA=0x0006ffd2]
+  IL_0093: 02             | ldarg.0      
+  IL_0094: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0099: 6fd42e0006     | callvirt     0x06002ed4 [T06#11988 | QueryWaves | RVA=0x00073b4c]
+  IL_0104: 02             | ldarg.0      
+  IL_0105: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0110: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0115: 7b8e3b0004     | ldfld        0x04003b8e [T04#15246 | height]
+  IL_0120: 02             | ldarg.0      
+  IL_0121: 7bcc190004     | ldfld        0x040019cc [T04#6604 | level]
+  IL_0126: 58             | add          
+  IL_0127: 2a             | ret          
+
+--- RID 11860: QueryWaves @ 0x06f09c (146B, 47 insns, unk=0) ---
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0006: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0011: 286c5e0006     | call         0x06005e6c [T06#24172 | Clear | RVA=0x0010aef8]
+  IL_0016: 02             | ldarg.0      
+  IL_0017: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0022: 03             | ldarg.1      
+  IL_0023: 7d2e1b0004     | stfld        0x04001b2e [T04#6958 | posX]
+  IL_0028: 02             | ldarg.0      
+  IL_0029: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0034: 04             | ldarg.2      
+  IL_0035: 7d2f1b0004     | stfld        0x04001b2f [T04#6959 | posZ]
+  IL_0040: 02             | ldarg.0      
+  IL_0041: 28ab00000a     | call         0x0a0000ab [T0a#171 | get_enabled]
+  IL_0046: 2c38           | brfalse.s    IL_0104 (+56)
+  IL_0048: 02             | ldarg.0      
+  IL_0049: 282d2e0006     | call         0x06002e2d [T06#11821 | get_Spectrum | RVA=0x0006ff5b]
+  IL_0054: 14             | ldnull       
+  IL_0055: 288c00000a     | call         0x0a00008c [T0a#140 | op_Inequality]
+  IL_0060: 2c11           | brfalse.s    IL_0079 (+17)
+  IL_0062: 02             | ldarg.0      
+  IL_0063: 282d2e0006     | call         0x06002e2d [T06#11821 | get_Spectrum | RVA=0x0006ff5b]
+  IL_0068: 02             | ldarg.0      
+  IL_0069: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0074: 6f94300006     | callvirt     0x06003094 [T06#12436 | QueryWaves | RVA=0x00080acc]
+  IL_0079: 02             | ldarg.0      
+  IL_0080: 28382e0006     | call         0x06002e38 [T06#11832 | get_OverlayManager | RVA=0x0006ffd2]
+  IL_0085: 2c11           | brfalse.s    IL_0104 (+17)
+  IL_0087: 02             | ldarg.0      
+  IL_0088: 28382e0006     | call         0x06002e38 [T06#11832 | get_OverlayManager | RVA=0x0006ffd2]
+  IL_0093: 02             | ldarg.0      
+  IL_0094: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0099: 6fd42e0006     | callvirt     0x06002ed4 [T06#11988 | QueryWaves | RVA=0x00073b4c]
+  IL_0104: 05             | ldarg.3      
+  IL_0105: 02             | ldarg.0      
+  IL_0106: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0111: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0116: 7b953b0004     | ldfld        0x04003b95 [T04#15253 | isClipped]
+  IL_0121: 52             | stind.i1     
+  IL_0122: 02             | ldarg.0      
+  IL_0123: 7beb190004     | ldfld        0x040019eb [T04#6635 | m_query]
+  IL_0128: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0133: 7b8e3b0004     | ldfld        0x04003b8e [T04#15246 | height]
+  IL_0138: 02             | ldarg.0      
+  IL_0139: 7bcc190004     | ldfld        0x040019cc [T04#6604 | level]
+  IL_0144: 58             | add          
+  IL_0145: 2a             | ret          
+
+--- RID 11988: QueryWaves @ 0x071d58 (738B, 273 insns, unk=0) ---
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 7bc51a0004     | ldfld        0x04001ac5 [T04#6853 | m_queryableOverlays]
+  IL_0006: 6f980b000a     | callvirt     0x0a000b98 [T0a#2968 | get_Count]
+  IL_0011: 2d01           | brtrue.s     IL_0014 (+1)
+  IL_0013: 2a             | ret          
+  IL_0014: 03             | ldarg.1      
+  IL_0015: 7b311b0004     | ldfld        0x04001b31 [T04#6961 | sampleOverlay]
+  IL_0020: 2d01           | brtrue.s     IL_0023 (+1)
+  IL_0022: 2a             | ret          
+  IL_0023: 03             | ldarg.1      
+  IL_0024: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0029: 18             | ldc.i4.2     
+  IL_0030: fe01           | cgt          
+  IL_0032: 0a             | stloc.0      
+  IL_0033: 03             | ldarg.1      
+  IL_0034: 7b2e1b0004     | ldfld        0x04001b2e [T04#6958 | posX]
+  IL_0039: 0b             | stloc.1      
+  IL_0040: 03             | ldarg.1      
+  IL_0041: 7b2f1b0004     | ldfld        0x04001b2f [T04#6959 | posZ]
+  IL_0046: 0c             | stloc.2      
+  IL_0047: 02             | ldarg.0      
+  IL_0048: 07             | ldloc.1      
+  IL_0049: 08             | ldloc.2      
+  IL_0050: 03             | ldarg.1      
+  IL_0051: 7b321b0004     | ldfld        0x04001b32 [T04#6962 | overrideIgnoreQuerys]
+  IL_0056: 06             | ldloc.0      
+  IL_0057: 28d32e0006     | call         0x06002ed3 [T06#11987 | GetQueryableContaining | RVA=0x00073a88]
+  IL_0062: 2200000000     | ldc.r4       0
+  IL_0067: 0d             | stloc.3      
+  IL_0068: 2200000000     | ldc.r4       0
+  IL_0073: 1304           | stloc.s      4
+  IL_0075: 2200000000     | ldc.r4       0
+  IL_0080: 1305           | stloc.s      5
+  IL_0082: 14             | ldnull       
+  IL_0083: 1306           | stloc.s      6
+  IL_0085: 14             | ldnull       
+  IL_0086: 1307           | stloc.s      7
+  IL_0088: 16             | ldc.i4.0     
+  IL_0089: 1308           | stloc.s      8
+  IL_0091: 38ee010000     | br           IL_0590 (+494)
+  IL_0096: 02             | ldarg.0      
+  IL_0097: 7bc71a0004     | ldfld        0x04001ac7 [T04#6855 | m_containingOverlays]
+  IL_0102: 1108           | ldloc.s      8
+  IL_0104: 6fb70b000a     | callvirt     0x0a000bb7 [T0a#2999 | get_Item]
+  IL_0109: 1309           | stloc.s      9
+  IL_0111: 1109           | ldloc.s      9
+  IL_0113: 7b591a0004     | ldfld        0x04001a59 [T04#6745 | overlay]
+  IL_0118: 6f012f0006     | callvirt     0x06002f01 [T06#12033 | get_ClipTex | RVA=0x00074e04]
+  IL_0123: 1306           | stloc.s      6
+  IL_0125: 1109           | ldloc.s      9
+  IL_0127: 7b591a0004     | ldfld        0x04001a59 [T04#6745 | overlay]
+  IL_0132: 6ffb2e0006     | callvirt     0x06002efb [T06#12027 | get_HeightTex | RVA=0x00074dd1]
+  IL_0137: 1307           | stloc.s      7
+  IL_0139: 1106           | ldloc.s      6
+  IL_0141: 6fe72e0006     | callvirt     0x06002ee7 [T06#12007 | get_IsDrawable | RVA=0x00074ceb]
+  IL_0146: 2c4b           | brfalse.s    IL_0223 (+75)
+  IL_0148: 1106           | ldloc.s      6
+  IL_0150: 7be71a0004     | ldfld        0x04001ae7 [T04#6887 | tex]
+  IL_0155: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0160: 2c3d           | brfalse.s    IL_0223 (+61)
+  IL_0162: 1106           | ldloc.s      6
+  IL_0164: 7be71a0004     | ldfld        0x04001ae7 [T04#6887 | tex]
+  IL_0169: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0174: 1109           | ldloc.s      9
+  IL_0176: 7b5a1a0004     | ldfld        0x04001a5a [T04#6746 | u]
+  IL_0181: 1109           | ldloc.s      9
+  IL_0183: 7b5b1a0004     | ldfld        0x04001a5b [T04#6747 | v]
+  IL_0188: 6f1c08000a     | callvirt     0x0a00081c [T0a#2076 | GetPixelBilinear]
+  IL_0193: 7bae05000a     | ldfld        0x0a0005ae [T0a#1454 | a]
+  IL_0198: 130a           | stloc.s      10
+  IL_0200: 09             | ldloc.3      
+  IL_0201: 110a           | ldloc.s      10
+  IL_0203: 2200000000     | ldc.r4       0
+  IL_0208: 1106           | ldloc.s      6
+  IL_0210: 7bea1a0004     | ldfld        0x04001aea [T04#6890 | alpha]
+  IL_0215: 28d801000a     | call         0x0a0001d8 [T0a#472 | Max]
+  IL_0220: 5a             | mul          
+  IL_0221: 58             | add          
+  IL_0222: 0d             | stloc.3      
+  IL_0223: 06             | ldloc.0      
+  IL_0224: 3a5e010000     | brtrue       IL_0579 (+350)
+  IL_0229: 1107           | ldloc.s      7
+  IL_0231: 6fe52e0006     | callvirt     0x06002ee5 [T06#12005 | get_IsDrawable | RVA=0x00074c88]
+  IL_0236: 3952010000     | brfalse      IL_0579 (+338)
+  IL_0241: 1107           | ldloc.s      7
+  IL_0243: 7be21a0004     | ldfld        0x04001ae2 [T04#6882 | alpha]
+  IL_0248: 130b           | stloc.s      11
+  IL_0250: 2200000000     | ldc.r4       0
+  IL_0255: 1107           | ldloc.s      7
+  IL_0257: 7be51a0004     | ldfld        0x04001ae5 [T04#6885 | maskAlpha]
+  IL_0262: 28d801000a     | call         0x0a0001d8 [T0a#472 | Max]
+  IL_0267: 130c           | stloc.s      12
+  IL_0269: 2200000000     | ldc.r4       0
+  IL_0274: 130d           | stloc.s      13
+  IL_0276: 2200000000     | ldc.r4       0
+  IL_0281: 130e           | stloc.s      14
+  IL_0283: 1107           | ldloc.s      7
+  IL_0285: 7bdf1a0004     | ldfld        0x04001adf [T04#6879 | tex]
+  IL_0290: 14             | ldnull       
+  IL_0291: 288c00000a     | call         0x0a00008c [T0a#140 | op_Inequality]
+  IL_0296: 2c34           | brfalse.s    IL_0350 (+52)
+  IL_0298: 1107           | ldloc.s      7
+  IL_0300: 7bdf1a0004     | ldfld        0x04001adf [T04#6879 | tex]
+  IL_0305: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0310: 2c26           | brfalse.s    IL_0350 (+38)
+  IL_0312: 1107           | ldloc.s      7
+  IL_0314: 7bdf1a0004     | ldfld        0x04001adf [T04#6879 | tex]
+  IL_0319: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0324: 1109           | ldloc.s      9
+  IL_0326: 7b5a1a0004     | ldfld        0x04001a5a [T04#6746 | u]
+  IL_0331: 1109           | ldloc.s      9
+  IL_0333: 7b5b1a0004     | ldfld        0x04001a5b [T04#6747 | v]
+  IL_0338: 6f1c08000a     | callvirt     0x0a00081c [T0a#2076 | GetPixelBilinear]
+  IL_0343: 7bae05000a     | ldfld        0x0a0005ae [T0a#1454 | a]
+  IL_0348: 130d           | stloc.s      13
+  IL_0350: 1107           | ldloc.s      7
+  IL_0352: 7be31a0004     | ldfld        0x04001ae3 [T04#6883 | mask]
+  IL_0357: 14             | ldnull       
+  IL_0358: 288c00000a     | call         0x0a00008c [T0a#140 | op_Inequality]
+  IL_0363: 2c40           | brfalse.s    IL_0429 (+64)
+  IL_0365: 1107           | ldloc.s      7
+  IL_0367: 7be31a0004     | ldfld        0x04001ae3 [T04#6883 | mask]
+  IL_0372: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0377: 2c32           | brfalse.s    IL_0429 (+50)
+  IL_0379: 1107           | ldloc.s      7
+  IL_0381: 7be31a0004     | ldfld        0x04001ae3 [T04#6883 | mask]
+  IL_0386: 753a000001     | isinst       0x0100003a [T01#58]
+  IL_0391: 1109           | ldloc.s      9
+  IL_0393: 7b5a1a0004     | ldfld        0x04001a5a [T04#6746 | u]
+  IL_0398: 1109           | ldloc.s      9
+  IL_0400: 7b5b1a0004     | ldfld        0x04001a5b [T04#6747 | v]
+  IL_0405: 6f1c08000a     | callvirt     0x0a00081c [T0a#2076 | GetPixelBilinear]
+  IL_0410: 7bae05000a     | ldfld        0x0a0005ae [T0a#1454 | a]
+  IL_0415: 130e           | stloc.s      14
+  IL_0417: 110e           | ldloc.s      14
+  IL_0419: 110c           | ldloc.s      12
+  IL_0421: 5a             | mul          
+  IL_0422: 289300000a     | call         0x0a000093 [T0a#147 | Clamp01]
+  IL_0427: 130e           | stloc.s      14
+  IL_0429: 1107           | ldloc.s      7
+  IL_0431: 7be41a0004     | ldfld        0x04001ae4 [T04#6884 | maskMode]
+  IL_0436: 2d09           | brtrue.s     IL_0447 (+9)
+  IL_0438: 110d           | ldloc.s      13
+  IL_0440: 110b           | ldloc.s      11
+  IL_0442: 5a             | mul          
+  IL_0443: 130d           | stloc.s      13
+  IL_0445: 2b4d           | br.s         IL_0524 (+77)
+  IL_0447: 1107           | ldloc.s      7
+  IL_0449: 7be41a0004     | ldfld        0x04001ae4 [T04#6884 | maskMode]
+  IL_0454: 17             | ldc.i4.1     
+  IL_0455: 3313           | bne.un.s     IL_0476 (+19)
+  IL_0457: 110d           | ldloc.s      13
+  IL_0459: 110b           | ldloc.s      11
+  IL_0461: 110e           | ldloc.s      14
+  IL_0463: 5a             | mul          
+  IL_0464: 5a             | mul          
+  IL_0465: 130d           | stloc.s      13
+  IL_0467: 2200000000     | ldc.r4       0
+  IL_0472: 130e           | stloc.s      14
+  IL_0474: 2b30           | br.s         IL_0524 (+48)
+  IL_0476: 1107           | ldloc.s      7
+  IL_0478: 7be41a0004     | ldfld        0x04001ae4 [T04#6884 | maskMode]
+  IL_0483: 18             | ldc.i4.2     
+  IL_0484: 3312           | bne.un.s     IL_0504 (+18)
+  IL_0486: 110d           | ldloc.s      13
+  IL_0488: 110b           | ldloc.s      11
+  IL_0490: 220000803f     | ldc.r4       1
+  IL_0495: 110e           | ldloc.s      14
+  IL_0497: 59             | sub          
+  IL_0498: 5a             | mul          
+  IL_0499: 5a             | mul          
+  IL_0500: 130d           | stloc.s      13
+  IL_0502: 2b14           | br.s         IL_0524 (+20)
+  IL_0504: 1107           | ldloc.s      7
+  IL_0506: 7be41a0004     | ldfld        0x04001ae4 [T04#6884 | maskMode]
+  IL_0511: 19             | ldc.i4.3     
+  IL_0512: 330a           | bne.un.s     IL_0524 (+10)
+  IL_0514: 110d           | ldloc.s      13
+  IL_0516: 110b           | ldloc.s      11
+  IL_0518: 110e           | ldloc.s      14
+  IL_0520: 5a             | mul          
+  IL_0521: 5a             | mul          
+  IL_0522: 130d           | stloc.s      13
+  IL_0524: 02             | ldarg.0      
+  IL_0525: 28c62e0006     | call         0x06002ec6 [T06#11974 | get_HeightOverlayBlendMode | RVA=0x0007366e]
+  IL_0530: 2d10           | brtrue.s     IL_0548 (+16)
+  IL_0532: 1104           | ldloc.s      4
+  IL_0534: 110d           | ldloc.s      13
+  IL_0536: 58             | add          
+  IL_0537: 1304           | stloc.s      4
+  IL_0539: 1105           | ldloc.s      5
+  IL_0541: 110e           | ldloc.s      14
+  IL_0543: 58             | add          
+  IL_0544: 1305           | stloc.s      5
+  IL_0546: 2b1f           | br.s         IL_0579 (+31)
+  IL_0548: 02             | ldarg.0      
+  IL_0549: 28c62e0006     | call         0x06002ec6 [T06#11974 | get_HeightOverlayBlendMode | RVA=0x0007366e]
+  IL_0554: 17             | ldc.i4.1     
+  IL_0555: 3316           | bne.un.s     IL_0579 (+22)
+  IL_0557: 110d           | ldloc.s      13
+  IL_0559: 1104           | ldloc.s      4
+  IL_0561: 28d801000a     | call         0x0a0001d8 [T0a#472 | Max]
+  IL_0566: 1304           | stloc.s      4
+  IL_0568: 110e           | ldloc.s      14
+  IL_0570: 1105           | ldloc.s      5
+  IL_0572: 28d801000a     | call         0x0a0001d8 [T0a#472 | Max]
+  IL_0577: 1305           | stloc.s      5
+  IL_0579: de03           | leave.s      IL_0584 (+3)
+  IL_0581: 26             | pop          
+  IL_0582: de00           | leave.s      IL_0584 (+0)
+  IL_0584: 1108           | ldloc.s      8
+  IL_0586: 17             | ldc.i4.1     
+  IL_0587: 58             | add          
+  IL_0588: 1308           | stloc.s      8
+  IL_0590: 1108           | ldloc.s      8
+  IL_0592: 02             | ldarg.0      
+  IL_0593: 7bc71a0004     | ldfld        0x04001ac7 [T04#6855 | m_containingOverlays]
+  IL_0598: 6fb80b000a     | callvirt     0x0a000bb8 [T0a#3000 | get_Count]
+  IL_0603: 3f00feffff     | blt          IL_0096 (-512)
+  IL_0608: 09             | ldloc.3      
+  IL_0609: 289300000a     | call         0x0a000093 [T0a#147 | Clamp01]
+  IL_0614: 0d             | stloc.3      
+  IL_0615: 220000003f     | ldc.r4       0.5
+  IL_0620: 09             | ldloc.3      
+  IL_0621: 59             | sub          
+  IL_0622: 2200000000     | ldc.r4       0
+  IL_0627: 340c           | bge.un.s     IL_0641 (+12)
+  IL_0629: 03             | ldarg.1      
+  IL_0630: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0635: 17             | ldc.i4.1     
+  IL_0636: 7d953b0004     | stfld        0x04003b95 [T04#15253 | isClipped]
+  IL_0641: 220000803f     | ldc.r4       1
+  IL_0646: 1105           | ldloc.s      5
+  IL_0648: 289300000a     | call         0x0a000093 [T0a#147 | Clamp01]
+  IL_0653: 59             | sub          
+  IL_0654: 1305           | stloc.s      5
+  IL_0656: 03             | ldarg.1      
+  IL_0657: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0662: 7c8e3b0004     | ldflda       0x04003b8e [T04#15246 | height]
+  IL_0667: 25             | dup          
+  IL_0668: 4e             | ldind.r4     
+  IL_0669: 1105           | ldloc.s      5
+  IL_0671: 5a             | mul          
+  IL_0672: 56             | stind.r4     
+  IL_0673: 03             | ldarg.1      
+  IL_0674: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0679: 7c8f3b0004     | ldflda       0x04003b8f [T04#15247 | displacementX]
+  IL_0684: 25             | dup          
+  IL_0685: 4e             | ldind.r4     
+  IL_0686: 1105           | ldloc.s      5
+  IL_0688: 5a             | mul          
+  IL_0689: 56             | stind.r4     
+  IL_0690: 03             | ldarg.1      
+  IL_0691: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0696: 7c903b0004     | ldflda       0x04003b90 [T04#15248 | displacementZ]
+  IL_0701: 25             | dup          
+  IL_0702: 4e             | ldind.r4     
+  IL_0703: 1105           | ldloc.s      5
+  IL_0705: 5a             | mul          
+  IL_0706: 56             | stind.r4     
+  IL_0707: 03             | ldarg.1      
+  IL_0708: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0713: 7c8e3b0004     | ldflda       0x04003b8e [T04#15246 | height]
+  IL_0718: 25             | dup          
+  IL_0719: 4e             | ldind.r4     
+  IL_0720: 1104           | ldloc.s      4
+  IL_0722: 58             | add          
+  IL_0723: 56             | stind.r4     
+  IL_0724: 03             | ldarg.1      
+  IL_0725: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0730: 1104           | ldloc.s      4
+  IL_0732: 7d913b0004     | stfld        0x04003b91 [T04#15249 | overlayHeight]
+  IL_0737: 2a             | ret          
+
+--- RID 12173: QueryWaves @ 0x0768a8 (951B, 321 insns, unk=0) ---
+  IL_0000: 04             | ldarg.2      
+  IL_0001: 6fde0b000a     | callvirt     0x0a000bde [T0a#3038 | get_Count]
+  IL_0006: 7e5c1b0004     | ldsfld       0x04001b5c [T04#7004 | GRIDS]
+  IL_0011: 2e22           | beq.s        IL_0047 (+34)
+  IL_0013: 72f7520170     | ldstr        0x700152f7 [tid=0x70,rid=86775]
+  IL_0018: 7e5c1b0004     | ldsfld       0x04001b5c [T04#7004 | GRIDS]
+  IL_0023: 0c             | stloc.2      
+  IL_0024: 1202           | ldloca.s     2
+  IL_0026: 28eb00000a     | call         0x0a0000eb [T0a#235 | ToString]
+  IL_0031: 7280530170     | ldstr        0x70015380 [tid=0x70,rid=86912]
+  IL_0036: 284b01000a     | call         0x0a00014b [T0a#331 | Concat]
+  IL_0041: 735c0b000a     | newobj       0x0a000b5c [T0a#2908 | .ctor]
+  IL_0046: 7a             | throw        
+  IL_0047: 04             | ldarg.2      
+  IL_0048: 16             | ldc.i4.0     
+  IL_0049: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0054: 6fd3310006     | callvirt     0x060031d3 [T06#12755 | get_Channels | RVA=0x00086e92]
+  IL_0059: 7e5b1b0004     | ldsfld       0x04001b5b [T04#7003 | CHANNELS]
+  IL_0064: 2e22           | beq.s        IL_0100 (+34)
+  IL_0066: 7290530170     | ldstr        0x70015390 [tid=0x70,rid=86928]
+  IL_0071: 7e5b1b0004     | ldsfld       0x04001b5b [T04#7003 | CHANNELS]
+  IL_0076: 0c             | stloc.2      
+  IL_0077: 1202           | ldloca.s     2
+  IL_0079: 28eb00000a     | call         0x0a0000eb [T0a#235 | ToString]
+  IL_0084: 7200540170     | ldstr        0x70015400 [tid=0x70,rid=87040]
+  IL_0089: 284b01000a     | call         0x0a00014b [T0a#331 | Concat]
+  IL_0094: 735c0b000a     | newobj       0x0a000b5c [T0a#2908 | .ctor]
+  IL_0099: 7a             | throw        
+  IL_0100: 02             | ldarg.0      
+  IL_0101: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0106: 17             | ldc.i4.1     
+  IL_0107: 2e09           | beq.s        IL_0118 (+9)
+  IL_0109: 02             | ldarg.0      
+  IL_0110: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0115: 2c01           | brfalse.s    IL_0118 (+1)
+  IL_0117: 2a             | ret          
+  IL_0118: 02             | ldarg.0      
+  IL_0119: 7b2e1b0004     | ldfld        0x04001b2e [T04#6958 | posX]
+  IL_0124: 05             | ldarg.3      
+  IL_0125: 7c561a0004     | ldflda       0x04001a56 [T04#6742 | offset]
+  IL_0130: 7b8800000a     | ldfld        0x0a000088 [T0a#136 | x]
+  IL_0135: 58             | add          
+  IL_0136: 0a             | stloc.0      
+  IL_0137: 02             | ldarg.0      
+  IL_0138: 7b2f1b0004     | ldfld        0x04001b2f [T04#6959 | posZ]
+  IL_0143: 05             | ldarg.3      
+  IL_0144: 7c561a0004     | ldflda       0x04001a56 [T04#6742 | offset]
+  IL_0149: 7b8900000a     | ldfld        0x0a000089 [T0a#137 | z]
+  IL_0154: 58             | add          
+  IL_0155: 0b             | stloc.1      
+  IL_0156: 05             | ldarg.3      
+  IL_0157: 7b581a0004     | ldfld        0x04001a58 [T04#6744 | result]
+  IL_0162: 2d10           | brtrue.s     IL_0180 (+16)
+  IL_0164: 05             | ldarg.3      
+  IL_0165: 7e5b1b0004     | ldsfld       0x04001b5b [T04#7003 | CHANNELS]
+  IL_0170: 8ddb010001     | newarr       0x010001db [T01#475]
+  IL_0175: 7d581a0004     | stfld        0x04001a58 [T04#6744 | result]
+  IL_0180: 03             | ldarg.1      
+  IL_0181: 2d01           | brtrue.s     IL_0184 (+1)
+  IL_0183: 2a             | ret          
+  IL_0184: 03             | ldarg.1      
+  IL_0185: 17             | ldc.i4.1     
+  IL_0186: 2e0c           | beq.s        IL_0200 (+12)
+  IL_0188: 02             | ldarg.0      
+  IL_0189: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0194: 17             | ldc.i4.1     
+  IL_0195: 40e2000000     | bne.un       IL_0426 (+226)
+  IL_0200: 02             | ldarg.0      
+  IL_0201: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0206: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0211: 04             | ldarg.2      
+  IL_0212: 02             | ldarg.0      
+  IL_0213: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0218: 06             | ldloc.0      
+  IL_0219: 07             | ldloc.1      
+  IL_0220: 05             | ldarg.3      
+  IL_0221: 288e2f0006     | call         0x06002f8e [T06#12174 | SampleHeightOnly | RVA=0x00078a60]
+  IL_0226: 02             | ldarg.0      
+  IL_0227: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0232: 02             | ldarg.0      
+  IL_0233: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0238: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0243: 16             | ldc.i4.0     
+  IL_0244: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0249: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0254: 02             | ldarg.0      
+  IL_0255: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0260: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0265: 17             | ldc.i4.1     
+  IL_0266: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0271: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0276: 58             | add          
+  IL_0277: 02             | ldarg.0      
+  IL_0278: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0283: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0288: 18             | ldc.i4.2     
+  IL_0289: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0294: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0299: 58             | add          
+  IL_0300: 02             | ldarg.0      
+  IL_0301: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0306: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0311: 19             | ldc.i4.3     
+  IL_0312: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0317: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0322: 58             | add          
+  IL_0323: 7d8e3b0004     | stfld        0x04003b8e [T04#15246 | height]
+  IL_0328: 02             | ldarg.0      
+  IL_0329: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0334: 2200000000     | ldc.r4       0
+  IL_0339: 7d8f3b0004     | stfld        0x04003b8f [T04#15247 | displacementX]
+  IL_0344: 02             | ldarg.0      
+  IL_0345: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0350: 2200000000     | ldc.r4       0
+  IL_0355: 7d903b0004     | stfld        0x04003b90 [T04#15248 | displacementZ]
+  IL_0360: 02             | ldarg.0      
+  IL_0361: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0366: 16             | ldc.i4.0     
+  IL_0367: 7d933b0004     | stfld        0x04003b93 [T04#15251 | iterations]
+  IL_0372: 02             | ldarg.0      
+  IL_0373: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0378: 2200000000     | ldc.r4       0
+  IL_0383: 7d943b0004     | stfld        0x04003b94 [T04#15252 | error]
+  IL_0388: 02             | ldarg.0      
+  IL_0389: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0394: 02             | ldarg.0      
+  IL_0395: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0400: 7b8e3b0004     | ldfld        0x04003b8e [T04#15246 | height]
+  IL_0405: 22000020c2     | ldc.r4       -40
+  IL_0410: 2200002042     | ldc.r4       40
+  IL_0415: 286e00000a     | call         0x0a00006e [T0a#110 | Clamp]
+  IL_0420: 7d8e3b0004     | stfld        0x04003b8e [T04#15246 | height]
+  IL_0425: 2a             | ret          
+  IL_0426: 06             | ldloc.0      
+  IL_0427: 1304           | stloc.s      4
+  IL_0429: 07             | ldloc.1      
+  IL_0430: 1305           | stloc.s      5
+  IL_0432: 06             | ldloc.0      
+  IL_0433: 1306           | stloc.s      6
+  IL_0435: 07             | ldloc.1      
+  IL_0436: 1307           | stloc.s      7
+  IL_0438: 02             | ldarg.0      
+  IL_0439: 7b2d1b0004     | ldfld        0x04001b2d [T04#6957 | minError]
+  IL_0444: 130a           | stloc.s      10
+  IL_0446: 110a           | ldloc.s      10
+  IL_0448: 7e2b1b0004     | ldsfld       0x04001b2b [T04#6955 | MIN_ERROR]
+  IL_0453: 3407           | bge.un.s     IL_0462 (+7)
+  IL_0455: 7e2b1b0004     | ldsfld       0x04001b2b [T04#6955 | MIN_ERROR]
+  IL_0460: 130a           | stloc.s      10
+  IL_0462: 110a           | ldloc.s      10
+  IL_0464: 110a           | ldloc.s      10
+  IL_0466: 5a             | mul          
+  IL_0467: 130a           | stloc.s      10
+  IL_0469: 16             | ldc.i4.0     
+  IL_0470: 130c           | stloc.s      12
+  IL_0472: 1106           | ldloc.s      6
+  IL_0474: 06             | ldloc.0      
+  IL_0475: 1104           | ldloc.s      4
+  IL_0477: 59             | sub          
+  IL_0478: 58             | add          
+  IL_0479: 1306           | stloc.s      6
+  IL_0481: 1107           | ldloc.s      7
+  IL_0483: 07             | ldloc.1      
+  IL_0484: 1105           | ldloc.s      5
+  IL_0486: 59             | sub          
+  IL_0487: 58             | add          
+  IL_0488: 1307           | stloc.s      7
+  IL_0490: 02             | ldarg.0      
+  IL_0491: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0496: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0501: 04             | ldarg.2      
+  IL_0502: 02             | ldarg.0      
+  IL_0503: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0508: 1106           | ldloc.s      6
+  IL_0510: 1107           | ldloc.s      7
+  IL_0512: 05             | ldarg.3      
+  IL_0513: 288f2f0006     | call         0x06002f8f [T06#12175 | Sample | RVA=0x00078bc8]
+  IL_0518: 02             | ldarg.0      
+  IL_0519: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0524: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0529: 16             | ldc.i4.0     
+  IL_0530: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0535: 7b8800000a     | ldfld        0x0a000088 [T0a#136 | x]
+  IL_0540: 02             | ldarg.0      
+  IL_0541: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0546: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0551: 17             | ldc.i4.1     
+  IL_0552: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0557: 7b8800000a     | ldfld        0x0a000088 [T0a#136 | x]
+  IL_0562: 58             | add          
+  IL_0563: 02             | ldarg.0      
+  IL_0564: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0569: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0574: 18             | ldc.i4.2     
+  IL_0575: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0580: 7b8800000a     | ldfld        0x0a000088 [T0a#136 | x]
+  IL_0585: 58             | add          
+  IL_0586: 02             | ldarg.0      
+  IL_0587: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0592: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0597: 19             | ldc.i4.3     
+  IL_0598: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0603: 7b8800000a     | ldfld        0x0a000088 [T0a#136 | x]
+  IL_0608: 58             | add          
+  IL_0609: 1308           | stloc.s      8
+  IL_0611: 02             | ldarg.0      
+  IL_0612: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0617: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0622: 16             | ldc.i4.0     
+  IL_0623: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0628: 7b8900000a     | ldfld        0x0a000089 [T0a#137 | z]
+  IL_0633: 02             | ldarg.0      
+  IL_0634: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0639: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0644: 17             | ldc.i4.1     
+  IL_0645: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0650: 7b8900000a     | ldfld        0x0a000089 [T0a#137 | z]
+  IL_0655: 58             | add          
+  IL_0656: 02             | ldarg.0      
+  IL_0657: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0662: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0667: 18             | ldc.i4.2     
+  IL_0668: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0673: 7b8900000a     | ldfld        0x0a000089 [T0a#137 | z]
+  IL_0678: 58             | add          
+  IL_0679: 02             | ldarg.0      
+  IL_0680: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0685: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0690: 19             | ldc.i4.3     
+  IL_0691: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0696: 7b8900000a     | ldfld        0x0a000089 [T0a#137 | z]
+  IL_0701: 58             | add          
+  IL_0702: 1309           | stloc.s      9
+  IL_0704: 1106           | ldloc.s      6
+  IL_0706: 1108           | ldloc.s      8
+  IL_0708: 58             | add          
+  IL_0709: 1304           | stloc.s      4
+  IL_0711: 1107           | ldloc.s      7
+  IL_0713: 1109           | ldloc.s      9
+  IL_0715: 58             | add          
+  IL_0716: 1305           | stloc.s      5
+  IL_0718: 110c           | ldloc.s      12
+  IL_0720: 17             | ldc.i4.1     
+  IL_0721: 58             | add          
+  IL_0722: 130c           | stloc.s      12
+  IL_0724: 06             | ldloc.0      
+  IL_0725: 1104           | ldloc.s      4
+  IL_0727: 59             | sub          
+  IL_0728: 07             | ldloc.1      
+  IL_0729: 1105           | ldloc.s      5
+  IL_0731: 59             | sub          
+  IL_0732: 0d             | stloc.3      
+  IL_0733: 25             | dup          
+  IL_0734: 5a             | mul          
+  IL_0735: 09             | ldloc.3      
+  IL_0736: 09             | ldloc.3      
+  IL_0737: 5a             | mul          
+  IL_0738: 58             | add          
+  IL_0739: 130b           | stloc.s      11
+  IL_0741: 110b           | ldloc.s      11
+  IL_0743: 110a           | ldloc.s      10
+  IL_0745: 360c           | ble.un.s     IL_0759 (+12)
+  IL_0747: 110c           | ldloc.s      12
+  IL_0749: 7e2c1b0004     | ldsfld       0x04001b2c [T04#6956 | MAX_ITERATIONS]
+  IL_0754: 3ee1feffff     | ble          IL_0472 (-287)
+  IL_0759: 02             | ldarg.0      
+  IL_0760: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0765: 02             | ldarg.0      
+  IL_0766: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0771: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0776: 16             | ldc.i4.0     
+  IL_0777: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0782: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0787: 02             | ldarg.0      
+  IL_0788: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0793: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0798: 17             | ldc.i4.1     
+  IL_0799: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0804: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0809: 58             | add          
+  IL_0810: 02             | ldarg.0      
+  IL_0811: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0816: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0821: 18             | ldc.i4.2     
+  IL_0822: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0827: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0832: 58             | add          
+  IL_0833: 02             | ldarg.0      
+  IL_0834: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0839: 7b923b0004     | ldfld        0x04003b92 [T04#15250 | displacement]
+  IL_0844: 19             | ldc.i4.3     
+  IL_0845: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0850: 7b9200000a     | ldfld        0x0a000092 [T0a#146 | y]
+  IL_0855: 58             | add          
+  IL_0856: 7d8e3b0004     | stfld        0x04003b8e [T04#15246 | height]
+  IL_0861: 02             | ldarg.0      
+  IL_0862: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0867: 1108           | ldloc.s      8
+  IL_0869: 7d8f3b0004     | stfld        0x04003b8f [T04#15247 | displacementX]
+  IL_0874: 02             | ldarg.0      
+  IL_0875: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0880: 1109           | ldloc.s      9
+  IL_0882: 7d903b0004     | stfld        0x04003b90 [T04#15248 | displacementZ]
+  IL_0887: 02             | ldarg.0      
+  IL_0888: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0893: 110c           | ldloc.s      12
+  IL_0895: 7d933b0004     | stfld        0x04003b93 [T04#15251 | iterations]
+  IL_0900: 02             | ldarg.0      
+  IL_0901: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0906: 110b           | ldloc.s      11
+  IL_0908: 7d943b0004     | stfld        0x04003b94 [T04#15252 | error]
+  IL_0913: 02             | ldarg.0      
+  IL_0914: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0919: 02             | ldarg.0      
+  IL_0920: 7c351b0004     | ldflda       0x04001b35 [T04#6965 | result]
+  IL_0925: 7b8e3b0004     | ldfld        0x04003b8e [T04#15246 | height]
+  IL_0930: 22000020c2     | ldc.r4       -40
+  IL_0935: 2200002042     | ldc.r4       40
+  IL_0940: 286e00000a     | call         0x0a00006e [T0a#110 | Clamp]
+  IL_0945: 7d8e3b0004     | stfld        0x04003b8e [T04#15246 | height]
+  IL_0950: 2a             | ret          
+
+--- RID 12174: SampleHeightOnly @ 0x076c6c (345B, 152 insns, unk=0) ---
+  IL_0000: 0e05           | ldarg.s      5
+  IL_0002: 7b581a0004     | ldfld        0x04001a58 [T04#6744 | result]
+  IL_0007: 0c             | stloc.2      
+  IL_0008: 04             | ldarg.2      
+  IL_0009: 16             | ldc.i4.0     
+  IL_0010: 91             | ldelem.u1    
+  IL_0011: 2c4f           | brfalse.s    IL_0092 (+79)
+  IL_0013: 0e05           | ldarg.s      5
+  IL_0015: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0020: 16             | ldc.i4.0     
+  IL_0021: 3145           | ble.s        IL_0092 (+69)
+  IL_0023: 05             | ldarg.3      
+  IL_0024: 0e05           | ldarg.s      5
+  IL_0026: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0031: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0036: 5a             | mul          
+  IL_0037: 0a             | stloc.0      
+  IL_0038: 0e04           | ldarg.s      4
+  IL_0040: 0e05           | ldarg.s      5
+  IL_0042: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0047: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0052: 5a             | mul          
+  IL_0053: 0b             | stloc.1      
+  IL_0054: 03             | ldarg.1      
+  IL_0055: 16             | ldc.i4.0     
+  IL_0056: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0061: 06             | ldloc.0      
+  IL_0062: 07             | ldloc.1      
+  IL_0063: 08             | ldloc.2      
+  IL_0064: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0069: 02             | ldarg.0      
+  IL_0070: 16             | ldc.i4.0     
+  IL_0071: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0076: 08             | ldloc.2      
+  IL_0077: 17             | ldc.i4.1     
+  IL_0078: 98             | ldelem.r4    
+  IL_0079: 0e05           | ldarg.s      5
+  IL_0081: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0086: 5a             | mul          
+  IL_0087: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0092: 04             | ldarg.2      
+  IL_0093: 17             | ldc.i4.1     
+  IL_0094: 91             | ldelem.u1    
+  IL_0095: 2c4f           | brfalse.s    IL_0176 (+79)
+  IL_0097: 0e05           | ldarg.s      5
+  IL_0099: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0104: 17             | ldc.i4.1     
+  IL_0105: 3145           | ble.s        IL_0176 (+69)
+  IL_0107: 05             | ldarg.3      
+  IL_0108: 0e05           | ldarg.s      5
+  IL_0110: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0115: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0120: 5a             | mul          
+  IL_0121: 0a             | stloc.0      
+  IL_0122: 0e04           | ldarg.s      4
+  IL_0124: 0e05           | ldarg.s      5
+  IL_0126: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0131: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0136: 5a             | mul          
+  IL_0137: 0b             | stloc.1      
+  IL_0138: 03             | ldarg.1      
+  IL_0139: 17             | ldc.i4.1     
+  IL_0140: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0145: 06             | ldloc.0      
+  IL_0146: 07             | ldloc.1      
+  IL_0147: 08             | ldloc.2      
+  IL_0148: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0153: 02             | ldarg.0      
+  IL_0154: 17             | ldc.i4.1     
+  IL_0155: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0160: 08             | ldloc.2      
+  IL_0161: 17             | ldc.i4.1     
+  IL_0162: 98             | ldelem.r4    
+  IL_0163: 0e05           | ldarg.s      5
+  IL_0165: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0170: 5a             | mul          
+  IL_0171: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0176: 04             | ldarg.2      
+  IL_0177: 18             | ldc.i4.2     
+  IL_0178: 91             | ldelem.u1    
+  IL_0179: 2c4f           | brfalse.s    IL_0260 (+79)
+  IL_0181: 0e05           | ldarg.s      5
+  IL_0183: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0188: 18             | ldc.i4.2     
+  IL_0189: 3145           | ble.s        IL_0260 (+69)
+  IL_0191: 05             | ldarg.3      
+  IL_0192: 0e05           | ldarg.s      5
+  IL_0194: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0199: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0204: 5a             | mul          
+  IL_0205: 0a             | stloc.0      
+  IL_0206: 0e04           | ldarg.s      4
+  IL_0208: 0e05           | ldarg.s      5
+  IL_0210: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0215: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0220: 5a             | mul          
+  IL_0221: 0b             | stloc.1      
+  IL_0222: 03             | ldarg.1      
+  IL_0223: 18             | ldc.i4.2     
+  IL_0224: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0229: 06             | ldloc.0      
+  IL_0230: 07             | ldloc.1      
+  IL_0231: 08             | ldloc.2      
+  IL_0232: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0237: 02             | ldarg.0      
+  IL_0238: 18             | ldc.i4.2     
+  IL_0239: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0244: 08             | ldloc.2      
+  IL_0245: 17             | ldc.i4.1     
+  IL_0246: 98             | ldelem.r4    
+  IL_0247: 0e05           | ldarg.s      5
+  IL_0249: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0254: 5a             | mul          
+  IL_0255: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0260: 04             | ldarg.2      
+  IL_0261: 19             | ldc.i4.3     
+  IL_0262: 91             | ldelem.u1    
+  IL_0263: 2c4f           | brfalse.s    IL_0344 (+79)
+  IL_0265: 0e05           | ldarg.s      5
+  IL_0267: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0272: 19             | ldc.i4.3     
+  IL_0273: 3145           | ble.s        IL_0344 (+69)
+  IL_0275: 05             | ldarg.3      
+  IL_0276: 0e05           | ldarg.s      5
+  IL_0278: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0283: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0288: 5a             | mul          
+  IL_0289: 0a             | stloc.0      
+  IL_0290: 0e04           | ldarg.s      4
+  IL_0292: 0e05           | ldarg.s      5
+  IL_0294: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0299: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0304: 5a             | mul          
+  IL_0305: 0b             | stloc.1      
+  IL_0306: 03             | ldarg.1      
+  IL_0307: 19             | ldc.i4.3     
+  IL_0308: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0313: 06             | ldloc.0      
+  IL_0314: 07             | ldloc.1      
+  IL_0315: 08             | ldloc.2      
+  IL_0316: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0321: 02             | ldarg.0      
+  IL_0322: 19             | ldc.i4.3     
+  IL_0323: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0328: 08             | ldloc.2      
+  IL_0329: 17             | ldc.i4.1     
+  IL_0330: 98             | ldelem.r4    
+  IL_0331: 0e05           | ldarg.s      5
+  IL_0333: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0338: 5a             | mul          
+  IL_0339: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0344: 2a             | ret          
+
+--- RID 12175: Sample @ 0x076dd4 (581B, 240 insns, unk=0) ---
+  IL_0000: 0e05           | ldarg.s      5
+  IL_0002: 7b581a0004     | ldfld        0x04001a58 [T04#6744 | result]
+  IL_0007: 0c             | stloc.2      
+  IL_0008: 04             | ldarg.2      
+  IL_0009: 16             | ldc.i4.0     
+  IL_0010: 91             | ldelem.u1    
+  IL_0011: 3987000000     | brfalse      IL_0151 (+135)
+  IL_0016: 0e05           | ldarg.s      5
+  IL_0018: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0023: 16             | ldc.i4.0     
+  IL_0024: 317d           | ble.s        IL_0151 (+125)
+  IL_0026: 05             | ldarg.3      
+  IL_0027: 0e05           | ldarg.s      5
+  IL_0029: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0034: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0039: 5a             | mul          
+  IL_0040: 0a             | stloc.0      
+  IL_0041: 0e04           | ldarg.s      4
+  IL_0043: 0e05           | ldarg.s      5
+  IL_0045: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0050: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0055: 5a             | mul          
+  IL_0056: 0b             | stloc.1      
+  IL_0057: 03             | ldarg.1      
+  IL_0058: 16             | ldc.i4.0     
+  IL_0059: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0064: 06             | ldloc.0      
+  IL_0065: 07             | ldloc.1      
+  IL_0066: 08             | ldloc.2      
+  IL_0067: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0072: 02             | ldarg.0      
+  IL_0073: 16             | ldc.i4.0     
+  IL_0074: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0079: 08             | ldloc.2      
+  IL_0080: 16             | ldc.i4.0     
+  IL_0081: 98             | ldelem.r4    
+  IL_0082: 0e05           | ldarg.s      5
+  IL_0084: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0089: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0094: 5a             | mul          
+  IL_0095: 7d8800000a     | stfld        0x0a000088 [T0a#136 | x]
+  IL_0100: 02             | ldarg.0      
+  IL_0101: 16             | ldc.i4.0     
+  IL_0102: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0107: 08             | ldloc.2      
+  IL_0108: 17             | ldc.i4.1     
+  IL_0109: 98             | ldelem.r4    
+  IL_0110: 0e05           | ldarg.s      5
+  IL_0112: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0117: 5a             | mul          
+  IL_0118: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0123: 02             | ldarg.0      
+  IL_0124: 16             | ldc.i4.0     
+  IL_0125: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0130: 08             | ldloc.2      
+  IL_0131: 18             | ldc.i4.2     
+  IL_0132: 98             | ldelem.r4    
+  IL_0133: 0e05           | ldarg.s      5
+  IL_0135: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0140: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0145: 5a             | mul          
+  IL_0146: 7d8900000a     | stfld        0x0a000089 [T0a#137 | z]
+  IL_0151: 04             | ldarg.2      
+  IL_0152: 17             | ldc.i4.1     
+  IL_0153: 91             | ldelem.u1    
+  IL_0154: 3987000000     | brfalse      IL_0294 (+135)
+  IL_0159: 0e05           | ldarg.s      5
+  IL_0161: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0166: 17             | ldc.i4.1     
+  IL_0167: 317d           | ble.s        IL_0294 (+125)
+  IL_0169: 05             | ldarg.3      
+  IL_0170: 0e05           | ldarg.s      5
+  IL_0172: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0177: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0182: 5a             | mul          
+  IL_0183: 0a             | stloc.0      
+  IL_0184: 0e04           | ldarg.s      4
+  IL_0186: 0e05           | ldarg.s      5
+  IL_0188: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0193: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0198: 5a             | mul          
+  IL_0199: 0b             | stloc.1      
+  IL_0200: 03             | ldarg.1      
+  IL_0201: 17             | ldc.i4.1     
+  IL_0202: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0207: 06             | ldloc.0      
+  IL_0208: 07             | ldloc.1      
+  IL_0209: 08             | ldloc.2      
+  IL_0210: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0215: 02             | ldarg.0      
+  IL_0216: 17             | ldc.i4.1     
+  IL_0217: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0222: 08             | ldloc.2      
+  IL_0223: 16             | ldc.i4.0     
+  IL_0224: 98             | ldelem.r4    
+  IL_0225: 0e05           | ldarg.s      5
+  IL_0227: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0232: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0237: 5a             | mul          
+  IL_0238: 7d8800000a     | stfld        0x0a000088 [T0a#136 | x]
+  IL_0243: 02             | ldarg.0      
+  IL_0244: 17             | ldc.i4.1     
+  IL_0245: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0250: 08             | ldloc.2      
+  IL_0251: 17             | ldc.i4.1     
+  IL_0252: 98             | ldelem.r4    
+  IL_0253: 0e05           | ldarg.s      5
+  IL_0255: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0260: 5a             | mul          
+  IL_0261: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0266: 02             | ldarg.0      
+  IL_0267: 17             | ldc.i4.1     
+  IL_0268: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0273: 08             | ldloc.2      
+  IL_0274: 18             | ldc.i4.2     
+  IL_0275: 98             | ldelem.r4    
+  IL_0276: 0e05           | ldarg.s      5
+  IL_0278: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0283: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0288: 5a             | mul          
+  IL_0289: 7d8900000a     | stfld        0x0a000089 [T0a#137 | z]
+  IL_0294: 04             | ldarg.2      
+  IL_0295: 18             | ldc.i4.2     
+  IL_0296: 91             | ldelem.u1    
+  IL_0297: 3987000000     | brfalse      IL_0437 (+135)
+  IL_0302: 0e05           | ldarg.s      5
+  IL_0304: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0309: 18             | ldc.i4.2     
+  IL_0310: 317d           | ble.s        IL_0437 (+125)
+  IL_0312: 05             | ldarg.3      
+  IL_0313: 0e05           | ldarg.s      5
+  IL_0315: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0320: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0325: 5a             | mul          
+  IL_0326: 0a             | stloc.0      
+  IL_0327: 0e04           | ldarg.s      4
+  IL_0329: 0e05           | ldarg.s      5
+  IL_0331: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0336: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0341: 5a             | mul          
+  IL_0342: 0b             | stloc.1      
+  IL_0343: 03             | ldarg.1      
+  IL_0344: 18             | ldc.i4.2     
+  IL_0345: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0350: 06             | ldloc.0      
+  IL_0351: 07             | ldloc.1      
+  IL_0352: 08             | ldloc.2      
+  IL_0353: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0358: 02             | ldarg.0      
+  IL_0359: 18             | ldc.i4.2     
+  IL_0360: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0365: 08             | ldloc.2      
+  IL_0366: 16             | ldc.i4.0     
+  IL_0367: 98             | ldelem.r4    
+  IL_0368: 0e05           | ldarg.s      5
+  IL_0370: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0375: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0380: 5a             | mul          
+  IL_0381: 7d8800000a     | stfld        0x0a000088 [T0a#136 | x]
+  IL_0386: 02             | ldarg.0      
+  IL_0387: 18             | ldc.i4.2     
+  IL_0388: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0393: 08             | ldloc.2      
+  IL_0394: 17             | ldc.i4.1     
+  IL_0395: 98             | ldelem.r4    
+  IL_0396: 0e05           | ldarg.s      5
+  IL_0398: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0403: 5a             | mul          
+  IL_0404: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0409: 02             | ldarg.0      
+  IL_0410: 18             | ldc.i4.2     
+  IL_0411: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0416: 08             | ldloc.2      
+  IL_0417: 18             | ldc.i4.2     
+  IL_0418: 98             | ldelem.r4    
+  IL_0419: 0e05           | ldarg.s      5
+  IL_0421: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0426: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0431: 5a             | mul          
+  IL_0432: 7d8900000a     | stfld        0x0a000089 [T0a#137 | z]
+  IL_0437: 04             | ldarg.2      
+  IL_0438: 19             | ldc.i4.3     
+  IL_0439: 91             | ldelem.u1    
+  IL_0440: 3987000000     | brfalse      IL_0580 (+135)
+  IL_0445: 0e05           | ldarg.s      5
+  IL_0447: 7b571a0004     | ldfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0452: 19             | ldc.i4.3     
+  IL_0453: 317d           | ble.s        IL_0580 (+125)
+  IL_0455: 05             | ldarg.3      
+  IL_0456: 0e05           | ldarg.s      5
+  IL_0458: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0463: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0468: 5a             | mul          
+  IL_0469: 0a             | stloc.0      
+  IL_0470: 0e04           | ldarg.s      4
+  IL_0472: 0e05           | ldarg.s      5
+  IL_0474: 7c531a0004     | ldflda       0x04001a53 [T04#6739 | invGridSizes]
+  IL_0479: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0484: 5a             | mul          
+  IL_0485: 0b             | stloc.1      
+  IL_0486: 03             | ldarg.1      
+  IL_0487: 19             | ldc.i4.3     
+  IL_0488: 6fdf0b000a     | callvirt     0x0a000bdf [T0a#3039 | get_Item]
+  IL_0493: 06             | ldloc.0      
+  IL_0494: 07             | ldloc.1      
+  IL_0495: 08             | ldloc.2      
+  IL_0496: 6fdf310006     | callvirt     0x060031df [T06#12767 | Get | RVA=0x000870a8]
+  IL_0501: 02             | ldarg.0      
+  IL_0502: 19             | ldc.i4.3     
+  IL_0503: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0508: 08             | ldloc.2      
+  IL_0509: 16             | ldc.i4.0     
+  IL_0510: 98             | ldelem.r4    
+  IL_0511: 0e05           | ldarg.s      5
+  IL_0513: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0518: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0523: 5a             | mul          
+  IL_0524: 7d8800000a     | stfld        0x0a000088 [T0a#136 | x]
+  IL_0529: 02             | ldarg.0      
+  IL_0530: 19             | ldc.i4.3     
+  IL_0531: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0536: 08             | ldloc.2      
+  IL_0537: 17             | ldc.i4.1     
+  IL_0538: 98             | ldelem.r4    
+  IL_0539: 0e05           | ldarg.s      5
+  IL_0541: 7b541a0004     | ldfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0546: 5a             | mul          
+  IL_0547: 7d9200000a     | stfld        0x0a000092 [T0a#146 | y]
+  IL_0552: 02             | ldarg.0      
+  IL_0553: 19             | ldc.i4.3     
+  IL_0554: 8f0e000001     | ldelema      0x0100000e [T01#14]
+  IL_0559: 08             | ldloc.2      
+  IL_0560: 18             | ldc.i4.2     
+  IL_0561: 98             | ldelem.r4    
+  IL_0562: 0e05           | ldarg.s      5
+  IL_0564: 7c551a0004     | ldflda       0x04001a55 [T04#6741 | choppyness]
+  IL_0569: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0574: 5a             | mul          
+  IL_0575: 7d8900000a     | stfld        0x0a000089 [T0a#137 | z]
+  IL_0580: 2a             | ret          
+
+--- RID 12430: UpdateQueryScaling @ 0x07e2c8 (305B, 95 insns, unk=0) ---
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 02             | ldarg.0      
+  IL_0002: 7b1b1c0004     | ldfld        0x04001c1b [T04#7195 | m_conditions]
+  IL_0007: 16             | ldc.i4.0     
+  IL_0008: 9a             | ldelem.ref   
+  IL_0009: 6ff02f0006     | callvirt     0x06002ff0 [T06#12272 | get_Choppyness | RVA=0x0007b22b]
+  IL_0014: 02             | ldarg.0      
+  IL_0015: 7b041c0004     | ldfld        0x04001c04 [T04#7172 | choppyness]
+  IL_0020: 2200000000     | ldc.r4       0
+  IL_0025: 229a99993f     | ldc.r4       1.2
+  IL_0030: 286e00000a     | call         0x0a00006e [T0a#110 | Clamp]
+  IL_0035: 288d01000a     | call         0x0a00018d [T0a#397 | op_Multiply]
+  IL_0040: 7d191c0004     | stfld        0x04001c19 [T04#7193 | m_choppyness]
+  IL_0045: 02             | ldarg.0      
+  IL_0046: 02             | ldarg.0      
+  IL_0047: 7b1b1c0004     | ldfld        0x04001c1b [T04#7195 | m_conditions]
+  IL_0052: 16             | ldc.i4.0     
+  IL_0053: 9a             | ldelem.ref   
+  IL_0054: 6fee2f0006     | callvirt     0x06002fee [T06#12270 | get_GridSizes | RVA=0x0007b21a]
+  IL_0059: 7d181c0004     | stfld        0x04001c18 [T04#7192 | m_gridSizes]
+  IL_0064: 1200           | ldloca.s     0
+  IL_0066: fe1573000001   | initobj      0x01000073 [T01#115]
+  IL_0072: 1200           | ldloca.s     0
+  IL_0074: 220000803f     | ldc.r4       1
+  IL_0079: 02             | ldarg.0      
+  IL_0080: 2881300006     | call         0x06003081 [T06#12417 | get_GridSizes | RVA=0x0007f9cd]
+  IL_0085: 7ba702000a     | ldfld        0x0a0002a7 [T0a#679 | x]
+  IL_0090: 02             | ldarg.0      
+  IL_0091: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0096: 5a             | mul          
+  IL_0097: 5b             | div          
+  IL_0098: 7da702000a     | stfld        0x0a0002a7 [T0a#679 | x]
+  IL_0103: 1200           | ldloca.s     0
+  IL_0105: 220000803f     | ldc.r4       1
+  IL_0110: 02             | ldarg.0      
+  IL_0111: 2881300006     | call         0x06003081 [T06#12417 | get_GridSizes | RVA=0x0007f9cd]
+  IL_0116: 7ba802000a     | ldfld        0x0a0002a8 [T0a#680 | y]
+  IL_0121: 02             | ldarg.0      
+  IL_0122: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0127: 5a             | mul          
+  IL_0128: 5b             | div          
+  IL_0129: 7da802000a     | stfld        0x0a0002a8 [T0a#680 | y]
+  IL_0134: 1200           | ldloca.s     0
+  IL_0136: 220000803f     | ldc.r4       1
+  IL_0141: 02             | ldarg.0      
+  IL_0142: 2881300006     | call         0x06003081 [T06#12417 | get_GridSizes | RVA=0x0007f9cd]
+  IL_0147: 7ba902000a     | ldfld        0x0a0002a9 [T0a#681 | z]
+  IL_0152: 02             | ldarg.0      
+  IL_0153: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0158: 5a             | mul          
+  IL_0159: 5b             | div          
+  IL_0160: 7da902000a     | stfld        0x0a0002a9 [T0a#681 | z]
+  IL_0165: 1200           | ldloca.s     0
+  IL_0167: 220000803f     | ldc.r4       1
+  IL_0172: 02             | ldarg.0      
+  IL_0173: 2881300006     | call         0x06003081 [T06#12417 | get_GridSizes | RVA=0x0007f9cd]
+  IL_0178: 7ba502000a     | ldfld        0x0a0002a5 [T0a#677 | w]
+  IL_0183: 02             | ldarg.0      
+  IL_0184: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0189: 5a             | mul          
+  IL_0190: 5b             | div          
+  IL_0191: 7da502000a     | stfld        0x0a0002a5 [T0a#677 | w]
+  IL_0196: 02             | ldarg.0      
+  IL_0197: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0202: 06             | ldloc.0      
+  IL_0203: 7d531a0004     | stfld        0x04001a53 [T04#6739 | invGridSizes]
+  IL_0208: 02             | ldarg.0      
+  IL_0209: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0214: 02             | ldarg.0      
+  IL_0215: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0220: 7d541a0004     | stfld        0x04001a54 [T04#6740 | scaleY]
+  IL_0225: 02             | ldarg.0      
+  IL_0226: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0231: 02             | ldarg.0      
+  IL_0232: 2882300006     | call         0x06003082 [T06#12418 | get_Choppyness | RVA=0x0007f9d5]
+  IL_0237: 02             | ldarg.0      
+  IL_0238: 7b0a1c0004     | ldfld        0x04001c0a [T04#7178 | gridScale]
+  IL_0243: 288d01000a     | call         0x0a00018d [T0a#397 | op_Multiply]
+  IL_0248: 7d551a0004     | stfld        0x04001a55 [T04#6741 | choppyness]
+  IL_0253: 02             | ldarg.0      
+  IL_0254: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0259: 02             | ldarg.0      
+  IL_0260: 7bf7190004     | ldfld        0x040019f7 [T04#6647 | m_ocean]
+  IL_0265: 6f352e0006     | callvirt     0x06002e35 [T06#11829 | get_PositionOffset | RVA=0x0006ff9f]
+  IL_0270: 7d561a0004     | stfld        0x04001a56 [T04#6742 | offset]
+  IL_0275: 02             | ldarg.0      
+  IL_0276: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0281: 02             | ldarg.0      
+  IL_0282: 7b1b1c0004     | ldfld        0x04001c1b [T04#7195 | m_conditions]
+  IL_0287: 16             | ldc.i4.0     
+  IL_0288: 9a             | ldelem.ref   
+  IL_0289: 6ff42f0006     | callvirt     0x06002ff4 [T06#12276 | get_Key | RVA=0x0007b24d]
+  IL_0294: 6f0f300006     | callvirt     0x0600300f [T06#12303 | get_NumGrids | RVA=0x0007b647]
+  IL_0299: 7d571a0004     | stfld        0x04001a57 [T04#6743 | numGrids]
+  IL_0304: 2a             | ret          
+
+--- RID 12436: QueryWaves @ 0x07ecd8 (110B, 52 insns, unk=0) ---
+  IL_0000: 02             | ldarg.0      
+  IL_0001: 28ab00000a     | call         0x0a0000ab [T0a#171 | get_enabled]
+  IL_0006: 2d01           | brtrue.s     IL_0009 (+1)
+  IL_0008: 2a             | ret          
+  IL_0009: 02             | ldarg.0      
+  IL_0010: 2885300006     | call         0x06003085 [T06#12421 | get_DisplacementBuffer | RVA=0x0007f9ee]
+  IL_0015: 0a             | stloc.0      
+  IL_0016: 06             | ldloc.0      
+  IL_0017: 2d01           | brtrue.s     IL_0020 (+1)
+  IL_0019: 2a             | ret          
+  IL_0020: 02             | ldarg.0      
+  IL_0021: 7bff1b0004     | ldfld        0x04001bff [T04#7167 | disableReadBack]
+  IL_0026: 2c09           | brfalse.s    IL_0037 (+9)
+  IL_0028: 06             | ldloc.0      
+  IL_0029: 6f852f0006     | callvirt     0x06002f85 [T06#12165 | get_IsGPU]
+  IL_0034: 2c01           | brfalse.s    IL_0037 (+1)
+  IL_0036: 2a             | ret          
+  IL_0037: 03             | ldarg.1      
+  IL_0038: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0043: 17             | ldc.i4.1     
+  IL_0044: 2e09           | beq.s        IL_0055 (+9)
+  IL_0046: 03             | ldarg.1      
+  IL_0047: 7b331b0004     | ldfld        0x04001b33 [T04#6963 | mode]
+  IL_0052: 2c01           | brfalse.s    IL_0055 (+1)
+  IL_0054: 2a             | ret          
+  IL_0055: 03             | ldarg.1      
+  IL_0056: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0061: 16             | ldc.i4.0     
+  IL_0062: 91             | ldelem.u1    
+  IL_0063: 2d1f           | brtrue.s     IL_0096 (+31)
+  IL_0065: 03             | ldarg.1      
+  IL_0066: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0071: 17             | ldc.i4.1     
+  IL_0072: 91             | ldelem.u1    
+  IL_0073: 2d15           | brtrue.s     IL_0096 (+21)
+  IL_0075: 03             | ldarg.1      
+  IL_0076: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0081: 18             | ldc.i4.2     
+  IL_0082: 91             | ldelem.u1    
+  IL_0083: 2d0b           | brtrue.s     IL_0096 (+11)
+  IL_0085: 03             | ldarg.1      
+  IL_0086: 7b301b0004     | ldfld        0x04001b30 [T04#6960 | sampleSpectrum]
+  IL_0091: 19             | ldc.i4.3     
+  IL_0092: 91             | ldelem.u1    
+  IL_0093: 2d01           | brtrue.s     IL_0096 (+1)
+  IL_0095: 2a             | ret          
+  IL_0096: 06             | ldloc.0      
+  IL_0097: 03             | ldarg.1      
+  IL_0098: 02             | ldarg.0      
+  IL_0099: 7b211c0004     | ldfld        0x04001c21 [T04#7201 | m_queryScaling]
+  IL_0104: 6f8b2f0006     | callvirt     0x06002f8b [T06#12171 | QueryWaves]
+  IL_0109: 2a             | ret          
+
+_____________
+
+
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > generate_verify_report.py                                                                        > import os
+> import struct                                                                           > from datetime import datetime                                                           > from typing import Dict, List, Optional, Tuple                                          > import dnfile                                                                           >                                                                                          > DLL_PATH = "/mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Dat/Managed/Assembly-CSharp.dll"                                                             > OUT_FILE = "VERIFY_SUBMISSION_REPORT.txt"                                               >                                                                                         > TARGET_RIDS = [11859, 11860, 11988, 12173, 12174, 12175, 12430, 12436]                  >                                                                                         > KEY_TOKENS = [                                                                          >     0x040019CC,  # Ceto.Ocean.level                                                     >     0x040019EB,  # Ceto.Ocean.m_query                                                   >     0x04001A53,  # invGridSizes                                                         >     0x04001A54,  # scaleY                                                               >     0x04001A55,  # choppyness                                                           >     0x04001A56,  # offset                                                               >     0x04001A57,  # numGrids
+>     0x04001B2E,  # WaveQuery.posX                                                       ,>     0x04001B2F,  # WaveQuery.posZ
+>     0x04001B30,  # WaveQuery.sampleSpectrum                                             >     0x04001B31,  # WaveQuery.sampleOverlay                                              >     0x04001B33,  # WaveQuery.mode                                                       >     0x04001B35,  # WaveQuery.result                                                     >     0x04003B8E,  # WaveQueryResult.height                                               0>     0x04003B8F,  # WaveQueryResult.displacementX                                       >     0x04003B90,  # WaveQueryResult.displacementZ                                        >     0x04003B95,  # WaveQueryResult.isClipped                                            >     0x06002E2D,  # Ocean.get_Spectrum                                                   >     0x06002E38,  # Ocean.get_OverlayManager                                             >     0x06002ED4,  # OverlayManager.QueryWaves                                             >     0x06002F8B,  # QueryDisplacements.QueryWaves
+>     0x06002F8E,  # QueryDisplacements.SampleHeightOnly                                  >     0x06002F8F,  # QueryDisplacements.Sample                                            >     0x06003094,  # WaveSpectrum.QueryWaves                                              >     0x06005E6C,  # WaveQueryResult.Clear                                                > ]                                                                                       >                                                                                         (> OP1: Dict[int, Tuple[str, Optional[str]]] = {                                          >     0x00: ("nop", None), 0x01: ("break", None), 0x02: ("ldarg.0", None), 0x03: ("ldarg.1", None),                                                                                 ,>     0x04: ("ldarg.2", None), 0x05: ("ldarg.3", None), 0x06: ("ldloc.0", None), 0x07: ("dloc.1", None),                                                                           >     0x08: ("ldloc.2", None), 0x09: ("ldloc.3", None), 0x0A: ("stloc.0", None), 0x0B: ("stloc.1", None),                                                                           >     0x0C: ("stloc.2", None), 0x0D: ("stloc.3", None), 0x0E: ("ldarg.s", "u1"), 0x0F: ("ldarga.s", "u1"),                                                                          >     0x10: ("starg.s", "u1"), 0x11: ("ldloc.s", "u1"), 0x12: ("ldloca.s", "u1"), 0x13: ("stloc.s", "u1"),                                                                          >     0x14: ("ldnull", None), 0x15: ("ldc.i4.m1", None), 0x16: ("ldc.i4.0", None), 0x17: ("ldc.i4.1", None),                                                                        >     0x18: ("ldc.i4.2", None), 0x19: ("ldc.i4.3", None), 0x1A: ("ldc.i4.4", None), 0x1B: ("ldc.i4.5", None),
+>     0x1C: ("ldc.i4.6", None), 0x1D: ("ldc.i4.7", None), 0x1E: ("ldc.i4.8", None), 0x1F: ("ldc.i4.s", "i1"),                                                                       >     0x20: ("ldc.i4", "i4"), 0x21: ("ldc.i8", "i8"), 0x22: ("ldc.r4", "r4"), 0x23: ("ldc.r8", "r8"),                                                                               >     0x25: ("dup", None), 0x26: ("pop", None), 0x27: ("jmp", "tok"), 0x28: ("call", "tok"),                                                                                        >     0x29: ("calli", "tok"), 0x2A: ("ret", None), 0x2B: ("br.s", "br1"), 0x2C: ("brfalse.s", "br1"),                                                                               >     0x2D: ("brtrue.s", "br1"), 0x2E: ("beq.s", "br1"), 0x2F: ("bge.s", "br1"), 0x30: ("bgt.s", "br1"),                                                                            >     0x31: ("ble.s", "br1"), 0x32: ("blt.s", "br1"), 0x33: ("bne.un.s", "br1"), 0x34: ("bge.un.s", "br1"),                                                                         >     0x35: ("bgt.un.s", "br1"), 0x36: ("ble.un.s", "br1"), 0x37: ("blt.un.s", "br1"), 0x38: ("br", "br4"),                                                                         >     0x39: ("brfalse", "br4"), 0x3A: ("brtrue", "br4"), 0x3B: ("beq", "br4"), 0x3C: ("bge", "br4"),                                                                                >     0x3D: ("bgt", "br4"), 0x3E: ("ble", "br4"), 0x3F: ("blt", "br4"), 0x40: ("bne.un", "br4"),                                                                                    >     0x41: ("bge.un", "br4"), 0x42: ("bgt.un", "br4"), 0x43: ("ble.un", "br4"), 0x44: ("blt.un", "br4"),                                                                           H>     0x46: ("ldind.i1", None), 0x47: ("ldind.u1", None), 0x48: ("ldind.i2", None), 0x49:("ldind.u2", None),                                                                       >     0x4A: ("ldind.i4", None), 0x4B: ("ldind.u4", None), 0x4C: ("ldind.i8", None), 0x4D: ("ldind.i", None),                                                                        >     0x4E: ("ldind.r4", None), 0x4F: ("ldind.r8", None), 0x50: ("ldind.ref", None), 0x51: ("stind.ref", None),                                                                     >     0x52: ("stind.i1", None), 0x53: ("stind.i2", None), 0x54: ("stind.i4", None), 0x55: ("stind.i8", None),                                                                       >     0x56: ("stind.r4", None), 0x57: ("stind.r8", None), 0x58: ("add", None), 0x59: ("sub", None),                                                                                 >     0x5A: ("mul", None), 0x5B: ("div", None), 0x5C: ("div.un", None), 0x5D: ("rem", None),
+>     0x5E: ("rem.un", None), 0x5F: ("and", None), 0x60: ("or", None), 0x61: ("xor", None),                                                                                         >     0x62: ("shl", None), 0x63: ("shr", None), 0x64: ("shr.un", None), 0x65: ("neg", None),
+>     0x66: ("not", None), 0x67: ("conv.i1", None), 0x68: ("conv.i2", None), 0x69: ("conv.i4", None),                                                                               >     0x6A: ("conv.i8", None), 0x6B: ("conv.r4", None), 0x6C: ("conv.r8", None), 0x6D: ("conv.u4", None),                                                                           >     0x6E: ("conv.u8", None), 0x6F: ("callvirt", "tok"), 0x70: ("cpobj", "tok"), 0x71: ("ldobj", "tok"),                                                                           >     0x72: ("ldstr", "tok"), 0x73: ("newobj", "tok"), 0x74: ("castclass", "tok"), 0x75: ("isinst", "tok"),                                                                         >     0x76: ("conv.r.un", None), 0x79: ("unbox", "tok"), 0x7A: ("throw", None), 0x7B: ("ldfld", "tok"),                                                                             >     0x7C: ("ldflda", "tok"), 0x7D: ("stfld", "tok"), 0x7E: ("ldsfld", "tok"), 0x7F: ("ldsflda", "tok"),                                                                           >     0x80: ("stsfld", "tok"), 0x81: ("stobj", "tok"), 0x8C: ("box", "tok"), 0x8D: ("newarr", "tok"),                                                                               >     0x8E: ("ldlen", None), 0x8F: ("ldelema", "tok"), 0x90: ("ldelem.i1", None), 0x91: ("ldelem.u1", None),                                                                         >     0x92: ("ldelem.i2", None), 0x93: ("ldelem.u2", None), 0x94: ("ldelem.i4", None), 0x5: ("ldelem.u4", None),                                                                   >     0x96: ("ldelem.i8", None), 0x97: ("ldelem.i", None), 0x98: ("ldelem.r4", None), 0x99: ("ldelem.r8", None),                                                                    >     0x9A: ("ldelem.ref", None), 0x9B: ("stelem.i", None), 0x9C: ("stelem.i1", None), 0x9D: ("stelem.i2", None),                                                                   >     0x9E: ("stelem.i4", None), 0x9F: ("stelem.i8", None), 0xA0: ("stelem.r4", None), 0xA1: ("stelem.r8", None),                                                                   >     0xA2: ("stelem.ref", None), 0xA3: ("ldelem", "tok"), 0xA4: ("stelem", "tok"), 0xA5: ("unbox.any", "tok"),                                                                     >     0xC2: ("refanyval", "tok"), 0xC3: ("ckfinite", None), 0xD1: ("conv.u2", None), 0xD2: ("conv.u1", None),
+>     0xD3: ("conv.i", None), 0xD6: ("add.ovf", None), 0xD7: ("add.ovf.un", None), 0xD8: ("mul.ovf", None),                                                                         >     0xD9: ("mul.ovf.un", None), 0xDA: ("sub.ovf", None), 0xDB: ("sub.ovf.un", None), 0xDE: ("leave.s", "br1"),                                                                    >     0xDF: ("leave", "br4"), 0xE0: ("conv.u", None),                                     h> }                                                                                      >                                                                                         e> OP_FE: Dict[int, Tuple[str, Optional[str]]] = {                                        =>     0x00: ("ceq", None), 0x01: ("cgt", None), 0x02: ("cgt.un", None), 0x03: ("clt", Non), 0x04: ("clt.un", None),                                                                >     0x0C: ("ldloc", "u2"), 0x0D: ("ldloca", "u2"), 0x0E: ("stloc", "u2"), 0x15: ("initobj", "tok"),                                                                               > }                                                                                       >                                                                                         > def str_val(obj) -> str:                                                                >     if obj is None:                                                                     n>         return ""                                                                      >     v = getattr(obj, "value", None)                                                     >     if isinstance(v, str):                                                              >         return v.rstrip("\x00")
+>     raw = getattr(obj, "raw_data", None)                                                >     if isinstance(raw, (bytes, bytearray)):                                             >         return raw.decode("utf-8", errors="replace").rstrip("\x00")
+>     return str(obj).rstrip("\x00")                                                      >                                                                                         > def resolve_token(pe: dnfile.dnPE, tok: int) -> str:                                    >     tid = (tok >> 24) & 0xFF                                                            >     rid = tok & 0xFFFFFF                                                                >     tbl = pe.net.mdtables.tables.get(tid)
+>     if not tbl or rid <= 0 or rid > len(tbl.rows):                                      >         return f"tid=0x{tid:02x},rid={rid}"
+>     row = tbl.rows[rid - 1]                                                             >     name = str_val(getattr(row, "Name", None))
+>     parts = [f"T{tid:02x}#{rid}"]                                                       >     if name:                                                                            r>         parts.append(name)                                                             >     rva = getattr(row, "Rva", None)                                                     >     if isinstance(rva, int) and rva:                                                       >         parts.append(f"RVA=0x{rva:08x}")                                             >     return " | ".join(parts)                                                            >                                                                                         > def parse_body(raw_dll: bytes, foff: int) -> Tuple[str, int, int]:                      >     if foff <= 0 or foff >= len(raw_dll):                                               >         return ("no_body", 0, 0)                                                        >     first = raw_dll[foff]                                                               >     if (first & 0x03) == 0x02:                                                          >         return ("Tiny", first >> 2, foff + 1)                                           >     if (first & 0x07) == 0x03 and foff + 12 <= len(raw_dll):                            >         flags, max_stack, code_size, local_sig = struct.unpack_from("<HHII", raw_dll, foff)                                                                                       >         hdr_bytes = ((flags >> 12) & 0x0F) * 4                                          >         return (f"Fat(stack={max_stack},loc=0x{local_sig:08x})", code_size, foff + hdr_bytes)                                                                                     >     return (f"hdr=0x{first:02x}", 0, foff)                                              >                                                                                         > def read_op(il: bytes, ip: int, otype: Optional[str]) -> Tuple[str, int]:               >     n = len(il)                                                                         >     if otype is None:                                                                   >         return "", ip                                                                   >     if otype == "i1" and ip + 1 <= n:                                                   >         return str(struct.unpack_from("<b", il, ip)[0]), ip + 1                         >     if otype == "u1" and ip + 1 <= n:                                                   >         return str(il[ip]), ip + 1                                                      >     if otype == "u2" and ip + 2 <= n:                                                   >         return str(struct.unpack_from("<H", il, ip)[0]), ip + 2                         >     if otype == "i4" and ip + 4 <= n:                                                   >         return str(struct.unpack_from("<i", il, ip)[0]), ip + 4                         >     if otype == "r4" and ip + 4 <= n:                                                   >         return f"{struct.unpack_from('<f', il, ip)[0]:g}", ip + 4                       >     if otype == "br1" and ip + 1 <= n:                                                  >         d = struct.unpack_from("<b", il, ip)[0]                                         >         return f"IL_{ip + 1 + d:04d} ({d:+d})", ip + 1                                  >     if otype == "br4" and ip + 4 <= n:                                                  >         d = struct.unpack_from("<i", il, ip)[0]                                         >         return f"IL_{ip + 4 + d:04d} ({d:+d})", ip + 4                                  >     if otype == "tok" and ip + 4 <= n:                                                  >         tok = struct.unpack_from("<I", il, ip)[0]                                       >         return f"0x{tok:08x}", ip + 4                                                   >     return "<TRUNC>", n                                                                 >                                                                                         > def disasm(pe: dnfile.dnPE, raw_dll: bytes, off: int, size: int) -> Tuple[int, List[str]]:                                                                                        >     il = raw_dll[off : off + size]                                                      >     ip, n, unk = 0, len(il), 0                                                          >     out = []                                                                            >     while ip < n:                                                                       >         s_ip = ip                                                                       >         b0 = il[ip]; ip += 1                                                            >         if b0 == 0xFE and ip < n:                                                       >             b1 = il[ip]; ip += 1                                                        >             mnem, otype = OP_FE.get(b1, (f"fe_{b1:02x}", None))                         >         else:                                                                           >             mnem, otype = OP1.get(b0, (f"op_{b0:02x}", None))                           >         if mnem.startswith(("op_", "fe_")):                                             >             unk += 1                                                                    >         arg_s, n_ip = read_op(il, ip, otype)                                            >         if otype == "tok" and arg_s.startswith("0x"):                                   >             tok_i = int(arg_s, 16)                                                      >             arg_s = f"{arg_s} [{resolve_token(pe, tok_i)}]"                             >         out.append(f"  IL_{s_ip:04d}: {il[s_ip:n_ip].hex():14s} | {mnem:12s} {arg_s}")  >         ip = n_ip                                                                       >     return unk, out                                                                     >                                                                                         > def main() -> None:                                                                     >     pe = dnfile.dnPE(DLL_PATH)                                                          >     with open(DLL_PATH, "rb") as f:                                                     >         raw_dll = f.read()                                                              >                                                                                         >     m_rows = pe.net.mdtables.tables.get(6).rows                                         >     lines: List[str] = [                                                                >         "========================================================================",     >         "STRANDED DEEP - INDEPENDENT IL BYTECODE VERIFICATION REPORT",                  >         f"Generated : {datetime.now().isoformat(timespec='seconds')}",                  >         f"DLL Path  : {DLL_PATH}",                                                      >         f"DLL Size  : {os.path.getsize(DLL_PATH)} bytes",                               >         "========================================================================",     >         "",                                                                             >         "[1] VERIFIED TARGET METHODS",                                                  >         "RID    | Name                           | RVA        | FileOff    | Body & CodeSize",                                                                                    >         "-" * 92,                                                                       >     ]                                                                                   >                                                                                         >     entries = []                                                                        >     for rid in TARGET_RIDS:                                                             >         mrow = m_rows[rid - 1]
+>         m_name = str_val(getattr(mrow, "Name", None))                                   >         rva = getattr(mrow, "Rva", 0) or 0
+>         foff = pe.get_offset_from_rva(rva) if rva else 0                                >         hinfo, csize, boff = parse_body(raw_dll, foff)                                  >         lines.append(f"{rid:6d} | {m_name:30s} | 0x{rva:08x} | 0x{foff:08x} | {hinfo}, {csize}B @ 0x{boff:06x}")                                                                  >         entries.append((rid, m_name, rva, foff, hinfo, csize, boff))                    >                                                                                         >     lines.extend(["", "[2] RESOLVED METADATA TOKENS", "-" * 92])                        >     for tok in KEY_TOKENS:                                                              >         lines.append(f"  0x{tok:08x} -> {resolve_token(pe, tok)}")                      >                                                                                         >     lines.extend(["", "[3] IL BYTECODE DISASSEMBLY", "-" * 92])                         >     for rid, m_name, rva, foff, hinfo, csize, boff in entries:                          >         if csize > 0 and boff > 0:                                                      >             unk, insns = disasm(pe, raw_dll, boff, csize)                               >             lines.append(f"\n--- RID {rid}: {m_name} @ 0x{boff:06x} ({csize}B, {len(insns)} insns, unk={unk}) ---")                                                               >             lines.extend(insns)                                                         >         else:                                                                           >             lines.append(f"\n--- RID {rid}: {m_name} ({hinfo}) ---")                    >                                                                                         >     with open(OUT_FILE, "w", encoding="utf-8") as f:                                    >         f.write("\n".join(lines) + "\n")
+>                                                                                         >     print(f"Wrote complete verification report -> {OUT_FILE} ({os.path.getsize(OUT_FILE)} bytes)")                                                                                >                                                                                         > if __name__ == "__main__":                                                              >     main()
+> EOF                                                                                     root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python generate_verify_report.py                                                       Wrote complete verification report -> VERIFY_SUBMISSION_REPORT.txt (69353 bytes)          root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
