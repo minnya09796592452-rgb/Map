@@ -1,0 +1,10 @@
+GOOGLE AI CORE V3 - DECODER A/B REPORT
+UTC: 2026-11-21T21:18:32.389645+00:00
+{
+  "decoder_a_errors": [],
+  "decoder_b_errors": [],
+  "instruction_count_a": 3,
+  "instruction_count_b": 3,
+  "disagreements": [],
+  "status": "VERIFIED"
+}

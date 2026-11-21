@@ -1,0 +1,33 @@
+GOOGLE AI CORE V3 - ADVERSARIAL REPORT
+UTC: 2026-11-21T21:18:32.389645+00:00
+{
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "cases": [
+    {
+      "test": "PE_INVALID_SIGNATURE",
+      "passed": true
+    },
+    {
+      "test": "PE_TRUNCATED_SECTION_TABLE",
+      "passed": true
+    },
+    {
+      "test": "IL_TRUNCATED_OPERAND",
+      "passed": true
+    },
+    {
+      "test": "IL_BRANCH_INTO_OPERAND",
+      "passed": true
+    },
+    {
+      "test": "DECODER_AB_DIFFERENTIAL_VALID",
+      "passed": true
+    },
+    {
+      "test": "EH_OUT_OF_RANGE_HANDLER",
+      "passed": true
+    }
+  ]
+}

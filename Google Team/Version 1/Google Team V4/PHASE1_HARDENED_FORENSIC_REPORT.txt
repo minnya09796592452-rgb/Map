@@ -1,0 +1,7 @@
+GOOGLE AI CORE V3 - PHASE 1..6 REPORT
+UTC: 2026-11-21T21:18:32.389645+00:00
+DLL: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll (exists=True)
+SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+PE/CLI/MD Valid: False
+Key Methods VERIFIED: 9/34
+Issues: ["Table 0x11 (StandAloneSig) exceeds #~ boundary"]
