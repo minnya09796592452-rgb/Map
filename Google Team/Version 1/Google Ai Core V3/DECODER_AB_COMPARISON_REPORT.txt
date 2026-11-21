@@ -1,0 +1,6 @@
+DECODER A vs TRUE INDEPENDENT DECODER B (OFFSET + OPERAND + JUMP TARGETS)
+================================================================================
+Total Scanned: 1064 | VERIFIED: 980 | PARTIALLY VERIFIED: 0 | UNVERIFIED: 0 | ABSTRACT: 84
+
+Disagreements / Structural Failures:
+NONE (0 disagreements across all offsets, operands, and jump targets)

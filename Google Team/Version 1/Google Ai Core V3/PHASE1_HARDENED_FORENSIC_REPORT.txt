@@ -1,0 +1,278 @@
+==========================================================================================
+GOOGLE AI CORE V2.1 — HARDENED PHASE 1 FORENSIC REPORT
+Generated : 2026-11-21T19:38:38
+DLL Path  : /mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+DLL SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+==========================================================================================
+
+[1. RECALCULATED VERIFICATION COUNTS (TRUE INDEPENDENT DUAL-DECODER)]
+  - Total Scanned Methods      : 1064
+  - VERIFIED (Dual-Decoder OK) : 980
+  - PARTIALLY VERIFIED         : 0
+  - INFERRED                   : 0
+  - UNVERIFIED (Failed Checks) : 0
+  - ABSTRACT / EXTERN (RVA=0)  : 84
+
+[2. VERIFIED EVIDENCE — GRID 3 & CPU BUFFER LIFECYCLE]
+--- Ceto.WaveSpectrum.ReadFromGPU (0x06003091) ---
+  IL_0000: ldarg.0        
+  IL_0001: ldfld          0x04001BFF [Field:disableReadBack]
+  IL_0006: brtrue.s       IL_0020
+  IL_0008: ldarg.0        
+  IL_0009: ldfld          0x04001C2D [Field:readSdr]
+  IL_000E: ldnull         
+  IL_000F: call           0x0A000081 [Ref:op_Equality]
+  IL_0014: brfalse.s      IL_0020
+  IL_0016: ldstr          0x700163BB [US:'Trying to read GPU displacement data but the read shader is null']
+  IL_001B: call           0x06002E47 [Ceto.Ocean.LogWarning]
+  IL_0020: call           0x0A000B5B [Ref:get_graphicsShaderLevel]
+  IL_0025: ldc.i4.s       0x32
+  IL_0027: blt.s          IL_0030
+  IL_0029: call           0x0A000C02 [Ref:get_supportsComputeShaders]
+  IL_002E: br.s           IL_0031
+  IL_0030: ldc.i4.0       
+  IL_0031: stloc.0        
+  IL_0032: ldarg.0        
+  IL_0033: ldfld          0x04001BFF [Field:disableReadBack]
+  IL_0038: brtrue.s       IL_0053
+  IL_003A: ldarg.0        
+  IL_003B: ldfld          0x04001C2D [Field:readSdr]
+  IL_0040: ldnull         
+  IL_0041: call           0x0A00008C [Ref:op_Inequality]
+  IL_0046: brfalse.s      IL_0053
+  IL_0048: ldarg.0        
+  IL_0049: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_004E: ldnull         
+  IL_004F: cgt.un         
+  IL_0051: br.s           IL_0054
+  IL_0053: ldc.i4.0       
+  IL_0054: ldloc.0        
+  IL_0055: and            
+  IL_0056: brfalse        IL_011C
+  IL_005B: ldarg.0        
+  IL_005C: call           0x06003085 [Ceto.WaveSpectrum.get_DisplacementBuffer]
+  IL_0061: callvirt       0x06002F87 [Ceto.IDisplacementBuffer.GetReadDisplacements]
+  IL_0066: stloc.1        
+  IL_0067: ldarg.1        
+  IL_0068: ldc.i4.0       
+  IL_0069: ble.s          IL_009A
+  IL_006B: ldarg.0        
+  IL_006C: ldfld          0x04001C0E [Field:m_displacementMaps]
+  IL_0071: ldc.i4.0       
+  IL_0072: ldelem.ref     
+  IL_0073: ldc.i4.3       
+  IL_0074: ldarg.0        
+  IL_0075: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_007A: ldarg.0        
+  IL_007B: ldfld          0x04001C2D [Field:readSdr]
+  IL_0080: call           0x060030F7 [Ceto.Common.Unity.Utility.CBUtility.ReadFromRenderTexture]
+  IL_0085: ldarg.0        
+  IL_0086: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_008B: ldloc.1        
+  IL_008C: ldc.i4.0       
+  IL_008D: ldelem.ref     
+  IL_008E: callvirt       0x060031D0 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Data]
+  IL_0093: callvirt       0x0A000C03 [Ref:GetData]
+  IL_0098: br.s           IL_00A2
+  IL_009A: ldloc.1        
+  IL_009B: ldc.i4.0       
+  IL_009C: ldelem.ref     
+  IL_009D: callvirt       0x060031D7 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Clear]
+  IL_00A2: ldarg.1        
+  IL_00A3: ldc.i4.1       
+  IL_00A4: ble.s          IL_00D5
+  IL_00A6: ldarg.0        
+  IL_00A7: ldfld          0x04001C0E [Field:m_displacementMaps]
+  IL_00AC: ldc.i4.1       
+  IL_00AD: ldelem.ref     
+  IL_00AE: ldc.i4.3       
+  IL_00AF: ldarg.0        
+  IL_00B0: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_00B5: ldarg.0        
+  IL_00B6: ldfld          0x04001C2D [Field:readSdr]
+  IL_00BB: call           0x060030F7 [Ceto.Common.Unity.Utility.CBUtility.ReadFromRenderTexture]
+  IL_00C0: ldarg.0        
+  IL_00C1: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_00C6: ldloc.1        
+  IL_00C7: ldc.i4.1       
+  IL_00C8: ldelem.ref     
+  IL_00C9: callvirt       0x060031D0 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Data]
+  IL_00CE: callvirt       0x0A000C03 [Ref:GetData]
+  IL_00D3: br.s           IL_00DD
+  IL_00D5: ldloc.1        
+  IL_00D6: ldc.i4.1       
+  IL_00D7: ldelem.ref     
+  IL_00D8: callvirt       0x060031D7 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Clear]
+  IL_00DD: ldarg.1        
+  IL_00DE: ldc.i4.2       
+  IL_00DF: ble.s          IL_0110
+  IL_00E1: ldarg.0        
+  IL_00E2: ldfld          0x04001C0E [Field:m_displacementMaps]
+  IL_00E7: ldc.i4.2       
+  IL_00E8: ldelem.ref     
+  IL_00E9: ldc.i4.3       
+  IL_00EA: ldarg.0        
+  IL_00EB: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_00F0: ldarg.0        
+  IL_00F1: ldfld          0x04001C2D [Field:readSdr]
+  IL_00F6: call           0x060030F7 [Ceto.Common.Unity.Utility.CBUtility.ReadFromRenderTexture]
+  IL_00FB: ldarg.0        
+  IL_00FC: ldfld          0x04001C20 [Field:m_readBuffer]
+  IL_0101: ldloc.1        
+  IL_0102: ldc.i4.2       
+  IL_0103: ldelem.ref     
+  IL_0104: callvirt       0x060031D0 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.get_Data]
+  IL_0109: callvirt       0x0A000C03 [Ref:GetData]
+  IL_010E: br.s           IL_0118
+  IL_0110: ldloc.1        
+  IL_0111: ldc.i4.2       
+  IL_0112: ldelem.ref     
+  IL_0113: callvirt       0x060031D7 [Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Clear]
+  IL_0118: ldarg.1        
+  IL_0119: ldc.i4.3       
+  IL_011A: pop            
+  IL_011B: pop            
+  IL_011C: ret            
+
+--- Ceto.DisplacementBufferCPU.Run (0x06002F78) ---
+  IL_0000: ldarg.0        
+  IL_0001: call           0x06002F7B [Ceto.DisplacementBufferCPU.SwapDisplacements]
+  IL_0006: ldarg.0        
+  IL_0007: ldarg.1        
+  IL_0008: ldarg.2        
+  IL_0009: call           0x06002FBD [Ceto.WaveSpectrumBufferCPU.Run]
+  IL_000E: ret            
+
+--- Ceto.WaveSpectrumBufferCPU.Run (0x06002FBD) ---
+  IL_0000: ldarg.0        
+  IL_0001: call           0x06002FBA [Ceto.WaveSpectrumBufferCPU.IsDone]
+  IL_0006: brtrue.s       IL_0013
+  IL_0008: ldstr          0x70015452 [US:'Can not run when there are tasks that have not finished']
+  IL_000D: newobj         0x0A000B5C [Ref:.ctor]
+  IL_0012: throw          
+  IL_0013: ldarg.0        
+  IL_0014: ldarg.2        
+  IL_0015: call           0x06002F99 [Ceto.WaveSpectrumBuffer.set_TimeValue]
+  IL_001A: ldarg.0        
+  IL_001B: ldc.i4.1       
+  IL_001C: call           0x06002F9B [Ceto.WaveSpectrumBuffer.set_HasRun]
+  IL_0021: ldarg.0        
+  IL_0022: ldc.i4.0       
+  IL_0023: call           0x06002F9D [Ceto.WaveSpectrumBuffer.set_BeenSampled]
+  IL_0028: ldarg.0        
+  IL_0029: callvirt       0x06002FA7 [Ceto.WaveSpectrumBuffer.EnabledBuffers]
+  IL_002E: brtrue.s       IL_0031
+  IL_0030: ret            
+  IL_0031: ldarg.0        
+  IL_0032: ldarg.1        
+  IL_0033: ldarg.2        
+  IL_0034: callvirt       0x06002FA3 [Ceto.WaveSpectrumBuffer.Initilize]
+  IL_0039: ldsfld         0x040019B4 [Field:DISABLE_FOURIER_MULTITHREADING]
+  IL_003E: brfalse.s      IL_0062
+  IL_0040: ldarg.0        
+  IL_0041: ldfld          0x04001B69 [Field:m_initTask]
+  IL_0046: callvirt       0x06003163 [Ceto.Common.Threading.Tasks.ThreadedTask.Start]
+  IL_004B: ldarg.0        
+  IL_004C: ldfld          0x04001B69 [Field:m_initTask]
+  IL_0051: callvirt       0x06003165 [Ceto.Common.Threading.Tasks.ThreadedTask.Run]
+  IL_0056: pop            
+  IL_0057: ldarg.0        
+  IL_0058: ldfld          0x04001B69 [Field:m_initTask]
+  IL_005D: callvirt       0x06003167 [Ceto.Common.Threading.Tasks.ThreadedTask.End]
+  IL_0062: ldarg.0        
+  IL_0063: ldfld          0x04001B65 [Field:m_buffers]
+  IL_0068: ldlen          
+  IL_0069: conv.i4        
+  IL_006A: stloc.0        
+  IL_006B: ldc.i4.0       
+  IL_006C: stloc.1        
+  IL_006D: br             IL_0134
+  IL_0072: ldarg.0        
+  IL_0073: ldfld          0x04001B65 [Field:m_buffers]
+  IL_0078: ldloc.1        
+  IL_0079: ldelem.ref     
+  IL_007A: ldfld          0x04003B9A [Field:disabled]
+  IL_007F: brtrue         IL_0130
+  IL_0084: ldarg.0        
+  IL_0085: ldfld          0x04001B68 [Field:m_fourierTasks]
+  IL_008A: ldloc.1        
+  IL_008B: callvirt       0x0A000BE7 [Ref:get_Item]
+  IL_0090: brtrue.s       IL_00B8
+  IL_0092: ldarg.0        
+  IL_0093: ldfld          0x04001B68 [Field:m_fourierTasks]
+  IL_0098: ldloc.1        
+  IL_0099: ldarg.0        
+  IL_009A: ldarg.0        
+  IL_009B: ldfld          0x04001B66 [Field:m_fourier]
+  IL_00A0: ldloc.1        
+  IL_00A1: ldarg.0        
+  IL_00A2: ldfld          0x04001B69 [Field:m_initTask]
+  IL_00A7: callvirt       0x0600304C [Ceto.InitSpectrumDisplacementsTask.get_NumGrids]
+  IL_00AC: newobj         0x06003045 [Ceto.FourierTask..ctor]
+  IL_00B1: callvirt       0x0A000BE8 [Ref:set_Item]
+  IL_00B6: br.s           IL_00D5
+  IL_00B8: ldarg.0        
+  IL_00B9: ldfld          0x04001B68 [Field:m_fourierTasks]
+  IL_00BE: ldloc.1        
+  IL_00BF: callvirt       0x0A000BE7 [Ref:get_Item]
+  IL_00C4: ldloc.1        
+  IL_00C5: ldarg.0        
+  IL_00C6: ldfld          0x04001B69 [Field:m_initTask]
+  IL_00CB: callvirt       0x0600304C [Ceto.InitSpectrumDisplacementsTask.get_NumGrids]
+  IL_00D0: callvirt       0x06003046 [Ceto.FourierTask.Reset]
+  IL_00D5: ldarg.0        
+  IL_00D6: ldfld          0x04001B68 [Field:m_fourierTasks]
+  IL_00DB: ldloc.1        
+  IL_00DC: callvirt       0x0A000BE7 [Ref:get_Item]
+  IL_00E1: stloc.2        
+  IL_00E2: ldloc.2        
+  IL_00E3: callvirt       0x06003156 [Ceto.Common.Threading.Tasks.ThreadedTask.get_Done]
+  IL_00E8: brfalse.s      IL_00F5
+  IL_00EA: ldstr          0x700154C2 [US:'Fourier task should not be done before running']
+  IL_00EF: newobj         0x0A000B5C [Ref:.ctor]
+  IL_00F4: throw          
+  IL_00F5: ldsfld         0x040019B4 [Field:DISABLE_FOURIER_MULTITHREADING]
+  IL_00FA: brfalse.s      IL_0111
+  IL_00FC: ldloc.2        
+  IL_00FD: callvirt       0x06003163 [Ceto.Common.Threading.Tasks.ThreadedTask.Start]
+  IL_0102: ldloc.2        
+  IL_0103: callvirt       0x06003165 [Ceto.Common.Threading.Tasks.ThreadedTask.Run]
+  IL_0108: pop            
+  IL_0109: ldloc.2        
+  IL_010A: callvirt       0x06003167 [Ceto.Common.Threading.Tasks.ThreadedTask.End]
+  IL_010F: br.s           IL_0130
+  IL_0111: ldloc.2        
+  IL_0112: ldc.i4.1       
+  IL_0113: callvirt       0x0600315C [Ceto.Common.Threading.Tasks.ThreadedTask.set_RunOnStopWaiting]
+  IL_0118: ldloc.2        
+  IL_0119: ldarg.0        
+  IL_011A: ldfld          0x04001B69 [Field:m_initTask]
+  IL_011F: callvirt       0x06003169 [Ceto.Common.Threading.Tasks.ThreadedTask.WaitOn]
+  IL_0124: ldarg.0        
+  IL_0125: ldfld          0x04001B67 [Field:m_scheduler]
+  IL_012A: ldloc.2        
+  IL_012B: callvirt       0x060031A1 [Ceto.Common.Threading.Scheduling.Scheduler.AddWaiting]
+  IL_0130: ldloc.1        
+  IL_0131: ldc.i4.1       
+  IL_0132: add            
+  IL_0133: stloc.1        
+  IL_0134: ldloc.1        
+  IL_0135: ldloc.0        
+  IL_0136: blt            IL_0072
+  IL_013B: ldsfld         0x040019B4 [Field:DISABLE_FOURIER_MULTITHREADING]
+  IL_0140: brtrue.s       IL_015F
+  IL_0142: ldarg.0        
+  IL_0143: ldfld          0x04001B69 [Field:m_initTask]
+  IL_0148: ldc.i4.1       
+  IL_0149: callvirt       0x06003159 [Ceto.Common.Threading.Tasks.ThreadedTask.set_NoFinish]
+  IL_014E: ldarg.0        
+  IL_014F: ldfld          0x04001B67 [Field:m_scheduler]
+  IL_0154: ldarg.0        
+  IL_0155: ldfld          0x04001B69 [Field:m_initTask]
+  IL_015A: callvirt       0x060031A0 [Ceto.Common.Threading.Scheduling.Scheduler.Run]
+  IL_015F: ret            
+
+[3. REMAINING STRUCTURAL & EVIDENCE GAPS]
+  - Compiled Shader / ComputeShader binaries (.shader/.assets): UNVERIFIED (external to Assembly-CSharp.dll)
+  - Serialized Scene Inspector parameters (fourierSize, gridScale, windSpeed): UNVERIFIED (external to DLL)
+==========================================================================================
