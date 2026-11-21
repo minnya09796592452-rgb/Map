@@ -1,0 +1,6 @@
+DECODER A vs INDEPENDENT DECODER B COMPARISON REPORT
+================================================================================
+Total Scanned: 1064 | VERIFIED: 980 | PARTIALLY VERIFIED: 0 | UNVERIFIED: 0 | ABSTRACT: 84
+
+Disagreements / Structural Failures:
+NONE (0 disagreements on verified methods)
