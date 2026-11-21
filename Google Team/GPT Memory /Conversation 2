@@ -1239,3 +1239,704 @@ V3 နှစ်ခုစလုံးအတွက် အောက်ပါ Status
 **Scope သတ်မှတ်ချက်:** လက်ရှိအကြံပြုချက်တွေဟာ V3 နှစ်ခုအတွက်သာ ဖြစ်ပါတယ်။ V1၊ V2၊ Original Evidence နဲ့ DLL များကို မပြင်ဆင်ဘဲ ထိန်းသိမ်းထားသင့်ပါတယ်။
 
 ဒီအကြံပြုချက်တွေကို လက်တွေ့အကောင်အထည်ဖော်မယ်ဆိုရင် ပထမဆုံး Google V3 ရဲ့ လက်ရှိ Code ကို ပြန်စစ်ပြီး ပြင်ဆင်ရမယ့်နေရာတွေကို သီးခြားသတ်မှတ်တာက အကောင်းဆုံးပါ။
+လက်ရှိ V3 နှစ်ခုရဲ့ စစ်ဆေးတွေ့ရှိချက်အရဆိုရင် **Google Ai Core V3 က ပန်းတိုင်နဲ့ ပိုနီးစပ်ပါတယ်။**
+
+**Google Ai Core V3**
+
+ပိုနီးစပ်
+
+ပထမဦးစားပေး
+
+- Raw DLL ကို အခြေခံတဲ့ Parser ရှိတယ်။
+- PE၊ CLI၊ Metadata၊ IL နဲ့ EH စစ်ဆေးမှုတွေ ပါဝင်တယ်။
+- Decoder A/B ကို ပိုမိုလွတ်လပ်အောင် တည်ဆောက်ထားတယ်။
+- Structural Validation နဲ့ Adversarial Testing ကို ဆက်လက်တိုးတက်အောင် လုပ်နိုင်တယ်။
+
+  **Gemini Ai Core V3**
+
+  နောက်တစ်ဆင့်
+- Evidence စုစည်းမှုနဲ့ CORE/PIPE/COMBINED Comparison ပိုကောင်းလာတယ်။
+- ဒါပေမဲ့ Method Parsing က Regex အခြေပြု ဖြစ်နေသေးတယ်။
+- Raw Method Body ကို တိကျစွာ Hash မလုပ်နိုင်သေးဘူး။
+- Method Identity နဲ့ Duplicate Handling မှာ အားနည်းချက်ရှိတယ်။
+
+### **ပန်းတိုင်အပေါ် အဓိကကွာခြားချက်**
+
+| အချက်                              | ပိုနီးစပ်သူ           |
+| ---------------------------------- | --------------------- |
+| DLL Forensic Analysis              | Google V3             |
+| Raw IL Verification                | Google V3             |
+| Evidence Organization              | Gemini V3             |
+| Method Body Comparison             | Gemini V3 မှာ Gap ရှိ |
+| Structural Reliability             | Google V3             |
+| Final Ocean Technical Verification | နှစ်ခုလုံး မပြီးသေး   |
+
+### **ကျွန်တော့်ရဲ့ ဆုံးဖြတ်ချက်**
+
+**Google V3 ကို Main Verification Engine အဖြစ် ဆက်တည်ဆောက်ပါ။ Gemini V3 ကို Supporting Evidence/Comparison Engine အဖြစ်ထားပါ။**
+
+ဒါပေမဲ့ Google V3 ရဲ့ `980 VERIFIED` ဆိုတဲ့ရလဒ်ကို အပြည့်အဝ အတည်ပြုပြီးသားလို့ မယူဆသင့်သေးပါဘူး။ လက်ရှိအခြေအနေက `PARTIALLY VERIFIED` ပဲ ဖြစ်ပါတယ်။
+
+ပန်းတိုင်က Ocean Displacement ရဲ့ မူရင်း C#၊ GPU/CPU Pipeline နဲ့ Shader အလုပ်လုပ်ပုံကို မှန်ကန်စွာ ပြန်လည်နားလည်ပြီး Godot ဘက်ကို ယုံကြည်စိတ်ချစွာ ပြောင်းရွှေ့နိုင်ဖို့ဆိုရင် Google V3 က လက်ရှိအကောင်းဆုံး အခြေခံဖြစ်ပါတယ်။ 🌊
+
+Google Ai Core V3 အတွက် တိုက်ရိုက် Copy ကူးပြီး လုပ်ဆောင်နိုင်မယ့် အသေးစိတ်ပြင်ဆင်ရေးညွှန်ကြားချက်ကို ရေးပေးထားပါတယ်။
+
+ဒီညွှန်ကြားချက်ရဲ့ အဓိကရည်ရွယ်ချက်က **Google V3 ကို ယုံကြည်စိတ်ချရတဲ့ DLL Forensic Verification Engine ဖြစ်လာစေဖို့** ဖြစ်ပါတယ်။ လက်ရှိအလုပ်လုပ်နေတဲ့ Parser ကို မလိုအပ်ဘဲ ပြန်ရေးတာမဟုတ်ဘဲ ရှိပြီးသားအခြေခံကို ထိန်းသိမ်းပြီး အားနည်းချက်တွေကို တစ်ခုချင်းပိတ်ဖို့ပါ။
+
+Copy-ready specification
+
+# GOOGLE AI CORE V3 — FORENSIC HARDENING & VERIFICATION UPGRADE SPECIFICATION
+
+## PRIMARY OBJECTIVE
+
+Upgrade the existing Google Ai Core V3 forensic auditing system into a structurally reliable, independently verifiable .NET DLL and IL analysis engine.
+
+The objective is to establish trustworthy evidence for the original Ceto / Ocean implementation, including its CPU pipeline, GPU pipeline, displacement processing, wave queries, and related implementation details.
+
+This is a forensic verification task, NOT a report-formatting task.
+
+Do not claim that a method, structure, or technical behavior is VERIFIED merely because a token, method name, or expected text was found.
+
+Every verification claim must be supported by actual parsed data and reproducible validation results.
+
+---
+
+# PHASE 0 — PRESERVE AND INSPECT THE EXISTING PROJECT
+
+Before making any modification:
+
+1. Inspect every file in the existing Google Ai Core V3 directory.
+2. Read the current source code, manifests, reports, decoder implementations, and self-audit scripts.
+3. Identify the existing DLL input path, output path, command-line arguments, and dependencies.
+4. Map the current implementation architecture.
+5. Identify reusable components and existing validation logic.
+6. Record the original SHA256 hashes of all files that may be modified.
+7. Establish a baseline test result before changing anything.
+
+STRICT SCOPE:
+
+- Modify only files inside Google Ai Core V3.
+- Do not modify Gemini Ai Core V3.
+- Do not modify Google Ai Core V1 or V2.
+- Do not modify original DLL files.
+- Do not overwrite raw evidence.
+- Do not delete previous reports.
+- Preserve existing useful functionality.
+- Do not perform unrelated gameplay, save/load, or game-system modifications.
+
+Before major changes, provide a concise implementation plan identifying the exact files to modify.
+
+---
+
+# PHASE 1 — PE AND CLI STRUCTURAL VALIDATION
+
+Strengthen the PE and CLI parser.
+
+## 1.1 PE Section Boundary Validation
+
+Implement strict RVA-to-file-offset validation.
+
+For every mapped RVA:
+
+- Identify the owning PE section.
+- Validate the RVA against the section's virtual range.
+- Validate the corresponding raw file offset.
+- Validate that the entire requested data range fits inside the section's raw data.
+- Reject data ranges crossing section boundaries.
+- Reject ranges extending beyond the physical file.
+- Handle virtual-only section regions correctly.
+- Detect ambiguous or overlapping section mappings.
+
+Do not validate only the starting RVA.
+
+Method bodies, EH sections, metadata streams, and other mapped structures must be checked against their actual owning boundaries.
+
+## 1.2 CLI Header Validation
+
+Validate:
+
+- CLI header RVA and size.
+- Metadata directory RVA and size.
+- Entry-point token or RVA.
+- Managed-native header directory where applicable.
+- Relevant CLI flags.
+- Directory boundaries and file mappings.
+
+Reject malformed or truncated structures.
+
+## 1.3 PE Validation Results
+
+Generate explicit results for:
+
+- PE signature.
+- Optional header.
+- Section table.
+- RVA mappings.
+- Section ownership.
+- Raw data boundaries.
+- CLI header.
+- Metadata directory.
+- Invalid or ambiguous mappings.
+
+Each result must include the relevant offset, size, section, and failure reason.
+
+---
+
+# PHASE 2 — METADATA ROOT AND STREAM VALIDATION
+
+Implement complete boundary-aware metadata parsing.
+
+## 2.1 Metadata Root
+
+Validate:
+
+- Metadata signature.
+- Major and minor version.
+- Version string length.
+- Alignment.
+- Stream count.
+- Stream header boundaries.
+- Stream names.
+- Stream offsets and sizes.
+
+## 2.2 Metadata Stream Boundaries
+
+Every stream must remain inside the metadata root's declared range.
+
+Validate the individual boundaries of:
+
+- \#\~
+- \#-
+- \#Strings
+- \#US
+- \#GUID
+- \#Blob
+
+Do not use the total DLL file size as a substitute for metadata stream boundary validation.
+
+Reject:
+
+- Streams extending beyond the metadata root.
+- Overlapping or ambiguous stream ranges where invalid.
+- Truncated stream headers.
+- Invalid heap offsets.
+- Invalid string termination.
+- Invalid blob length prefixes.
+
+## 2.3 Metadata Table Validation
+
+Validate:
+
+- Valid table mask.
+- Sorted table mask.
+- Row counts.
+- Heap index widths.
+- Simple table index widths.
+- Coded index widths.
+- Table-specific row sizes.
+- Table boundaries.
+- Index references against actual table row counts.
+
+Every metadata table read must remain inside its own stream boundaries.
+
+---
+
+# PHASE 3 — COMPLETE METADATA TOKEN RESOLUTION
+
+Build reliable token resolution.
+
+Support and validate applicable metadata token types, including:
+
+- Module
+- TypeRef
+- TypeDef
+- Field
+- MethodDef
+- Param
+- InterfaceImpl
+- MemberRef
+- Constant
+- CustomAttribute
+- StandAloneSig
+- Event
+- Property
+- TypeSpec
+- MethodSpec
+- Assembly
+- AssemblyRef
+- File
+- ExportedType
+- ManifestResource
+- GenericParam
+- GenericParamConstraint
+- MethodSemantics
+- MethodImpl
+
+For each resolved token:
+
+1. Validate token table type.
+2. Validate RID.
+3. Validate that the RID is within the relevant table.
+4. Resolve the correct metadata row.
+5. Validate relevant coded-index references.
+6. Parse associated signatures and blobs where applicable.
+7. Return a structured resolution result.
+
+Do not treat a token as valid merely because its table exists or its RID is below the row count.
+
+## 3.1 Signature Parsing
+
+Implement bounded parsing for applicable signature types:
+
+- Method signatures.
+- Field signatures.
+- Local variable signatures.
+- Property signatures.
+- Type signatures.
+- Generic instantiations.
+- Method specifications.
+- Function pointers.
+- Array signatures.
+- Custom modifiers.
+
+Validate compressed integers, element types, generic parameter indexes, nested types, and blob boundaries.
+
+Malformed signatures must produce explicit errors rather than silently passing.
+
+---
+
+# PHASE 4 — METHOD BODY VALIDATION
+
+This is a critical phase.
+
+Implement complete Tiny and Fat method body parsing.
+
+For each MethodDef:
+
+1. Resolve MethodDef metadata.
+2. Read RVA.
+3. Validate the owning PE section.
+4. Parse method header.
+5. Determine code size.
+6. Validate the complete IL byte range.
+7. Parse local variable signature token.
+8. Validate initialization flags.
+9. Parse instruction boundaries.
+10. Parse optional extra sections.
+11. Validate final method-body boundaries.
+
+Store the following for each method:
+
+- Metadata token.
+- Declaring type.
+- Namespace.
+- Method name.
+- Method signature.
+- Generic arity.
+- RVA.
+- File offset.
+- Header format.
+- Header size.
+- Code size.
+- Local signature token.
+- Raw IL SHA256.
+- Full method body SHA256.
+- EH section information.
+- Decoder results.
+- Validation status.
+
+Do not use method name alone as a unique identifier.
+
+Do not use arbitrary text windows to calculate method hashes.
+
+Hash the exact byte ranges established by the parser.
+
+---
+
+# PHASE 5 — INDEPENDENT DECODER A/B VERIFICATION
+
+Strengthen the independence of both decoders.
+
+## 5.1 Decoder A
+
+Retain the current primary decoder where reliable.
+
+Validate:
+
+- Opcode.
+- Operand type.
+- Operand length.
+- Operand bytes.
+- Instruction boundaries.
+- Branch destinations.
+- Switch destinations.
+- Prefix instructions.
+- Invalid opcodes.
+- Truncated operands.
+- Method-end boundaries.
+
+## 5.2 Decoder B
+
+Maintain a genuinely independent opcode definition and decoding implementation.
+
+Decoder B must not import or reuse Decoder A's opcode tables or operand-size logic.
+
+Implement its own:
+
+- Opcode mapping.
+- Operand decoding.
+- Instruction-length calculation.
+- Branch target calculation.
+- Switch target calculation.
+- Instruction-boundary validation.
+
+Independence must be demonstrated by source inspection and differential testing, not by naming two separate classes.
+
+## 5.3 Differential Comparison
+
+Compare:
+
+- Instruction offsets.
+- Opcode values.
+- Mnemonics.
+- Operand types.
+- Raw operand bytes.
+- Decoded operand values.
+- Branch destinations.
+- Switch destinations.
+- Instruction boundaries.
+- Method-end positions.
+
+Generate a detailed disagreement report.
+
+A zero-disagreement result must not be reported as complete structural verification unless all applicable checks were independently performed.
+
+---
+
+# PHASE 6 — EXCEPTION HANDLING VALIDATION
+
+Implement independent EH parsing in both decoder paths.
+
+Support:
+
+- Small EH sections.
+- Fat EH sections.
+- Multiple EH sections.
+- Section chaining.
+- Catch clauses.
+- Filter clauses.
+- Finally clauses.
+- Fault clauses.
+
+Validate:
+
+1. EH section header.
+2. Section size.
+3. Clause count.
+4. Clause flags.
+5. Try offset and length.
+6. Handler offset and length.
+7. Filter offset.
+8. Catch type token.
+9. Range boundaries.
+10. Instruction-boundary alignment.
+11. Try and handler region relationships.
+12. Overlap and nesting constraints.
+13. Section chaining and termination.
+
+Validate catch tokens using the metadata token resolver.
+
+Validate filter offsets as actual valid instruction boundaries.
+
+Check EH ranges against the exact method body, not merely the total file length.
+
+Do not claim independent EH verification until Decoder A and Decoder B each parse and validate the EH structures independently.
+
+---
+
+# PHASE 7 — ADVERSARIAL AND NEGATIVE TESTING
+
+Create a dedicated test suite using synthetic malformed PE/CLI/IL inputs.
+
+Include at least the following categories:
+
+## PE Tests
+
+- Invalid PE signature.
+- Invalid optional header.
+- Truncated section table.
+- Invalid section raw range.
+- RVA outside all sections.
+- RVA crossing section boundaries.
+- Overlapping section mappings.
+
+## Metadata Tests
+
+- Invalid metadata signature.
+- Truncated metadata root.
+- Stream beyond metadata root.
+- Overlapping streams.
+- Invalid heap offset.
+- Invalid table row count.
+- Invalid coded index.
+- Invalid blob length.
+
+## IL Tests
+
+- Truncated opcode.
+- Truncated operand.
+- Invalid opcode.
+- Invalid branch target.
+- Branch into an operand.
+- Invalid switch count.
+- Truncated switch table.
+- Invalid local signature token.
+- Method body crossing section boundaries.
+
+## EH Tests
+
+- Truncated EH section.
+- Invalid EH flags.
+- Invalid clause length.
+- Invalid catch token.
+- Invalid filter offset.
+- Out-of-range try region.
+- Out-of-range handler region.
+- Invalid section chaining.
+- Invalid or overlapping protected regions.
+
+For every test:
+
+- Record expected result.
+- Record actual result.
+- Record parser behavior.
+- Record failure reason.
+- Ensure malformed data cannot silently receive VERIFIED status.
+
+Do not modify the original DLL to create test cases.
+
+Use separate synthetic test fixtures.
+
+---
+
+# PHASE 8 — V3 SELF-AUDIT REPAIR
+
+Inspect and repair:
+
+check_v2_weaknesses.py
+
+The V3 self-audit must:
+
+1. Reference only Google Ai Core V3 paths.
+2. Never silently inspect V2 output as V3 evidence.
+3. Verify actual runtime behavior.
+4. Run decoder differential tests.
+5. Run malformed input tests.
+6. Validate EH independence.
+7. Validate PE section boundary enforcement.
+8. Validate metadata stream boundaries.
+9. Validate token resolution.
+10. Validate that reports reflect actual execution results.
+
+Do not consider a weakness resolved because a particular function name or source-code string exists.
+
+Use executable tests with explicit assertions.
+
+Generate a self-audit report containing:
+
+- Test name.
+- Expected behavior.
+- Actual behavior.
+- PASS or FAIL.
+- Evidence file.
+- Relevant source location.
+- Remaining limitation.
+
+---
+
+# PHASE 9 — OCEAN / CETO TECHNICAL EVIDENCE VERIFICATION
+
+After the forensic engine is hardened, use it to validate the original Ocean/Ceto implementation.
+
+Focus on actual source and binary evidence.
+
+Investigate:
+
+## CPU Pipeline
+
+- DisplacementBufferCPU.
+- GetWriteDisplacements.
+- GetReadDisplacements.
+- SwapDisplacements.
+- WaveSpectrumBufferCPU.
+- FourierTask.ProcessData.
+- Buffer update ordering.
+- Actual data flow between producer and consumer.
+
+## GPU Pipeline
+
+- GenerateDisplacement.
+- Texture bindings.
+- DisplacementMap0 through DisplacementMap3.
+- GPU resource creation.
+- Compute shader dispatch.
+- Readback behavior.
+
+## Wave Queries
+
+- WaveQuery.
+- sampleSpectrum.
+- QueryWaves.
+- Grid selection.
+- Height calculation.
+- Ocean.level contribution.
+
+## Grid Behavior
+
+- CHANNELS.
+- GRIDS.
+- CPU buffer dimensions.
+- Grid 0–3 processing.
+- GPU rendering consumption.
+- CPU readback availability.
+
+## FFT and Shader
+
+Inspect actual shader source or compiled shader assets.
+
+Verify:
+
+- FFT implementation.
+- Kernel behavior.
+- Texture sampling.
+- Grid indexing.
+- Channel interpretation.
+- Transform stages.
+- Data formats.
+- Dispatch dimensions.
+
+IMPORTANT:
+
+Do not infer shader behavior from C# texture-binding calls alone.
+
+Do not claim Grid3 is unused merely because CPU readback does not include Grid3.
+
+Do not invent the reason for any optimization.
+
+Separate IL evidence, asset evidence, runtime evidence, and inference.
+
+If original shader assets or runtime execution evidence are unavailable, mark those claims UNVERIFIED.
+
+---
+
+# PHASE 10 — REPORTING AND VERIFICATION STANDARD
+
+Use the following status definitions consistently.
+
+VERIFIED:\
+All applicable validation gates passed and reproducible evidence exists.
+
+PARTIALLY VERIFIED:\
+Some validation gates passed, but material limitations remain.
+
+UNVERIFIED:\
+Required evidence or validation is unavailable or has not been executed.
+
+FAILED:\
+A required validation failed.
+
+CONFLICTING:\
+Relevant evidence sources disagree.
+
+Do not promote a status without evidence.
+
+## Required Final Reports
+
+Generate or update:
+
+1. PHASE1_HARDENED_FORENSIC_REPORT.txt
+2. DECODER_AB_COMPARISON_REPORT.txt
+3. PER_METHOD_VALIDATION_MANIFEST.json
+4. V3_SELF_AUDIT_REPORT.txt
+5. ADVERSARIAL_TEST_REPORT.txt
+6. OCEAN_CETO_TECHNICAL_EVIDENCE_REPORT.txt
+
+Preserve previous reports before replacing or updating them.
+
+The per-method manifest must include enough information to reproduce and independently inspect each method's validation.
+
+---
+
+# PHASE 11 — FINAL QUALITY GATES
+
+Do not declare the upgrade complete until all applicable gates have been executed.
+
+Required gates:
+
+- PE validation.
+- CLI validation.
+- Metadata root validation.
+- Metadata stream boundary validation.
+- Metadata table validation.
+- Token resolution.
+- Signature parsing.
+- Method body boundary validation.
+- Decoder A validation.
+- Decoder B validation.
+- Decoder differential validation.
+- Independent EH validation.
+- Adversarial tests.
+- V3 self-audit.
+- Report consistency validation.
+
+If any gate cannot be executed, identify it explicitly.
+
+Never replace missing test evidence with a hardcoded PASS result.
+
+Never claim all 1,064 selected methods are VERIFIED unless every applicable validation gate has actually passed for those methods.
+
+The 1,064 count refers to the selected Ceto/Ocean-related methods in the current audit scope, not necessarily the entire Assembly-CSharp assembly.
+
+---
+
+# IMPLEMENTATION DELIVERY REQUIREMENTS
+
+Before implementation:
+
+- Explain the plan.
+- Identify exact files to modify.
+- Identify dependencies and test environment requirements.
+
+During implementation:
+
+- Make minimal, scoped changes.
+- Preserve existing working functionality.
+- Avoid unrelated refactoring.
+- Keep original evidence untouched.
+- Maintain reproducibility.
+
+After implementation:
+
+- List every modified file.
+- List every new file.
+- Report actual tests executed.
+- Report passed and failed tests separately.
+- Provide SHA256 hashes for relevant outputs.
+- Explain remaining limitations.
+- Identify claims that remain UNVERIFIED.
+
+FINAL ACCEPTANCE CONDITION:
+
+The upgraded Google Ai Core V3 must be a reproducible forensic verification engine, not merely a script that produces convincing reports.
+
+Accuracy, structural correctness, independent validation, and traceable evidence take priority over the number of methods marked VERIFIED.
+
+## **အကောင်အထည်ဖော်ရာမှာ သတိထားရမယ့်အချက်**
+
+ဒီ Specification မှာ အရေးကြီးဆုံးက အောက်ပါသုံးချက်ပါ။
+
+1. **Decoder A/B တကယ်လွတ်လပ်ရမယ်။** Code နှစ်ခုခွဲထားရုံနဲ့ Independent Verification မဖြစ်ပါဘူး။
+2. **Method Body ကို Byte အတိအကျစစ်ရမယ်။** Method Name သို့မဟုတ် Token ရှိရုံနဲ့ VERIFIED မပေးရပါဘူး။
+3. **Ocean Shader နဲ့ FFT ကို သီးခြားသက်သေပြရမယ်။** C# မှာ Texture Bind လုပ်ထားတာတစ်ခုတည်းနဲ့ GPU ဘက်အလုပ်လုပ်ပုံကို အတည်မပြုနိုင်ပါဘူး။
+
+**အရေးကြီး:** ဒီညွှန်ကြားချက်က အကောင်အထည်ဖော်ရန် Specification ဖြစ်ပြီး Code ပြင်ဆင်ပြီးသွားပြီလို့ မဆိုလိုပါဘူး။ လက်ရှိ Google V3 ရဲ့ မူရင်းဖိုင်တွေကို မထိခိုက်စေဘဲ အဆင့်လိုက်လုပ်ဆောင်ဖို့ ရည်ရွယ်ထားတာပါ။
