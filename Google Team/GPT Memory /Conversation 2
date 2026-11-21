@@ -325,6 +325,258 @@ FFT Numerical Correctness	UNVERIFIED
 
 ပြင်ဆင်ထားသောဖိုင်: 0။ GitHub Changes: 0။ Runtime Tests: 0။
 
+--------
+
+လက်ရှိ `main` branch ကိုပြန်စစ်ပြီးပါပြီ။ ဒီတစ်ခါ Folder နှစ်ခုကို သီးခြား Audit လုပ်မယ် — **Gemini Ai Core 1** ထဲက audit scripts / manifests / reports နဲ့ **Google Ai Core V1** ထဲက deep-audit script / evidence report ကို တစ်ခုချင်းစီစစ်ပြီး အချင်းချင်းရလဒ်တွေ ကိုက်ညီမှုရှိမရှိပါ နှိုင်းယှဉ်မယ်။ Repository ထဲမှာ ဘာမှပြင်ဆင်ခြင်း မလုပ်ပါဘူး။
+
+## **1. Folder တစ်ခုချင်းစီ၏ အကြောင်းအရာ**
+
+လက်ရှိ `main` branch commit:
+
+e7b0f555a1a712b986331c25383b626052f22829
+
+**Gemini Ai Core 1**
+
+6 files · 5 substantive files + 1 tiny placeholder
+
+- `audit_with_paths.py`
+- `path_audit_manifest.json`
+- `run_all_audit.py`
+- `structure_summary.json`
+- `unified_audit_report.txt`
+- `Gaass` — 5 bytes၊ audit logic မဟုတ်ပါ။
+
+**Google Ai Core V1**
+
+3 files
+
+- `PHASE1_DEEP_FORENSIC_AUDIT.txt`
+- `Scrpic.txt`
+- `run_phase1_deep_audit.py`
+
+## **2. Gemini Ai Core 1 — အသေးစိတ်စစ်ဆေးချက်**
+
+### **A.&#x20;**`audit_with_paths.py`
+
+ဒီ Script ရဲ့ ရည်ရွယ်ချက်က Ocean evidence ဖိုင် ၈ ခုကို ရှာဖွေပြီး file size နဲ့ SHA256 ထုတ်ပေးဖို့ ဖြစ်တယ်။
+
+စစ်ဆေးတွေ့ရှိချက် —
+
+- `BASE_DIR` ကို `/storage/emulated/0/Download/Stranded-Deep-Original` သတ်မှတ်ထားတယ်။
+- `DATA_DIR` ရှိ/မရှိကို သီးခြားစစ်တယ်။
+- ဒါပေမဲ့ `CHECK_FILES` ရဲ့ ဖိုင်တွေကို `DATA_DIR` ထဲမှာမရှာဘဲ `BASE_DIR` ထဲမှာပဲ ရှာတယ်။
+- Output ကို `BASE_DIR/Gemini Ai Core/path_audit_manifest.json` ထဲရေးတယ်။
+
+**အရေးကြီးတဲ့အချက်:** Directory ရှိတယ်ဆိုတာနဲ့ စစ်ဆေးမယ့်ဖိုင်တွေ အဲဒီ Directory ထဲမှာရှိတယ်လို့ အတည်ပြုနိုင်တာ မဟုတ်ဘူး။ လက်ရှိ Manifest ကလည်း အဲဒီနှစ်ခုကို သီးခြားပြထားတယ်။
+
+### **B.&#x20;**`path_audit_manifest.json`
+
+ဒီ Manifest ထဲမှာ —
+
+| ဖိုင်အုပ်စု              | Manifest ရလဒ် |
+| ------------------------ | ------------- |
+| Evidence ဖိုင် ၅ ခု      | ရှိ           |
+| Ocean Core Part 1        | မရှိ          |
+| GPU CPU Pipeline Part 1  | မရှိ          |
+| Combined Pipeline Part 1 | မရှိ          |
+
+ဒီနေရာမှာ အရေးကြီးတဲ့ အချိန်ကာလကွာခြားချက်ရှိတယ်။
+
+Manifest က စစ်ခဲ့တဲ့ local folder မှာ အဲဒီဖိုင်သုံးခု မရှိခဲ့ဘူး။ ဒါပေမဲ့ အခု GitHub ရဲ့ `Google Team/Full Momery/` ထဲမှာ အဲဒီဖိုင်သုံးခု ရှိနေပြီ။ ဒါကြောင့် Manifest ကို လက်ရှိ GitHub ဖိုင်တွေရဲ့ ပျောက်ဆုံးမှုအထောက်အထားအဖြစ် မသုံးသင့်ဘူး။
+
+### **C.&#x20;**`run_all_audit.py`
+
+ဒီဖိုင်က Gemini Core ရဲ့ အဓိက Audit Generator ဖြစ်တယ်။
+
+စစ်ဆေးတွေ့ရှိချက်တွေ —
+
+1. `VERIFIED_TOKENS` ထဲမှာ Ocean နဲ့ CPU/GPU pipeline ဆိုင်ရာ Method Token တွေကို သတ်မှတ်ထားတယ်။
+2. `METHOD_BODY_SIZES` ထဲမှာ Method body size အချို့ကို သတ်မှတ်ထားတယ်။
+3. Workspace ထဲက ဖိုင်တွေကို ရှာဖွေပြီး SHA256၊ Token၊ Class၊ Field၊ Method စာရင်းတွေ ထုတ်တယ်။
+4. Core / Pipeline / Combined ဖိုင်တွေရဲ့ Token Set ကို နှိုင်းယှဉ်ဖို့ ရေးထားတယ်။
+5. Report နဲ့ JSON Summary ကို ထုတ်ပေးတယ်။
+
+**တွေ့ရှိတဲ့ အဓိကပြဿနာ**
+
+`VERIFIED_TOKENS` နဲ့ `METHOD_BODY_SIZES` ကို စစ်ဆေးမှုအတွက် တကယ်အသုံးမပြုထားဘူး။ အဲဒီတန်ဖိုးတွေကို ကြိုတင်သတ်မှတ်ထားတာပဲ ဖြစ်တယ်။
+
+ထို့အပြင် `build_report()` ထဲမှာ Grid 3 ရဲ့ bandwidth optimization အကြောင်းကို ကြိုတင်ရေးထည့်ထားတယ်။ ဒါပေမဲ့ Generator က အဲဒီအကြောင်းပြချက်ကို DLL ထဲကနေ သီးခြားစစ်ဆေးပြီးမှ ရေးတာ မဟုတ်ဘူး။
+
+### **D.&#x20;**`structure_summary.json`**&#x20;နဲ့&#x20;**`unified_audit_report.txt`
+
+ဒီနှစ်ဖိုင်ကို အတူတကွစစ်တဲ့အခါ အရေးကြီးတဲ့ မကိုက်ညီမှုတွေရှိတယ်။
+
+- Summary ထဲမှာ Core / Pipeline / Combined Token အားလုံး `0` ဖြစ်နေတယ်။
+- `found_files` ထဲမှာ အဲဒီဖိုင်သုံးခု မပါဘူး။
+- ဒါကြောင့် Token Union Audit ရဲ့ ရလဒ်ဟာ ဖိုင်သုံးခုကို အမှန်တကယ် နှိုင်းယှဉ်ပြီး ရလာတာ မဟုတ်ဘူး။
+- Summary ထဲမှာ အခြား report သုံးခုကို ရှာတွေ့ထားတယ်။ ဒါပေမဲ့ အဲဒီဖိုင်တွေက ဒီ Folder ထဲမှာ မပါဘူး။
+
+အဲဒါကြောင့် **Combined Token Union ကို ဒီ Folder ရဲ့ Summary တစ်ခုတည်းနဲ့ အတည်ပြုလို့ မရဘူး။** ယခင် Raw Blob ကနေ တိုက်ရိုက်စစ်ဆေးထားတဲ့ Core / Pipeline / Combined Token Set နှိုင်းယှဉ်ချက်ကိုတော့ သီးခြားအထောက်အထားအဖြစ် ဆက်လက်အသုံးပြုနိုင်တယ်။
+
+## **3. Google Ai Core V1 — Deep Forensic Audit**
+
+ဒီ Folder က ပိုပြီးအရေးကြီးတယ်။ ဘာကြောင့်လဲဆိုတော့ ဒီမှာ DLL ကို Raw Byte ဖတ်ပြီး Metadata နဲ့ IL ကို ကိုယ်တိုင် Decode လုပ်ဖို့ ကြိုးစားထားတဲ့ Python Script ပါဝင်လို့ပဲ။
+
+### **A.&#x20;**`PHASE1_DEEP_FORENSIC_AUDIT.txt`
+
+Report ရှိပြီး
+
+Report မှာ ဖော်ပြထားတဲ့ အချက်အလက် —
+
+| အချက်                      | Report ထဲက တန်ဖိုး    |
+| -------------------------- | --------------------- |
+| DLL SHA256                 | `d5501ae7...eef214bc` |
+| Target Methods             | 1,064                 |
+| Byte-Verified              | 980                   |
+| Abstract / Interface       | 84                    |
+| Decode / Branch Mismatches | 0                     |
+
+DLL SHA256 က ယခင် Ocean Audit မှာ အသုံးပြုခဲ့တဲ့ DLL SHA256 နဲ့ ကိုက်ညီတယ်။
+
+Report ထဲမှာ ပါဝင်တဲ့ အဓိကအပိုင်းတွေက —
+
+1. Grid 3 Reference Scan
+2. `ReadFromGPU` Raw IL
+3. `WaveQuery` Constructor
+4. `SetQueryWavesSampling`
+5. CPU Buffer Swap
+6. CPU Buffer Initialization
+7. `WaveSpectrumBufferCPU.Run`
+8. Independent Decoder Statistics
+9. GPU FFT / Shader Uniform Binding
+
+ဒီ Report ဟာ အရင် Gemini Report ထက် ပိုပြီး Raw IL Evidence ပါဝင်တယ်။
+
+### **B.&#x20;**`run_phase1_deep_audit.py`
+
+ဒီဖိုင်ကို အဓိကထားပြီး စစ်ဆေးခဲ့တယ်။
+
+Independent parser approach
+
+Script က `dnfile` သို့မဟုတ် `UnityPy` ကို အသုံးမပြုဘဲ Python `struct` နဲ့ ကိုယ်ပိုင် PE/CLI Metadata Parser ရေးထားတယ်။
+
+လုပ်ဆောင်ပုံက —
+
+- PE Header ဖတ်တယ်။
+- Section Table ဖတ်တယ်။
+- CLI Header နဲ့ Metadata Streams ရှာတယ်။
+- `#~`, `#Strings`, `#US` ဖတ်တယ်။
+- TypeDef / MethodDef / Field / MemberRef Table တွေကို ဖတ်တယ်။
+- Method RVA ကို File Offset ပြောင်းတယ်။
+- IL Opcode တွေကို Decode လုပ်တယ်။
+- Branch Target တွေကို စစ်တယ်။
+
+ဒါဟာ အရင် Decoder ကို ထပ်ပြီးစစ်ဆေးဖို့ အရေးပါတဲ့ Independent Approach ဖြစ်တယ်။
+
+ဒါပေမဲ့ အခုအခြေအနေမှာ `VERIFIED` ဆိုတဲ့ အဓိပ္ပာယ်ကို လျှော့သတ်မှတ်ရမယ်။
+
+**Decoder ထဲမှာ တွေ့ရတဲ့ အားနည်းချက်များ**
+
+| စစ်ဆေးရမည့်အပိုင်း                  | လက်ရှိအခြေအနေ                      |
+| ----------------------------------- | ---------------------------------- |
+| Unknown Opcode                      | ရှိလျှင် ရပ်တယ်                    |
+| Operand Length Bounds               | မပြည့်စုံ                          |
+| Tiny / Fat Header                   | အခြေခံဖတ်နိုင်                     |
+| Declared Code Size နဲ့ Slice Length | အပြည့်အဝမစစ်                       |
+| Local Signature Token               | မစစ်                               |
+| MoreSects                           | မစစ်                               |
+| Exception Handling Sections         | မစစ်                               |
+| EH Region Boundaries                | မစစ်                               |
+| Branch Target                       | Instruction Offset နဲ့ နှိုင်းယှဉ် |
+| Switch Target                       | အခြေခံစစ်ဆေးမှုသာရှိ               |
+| Metadata Token Validity             | အပြည့်အဝမစစ်                       |
+
+အထူးသတိထားရမယ့်အချက်က Operand ကိုဖတ်တဲ့အခါ `struct.unpack_from()` ကို သုံးထားပေမဲ့ အရင်ဆုံး ကျန်ရှိတဲ့ Byte အရေအတွက်ကို သီးခြားမစစ်ထားတာပဲ။
+
+နောက်တစ်ချက်က —
+
+```
+status = "VERIFIED" if (    pc == code_size and errors == 0 and bad_br == 0) else "MISMATCH"
+```
+
+ဒီစစ်ဆေးချက်က IL Decode ပြီးဆုံးမှုနဲ့ Branch Target ကိုသာ အဓိကထားတယ်။
+
+Method Header, Local Signature, Exception Handling Section နဲ့ Method Body ရဲ့ အပြည့်အစုံ Structural Validity ကို မစစ်နိုင်သေးဘူး။
+
+ဒါကြောင့် `980 VERIFIED` ဆိုတာကို **1,064 Methods အားလုံးရဲ့ Structural Integrity အပြည့်အဝအတည်ပြုပြီးပြီ** လို့ မသတ်မှတ်နိုင်ဘူး။
+
+မှန်ကန်တဲ့ သတ်မှတ်ချက်က —
+
+**980 Methods — Decoder ရဲ့ လက်ရှိစစ်ဆေးချက်များအောက်တွင် Decode ပြီးဆုံးပြီး Branch Check ဖြတ်ထားသည်။**
+
+### **C.&#x20;**`Scrpic.txt`
+
+ဒီဖိုင်က Python Script မဟုတ်ဘဲ Terminal Session / Command Transcript ဖြစ်တယ်။
+
+အရေးကြီးတဲ့အချက်တစ်ခုက Script ကို Run လုပ်ထားတဲ့ Output ကို တိုက်ရိုက်ထည့်ထားတယ်။
+
+```
+[OK] Saved -> Google Ai Core/PHASE1_DEEP_FORENSIC_AUDIT.txt
+[STATS] Scanned=1064 | Verified=980 | Abstract=84 | Mismatch=0
+```
+
+ဒီ Output က Script တစ်ကြိမ် Run လုပ်ခဲ့တဲ့ မှတ်တမ်းဖြစ်တယ်။ ဒါပေမဲ့ လက်ရှိ GitHub ပေါ်က Script ကို ဒီ Audit အတွင်း ပြန် Run မလုပ်ထားတဲ့အတွက် အဲဒီ Output ကို လက်ရှိအခြေအနေမှာ ထပ်မံအတည်ပြုထားတယ်လို့ မဆိုနိုင်ဘူး။
+
+## **4. Folder နှစ်ခုကြား အရေးကြီးဆုံး မကိုက်ညီမှုများ**
+
+| အကြောင်းအရာ                  | Gemini Core 1           | Google Core V1             |
+| ---------------------------- | ----------------------- | -------------------------- |
+| Grid 3 Analysis              | ကြိုတင်ရေးထားသော Report | Raw IL Evidence ပါဝင်      |
+| CPU Buffer Lifecycle         | အကျဉ်းချုပ်             | Raw IL Method Dump ပါဝင်   |
+| Independent Decoder          | မရှိ                    | ရှိ                        |
+| Method Count                 | မပြည့်စုံ               | 1,064 ဟု Report ဖော်ပြ     |
+| Token Audit                  | Input Files မတွေ့၍ 0    | Method Decoder ကို အဓိကထား |
+| Structural Validation        | မရှိ                    | မပြည့်စုံသေး               |
+| Compiled Shader Verification | မရှိ                    | မပြီးသေး                   |
+
+### **အရေးကြီးတဲ့ Grid 3 အချက်**
+
+Google Core V1 Report ထဲမှာ `ReadFromGPU` က Grid 0, 1, 2 ကိုသာ Readback လုပ်တာကို Raw IL နဲ့ပြထားတယ်။
+
+အဲဒီအချက်က ယခင် Ocean Audit ရဲ့ ရလဒ်နဲ့ ကိုက်ညီတယ်။
+
+ဒါပေမဲ့ `Ceto_DisplacementMap3` ကို C# က Bind လုပ်တယ်ဆိုတာနဲ့ Shader က တကယ် Sample လုပ်တယ်ဆိုတာ မတူဘူး။
+
+အခု Folder နှစ်ခုထဲမှာ Compiled Shader ရဲ့ အမှန်တကယ် Sampling ကို သက်သေပြနိုင်တဲ့ Shader Binary သို့မဟုတ် Shader Source မတွေ့ရသေးဘူး။
+
+ဒါကြောင့် Grid 3 Shader Consumption ကို မပြီးသေးတဲ့အပိုင်းအဖြစ်ပဲ ထားရမယ်။
+
+## **5. နောက်ဆုံး Audit ဆုံးဖြတ်ချက်**
+
+**Gemini Ai Core 1**
+
+PARTIALLY VERIFIED
+
+- Report Generator ရှိတယ်။
+- Path Manifest ရှိတယ်။
+- Report နဲ့ JSON Summary ကြား Input Coverage မကိုက်ညီမှုရှိတယ်။
+- ကြိုတင်သတ်မှတ်ထားတဲ့ Claims တွေကို Runtime Verification လုပ်ထားတာ မဟုတ်ဘူး။
+
+**Google Ai Core V1**
+
+SUBSTANTIAL RAW IL EVIDENCE
+
+- Independent Raw PE / CLI Parser ရှိတယ်။
+- IL Method Dump တွေရှိတယ်။
+- Grid 3 နဲ့ CPU Buffer Lifecycle အတွက် အထောက်အထားရှိတယ်။
+- Decoder Structural Validation မပြည့်စုံသေးဘူး။
+- Shader Sampling နဲ့ FFT Numerical Correctness မပြီးသေးဘူး။
+
+**ကျွန်တော့်ရဲ့ အဓိကသတ်မှတ်ချက်:** Google Ai Core V1 ကို အခြေခံပြီး ဆက်လုပ်သင့်တယ်။ Gemini Ai Core 1 ကိုတော့ Report နဲ့ File Manifest အတွက် အထောက်အထားအဖြစ်ထားပြီး Decoder အတည်ပြုချက်အဖြစ် မသုံးသင့်သေးဘူး။
+
+## **6. မပြုလုပ်ရသေးသောအရာများ**
+
+- GitHub ဖိုင်တစ်ခုမှ မပြင်ထားဘူး။
+- Script တစ်ခုမှ မပြန် Run ထားဘူး။
+- DLL ကို ဒီ Session မှာ ပြန် Decode မလုပ်ထားဘူး။
+- Compiled Shader ကို မစစ်နိုင်သေးဘူး။
+- Godot Migration ကို မစတင်ထားဘူး။
+
+နောက်တစ်ဆင့်မှာ Google Ai Core V1 ရဲ့ Decoder ကို **Method Header → Code Size → Operand Bounds → Branch/Switch → EH Sections → Metadata Token** အစီအစဉ်နဲ့ သီးခြားစစ်ဆေးပြီး `VERIFIED / PARTIALLY VERIFIED / INFERRED / UNVERIFIED` အဆင့်လေးဆင့်နဲ့ ပြန်သတ်မှတ်နိုင်တယ်။
+
+
+
+-------------
 
 
 ------------
