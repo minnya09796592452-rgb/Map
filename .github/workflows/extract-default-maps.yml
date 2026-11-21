@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - "Default Maps.zip"
+      - "PROJECTS/MISSION_3_TERRAIN/evidence/Default Maps.zip"
       - ".github/workflows/extract-default-maps.yml"
 
 permissions:
@@ -34,11 +34,11 @@ jobs:
           import stat
           import zipfile
 
-          archive = Path("Default Maps.zip")
-          output = Path("extracted") / "Default Maps"
+          archive = Path("PROJECTS/MISSION_3_TERRAIN/evidence/Default Maps.zip")
+          output = Path("PROJECTS/MISSION_3_TERRAIN/evidence/extracted") / "Default Maps"
 
           if not archive.is_file():
-              raise SystemExit("Default Maps.zip was not found at the repository root.")
+              raise SystemExit("Default Maps.zip was not found in the Mission 3 evidence folder.")
 
           # Replace only this workflow-owned output directory.
           if output.exists():
@@ -90,7 +90,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "extracted/Default Maps"
+          git add -- "PROJECTS/MISSION_3_TERRAIN/evidence/extracted/Default Maps"
           if git diff --cached --quiet; then
             echo "No extracted-file changes to commit."
             exit 0
