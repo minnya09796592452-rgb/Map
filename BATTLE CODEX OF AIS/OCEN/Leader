@@ -1,0 +1,370 @@
+# FINAL TECHNICAL REVIEW — OCEAN DISPLACEMENT PIPELINE
+## Main Report Reconciliation, Evidence Audit & Remaining Source Investigation
+
+**Target document:**
+`DISPLACEMENT_GENERATION_PIPELINE_VERIFICATION.txt`
+
+**DLL SHA256:**
+`d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc`
+
+## PRIMARY OBJECTIVE
+
+Continue from the existing report and its targeted correction addendum.
+
+Do not restart the investigation.
+Do not discard previously established evidence.
+Do not produce another report that merely repeats the current findings.
+
+Your task is to:
+1. Reconcile contradictions between the original report and its addendum.
+2. Independently audit the evidence behind critical conclusions.
+3. Investigate the remaining CPU/GPU displacement discrepancies.
+4. Improve IL decoder verification so that byte coverage genuinely means instruction-boundary coverage.
+5. Produce one internally consistent final technical report.
+
+Accuracy takes priority over completion claims.
+
+---
+
+# TASK 1 — RECONCILE THE ENTIRE REPORT
+
+Read the complete existing report, including every original section and all addenda.
+
+Search for outdated statements and correct them in their original sections.
+
+Known contradictions requiring attention:
+
+### A. Query algorithm terminology
+
+Replace outdated `Newton-Raphson` references with:
+
+`Fixed-Point Iterative Horizontal Inversion`
+
+Only use Newton-Raphson if new IL evidence establishes derivative or Jacobian calculations.
+
+### B. Iteration count
+
+Ensure all sections consistently state:
+
+- Initial counter: 0.
+- Maximum constant: 20.
+- Increment occurs before the `<= 20` branch check.
+- Maximum sampling passes: 21, according to the current reconstructed control flow.
+
+Do not leave an outdated statement claiming exactly 20 sampling passes.
+
+### C. Grid 3
+
+Remove unsupported claims that Grid 3 omission is a confirmed optimization.
+
+Current evidence indicates:
+
+- GPU visual rendering binds displacement map 3 when `numGrids > 3`.
+- `ReadFromGPU()` appears to omit CPU readback for Grid 3.
+- GPU query arrays may therefore contain zero-initialized Grid 3 data.
+- Query sampling can still include Grid 3 when its conditions permit.
+
+Keep the developer's rationale UNVERIFIED.
+
+### D. Decoder classifications
+
+Do not label an entire method VERIFIED solely because:
+
+`decoded_bytes == code_size`
+
+Every relevant original section, summary, table and conclusion must agree with the latest evidence classifications.
+
+Create a contradiction checklist and confirm that no outdated conclusion remains.
+
+---
+
+# TASK 2 — INVESTIGATE THE GRID 3 CPU/GPU DISCREPANCY
+
+This is a critical issue. Do not stop at repeating the existing addendum.
+
+Inspect the complete IL bodies and field relationships for:
+
+- `WaveSpectrum.ReadFromGPU()` — `0x06003091`
+- `WaveSpectrum.GenerateDisplacement()` — `0x06003090`
+- `DisplacementBufferGPU.QueryWaves()` — `0x06002F83`
+- `DisplacementBufferGPU` constructor — `0x06002F7E`
+- `DisplacementBufferCPU.QueryWaves()` — `0x06002F7D`
+- `QueryDisplacements.Sample()` — `0x06002F8F`
+- `QueryDisplacements.SampleHeightOnly()` — `0x06002F8E`
+- `QueryDisplacements.UpdateQueryScaling()` and all relevant callers
+- `WaveSpectrum.UpdateQueryScaling()` — verify its actual token before using it.
+
+Answer these questions individually:
+
+1. Which GPU texture contains Grid 3?
+2. Does the visual shader actually consume that texture?
+3. Is Grid 3 copied back into CPU memory?
+4. Does the GPU query buffer contain an allocated Grid 3 array?
+5. Is that array initialized to zero?
+6. Is it ever populated through another method?
+7. Does CPU query sampling read Grid 3 unconditionally or conditionally?
+8. What happens when `sampleSpectrum[3]` is false?
+9. What happens when `numGrids` is 3 versus 4?
+10. Is there any alternate GPU sampling path that bypasses CPU readback?
+
+Build two separate data-flow diagrams:
+
+**GPU visual rendering path**
+
+`Spectrum → GPU FFT → displacement textures → shader`
+
+**GPU CPU-query path**
+
+`GPU displacement generation → ReadFromGPU → CPU query arrays → QueryDisplacements.Sample`
+
+Compare both with the CPU displacement path.
+
+Important: distinguish allocated memory, initialized memory, populated memory and sampled memory. These are not interchangeable.
+
+Do not call the discrepancy a bug, optimization or intentional design without direct evidence.
+
+---
+
+# TASK 3 — COMPLETE CPU BUFFER LIFECYCLE
+
+Recheck the complete lifecycle:
+
+- `DisplacementBufferCPU` constructor
+- `GetWriteDisplacements()`
+- `GetReadDisplacements()`
+- `SwapDisplacements()`
+- `Initilize()`
+- `Run()`
+- `QueryWaves()`
+- `WaveSpectrumBufferCPU.Run()`
+- `FourierTask.ProcessData()`
+
+Produce a state-transition table showing:
+
+| Stage | Buffer [0] | Buffer [1] |
+|---|---|---|
+| Before swap | Exact role | Exact role |
+| After swap | Exact role | Exact role |
+| After initialization | Exact contents/state | Exact contents/state |
+| After Fourier output | Exact contents/state | Exact contents/state |
+| During query | Read/write role | Read/write role |
+
+Resolve whether the order of swapping, clearing, generating and querying can produce stale data.
+
+Use actual IL call order. Do not infer execution timing from method names.
+
+---
+
+# TASK 4 — REPAIR THE DECODER VERIFICATION STANDARD
+
+The current V4 audit has an important limitation:
+
+`OPERAND_SIZE.get(opname, 0)`
+
+A missing operand definition can silently become zero bytes.
+
+This is not acceptable as proof of correct instruction boundaries.
+
+Build an improved verification procedure.
+
+Requirements:
+
+### A. Unknown instructions
+
+- Unknown opcode must stop decoding that method.
+- Unknown operand type must stop decoding that method.
+- Never silently advance by zero bytes.
+- Record the exact byte offset of the failure.
+
+### B. Operand coverage
+
+Enumerate every operand type actually used in each selected method.
+
+Verify support for:
+- InlineNone
+- ShortInlineI
+- InlineI
+- InlineI8
+- ShortInlineR
+- InlineR
+- ShortInlineBrTarget
+- InlineBrTarget
+- InlineSwitch
+- InlineString
+- InlineField
+- InlineMethod
+- InlineType
+- InlineTok
+- InlineSig
+- ShortInlineVar
+- InlineVar
+
+Do not require unsupported operand types that do not occur in the inspected method, but report them as unsupported capabilities of the decoder.
+
+### C. Branch verification
+
+For every branch and switch:
+- Decode the displacement using the correct operand width.
+- Calculate the target relative to the correct instruction-end position.
+- Confirm that each target is an actual instruction boundary.
+- Report invalid or unresolved targets.
+
+### D. Method body verification
+
+Check:
+- Tiny and fat method headers.
+- Code size.
+- Local variable signature token.
+- MoreSects flag.
+- Exception handling sections.
+- `leave` and `leave.s` instructions.
+- Protected region boundaries.
+
+A method containing EH sections cannot receive full structural verification if those sections are not parsed.
+
+### E. Independent raw-byte verification
+
+For each critical method:
+- Extract the original method bytes directly from the DLL.
+- Record SHA256.
+- Independently decode from those bytes.
+- Compare decoded instruction lengths with the declared code size.
+- Ensure no overlap, gap or unexplained byte remains.
+
+Do not use dnfile's decoded instruction output as an independent decoder.
+
+dnfile may still be used for metadata cross-reference, but distinguish metadata resolution from raw IL decoding.
+
+### F. Verification result
+
+Use four statuses:
+
+- VERIFIED — raw bytes, instruction boundaries, operands, branches and relevant method structure verified.
+- PARTIALLY VERIFIED — meaningful evidence exists, but a specific structural or decoding limitation remains.
+- INFERRED — interpretation is plausible but not directly established by source.
+- UNVERIFIED — evidence is insufficient.
+
+Coverage percentage alone must never determine status.
+
+---
+
+# TASK 5 — INVESTIGATE THE REMAINING SHADER / FFT SOURCE
+
+The existing report establishes substantial C# FFT and GPU dispatch evidence.
+
+However, C# calls to `PerformFFT()`, `Blit()` or `RenderTexture` do not independently establish the exact shader mathematics.
+
+Inspect the original Unity asset data for the actual shader or compute-shader sources.
+
+Search for:
+- Fourier butterfly implementation.
+- Twiddle factor calculation.
+- Horizontal and vertical FFT passes.
+- Complex number operations.
+- Spectrum initialization.
+- Displacement X/Y/Z generation.
+- Grid-specific shader bindings.
+- Grid 3 shader usage.
+- Texture format and channel mapping.
+- Any normalization applied during FFT or displacement generation.
+
+If shader source is unavailable and only compiled shader data exists, state that limitation.
+
+Do not invent shader equations from generic ocean simulation knowledge.
+
+Keep C# evidence and shader evidence in separate sections.
+
+---
+
+# TASK 6 — FINAL END-TO-END PIPELINE
+
+After completing the investigation, reconstruct the complete pipeline:
+
+1. Spectrum initialization.
+2. Wave-vector and spectrum preparation.
+3. Butterfly lookup preparation.
+4. CPU/GPU FFT execution.
+5. Fourier output generation.
+6. Displacement X/Y/Z construction.
+7. CPU/GPU buffer or texture storage.
+8. GPU visual rendering.
+9. CPU query data preparation.
+10. Grid sampling.
+11. Bilinear interpolation.
+12. Horizontal displacement inversion.
+13. Height accumulation.
+14. Ocean level addition.
+
+For every transition, identify:
+
+- Source method.
+- Method token.
+- RVA.
+- File offset.
+- IL instruction range or shader source location.
+- Verification status.
+
+Clearly separate:
+- GPU visual surface generation.
+- CPU wave-query calculation.
+- Ocean level contribution.
+
+Do not combine them into one assumed execution path.
+
+---
+
+# TASK 7 — FINAL DELIVERABLE
+
+Update the existing:
+
+`DISPLACEMENT_GENERATION_PIPELINE_VERIFICATION.txt`
+
+Keep the original useful evidence and section organization.
+
+Do not create multiple competing final reports.
+
+The final document must contain:
+
+1. Executive summary.
+2. DLL identity.
+3. Verified C# displacement pipeline.
+4. CPU buffer lifecycle.
+5. GPU texture and readback lifecycle.
+6. Grid 3 discrepancy investigation.
+7. FFT implementation.
+8. Interpolation implementation.
+9. Query algorithm and exact loop reconstruction.
+10. Decoder verification methodology.
+11. Shader investigation results.
+12. Unified end-to-end pipeline.
+13. Contradiction resolution checklist.
+14. Remaining evidence gaps.
+15. Final verification matrix.
+
+## STRICT QUALITY RULES
+
+- Every claim must be traceable to source evidence.
+- Never invent method tokens, offsets or constants.
+- Verify token ownership before assigning a method name.
+- Do not use method names alone as proof of execution order.
+- Do not equate GPU visual data with CPU query data.
+- Do not call a method runtime-verified without runtime evidence.
+- Do not call a decoder independently verified when it relies on the same decoding output being audited.
+- Preserve uncertainty explicitly.
+- If a question cannot be answered from available evidence, state exactly what additional source or asset is needed.
+
+## FINAL ACCEPTANCE CRITERIA
+
+The report is acceptable only when:
+
+1. Original sections and addenda contain no unresolved contradictions.
+2. Grid 3 visual and query paths are separately reconstructed.
+3. CPU double-buffer lifecycle is consistent from initialization through query.
+4. Iteration count and algorithm terminology match actual IL.
+5. Critical method boundaries are verified from raw bytes.
+6. Shader claims are supported by actual shader evidence or explicitly marked unavailable.
+7. Every remaining gap has a concrete reason and a specific next evidence target.
+
+**The goal is not to produce a report that looks complete. The goal is to establish exactly what the original Stranded Deep ocean system does, what the source proves, and what remains unknown.**
+
+
