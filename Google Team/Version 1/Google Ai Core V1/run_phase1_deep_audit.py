@@ -1,0 +1,469 @@
+import os
+import struct
+import hashlib
+from datetime import datetime
+
+DLL_PATH = "/mnt/sdcard/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data/Managed/Assembly-CSharp.dll"
+OUT_DIR = "Google Ai Core"
+OUT_FILE = os.path.join(OUT_DIR, "PHASE1_DEEP_FORENSIC_AUDIT.txt")
+
+class RawPEMetadata:
+    def __init__(self, path):
+        with open(path, "rb") as f:
+            self.data = f.read()
+        self.sha256 = hashlib.sha256(self.data).hexdigest()
+        self.sections = []
+        self._parse_pe()
+        self._parse_cli()
+
+    def _parse_pe(self):
+        pe_off = struct.unpack_from("<I", self.data, 0x3C)[0]
+        assert self.data[pe_off:pe_off+4] == b"PE\x00\x00"
+        num_sec = struct.unpack_from("<H", self.data, pe_off + 6)[0]
+        opt_size = struct.unpack_from("<H", self.data, pe_off + 20)[0]
+        opt_off = pe_off + 24
+        magic = struct.unpack_from("<H", self.data, opt_off)[0]
+        dd_off = opt_off + (96 if magic == 0x10B else 112)
+        self.cli_rva, self.cli_size = struct.unpack_from("<II", self.data, dd_off + 14 * 8)
+        sec_off = opt_off + opt_size
+        for i in range(num_sec):
+            s = sec_off + i * 40
+            vsize, vrva, rsize, roff = struct.unpack_from("<IIII", self.data, s + 8)
+            self.sections.append((vrva, vsize, roff, rsize))
+
+    def rva_to_offset(self, rva):
+        if rva == 0:
+            return 0
+        for vrva, vsize, roff, rsize in self.sections:
+            span = max(vsize, rsize)
+            if vrva <= rva < vrva + span:
+                return roff + (rva - vrva)
+        return 0
+
+    def _parse_cli(self):
+        cli_off = self.rva_to_offset(self.cli_rva)
+        meta_rva, meta_size = struct.unpack_from("<II", self.data, cli_off + 8)
+        meta_off = self.rva_to_offset(meta_rva)
+        ver_len = struct.unpack_from("<I", self.data, meta_off + 12)[0]
+        ver_len_aligned = (ver_len + 3) & ~3
+        num_streams = struct.unpack_from("<H", self.data, meta_off + 16 + ver_len_aligned + 2)[0]
+        pos = meta_off + 16 + ver_len_aligned + 4
+        self.streams = {}
+        for _ in range(num_streams):
+            soff, ssize = struct.unpack_from("<II", self.data, pos)
+            pos += 8
+            end = self.data.find(b"\x00", pos)
+            name = self.data[pos:end].decode("ascii", errors="replace")
+            pos = (end + 4) & ~3
+            self.streams[name] = (meta_off + soff, ssize)
+        self._parse_tables()
+
+    def _get_string(self, idx):
+        off, size = self.streams["#Strings"]
+        if idx >= size:
+            return ""
+        end = self.data.find(b"\x00", off + idx)
+        return self.data[off + idx:end].decode("utf-8", errors="replace")
+
+    def _get_user_string(self, offset):
+        off, size = self.streams["#US"]
+        if offset >= size:
+            return ""
+        p = off + offset
+        b0 = self.data[p]
+        if (b0 & 0x80) == 0:
+            length = b0; p += 1
+        elif (b0 & 0xC0) == 0x80:
+            length = ((b0 & 0x3F) << 8) | self.data[p+1]; p += 2
+        else:
+            length = ((b0 & 0x1F) << 24) | (self.data[p+1] << 16) | (self.data[p+2] << 8) | self.data[p+3]; p += 4
+        if length <= 1:
+            return ""
+        raw = self.data[p:p + length - 1]
+        return raw.decode("utf-16le", errors="replace")
+    def _parse_tables(self):
+        off, _ = self.streams["#~"]
+        heap_sizes = self.data[off + 6]
+        valid_mask = struct.unpack_from("<Q", self.data, off + 8)[0]
+        str_idx_sz = 4 if (heap_sizes & 0x01) else 2
+        guid_idx_sz = 4 if (heap_sizes & 0x02) else 2
+        blob_idx_sz = 4 if (heap_sizes & 0x04) else 2
+
+        pos = off + 24
+        row_counts = {}
+        for tid in range(64):
+            if (valid_mask >> tid) & 1:
+                row_counts[tid] = struct.unpack_from("<I", self.data, pos)[0]
+                pos += 4
+
+        def idx_sz(tids):
+            return 4 if any(row_counts.get(t, 0) >= 65536 for t in tids) else 2
+
+        def coded_sz(tids, tag_bits):
+            limit = 1 << (16 - tag_bits)
+            return 4 if any(row_counts.get(t, 0) >= limit for t in tids) else 2
+
+        td_or_tr = coded_sz([0x02, 0x01, 0x1B], 2)
+        has_const = coded_sz([0x04, 0x08, 0x17], 2)
+        has_ca = coded_sz([0x06, 0x04, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x00, 0x0E, 0x17, 0x14, 0x11, 0x1A, 0x1B, 0x20, 0x23, 0x26, 0x27, 0x28], 5)
+        has_fm = coded_sz([0x04, 0x08], 1)
+        has_decl = coded_sz([0x02, 0x06, 0x20], 2)
+        mr_parent = coded_sz([0x02, 0x01, 0x1A, 0x06, 0x1B], 3)
+        has_sem = coded_sz([0x14, 0x17], 1)
+        md_or_mr = coded_sz([0x06, 0x0A], 1)
+        impl = coded_sz([0x04, 0x0A], 1)
+        ca_type = coded_sz([0x06, 0x0A], 3)
+        res_scope = coded_sz([0x00, 0x1A, 0x23, 0x01], 2)
+        to_md = coded_sz([0x02, 0x06], 1)
+
+        row_sizes = {
+            0x00: 2 + str_idx_sz + guid_idx_sz * 3,
+            0x01: res_scope + str_idx_sz * 2,
+            0x02: 4 + str_idx_sz * 2 + td_or_tr + idx_sz([0x04]) + idx_sz([0x06]),
+            0x04: 2 + str_idx_sz + blob_idx_sz,
+            0x06: 4 + 2 + 2 + str_idx_sz + blob_idx_sz + idx_sz([0x08]),
+            0x08: 2 + 2 + str_idx_sz,
+            0x09: idx_sz([0x02]) + td_or_tr,
+            0x0A: mr_parent + str_idx_sz + blob_idx_sz,
+            0x0B: 2 + has_const + blob_idx_sz,
+            0x0C: has_ca + ca_type + blob_idx_sz,
+            0x0D: has_fm + blob_idx_sz,
+            0x0E: 2 + has_decl + blob_idx_sz,
+            0x0F: 2 + 4 + idx_sz([0x02]),
+            0x10: 4 + idx_sz([0x04]),
+            0x11: blob_idx_sz,
+            0x12: idx_sz([0x02]) + idx_sz([0x14]),
+            0x14: 2 + str_idx_sz + td_or_tr,
+            0x15: idx_sz([0x02]) + idx_sz([0x17]),
+            0x17: 2 + str_idx_sz + blob_idx_sz,
+            0x18: 2 + idx_sz([0x06]) + has_sem,
+            0x19: idx_sz([0x02]) + md_or_mr + md_or_mr,
+            0x1A: str_idx_sz,
+            0x1B: blob_idx_sz,
+            0x1C: 2 + impl + str_idx_sz + idx_sz([0x1A]),
+            0x1D: 4 + idx_sz([0x04]),
+            0x20: 4 + 8 + 4 + blob_idx_sz + str_idx_sz * 2,
+            0x23: 8 + 4 + blob_idx_sz + str_idx_sz * 2 + blob_idx_sz,
+            0x26: 4 + 4 + str_idx_sz + impl,
+            0x27: 4 + 4 + str_idx_sz * 2 + impl,
+            0x28: 4 + 4 + str_idx_sz + impl,
+            0x29: idx_sz([0x02]) + idx_sz([0x02]),
+            0x2A: 2 + 2 + to_md + str_idx_sz,
+            0x2B: md_or_mr + blob_idx_sz,
+            0x2C: idx_sz([0x2A]) + td_or_tr,
+        }
+
+        table_offsets = {}
+        for tid in range(64):
+            cnt = row_counts.get(tid, 0)
+            if cnt > 0:
+                table_offsets[tid] = pos
+                pos += cnt * row_sizes[tid]
+
+        td_cnt = row_counts.get(0x02, 0)
+        td_off = table_offsets.get(0x02, 0)
+        td_rsz = row_sizes[0x02]
+        typedefs = []
+        for rid in range(1, td_cnt + 1):
+            r = td_off + (rid - 1) * td_rsz
+            name_i = struct.unpack_from("<I" if str_idx_sz == 4 else "<H", self.data, r + 4)[0]
+            ns_i = struct.unpack_from("<I" if str_idx_sz == 4 else "<H", self.data, r + 4 + str_idx_sz)[0]
+            mlist_off = r + 4 + str_idx_sz * 2 + td_or_tr + idx_sz([0x04])
+            mlist = struct.unpack_from("<I" if idx_sz([0x06]) == 4 else "<H", self.data, mlist_off)[0]
+            typedefs.append((rid, self._get_string(ns_i), self._get_string(name_i), mlist))
+
+        md_cnt = row_counts.get(0x06, 0)
+        md_off = table_offsets.get(0x06, 0)
+        md_rsz = row_sizes[0x06]
+        self.methods = {}
+        td_idx = 0
+        for rid in range(1, md_cnt + 1):
+            while td_idx + 1 < len(typedefs) and typedefs[td_idx + 1][3] <= rid:
+                td_idx += 1
+            ns, tname = typedefs[td_idx][1], typedefs[td_idx][2]
+            full_type = f"{ns}.{tname}" if ns else tname
+            r = md_off + (rid - 1) * md_rsz
+            rva = struct.unpack_from("<I", self.data, r)[0]
+            name_i = struct.unpack_from("<I" if str_idx_sz == 4 else "<H", self.data, r + 8)[0]
+            mname = self._get_string(name_i)
+            token = 0x06000000 | rid
+            self.methods[token] = {
+                "token": token, "rid": rid, "type": full_type,
+                "name": mname, "rva": rva, "offset": self.rva_to_offset(rva)
+            }
+
+        fd_cnt = row_counts.get(0x04, 0)
+        fd_off = table_offsets.get(0x04, 0)
+        fd_rsz = row_sizes[0x04]
+        self.fields = {}
+        for rid in range(1, fd_cnt + 1):
+            r = fd_off + (rid - 1) * fd_rsz
+            name_i = struct.unpack_from("<I" if str_idx_sz == 4 else "<H", self.data, r + 2)[0]
+            self.fields[0x04000000 | rid] = self._get_string(name_i)
+
+        mr_cnt = row_counts.get(0x0A, 0)
+        mr_off = table_offsets.get(0x0A, 0)
+        mr_rsz = row_sizes[0x0A]
+        self.memberrefs = {}
+        for rid in range(1, mr_cnt + 1):
+            r = mr_off + (rid - 1) * mr_rsz
+            name_i = struct.unpack_from("<I" if str_idx_sz == 4 else "<H", self.data, r + mr_parent)[0]
+            self.memberrefs[0x0A000000 | rid] = self._get_string(name_i)
+
+    def resolve_token(self, tok):
+        tbl = tok >> 24
+        if tbl == 0x06 and tok in self.methods:
+            m = self.methods[tok]
+            return f"{m['type']}.{m['name']}"
+        if tbl == 0x04 and tok in self.fields:
+            return f"Field:{self.fields[tok]}"
+        if tbl == 0x0A and tok in self.memberrefs:
+            return f"Ref:{self.memberrefs[tok]}"
+        if tbl == 0x70:
+            return f"US:'{self._get_user_string(tok & 0x00FFFFFF)}'"
+        return f"0x{tok:08X}"
+SINGLE_OP = {
+    0x00: ("nop", 0), 0x01: ("break", 0), 0x02: ("ldarg.0", 0), 0x03: ("ldarg.1", 0),
+    0x04: ("ldarg.2", 0), 0x05: ("ldarg.3", 0), 0x06: ("ldloc.0", 0), 0x07: ("ldloc.1", 0),
+    0x08: ("ldloc.2", 0), 0x09: ("ldloc.3", 0), 0x0A: ("stloc.0", 0), 0x0B: ("stloc.1", 0),
+    0x0C: ("stloc.2", 0), 0x0D: ("stloc.3", 0), 0x0E: ("ldarg.s", 1), 0x0F: ("ldarga.s", 1),
+    0x10: ("starg.s", 1), 0x11: ("ldloc.s", 1), 0x12: ("ldloca.s", 1), 0x13: ("stloc.s", 1),
+    0x14: ("ldnull", 0), 0x15: ("ldc.i4.m1", 0), 0x16: ("ldc.i4.0", 0), 0x17: ("ldc.i4.1", 0),
+    0x18: ("ldc.i4.2", 0), 0x19: ("ldc.i4.3", 0), 0x1A: ("ldc.i4.4", 0), 0x1B: ("ldc.i4.5", 0),
+    0x1C: ("ldc.i4.6", 0), 0x1D: ("ldc.i4.7", 0), 0x1E: ("ldc.i4.8", 0), 0x1F: ("ldc.i4.s", 1),
+    0x20: ("ldc.i4", 4), 0x21: ("ldc.i8", 8), 0x22: ("ldc.r4", 4), 0x23: ("ldc.r8", 8),
+    0x25: ("dup", 0), 0x26: ("pop", 0), 0x27: ("jmp", 4), 0x28: ("call", 4),
+    0x29: ("calli", 4), 0x2A: ("ret", 0), 0x2B: ("br.s", -1), 0x2C: ("brfalse.s", -1),
+    0x2D: ("brtrue.s", -1), 0x2E: ("beq.s", -1), 0x2F: ("bge.s", -1), 0x30: ("bgt.s", -1),
+    0x31: ("ble.s", -1), 0x32: ("blt.s", -1), 0x33: ("bne.un.s", -1), 0x34: ("bge.un.s", -1),
+    0x35: ("bgt.un.s", -1), 0x36: ("ble.un.s", -1), 0x37: ("blt.un.s", -1), 0x38: ("br", -4),
+    0x39: ("brfalse", -4), 0x3A: ("brtrue", -4), 0x3B: ("beq", -4), 0x3C: ("bge", -4),
+    0x3D: ("bgt", -4), 0x3E: ("ble", -4), 0x3F: ("blt", -4), 0x40: ("bne.un", -4),
+    0x41: ("bge.un", -4), 0x42: ("bgt.un", -4), 0x43: ("ble.un", -4), 0x44: ("blt.un", -4),
+    0x45: ("switch", -99), 0x46: ("ldind.i1", 0), 0x47: ("ldind.u1", 0), 0x48: ("ldind.i2", 0),
+    0x49: ("ldind.u2", 0), 0x4A: ("ldind.i4", 0), 0x4B: ("ldind.u4", 0), 0x4C: ("ldind.i8", 0),
+    0x4D: ("ldind.i", 0), 0x4E: ("ldind.r4", 0), 0x4F: ("ldind.r8", 0), 0x50: ("ldind.ref", 0),
+    0x51: ("stind.ref", 0), 0x52: ("stind.i1", 0), 0x53: ("stind.i2", 0), 0x54: ("stind.i4", 0),
+    0x55: ("stind.i8", 0), 0x56: ("stind.r4", 0), 0x57: ("stind.r8", 0), 0x58: ("add", 0),
+    0x59: ("sub", 0), 0x5A: ("mul", 0), 0x5B: ("div", 0), 0x5C: ("div.un", 0),
+    0x5D: ("rem", 0), 0x5E: ("rem.un", 0), 0x5F: ("and", 0), 0x60: ("or", 0),
+    0x61: ("xor", 0), 0x62: ("shl", 0), 0x63: ("shr", 0), 0x64: ("shr.un", 0),
+    0x65: ("neg", 0), 0x66: ("not", 0), 0x67: ("conv.i1", 0), 0x68: ("conv.i2", 0),
+    0x69: ("conv.i4", 0), 0x6A: ("conv.i8", 0), 0x6B: ("conv.r4", 0), 0x6C: ("conv.r8", 0),
+    0x6D: ("conv.u4", 0), 0x6E: ("conv.u8", 0), 0x6F: ("callvirt", 4), 0x70: ("cpobj", 4),
+    0x71: ("ldobj", 4), 0x72: ("ldstr", 4), 0x73: ("newobj", 4), 0x74: ("castclass", 4),
+    0x75: ("isinst", 4), 0x76: ("conv.r.un", 0), 0x79: ("unbox", 4), 0x7A: ("throw", 0),
+    0x7B: ("ldfld", 4), 0x7C: ("ldflda", 4), 0x7D: ("stfld", 4), 0x7E: ("ldsfld", 4),
+    0x7F: ("ldsflda", 4), 0x80: ("stsfld", 4), 0x81: ("stobj", 4), 0x82: ("conv.ovf.i1.un", 0),
+    0x83: ("conv.ovf.i2.un", 0), 0x84: ("conv.ovf.i4.un", 0), 0x85: ("conv.ovf.i8.un", 0),
+    0x86: ("conv.ovf.u1.un", 0), 0x87: ("conv.ovf.u2.un", 0), 0x88: ("conv.ovf.u4.un", 0),
+    0x89: ("conv.ovf.u8.un", 0), 0x8A: ("conv.ovf.i.un", 0), 0x8B: ("conv.ovf.u.un", 0),
+    0x8C: ("box", 4), 0x8D: ("newarr", 4), 0x8E: ("ldlen", 0), 0x8F: ("ldelema", 4),
+    0x90: ("ldelem.i1", 0), 0x91: ("ldelem.u1", 0), 0x92: ("ldelem.i2", 0), 0x93: ("ldelem.u2", 0),
+    0x94: ("ldelem.i4", 0), 0x95: ("ldelem.u4", 0), 0x96: ("ldelem.i8", 0), 0x97: ("ldelem.i", 0),
+    0x98: ("ldelem.r4", 0), 0x99: ("ldelem.r8", 0), 0x9A: ("ldelem.ref", 0), 0x9B: ("stelem.i", 0),
+    0x9C: ("stelem.i1", 0), 0x9D: ("stelem.i2", 0), 0x9E: ("stelem.i4", 0), 0x9F: ("stelem.i8", 0),
+    0xA0: ("stelem.r4", 0), 0xA1: ("stelem.r8", 0), 0xA2: ("stelem.ref", 0), 0xA3: ("ldelem", 4),
+    0xA4: ("stelem", 4), 0xA5: ("unbox.any", 4), 0xB3: ("conv.ovf.i1", 0), 0xB4: ("conv.ovf.u1", 0),
+    0xB5: ("conv.ovf.i2", 0), 0xB6: ("conv.ovf.u2", 0), 0xB7: ("conv.ovf.i4", 0), 0xB8: ("conv.ovf.u4", 0),
+    0xB9: ("conv.ovf.i8", 0), 0xBA: ("conv.ovf.u8", 0), 0xC2: ("refanyval", 4), 0xC3: ("ckfinite", 0),
+    0xC6: ("mkrefany", 4), 0xD0: ("ldtoken", 4), 0xD1: ("conv.u2", 0), 0xD2: ("conv.u1", 0),
+    0xD3: ("conv.i", 0), 0xD4: ("conv.ovf.i", 0), 0xD5: ("conv.ovf.u", 0), 0xD6: ("add.ovf", 0),
+    0xD7: ("add.ovf.un", 0), 0xD8: ("mul.ovf", 0), 0xD9: ("mul.ovf.un", 0), 0xDA: ("sub.ovf", 0),
+    0xDB: ("sub.ovf.un", 0), 0xDC: ("endfinally", 0), 0xDD: ("leave", -4), 0xDE: ("leave.s", -1),
+    0xDF: ("stind.i", 0), 0xE0: ("conv.u", 0)
+}
+
+FE_OP = {
+    0x00: ("arglist", 0), 0x01: ("ceq", 0), 0x02: ("cgt", 0), 0x03: ("cgt.un", 0),
+    0x04: ("clt", 0), 0x05: ("clt.un", 0), 0x06: ("ldftn", 4), 0x07: ("ldvirtftn", 4),
+    0x09: ("ldarg", 2), 0x0A: ("ldarga", 2), 0x0B: ("starg", 2), 0x0C: ("ldloc", 2),
+    0x0D: ("ldloca", 2), 0x0E: ("stloc", 2), 0x0F: ("localloc", 0), 0x11: ("endfilter", 0),
+    0x12: ("unaligned.", 1), 0x13: ("volatile.", 0), 0x14: ("tail.", 0), 0x15: ("initobj", 4),
+    0x16: ("constrained.", 4), 0x17: ("cpblk", 0), 0x18: ("initblk", 0), 0x1A: ("rethrow", 0),
+    0x1C: ("sizeof", 4), 0x1D: ("refanytype", 0), 0x1E: ("readonly.", 0)
+}
+
+def decode_method_body(pe, method_info):
+    off = method_info["offset"]
+    if off == 0:
+        return {"status": "ABSTRACT_OR_EXTERN", "size": 0, "decoded": 0, "insns": [], "errors": 0, "bad_br": 0}
+    b0 = pe.data[off]
+    fmt = b0 & 0x03
+    if fmt == 0x02:
+        code_size = b0 >> 2
+        body_off = off + 1
+    elif fmt == 0x03:
+        code_size = struct.unpack_from("<I", pe.data, off + 4)[0]
+        body_off = off + 12
+    else:
+        return {"status": "UNKNOWN_HEADER", "size": 0, "decoded": 0, "insns": [], "errors": 1, "bad_br": 0}
+
+    code = pe.data[body_off:body_off + code_size]
+    pc = 0
+    insns = []
+    offsets = set()
+    branches = []
+    errors = 0
+
+    while pc < code_size:
+        offsets.add(pc)
+        start_pc = pc
+        op = code[pc]
+        pc += 1
+        if op == 0xFE:
+            if pc >= code_size:
+                errors += 1; break
+            op2 = code[pc]; pc += 1
+            if op2 not in FE_OP:
+                errors += 1; insns.append((start_pc, f"UNKNOWN_FE_{op2:02X}", "")); break
+            mnem, arg_sz = FE_OP[op2]
+        else:
+            if op not in SINGLE_OP:
+                errors += 1; insns.append((start_pc, f"UNKNOWN_{op:02X}", "")); break
+            mnem, arg_sz = SINGLE_OP[op]
+
+        operand_str = ""
+        if arg_sz == 1:
+            operand_str = f"0x{code[pc]:02X}"; pc += 1
+        elif arg_sz == 2:
+            val = struct.unpack_from("<H", code, pc)[0]; pc += 2
+            operand_str = f"0x{val:04X}"
+        elif arg_sz == 4:
+            val = struct.unpack_from("<I", code, pc)[0]; pc += 4
+            if mnem == "ldc.r4":
+                fval = struct.unpack("<f", struct.pack("<I", val))[0]
+                operand_str = f"{fval}"
+            elif mnem in ("call", "callvirt", "newobj", "ldfld", "ldflda", "stfld", "ldsfld", "ldsflda", "stsfld", "ldstr", "newarr", "ldelema", "ldelem", "stelem", "box", "unbox.any", "castclass", "isinst", "ldtoken", "initobj", "constrained."):
+                operand_str = f"0x{val:08X} [{pe.resolve_token(val)}]"
+            else:
+                operand_str = f"0x{val:08X}"
+        elif arg_sz == 8:
+            val = struct.unpack_from("<Q", code, pc)[0]; pc += 8
+            operand_str = f"0x{val:016X}"
+        elif arg_sz == -1:
+            rel = struct.unpack_from("<b", code, pc)[0]; pc += 1
+            target = pc + rel
+            branches.append((start_pc, target))
+            operand_str = f"IL_{target:04X}"
+        elif arg_sz == -4:
+            rel = struct.unpack_from("<i", code, pc)[0]; pc += 4
+            target = pc + rel
+            branches.append((start_pc, target))
+            operand_str = f"IL_{target:04X}"
+        elif arg_sz == -99:
+            cnt = struct.unpack_from("<I", code, pc)[0]; pc += 4
+            base_pc = pc + cnt * 4
+            targs = []
+            for _ in range(cnt):
+                rel = struct.unpack_from("<i", code, pc)[0]; pc += 4
+                t = base_pc + rel
+                branches.append((start_pc, t))
+                targs.append(f"IL_{t:04X}")
+            operand_str = f"[{', '.join(targs)}]"
+
+        insns.append((start_pc, mnem, operand_str))
+
+    bad_br = sum(1 for _, t in branches if t not in offsets and t != code_size)
+    status = "VERIFIED" if (pc == code_size and errors == 0 and bad_br == 0) else "MISMATCH"
+    return {"status": status, "size": code_size, "decoded": pc, "insns": insns, "errors": errors, "bad_br": bad_br}
+def main():
+    os.makedirs(OUT_DIR, exist_ok=True)
+    pe = RawPEMetadata(DLL_PATH)
+
+    ceto_methods = [
+        m for m in pe.methods.values()
+        if m["type"].startswith("Ceto.") or "Ocean" in m["type"] or "Wave" in m["type"] or "Fourier" in m["type"] or "Displacement" in m["type"]
+    ]
+    ceto_methods.sort(key=lambda x: x["token"])
+
+    verified_cnt = 0
+    abstract_cnt = 0
+    mismatch_cnt = 0
+    decoded_cache = {}
+    for m in ceto_methods:
+        res = decode_method_body(pe, m)
+        decoded_cache[m["token"]] = res
+        if res["status"] == "VERIFIED":
+            verified_cnt += 1
+        elif res["status"] == "ABSTRACT_OR_EXTERN":
+            abstract_cnt += 1
+        else:
+            mismatch_cnt += 1
+
+    def dump_method(tok):
+        m = pe.methods[tok]
+        d = decoded_cache[tok]
+        lines = [f"--- {m['type']}.{m['name']} (Token: 0x{tok:08X} | RID: {m['rid']} | RVA: 0x{m['rva']:X} | Size: {d['size']}B | Status: {d['status']}) ---"]
+        for pc, mnem, op in d["insns"]:
+            lines.append(f"  IL_{pc:04X}: {mnem:<14} {op}")
+        return "\n".join(lines)
+
+    grid3_refs = []
+    swap_callers = []
+    shader_bindings = []
+    for tok, m in pe.methods.items():
+        d = decoded_cache[tok] if tok in decoded_cache else decode_method_body(pe, m)
+        for pc, mnem, op in d["insns"]:
+            if any(k in op for k in ["Ceto_DisplacementMap3", "sampleSpectrum", "ReadFromGPU", "m_displacementMaps"]):
+                grid3_refs.append(f"  0x{tok:08X} {m['type']}.{m['name']} @ IL_{pc:04X}: {mnem} {op}")
+            if any(k in op for k in ["0x06002F78", "0x06002F7B", "0x06002FBD", "0x06003090"]):
+                swap_callers.append(f"  0x{tok:08X} {m['type']}.{m['name']} @ IL_{pc:04X}: {mnem} {op}")
+            if m["type"].startswith("Ceto.") and mnem == "ldstr" and ("Ceto_" in op or "read" in op.lower() or "fourier" in op.lower()):
+                shader_bindings.append(f"  0x{tok:08X} {m['type']}.{m['name']} @ IL_{pc:04X}: {op}")
+
+    report = [
+        "=" * 92,
+        "GOOGLE AI CORE — PHASE 1 DEEP FORENSIC AUDIT REPORT",
+        f"Generated : {datetime.now().isoformat(timespec='seconds')}",
+        f"Target DLL: {DLL_PATH}",
+        f"DLL SHA256: {pe.sha256}",
+        "=" * 92, "",
+        "[SECTION 1: GRID 3 FULL TRACE — SHADER CONSUMPTION, QUERY BUFFER & ALTERNATE PATHS]",
+        "-" * 92,
+        "1.1 Cross-DLL Reference Scan for Ceto_DisplacementMap3 / sampleSpectrum / m_displacementMaps:"
+    ]
+    report.extend(grid3_refs[:60])
+    report.extend([
+        "", "1.2 Raw IL Proof — WaveSpectrum.ReadFromGPU (0x06003091):",
+        dump_method(0x06003091),
+        "", "1.3 Raw IL Proof — WaveQuery..ctor (0x06002F44) & SetQueryWavesSampling (0x06002E51):",
+        dump_method(0x06002F44),
+        dump_method(0x06002E51),
+        "", "[SECTION 2: CPU BUFFER STATE VERIFICATION — CALLER ORDER, SWAP & TASK COMPLETION]",
+        "-" * 92,
+        "2.1 Callers of DisplacementBufferCPU.Run (0x06002F78) & WaveSpectrumBufferCPU.Run (0x06002FBD):"
+    ])
+    report.extend(swap_callers)
+    report.extend([
+        "", "2.2 Raw IL Proof — DisplacementBufferCPU.Run (0x06002F78), SwapDisplacements (0x06002F7B), Initilize (0x06002F75):",
+        dump_method(0x06002F78),
+        dump_method(0x06002F7B),
+        dump_method(0x06002F75),
+        "", "2.3 Raw IL Proof — WaveSpectrumBufferCPU.Run (0x06002FBD):",
+        dump_method(0x06002FBD),
+        "", "[SECTION 3: INDEPENDENT RAW BYTE DECODER — FULL CETO / OCEAN METHOD AUDIT]",
+        "-" * 92,
+        f"  - Total Target Methods Scanned : {len(ceto_methods)}",
+        f"  - 100% Byte-Verified Methods   : {verified_cnt}",
+        f"  - Abstract / Interface (RVA=0) : {abstract_cnt}",
+        f"  - Decode / Branch Mismatches   : {mismatch_cnt}",
+        f"  - Parser Dependency            : ZERO (Pure Python struct + ECMA-335 CLI/CIL decoder)",
+        "", "[SECTION 4: GPU FFT & SHADER UNIFORM / KERNEL BINDING VERIFICATION]",
+        "-" * 92,
+        "4.1 Raw IL Proof — WaveSpectrumBufferGPU.Initilize (0x06002FC5) & FourierGPU.PeformFFT (0x0600303A):",
+        dump_method(0x06002FC5),
+        dump_method(0x0600303A),
+        "", "4.2 All Ceto Shader Uniforms & Compute Kernels Bound in IL:"
+    ])
+    report.extend(sorted(set(shader_bindings)))
+    report.extend(["", "=" * 92, "END OF AUDIT REPORT", "=" * 92])
+
+    with open(OUT_FILE, "w", encoding="utf-8") as f:
+        f.write("\n".join(report))
+
+    print(f"[OK] Saved -> {OUT_FILE}")
+    print(f"[STATS] Scanned={len(ceto_methods)} | Verified={verified_cnt} | Abstract={abstract_cnt} | Mismatch={mismatch_cnt}")
+
+if __name__ == "__main__":
+    main()
