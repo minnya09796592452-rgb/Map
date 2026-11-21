@@ -1,0 +1,154 @@
+MISSION 3 ORIGINAL GAME DLL CLASSIFICATION V14
+=================================================================
+Date: 2026-11-20T00:44:05.328861
+Game root: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+Boundary: /storage/emulated/0/Map Check
+Original game files modified: NO
+
+===== SUMMARY =====
+DLL count: 124
+Total DLL size: 71,518,384 bytes
+Symlinks skipped: 0
+Errors: 0
+
+===== CLASSIFICATION COUNTS =====
+MANAGED_DOTNET: 119
+MONO_RUNTIME: 2
+NATIVE_PE: 3
+
+===== IMPORTANT GAME ASSEMBLIES =====
+MANAGED_DOTNET | 642,048 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp-firstpass.dll | CLR header 2.5
+MANAGED_DOTNET | 3,432,448 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp.dll | CLR header 2.5
+
+===== COMPLETE DLL INDEX =====
+MONO_RUNTIME | MONO_RUNTIME_COMPONENT | 7,680,088 bytes | MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll | CLR directory absent
+MONO_RUNTIME | MONO_RUNTIME_COMPONENT | 600,576 bytes | MonoBleedingEdge/EmbedRuntime/MonoPosixHelper.dll | CLR directory absent
+MANAGED_DOTNET | FIRSTPASS_GAME_ASSEMBLY | 642,048 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp-firstpass.dll | CLR header 2.5
+MANAGED_DOTNET | MAIN_GAME_ASSEMBLY | 3,432,448 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 262,656 bytes | Stranded_Deep_Data/Managed/bolt.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 91,648 bytes | Stranded_Deep_Data/Managed/bolt.user.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 62,976 bytes | Stranded_Deep_Data/Managed/ch.sycoforge.Decal.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 366,592 bytes | Stranded_Deep_Data/Managed/com.rlabrecque.steamworks.net.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 8,704 bytes | Stranded_Deep_Data/Managed/GdkUtilities.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 241,152 bytes | Stranded_Deep_Data/Managed/Mono.Security.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 4,630,528 bytes | Stranded_Deep_Data/Managed/mscorlib.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 90,112 bytes | Stranded_Deep_Data/Managed/netstandard.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 683,008 bytes | Stranded_Deep_Data/Managed/Newtonsoft.Json.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 230,912 bytes | Stranded_Deep_Data/Managed/Photon3Unity3D.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 12,800 bytes | Stranded_Deep_Data/Managed/PhotonBolt.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 101,376 bytes | Stranded_Deep_Data/Managed/PhotonRealtime.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 2,007,040 bytes | Stranded_Deep_Data/Managed/Rewired_Core.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 929,792 bytes | Stranded_Deep_Data/Managed/Rewired_Windows.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 4,096 bytes | Stranded_Deep_Data/Managed/Rewired_Windows_Functions.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 32,768 bytes | Stranded_Deep_Data/Managed/Sirenix.OdinInspector.Attributes.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 5,120 bytes | Stranded_Deep_Data/Managed/Sirenix.OdinInspector.CompatibilityLayer.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 15,360 bytes | Stranded_Deep_Data/Managed/Sirenix.Serialization.Config.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 325,632 bytes | Stranded_Deep_Data/Managed/Sirenix.Serialization.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 148,992 bytes | Stranded_Deep_Data/Managed/Sirenix.Utilities.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 257,024 bytes | Stranded_Deep_Data/Managed/System.ComponentModel.Composition.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 124,928 bytes | Stranded_Deep_Data/Managed/System.Configuration.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 1,113,088 bytes | Stranded_Deep_Data/Managed/System.Core.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 29,696 bytes | Stranded_Deep_Data/Managed/System.Data.DataSetExtensions.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 2,118,656 bytes | Stranded_Deep_Data/Managed/System.Data.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 2,637,312 bytes | Stranded_Deep_Data/Managed/System.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 489,984 bytes | Stranded_Deep_Data/Managed/System.Drawing.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 44,544 bytes | Stranded_Deep_Data/Managed/System.EnterpriseServices.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 114,688 bytes | Stranded_Deep_Data/Managed/System.IO.Compression.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 18,432 bytes | Stranded_Deep_Data/Managed/System.IO.Compression.FileSystem.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 121,344 bytes | Stranded_Deep_Data/Managed/System.Net.Http.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 119,296 bytes | Stranded_Deep_Data/Managed/System.Numerics.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 934,400 bytes | Stranded_Deep_Data/Managed/System.Runtime.Serialization.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 314,880 bytes | Stranded_Deep_Data/Managed/System.Security.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 215,040 bytes | Stranded_Deep_Data/Managed/System.ServiceModel.Internals.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 35,328 bytes | Stranded_Deep_Data/Managed/System.Transactions.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 3,160,064 bytes | Stranded_Deep_Data/Managed/System.Xml.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 136,704 bytes | Stranded_Deep_Data/Managed/System.Xml.Linq.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 40,448 bytes | Stranded_Deep_Data/Managed/udpkit.common.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 102,912 bytes | Stranded_Deep_Data/Managed/udpkit.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 15,872 bytes | Stranded_Deep_Data/Managed/udpkit.platform.dotnet.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 6,656 bytes | Stranded_Deep_Data/Managed/udpkit.platform.null.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 73,216 bytes | Stranded_Deep_Data/Managed/udpkit.platform.photon.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 144,896 bytes | Stranded_Deep_Data/Managed/Unity.Postprocessing.Runtime.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 370,688 bytes | Stranded_Deep_Data/Managed/Unity.TextMeshPro.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 115,712 bytes | Stranded_Deep_Data/Managed/Unity.Timeline.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 12,800 bytes | Stranded_Deep_Data/Managed/UnityEngine.AccessibilityModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 45,568 bytes | Stranded_Deep_Data/Managed/UnityEngine.AIModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 68,608 bytes | Stranded_Deep_Data/Managed/UnityEngine.AndroidJNIModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 151,040 bytes | Stranded_Deep_Data/Managed/UnityEngine.AnimationModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,752 bytes | Stranded_Deep_Data/Managed/UnityEngine.ARModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 23,040 bytes | Stranded_Deep_Data/Managed/UnityEngine.AssetBundleModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 59,392 bytes | Stranded_Deep_Data/Managed/UnityEngine.AudioModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 15,360 bytes | Stranded_Deep_Data/Managed/UnityEngine.ClothModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,752 bytes | Stranded_Deep_Data/Managed/UnityEngine.ClusterInputModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 11,776 bytes | Stranded_Deep_Data/Managed/UnityEngine.ClusterRendererModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 1,252,352 bytes | Stranded_Deep_Data/Managed/UnityEngine.CoreModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.CrashReportingModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 14,336 bytes | Stranded_Deep_Data/Managed/UnityEngine.DirectorModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 100,352 bytes | Stranded_Deep_Data/Managed/UnityEngine.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 18,432 bytes | Stranded_Deep_Data/Managed/UnityEngine.DSPGraphModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 29,184 bytes | Stranded_Deep_Data/Managed/UnityEngine.GameCenterModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.GIModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 14,336 bytes | Stranded_Deep_Data/Managed/UnityEngine.GridModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.HotReloadModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 13,824 bytes | Stranded_Deep_Data/Managed/UnityEngine.ImageConversionModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 162,304 bytes | Stranded_Deep_Data/Managed/UnityEngine.IMGUIModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 26,112 bytes | Stranded_Deep_Data/Managed/UnityEngine.InputLegacyModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 12,800 bytes | Stranded_Deep_Data/Managed/UnityEngine.InputModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 11,264 bytes | Stranded_Deep_Data/Managed/UnityEngine.JSONSerializeModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,752 bytes | Stranded_Deep_Data/Managed/UnityEngine.LocalizationModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 23,040 bytes | Stranded_Deep_Data/Managed/UnityEngine.NVIDIAModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 143,872 bytes | Stranded_Deep_Data/Managed/UnityEngine.ParticleSystemModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.PerformanceReportingModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 123,392 bytes | Stranded_Deep_Data/Managed/UnityEngine.Physics2DModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 102,912 bytes | Stranded_Deep_Data/Managed/UnityEngine.PhysicsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.ProfilerModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,728 bytes | Stranded_Deep_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.ScreenCaptureModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 21,504 bytes | Stranded_Deep_Data/Managed/UnityEngine.SharedInternalsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,752 bytes | Stranded_Deep_Data/Managed/UnityEngine.SpriteMaskModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 14,848 bytes | Stranded_Deep_Data/Managed/UnityEngine.SpriteShapeModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.StreamingModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 14,336 bytes | Stranded_Deep_Data/Managed/UnityEngine.SubstanceModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 24,064 bytes | Stranded_Deep_Data/Managed/UnityEngine.SubsystemsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 88,064 bytes | Stranded_Deep_Data/Managed/UnityEngine.TerrainModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.TerrainPhysicsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 40,448 bytes | Stranded_Deep_Data/Managed/UnityEngine.TextCoreFontEngineModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 183,808 bytes | Stranded_Deep_Data/Managed/UnityEngine.TextCoreTextEngineModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 28,160 bytes | Stranded_Deep_Data/Managed/UnityEngine.TextRenderingModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 32,256 bytes | Stranded_Deep_Data/Managed/UnityEngine.TilemapModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 15,872 bytes | Stranded_Deep_Data/Managed/UnityEngine.TLSModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.UaaLAnalyticsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 227,840 bytes | Stranded_Deep_Data/Managed/UnityEngine.UI.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 1,186,816 bytes | Stranded_Deep_Data/Managed/UnityEngine.UIElementsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 48,128 bytes | Stranded_Deep_Data/Managed/UnityEngine.UIElementsNativeModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 25,600 bytes | Stranded_Deep_Data/Managed/UnityEngine.UIModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.UmbraModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 78,848 bytes | Stranded_Deep_Data/Managed/UnityEngine.UNETModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 33,792 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityAnalyticsModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 11,264 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityConnectModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 11,264 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityCurlModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 9,216 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityTestProtocolModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 12,288 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 12,288 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestAudioModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 46,080 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 11,264 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestTextureModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 20,992 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestWWWModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 13,312 bytes | Stranded_Deep_Data/Managed/UnityEngine.VehiclesModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 43,520 bytes | Stranded_Deep_Data/Managed/UnityEngine.VFXModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 29,696 bytes | Stranded_Deep_Data/Managed/UnityEngine.VideoModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 24,064 bytes | Stranded_Deep_Data/Managed/UnityEngine.VirtualTexturingModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 15,872 bytes | Stranded_Deep_Data/Managed/UnityEngine.VRModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.WindModule.dll | CLR header 2.5
+MANAGED_DOTNET | UNITY_ENGINE_ASSEMBLY | 59,392 bytes | Stranded_Deep_Data/Managed/UnityEngine.XRModule.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 250,368 bytes | Stranded_Deep_Data/Managed/websocket-sharp.dll | CLR header 2.5
+MANAGED_DOTNET | OTHER_DLL | 345,600 bytes | Stranded_Deep_Data/Managed/XGamingRuntime.dll | CLR header 2.5
+NATIVE_PE | OTHER_DLL | 12,800 bytes | Stranded_Deep_Data/Plugins/x86_64/Rewired_DirectInput.dll | CLR directory absent
+NATIVE_PE | OTHER_DLL | 1,692,672 bytes | Stranded_Deep_Data/Plugins/x86_64/steam_api64.dll | CLR directory absent
+NATIVE_PE | OTHER_DLL | 28,773,464 bytes | UnityPlayer.dll | CLR directory absent
+
+===== ERRORS =====
+NONE
+
+===== END V14 =====
+Original game files were not modified.
+All outputs are inside Map Check.

@@ -1,0 +1,3164 @@
+MISSION 3 ZONE DEEP V7
+============================================================================
+MODE: READ ONLY
+ROOT: /storage/emulated/0/Map Check
+DLL SHA256: d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc
+DLL SIZE: 3432448
+
+============================================================================
+RELEVANT METHOD INDEX
+============================================================================
+MATCH COUNT: 606
+PiscusManager::CheckInsideTerrain
+Piscus_Creature::get_BiomePosition
+Piscus_Creature::set_BiomePosition
+Piscus_Creature::get_BiomeSize
+Piscus_Creature::set_BiomeSize
+InteractiveObject_HARVESTPLANT::CreateSeed
+SetupAdvancedFoliageShader::afsSetupTerrainEngine
+SetupAdvancedFoliageShader::afsAutoSyncToTerrain
+Achievements::ZoneEvents_CampFirePlaced
+Achievements::ZoneEvents_CropPlanted
+TerrainPointSampler::Init
+TerrainPointSampler::TryGetSample
+TerrainPointSampler::.ctor
+ZoneTerrainPointSampler::Init
+ZoneTerrainPointSampler::TryGetSample
+ZoneTerrainPointSampler::.ctor
+LevelLoader::get_LoadingZones
+StrandedWorld::GetZoneData
+StrandedWorld::get_WORLD_SEED
+StrandedWorld::get_Zones
+StrandedWorld::get_NmlZone
+StrandedWorld::get_ZoneLoader
+StrandedWorld::GetZone
+StrandedWorld::GetZoneId
+StrandedWorld::GetZone_
+StrandedWorld::GetBiome
+StrandedWorld::GetBiome_
+StrandedWorld::add_ZoneEntered
+StrandedWorld::remove_ZoneEntered
+StrandedWorld::OnZoneEntered
+StrandedWorld::LoadZonePositions
+StrandedWorld::SubscribeToZoneLoaderEvents
+StrandedWorld::UnsubscribeFromZoneLoaderEvents
+StrandedWorld::ZoneLoader_LoadedZone
+StrandedWorld::InitializeZones
+StrandedWorld::ApplyWorldToZones
+StrandedWorld::PollZones
+StrandedWorld::PollZone
+StrandedWorld::SaveZone
+StrandedWorld::OnZoneDownloaded
+StrandedWorld::LoadZone
+StrandedWorld::SetShelterOnZones
+StrandedWorld::SetSheltersOnWorldZones
+StrandedWorld::SetWollieOnShelterZone
+StrandedWorld::FindClosestZone
+StrandedWorld::FindClosestZone
+StrandedWorld::FindZone
+StrandedWorld::FindEndGameZone
+StrandedWorld::InZoneUnLoadingBounds
+StrandedWorld::InZoneLoadingBounds
+StrandedWorld::GetRandowWorldSeed
+StrandedWorld::SetRandomWorldSeed
+StrandedWorld::SetWorldSeed
+StrandedWorld::SetWorldSeed
+StrandedWorld::GenerateLocalSeed
+StrandedWorld::LoadStartingZone
+StrandedWorld::LoadStartingZone
+StrandedWorld::LoadStartingZone_Sequence
+IslandDebugTexture::AttachTexture
+IslandDebugTexture::DrawLine
+IslandDebugTexture::DrawLines
+IslandDebugTexture::FillTexturePolygon
+IslandDebugTexture::RenderSoilMapImageIcon
+IslandDebugTexture::.ctor
+WorldTools::GenerateZoneBiome
+WorldTools::GenerateZoneHeightmap
+WorldTools::GENERATE_ISLAND_HEIGHTMAP
+WorldTools::StitchTerrainEdges
+WorldTools::CreateHeightMapTexture
+WorldTools::GenerateTerrain
+WorldTools::NormalizeHeightmap
+WorldTools::SmoothTerrain
+WorldTools::FillCellHeightmap
+WorldTools::HeightmapRiver
+ZoneAttributes::get_Rain
+ZoneAttributes::get_CampFires
+ZoneAttributes::set_CampFires
+ZoneAttributes::get_Crops
+ZoneAttributes::.ctor
+ZoneAttributes::Save
+ZoneAttributes::Load
+Zone::InBounds
+Zone::InSaveBounds
+Zone::InSaveBoundsRadius
+Zone::InSaveBoundsHeight
+Zone::get_Terrain
+Zone::get_Biome
+Zone::set_Biome
+Zone::get_Seed
+Zone::set_Seed
+Zone::get_Loading
+Zone::set_Loading
+Zone::get_Loaded
+Zone::set_Loaded
+Zone::get_IsMapEditor
+Zone::set_IsMapEditor
+Zone::get_IsUserMap
+Zone::set_IsUserMap
+Zone::get_HasObjectsForBillboard
+Zone::set_HasObjectsForBillboard
+Zone::get_HasShelter
+Zone::set_HasShelter
+Zone::get_ShelterType
+Zone::set_ShelterType
+Zone::get_HasWollie
+Zone::set_HasWollie
+Zone::get_HasVisited
+Zone::set_HasVisited
+Zone::get_GenerationPoints
+Zone::get_GeneratedObjects
+Zone::get_WaveOverlay
+Zone::set_WaveOverlay
+Zone::get_Billboarding
+Zone::Awake
+Zone::GenerateGridData
+Zone::Enter
+Zone::Exit
+Zone::OnObjectGenerated
+Zone::OnObjectCreated
+Zone::OnObjectLoaded
+Zone::FindImpostor
+Zone::CreateImpostors
+Zone::LoadImpostors
+Zone::CreateImpostor
+Zone::CreateImpostor
+Zone::TryGetImpostor
+Zone::ReleaseImpostors
+Zone::.ctor
+ZoneNML::Awake
+ZoneNML::InSaveBounds
+ZoneNML::Enter
+ZoneNML::.ctor
+ZoneObject::get_Obj
+ZoneObject::get_Rarity
+ZoneObject::.ctor
+ZoneObjects::get_Objects
+ZoneObjects::CheckGenerationIsProcedural
+ZoneObjects::CheckGenerationIsManual
+ZoneObjects::.ctor
+ZonePositionGenerator::GeneratePoints
+ZonePositionGenerator::IsValid
+Island::get_Points
+Island::set_Points
+Island::get_Centers
+Island::set_Centers
+Island::get_Corners
+Island::set_Corners
+Island::get_Edges
+Island::set_Edges
+Island::get_Size
+Island::set_Size
+Island::get_NumPoints
+Island::set_NumPoints
+Island::get_IslandType
+Island::set_IslandType
+Island::get_PointType
+Island::set_PointType
+Island::.ctor
+Island::Reset
+Island::NewIsland
+Island::ImproveCorners
+Island::BuildGraph
+Island::LandCorners
+Island::AssignCornerElevations
+Island::RedistributeElevations
+Island::AssignOceanCoastAndLand
+Island::AssignPolygonElevations
+Island::CalculateDownslopes
+Island::CalculateWatersheds
+Island::CreateRivers
+Island::GetBiome
+Island::AssignBiomes
+Island::LookUpEdgeFromCorner
+Island::LookUpEdgeFromCenter
+Island::Inside
+Island::InsideIsland
+Island::.cctor
+LE_ConfigTerrain::get_BrushProjector
+LE_ConfigTerrain::get_Brushes
+LE_ConfigTerrain::get_Heightmaps
+LE_ConfigTerrain::set_Heightmaps
+LE_ConfigTerrain::get_CustomDefaultTerrain
+LE_ConfigTerrain::get_TerrainLayer
+LE_ConfigTerrain::.ctor
+LE_LevelEditorMain::get_GUI3dTerrain
+LE_LevelEditorMain::InitializeDefaultTerrain
+LE_SaveLoad::SaveMapHeightMapFile
+LE_SaveLoad::LoadMapHeightMapFile
+LE_ZoneTileGenerator::Start
+LE_ZoneTileGenerator::GenerateHeightmapFromTexture
+LE_ZoneTileGenerator::GenerateShoreMap
+LE_ZoneTileGenerator::GenerateRandomIsland
+LE_ZoneTileGenerator::GenerateAdvancedPerlin
+LE_ZoneTileGenerator::GenerateAdvancedNormalise
+LE_ZoneTileGenerator::GenerateSmooth
+LE_ZoneTileGenerator::CreateHeightMapTexture
+LE_ZoneTileGenerator::CreateShoreMaskTexture
+LE_ZoneTileGenerator::AddWaveOverlay
+LE_ZoneTileGenerator::LoadMap
+LE_ZoneTileGenerator::.ctor
+LE_GUI3dObject::AddTerrainSnapping
+LE_GUI3dTerrain::get_TerrainInstance
+LE_GUI3dTerrain::get_TerrainManager
+LE_GUI3dTerrain::SetTerrain
+LE_GUI3dTerrain::RemoveTerrainManager
+LE_GUI3dTerrain::get_DefaultTerrainDataPrefab
+LE_GUI3dTerrain::set_DefaultTerrainDataPrefab
+LE_GUI3dTerrain::get_BrushProjector
+LE_GUI3dTerrain::set_BrushProjector
+LE_GUI3dTerrain::get_BrushAlphaTexture
+LE_GUI3dTerrain::set_BrushAlphaTexture
+LE_GUI3dTerrain::get_Heightmap
+LE_GUI3dTerrain::set_Heightmap
+LE_GUI3dTerrain::get_Amount
+LE_GUI3dTerrain::set_Amount
+LE_GUI3dTerrain::get_Size
+LE_GUI3dTerrain::set_Size
+LE_GUI3dTerrain::get_TargetRelativeValue
+LE_GUI3dTerrain::set_TargetRelativeValue
+LE_GUI3dTerrain::get_IsReadingTerrainSetHeight
+LE_GUI3dTerrain::set_IsReadingTerrainSetHeight
+LE_GUI3dTerrain::get_IsDirectedSmooth
+LE_GUI3dTerrain::set_IsDirectedSmooth
+LE_GUI3dTerrain::get_DirectedSmoothAngle
+LE_GUI3dTerrain::set_DirectedSmoothAngle
+LE_GUI3dTerrain::get_EditMode
+LE_GUI3dTerrain::set_EditMode
+LE_GUI3dTerrain::get_ActiveEditMode
+LE_GUI3dTerrain::SetCursorPosition
+LE_GUI3dTerrain::SetIsCursorAction
+LE_GUI3dTerrain::HideCursor
+LE_GUI3dTerrain::Start
+LE_GUI3dTerrain::Update
+LE_GUI3dTerrain::Focus
+LE_GUI3dTerrain::UpdateBrushProjector
+LE_GUI3dTerrain::GetRelativeLocalLocation
+LE_GUI3dTerrain::.ctor
+LE_GUIInterface::OnTerrainHeightmapTextureChanged
+LE_GUIInterface::OnTerrainBrushChanged
+LE_GUIInterface::OnTerrainEditBrushSizeChanged
+LE_GUIInterface::OnTerrainEditBrushAmountChanged
+LE_GUIInterface::OnTerrainEditBrushTargetValueChanged
+LE_GUIInterface::OnTerrainEditDirectionChanged
+LE_GUIInterface::OnTerrainChangeHeightModeChanged
+LE_GUIInterface::OnTerrainIsDirectedSmoothChanged
+LE_GUIInterface::OnTerrainEditModeBtn
+LE_GUIInterface::OnTerrainReadSetHeightBtn
+LE_GUIInterface::OnTerrainGenerateShoremap
+LE_GUIInterface::OnTerrainGenerateCustomHeightmap
+LE_GUIInterface::OnTerrainGeneratePerlin
+LE_GUIInterface::OnTerrainGenerateNormalise
+LE_GUIInterface::OnTerrainGenerateIsland
+LE_GUIInterface::OnTerrainSmooth
+LE_GUIInterface_uGUIimpl::OnTerrainGenerateCustomHeightmap
+LE_GUIInterface_uGUIimpl::OnTerrainGeneratePerlin
+LE_GUIInterface_uGUIimpl::TerrainGeneratePerlin
+LE_GUIInterface_uGUIimpl::OnTerrainGenerateNormalise
+LE_GUIInterface_uGUIimpl::OnTerrainGenerateIsland
+LE_GUIInterface_uGUIimpl::OnTerrainGenerateShoremap
+LE_GUIInterface_uGUIimpl::OnTerrainSmooth
+LE_GUIInterface_uGUIimpl::SetTerrainUIMode
+LE_GUIInterface_uGUIimpl::SetTerrainEditBrushSize
+LE_GUIInterface_uGUIimpl::SetTerrainEditBrushAmount
+LE_GUIInterface_uGUIimpl::SetTerrainEditBrushTargetValue
+LE_GUIInterface_uGUIimpl::SetTerrainIsReadingSetHeight
+LE_GUIInterface_uGUIimpl::<OnTerrainGeneratePerlin>b__34_0
+LE_GUIInterface_uGUIimpl::<OnTerrainGenerateNormalise>b__36_0
+LE_LogicTerrain::LoadRawHeightmaps
+LE_LogicTerrain::.ctor
+LE_LogicTerrain::Destroy
+LE_LogicTerrain::Update
+LE_LogicTerrain::OnLoadedLevelInEditor
+LE_LogicTerrain::OnTerrainBrushChanged
+LE_LogicTerrain::OnTerrainHeightmapTextureChanged
+LE_LogicTerrain::OnTerrainEditBrushSizeChanged
+LE_LogicTerrain::OnTerrainEditBrushAmountChanged
+LE_LogicTerrain::OnTerrainEditBrushTargetValueChanged
+LE_LogicTerrain::OnTerrainEditDirectionChanged
+LE_LogicTerrain::OnTerrainChangeHeightModeChanged
+LE_LogicTerrain::OnTerrainIsDirectedSmoothChanged
+LE_LogicTerrain::OnTerrainEditModeBtn
+LE_LogicTerrain::OnTerrainReadSetHeightBtn
+LE_LogicTerrain::CheckParameters
+LE_LogicTerrain::InitTerrainValues
+LE_LogicTerrain::GetTerrainUIMode
+LE_LogicTerrain::ReadSetHeightRoutine
+LE_TerrainCreatedEvent::get_TerrainGameObject
+LE_TerrainCreatedEvent::.ctor
+LE_TerrainManager::get_TerrainData
+LE_TerrainManager::.ctor
+LE_TerrainManager::SmoothHeight
+LE_TerrainManager::ChangeHeight
+LE_TerrainManager::ClampHeightBounds
+LE_TerrainManager::ChangeHeight
+LE_TerrainManager::ChangeHeightInternal
+LE_TerrainManager::GetAffectedAreaInternal
+MPExtensions::GetZoneData
+MultiplayerMng::get_ZoneStreamChannel
+ZoneDownloadedEvent::.ctor
+MultiplayerZoneSync::get_Instance
+MultiplayerZoneSync::set_Instance
+MultiplayerZoneSync::Awake
+MultiplayerZoneSync::OnDestroy
+MultiplayerZoneSync::TryGetCommand
+MultiplayerZoneSync::LinkData
+MultiplayerZoneSync::LinkInstance
+MultiplayerZoneSync::IsLinked
+MultiplayerZoneSync::LinkReset
+MultiplayerZoneSync::Load
+MultiplayerZoneSync::DumpNotCompleted
+MultiplayerZoneSync::get_ZoneDowloadIndex
+MultiplayerZoneSync::SendZone
+MultiplayerZoneSync::SendZone_Sequence
+MultiplayerZoneSync::StreamDataStarted
+MultiplayerZoneSync::StreamDataProgress
+MultiplayerZoneSync::StreamDataAborted
+MultiplayerZoneSync::StreamDataReceived
+MultiplayerZoneSync::PostZone
+MultiplayerZoneSync::PostZone_Sequence
+MultiplayerZoneSync::Label
+MultiplayerZoneSync::.ctor
+MultiplayerZoneSync::.cctor
+Peer::get_StartingCrate
+Peer::set_StartingCrate
+Peer::get_WorldSeed
+Peer::set_WorldSeed
+ShoreMaskGenerator::CreateHeightMap
+BiomeFlockProvider::Start
+BiomeFlockProvider::OnDestroy
+BiomeFlockProvider::StrandedWorld_ZoneEntered
+BiomeFlockProvider::GetFlocks
+BiomeFlockProvider::GetFlockData
+BiomeFlockProvider::.ctor
+FlockChild::RandomizeAnimationStartingFrame
+FlockController::PollZone
+FlockController::GetStartingPosition
+ZoneEventHandler::.ctor
+ZoneEventHandler::Invoke
+ZoneEventHandler::BeginInvoke
+ZoneEventHandler::EndInvoke
+LegacyUtilities::LoadStrandedWorldPlayerZoneId_PreCoop
+SnapHeightToTerrain::ModifyPlacement
+SnapHeightToTerrain::.ctor
+PrefabSizeFitsBetweenTerrainAndOcean::ValidatePlacement
+PrefabSizeFitsBetweenTerrainAndOcean::.ctor
+TerrainIsBelowPlacement::ValidatePlacement
+TerrainIsBelowPlacement::.ctor
+TerrainIsIslandHeightAtPlacement::ValidatePlacement
+TerrainIsIslandHeightAtPlacement::.ctor
+TerrainIsMinimumHeightAtPlacement::ValidatePlacement
+TerrainIsMinimumHeightAtPlacement::.ctor
+BuoyancyManager::CheckInRangeOfActiveZone
+Footstep::Footstep_Terrain
+PlayerUtilities::GetServerStartingCrate
+IMapEditorObject::OnCustomMapLoaded
+MapTools::CreateHeightmapTexture
+BiomeCategory::.ctor
+ProceduralObjectManager::get_BiomeGeneration
+IZoneDataProvider::GetZoneData
+ITerrainProvider::GetHeight
+ITerrainProvider::GetNormal
+NullTerrainProvider::GetHeight
+NullTerrainProvider::GetNormal
+NullTerrainProvider::.ctor
+ZoneUtilities::FindObject
+ZoneUtilities::FindObjectRanged
+ZoneUtilities::FindObject
+ZoneUtilities::FindObjectRanged
+MapEditorData::.ctor
+World::get__generationZonePositons
+World::set__generationZonePositons
+World::get_GenerationZonePositons
+World::get__generatedZonePoints
+World::set__generatedZonePoints
+World::get_GeneratedZonePoints
+World::CreateWorldZonePoints
+World::SaveWorldSeed
+World::CheckWorldSeedFileExists
+World::LoadWorldSeed
+World::ImportHeightmapFromRawFile
+ZoneEvents::add_CampFirePlaced
+ZoneEvents::remove_CampFirePlaced
+ZoneEvents::add_CropPlanted
+ZoneEvents::remove_CropPlanted
+ZoneEvents::Awake
+ZoneEvents::OnDestroy
+ZoneEvents::EventManager_CampFirePlacedEvent
+ZoneEvents::EventManager_PlantedCropEvent
+ZoneEvents::.ctor
+GeneratedObject::.ctor
+ZoneLoader::get_DeferredLoading
+ZoneLoader::get_PostLoading
+ZoneLoader::get_PhysicalLoading
+ZoneLoader::get_IsGenerating
+ZoneLoader::get_IsLoading
+ZoneLoader::set_IsLoading
+ZoneLoader::get_Random
+ZoneLoader::get_ObjectProcessingMode
+ZoneLoader::set_ObjectProcessingMode
+ZoneLoader::add_CreatedZone
+ZoneLoader::remove_CreatedZone
+ZoneLoader::add_LoadedZone
+ZoneLoader::remove_LoadedZone
+ZoneLoader::OnDestroy
+ZoneLoader::LoadZone_Async
+ZoneLoader::LoadZone
+ZoneLoader::LoadZone_Sequence
+ZoneLoader::AbortLoadingZone
+ZoneLoader::CleanUp
+ZoneLoader::CreateZone
+ZoneLoader::CreateZoneObjects_Async
+ZoneLoader::CreateZoneObjects
+ZoneLoader::CreateZoneObjects_Sequence
+ZoneLoader::GenerateZone
+ZoneLoader::GenerateObjects
+ZoneLoader::GenerateProceduralObjectsPosition
+ZoneLoader::GenerateProceduralObjectsProcedural
+ZoneLoader::GenerateShelter
+ZoneLoader::GenerateObject
+ZoneLoader::CreateGeneratedPrefab
+ZoneLoader::CreateLoadedPrefab
+ZoneLoader::Load
+ZoneLoader::ClientLoad
+ZoneLoader::ClientSetParent
+ZoneLoader::InvokeCallback
+ZoneLoader::ResetTemporaryLoadingPosition
+ZoneLoader::ProcessCollection_Async
+ZoneLoader::ProcessCollection
+ZoneLoader::ProcessCollection_Sequence
+ZoneLoader::GetProcessingSteps
+ZoneLoader::GetClosestPlayer
+ZoneLoader::UpdateSessionToken_IsBusy
+ZoneLoader::ClientLinking
+ZoneLoader::.ctor
+GenerationPoints::.ctor
+ZoneObjectGenerator::GenerateGridData
+ZoneObjectGenerator::DebugSoilMap
+RemoteStatsEventsListener::MapEditorSaveMenuPresenter_Saved
+CartographerMenuPresenter::CreateIslandButton_Click
+CartographerMenuPresenter::CreateIsland
+CartographerMenuPresenter::EditIsland
+CartographerMenuPresenter::<CreateIsland>b__82_0
+CartographerMenuPresenter::<EditIsland>b__83_0
+NewGameMenuPresenter::IsStartingCrateEnabled
+NewGameMenuPresenter::StartingCrateButton_Click
+CartographerMenuViewAdapterBase::get_CreateIslandButton
+CartographerMenuViewAdapterBase::get_WorldSeedLabel
+NewGameMenuViewAdapterBase::get_StartingCrateOptionButton
+TMPNewGameMenuViewAdapter::get_StartingCrateOptionButton
+UCartographerMenuViewAdapter::get_CreateIslandButton
+UCartographerMenuViewAdapter::get_WorldSeedLabel
+MapEditorMenuPresenter::Awake
+MapEditorMenuPresenter::Start
+MapEditorMenuPresenter::Initialize
+MapEditorMenuPresenter::InitializeMap
+MapEditorMenuPresenter::OnDestroy
+MapEditorMenuPresenter::SetControlEvents
+MapEditorMenuPresenter::SaveMenuPresenter_Save
+MapEditorMenuPresenter::SaveMenuPresenter_ShowView
+MapEditorMenuPresenter::SaveMenuPresenter_HideView
+MapEditorMenuPresenter::Update
+MapEditorMenuPresenter::Show
+MapEditorMenuPresenter::Hide
+MapEditorMenuPresenter::ResumeButton_Click
+MapEditorMenuPresenter::SaveButton_Click
+MapEditorMenuPresenter::QuitButton_Click
+MapEditorMenuPresenter::Quit
+MapEditorMenuPresenter::.ctor
+MapEditorMenuPresenter::<QuitButton_Click>b__20_0
+MapEditorSaveMenuPresenter::get_CurrentMap
+MapEditorSaveMenuPresenter::set_CurrentMap
+MapEditorSaveMenuPresenter::add_ShowView
+MapEditorSaveMenuPresenter::remove_ShowView
+MapEditorSaveMenuPresenter::View_ShowView
+MapEditorSaveMenuPresenter::add_HideView
+MapEditorSaveMenuPresenter::remove_HideView
+MapEditorSaveMenuPresenter::View_HideView
+MapEditorSaveMenuPresenter::add_Saved
+MapEditorSaveMenuPresenter::remove_Saved
+MapEditorSaveMenuPresenter::OnSaved
+MapEditorSaveMenuPresenter::Initialize
+MapEditorSaveMenuPresenter::OnDestroy
+MapEditorSaveMenuPresenter::SetControlEvents
+MapEditorSaveMenuPresenter::ClearControlEvents
+MapEditorSaveMenuPresenter::Show
+MapEditorSaveMenuPresenter::Hide
+MapEditorSaveMenuPresenter::UpdatePreviewImage
+MapEditorSaveMenuPresenter::SaveButton_Click
+MapEditorSaveMenuPresenter::OnValidateTextsSucceeded
+MapEditorSaveMenuPresenter::OnValidateTextsFailed
+MapEditorSaveMenuPresenter::BackButton_Click
+MapEditorSaveMenuPresenter::NameInputField_Changed
+MapEditorSaveMenuPresenter::SaveMap
+MapEditorSaveMenuPresenter::.ctor
+MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_0
+MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_1
+MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_2
+MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_3
+MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_0
+MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_1
+MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_2
+MapEditorSaveMenuPresenter::<OnValidateTextsFailed>b__27_0
+IMapEditorSaveMenuViewAdapter::get_CanvasGroup
+IMapEditorSaveMenuViewAdapter::get_SaveButton
+IMapEditorSaveMenuViewAdapter::get_BackButton
+IMapEditorSaveMenuViewAdapter::get_NameInputField
+IMapEditorSaveMenuViewAdapter::get_DescriptionInputField
+IMapEditorSaveMenuViewAdapter::get_PreviewImage
+UMapEditorSaveMenuViewAdapter::get_CanvasGroup
+UMapEditorSaveMenuViewAdapter::get_SaveButton
+UMapEditorSaveMenuViewAdapter::get_BackButton
+UMapEditorSaveMenuViewAdapter::get_NameInputField
+UMapEditorSaveMenuViewAdapter::get_DescriptionInputField
+UMapEditorSaveMenuViewAdapter::get_PreviewImage
+UMapEditorSaveMenuViewAdapter::Awake
+UMapEditorSaveMenuViewAdapter::Show
+UMapEditorSaveMenuViewAdapter::Hide
+UMapEditorSaveMenuViewAdapter::.ctor
+UMapEditorSaveMenuViewAdapter::Beam.UI.IViewAdapter.get_transform
+IMapEditorMenuViewAdapter::get_CanvasGroup
+IMapEditorMenuViewAdapter::get_ResumeButton
+IMapEditorMenuViewAdapter::get_SaveButton
+IMapEditorMenuViewAdapter::get_QuitButton
+IMapEditorMenuViewAdapter::get_MapTitleLabel
+UMapEditorViewAdapter::Beam.UI.MapEditor.IMapEditorMenuViewAdapter.get_CanvasGroup
+UMapEditorViewAdapter::get_ResumeButton
+UMapEditorViewAdapter::get_SaveButton
+UMapEditorViewAdapter::get_QuitButton
+UMapEditorViewAdapter::get_MapTitleLabel
+UMapEditorViewAdapter::Awake
+UMapEditorViewAdapter::Show
+UMapEditorViewAdapter::Hide
+UMapEditorViewAdapter::.ctor
+UMapEditorViewAdapter::Beam.UI.IViewAdapter.get_transform
+UMapListElement::Beam.UI.MapEditor.IMapListElement.get_gameObject
+UWorldMapSlot::Beam.UI.MapEditor.IWorldMapSlot.get_gameObject
+ConnectorCheck_CheckDistanceFromZone::Check
+ConnectorCheck_CheckDistanceFromZone::.ctor
+PlacementModifier_LimitHeightToTerrain::Modify
+PlacementModifier_LimitHeightToTerrain::.ctor
+PlacementModifier_SnapToTerrain::Modify
+PlacementModifier_SnapToTerrain::.ctor
+Dragger::GatherPalmLogsIsland
+Dragger::RecreatePhysicsSetupForPalmLogsIsland
+LodController::CheckTerrain
+DeterministicFastRandom::GetSeed
+<>c::<ZoneEvents_CampFirePlaced>b__39_0
+<>c::<ZoneEvents_CropPlanted>b__40_0
+BiomeGrid::.ctor
+<LoadStartingZone_Sequence>d__119::.ctor
+<LoadStartingZone_Sequence>d__119::System.IDisposable.Dispose
+<LoadStartingZone_Sequence>d__119::MoveNext
+<LoadStartingZone_Sequence>d__119::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+<LoadStartingZone_Sequence>d__119::System.Collections.IEnumerator.Reset
+<LoadStartingZone_Sequence>d__119::System.Collections.IEnumerator.get_Current
+<>c::<FillCellHeightmap>b__28_0
+<>c::<FillCellHeightmap>b__28_1
+<>c::<FillCellHeightmap>b__28_2
+<>c::<FillCellHeightmap>b__28_3
+<>c::<FillCellHeightmap>b__28_4
+<>c::<FillCellHeightmap>b__28_5
+BiomeProperties::HexToColor
+BiomeProperties::.cctor
+<>c__DisplayClass55_0::<AddTerrainSnapping>b__0
+<>c__DisplayClass55_0::<AddTerrainSnapping>b__1
+<>c::<OnTerrainGenerateCustomHeightmap>b__33_0
+<>c::<OnTerrainGenerateIsland>b__37_0
+<>c::<OnTerrainSmooth>b__39_0
+<>c__DisplayClass34_0::<OnTerrainGeneratePerlin>b__1
+Heightmap::.ctor
+<>c::<InitTerrainValues>b__23_0
+<>c__DisplayClass42_0::<GetZoneData>b__0
+<>c__DisplayClass28_0::<SendZone_Sequence>b__0
+<SendZone_Sequence>d__28::.ctor
+<SendZone_Sequence>d__28::System.IDisposable.Dispose
+<SendZone_Sequence>d__28::MoveNext
+<SendZone_Sequence>d__28::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+<SendZone_Sequence>d__28::System.Collections.IEnumerator.Reset
+<SendZone_Sequence>d__28::System.Collections.IEnumerator.get_Current
+<>c__DisplayClass34_0::<PostZone_Sequence>b__0
+<PostZone_Sequence>d__34::.ctor
+<PostZone_Sequence>d__34::System.IDisposable.Dispose
+<PostZone_Sequence>d__34::MoveNext
+<PostZone_Sequence>d__34::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+<PostZone_Sequence>d__34::System.Collections.IEnumerator.Reset
+<PostZone_Sequence>d__34::System.Collections.IEnumerator.get_Current
+<LoadZone_Sequence>d__44::.ctor
+<LoadZone_Sequence>d__44::System.IDisposable.Dispose
+<LoadZone_Sequence>d__44::MoveNext
+<LoadZone_Sequence>d__44::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+<LoadZone_Sequence>d__44::System.Collections.IEnumerator.Reset
+<LoadZone_Sequence>d__44::System.Collections.IEnumerator.get_Current
+<CreateZoneObjects_Sequence>d__50::.ctor
+<CreateZoneObjects_Sequence>d__50::System.IDisposable.Dispose
+<CreateZoneObjects_Sequence>d__50::MoveNext
+<CreateZoneObjects_Sequence>d__50::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+<CreateZoneObjects_Sequence>d__50::System.Collections.IEnumerator.Reset
+<CreateZoneObjects_Sequence>d__50::System.Collections.IEnumerator.get_Current
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::.ctor
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::System.IDisposable.Dispose
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::MoveNext
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.Generic.IEnumerator<System.Object>.get_Current
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.IEnumerator.Reset
+<RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.IEnumerator.get_Current
+TerrainEditModeEventArgs::.ctor
+TerrainChangeHeightModeEventArgs::.ctor
+
+============================================================================
+ZONE FIELD INVENTORY
+============================================================================
+TYPE: Zone
+FIELD[00] SAVE_BOUNDS_MAX_HEIGHT | SIG=06 0c
+FIELD[01] SAVE_BOUNDS_MIN_HEIGHT | SIG=06 0c
+FIELD[02] SAVE_BOUNDS_BUFFER | SIG=06 0c
+FIELD[03] SAVE_BOUNDS_RADIUS | SIG=06 0c
+FIELD[04] SQR_SAVE_BOUNDS_RADIUS | SIG=06 0c
+FIELD[05] Attributes | SIG=06 12 84 80
+FIELD[06] _terrain | SIG=06 12 81 d5
+FIELD[07] SaveContainer | SIG=06 12 80 89
+FIELD[08] _biome | SIG=06 11 b0 a0
+FIELD[09] ZoneName | SIG=06 0e
+FIELD[10] Id | SIG=06 0e
+FIELD[11] Version | SIG=06 08
+FIELD[12] IsStartingIsland | SIG=06 02
+FIELD[13] <Seed>k__BackingField | SIG=06 08
+FIELD[14] <Loading>k__BackingField | SIG=06 02
+FIELD[15] <Loaded>k__BackingField | SIG=06 02
+FIELD[16] <IsMapEditor>k__BackingField | SIG=06 02
+FIELD[17] <IsUserMap>k__BackingField | SIG=06 02
+FIELD[18] <HasObjectsForBillboard>k__BackingField | SIG=06 02
+FIELD[19] <HasShelter>k__BackingField | SIG=06 02
+FIELD[20] <ShelterType>k__BackingField | SIG=06 08
+FIELD[21] <HasWollie>k__BackingField | SIG=06 02
+FIELD[22] <HasVisited>k__BackingField | SIG=06 02
+FIELD[23] _generationPoints | SIG=06 14 12 a2 8c 02 00 02 00 00
+FIELD[24] _generatedObjects | SIG=06 15 12 65 01 12 a2 84
+FIELD[25] <WaveOverlay>k__BackingField | SIG=06 12 9a 00
+FIELD[26] _billboarding | SIG=06 02
+FIELD[27] _activeImposters | SIG=06 15 12 65 01 12 ad 00
+
+============================================================================
+MAP EDITOR / ENUM TYPE INVENTORY
+============================================================================
+
+TYPE: MapEditorData
+FIELD[00] Valid | SIG=06 02
+FIELD[01] Id | SIG=06 0e
+FIELD[02] VersionNumber | SIG=06 08
+FIELD[03] GameVersionNumber | SIG=06 0e
+FIELD[04] Source | SIG=06 11 b7 00
+FIELD[05] State | SIG=06 11 b7 04
+FIELD[06] Biome | SIG=06 11 b0 a0
+FIELD[07] Name | SIG=06 0e
+FIELD[08] Author | SIG=06 0e
+FIELD[09] Description | SIG=06 0e
+FIELD[10] DateCreated | SIG=06 0e
+FIELD[11] DateEdited | SIG=06 0e
+FIELD[12] DateAdded | SIG=06 0e
+FIELD[13] LargePreviewImageBytes | SIG=06 1d 05
+FIELD[14] LargePreviewImage | SIG=06 12 80 e9
+FIELD[15] SmallPreviewImage | SIG=06 12 80 e9
+
+TYPE: BiomeType
+FIELD[00] value__ | SIG=06 08
+FIELD[01] RANDOM | SIG=06 11 b0 a0
+FIELD[02] DEEP_SEA | SIG=06 11 b0 a0
+FIELD[03] MEDIUM | SIG=06 11 b0 a0
+FIELD[04] SHALLOW | SIG=06 11 b0 a0
+FIELD[05] ISLAND | SIG=06 11 b0 a0
+FIELD[06] ISLAND_SMALL | SIG=06 11 b0 a0
+FIELD[07] ISLAND_ROCK | SIG=06 11 b0 a0
+FIELD[08] MISSION | SIG=06 11 b0 a0
+FIELD[09] CARRIER | SIG=06 11 b0 a0
+
+TYPE: EMapSource
+FIELD[00] value__ | SIG=06 08
+FIELD[01] Local | SIG=06 11 b7 00
+FIELD[02] Community | SIG=06 11 b7 00
+
+TYPE: EMapState
+FIELD[00] value__ | SIG=06 08
+FIELD[01] Current | SIG=06 11 b7 04
+FIELD[02] Older | SIG=06 11 b7 04
+FIELD[03] Unavailable | SIG=06 11 b7 04
+
+============================================================================
+RELEVANT CONSTANTS
+============================================================================
+ISLAND_HERMIT_GOAL | 0a 00 00 00
+ISLAND_HOPPER_GOAL | 01 00 00 00
+biome | 00 00 00 00
+biome | 00 00 00 00
+biome | 00 00 00 00
+ZONE_SPACING | 00 00 a0 3f
+ZONE_SIZE | 00 00 fa 43
+ZONE_SIZE_HALF | 00 00 7a 43
+ZONE_TERRAIN_SIZE | 00 00 7a 43
+ZONE_TERRAIN_SIZE_HALF | 00 00 fa 42
+ZONE_TERRAIN_SIZE_HALF_SQR | 00 24 74 46
+ZONE_LOAD_UNLOAD_BUFFER | 00 00 20 41
+ZONE_LOAD_DISTANCE | 00 00 70 43
+ZONE_UNLOAD_DISTANCE | 00 00 7a 43
+ZONE_HEIGHTMAP_SIZE | 01 01 00 00
+ZONE_HEIGHTMAP_HEIGHT | 96 00 00 00
+TERRAIN_Y_POSITION | 9c ff ff ff
+TERRAIN_RESOLUTION | 2d 00 00 00
+TERRAIN_DETAIL_DISTANCE | 46 00 00 00
+WORLD_ZONES | 07 00 00 00
+WORLD_ZONES_SQUARED | 31 00 00 00
+LEGACY_WORLD_ZONES | 05 00 00 00
+LEGACY_ZONE_SIZE | 00 80 1d 44
+LEGACY_ZONE_SIZE_HALF | 00 80 9d 43
+heightmapRes | 01 01 00 00
+Island_Base_Height | c3 f5 28 3f
+Starting | 03 00 00 00
+TERRAIN | 00 00 00 00
+Zones | 07 00 00 00
+customButtonsStartingId | 80 00 00 80
+zone | 00 00 00 00
+CONTAINER_STARTING | 04 00 00 00
+MOST_ISLANDS_HOPPED | 03 00 00 00
+MOST_ISLANDS_EXPLORED | 04 00 00 00
+WORLD_SEED_FILENAME | 53 00 65 00 65 00 64 00 2e 00 73 00 64 00 64 00
+ISLANDS_HOPPED | 02 00 00 00
+ISLANDS_EXPLORED | 03 00 00 00
+ISLANDS_INSERTED | 0b 00 00 00
+ISLANDS_CREATED | 0c 00 00 00
+ISLAND_HOPPER | 07 00 00 00
+MOST_ISLANDS_HOPPED | 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 48 00 4f 00 50 00 50 00 45 00 44 00
+MOST_ISLANDS_EXPLORED | 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 45 00 58 00 50 00 4c 00 4f 00 52 00 45 00 44 00
+MOST_ISLANDS_CREATED | 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 43 00 52 00 45 00 41 00 54 00 45 00 44 00
+LOADING_PROGRESS_TEXT_LOADING_STARTING_ZONE | 4c 00 4f 00 41 00 44 00 49 00 4e 00 47 00 5f 00 50 00 52 00 4f 00 47 00 52 00 45 00 53 00 53 00 5f 00 54 00 45 00 58 00 54 00 5f 00 4c 00 4f 00 41 00 44 00 49 00 4e 00 47 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 5a 00 4f 00 4e 00 45 00
+LOADING_PROGRESS_TEXT_LOADING_CURRENT_ZONE | 4c 00 4f 00 41 00 44 00 49 00 4e 00 47 00 5f 00 50 00 52 00 4f 00 47 00 52 00 45 00 53 00 53 00 5f 00 54 00 45 00 58 00 54 00 5f 00 4c 00 4f 00 41 00 44 00 49 00 4e 00 47 00 5f 00 43 00 55 00 52 00 52 00 45 00 4e 00 54 00 5f 00 5a 00 4f 00 4e 00 45 00
+NEW_GAME_MENU_BUTTON_STARTING_CRATE | 4e 00 45 00 57 00 5f 00 47 00 41 00 4d 00 45 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 43 00 52 00 41 00 54 00 45 00
+LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_CREATED | 4c 00 45 00 41 00 44 00 45 00 52 00 42 00 4f 00 41 00 52 00 44 00 53 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 43 00 52 00 45 00 41 00 54 00 45 00 44 00
+LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_EXPLORED | 4c 00 45 00 41 00 44 00 45 00 52 00 42 00 4f 00 41 00 52 00 44 00 53 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 45 00 58 00 50 00 4c 00 4f 00 52 00 45 00 44 00
+LEADERBOARDS_MENU_BUTTON_MOST_ISLANDS_HOPPED | 4c 00 45 00 41 00 44 00 45 00 52 00 42 00 4f 00 41 00 52 00 44 00 53 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 4d 00 4f 00 53 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 48 00 4f 00 50 00 50 00 45 00 44 00
+CARTOGRAPHER_MENU_BUTTON_CREATE_AN_ISLAND | 43 00 41 00 52 00 54 00 4f 00 47 00 52 00 41 00 50 00 48 00 45 00 52 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 43 00 52 00 45 00 41 00 54 00 45 00 5f 00 41 00 4e 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00
+CARTOGRAPHER_MENU_DB_UPDATE_ZONE_DESC | 43 00 41 00 52 00 54 00 4f 00 47 00 52 00 41 00 50 00 48 00 45 00 52 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 44 00 42 00 5f 00 55 00 50 00 44 00 41 00 54 00 45 00 5f 00 5a 00 4f 00 4e 00 45 00 5f 00 44 00 45 00 53 00 43 00
+CARTOGRAPHER_MENU_DB_WARNING_RANDOMIZE_SEED_DESC | 43 00 41 00 52 00 54 00 4f 00 47 00 52 00 41 00 50 00 48 00 45 00 52 00 5f 00 4d 00 45 00 4e 00 55 00 5f 00 44 00 42 00 5f 00 57 00 41 00 52 00 4e 00 49 00 4e 00 47 00 5f 00 52 00 41 00 4e 00 44 00 4f 00 4d 00 49 00 5a 00 45 00 5f 00 53 00 45 00 45 00 44 00 5f 00 44 00 45 00 53 00 43 00
+WORLD_MSG_SEED_FILE_MISSING | 57 00 4f 00 52 00 4c 00 44 00 5f 00 4d 00 53 00 47 00 5f 00 53 00 45 00 45 00 44 00 5f 00 46 00 49 00 4c 00 45 00 5f 00 4d 00 49 00 53 00 53 00 49 00 4e 00 47 00
+WORLD_MSG_ERROR_SAVING_WORLD_SEED | 57 00 4f 00 52 00 4c 00 44 00 5f 00 4d 00 53 00 47 00 5f 00 45 00 52 00 52 00 4f 00 52 00 5f 00 53 00 41 00 56 00 49 00 4e 00 47 00 5f 00 57 00 4f 00 52 00 4c 00 44 00 5f 00 53 00 45 00 45 00 44 00
+WORLD_MSG_ERROR_LOADING_WORLD_SEED | 57 00 4f 00 52 00 4c 00 44 00 5f 00 4d 00 53 00 47 00 5f 00 45 00 52 00 52 00 4f 00 52 00 5f 00 4c 00 4f 00 41 00 44 00 49 00 4e 00 47 00 5f 00 57 00 4f 00 52 00 4c 00 44 00 5f 00 53 00 45 00 45 00 44 00
+deadzone | 00 00 80 3e
+MAP_EDITOR_BUTTON_TERRAIN | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00
+MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 52 00 41 00 49 00 53 00 45 00 5f 00 4c 00 4f 00 57 00 45 00 52 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_SIZE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 52 00 41 00 49 00 53 00 45 00 5f 00 4c 00 4f 00 57 00 45 00 52 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 53 00 49 00 5a 00 45 00
+MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_AMOUNT | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 52 00 41 00 49 00 53 00 45 00 5f 00 4c 00 4f 00 57 00 45 00 52 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 41 00 4d 00 4f 00 55 00 4e 00 54 00
+MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_RAISE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 52 00 41 00 49 00 53 00 45 00 5f 00 4c 00 4f 00 57 00 45 00 52 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 52 00 41 00 49 00 53 00 45 00
+MAP_EDITOR_TERRAIN_RAISE_LOWER_HEIGHT_LABEL_LOWER | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 52 00 41 00 49 00 53 00 45 00 5f 00 4c 00 4f 00 57 00 45 00 52 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 4c 00 4f 00 57 00 45 00 52 00
+MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 45 00 54 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_SIZE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 45 00 54 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 53 00 49 00 5a 00 45 00
+MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_AMOUNT | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 45 00 54 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 41 00 4d 00 4f 00 55 00 4e 00 54 00
+MAP_EDITOR_TERRAIN_SET_HEIGHT_LABEL_TARGET_VALUE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 45 00 54 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 54 00 41 00 52 00 47 00 45 00 54 00 5f 00 56 00 41 00 4c 00 55 00 45 00
+MAP_EDITOR_TERRAIN_BUTTON_READ_TERRAIN_PAINT_HEIGHT | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 52 00 45 00 41 00 44 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 41 00 49 00 4e 00 54 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00
+MAP_EDITOR_TERRAIN_BUTTON_CLICK_TO_READ_TERRAIN_HEIGHT | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 43 00 4c 00 49 00 43 00 4b 00 5f 00 54 00 4f 00 5f 00 52 00 45 00 41 00 44 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00
+MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_SIZE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 53 00 49 00 5a 00 45 00
+MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_AMOUNT | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 41 00 4d 00 4f 00 55 00 4e 00 54 00
+MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_TOGGLE_IS_DIRECTED | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 54 00 4f 00 47 00 47 00 4c 00 45 00 5f 00 49 00 53 00 5f 00 44 00 49 00 52 00 45 00 43 00 54 00 45 00 44 00
+MAP_EDITOR_TERRAIN_SMOOTH_HEIGHT_LABEL_ANGLE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 41 00 4e 00 47 00 4c 00 45 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4f 00 4e 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_SHOREMAP | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4f 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00 5f 00 53 00 48 00 4f 00 52 00 45 00 4d 00 41 00 50 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_BUTTON_GENERATE_ISLAND | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4f 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_LABEL_TIME | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4f 00 4e 00 5f 00 4c 00 41 00 42 00 45 00 4c 00 5f 00 54 00 49 00 4d 00 45 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GENERATION_TOGGLE_OCEAN | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4f 00 4e 00 5f 00 54 00 4f 00 47 00 47 00 4c 00 45 00 5f 00 4f 00 43 00 45 00 41 00 4e 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_FREQ_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 46 00 52 00 45 00 51 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_VALUE_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 56 00 41 00 4c 00 55 00 45 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_OCTAVES_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 4f 00 43 00 54 00 41 00 56 00 45 00 53 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BLEND_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 42 00 4c 00 45 00 4e 00 44 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_PERLIN_GEN_BUTTON_GEN_PERLIN | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 47 00 45 00 4e 00 5f 00 50 00 45 00 52 00 4c 00 49 00 4e 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MIN_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 4d 00 49 00 4e 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_MAX_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 4d 00 41 00 58 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BLEND_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 42 00 4c 00 45 00 4e 00 44 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_NORMALIZE_TERRAIN_BUTTON_NORMALIZE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 4e 00 4f 00 52 00 4d 00 41 00 4c 00 49 00 5a 00 45 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_CUSTOM_HEIGHTMAPS_LABEL | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 43 00 55 00 53 00 54 00 4f 00 4d 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00 53 00 5f 00 4c 00 41 00 42 00 45 00 4c 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_GENERATE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00
+MAP_EDITOR_TERRAIN_PROCEDURAL_GEN_BUTTON_SMOOTH_HEIGHTMAP | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 50 00 52 00 4f 00 43 00 45 00 44 00 55 00 52 00 41 00 4c 00 5f 00 47 00 45 00 4e 00 5f 00 42 00 55 00 54 00 54 00 4f 00 4e 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00
+MAP_EDITOR_DB_GENERATE_HEIGHTMAP_TITLE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00 5f 00 54 00 49 00 54 00 4c 00 45 00
+MAP_EDITOR_DB_GENERATE_HEIGHTMAP_DESC | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00 5f 00 44 00 45 00 53 00 43 00
+MAP_EDITOR_DB_GENERATING_HEIGHTMAP_TITLE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4e 00 47 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00 5f 00 54 00 49 00 54 00 4c 00 45 00
+MAP_EDITOR_DB_GENERATING_HEIGHTMAP_DESC | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 49 00 4e 00 47 00 5f 00 48 00 45 00 49 00 47 00 48 00 54 00 4d 00 41 00 50 00 5f 00 44 00 45 00 53 00 43 00
+MAP_EDITOR_DB_GENERATE_ISLAND_TITLE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 47 00 45 00 4e 00 45 00 52 00 41 00 54 00 45 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 5f 00 54 00 49 00 54 00 4c 00 45 00
+MAP_EDITOR_DB_SMOOTH_TERRAIN_TITLE | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 54 00 49 00 54 00 4c 00 45 00
+MAP_EDITOR_DB_SMOOTH_TERRAIN_DESC | 4d 00 41 00 50 00 5f 00 45 00 44 00 49 00 54 00 4f 00 52 00 5f 00 44 00 42 00 5f 00 53 00 4d 00 4f 00 4f 00 54 00 48 00 5f 00 54 00 45 00 52 00 52 00 41 00 49 00 4e 00 5f 00 44 00 45 00 53 00 43 00
+NEW_GAME_MODE_STARTING_CRATE_ON | 4e 00 45 00 57 00 5f 00 47 00 41 00 4d 00 45 00 5f 00 4d 00 4f 00 44 00 45 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 43 00 52 00 41 00 54 00 45 00 5f 00 4f 00 4e 00
+NEW_GAME_MODE_STARTING_CRATE_OFF | 4e 00 45 00 57 00 5f 00 47 00 41 00 4d 00 45 00 5f 00 4d 00 4f 00 44 00 45 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 43 00 52 00 41 00 54 00 45 00 5f 00 4f 00 46 00 46 00
+NEW_GAME_MODE_STARTING_CRATE_ON_DESC | 4e 00 45 00 57 00 5f 00 47 00 41 00 4d 00 45 00 5f 00 4d 00 4f 00 44 00 45 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 43 00 52 00 41 00 54 00 45 00 5f 00 4f 00 4e 00 5f 00 44 00 45 00 53 00 43 00
+NEW_GAME_MODE_STARTING_CRATE_OFF_DESC | 4e 00 45 00 57 00 5f 00 47 00 41 00 4d 00 45 00 5f 00 4d 00 4f 00 44 00 45 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00 5f 00 43 00 52 00 41 00 54 00 45 00 5f 00 4f 00 46 00 46 00 5f 00 44 00 45 00 53 00 43 00
+STATS_ISLANDS_EXPLORED | 53 00 54 00 41 00 54 00 53 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 53 00 5f 00 45 00 58 00 50 00 4c 00 4f 00 52 00 45 00 44 00
+INTERACTIVE_TYPE_CONTAINER_STARTING | 49 00 4e 00 54 00 45 00 52 00 41 00 43 00 54 00 49 00 56 00 45 00 5f 00 54 00 59 00 50 00 45 00 5f 00 43 00 4f 00 4e 00 54 00 41 00 49 00 4e 00 45 00 52 00 5f 00 53 00 54 00 41 00 52 00 54 00 49 00 4e 00 47 00
+ACHIEVEMENT_ISLAND_HOPPER | 41 00 43 00 48 00 49 00 45 00 56 00 45 00 4d 00 45 00 4e 00 54 00 5f 00 49 00 53 00 4c 00 41 00 4e 00 44 00 5f 00 48 00 4f 00 50 00 50 00 45 00 52 00
+MAX_DISTANCE_FROM_ZONE | 00 00 fa 42
+Terrain | 04 00 00 00
+ISLAND | 04 00 00 00
+ISLAND_SMALL | 05 00 00 00
+ISLAND_ROCK | 06 00 00 00
+SNAP_TO_TERRAIN | 01 00 00 00
+SNAP_TO_2D_GRID_AND_TERRAIN | 04 00 00 00
+ZoneGeneration | 09 00 00 00
+ZoneLoading | 0a 00 00 00
+GameStartingCrate | 06 00 00 00
+WorldSeed | 07 00 00 00
+
+============================================================================
+METHOD BODY / TOKEN REFERENCES
+============================================================================
+
+METHOD: PiscusManager::CheckInsideTerrain
+RVA: 0x4d9c
+INSTRUCTIONS: 35
+
+METHOD: Piscus_Creature::get_BiomePosition
+RVA: 0x5602
+INSTRUCTIONS: 3
+
+METHOD: Piscus_Creature::set_BiomePosition
+RVA: 0x560a
+INSTRUCTIONS: 4
+
+METHOD: Piscus_Creature::get_BiomeSize
+RVA: 0x5613
+INSTRUCTIONS: 3
+
+METHOD: Piscus_Creature::set_BiomeSize
+RVA: 0x561b
+INSTRUCTIONS: 4
+
+METHOD: InteractiveObject_HARVESTPLANT::CreateSeed
+RVA: 0xf634
+INSTRUCTIONS: 35
+
+METHOD: SetupAdvancedFoliageShader::afsSetupTerrainEngine
+RVA: 0x1343c
+INSTRUCTIONS: 43
+
+METHOD: SetupAdvancedFoliageShader::afsAutoSyncToTerrain
+RVA: 0x137a4
+INSTRUCTIONS: 35
+
+METHOD: Achievements::ZoneEvents_CampFirePlaced
+RVA: 0x1884c
+INSTRUCTIONS: 24
+
+METHOD: Achievements::ZoneEvents_CropPlanted
+RVA: 0x188a0
+INSTRUCTIONS: 24
+
+METHOD: TerrainPointSampler::Init
+RVA: 0x1e84f
+INSTRUCTIONS: 1
+
+METHOD: TerrainPointSampler::TryGetSample
+RVA: 0x1e854
+INSTRUCTIONS: 23
+
+METHOD: TerrainPointSampler::.ctor
+RVA: 0x1e8a5
+INSTRUCTIONS: 3
+
+METHOD: ZoneTerrainPointSampler::Init
+RVA: 0x1e8ad
+INSTRUCTIONS: 6
+
+METHOD: ZoneTerrainPointSampler::TryGetSample
+RVA: 0x1e8bc
+INSTRUCTIONS: 62
+
+METHOD: ZoneTerrainPointSampler::.ctor
+RVA: 0x1e985
+INSTRUCTIONS: 3
+
+METHOD: LevelLoader::get_LoadingZones
+RVA: 0x1f5c8
+INSTRUCTIONS: 3
+
+METHOD: StrandedWorld::GetZoneData
+RVA: 0x20288
+INSTRUCTIONS: 12
+
+METHOD: StrandedWorld::get_WORLD_SEED
+RVA: 0x20413
+INSTRUCTIONS: 8
+
+METHOD: StrandedWorld::get_Zones
+RVA: 0x20431
+INSTRUCTIONS: 3
+
+METHOD: StrandedWorld::get_NmlZone
+RVA: 0x20439
+INSTRUCTIONS: 3
+
+METHOD: StrandedWorld::get_ZoneLoader
+RVA: 0x20441
+INSTRUCTIONS: 3
+
+METHOD: StrandedWorld::GetZone
+RVA: 0x2045c
+INSTRUCTIONS: 25
+
+METHOD: StrandedWorld::GetZoneId
+RVA: 0x20498
+INSTRUCTIONS: 30
+
+METHOD: StrandedWorld::GetZone_
+RVA: 0x204d8
+INSTRUCTIONS: 26
+
+METHOD: StrandedWorld::GetBiome
+RVA: 0x2050d
+INSTRUCTIONS: 9
+
+METHOD: StrandedWorld::GetBiome_
+RVA: 0x20520
+INSTRUCTIONS: 10
+
+METHOD: StrandedWorld::add_ZoneEntered
+RVA: 0x205b4
+INSTRUCTIONS: 20
+
+METHOD: StrandedWorld::remove_ZoneEntered
+RVA: 0x205ec
+INSTRUCTIONS: 20
+
+METHOD: StrandedWorld::OnZoneEntered
+RVA: 0x20621
+INSTRUCTIONS: 9
+
+METHOD: StrandedWorld::LoadZonePositions
+RVA: 0x20648
+INSTRUCTIONS: 46
+
+METHOD: StrandedWorld::SubscribeToZoneLoaderEvents
+RVA: 0x206fe
+INSTRUCTIONS: 13
+
+METHOD: StrandedWorld::UnsubscribeFromZoneLoaderEvents
+RVA: 0x2072e
+INSTRUCTIONS: 16
+
+METHOD: StrandedWorld::ZoneLoader_LoadedZone
+RVA: 0x20768
+INSTRUCTIONS: 23
+
+METHOD: StrandedWorld::InitializeZones
+RVA: 0x207e4
+INSTRUCTIONS: 40
+
+METHOD: StrandedWorld::ApplyWorldToZones
+RVA: 0x20884
+INSTRUCTIONS: 99
+
+METHOD: StrandedWorld::PollZones
+RVA: 0x20ea0
+INSTRUCTIONS: 48
+
+METHOD: StrandedWorld::PollZone
+RVA: 0x20fc8
+INSTRUCTIONS: 5
+
+METHOD: StrandedWorld::SaveZone
+RVA: 0x210a4
+INSTRUCTIONS: 254
+
+METHOD: StrandedWorld::OnZoneDownloaded
+RVA: 0x213b8
+INSTRUCTIONS: 13
+
+METHOD: StrandedWorld::LoadZone
+RVA: 0x213e4
+INSTRUCTIONS: 29
+
+METHOD: StrandedWorld::SetShelterOnZones
+RVA: 0x214c4
+INSTRUCTIONS: 82
+
+METHOD: StrandedWorld::SetSheltersOnWorldZones
+RVA: 0x2160c
+INSTRUCTIONS: 42
+
+METHOD: StrandedWorld::SetWollieOnShelterZone
+RVA: 0x21668
+INSTRUCTIONS: 17
+
+METHOD: StrandedWorld::FindClosestZone
+RVA: 0x2172c
+INSTRUCTIONS: 7
+
+METHOD: StrandedWorld::FindClosestZone
+RVA: 0x21744
+INSTRUCTIONS: 44
+
+METHOD: StrandedWorld::FindZone
+RVA: 0x2179c
+INSTRUCTIONS: 28
+
+METHOD: StrandedWorld::FindEndGameZone
+RVA: 0x217dc
+INSTRUCTIONS: 28
+
+METHOD: StrandedWorld::InZoneUnLoadingBounds
+RVA: 0x21820
+INSTRUCTIONS: 22
+
+METHOD: StrandedWorld::InZoneLoadingBounds
+RVA: 0x21884
+INSTRUCTIONS: 22
+
+METHOD: StrandedWorld::GetRandowWorldSeed
+RVA: 0x21adc
+INSTRUCTIONS: 16
+
+METHOD: StrandedWorld::SetRandomWorldSeed
+RVA: 0x21b15
+INSTRUCTIONS: 3
+
+METHOD: StrandedWorld::SetWorldSeed
+RVA: 0x21b20
+INSTRUCTIONS: 20
+
+METHOD: StrandedWorld::SetWorldSeed
+RVA: 0x21b80
+INSTRUCTIONS: 23
+
+METHOD: StrandedWorld::GenerateLocalSeed
+RVA: 0x21bd0
+INSTRUCTIONS: 44
+
+METHOD: StrandedWorld::LoadStartingZone
+RVA: 0x21ea0
+INSTRUCTIONS: 8
+
+METHOD: StrandedWorld::LoadStartingZone
+RVA: 0x21ebc
+INSTRUCTIONS: 17
+
+METHOD: StrandedWorld::LoadStartingZone_Sequence
+RVA: 0x21ef0
+INSTRUCTIONS: 9
+
+METHOD: IslandDebugTexture::AttachTexture
+RVA: 0x22128
+INSTRUCTIONS: 192
+
+METHOD: IslandDebugTexture::DrawLine
+RVA: 0x22408
+INSTRUCTIONS: 13
+
+METHOD: IslandDebugTexture::DrawLines
+RVA: 0x22420
+INSTRUCTIONS: 130
+
+METHOD: IslandDebugTexture::FillTexturePolygon
+RVA: 0x224f4
+INSTRUCTIONS: 315
+
+METHOD: IslandDebugTexture::RenderSoilMapImageIcon
+RVA: 0x227a8
+INSTRUCTIONS: 52
+
+METHOD: IslandDebugTexture::.ctor
+RVA: 0x2281b
+INSTRUCTIONS: 3
+
+METHOD: WorldTools::GenerateZoneBiome
+RVA: 0x2292c
+INSTRUCTIONS: 24
+
+METHOD: WorldTools::GenerateZoneHeightmap
+RVA: 0x22968
+INSTRUCTIONS: 76
+
+METHOD: WorldTools::GENERATE_ISLAND_HEIGHTMAP
+RVA: 0x22a5c
+INSTRUCTIONS: 348
+
+METHOD: WorldTools::StitchTerrainEdges
+RVA: 0x22e88
+INSTRUCTIONS: 55
+
+METHOD: WorldTools::CreateHeightMapTexture
+RVA: 0x22f00
+INSTRUCTIONS: 74
+
+METHOD: WorldTools::GenerateTerrain
+RVA: 0x2306c
+INSTRUCTIONS: 179
+
+METHOD: WorldTools::NormalizeHeightmap
+RVA: 0x2350a
+INSTRUCTIONS: 12
+
+METHOD: WorldTools::SmoothTerrain
+RVA: 0x2352c
+INSTRUCTIONS: 10
+
+METHOD: WorldTools::FillCellHeightmap
+RVA: 0x23678
+INSTRUCTIONS: 316
+
+METHOD: WorldTools::HeightmapRiver
+RVA: 0x23920
+INSTRUCTIONS: 164
+
+METHOD: ZoneAttributes::get_Rain
+RVA: 0x23a91
+INSTRUCTIONS: 3
+
+METHOD: ZoneAttributes::get_CampFires
+RVA: 0x23a99
+INSTRUCTIONS: 3
+
+METHOD: ZoneAttributes::set_CampFires
+RVA: 0x23aa1
+INSTRUCTIONS: 4
+
+METHOD: ZoneAttributes::get_Crops
+RVA: 0x23aaa
+INSTRUCTIONS: 3
+
+METHOD: ZoneAttributes::.ctor
+RVA: 0x23ab4
+INSTRUCTIONS: 34
+
+METHOD: ZoneAttributes::Save
+RVA: 0x23b0c
+INSTRUCTIONS: 68
+
+METHOD: ZoneAttributes::Load
+RVA: 0x23c10
+INSTRUCTIONS: 57
+
+METHOD: Zone::InBounds
+RVA: 0x23cc0
+INSTRUCTIONS: 10
+
+METHOD: Zone::InSaveBounds
+RVA: 0x23ce4
+INSTRUCTIONS: 10
+
+METHOD: Zone::InSaveBoundsRadius
+RVA: 0x23cf8
+INSTRUCTIONS: 9
+
+METHOD: Zone::InSaveBoundsHeight
+RVA: 0x23d17
+INSTRUCTIONS: 11
+
+METHOD: Zone::get_Terrain
+RVA: 0x23d35
+INSTRUCTIONS: 3
+
+METHOD: Zone::get_Biome
+RVA: 0x23d3d
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_Biome
+RVA: 0x23d45
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_Seed
+RVA: 0x23d4e
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_Seed
+RVA: 0x23d56
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_Loading
+RVA: 0x23d5f
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_Loading
+RVA: 0x23d67
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_Loaded
+RVA: 0x23d70
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_Loaded
+RVA: 0x23d78
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_IsMapEditor
+RVA: 0x23d81
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_IsMapEditor
+RVA: 0x23d89
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_IsUserMap
+RVA: 0x23d92
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_IsUserMap
+RVA: 0x23d9a
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_HasObjectsForBillboard
+RVA: 0x23da3
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_HasObjectsForBillboard
+RVA: 0x23dab
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_HasShelter
+RVA: 0x23db4
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_HasShelter
+RVA: 0x23dbc
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_ShelterType
+RVA: 0x23dc5
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_ShelterType
+RVA: 0x23dcd
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_HasWollie
+RVA: 0x23dd6
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_HasWollie
+RVA: 0x23dde
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_HasVisited
+RVA: 0x23de7
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_HasVisited
+RVA: 0x23def
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_GenerationPoints
+RVA: 0x23df8
+INSTRUCTIONS: 3
+
+METHOD: Zone::get_GeneratedObjects
+RVA: 0x23e00
+INSTRUCTIONS: 3
+
+METHOD: Zone::get_WaveOverlay
+RVA: 0x23e08
+INSTRUCTIONS: 3
+
+METHOD: Zone::set_WaveOverlay
+RVA: 0x23e10
+INSTRUCTIONS: 4
+
+METHOD: Zone::get_Billboarding
+RVA: 0x23e19
+INSTRUCTIONS: 3
+
+METHOD: Zone::Awake
+RVA: 0x23e21
+INSTRUCTIONS: 13
+
+METHOD: Zone::GenerateGridData
+RVA: 0x23e4f
+INSTRUCTIONS: 7
+
+METHOD: Zone::Enter
+RVA: 0x23e63
+INSTRUCTIONS: 14
+
+METHOD: Zone::Exit
+RVA: 0x23e8f
+INSTRUCTIONS: 14
+
+METHOD: Zone::OnObjectGenerated
+RVA: 0x23ebb
+INSTRUCTIONS: 5
+
+METHOD: Zone::OnObjectCreated
+RVA: 0x23ec9
+INSTRUCTIONS: 1
+
+METHOD: Zone::OnObjectLoaded
+RVA: 0x23ecb
+INSTRUCTIONS: 1
+
+METHOD: Zone::FindImpostor
+RVA: 0x23ed0
+INSTRUCTIONS: 12
+
+METHOD: Zone::CreateImpostors
+RVA: 0x23efc
+INSTRUCTIONS: 75
+
+METHOD: Zone::LoadImpostors
+RVA: 0x23fcc
+INSTRUCTIONS: 169
+
+METHOD: Zone::CreateImpostor
+RVA: 0x241ec
+INSTRUCTIONS: 40
+
+METHOD: Zone::CreateImpostor
+RVA: 0x2426c
+INSTRUCTIONS: 26
+
+METHOD: Zone::TryGetImpostor
+RVA: 0x242c0
+INSTRUCTIONS: 31
+
+METHOD: Zone::ReleaseImpostors
+RVA: 0x24304
+INSTRUCTIONS: 24
+
+METHOD: Zone::.ctor
+RVA: 0x2434a
+INSTRUCTIONS: 12
+
+METHOD: ZoneNML::Awake
+RVA: 0x24373
+INSTRUCTIONS: 1
+
+METHOD: ZoneNML::InSaveBounds
+RVA: 0x24375
+INSTRUCTIONS: 2
+
+METHOD: ZoneNML::Enter
+RVA: 0x24378
+INSTRUCTIONS: 1
+
+METHOD: ZoneNML::.ctor
+RVA: 0x2437a
+INSTRUCTIONS: 3
+
+METHOD: ZoneObject::get_Obj
+RVA: 0x24382
+INSTRUCTIONS: 3
+
+METHOD: ZoneObject::get_Rarity
+RVA: 0x2438a
+INSTRUCTIONS: 3
+
+METHOD: ZoneObject::.ctor
+RVA: 0x24392
+INSTRUCTIONS: 6
+
+METHOD: ZoneObjects::get_Objects
+RVA: 0x243a5
+INSTRUCTIONS: 3
+
+METHOD: ZoneObjects::CheckGenerationIsProcedural
+RVA: 0x243ad
+INSTRUCTIONS: 5
+
+METHOD: ZoneObjects::CheckGenerationIsManual
+RVA: 0x243b8
+INSTRUCTIONS: 5
+
+METHOD: ZoneObjects::.ctor
+RVA: 0x243c3
+INSTRUCTIONS: 12
+
+METHOD: ZonePositionGenerator::GeneratePoints
+RVA: 0x243e8
+INSTRUCTIONS: 168
+
+METHOD: ZonePositionGenerator::IsValid
+RVA: 0x245a0
+INSTRUCTIONS: 108
+
+METHOD: Island::get_Points
+RVA: 0x492e3
+INSTRUCTIONS: 3
+
+METHOD: Island::set_Points
+RVA: 0x492eb
+INSTRUCTIONS: 4
+
+METHOD: Island::get_Centers
+RVA: 0x492f4
+INSTRUCTIONS: 3
+
+METHOD: Island::set_Centers
+RVA: 0x492fc
+INSTRUCTIONS: 4
+
+METHOD: Island::get_Corners
+RVA: 0x49305
+INSTRUCTIONS: 3
+
+METHOD: Island::set_Corners
+RVA: 0x4930d
+INSTRUCTIONS: 4
+
+METHOD: Island::get_Edges
+RVA: 0x49316
+INSTRUCTIONS: 3
+
+METHOD: Island::set_Edges
+RVA: 0x4931e
+INSTRUCTIONS: 4
+
+METHOD: Island::get_Size
+RVA: 0x49327
+INSTRUCTIONS: 3
+
+METHOD: Island::set_Size
+RVA: 0x4932f
+INSTRUCTIONS: 4
+
+METHOD: Island::get_NumPoints
+RVA: 0x49338
+INSTRUCTIONS: 3
+
+METHOD: Island::set_NumPoints
+RVA: 0x49340
+INSTRUCTIONS: 4
+
+METHOD: Island::get_IslandType
+RVA: 0x49349
+INSTRUCTIONS: 3
+
+METHOD: Island::set_IslandType
+RVA: 0x49351
+INSTRUCTIONS: 4
+
+METHOD: Island::get_PointType
+RVA: 0x4935a
+INSTRUCTIONS: 3
+
+METHOD: Island::set_PointType
+RVA: 0x49362
+INSTRUCTIONS: 4
+
+METHOD: Island::.ctor
+RVA: 0x4936c
+INSTRUCTIONS: 23
+
+METHOD: Island::Reset
+RVA: 0x493c0
+INSTRUCTIONS: 155
+
+METHOD: Island::NewIsland
+RVA: 0x495f0
+INSTRUCTIONS: 116
+
+METHOD: Island::ImproveCorners
+RVA: 0x49734
+INSTRUCTIONS: 157
+
+METHOD: Island::BuildGraph
+RVA: 0x49938
+INSTRUCTIONS: 316
+
+METHOD: Island::LandCorners
+RVA: 0x49dc0
+INSTRUCTIONS: 29
+
+METHOD: Island::AssignCornerElevations
+RVA: 0x49e2c
+INSTRUCTIONS: 104
+
+METHOD: Island::RedistributeElevations
+RVA: 0x49f90
+INSTRUCTIONS: 56
+
+METHOD: Island::AssignOceanCoastAndLand
+RVA: 0x4a020
+INSTRUCTIONS: 251
+
+METHOD: Island::AssignPolygonElevations
+RVA: 0x4a328
+INSTRUCTIONS: 48
+
+METHOD: Island::CalculateDownslopes
+RVA: 0x4a3d4
+INSTRUCTIONS: 45
+
+METHOD: Island::CalculateWatersheds
+RVA: 0x4a478
+INSTRUCTIONS: 109
+
+METHOD: Island::CreateRivers
+RVA: 0x4a5cc
+INSTRUCTIONS: 64
+
+METHOD: Island::GetBiome
+RVA: 0x4a67c
+INSTRUCTIONS: 17
+
+METHOD: Island::AssignBiomes
+RVA: 0x4a6a0
+INSTRUCTIONS: 19
+
+METHOD: Island::LookUpEdgeFromCorner
+RVA: 0x4a6f8
+INSTRUCTIONS: 31
+
+METHOD: Island::LookUpEdgeFromCenter
+RVA: 0x4a760
+INSTRUCTIONS: 31
+
+METHOD: Island::Inside
+RVA: 0x4a7c8
+INSTRUCTIONS: 22
+
+METHOD: Island::InsideIsland
+RVA: 0x4a808
+INSTRUCTIONS: 58
+
+METHOD: Island::.cctor
+RVA: 0x4a8b7
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::get_BrushProjector
+RVA: 0x52ffa
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::get_Brushes
+RVA: 0x53002
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::get_Heightmaps
+RVA: 0x5300a
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::set_Heightmaps
+RVA: 0x53012
+INSTRUCTIONS: 4
+
+METHOD: LE_ConfigTerrain::get_CustomDefaultTerrain
+RVA: 0x5301b
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::get_TerrainLayer
+RVA: 0x53023
+INSTRUCTIONS: 3
+
+METHOD: LE_ConfigTerrain::.ctor
+RVA: 0x5302b
+INSTRUCTIONS: 14
+
+METHOD: LE_LevelEditorMain::get_GUI3dTerrain
+RVA: 0x533ea
+INSTRUCTIONS: 3
+
+METHOD: LE_LevelEditorMain::InitializeDefaultTerrain
+RVA: 0x54170
+INSTRUCTIONS: 46
+
+METHOD: LE_SaveLoad::SaveMapHeightMapFile
+RVA: 0x54960
+INSTRUCTIONS: 72
+
+METHOD: LE_SaveLoad::LoadMapHeightMapFile
+RVA: 0x54a1c
+INSTRUCTIONS: 58
+
+METHOD: LE_ZoneTileGenerator::Start
+RVA: 0x54abf
+INSTRUCTIONS: 6
+
+METHOD: LE_ZoneTileGenerator::GenerateHeightmapFromTexture
+RVA: 0x54ad6
+INSTRUCTIONS: 9
+
+METHOD: LE_ZoneTileGenerator::GenerateShoreMap
+RVA: 0x54af0
+INSTRUCTIONS: 22
+
+METHOD: LE_ZoneTileGenerator::GenerateRandomIsland
+RVA: 0x54b40
+INSTRUCTIONS: 14
+
+METHOD: LE_ZoneTileGenerator::GenerateAdvancedPerlin
+RVA: 0x54b78
+INSTRUCTIONS: 25
+
+METHOD: LE_ZoneTileGenerator::GenerateAdvancedNormalise
+RVA: 0x54bd4
+INSTRUCTIONS: 22
+
+METHOD: LE_ZoneTileGenerator::GenerateSmooth
+RVA: 0x54c22
+INSTRUCTIONS: 19
+
+METHOD: LE_ZoneTileGenerator::CreateHeightMapTexture
+RVA: 0x54c60
+INSTRUCTIONS: 66
+
+METHOD: LE_ZoneTileGenerator::CreateShoreMaskTexture
+RVA: 0x54d00
+INSTRUCTIONS: 57
+
+METHOD: LE_ZoneTileGenerator::AddWaveOverlay
+RVA: 0x54d80
+INSTRUCTIONS: 143
+
+METHOD: LE_ZoneTileGenerator::LoadMap
+RVA: 0x54faf
+INSTRUCTIONS: 11
+
+METHOD: LE_ZoneTileGenerator::.ctor
+RVA: 0x54fd3
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dObject::AddTerrainSnapping
+RVA: 0x55a50
+INSTRUCTIONS: 54
+
+METHOD: LE_GUI3dTerrain::get_TerrainInstance
+RVA: 0x56956
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::get_TerrainManager
+RVA: 0x5695e
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::SetTerrain
+RVA: 0x56966
+INSTRUCTIONS: 18
+
+METHOD: LE_GUI3dTerrain::RemoveTerrainManager
+RVA: 0x569a2
+INSTRUCTIONS: 16
+
+METHOD: LE_GUI3dTerrain::get_DefaultTerrainDataPrefab
+RVA: 0x569d0
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_DefaultTerrainDataPrefab
+RVA: 0x569d8
+INSTRUCTIONS: 4
+
+METHOD: LE_GUI3dTerrain::get_BrushProjector
+RVA: 0x569e1
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_BrushProjector
+RVA: 0x569e9
+INSTRUCTIONS: 11
+
+METHOD: LE_GUI3dTerrain::get_BrushAlphaTexture
+RVA: 0x56a0d
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_BrushAlphaTexture
+RVA: 0x56a15
+INSTRUCTIONS: 10
+
+METHOD: LE_GUI3dTerrain::get_Heightmap
+RVA: 0x56a34
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_Heightmap
+RVA: 0x56a3c
+INSTRUCTIONS: 4
+
+METHOD: LE_GUI3dTerrain::get_Amount
+RVA: 0x56a45
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_Amount
+RVA: 0x56a4d
+INSTRUCTIONS: 4
+
+METHOD: LE_GUI3dTerrain::get_Size
+RVA: 0x56a56
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_Size
+RVA: 0x56a60
+INSTRUCTIONS: 33
+
+METHOD: LE_GUI3dTerrain::get_TargetRelativeValue
+RVA: 0x56ac2
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_TargetRelativeValue
+RVA: 0x56aca
+INSTRUCTIONS: 4
+
+METHOD: LE_GUI3dTerrain::get_IsReadingTerrainSetHeight
+RVA: 0x56ad3
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_IsReadingTerrainSetHeight
+RVA: 0x56adb
+INSTRUCTIONS: 7
+
+METHOD: LE_GUI3dTerrain::get_IsDirectedSmooth
+RVA: 0x56aeb
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_IsDirectedSmooth
+RVA: 0x56af3
+INSTRUCTIONS: 4
+
+METHOD: LE_GUI3dTerrain::get_DirectedSmoothAngle
+RVA: 0x56afc
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_DirectedSmoothAngle
+RVA: 0x56b04
+INSTRUCTIONS: 22
+
+METHOD: LE_GUI3dTerrain::get_EditMode
+RVA: 0x56b5b
+INSTRUCTIONS: 3
+
+METHOD: LE_GUI3dTerrain::set_EditMode
+RVA: 0x56b63
+INSTRUCTIONS: 14
+
+METHOD: LE_GUI3dTerrain::get_ActiveEditMode
+RVA: 0x56b83
+INSTRUCTIONS: 2
+
+METHOD: LE_GUI3dTerrain::SetCursorPosition
+RVA: 0x56b88
+INSTRUCTIONS: 29
+
+METHOD: LE_GUI3dTerrain::SetIsCursorAction
+RVA: 0x56bec
+INSTRUCTIONS: 172
+
+METHOD: LE_GUI3dTerrain::HideCursor
+RVA: 0x56e10
+INSTRUCTIONS: 22
+
+METHOD: LE_GUI3dTerrain::Start
+RVA: 0x56e63
+INSTRUCTIONS: 15
+
+METHOD: LE_GUI3dTerrain::Update
+RVA: 0x56e95
+INSTRUCTIONS: 15
+
+METHOD: LE_GUI3dTerrain::Focus
+RVA: 0x56ec4
+INSTRUCTIONS: 81
+
+METHOD: LE_GUI3dTerrain::UpdateBrushProjector
+RVA: 0x56fdc
+INSTRUCTIONS: 107
+
+METHOD: LE_GUI3dTerrain::GetRelativeLocalLocation
+RVA: 0x5714c
+INSTRUCTIONS: 69
+
+METHOD: LE_GUI3dTerrain::.ctor
+RVA: 0x57218
+INSTRUCTIONS: 23
+
+METHOD: LE_GUIInterface::OnTerrainHeightmapTextureChanged
+RVA: 0x575ce
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainBrushChanged
+RVA: 0x575f4
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainEditBrushSizeChanged
+RVA: 0x5761a
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainEditBrushAmountChanged
+RVA: 0x57640
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainEditBrushTargetValueChanged
+RVA: 0x57666
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainEditDirectionChanged
+RVA: 0x5768c
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainChangeHeightModeChanged
+RVA: 0x576b2
+INSTRUCTIONS: 16
+
+METHOD: LE_GUIInterface::OnTerrainIsDirectedSmoothChanged
+RVA: 0x576de
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainEditModeBtn
+RVA: 0x57704
+INSTRUCTIONS: 12
+
+METHOD: LE_GUIInterface::OnTerrainReadSetHeightBtn
+RVA: 0x5772a
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainGenerateShoremap
+RVA: 0x5780a
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainGenerateCustomHeightmap
+RVA: 0x5782f
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainGeneratePerlin
+RVA: 0x57854
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainGenerateNormalise
+RVA: 0x57879
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainGenerateIsland
+RVA: 0x5789e
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface::OnTerrainSmooth
+RVA: 0x578c3
+INSTRUCTIONS: 11
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainGenerateCustomHeightmap
+RVA: 0x57de8
+INSTRUCTIONS: 33
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainGeneratePerlin
+RVA: 0x57e5c
+INSTRUCTIONS: 13
+
+METHOD: LE_GUIInterface_uGUIimpl::TerrainGeneratePerlin
+RVA: 0x57e88
+INSTRUCTIONS: 21
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainGenerateNormalise
+RVA: 0x57eda
+INSTRUCTIONS: 13
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainGenerateIsland
+RVA: 0x57f05
+INSTRUCTIONS: 19
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainGenerateShoremap
+RVA: 0x57f43
+INSTRUCTIONS: 7
+
+METHOD: LE_GUIInterface_uGUIimpl::OnTerrainSmooth
+RVA: 0x57f5c
+INSTRUCTIONS: 19
+
+METHOD: LE_GUIInterface_uGUIimpl::SetTerrainUIMode
+RVA: 0x58084
+INSTRUCTIONS: 61
+
+METHOD: LE_GUIInterface_uGUIimpl::SetTerrainEditBrushSize
+RVA: 0x58142
+INSTRUCTIONS: 13
+
+METHOD: LE_GUIInterface_uGUIimpl::SetTerrainEditBrushAmount
+RVA: 0x58169
+INSTRUCTIONS: 13
+
+METHOD: LE_GUIInterface_uGUIimpl::SetTerrainEditBrushTargetValue
+RVA: 0x58190
+INSTRUCTIONS: 13
+
+METHOD: LE_GUIInterface_uGUIimpl::SetTerrainIsReadingSetHeight
+RVA: 0x581b8
+INSTRUCTIONS: 43
+
+METHOD: LE_GUIInterface_uGUIimpl::<OnTerrainGeneratePerlin>b__34_0
+RVA: 0x5866c
+INSTRUCTIONS: 21
+
+METHOD: LE_GUIInterface_uGUIimpl::<OnTerrainGenerateNormalise>b__36_0
+RVA: 0x586ba
+INSTRUCTIONS: 16
+
+METHOD: LE_LogicTerrain::LoadRawHeightmaps
+RVA: 0x5923c
+INSTRUCTIONS: 50
+
+METHOD: LE_LogicTerrain::.ctor
+RVA: 0x592c0
+INSTRUCTIONS: 172
+
+METHOD: LE_LogicTerrain::Destroy
+RVA: 0x59558
+INSTRUCTIONS: 112
+
+METHOD: LE_LogicTerrain::Update
+RVA: 0x59743
+INSTRUCTIONS: 9
+
+METHOD: LE_LogicTerrain::OnLoadedLevelInEditor
+RVA: 0x5975c
+INSTRUCTIONS: 21
+
+METHOD: LE_LogicTerrain::OnTerrainBrushChanged
+RVA: 0x597b4
+INSTRUCTIONS: 27
+
+METHOD: LE_LogicTerrain::OnTerrainHeightmapTextureChanged
+RVA: 0x59810
+INSTRUCTIONS: 27
+
+METHOD: LE_LogicTerrain::OnTerrainEditBrushSizeChanged
+RVA: 0x5986c
+INSTRUCTIONS: 29
+
+METHOD: LE_LogicTerrain::OnTerrainEditBrushAmountChanged
+RVA: 0x598c4
+INSTRUCTIONS: 18
+
+METHOD: LE_LogicTerrain::OnTerrainEditBrushTargetValueChanged
+RVA: 0x598fc
+INSTRUCTIONS: 6
+
+METHOD: LE_LogicTerrain::OnTerrainEditDirectionChanged
+RVA: 0x59910
+INSTRUCTIONS: 26
+
+METHOD: LE_LogicTerrain::OnTerrainChangeHeightModeChanged
+RVA: 0x5996c
+INSTRUCTIONS: 26
+
+METHOD: LE_LogicTerrain::OnTerrainIsDirectedSmoothChanged
+RVA: 0x599c7
+INSTRUCTIONS: 19
+
+METHOD: LE_LogicTerrain::OnTerrainEditModeBtn
+RVA: 0x599ff
+INSTRUCTIONS: 6
+
+METHOD: LE_LogicTerrain::OnTerrainReadSetHeightBtn
+RVA: 0x59a14
+INSTRUCTIONS: 23
+
+METHOD: LE_LogicTerrain::CheckParameters
+RVA: 0x59a74
+INSTRUCTIONS: 57
+
+METHOD: LE_LogicTerrain::InitTerrainValues
+RVA: 0x59b30
+INSTRUCTIONS: 120
+
+METHOD: LE_LogicTerrain::GetTerrainUIMode
+RVA: 0x59d01
+INSTRUCTIONS: 8
+
+METHOD: LE_LogicTerrain::ReadSetHeightRoutine
+RVA: 0x59d13
+INSTRUCTIONS: 6
+
+METHOD: LE_TerrainCreatedEvent::get_TerrainGameObject
+RVA: 0x5a1d0
+INSTRUCTIONS: 3
+
+METHOD: LE_TerrainCreatedEvent::.ctor
+RVA: 0x5a1d8
+INSTRUCTIONS: 6
+
+METHOD: LE_TerrainManager::get_TerrainData
+RVA: 0x5b626
+INSTRUCTIONS: 3
+
+METHOD: LE_TerrainManager::.ctor
+RVA: 0x5b62e
+INSTRUCTIONS: 6
+
+METHOD: LE_TerrainManager::SmoothHeight
+RVA: 0x5b640
+INSTRUCTIONS: 443
+
+METHOD: LE_TerrainManager::ChangeHeight
+RVA: 0x5b9d4
+INSTRUCTIONS: 159
+
+METHOD: LE_TerrainManager::ClampHeightBounds
+RVA: 0x5bb30
+INSTRUCTIONS: 31
+
+METHOD: LE_TerrainManager::ChangeHeight
+RVA: 0x5bb74
+INSTRUCTIONS: 118
+
+METHOD: LE_TerrainManager::ChangeHeightInternal
+RVA: 0x5bc60
+INSTRUCTIONS: 55
+
+METHOD: LE_TerrainManager::GetAffectedAreaInternal
+RVA: 0x5bcd0
+INSTRUCTIONS: 125
+
+METHOD: MPExtensions::GetZoneData
+RVA: 0x5d048
+INSTRUCTIONS: 28
+
+METHOD: MultiplayerMng::get_ZoneStreamChannel
+RVA: 0x5fc2e
+INSTRUCTIONS: 3
+
+METHOD: ZoneDownloadedEvent::.ctor
+RVA: 0x620d1
+INSTRUCTIONS: 9
+
+METHOD: MultiplayerZoneSync::get_Instance
+RVA: 0x620e7
+INSTRUCTIONS: 2
+
+METHOD: MultiplayerZoneSync::set_Instance
+RVA: 0x620ee
+INSTRUCTIONS: 3
+
+METHOD: MultiplayerZoneSync::Awake
+RVA: 0x620f6
+INSTRUCTIONS: 11
+
+METHOD: MultiplayerZoneSync::OnDestroy
+RVA: 0x62117
+INSTRUCTIONS: 7
+
+METHOD: MultiplayerZoneSync::TryGetCommand
+RVA: 0x6212c
+INSTRUCTIONS: 6
+
+METHOD: MultiplayerZoneSync::LinkData
+RVA: 0x6213c
+INSTRUCTIONS: 35
+
+METHOD: MultiplayerZoneSync::LinkInstance
+RVA: 0x621a8
+INSTRUCTIONS: 25
+
+METHOD: MultiplayerZoneSync::IsLinked
+RVA: 0x621f2
+INSTRUCTIONS: 6
+
+METHOD: MultiplayerZoneSync::LinkReset
+RVA: 0x62202
+INSTRUCTIONS: 4
+
+METHOD: MultiplayerZoneSync::Load
+RVA: 0x6220f
+INSTRUCTIONS: 12
+
+METHOD: MultiplayerZoneSync::DumpNotCompleted
+RVA: 0x62234
+INSTRUCTIONS: 72
+
+METHOD: MultiplayerZoneSync::get_ZoneDowloadIndex
+RVA: 0x62328
+INSTRUCTIONS: 9
+
+METHOD: MultiplayerZoneSync::SendZone
+RVA: 0x6233b
+INSTRUCTIONS: 9
+
+METHOD: MultiplayerZoneSync::SendZone_Sequence
+RVA: 0x6234e
+INSTRUCTIONS: 12
+
+METHOD: MultiplayerZoneSync::StreamDataStarted
+RVA: 0x6236c
+INSTRUCTIONS: 26
+
+METHOD: MultiplayerZoneSync::StreamDataProgress
+RVA: 0x623ca
+INSTRUCTIONS: 20
+
+METHOD: MultiplayerZoneSync::StreamDataAborted
+RVA: 0x62408
+INSTRUCTIONS: 16
+
+METHOD: MultiplayerZoneSync::StreamDataReceived
+RVA: 0x6243c
+INSTRUCTIONS: 23
+
+METHOD: MultiplayerZoneSync::PostZone
+RVA: 0x6248a
+INSTRUCTIONS: 8
+
+METHOD: MultiplayerZoneSync::PostZone_Sequence
+RVA: 0x6249c
+INSTRUCTIONS: 9
+
+METHOD: MultiplayerZoneSync::Label
+RVA: 0x624b2
+INSTRUCTIONS: 11
+
+METHOD: MultiplayerZoneSync::.ctor
+RVA: 0x624da
+INSTRUCTIONS: 12
+
+METHOD: MultiplayerZoneSync::.cctor
+RVA: 0x624fb
+INSTRUCTIONS: 5
+
+METHOD: Peer::get_StartingCrate
+RVA: 0x62857
+INSTRUCTIONS: 3
+
+METHOD: Peer::set_StartingCrate
+RVA: 0x6285f
+INSTRUCTIONS: 8
+
+METHOD: Peer::get_WorldSeed
+RVA: 0x6286c
+INSTRUCTIONS: 3
+
+METHOD: Peer::set_WorldSeed
+RVA: 0x62874
+INSTRUCTIONS: 8
+
+METHOD: ShoreMaskGenerator::CreateHeightMap
+RVA: 0x842ac
+INSTRUCTIONS: 60
+
+METHOD: BiomeFlockProvider::Start
+RVA: 0x89149
+INSTRUCTIONS: 9
+
+METHOD: BiomeFlockProvider::OnDestroy
+RVA: 0x8916d
+INSTRUCTIONS: 9
+
+METHOD: BiomeFlockProvider::StrandedWorld_ZoneEntered
+RVA: 0x89194
+INSTRUCTIONS: 26
+
+METHOD: BiomeFlockProvider::GetFlocks
+RVA: 0x89200
+INSTRUCTIONS: 24
+
+METHOD: BiomeFlockProvider::GetFlockData
+RVA: 0x89258
+INSTRUCTIONS: 41
+
+METHOD: BiomeFlockProvider::.ctor
+RVA: 0x892f8
+INSTRUCTIONS: 6
+
+METHOD: FlockChild::RandomizeAnimationStartingFrame
+RVA: 0x894a4
+INSTRUCTIONS: 49
+
+METHOD: FlockController::PollZone
+RVA: 0x8a468
+INSTRUCTIONS: 51
+
+METHOD: FlockController::GetStartingPosition
+RVA: 0x8abec
+INSTRUCTIONS: 27
+
+METHOD: LegacyUtilities::LoadStrandedWorldPlayerZoneId_PreCoop
+RVA: 0x94afc
+INSTRUCTIONS: 17
+
+METHOD: SnapHeightToTerrain::ModifyPlacement
+RVA: 0xa16ec
+INSTRUCTIONS: 37
+
+METHOD: SnapHeightToTerrain::.ctor
+RVA: 0xa176a
+INSTRUCTIONS: 3
+
+METHOD: PrefabSizeFitsBetweenTerrainAndOcean::ValidatePlacement
+RVA: 0xa1830
+INSTRUCTIONS: 19
+
+METHOD: PrefabSizeFitsBetweenTerrainAndOcean::.ctor
+RVA: 0xa1876
+INSTRUCTIONS: 3
+
+METHOD: TerrainIsBelowPlacement::ValidatePlacement
+RVA: 0xa187e
+INSTRUCTIONS: 15
+
+METHOD: TerrainIsBelowPlacement::.ctor
+RVA: 0xa18b1
+INSTRUCTIONS: 3
+
+METHOD: TerrainIsIslandHeightAtPlacement::ValidatePlacement
+RVA: 0xa18b9
+INSTRUCTIONS: 13
+
+METHOD: TerrainIsIslandHeightAtPlacement::.ctor
+RVA: 0xa18e1
+INSTRUCTIONS: 3
+
+METHOD: TerrainIsMinimumHeightAtPlacement::ValidatePlacement
+RVA: 0xa18e9
+INSTRUCTIONS: 14
+
+METHOD: TerrainIsMinimumHeightAtPlacement::.ctor
+RVA: 0xa1917
+INSTRUCTIONS: 3
+
+METHOD: BuoyancyManager::CheckInRangeOfActiveZone
+RVA: 0xa2ddc
+INSTRUCTIONS: 18
+
+METHOD: Footstep::Footstep_Terrain
+RVA: 0xa587c
+INSTRUCTIONS: 101
+
+METHOD: PlayerUtilities::GetServerStartingCrate
+RVA: 0xac010
+INSTRUCTIONS: 9
+
+METHOD: MapTools::CreateHeightmapTexture
+RVA: 0xb5bf8
+INSTRUCTIONS: 62
+
+METHOD: BiomeCategory::.ctor
+RVA: 0xb5d03
+INSTRUCTIONS: 3
+
+METHOD: ProceduralObjectManager::get_BiomeGeneration
+RVA: 0xb5d1b
+INSTRUCTIONS: 3
+
+METHOD: NullTerrainProvider::GetHeight
+RVA: 0xb5d48
+INSTRUCTIONS: 4
+
+METHOD: NullTerrainProvider::GetNormal
+RVA: 0xb5d59
+INSTRUCTIONS: 4
+
+METHOD: NullTerrainProvider::.ctor
+RVA: 0xb5d6a
+INSTRUCTIONS: 3
+
+METHOD: ZoneUtilities::FindObject
+RVA: 0xb5e80
+INSTRUCTIONS: 12
+
+METHOD: ZoneUtilities::FindObjectRanged
+RVA: 0xb5eb4
+INSTRUCTIONS: 18
+
+METHOD: ZoneUtilities::FindObject
+RVA: 0xb5ef4
+INSTRUCTIONS: 24
+
+METHOD: ZoneUtilities::FindObjectRanged
+RVA: 0xb5f4c
+INSTRUCTIONS: 57
+
+METHOD: MapEditorData::.ctor
+RVA: 0xb8034
+INSTRUCTIONS: 38
+
+METHOD: World::get__generationZonePositons
+RVA: 0xb8cd5
+INSTRUCTIONS: 5
+
+METHOD: World::set__generationZonePositons
+RVA: 0xb8ceb
+INSTRUCTIONS: 6
+
+METHOD: World::get_GenerationZonePositons
+RVA: 0xb8d02
+INSTRUCTIONS: 2
+
+METHOD: World::get__generatedZonePoints
+RVA: 0xb8d09
+INSTRUCTIONS: 5
+
+METHOD: World::set__generatedZonePoints
+RVA: 0xb8d1f
+INSTRUCTIONS: 6
+
+METHOD: World::get_GeneratedZonePoints
+RVA: 0xb8d36
+INSTRUCTIONS: 2
+
+METHOD: World::CreateWorldZonePoints
+RVA: 0xb9348
+INSTRUCTIONS: 80
+
+METHOD: World::SaveWorldSeed
+RVA: 0xb9528
+INSTRUCTIONS: 56
+
+METHOD: World::CheckWorldSeedFileExists
+RVA: 0xb974e
+INSTRUCTIONS: 13
+
+METHOD: World::LoadWorldSeed
+RVA: 0xb9770
+INSTRUCTIONS: 60
+
+METHOD: World::ImportHeightmapFromRawFile
+RVA: 0xb9a7c
+INSTRUCTIONS: 102
+
+METHOD: ZoneEvents::add_CampFirePlaced
+RVA: 0xb9bb0
+INSTRUCTIONS: 20
+
+METHOD: ZoneEvents::remove_CampFirePlaced
+RVA: 0xb9be8
+INSTRUCTIONS: 20
+
+METHOD: ZoneEvents::add_CropPlanted
+RVA: 0xb9c20
+INSTRUCTIONS: 20
+
+METHOD: ZoneEvents::remove_CropPlanted
+RVA: 0xb9c58
+INSTRUCTIONS: 20
+
+METHOD: ZoneEvents::Awake
+RVA: 0xb9c8d
+INSTRUCTIONS: 9
+
+METHOD: ZoneEvents::OnDestroy
+RVA: 0xb9cb1
+INSTRUCTIONS: 15
+
+METHOD: ZoneEvents::EventManager_CampFirePlacedEvent
+RVA: 0xb9ce4
+INSTRUCTIONS: 39
+
+METHOD: ZoneEvents::EventManager_PlantedCropEvent
+RVA: 0xb9d5c
+INSTRUCTIONS: 54
+
+METHOD: ZoneEvents::.ctor
+RVA: 0xb9e02
+INSTRUCTIONS: 3
+
+METHOD: GeneratedObject::.ctor
+RVA: 0xb9e0a
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_DeferredLoading
+RVA: 0xb9e12
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_PostLoading
+RVA: 0xb9e1a
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_PhysicalLoading
+RVA: 0xb9e22
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_IsGenerating
+RVA: 0xb9e2a
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_IsLoading
+RVA: 0xb9e32
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::set_IsLoading
+RVA: 0xb9e3a
+INSTRUCTIONS: 4
+
+METHOD: ZoneLoader::get_Random
+RVA: 0xb9e43
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::get_ObjectProcessingMode
+RVA: 0xb9e4b
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::set_ObjectProcessingMode
+RVA: 0xb9e53
+INSTRUCTIONS: 4
+
+METHOD: ZoneLoader::add_CreatedZone
+RVA: 0xb9e5c
+INSTRUCTIONS: 20
+
+METHOD: ZoneLoader::remove_CreatedZone
+RVA: 0xb9e94
+INSTRUCTIONS: 20
+
+METHOD: ZoneLoader::add_LoadedZone
+RVA: 0xb9ecc
+INSTRUCTIONS: 20
+
+METHOD: ZoneLoader::remove_LoadedZone
+RVA: 0xb9f04
+INSTRUCTIONS: 20
+
+METHOD: ZoneLoader::OnDestroy
+RVA: 0xb9f39
+INSTRUCTIONS: 7
+
+METHOD: ZoneLoader::LoadZone_Async
+RVA: 0xb9f49
+INSTRUCTIONS: 6
+
+METHOD: ZoneLoader::LoadZone
+RVA: 0xb9f58
+INSTRUCTIONS: 8
+
+METHOD: ZoneLoader::LoadZone_Sequence
+RVA: 0xb9f6a
+INSTRUCTIONS: 12
+
+METHOD: ZoneLoader::AbortLoadingZone
+RVA: 0xb9f88
+INSTRUCTIONS: 60
+
+METHOD: ZoneLoader::CleanUp
+RVA: 0xba034
+INSTRUCTIONS: 36
+
+METHOD: ZoneLoader::CreateZone
+RVA: 0xba0bd
+INSTRUCTIONS: 11
+
+METHOD: ZoneLoader::CreateZoneObjects_Async
+RVA: 0xba0d2
+INSTRUCTIONS: 5
+
+METHOD: ZoneLoader::CreateZoneObjects
+RVA: 0xba0e0
+INSTRUCTIONS: 7
+
+METHOD: ZoneLoader::CreateZoneObjects_Sequence
+RVA: 0xba0f1
+INSTRUCTIONS: 9
+
+METHOD: ZoneLoader::GenerateZone
+RVA: 0xba107
+INSTRUCTIONS: 13
+
+METHOD: ZoneLoader::GenerateObjects
+RVA: 0xba128
+INSTRUCTIONS: 181
+
+METHOD: ZoneLoader::GenerateProceduralObjectsPosition
+RVA: 0xba33c
+INSTRUCTIONS: 140
+
+METHOD: ZoneLoader::GenerateProceduralObjectsProcedural
+RVA: 0xba490
+INSTRUCTIONS: 355
+
+METHOD: ZoneLoader::GenerateShelter
+RVA: 0xba864
+INSTRUCTIONS: 473
+
+METHOD: ZoneLoader::GenerateObject
+RVA: 0xbacf8
+INSTRUCTIONS: 21
+
+METHOD: ZoneLoader::CreateGeneratedPrefab
+RVA: 0xbad40
+INSTRUCTIONS: 72
+
+METHOD: ZoneLoader::CreateLoadedPrefab
+RVA: 0xbae1c
+INSTRUCTIONS: 60
+
+METHOD: ZoneLoader::Load
+RVA: 0xbaed4
+INSTRUCTIONS: 43
+
+METHOD: ZoneLoader::ClientLoad
+RVA: 0xbaf71
+INSTRUCTIONS: 10
+
+METHOD: ZoneLoader::ClientSetParent
+RVA: 0xbaf90
+INSTRUCTIONS: 8
+
+METHOD: ZoneLoader::InvokeCallback
+RVA: 0xbafad
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::ResetTemporaryLoadingPosition
+RVA: 0xbafb5
+INSTRUCTIONS: 7
+
+METHOD: ZoneLoader::ProcessCollection_Async
+RVA: 0xbafd1
+INSTRUCTIONS: 7
+
+METHOD: ZoneLoader::ProcessCollection
+RVA: 0xbafe1
+INSTRUCTIONS: 9
+
+METHOD: ZoneLoader::ProcessCollection_Sequence
+RVA: 0xbaff4
+INSTRUCTIONS: 15
+
+METHOD: ZoneLoader::GetProcessingSteps
+RVA: 0xbb018
+INSTRUCTIONS: 43
+
+METHOD: ZoneLoader::GetClosestPlayer
+RVA: 0xbb088
+INSTRUCTIONS: 55
+
+METHOD: ZoneLoader::UpdateSessionToken_IsBusy
+RVA: 0xbb122
+INSTRUCTIONS: 19
+
+METHOD: ZoneLoader::ClientLinking
+RVA: 0xbb157
+INSTRUCTIONS: 3
+
+METHOD: ZoneLoader::.ctor
+RVA: 0xbb160
+INSTRUCTIONS: 21
+
+METHOD: GenerationPoints::.ctor
+RVA: 0xbb1b5
+INSTRUCTIONS: 18
+
+METHOD: ZoneObjectGenerator::GenerateGridData
+RVA: 0xbb1e4
+INSTRUCTIONS: 129
+
+METHOD: ZoneObjectGenerator::DebugSoilMap
+RVA: 0xbb350
+INSTRUCTIONS: 50
+
+METHOD: RemoteStatsEventsListener::MapEditorSaveMenuPresenter_Saved
+RVA: 0xc0e4e
+INSTRUCTIONS: 11
+
+METHOD: CartographerMenuPresenter::CreateIslandButton_Click
+RVA: 0xcc2e8
+INSTRUCTIONS: 19
+
+METHOD: CartographerMenuPresenter::CreateIsland
+RVA: 0xcd4e1
+INSTRUCTIONS: 19
+
+METHOD: CartographerMenuPresenter::EditIsland
+RVA: 0xcd51e
+INSTRUCTIONS: 19
+
+METHOD: CartographerMenuPresenter::<CreateIsland>b__82_0
+RVA: 0xcd806
+INSTRUCTIONS: 6
+
+METHOD: CartographerMenuPresenter::<EditIsland>b__83_0
+RVA: 0xcd815
+INSTRUCTIONS: 6
+
+METHOD: NewGameMenuPresenter::IsStartingCrateEnabled
+RVA: 0xd3428
+INSTRUCTIONS: 4
+
+METHOD: NewGameMenuPresenter::StartingCrateButton_Click
+RVA: 0xd3ab8
+INSTRUCTIONS: 14
+
+METHOD: TMPNewGameMenuViewAdapter::get_StartingCrateOptionButton
+RVA: 0xd4690
+INSTRUCTIONS: 3
+
+METHOD: UCartographerMenuViewAdapter::get_CreateIslandButton
+RVA: 0xd4b23
+INSTRUCTIONS: 3
+
+METHOD: UCartographerMenuViewAdapter::get_WorldSeedLabel
+RVA: 0xd4b33
+INSTRUCTIONS: 3
+
+METHOD: MapEditorMenuPresenter::Awake
+RVA: 0xe4986
+INSTRUCTIONS: 3
+
+METHOD: MapEditorMenuPresenter::Start
+RVA: 0xe4992
+INSTRUCTIONS: 7
+
+METHOD: MapEditorMenuPresenter::Initialize
+RVA: 0xe49a8
+INSTRUCTIONS: 42
+
+METHOD: MapEditorMenuPresenter::InitializeMap
+RVA: 0xe4a44
+INSTRUCTIONS: 45
+
+METHOD: MapEditorMenuPresenter::OnDestroy
+RVA: 0xe4afc
+INSTRUCTIONS: 32
+
+METHOD: MapEditorMenuPresenter::SetControlEvents
+RVA: 0xe4b7c
+INSTRUCTIONS: 22
+
+METHOD: MapEditorMenuPresenter::SaveMenuPresenter_Save
+RVA: 0xe4bdd
+INSTRUCTIONS: 9
+
+METHOD: MapEditorMenuPresenter::SaveMenuPresenter_ShowView
+RVA: 0xe4bff
+INSTRUCTIONS: 4
+
+METHOD: MapEditorMenuPresenter::SaveMenuPresenter_HideView
+RVA: 0xe4c08
+INSTRUCTIONS: 4
+
+METHOD: MapEditorMenuPresenter::Update
+RVA: 0xe4c14
+INSTRUCTIONS: 23
+
+METHOD: MapEditorMenuPresenter::Show
+RVA: 0xe4c60
+INSTRUCTIONS: 4
+
+METHOD: MapEditorMenuPresenter::Hide
+RVA: 0xe4c6d
+INSTRUCTIONS: 4
+
+METHOD: MapEditorMenuPresenter::ResumeButton_Click
+RVA: 0xe4c7a
+INSTRUCTIONS: 3
+
+METHOD: MapEditorMenuPresenter::SaveButton_Click
+RVA: 0xe4c84
+INSTRUCTIONS: 30
+
+METHOD: MapEditorMenuPresenter::QuitButton_Click
+RVA: 0xe4cf0
+INSTRUCTIONS: 14
+
+METHOD: MapEditorMenuPresenter::Quit
+RVA: 0xe4d20
+INSTRUCTIONS: 21
+
+METHOD: MapEditorMenuPresenter::.ctor
+RVA: 0xe4d70
+INSTRUCTIONS: 3
+
+METHOD: MapEditorMenuPresenter::<QuitButton_Click>b__20_0
+RVA: 0xe4d78
+INSTRUCTIONS: 8
+
+METHOD: MapEditorSaveMenuPresenter::get_CurrentMap
+RVA: 0xe4d91
+INSTRUCTIONS: 3
+
+METHOD: MapEditorSaveMenuPresenter::set_CurrentMap
+RVA: 0xe4d99
+INSTRUCTIONS: 4
+
+METHOD: MapEditorSaveMenuPresenter::add_ShowView
+RVA: 0xe4da4
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::remove_ShowView
+RVA: 0xe4ddc
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::View_ShowView
+RVA: 0xe4e11
+INSTRUCTIONS: 8
+
+METHOD: MapEditorSaveMenuPresenter::add_HideView
+RVA: 0xe4e24
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::remove_HideView
+RVA: 0xe4e5c
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::View_HideView
+RVA: 0xe4e91
+INSTRUCTIONS: 8
+
+METHOD: MapEditorSaveMenuPresenter::add_Saved
+RVA: 0xe4ea4
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::remove_Saved
+RVA: 0xe4edc
+INSTRUCTIONS: 20
+
+METHOD: MapEditorSaveMenuPresenter::OnSaved
+RVA: 0xe4f11
+INSTRUCTIONS: 8
+
+METHOD: MapEditorSaveMenuPresenter::Initialize
+RVA: 0xe4f24
+INSTRUCTIONS: 23
+
+METHOD: MapEditorSaveMenuPresenter::OnDestroy
+RVA: 0xe4f7c
+INSTRUCTIONS: 28
+
+METHOD: MapEditorSaveMenuPresenter::SetControlEvents
+RVA: 0xe4fdc
+INSTRUCTIONS: 22
+
+METHOD: MapEditorSaveMenuPresenter::ClearControlEvents
+RVA: 0xe5040
+INSTRUCTIONS: 22
+
+METHOD: MapEditorSaveMenuPresenter::Show
+RVA: 0xe50a4
+INSTRUCTIONS: 44
+
+METHOD: MapEditorSaveMenuPresenter::Hide
+RVA: 0xe514b
+INSTRUCTIONS: 14
+
+METHOD: MapEditorSaveMenuPresenter::UpdatePreviewImage
+RVA: 0xe5173
+INSTRUCTIONS: 1
+
+METHOD: MapEditorSaveMenuPresenter::SaveButton_Click
+RVA: 0xe5178
+INSTRUCTIONS: 68
+
+METHOD: MapEditorSaveMenuPresenter::OnValidateTextsSucceeded
+RVA: 0xe5270
+INSTRUCTIONS: 33
+
+METHOD: MapEditorSaveMenuPresenter::OnValidateTextsFailed
+RVA: 0xe52ed
+INSTRUCTIONS: 14
+
+METHOD: MapEditorSaveMenuPresenter::BackButton_Click
+RVA: 0xe5319
+INSTRUCTIONS: 3
+
+METHOD: MapEditorSaveMenuPresenter::NameInputField_Changed
+RVA: 0xe5321
+INSTRUCTIONS: 1
+
+METHOD: MapEditorSaveMenuPresenter::SaveMap
+RVA: 0xe5324
+INSTRUCTIONS: 146
+
+METHOD: MapEditorSaveMenuPresenter::.ctor
+RVA: 0xe5508
+INSTRUCTIONS: 3
+
+METHOD: MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_0
+RVA: 0xe5510
+INSTRUCTIONS: 6
+
+METHOD: MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_1
+RVA: 0xe5523
+INSTRUCTIONS: 6
+
+METHOD: MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_2
+RVA: 0xe5536
+INSTRUCTIONS: 9
+
+METHOD: MapEditorSaveMenuPresenter::<SaveButton_Click>b__25_3
+RVA: 0xe5558
+INSTRUCTIONS: 6
+
+METHOD: MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_0
+RVA: 0xe556b
+INSTRUCTIONS: 9
+
+METHOD: MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_1
+RVA: 0xe558d
+INSTRUCTIONS: 8
+
+METHOD: MapEditorSaveMenuPresenter::<OnValidateTextsSucceeded>b__26_2
+RVA: 0xe55a6
+INSTRUCTIONS: 6
+
+METHOD: MapEditorSaveMenuPresenter::<OnValidateTextsFailed>b__27_0
+RVA: 0xe55b9
+INSTRUCTIONS: 6
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_CanvasGroup
+RVA: 0xe55cc
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_SaveButton
+RVA: 0xe55d4
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_BackButton
+RVA: 0xe55dc
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_NameInputField
+RVA: 0xe55e4
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_DescriptionInputField
+RVA: 0xe55ec
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::get_PreviewImage
+RVA: 0xe55f4
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::Awake
+RVA: 0xe55fc
+INSTRUCTIONS: 4
+
+METHOD: UMapEditorSaveMenuViewAdapter::Show
+RVA: 0xe5609
+INSTRUCTIONS: 11
+
+METHOD: UMapEditorSaveMenuViewAdapter::Hide
+RVA: 0xe562a
+INSTRUCTIONS: 11
+
+METHOD: UMapEditorSaveMenuViewAdapter::.ctor
+RVA: 0xe564b
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorSaveMenuViewAdapter::Beam.UI.IViewAdapter.get_transform
+RVA: 0xe5653
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::Beam.UI.MapEditor.IMapEditorMenuViewAdapter.get_CanvasGroup
+RVA: 0xe565b
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::get_ResumeButton
+RVA: 0xe5663
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::get_SaveButton
+RVA: 0xe566b
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::get_QuitButton
+RVA: 0xe5673
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::get_MapTitleLabel
+RVA: 0xe567b
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::Awake
+RVA: 0xe5683
+INSTRUCTIONS: 4
+
+METHOD: UMapEditorViewAdapter::Show
+RVA: 0xe5690
+INSTRUCTIONS: 11
+
+METHOD: UMapEditorViewAdapter::Hide
+RVA: 0xe56b1
+INSTRUCTIONS: 11
+
+METHOD: UMapEditorViewAdapter::.ctor
+RVA: 0xe56d2
+INSTRUCTIONS: 3
+
+METHOD: UMapEditorViewAdapter::Beam.UI.IViewAdapter.get_transform
+RVA: 0xe56da
+INSTRUCTIONS: 3
+
+METHOD: UMapListElement::Beam.UI.MapEditor.IMapListElement.get_gameObject
+RVA: 0xe5b74
+INSTRUCTIONS: 3
+
+METHOD: UWorldMapSlot::Beam.UI.MapEditor.IWorldMapSlot.get_gameObject
+RVA: 0xe5e52
+INSTRUCTIONS: 3
+
+METHOD: ConnectorCheck_CheckDistanceFromZone::Check
+RVA: 0xe8a88
+INSTRUCTIONS: 21
+
+METHOD: ConnectorCheck_CheckDistanceFromZone::.ctor
+RVA: 0xe8acf
+INSTRUCTIONS: 3
+
+METHOD: PlacementModifier_LimitHeightToTerrain::Modify
+RVA: 0xf0928
+INSTRUCTIONS: 31
+
+METHOD: PlacementModifier_LimitHeightToTerrain::.ctor
+RVA: 0xf0994
+INSTRUCTIONS: 3
+
+METHOD: PlacementModifier_SnapToTerrain::Modify
+RVA: 0xf0b4c
+INSTRUCTIONS: 66
+
+METHOD: PlacementModifier_SnapToTerrain::.ctor
+RVA: 0xf0c20
+INSTRUCTIONS: 12
+
+METHOD: Dragger::GatherPalmLogsIsland
+RVA: 0xf448e
+INSTRUCTIONS: 23
+
+METHOD: Dragger::RecreatePhysicsSetupForPalmLogsIsland
+RVA: 0xf44c4
+INSTRUCTIONS: 6
+
+METHOD: LodController::CheckTerrain
+RVA: 0xfb554
+INSTRUCTIONS: 7
+
+METHOD: DeterministicFastRandom::GetSeed
+RVA: 0xfc72c
+INSTRUCTIONS: 3
+
+METHOD: <>c::<ZoneEvents_CampFirePlaced>b__39_0
+RVA: 0x1023b6
+INSTRUCTIONS: 9
+
+METHOD: <>c::<ZoneEvents_CropPlanted>b__40_0
+RVA: 0x1023c9
+INSTRUCTIONS: 5
+
+METHOD: BiomeGrid::.ctor
+RVA: 0x103aca
+INSTRUCTIONS: 3
+
+METHOD: <LoadStartingZone_Sequence>d__119::.ctor
+RVA: 0x10676d
+INSTRUCTIONS: 6
+
+METHOD: <LoadStartingZone_Sequence>d__119::System.IDisposable.Dispose
+RVA: 0x10677c
+INSTRUCTIONS: 1
+
+METHOD: <LoadStartingZone_Sequence>d__119::MoveNext
+RVA: 0x106780
+INSTRUCTIONS: 91
+
+METHOD: <LoadStartingZone_Sequence>d__119::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+RVA: 0x106894
+INSTRUCTIONS: 3
+
+METHOD: <LoadStartingZone_Sequence>d__119::System.Collections.IEnumerator.Reset
+RVA: 0x10689c
+INSTRUCTIONS: 2
+
+METHOD: <LoadStartingZone_Sequence>d__119::System.Collections.IEnumerator.get_Current
+RVA: 0x1068a3
+INSTRUCTIONS: 4
+
+METHOD: <>c::<FillCellHeightmap>b__28_0
+RVA: 0x106a5f
+INSTRUCTIONS: 3
+
+METHOD: <>c::<FillCellHeightmap>b__28_1
+RVA: 0x106a67
+INSTRUCTIONS: 3
+
+METHOD: <>c::<FillCellHeightmap>b__28_2
+RVA: 0x106a6f
+INSTRUCTIONS: 3
+
+METHOD: <>c::<FillCellHeightmap>b__28_3
+RVA: 0x106a77
+INSTRUCTIONS: 3
+
+METHOD: <>c::<FillCellHeightmap>b__28_4
+RVA: 0x106a7f
+INSTRUCTIONS: 3
+
+METHOD: <>c::<FillCellHeightmap>b__28_5
+RVA: 0x106a87
+INSTRUCTIONS: 3
+
+METHOD: BiomeProperties::HexToColor
+RVA: 0x106fcc
+INSTRUCTIONS: 26
+
+METHOD: BiomeProperties::.cctor
+RVA: 0x107024
+INSTRUCTIONS: 23
+
+METHOD: <>c__DisplayClass55_0::<AddTerrainSnapping>b__0
+RVA: 0x10751c
+INSTRUCTIONS: 18
+
+METHOD: <>c__DisplayClass55_0::<AddTerrainSnapping>b__1
+RVA: 0x107556
+INSTRUCTIONS: 7
+
+METHOD: <>c::<OnTerrainGenerateCustomHeightmap>b__33_0
+RVA: 0x107753
+INSTRUCTIONS: 14
+
+METHOD: <>c::<OnTerrainGenerateIsland>b__37_0
+RVA: 0x10778b
+INSTRUCTIONS: 7
+
+METHOD: <>c::<OnTerrainSmooth>b__39_0
+RVA: 0x1077a4
+INSTRUCTIONS: 7
+
+METHOD: <>c__DisplayClass34_0::<OnTerrainGeneratePerlin>b__1
+RVA: 0x1077c5
+INSTRUCTIONS: 7
+
+METHOD: Heightmap::.ctor
+RVA: 0x107a05
+INSTRUCTIONS: 3
+
+METHOD: <>c::<InitTerrainValues>b__23_0
+RVA: 0x107a21
+INSTRUCTIONS: 3
+
+METHOD: <>c__DisplayClass42_0::<GetZoneData>b__0
+RVA: 0x107b6e
+INSTRUCTIONS: 13
+
+METHOD: <>c__DisplayClass28_0::<SendZone_Sequence>b__0
+RVA: 0x109798
+INSTRUCTIONS: 7
+
+METHOD: <SendZone_Sequence>d__28::.ctor
+RVA: 0x1097ac
+INSTRUCTIONS: 6
+
+METHOD: <SendZone_Sequence>d__28::System.IDisposable.Dispose
+RVA: 0x1097bb
+INSTRUCTIONS: 1
+
+METHOD: <SendZone_Sequence>d__28::MoveNext
+RVA: 0x1097c0
+INSTRUCTIONS: 105
+
+METHOD: <SendZone_Sequence>d__28::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+RVA: 0x109914
+INSTRUCTIONS: 3
+
+METHOD: <SendZone_Sequence>d__28::System.Collections.IEnumerator.Reset
+RVA: 0x10991c
+INSTRUCTIONS: 2
+
+METHOD: <SendZone_Sequence>d__28::System.Collections.IEnumerator.get_Current
+RVA: 0x109923
+INSTRUCTIONS: 4
+
+METHOD: <>c__DisplayClass34_0::<PostZone_Sequence>b__0
+RVA: 0x109938
+INSTRUCTIONS: 7
+
+METHOD: <PostZone_Sequence>d__34::.ctor
+RVA: 0x10994c
+INSTRUCTIONS: 6
+
+METHOD: <PostZone_Sequence>d__34::System.IDisposable.Dispose
+RVA: 0x10995b
+INSTRUCTIONS: 1
+
+METHOD: <PostZone_Sequence>d__34::MoveNext
+RVA: 0x109960
+INSTRUCTIONS: 88
+
+METHOD: <PostZone_Sequence>d__34::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+RVA: 0x109a7e
+INSTRUCTIONS: 3
+
+METHOD: <PostZone_Sequence>d__34::System.Collections.IEnumerator.Reset
+RVA: 0x109a86
+INSTRUCTIONS: 2
+
+METHOD: <PostZone_Sequence>d__34::System.Collections.IEnumerator.get_Current
+RVA: 0x109a8d
+INSTRUCTIONS: 4
+
+METHOD: <LoadZone_Sequence>d__44::.ctor
+RVA: 0x111e23
+INSTRUCTIONS: 6
+
+METHOD: <LoadZone_Sequence>d__44::System.IDisposable.Dispose
+RVA: 0x111e32
+INSTRUCTIONS: 1
+
+METHOD: <LoadZone_Sequence>d__44::MoveNext
+RVA: 0x111e34
+INSTRUCTIONS: 322
+
+METHOD: <LoadZone_Sequence>d__44::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+RVA: 0x11221d
+INSTRUCTIONS: 3
+
+METHOD: <LoadZone_Sequence>d__44::System.Collections.IEnumerator.Reset
+RVA: 0x112225
+INSTRUCTIONS: 2
+
+METHOD: <LoadZone_Sequence>d__44::System.Collections.IEnumerator.get_Current
+RVA: 0x11222c
+INSTRUCTIONS: 4
+
+METHOD: <CreateZoneObjects_Sequence>d__50::.ctor
+RVA: 0x112239
+INSTRUCTIONS: 6
+
+METHOD: <CreateZoneObjects_Sequence>d__50::System.IDisposable.Dispose
+RVA: 0x112248
+INSTRUCTIONS: 1
+
+METHOD: <CreateZoneObjects_Sequence>d__50::MoveNext
+RVA: 0x11224c
+INSTRUCTIONS: 132
+
+METHOD: <CreateZoneObjects_Sequence>d__50::System.Collections.Generic.IEnumerator<System.Single>.get_Current
+RVA: 0x1123e6
+INSTRUCTIONS: 3
+
+METHOD: <CreateZoneObjects_Sequence>d__50::System.Collections.IEnumerator.Reset
+RVA: 0x1123ee
+INSTRUCTIONS: 2
+
+METHOD: <CreateZoneObjects_Sequence>d__50::System.Collections.IEnumerator.get_Current
+RVA: 0x1123f5
+INSTRUCTIONS: 4
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::.ctor
+RVA: 0x11cb03
+INSTRUCTIONS: 6
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::System.IDisposable.Dispose
+RVA: 0x11cb12
+INSTRUCTIONS: 1
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::MoveNext
+RVA: 0x11cb14
+INSTRUCTIONS: 152
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.Generic.IEnumerator<System.Object>.get_Current
+RVA: 0x11cd04
+INSTRUCTIONS: 3
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.IEnumerator.Reset
+RVA: 0x11cd0c
+INSTRUCTIONS: 2
+
+METHOD: <RecreatePhysicsSetupForPalmLogsIsland>d__27::System.Collections.IEnumerator.get_Current
+RVA: 0x11cd13
+INSTRUCTIONS: 3
+
+METHOD: TerrainEditModeEventArgs::.ctor
+RVA: 0x11f82f
+INSTRUCTIONS: 6
+
+METHOD: TerrainChangeHeightModeEventArgs::.ctor
+RVA: 0x11f83e
+INSTRUCTIONS: 6
+
+============================================================================
+LIMITATIONS
+- Method token references are not fully resolved to field names.
+- This is metadata and IL indexing, not runtime execution.
+- Mission 3 specific seed values require serialized/runtime evidence.
+- Original game files and Godot project were not modified.
+============================================================================

@@ -1,0 +1,127 @@
+STRANDED DEEP MAP ANALYSIS
+ROOT: /storage/emulated/0/Map Check
+TOTAL FILES: 13
+=================================================================
+FILE: Beam maps go here.txt
+SIZE: 0 bytes
+SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+HEADER HEX: 
+HEADER ASCII: 
+ENTROPY: 0.0000 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_EDITOR.map
+SIZE: 681 bytes
+SHA256: 3d9286b05805ca2be5c1f2a041585394c6022f8e5934aba0c1382334d532f49b
+HEADER HEX: 00 01 00 00 00 ff ff ff ff 01 00 00 00 00 00 00 00 0c 02 00 00 00 46 41 73 73 65 6d 62 6c 79 2d 43 53 68 61 72 70 2c 20 56 65 72 73 69 6f 6e 3d 30 2e 30 2e 30 2e 30 2c 20 43 75 6c 74 75 72 65 3d 6e 65 75 74 72 61 6c 2c 20 50 75 62 6c 69 63 4b 65 79 54 6f 6b 65 6e 3d 6e 75 6c 6c 05 01 00 00 00 1a 42 65 61 6d 2e 54 65 72 72 61 69 6e 2e 4d 61 70 45 64 69 74 6f 72 44 61 74 61 0d 00 00
+HEADER ASCII: ......................FAssembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null......Beam.Terrain.MapEditorData...
+ENTROPY: 4.9150 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_HEIGHT.map
+SIZE: 132,098 bytes
+SHA256: d1fe85eb3c787ca26c9f4a457a70ccd1dc1fe34381350a3d6f85858d16b6c9d3
+HEADER HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+HEADER ASCII: ................................................................................................................................
+ENTROPY: -0.0000 bits/byte
+DIMENSION CANDIDATES (whole file):
+514x257 (8-bit)
+=================================================================
+FILE: MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_OBJECT.map
+SIZE: 301 bytes
+SHA256: f49d6f9512327d1c90de06c743f7e40f603e0a36d8320862746647563a721f19
+HEADER HEX: 5b 0d 0a 09 7b 0d 0a 09 09 22 70 72 65 66 61 62 22 3a 20 22 36 30 34 37 66 38 38 66 2d 30 63 30 62 2d 34 63 31 39 2d 38 32 30 36 2d 32 36 37 31 31 62 65 33 30 36 38 37 22 2c 0d 0a 09 09 22 54 72 61 6e 73 66 6f 72 6d 22 3a 20 7b 0d 0a 09 09 09 22 6c 6f 63 61 6c 50 6f 73 69 74 69 6f 6e 22 3a 20 7b 0d 0a 09 09 09 09 22 78 22 3a 20 30 2c 0d 0a 09 09 09 09 22 79 22 3a 20 30 2c 0d 0a 09
+HEADER ASCII: [...{...."prefab": "6047f88f-0c0b-4c19-8206-26711be30687",...."Transform": {....."localPosition": {......"x": 0,......"y": 0,...
+ENTROPY: 4.7600 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_EDITOR.map
+SIZE: 681 bytes
+SHA256: 772c38771d26eb7bdd15eaa50c59e3f5841d5b4d2e7cde62ff8544f0c68dafaa
+HEADER HEX: 00 01 00 00 00 ff ff ff ff 01 00 00 00 00 00 00 00 0c 02 00 00 00 46 41 73 73 65 6d 62 6c 79 2d 43 53 68 61 72 70 2c 20 56 65 72 73 69 6f 6e 3d 30 2e 30 2e 30 2e 30 2c 20 43 75 6c 74 75 72 65 3d 6e 65 75 74 72 61 6c 2c 20 50 75 62 6c 69 63 4b 65 79 54 6f 6b 65 6e 3d 6e 75 6c 6c 05 01 00 00 00 1a 42 65 61 6d 2e 54 65 72 72 61 69 6e 2e 4d 61 70 45 64 69 74 6f 72 44 61 74 61 0d 00 00
+HEADER ASCII: ......................FAssembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null......Beam.Terrain.MapEditorData...
+ENTROPY: 4.9150 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_HEIGHT.map
+SIZE: 132,098 bytes
+SHA256: d1fe85eb3c787ca26c9f4a457a70ccd1dc1fe34381350a3d6f85858d16b6c9d3
+HEADER HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+HEADER ASCII: ................................................................................................................................
+ENTROPY: -0.0000 bits/byte
+DIMENSION CANDIDATES (whole file):
+514x257 (8-bit)
+=================================================================
+FILE: MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_OBJECT.map
+SIZE: 301 bytes
+SHA256: c78bee656fa164457098adf5f0e08d4e83cc554f66b039c701045f4a38199331
+HEADER HEX: 5b 0d 0a 09 7b 0d 0a 09 09 22 70 72 65 66 61 62 22 3a 20 22 62 38 37 37 33 64 39 39 2d 36 65 33 39 2d 34 35 36 61 2d 38 66 30 61 2d 62 35 39 38 34 35 30 63 62 63 62 31 22 2c 0d 0a 09 09 22 54 72 61 6e 73 66 6f 72 6d 22 3a 20 7b 0d 0a 09 09 09 22 6c 6f 63 61 6c 50 6f 73 69 74 69 6f 6e 22 3a 20 7b 0d 0a 09 09 09 09 22 78 22 3a 20 30 2c 0d 0a 09 09 09 09 22 79 22 3a 20 30 2c 0d 0a 09
+HEADER ASCII: [...{...."prefab": "b8773d99-6e39-456a-8f0a-b598450cbcb1",...."Transform": {....."localPosition": {......"x": 0,......"y": 0,...
+ENTROPY: 4.8005 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_EDITOR.map
+SIZE: 681 bytes
+SHA256: 9d88fdcc0ad37467cdaafadc964c176aa35cf62de2003b08e4fff095d803ff6d
+HEADER HEX: 00 01 00 00 00 ff ff ff ff 01 00 00 00 00 00 00 00 0c 02 00 00 00 46 41 73 73 65 6d 62 6c 79 2d 43 53 68 61 72 70 2c 20 56 65 72 73 69 6f 6e 3d 30 2e 30 2e 30 2e 30 2c 20 43 75 6c 74 75 72 65 3d 6e 65 75 74 72 61 6c 2c 20 50 75 62 6c 69 63 4b 65 79 54 6f 6b 65 6e 3d 6e 75 6c 6c 05 01 00 00 00 1a 42 65 61 6d 2e 54 65 72 72 61 69 6e 2e 4d 61 70 45 64 69 74 6f 72 44 61 74 61 0d 00 00
+HEADER ASCII: ......................FAssembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null......Beam.Terrain.MapEditorData...
+ENTROPY: 4.9150 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_HEIGHT.map
+SIZE: 132,098 bytes
+SHA256: d1fe85eb3c787ca26c9f4a457a70ccd1dc1fe34381350a3d6f85858d16b6c9d3
+HEADER HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+HEADER ASCII: ................................................................................................................................
+ENTROPY: -0.0000 bits/byte
+DIMENSION CANDIDATES (whole file):
+514x257 (8-bit)
+=================================================================
+FILE: MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_OBJECT.map
+SIZE: 301 bytes
+SHA256: eb15bbbf163b5fb25d957e48f16e58b62c92a8f58c6f549c2fd188f6dd2f2a66
+HEADER HEX: 5b 0d 0a 09 7b 0d 0a 09 09 22 70 72 65 66 61 62 22 3a 20 22 31 34 31 64 38 30 61 64 2d 61 30 38 62 2d 34 36 66 31 2d 38 65 30 62 2d 64 33 33 36 63 39 31 64 62 31 31 64 22 2c 0d 0a 09 09 22 54 72 61 6e 73 66 6f 72 6d 22 3a 20 7b 0d 0a 09 09 09 22 6c 6f 63 61 6c 50 6f 73 69 74 69 6f 6e 22 3a 20 7b 0d 0a 09 09 09 09 22 78 22 3a 20 30 2c 0d 0a 09 09 09 09 22 79 22 3a 20 30 2c 0d 0a 09
+HEADER ASCII: [...{...."prefab": "141d80ad-a08b-46f1-8e0b-d336c91db11d",...."Transform": {....."localPosition": {......"x": 0,......"y": 0,...
+ENTROPY: 4.7255 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_EDITOR.map
+SIZE: 681 bytes
+SHA256: cc1f2a7e8602158991d1ed725d21d33f52d7ddd345dc702cc0597679041bc7ab
+HEADER HEX: 00 01 00 00 00 ff ff ff ff 01 00 00 00 00 00 00 00 0c 02 00 00 00 46 41 73 73 65 6d 62 6c 79 2d 43 53 68 61 72 70 2c 20 56 65 72 73 69 6f 6e 3d 30 2e 30 2e 30 2e 30 2c 20 43 75 6c 74 75 72 65 3d 6e 65 75 74 72 61 6c 2c 20 50 75 62 6c 69 63 4b 65 79 54 6f 6b 65 6e 3d 6e 75 6c 6c 05 01 00 00 00 1a 42 65 61 6d 2e 54 65 72 72 61 69 6e 2e 4d 61 70 45 64 69 74 6f 72 44 61 74 61 0d 00 00
+HEADER ASCII: ......................FAssembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null......Beam.Terrain.MapEditorData...
+ENTROPY: 4.9150 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+=================================================================
+FILE: MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+SIZE: 132,098 bytes
+SHA256: 4694e3cd0d762fcd6fb282d524520465c1a37ffbbd70868786e613cb729e46a5
+HEADER HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+HEADER ASCII: ................................................................................................................................
+ENTROPY: -0.0000 bits/byte
+DIMENSION CANDIDATES (whole file):
+514x257 (8-bit)
+=================================================================
+FILE: MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_OBJECT.map
+SIZE: 31,135 bytes
+SHA256: 0e88b74bf9030fdfe375f63cb1e5b71b1dc520e50e14af4eed2d2afdbd4bbabe
+HEADER HEX: 5b 0d 0a 09 7b 0d 0a 09 09 22 70 72 65 66 61 62 22 3a 20 22 33 33 34 37 31 62 37 30 2d 62 37 62 37 2d 34 61 38 64 2d 38 66 63 34 2d 62 61 32 35 39 66 37 39 36 31 34 32 22 2c 0d 0a 09 09 22 54 72 61 6e 73 66 6f 72 6d 22 3a 20 7b 0d 0a 09 09 09 22 6c 6f 63 61 6c 50 6f 73 69 74 69 6f 6e 22 3a 20 7b 0d 0a 09 09 09 09 22 78 22 3a 20 2d 34 2e 36 32 34 39 39 32 2c 0d 0a 09 09 09 09 22 79
+HEADER ASCII: [...{...."prefab": "33471b70-b7b7-4a8d-8fc4-ba259f796142",...."Transform": {....."localPosition": {......"x": -4.624992,......"y
+ENTROPY: 4.8708 bits/byte
+DIMENSION CANDIDATES (whole file):
+None
+
+DUPLICATE FILES
+
+SHA256: d1fe85eb3c787ca26c9f4a457a70ccd1dc1fe34381350a3d6f85858d16b6c9d3
+MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_HEIGHT.map
+MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_HEIGHT.map
+MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_HEIGHT.map

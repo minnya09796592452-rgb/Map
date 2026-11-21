@@ -35,7 +35,7 @@ jobs:
           import zipfile
 
           archive = Path("PROJECTS/MISSION_3_TERRAIN/evidence/Default Maps.zip")
-          output = Path("PROJECTS/MISSION_3_TERRAIN/evidence/extracted") / "Default Maps"
+          output = Path("PROJECTS/MISSION_3_TERRAIN/evidence/extracted") / "Default Maps Archive"
 
           if not archive.is_file():
               raise SystemExit("Default Maps.zip was not found in the Mission 3 evidence folder.")
@@ -90,7 +90,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "PROJECTS/MISSION_3_TERRAIN/evidence/extracted/Default Maps"
+          git add -- "PROJECTS/MISSION_3_TERRAIN/evidence/extracted/Default Maps Archive"
           if git diff --cached --quiet; then
             echo "No extracted-file changes to commit."
             exit 0

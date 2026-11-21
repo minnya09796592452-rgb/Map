@@ -1,0 +1,396 @@
+MISSION 3 ORIGINAL GAME FULL INVENTORY V13
+=================================================================
+Date: 2026-11-20T00:35:59.334857
+Scan root: /storage/emulated/0/Map Check/Stranded-Deep-Game/Stranded Deep
+Scope: ORIGINAL GAME FOLDER ONLY
+Map Check boundary: /storage/emulated/0/Map Check
+Symlink traversal: DISABLED
+Original files modified: NO
+
+===== SUMMARY =====
+Folders: 29
+Files: 217
+Symlinks skipped: 0
+Scan errors: 0
+Total file size: 2,252,224,945 bytes
+Total size: 2.098 GiB
+
+===== FILE CATEGORY COUNTS =====
+CONFIG: 3
+MANAGED_OR_NATIVE_DLL: 124
+MONO_RUNTIME: 18
+NATIVE_BINARY: 3
+OTHER: 50
+UNITY_ASSET: 11
+UNITY_RESOURCES: 8
+
+===== EXTENSION COUNTS =====
+.aspx: 3
+.assets: 7
+.browser: 3
+.config: 7
+.dll: 124
+.exe: 3
+.info: 1
+.ini: 1
+.json: 2
+.manifest: 8
+.map: 15
+.resource: 6
+.ress: 6
+.txt: 13
+.unity3d: 7
+.xml: 1
+[NO EXTENSION]: 10
+
+===== ALL FOLDERS =====
+[GAME ROOT]
+[DIR] MonoBleedingEdge
+[DIR] MonoBleedingEdge/EmbedRuntime
+[DIR] MonoBleedingEdge/etc
+[DIR] MonoBleedingEdge/etc/mono
+[DIR] MonoBleedingEdge/etc/mono/2.0
+[DIR] MonoBleedingEdge/etc/mono/2.0/Browsers
+[DIR] MonoBleedingEdge/etc/mono/4.0
+[DIR] MonoBleedingEdge/etc/mono/4.0/Browsers
+[DIR] MonoBleedingEdge/etc/mono/4.5
+[DIR] MonoBleedingEdge/etc/mono/4.5/Browsers
+[DIR] MonoBleedingEdge/etc/mono/mconfig
+[DIR] Stranded_Deep_Data
+[DIR] Stranded_Deep_Data/Data
+[DIR] Stranded_Deep_Data/Data/Bundles
+[DIR] Stranded_Deep_Data/Data/Bundles/missions
+[DIR] Stranded_Deep_Data/Data/Bundles/scenes
+[DIR] Stranded_Deep_Data/Data/Bundles/watches
+[DIR] Stranded_Deep_Data/Data/Default Maps
+[DIR] Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0
+[DIR] Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1
+[DIR] Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2
+[DIR] Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3
+[DIR] Stranded_Deep_Data/Data/Licences
+[DIR] Stranded_Deep_Data/Managed
+[DIR] Stranded_Deep_Data/Plugins
+[DIR] Stranded_Deep_Data/Plugins/x86_64
+[DIR] Stranded_Deep_Data/Plugins/x86_64/steam_settings
+[DIR] Stranded_Deep_Data/Plugins/x86_64/steam_settings/settings
+[DIR] Stranded_Deep_Data/Resources
+
+===== ALL FILES =====
+[FILE] 7,680,088 bytes | .dll | MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll
+[FILE] 600,576 bytes | .dll | MonoBleedingEdge/EmbedRuntime/MonoPosixHelper.dll
+[FILE] 1,605 bytes | .browser | MonoBleedingEdge/etc/mono/2.0/Browsers/Compat.browser
+[FILE] 60,575 bytes | .aspx | MonoBleedingEdge/etc/mono/2.0/DefaultWsdlHelpGenerator.aspx
+[FILE] 29,066 bytes | .config | MonoBleedingEdge/etc/mono/2.0/machine.config
+[FILE] 2,622 bytes | .map | MonoBleedingEdge/etc/mono/2.0/settings.map
+[FILE] 11,635 bytes | .config | MonoBleedingEdge/etc/mono/2.0/web.config
+[FILE] 1,605 bytes | .browser | MonoBleedingEdge/etc/mono/4.0/Browsers/Compat.browser
+[FILE] 60,575 bytes | .aspx | MonoBleedingEdge/etc/mono/4.0/DefaultWsdlHelpGenerator.aspx
+[FILE] 33,598 bytes | .config | MonoBleedingEdge/etc/mono/4.0/machine.config
+[FILE] 2,622 bytes | .map | MonoBleedingEdge/etc/mono/4.0/settings.map
+[FILE] 18,802 bytes | .config | MonoBleedingEdge/etc/mono/4.0/web.config
+[FILE] 1,605 bytes | .browser | MonoBleedingEdge/etc/mono/4.5/Browsers/Compat.browser
+[FILE] 60,575 bytes | .aspx | MonoBleedingEdge/etc/mono/4.5/DefaultWsdlHelpGenerator.aspx
+[FILE] 34,056 bytes | .config | MonoBleedingEdge/etc/mono/4.5/machine.config
+[FILE] 2,622 bytes | .map | MonoBleedingEdge/etc/mono/4.5/settings.map
+[FILE] 18,811 bytes | .config | MonoBleedingEdge/etc/mono/4.5/web.config
+[FILE] 311,984 bytes | .ini | MonoBleedingEdge/etc/mono/browscap.ini
+[FILE] 3,578 bytes | [NO EXTENSION] | MonoBleedingEdge/etc/mono/config
+[FILE] 25,817 bytes | .xml | MonoBleedingEdge/etc/mono/mconfig/config.xml
+[FILE] 6 bytes | .txt | steam_appid.txt
+[FILE] 653,824 bytes | .exe | Stranded_Deep.exe
+[FILE] 29 bytes | .info | Stranded_Deep_Data/app.info
+[FILE] 66 bytes | .config | Stranded_Deep_Data/boot.config
+[FILE] 259,547,752 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/missions/carrier.unity3d
+[FILE] 6,133 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/missions/carrier.unity3d.manifest
+[FILE] 13,222,794 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d
+[FILE] 2,828 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d.manifest
+[FILE] 7,491,260 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d
+[FILE] 3,136 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d.manifest
+[FILE] 29,436,523 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d
+[FILE] 3,833 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d.manifest
+[FILE] 34,277,541 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d
+[FILE] 2,132 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d.manifest
+[FILE] 5,177,402 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d
+[FILE] 5,089 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d.manifest
+[FILE] 16,987 bytes | .unity3d | Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d
+[FILE] 1,688 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d.manifest
+[FILE] 1,218 bytes | [NO EXTENSION] | Stranded_Deep_Data/Data/Bundles/Windows
+[FILE] 637 bytes | .manifest | Stranded_Deep_Data/Data/Bundles/Windows.manifest
+[FILE] 0 bytes | .txt | Stranded_Deep_Data/Data/Default Maps/Beam maps go here.txt
+[FILE] 681 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_EDITOR.map
+[FILE] 132,098 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_HEIGHT.map
+[FILE] 301 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_OBJECT.map
+[FILE] 681 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_EDITOR.map
+[FILE] 132,098 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_HEIGHT.map
+[FILE] 301 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_OBJECT.map
+[FILE] 681 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_EDITOR.map
+[FILE] 132,098 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_HEIGHT.map
+[FILE] 301 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_OBJECT.map
+[FILE] 681 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_EDITOR.map
+[FILE] 132,098 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+[FILE] 31,135 bytes | .map | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_OBJECT.map
+[FILE] 1,780 bytes | .txt | Stranded_Deep_Data/Data/Licences/PrecomputedAtmosphericScattering.txt
+[FILE] 896 bytes | .txt | Stranded_Deep_Data/Data/Licences/SMAA.txt
+[FILE] 722 bytes | .txt | Stranded_Deep_Data/Data/Licences/Voronoi.txt
+[FILE] 1,557,464 bytes | [NO EXTENSION] | Stranded_Deep_Data/globalgamemanagers
+[FILE] 928,516 bytes | .assets | Stranded_Deep_Data/globalgamemanagers.assets
+[FILE] 81,548 bytes | [NO EXTENSION] | Stranded_Deep_Data/level0
+[FILE] 763,840 bytes | [NO EXTENSION] | Stranded_Deep_Data/level1
+[FILE] 75,924 bytes | [NO EXTENSION] | Stranded_Deep_Data/level2
+[FILE] 222,128 bytes | [NO EXTENSION] | Stranded_Deep_Data/level3
+[FILE] 741,992 bytes | [NO EXTENSION] | Stranded_Deep_Data/level4
+[FILE] 642,048 bytes | .dll | Stranded_Deep_Data/Managed/Assembly-CSharp-firstpass.dll
+[FILE] 3,432,448 bytes | .dll | Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+[FILE] 262,656 bytes | .dll | Stranded_Deep_Data/Managed/bolt.dll
+[FILE] 91,648 bytes | .dll | Stranded_Deep_Data/Managed/bolt.user.dll
+[FILE] 62,976 bytes | .dll | Stranded_Deep_Data/Managed/ch.sycoforge.Decal.dll
+[FILE] 366,592 bytes | .dll | Stranded_Deep_Data/Managed/com.rlabrecque.steamworks.net.dll
+[FILE] 8,704 bytes | .dll | Stranded_Deep_Data/Managed/GdkUtilities.dll
+[FILE] 241,152 bytes | .dll | Stranded_Deep_Data/Managed/Mono.Security.dll
+[FILE] 4,630,528 bytes | .dll | Stranded_Deep_Data/Managed/mscorlib.dll
+[FILE] 90,112 bytes | .dll | Stranded_Deep_Data/Managed/netstandard.dll
+[FILE] 683,008 bytes | .dll | Stranded_Deep_Data/Managed/Newtonsoft.Json.dll
+[FILE] 230,912 bytes | .dll | Stranded_Deep_Data/Managed/Photon3Unity3D.dll
+[FILE] 12,800 bytes | .dll | Stranded_Deep_Data/Managed/PhotonBolt.dll
+[FILE] 101,376 bytes | .dll | Stranded_Deep_Data/Managed/PhotonRealtime.dll
+[FILE] 2,007,040 bytes | .dll | Stranded_Deep_Data/Managed/Rewired_Core.dll
+[FILE] 929,792 bytes | .dll | Stranded_Deep_Data/Managed/Rewired_Windows.dll
+[FILE] 4,096 bytes | .dll | Stranded_Deep_Data/Managed/Rewired_Windows_Functions.dll
+[FILE] 32,768 bytes | .dll | Stranded_Deep_Data/Managed/Sirenix.OdinInspector.Attributes.dll
+[FILE] 5,120 bytes | .dll | Stranded_Deep_Data/Managed/Sirenix.OdinInspector.CompatibilityLayer.dll
+[FILE] 15,360 bytes | .dll | Stranded_Deep_Data/Managed/Sirenix.Serialization.Config.dll
+[FILE] 325,632 bytes | .dll | Stranded_Deep_Data/Managed/Sirenix.Serialization.dll
+[FILE] 148,992 bytes | .dll | Stranded_Deep_Data/Managed/Sirenix.Utilities.dll
+[FILE] 257,024 bytes | .dll | Stranded_Deep_Data/Managed/System.ComponentModel.Composition.dll
+[FILE] 124,928 bytes | .dll | Stranded_Deep_Data/Managed/System.Configuration.dll
+[FILE] 1,113,088 bytes | .dll | Stranded_Deep_Data/Managed/System.Core.dll
+[FILE] 29,696 bytes | .dll | Stranded_Deep_Data/Managed/System.Data.DataSetExtensions.dll
+[FILE] 2,118,656 bytes | .dll | Stranded_Deep_Data/Managed/System.Data.dll
+[FILE] 2,637,312 bytes | .dll | Stranded_Deep_Data/Managed/System.dll
+[FILE] 489,984 bytes | .dll | Stranded_Deep_Data/Managed/System.Drawing.dll
+[FILE] 44,544 bytes | .dll | Stranded_Deep_Data/Managed/System.EnterpriseServices.dll
+[FILE] 114,688 bytes | .dll | Stranded_Deep_Data/Managed/System.IO.Compression.dll
+[FILE] 18,432 bytes | .dll | Stranded_Deep_Data/Managed/System.IO.Compression.FileSystem.dll
+[FILE] 121,344 bytes | .dll | Stranded_Deep_Data/Managed/System.Net.Http.dll
+[FILE] 119,296 bytes | .dll | Stranded_Deep_Data/Managed/System.Numerics.dll
+[FILE] 934,400 bytes | .dll | Stranded_Deep_Data/Managed/System.Runtime.Serialization.dll
+[FILE] 314,880 bytes | .dll | Stranded_Deep_Data/Managed/System.Security.dll
+[FILE] 215,040 bytes | .dll | Stranded_Deep_Data/Managed/System.ServiceModel.Internals.dll
+[FILE] 35,328 bytes | .dll | Stranded_Deep_Data/Managed/System.Transactions.dll
+[FILE] 3,160,064 bytes | .dll | Stranded_Deep_Data/Managed/System.Xml.dll
+[FILE] 136,704 bytes | .dll | Stranded_Deep_Data/Managed/System.Xml.Linq.dll
+[FILE] 40,448 bytes | .dll | Stranded_Deep_Data/Managed/udpkit.common.dll
+[FILE] 102,912 bytes | .dll | Stranded_Deep_Data/Managed/udpkit.dll
+[FILE] 15,872 bytes | .dll | Stranded_Deep_Data/Managed/udpkit.platform.dotnet.dll
+[FILE] 6,656 bytes | .dll | Stranded_Deep_Data/Managed/udpkit.platform.null.dll
+[FILE] 73,216 bytes | .dll | Stranded_Deep_Data/Managed/udpkit.platform.photon.dll
+[FILE] 144,896 bytes | .dll | Stranded_Deep_Data/Managed/Unity.Postprocessing.Runtime.dll
+[FILE] 370,688 bytes | .dll | Stranded_Deep_Data/Managed/Unity.TextMeshPro.dll
+[FILE] 115,712 bytes | .dll | Stranded_Deep_Data/Managed/Unity.Timeline.dll
+[FILE] 12,800 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AccessibilityModule.dll
+[FILE] 45,568 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AIModule.dll
+[FILE] 68,608 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AndroidJNIModule.dll
+[FILE] 151,040 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AnimationModule.dll
+[FILE] 10,752 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ARModule.dll
+[FILE] 23,040 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AssetBundleModule.dll
+[FILE] 59,392 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.AudioModule.dll
+[FILE] 15,360 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ClothModule.dll
+[FILE] 10,752 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ClusterInputModule.dll
+[FILE] 11,776 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ClusterRendererModule.dll
+[FILE] 1,252,352 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.CoreModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.CrashReportingModule.dll
+[FILE] 14,336 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.DirectorModule.dll
+[FILE] 100,352 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.dll
+[FILE] 18,432 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.DSPGraphModule.dll
+[FILE] 29,184 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.GameCenterModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.GIModule.dll
+[FILE] 14,336 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.GridModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.HotReloadModule.dll
+[FILE] 13,824 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ImageConversionModule.dll
+[FILE] 162,304 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.IMGUIModule.dll
+[FILE] 26,112 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.InputLegacyModule.dll
+[FILE] 12,800 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.InputModule.dll
+[FILE] 11,264 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.JSONSerializeModule.dll
+[FILE] 10,752 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.LocalizationModule.dll
+[FILE] 23,040 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.NVIDIAModule.dll
+[FILE] 143,872 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ParticleSystemModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.PerformanceReportingModule.dll
+[FILE] 123,392 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.Physics2DModule.dll
+[FILE] 102,912 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.PhysicsModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ProfilerModule.dll
+[FILE] 9,728 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.ScreenCaptureModule.dll
+[FILE] 21,504 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.SharedInternalsModule.dll
+[FILE] 10,752 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.SpriteMaskModule.dll
+[FILE] 14,848 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.SpriteShapeModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.StreamingModule.dll
+[FILE] 14,336 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.SubstanceModule.dll
+[FILE] 24,064 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.SubsystemsModule.dll
+[FILE] 88,064 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TerrainModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TerrainPhysicsModule.dll
+[FILE] 40,448 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TextCoreFontEngineModule.dll
+[FILE] 183,808 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TextCoreTextEngineModule.dll
+[FILE] 28,160 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TextRenderingModule.dll
+[FILE] 32,256 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TilemapModule.dll
+[FILE] 15,872 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.TLSModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UaaLAnalyticsModule.dll
+[FILE] 227,840 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UI.dll
+[FILE] 1,186,816 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UIElementsModule.dll
+[FILE] 48,128 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UIElementsNativeModule.dll
+[FILE] 25,600 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UIModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UmbraModule.dll
+[FILE] 78,848 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UNETModule.dll
+[FILE] 33,792 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityAnalyticsModule.dll
+[FILE] 11,264 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityConnectModule.dll
+[FILE] 11,264 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityCurlModule.dll
+[FILE] 9,216 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityTestProtocolModule.dll
+[FILE] 12,288 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll
+[FILE] 12,288 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestAudioModule.dll
+[FILE] 46,080 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestModule.dll
+[FILE] 11,264 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestTextureModule.dll
+[FILE] 20,992 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestWWWModule.dll
+[FILE] 13,312 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.VehiclesModule.dll
+[FILE] 43,520 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.VFXModule.dll
+[FILE] 29,696 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.VideoModule.dll
+[FILE] 24,064 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.VirtualTexturingModule.dll
+[FILE] 15,872 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.VRModule.dll
+[FILE] 10,240 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.WindModule.dll
+[FILE] 59,392 bytes | .dll | Stranded_Deep_Data/Managed/UnityEngine.XRModule.dll
+[FILE] 250,368 bytes | .dll | Stranded_Deep_Data/Managed/websocket-sharp.dll
+[FILE] 345,600 bytes | .dll | Stranded_Deep_Data/Managed/XGamingRuntime.dll
+[FILE] 239 bytes | .txt | Stranded_Deep_Data/Plugins/Steamworks.NET.txt
+[FILE] 14 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/local_save.txt
+[FILE] 12,800 bytes | .dll | Stranded_Deep_Data/Plugins/x86_64/Rewired_DirectInput.dll
+[FILE] 1,692,672 bytes | .dll | Stranded_Deep_Data/Plugins/x86_64/steam_api64.dll
+[FILE] 41 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/dlc.txt
+[FILE] 8 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/settings/account_name.txt
+[FILE] 7 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/settings/language.txt
+[FILE] 5 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/settings/listen_port.txt
+[FILE] 17 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/settings/user_steam_id.txt
+[FILE] 6 bytes | .txt | Stranded_Deep_Data/Plugins/x86_64/steam_settings/steam_appid.txt
+[FILE] 184,519,152 bytes | .assets | Stranded_Deep_Data/resources.assets
+[FILE] 1,373,682,164 bytes | .ress | Stranded_Deep_Data/resources.assets.resS
+[FILE] 33,027,648 bytes | .resource | Stranded_Deep_Data/resources.resource
+[FILE] 4,843,640 bytes | [NO EXTENSION] | Stranded_Deep_Data/Resources/unity default resources
+[FILE] 991,480 bytes | [NO EXTENSION] | Stranded_Deep_Data/Resources/unity_builtin_extra
+[FILE] 1,158 bytes | .json | Stranded_Deep_Data/RuntimeInitializeOnLoads.json
+[FILE] 3,399 bytes | .json | Stranded_Deep_Data/ScriptingAssemblies.json
+[FILE] 12,027,872 bytes | .assets | Stranded_Deep_Data/sharedassets0.assets
+[FILE] 42,516,984 bytes | .ress | Stranded_Deep_Data/sharedassets0.assets.resS
+[FILE] 10,591,552 bytes | .resource | Stranded_Deep_Data/sharedassets0.resource
+[FILE] 303,064 bytes | .assets | Stranded_Deep_Data/sharedassets1.assets
+[FILE] 12,545,080 bytes | .ress | Stranded_Deep_Data/sharedassets1.assets.resS
+[FILE] 4,206,176 bytes | .resource | Stranded_Deep_Data/sharedassets1.resource
+[FILE] 170,092 bytes | .assets | Stranded_Deep_Data/sharedassets2.assets
+[FILE] 1,029,728 bytes | .ress | Stranded_Deep_Data/sharedassets2.assets.resS
+[FILE] 49,505,376 bytes | .resource | Stranded_Deep_Data/sharedassets2.resource
+[FILE] 14,261,120 bytes | .assets | Stranded_Deep_Data/sharedassets3.assets
+[FILE] 51,739,940 bytes | .ress | Stranded_Deep_Data/sharedassets3.assets.resS
+[FILE] 4,438,400 bytes | .resource | Stranded_Deep_Data/sharedassets3.resource
+[FILE] 16,492,880 bytes | .assets | Stranded_Deep_Data/sharedassets4.assets
+[FILE] 2,350,508 bytes | .ress | Stranded_Deep_Data/sharedassets4.assets.resS
+[FILE] 4,091,680 bytes | .resource | Stranded_Deep_Data/sharedassets4.resource
+[FILE] 772,608 bytes | .exe | Stranded_Deep_x64.exe
+[FILE] 1,123,928 bytes | .exe | UnityCrashHandler64.exe
+[FILE] 28,773,464 bytes | .dll | UnityPlayer.dll
+
+===== IMPORTANT GAME FILES =====
+7,680,088 bytes | MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll
+600,576 bytes | MonoBleedingEdge/EmbedRuntime/MonoPosixHelper.dll
+1,605 bytes | MonoBleedingEdge/etc/mono/2.0/Browsers/Compat.browser
+60,575 bytes | MonoBleedingEdge/etc/mono/2.0/DefaultWsdlHelpGenerator.aspx
+29,066 bytes | MonoBleedingEdge/etc/mono/2.0/machine.config
+2,622 bytes | MonoBleedingEdge/etc/mono/2.0/settings.map
+11,635 bytes | MonoBleedingEdge/etc/mono/2.0/web.config
+1,605 bytes | MonoBleedingEdge/etc/mono/4.0/Browsers/Compat.browser
+60,575 bytes | MonoBleedingEdge/etc/mono/4.0/DefaultWsdlHelpGenerator.aspx
+33,598 bytes | MonoBleedingEdge/etc/mono/4.0/machine.config
+2,622 bytes | MonoBleedingEdge/etc/mono/4.0/settings.map
+18,802 bytes | MonoBleedingEdge/etc/mono/4.0/web.config
+1,605 bytes | MonoBleedingEdge/etc/mono/4.5/Browsers/Compat.browser
+60,575 bytes | MonoBleedingEdge/etc/mono/4.5/DefaultWsdlHelpGenerator.aspx
+34,056 bytes | MonoBleedingEdge/etc/mono/4.5/machine.config
+2,622 bytes | MonoBleedingEdge/etc/mono/4.5/settings.map
+18,811 bytes | MonoBleedingEdge/etc/mono/4.5/web.config
+311,984 bytes | MonoBleedingEdge/etc/mono/browscap.ini
+3,578 bytes | MonoBleedingEdge/etc/mono/config
+25,817 bytes | MonoBleedingEdge/etc/mono/mconfig/config.xml
+66 bytes | Stranded_Deep_Data/boot.config
+259,547,752 bytes | Stranded_Deep_Data/Data/Bundles/missions/carrier.unity3d
+6,133 bytes | Stranded_Deep_Data/Data/Bundles/missions/carrier.unity3d.manifest
+13,222,794 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d
+2,828 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_eel.unity3d.manifest
+7,491,260 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d
+3,136 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_shark.unity3d.manifest
+29,436,523 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d
+3,833 bytes | Stranded_Deep_Data/Data/Bundles/missions/mission_squid.unity3d.manifest
+34,277,541 bytes | Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d
+2,132 bytes | Stranded_Deep_Data/Data/Bundles/scenes/introscene.unity3d.manifest
+5,177,402 bytes | Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d
+5,089 bytes | Stranded_Deep_Data/Data/Bundles/watches/beepi.unity3d.manifest
+16,987 bytes | Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d
+1,688 bytes | Stranded_Deep_Data/Data/Bundles/watches/getbit.unity3d.manifest
+1,218 bytes | Stranded_Deep_Data/Data/Bundles/Windows
+637 bytes | Stranded_Deep_Data/Data/Bundles/Windows.manifest
+0 bytes | Stranded_Deep_Data/Data/Default Maps/Beam maps go here.txt
+681 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_EDITOR.map
+132,098 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_HEIGHT.map
+301 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_0/MAP_INTERNAL_MISSION_0_OBJECT.map
+681 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_EDITOR.map
+132,098 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_HEIGHT.map
+301 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_1/MAP_INTERNAL_MISSION_1_OBJECT.map
+681 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_EDITOR.map
+132,098 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_HEIGHT.map
+301 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_2/MAP_INTERNAL_MISSION_2_OBJECT.map
+681 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_EDITOR.map
+132,098 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_HEIGHT.map
+31,135 bytes | Stranded_Deep_Data/Data/Default Maps/MAP_INTERNAL_MISSION_3/MAP_INTERNAL_MISSION_3_OBJECT.map
+1,557,464 bytes | Stranded_Deep_Data/globalgamemanagers
+928,516 bytes | Stranded_Deep_Data/globalgamemanagers.assets
+81,548 bytes | Stranded_Deep_Data/level0
+763,840 bytes | Stranded_Deep_Data/level1
+75,924 bytes | Stranded_Deep_Data/level2
+222,128 bytes | Stranded_Deep_Data/level3
+741,992 bytes | Stranded_Deep_Data/level4
+642,048 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp-firstpass.dll
+3,432,448 bytes | Stranded_Deep_Data/Managed/Assembly-CSharp.dll
+241,152 bytes | Stranded_Deep_Data/Managed/Mono.Security.dll
+15,360 bytes | Stranded_Deep_Data/Managed/Sirenix.Serialization.Config.dll
+124,928 bytes | Stranded_Deep_Data/Managed/System.Configuration.dll
+23,040 bytes | Stranded_Deep_Data/Managed/UnityEngine.AssetBundleModule.dll
+88,064 bytes | Stranded_Deep_Data/Managed/UnityEngine.TerrainModule.dll
+10,240 bytes | Stranded_Deep_Data/Managed/UnityEngine.TerrainPhysicsModule.dll
+32,256 bytes | Stranded_Deep_Data/Managed/UnityEngine.TilemapModule.dll
+12,288 bytes | Stranded_Deep_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll
+184,519,152 bytes | Stranded_Deep_Data/resources.assets
+1,373,682,164 bytes | Stranded_Deep_Data/resources.assets.resS
+12,027,872 bytes | Stranded_Deep_Data/sharedassets0.assets
+42,516,984 bytes | Stranded_Deep_Data/sharedassets0.assets.resS
+10,591,552 bytes | Stranded_Deep_Data/sharedassets0.resource
+303,064 bytes | Stranded_Deep_Data/sharedassets1.assets
+12,545,080 bytes | Stranded_Deep_Data/sharedassets1.assets.resS
+4,206,176 bytes | Stranded_Deep_Data/sharedassets1.resource
+170,092 bytes | Stranded_Deep_Data/sharedassets2.assets
+1,029,728 bytes | Stranded_Deep_Data/sharedassets2.assets.resS
+49,505,376 bytes | Stranded_Deep_Data/sharedassets2.resource
+14,261,120 bytes | Stranded_Deep_Data/sharedassets3.assets
+51,739,940 bytes | Stranded_Deep_Data/sharedassets3.assets.resS
+4,438,400 bytes | Stranded_Deep_Data/sharedassets3.resource
+16,492,880 bytes | Stranded_Deep_Data/sharedassets4.assets
+2,350,508 bytes | Stranded_Deep_Data/sharedassets4.assets.resS
+4,091,680 bytes | Stranded_Deep_Data/sharedassets4.resource
+28,773,464 bytes | UnityPlayer.dll
+
+===== EMPTY FOLDERS =====
+NONE
+
+===== SKIPPED SYMLINKS =====
+NONE
+
+===== SCAN ERRORS =====
+NONE
+
+===== END OF INVENTORY =====
+No game files were modified.
+No symlink targets were followed.
+All output files are inside Map Check.
