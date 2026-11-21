@@ -1,0 +1,183 @@
+==============================================================================
+GEMINI AI CORE 1 — REPRODUCIBLE FORENSIC AUDIT REPORT
+Scan Timestamp (UTC) : 2026-11-21T18:58:33.181085+00:00
+Resolved BASE_DIR    : /storage/emulated/0/Download/Stranded-Deep-Original
+Resolved DATA_DIR    : /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data
+==============================================================================
+
+[1. PATH RESOLUTION & INPUT DISCOVERY]
+- Scanned Directories (2): BASE_DIR:/storage/emulated/0/Download/Stranded-Deep-Original, DATA_DIR:/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data
+- Path Resolution Errors (0):
+- Duplicate Filenames Across Directories (0):
+- Selected Input Files (8) with SHA-256:
+  * DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt | 982630B | sha256=629cebbaaea57c750fd3b1099f8fb75c05161c7c0e53d6637abae7536c4dd692
+  * DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt | 398336B | sha256=056c52ccf537c6814436fd815958ab7fd3c59a092580c66e39a61070c27008c8
+  * VERIFY_SUBMISSION_REPORT.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/VERIFY_SUBMISSION_REPORT.txt | 93752B | sha256=0929870c887c6d7cdea0c85c1c03c3c42f317d21237faef070dc0c2abb90476c
+  * VERIFY_SUBMISSION_REPORT_V2.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/VERIFY_SUBMISSION_REPORT_V2.txt | 53519B | sha256=a572a353573ba1aa83c6c65eca61ad110bca6c4be16e43fe07cedd22f6d22314
+  * key_ocean_details.json [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/key_ocean_details.json | 3594B | sha256=ef3c8e266e11216f8ce7d8327d971de49968cd6f334d3543e92897df9e82beef
+  * key_ocean_v3.json [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/key_ocean_v3.json | 4579B | sha256=6f3415bc9a5ae726bca9d395678db63a19190b1198ce3f83d7914ac19ca545c5
+  * stranded_deep_ocean_evidence_full.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/stranded_deep_ocean_evidence_full.txt | 51404B | sha256=4f1e214bb9aff6a1896aad3fee735b37d619fc1b2196c222675037ef8510b8d6
+  * stranded_deep_ocean_full_evidence_v2.txt [BASE_DIR] -> /storage/emulated/0/Download/Stranded-Deep-Original/stranded_deep_ocean_full_evidence_v2.txt | 90766B | sha256=8377199c7f24f27f6df98ad47d8ad2bc070d483365a4c3b3f237e1b56ff29623
+- Missing Files (3) — explicitly reported, not treated as empty inputs:
+  * MISSING: 1_OCEAN_CORE_PART_01.txt (File not found in scanned directories (not treated as empty input))
+  * MISSING: 2_GPU_CPU_PIPELINE_PART_01.txt (File not found in scanned directories (not treated as empty input))
+  * MISSING: 3_COMBINED_OCEAN_GPU_CPU_PART_01.txt (File not found in scanned directories (not treated as empty input))
+
+[2. TOKEN & METHOD BODY SIZE VERIFICATION]
+- File: DISPLACEMENT_GENERATION_PIPELINE_FINAL.txt
+  * Unique Tokens Found: 380 | Total Occurrences: 1863
+  * Matched Expected Tokens: 33/34
+  * Missing Expected Tokens (1): {'WaveQuery..ctor': '0x06002F44'}
+  * Additional Tokens Count: 347 (sample=['0x06000000', '0x06002DF5', '0x06002E18', '0x06002E19', '0x06002E1A', '0x06002E1B', '0x06002E1E', '0x06002E1F', '0x06002E23', '0x06002E24'])
+  * Duplicate Method Records: {'Ceto.Ocean.QueryWaves': 4, 'Ceto.FourierCPU.FFT': 2, 'Ceto.FourierGPU.PeformFFT': 4, 'Ceto.Common.Unity.Utility.RTUtility.Blit': 3, 'Ceto.Common.Unity.Utility.RTUtility.MultiTargetBlit': 2, 'Ceto.Common.Unity.Utility.RTUtility.Release': 2, 'Ceto.Common.Unity.Utility.RTUtility.ReleaseAndDestroy': 2, 'Ceto.Common.Unity.Utility.RTUtility.ReleaseTemporary': 2, 'Ceto.Common.Containers.Interpolation.InterpolatedArray.Index': 2, 'Ceto.Common.Containers.Interpolation.InterpolatedArray2f..ctor': 3, 'Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Get': 4, 'Ceto.Common.Containers.Interpolation.InterpolatedArray2f.Set': 2}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt
+  * Unique Tokens Found: 139 | Total Occurrences: 399
+  * Matched Expected Tokens: 33/34
+  * Missing Expected Tokens (1): {'WaveQuery..ctor': '0x06002F44'}
+  * Additional Tokens Count: 106 (sample=['0x06000000', '0x06002E47', '0x06002F76', '0x06002F82', '0x06002F83', '0x06002F84', '0x06002F85', '0x06002F87', '0x06002F8B', '0x06002F90'])
+  * Duplicate Method Records: {'.ctor': 6, 'Initilize': 2, 'GetReadDisplacements': 2, 'Run': 5, 'QueryWaves': 4, '.cctor': 2, 'PeformFFT': 4, 'Index': 2, 'Get': 4}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: VERIFY_SUBMISSION_REPORT.txt
+  * Unique Tokens Found: 25 | Total Occurrences: 61
+  * Matched Expected Tokens: 4/34
+  * Missing Expected Tokens (30): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.GetReadDisplacements': '0x06002F77', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.QueryWaves': '0x06002F8D', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7'}
+  * Additional Tokens Count: 21 (sample=['0x06002E2D', '0x06002E35', '0x06002E38', '0x06002EC6', '0x06002ED3', '0x06002ED4', '0x06002EE5', '0x06002EE7', '0x06002EFB', '0x06002F01'])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: VERIFY_SUBMISSION_REPORT_V2.txt
+  * Unique Tokens Found: 14 | Total Occurrences: 39
+  * Matched Expected Tokens: 6/34
+  * Missing Expected Tokens (28): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7'}
+  * Additional Tokens Count: 8 (sample=['0x06002E35', '0x06002ED4', '0x06002F8B', '0x06002FF4', '0x0600300F', '0x06003081', '0x06003082', '0x06003085'])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: key_ocean_details.json
+  * Unique Tokens Found: 0 | Total Occurrences: 0
+  * Matched Expected Tokens: 0/34
+  * Missing Expected Tokens (34): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.GetReadDisplacements': '0x06002F77', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.QueryWaves': '0x06002F8D', 'QueryDisplacements.SampleHeightOnly': '0x06002F8E', 'QueryDisplacements.Sample': '0x06002F8F', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.QueryWaves': '0x06003094', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7', 'InterpolatedArray2f.Get': '0x060031DF'}
+  * Additional Tokens Count: 0 (sample=[])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: key_ocean_v3.json
+  * Unique Tokens Found: 0 | Total Occurrences: 0
+  * Matched Expected Tokens: 0/34
+  * Missing Expected Tokens (34): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.GetReadDisplacements': '0x06002F77', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.QueryWaves': '0x06002F8D', 'QueryDisplacements.SampleHeightOnly': '0x06002F8E', 'QueryDisplacements.Sample': '0x06002F8F', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.QueryWaves': '0x06003094', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7', 'InterpolatedArray2f.Get': '0x060031DF'}
+  * Additional Tokens Count: 0 (sample=[])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: stranded_deep_ocean_evidence_full.txt
+  * Unique Tokens Found: 44 | Total Occurrences: 88
+  * Matched Expected Tokens: 6/34
+  * Missing Expected Tokens (28): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7'}
+  * Additional Tokens Count: 38 (sample=['0x06000707', '0x0600077A', '0x0600077C', '0x06002E24', '0x06002E2D', '0x06002E35', '0x06002E38', '0x06002E55', '0x06002ED4', '0x06002F48'])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+- File: stranded_deep_ocean_full_evidence_v2.txt
+  * Unique Tokens Found: 37 | Total Occurrences: 80
+  * Matched Expected Tokens: 6/34
+  * Missing Expected Tokens (28): {'WaveQuery..ctor': '0x06002F44', 'DisplacementBufferCPU..ctor': '0x06002F74', 'DisplacementBufferCPU.Initilize': '0x06002F75', 'DisplacementBufferCPU.Run': '0x06002F78', 'DisplacementBufferCPU.CopyAndCreateDisplacements': '0x06002F79', 'DisplacementBufferCPU.CopyDisplacements': '0x06002F7A', 'DisplacementBufferCPU.SwapDisplacements': '0x06002F7B', 'DisplacementBufferCPU.QueryWaves': '0x06002F7D', 'DisplacementBufferGPU..ctor': '0x06002F7E', 'DisplacementBufferGPU.GetReadDisplacements': '0x06002F7F', 'DisplacementBufferGPU.CopyAndCreateDisplacements': '0x06002F80', 'DisplacementBufferGPU.CopyDisplacements': '0x06002F81', 'QueryDisplacements.CopyAndCreateDisplacements': '0x06002F91', 'QueryDisplacements.CopyDisplacements': '0x06002F92', 'QueryDisplacements..cctor': '0x06002F93', 'WaveSpectrumBufferCPU.Run': '0x06002FBD', 'WaveSpectrumBufferGPU.Initilize': '0x06002FC5', 'WaveSpectrumBufferGPU.Run': '0x06002FCC', 'FourierGPU.PeformFFT': '0x06003037', 'FourierTask.Run': '0x06003048', 'FourierTask.PerformSingleFourier': '0x0600304A', 'FourierTask.ProcessData': '0x0600304B', 'InitSpectrumDisplacementsTask.Run': '0x06003060', 'WaveSpectrum.GenerateDisplacement': '0x06003090', 'WaveSpectrum.ReadFromGPU': '0x06003091', 'WaveSpectrum.CreateBuffers': '0x06003095', 'WaveSpectrum.GetFourierSize': '0x0600309D', 'CBUtility.ReadFromRenderTexture': '0x060030F7'}
+  * Additional Tokens Count: 31 (sample=['0x06000000', '0x06002E24', '0x06002E2D', '0x06002E35', '0x06002E38', '0x06002E55', '0x06002ED4', '0x06002F48', '0x06002F4A', '0x06002F4B'])
+  * Duplicate Method Records: {}
+  * Mismatched Method-Token Pairs: []
+  * Size Check [QueryDisplacements.QueryWaves]: status=UNVERIFIED expected=951 observed=None
+  * Size Check [QueryDisplacements.SampleHeightOnly]: status=UNVERIFIED expected=345 observed=None
+  * Size Check [QueryDisplacements.Sample]: status=UNVERIFIED expected=581 observed=None
+  * Size Check [QueryDisplacements.CopyDisplacements]: status=UNVERIFIED expected=197 observed=None
+  * Size Check [DisplacementBufferGPU.GetReadDisplacements]: status=UNVERIFIED expected=7 observed=None
+  * Size Check [DisplacementBufferGPU.CopyAndCreateDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [DisplacementBufferGPU.CopyDisplacements]: status=UNVERIFIED expected=13 observed=None
+  * Size Check [FourierTask.ProcessData]: status=UNVERIFIED expected=1636 observed=None
+
+[3. COMBINED EVIDENCE VALIDATION (CORE + PIPE UNION)]
+{
+  "status": "UNVERIFIED",
+  "verdict": "MISSING_INPUTS",
+  "is_independent_source": false,
+  "present_files": [],
+  "missing_files": [
+    "1_OCEAN_CORE_PART_01.txt",
+    "2_GPU_CPU_PIPELINE_PART_01.txt",
+    "3_COMBINED_OCEAN_GPU_CPU_PART_01.txt"
+  ],
+  "reason": "Cannot verify exact/partial union until 1_OCEAN_CORE_PART_01.txt, 2_GPU_CPU_PIPELINE_PART_01.txt, and 3_COMBINED_OCEAN_GPU_CPU_PART_01.txt are all present."
+}
+
+[4. EXPLICIT VERIFICATION STATUS & OUTCOMES]
+- GRID3_READBACK_OBSERVATION: status=VERIFIED | outcome=PASS
+  * Observed: In Ceto.WaveSpectrum.ReadFromGPU (0x06003091), readback calls are observed for Grids 0..2 with no corresponding readback call for Grid 3 in the audited IL summary.
+- GRID3_SKIP_REASON_BANDWIDTH: status=UNVERIFIED | outcome=PARTIAL / UNVERIFIED
+  * Observed: No hardcoded bandwidth-saving claim is asserted as verified fact; why Grid 3 is omitted from CPU readback is separated from observed IL instructions.
+  * Inferred (Not Direct Proof): Saving GPU-to-CPU readback transfer cost for Grid 3 is an unverified inference unless directly proven by source/comments/constants.
+- GRID3_TEXTURE_BINDING_AND_SHADER_CONSUMPTION: status=PARTIALLY VERIFIED | outcome=PARTIAL
+  * Observed: GenerateDisplacement (0x06003090) binds Ceto_DisplacementMap0..3; actual shader sampling of Grid 3 and CPU query data validity when sampleSpectrum[3] is enabled are not yet proven end-to-end.
+- CPU_BUFFER_SWAP_ORDER: status=PARTIALLY VERIFIED | outcome=PARTIAL
+  * Observed: DisplacementBufferCPU.Run (0x06002F78) invokes SwapDisplacements (0x06002F7B) prior to spectrum/FFT task execution; task completion / caller ordering risks remain a subject of verification.
+- COMBINED_UNION_VALIDATION: status=UNVERIFIED | outcome=PARTIAL
+  * Observed: UNVERIFIED
+- SAMPLING_AND_CLAMP_PIPELINE: status=PARTIALLY VERIFIED | outcome=PARTIAL
+  * Observed: QueryDisplacements.Sample (0x06002F8F) and SampleHeightOnly (0x06002F8E) scaling, iteration, and [-40.0f, 40.0f] height clamp.
+
+[5. UNRESOLVED EVIDENCE GAPS]
+- [UNVERIFIED GAP] 1_OCEAN_CORE_PART_01.txt, 2_GPU_CPU_PIPELINE_PART_01.txt, and 3_COMBINED_OCEAN_GPU_CPU_PART_01.txt must be present at resolved paths to execute full 1,028-method/token union & byte-level verification.
+- [UNVERIFIED GAP] Reason for omitting Grid 3 from CPU readback in ReadFromGPU (0x06003091) remains UNVERIFIED as a proven design rationale (bandwidth-saving explanation is INFERRED / UNVERIFIED).
+- [UNVERIFIED GAP] Actual GPU shader sampling of Ceto_DisplacementMap3 and CPU query validity when sampleSpectrum[3] is enabled remain UNVERIFIED.
+- [UNVERIFIED GAP] Runtime task completion / caller ordering behavior around SwapDisplacements() (0x06002F7B) and WaveSpectrumBufferCPU.Run (0x06002FBD) requires direct caller/scheduling proof.
+
+EOF_AUDIT_V1
