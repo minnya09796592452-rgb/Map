@@ -1,0 +1,44 @@
+==========================================================================================
+INDEPENDENT TECHNICAL AUDIT — CASTAWAY-DEPTHS
+Source Audited: DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt (No DLL/Asset mutation)
+==========================================================================================
+Parsed IL Method Blocks : 45
+Confirmed IL Assertions : 11 / 11
+Missing / Unconfirmed   : 0
+
+1. OUTPUT STRUCTURE & BYTE LAYOUT VERIFICATION
+- Logical Grid Dimensions : GRIDS = 4 (0x04001B5C), CHANNELS = 3 (0x04001B5B).
+- CPU Buffer Structure    : m_displacements (0x04001B58) = List<InterpolatedArray2f[]> (len=2: Slot 0=Write, Slot 1=Read).
+  Each grid allocates flat float[] m_data (size * size * 3, 4B/float = 12B/texel, interleaved: (y*SX+x)*3+ch).
+  Channel 0 (+0B) = Displacement X | Channel 1 (+4B) = Height Y | Channel 2 (+8B) = Displacement Z.
+- GPU Texture & Readback  : m_displacementMaps[0..3] (RenderTextureFormat.ARGBHalf = enum 2, 8B/texel on VRAM),
+  m_readBuffer = ComputeBuffer(size*size, stride=12) via CBUtility.ReadFromRenderTexture (0x060030F7).
+
+2. SOURCE CODE CROSS-VERIFICATION (TOKEN / RID / RVA / OFFSET)
+[CONFIRMED] Ceto.DisplacementBufferCPU..ctor | Token=0x06002F74 | RID=12148 | RVA=0x78404 | Off=0x76604 | Size=126B | IL_Lines=56 -> m_displacements List<InterpolatedArray2f[]> allocation
+[CONFIRMED] Ceto.DisplacementBufferCPU.GetWriteDisplacements | Token=0x06002F76 | RID=12150 | RVA=0x78525 | Off=0x76725 | Size=13B | IL_Lines=5 -> Write buffer bound to Slot 0
+[CONFIRMED] Ceto.DisplacementBufferCPU.GetReadDisplacements | Token=0x06002F77 | RID=12151 | RVA=0x78533 | Off=0x76733 | Size=13B | IL_Lines=5 -> Read buffer bound to Slot 1
+[CONFIRMED] Ceto.DisplacementBufferCPU.Run | Token=0x06002F78 | RID=12152 | RVA=0x78541 | Off=0x76741 | Size=15B | IL_Lines=7 -> SwapDisplacements called prior to CPU spectrum/FFT run
+[CONFIRMED] Ceto.DisplacementBufferCPU.QueryWaves | Token=0x06002F7D | RID=12157 | RVA=0x785C0 | Off=0x767C0 | Size=28B | IL_Lines=15 -> QueryWaves reads Slot 1 via GetReadDisplacements
+[CONFIRMED] Ceto.DisplacementBufferGPU..ctor | Token=0x06002F7E | RID=12158 | RVA=0x785E8 | Off=0x767E8 | Size=67B | IL_Lines=33 -> m_displacements single InterpolatedArray2f[] allocation
+[CONFIRMED] Ceto.DisplacementBufferGPU.QueryWaves | Token=0x06002F83 | RID=12163 | RVA=0x7866C | Off=0x7686C | Size=26B | IL_Lines=13 -> GPU QueryWaves reads m_displacements
+[CONFIRMED] Ceto.WaveSpectrum.GenerateDisplacement | Token=0x06003090 | RID=12432 | RVA=0x803CC | Off=0x7E5CC | Size=780B | IL_Lines=260 -> Updates m_displacementBuffer & publishes Ceto_DisplacementMap0..3
+[CONFIRMED] Ceto.WaveSpectrum.ReadFromGPU | Token=0x06003091 | RID=12433 | RVA=0x806E4 | Off=0x7E8E4 | Size=285B | IL_Lines=118 -> Calls CBUtility.ReadFromRenderTexture for Grids 0..2 (Grid 3 omitted)
+[CONFIRMED] Ceto.QueryDisplacements..cctor | Token=0x06002F93 | RID=12179 | RVA=0x79375 | Off=0x77575 | Size=13B | IL_Lines=5 -> CHANNELS=3 and GRIDS=4 static initialization
+[CONFIRMED] Ceto.QueryDisplacements.Sample | Token=0x06002F8F | RID=12175 | RVA=0x78BC8 | Off=0x76DC8 | Size=581B | IL_Lines=240 -> Calls InterpolatedArray2f.Get and maps ch0->X, ch1->Y, ch2->Z
+
+3. EVIDENCE-BASED CLASSIFICATION
+A. CONFIRMED:
+   - Interleaved 3-channel float32 layout (X, Height Y, Z) across CPU InterpolatedArray2f and GPU ComputeBuffer.
+   - CPU double-buffer swap order: DisplacementBufferCPU.Run (0x06002F78) calls SwapDisplacements (0x06002F7B) first.
+   - GPU ReadFromGPU (0x06003091) transfers Grids 0, 1, 2 to CPU and explicitly skips Grid 3 (IL_0118..011C).
+   - QueryDisplacements.QueryWaves (0x06002F8D) performs <= 21 horizontal inversion iterations and clamps Y to [-40, 40].
+B. INFERRED:
+   - Grid 3 is excluded from CPU readback to avoid PCIe bandwidth cost for high-frequency visual ripples.
+C. UNVERIFIED:
+   - Alpha (A) channel usage inside compiled GPU surface shaders (not transferred in stride=12 ComputeBuffer).
+   - Stripped scene MonoBehaviour inspector parameter values (enableTypeTree == False).
+
+4. FINAL ENGINEERING RECOMMENDATION
+- Close broad DLL scanning; inspect compiled shader blobs (readNames2D / displacementCopySdr) and raw _Ceto
+  WaveSpectrum MonoBehaviour serialized field offsets before Godot 4 ocean displacement implementation.
