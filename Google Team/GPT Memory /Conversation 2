@@ -2143,3 +2143,497 @@ V4 ရဲ့ ရည်ရွယ်ချက်နဲ့ နီးစပ်လာ
 စစ်ဆေးမှုကန့်သတ်ချက်: GitHub ရှိ V4 ဖိုင် 8 ခုနဲ့ Report/Manifest/Script တွေကို Source-Level စစ်ဆေးခဲ့တာပါ။ DLL ကို ဒီနေရာမှာ မရရှိတဲ့အတွက် Script ကို ပြန် Run မလုပ်နိုင်ခဲ့ပါဘူး။ Repo ဖိုင်တွေကိုလည်း မပြင်ဆင်ထားပါဘူး။ Report ထဲက 6/6 ကိုလည်း ကျွန်တော် သီးခြားပြန် Run လုပ်ပြီး အတည်ပြုထားတာ မဟုတ်ပါဘူး။
 
 ကျွန်တော့်အကြံပြုချက်က V4 ကို ချက်ချင်း V5 တိုးမသွားဘဲ အရင်ဆုံး ဒီ Fat Header Parsing နဲ့ Metadata Table Parsing အမှားတွေကို ပိတ်ဖို့ပါ။ ဒီနှစ်ခု မမှန်သေးဘဲ Report အရေအတွက်နဲ့ VERIFIED အရေအတွက်ကို တိုးတာက ပန်းတိုင်နဲ့ ပိုဝေးသွားစေနိုင်ပါတယ်။
+မင်းပြောတာကို ငါ ဒီတစ်ခါ နည်းပညာပိုင်းဆိုင်ရာ အငြင်းအခုံတစ်ခုလို မယူဘူး။ **ငါ့ရဲ့အလုပ်လုပ်ပုံနဲ့ ထွက်လာတဲ့ရလဒ်ကို နှိုင်းယှဉ်ပြီး ဝေဖန်နေတာ** လို့ နားလည်တယ်။
+
+မင်းပြောတဲ့ ဥပမာထဲမှာ အရေးကြီးတဲ့အချက်တစ်ခုရှိတယ်။
+
+လုပ်ငန်းတစ်ခုမှာ သေချာစစ်ဆေးတတ်တာက အားသာချက်ပါ။ ဒါပေမဲ့ စစ်ဆေးမှုတွေကြောင့် လုပ်ငန်းရလဒ် မထွက်လာဘူးဆိုရင် အဲဒီသေချာမှုက လုပ်ငန်းအတွက် တန်ဖိုးမဖြစ်တော့ဘူး။
+
+**ငါ့ရဲ့အားနည်းချက်က အမှားမဖြစ်ဖို့ကို အလွန်ဦးစားပေးပြီး၊ အသုံးပြုလို့ရတဲ့ ရလဒ်တစ်ခု အမြန်ထုတ်ပေးဖို့ကို လုံလောက်အောင် မဦးစားပေးခဲ့တာပဲ။**
+
+Ocean နဲ့ Map Check ကို နှစ်ရက်လုပ်ခဲ့ပြီး မင်းမြင်နိုင်တဲ့ UI View တစ်ခု၊ Godot ထဲမှာ မြင်ရတဲ့ ရလဒ်တစ်ခု၊ APK ပေါ်မှာ စမ်းသပ်နိုင်တဲ့ တိုးတက်မှုတစ်ခု မပေးနိုင်ခဲ့ဘူးဆိုရင် အဲဒီနှစ်ရက်ရဲ့ လုပ်ငန်းရလဒ်ကို ငါကောင်းတယ်လို့ မပြောနိုင်ဘူး။
+
+ငါ့ရဲ့စစ်ဆေးမှုတွေဟာ နောက်ဆုံးထုတ်ကုန်ကို ရောက်ဖို့ အထောက်အကူဖြစ်ရမယ်။ ကိုယ်တိုင်က Project ရဲ့ အဓိကလုပ်ငန်းစဉ်ဖြစ်ပြီး တိုးတက်မှုကို တားဆီးနေတဲ့ အရာ မဖြစ်သင့်ဘူး။
+
+### **ငါ့အလုပ်လုပ်ပုံကို ဘယ်လိုပြောင်းမလဲ**
+
+ငါ့အတွက် အခုကစပြီး အဓိကဦးစားပေးက **Progress First, Verify Along the Way** ဖြစ်ရမယ်။
+
+| အရင်လုပ်ပုံ                         | ပြောင်းလဲမယ့်လုပ်ပုံ                          |
+| ----------------------------------- | --------------------------------------------- |
+| အချက်အလက်အားလုံး ပြည့်စုံမှ ရှေ့ဆက် | လိုအပ်တဲ့အချက်အလက်နဲ့ ပထမရလဒ်ကို အရင်တည်ဆောက် |
+| Error ဖြစ်နိုင်တာကို အရင်ရှောင်     | Error ဖြစ်ရင် အကြောင်းရင်းရှာပြီး ပြင်ဆင်     |
+| Report တွေ အရင်များလာ               | အသုံးပြုလို့ရတဲ့ Result ကို အရင်ထုတ်          |
+| အရာအားလုံးကို တစ်ပြိုင်နက် Verify   | အဆင့်လိုက် စစ်ဆေးပြီး တိုးတက်မှုကို ဆက်ထိန်း  |
+| PASS ရဖို့ အာရုံစိုက်               | လက်တွေ့အသုံးဝင်တဲ့ ရလဒ်ရဖို့ အာရုံစိုက်       |
+
+ဥပမာ Ocean အတွက်ဆိုရင် Ceto, CPU, GPU အားလုံးကို အရင်ဆုံး အပြည့်အစုံစစ်ပြီးမှ Godot ကို စတင်မယ်ဆိုတာ မဟုတ်တော့ဘူး။
+
+- ရှိပြီးသား Ceto Evidence ကို အသုံးချမယ်။
+- Ocean ရဲ့ ပထမဆုံး မြင်ရတဲ့ Result ကို Godot မှာ တည်ဆောက်မယ်။
+- မရသေးတဲ့အပိုင်းတွေကို အမှားအဖြစ် မှတ်တမ်းတင်ပြီး ဆက်ပြင်မယ်။
+- ရလဒ်တိုးတက်လာတာနဲ့အမျှ CPU/GPU နဲ့ မူရင်း Ceto ကို Cross-Verify လုပ်မယ်။
+
+Map Check မှာလည်း ရှိပြီးသား Terrain အချက်အလက်တွေကို ထိန်းသိမ်းပြီး မြင်ရတဲ့ Map Result ကို ဦးစားပေးရမယ်။ Ocean နဲ့ Terrain ကို အကြောင်းမဲ့ ရောထွေးမှာ မဟုတ်ဘူး။
+
+### **မင်းပေးထားတဲ့ Sources Link အကြောင်း**
+
+ငါကြိုးစားဖွင့်ကြည့်ခဲ့တယ်။ ဒါပေမဲ့ ဒီ Chat ထဲကနေ Project ရဲ့ Sources Tab ကို တိုက်ရိုက်ဖတ်ခွင့်မရခဲ့ဘူး။ ဒါကြောင့် အဲဒီထဲက ဖိုင်တွေကို မြင်ပြီးပြီလို့ မပြောဘူး။
+
+မင်းပြောတဲ့ တစ်နာရီတောင်မကြာဘဲ မြင်သာတဲ့ရလဒ်ရလာတဲ့ အလုပ်တွေကိုလည်း ငါ့ဘက်က မမြင်ရသေးဘဲ အောင်မြင်မှုအသေးစိတ်ကို ခန့်မှန်းမပြောချင်ဘူး။
+
+### **ငါ့ကိုယ်ငါ နောက်ဆုံးသုံးသပ်ချက်**
+
+ငါက နည်းပညာဆိုင်ရာ အမှားတွေကို ရှာဖွေရာမှာ အချိန်များစွာ သုံးနိုင်တယ်။ ဒါပေမဲ့ အဲဒီအချိန်တွေက မင်းရဲ့ Main Target ကို ပိုနီးလာစေသလားဆိုတာ မေးခွန်းထုတ်ရမယ်။
+
+အဖြေက မင်းမျှော်လင့်ထားသလောက် မဟုတ်ခဲ့ဘူး။
+
+မင်းလိုချင်တာက Report တွေ အများကြီးမဟုတ်ဘူး။ Stranded Deep ရဲ့ Ocean နဲ့ Map ကို Godot မှာ တကယ်မြင်ရဖို့၊ နောက်ဆုံး APK ပေါ်မှာ ရလဒ်ကို မြင်ရဖို့ပဲ။
+
+အဲဒီရလဒ်ကို ဦးတည်ပြီး အလုပ်လုပ်ရမယ်။
+
+**ငါ့အတွက် အောင်မြင်မှုဆိုတာ စစ်ဆေးမှု ၁၀၀% ပြည့်တာတစ်ခုတည်း မဟုတ်ဘူး။ မင်းရဲ့ Project ကို လက်တွေ့မှာ ရှေ့တစ်ဆင့်ရောက်အောင် ပို့ပေးနိုင်တာပဲ။**
+
+မင်းပြောတဲ့ အဓိကအချက်ကို ငါလက်ခံတယ်။ အမှားကို မကြောက်ဘဲ ရှေ့တိုးရမယ်၊ ဒါပေမဲ့ ရှိပြီးသားအလုပ်တွေကို မဖျက်ဆီးဘဲ ရှေ့တိုးရမယ်။ 🤝
+
+ငါရွေးချယ်လိုက်ပြီ။ ဒီတစ်ခါ **Code အားလုံးပြီးမှ View ကြည့်မယ့်နည်းလမ်းကို မရွေးတော့ဘူး။ Godot ထဲမှာ မြင်ရတဲ့ရလဒ်ကို အခြေခံပြီး အဆင့်ဆင့် တည်ဆောက်မယ်။**
+
+မင်းပေးထားတဲ့ Screenshot ကို ငါ ဖွင့်ကြည့်ပြီးပြီ။ အဲဒီပုံက ငါ့အတွက် အရေးကြီးတဲ့ အထောက်အထားတစ်ခု ဖြစ်တယ်။
+
+
+
+Screenshot ထဲမှာ မြင်ရတာတွေက -
+
+- Godot **4.7.2 Stable**
+- 3D Editor View
+- `Ocean.tscn` ကို ရွေးထားတယ်။
+- သင်္ဘော Deck ပုံစံ၊ သံပြားမျက်နှာပြင်နဲ့ ပင်လယ်ရေပြင်ကို မြင်ရတယ်။
+- Scene ထဲမှာ Ocean နဲ့ ပတ်သက်တဲ့ Resources တွေလည်း ရှိနေတယ်။
+
+ဒီဟာက မင်းလိုချင်တဲ့အရာဟာ စာရွက်ပေါ်က နည်းပညာအစီအစဉ်တစ်ခုတည်း မဟုတ်ဘဲ **မြင်ရတဲ့ 3D Project တစ်ခုကို အခြေခံပြီး တိုးတက်အောင်လုပ်ဖို့** ဆိုတာ ပြနေတယ်။
+
+Raw GitHub URL ကိုတော့ ဒီနေရာကနေ တိုက်ရိုက်ဖတ်မရခဲ့ဘူး။ အထက်က သုံးသပ်ချက်က မင်းပေးထားတဲ့ Screenshot ဖိုင်ကို ဖွင့်ကြည့်ထားတဲ့အပေါ် အခြေခံထားတယ်။
+
+## **ငါရွေးချယ်တဲ့ Plan — Visual-First Development**
+
+
+
+ရွေးချယ်ပြီး
+
+**View → Build → Run → Verify → Expand**
+
+
+
+### **Phase 1 — လက်ရှိ Project ကို ကာကွယ်ခြင်း**
+
+ပထမဆုံး လုပ်မယ့်အရာက ရှိပြီးသား Project ကို မဖျက်ဆီးဖို့ပဲ။
+
+- လက်ရှိ Godot Project Structure ကို စစ်ဆေးမယ်။
+- `Ocean.tscn` နဲ့ ဆက်စပ် Resources တွေကို ခွဲထုတ်မယ်။
+- မူရင်းဖိုင်တွေ၊ Scripts တွေကို Backup/Version ထိန်းမယ်။
+- လက်ရှိမြင်ရတဲ့ View ကို Baseline အဖြစ် မှတ်တမ်းတင်မယ်။
+
+**ဒီအဆင့်မှာ မူရင်း Project ကို မပြင်ဘူး။**
+
+### **Phase 2 — ပထမဆုံး မြင်ရတဲ့ Ocean Result**
+
+ပထမဆုံး လက်တွေ့ရလဒ်
+
+လက်ရှိ Scene ကို အခြေခံပြီး -
+
+1. Ocean Surface ကို မြင်ရအောင်ထားမယ်။
+2. Camera View ကို စစ်မယ်။
+3. သင်္ဘော Deck နဲ့ Ocean ရဲ့ နေရာချထားမှုကို စစ်မယ်။
+4. ရေပြင်ရဲ့ Displacement နဲ့ Wave Appearance ကို တစ်ဆင့်ချင်း တည်ဆောက်မယ်။
+5. ပြောင်းလဲမှုတစ်ခုစီပြီးတိုင်း Godot View မှာ ပြန်ကြည့်မယ်။
+
+အရေးကြီးတာက Shader တစ်ခုရေးပြီး အားလုံးပြီးမှ ဖွင့်ကြည့်တာ မဟုတ်ဘူး။ ပြောင်းလဲမှုတစ်ခုစီကို မြင်ရမယ်။
+
+### **Phase 3 — Ceto / CPU / GPU ကို ချိတ်ဆက်ခြင်း**
+
+ဒီနေရာမှာ အရင်ရရှိထားတဲ့ အလုပ်တွေကို အသုံးချမယ်။
+
+| အပိုင်း      | လုပ်ဆောင်ချက်                                            |
+| ------------ | -------------------------------------------------------- |
+| Ceto         | ရှိပြီးသား Python Extraction နဲ့ IL Evidence ကို အသုံးချ |
+| CPU          | Displacement Buffer နဲ့ Query Flow ချိတ်ဆက်              |
+| GPU          | Texture, Compute, Readback ကို အဆင့်လိုက် ချိတ်ဆက်       |
+| Cross-Verify | မူရင်း Ceto နဲ့ Godot ရလဒ်ကို နှိုင်းယှဉ်                |
+
+အထောက်အထားမပြည့်စုံသေးတာတွေကို ဆက်စစ်မယ်။ ဒါပေမဲ့ အဲဒါကြောင့် မြင်ရတဲ့ Project တည်ဆောက်မှုကို ရပ်မထားဘူး။
+
+### **Phase 4 — Android APK**
+
+- Godot Editor မှာ Scene Run လုပ်မယ်။
+- Desktop မှာ စမ်းမယ်။
+- Mobile Rendering ကို စစ်မယ်။
+- APK Export လုပ်မယ်။
+- Android ပေါ်မှာ တကယ်ဖွင့်ပြီး မြင်ရတဲ့ရလဒ်ကို စစ်မယ်။
+
+APK Export အောင်မြင်တာနဲ့ APK ထဲမှာ အားလုံးမှန်တယ်လို့ မသတ်မှတ်ဘူး။ ဖုန်းပေါ်မှာ တကယ်စမ်းပြီးမှ အောင်မြင်မှုကို သတ်မှတ်မယ်။
+
+## **ငါ့ရဲ့ အလုပ်စည်းမျဉ်းအသစ်**
+
+**အဆင့်တစ်ခုစီမှာ ရလဒ် ၄ ခု ရှိရမယ်။**
+
+1. **Code** — ဘာပြောင်းခဲ့လဲ။
+2. **View** — Godot ထဲမှာ ဘာမြင်ရလဲ။
+3. **Test** — တကယ် Run လုပ်ပြီး ဘာရလဒ်ရလဲ။
+4. **Next Step** — နောက်တစ်ဆင့် ဘာလုပ်မလဲ။
+
+**တားမြစ်ချက်များ**
+
+- မူရင်းအလုပ်ကို အကြောင်းမဲ့ မဖျက်ရ။
+- အောင်မြင်ပြီးသားအပိုင်းကို မလိုအပ်ဘဲ ပြန်မတည်ဆောက်ရ။
+- Report အတွက် Report မထုတ်ရ။
+- စမ်းသပ်မထားတာကို အောင်မြင်တယ်လို့ မပြောရ။
+- View မမြင်ရသေးဘဲ အဆင့်ကြီးတစ်ခုလုံး ပြီးပြီလို့ မသတ်မှတ်ရ။
+
+## **အခု ပထမဆုံး လုပ်မယ့်အလုပ်**
+
+ငါ့ရဲ့ ဦးစားပေးက **လက်ရှိ Godot Project ကို စစ်ဆေးပြီး ရှိပြီးသား Ocean View ကို မပျက်စီးစေဘဲ ပထမဆုံး Run လုပ်နိုင်တဲ့ အခြေအနေကို တည်ငြိမ်အောင်လုပ်ဖို့** ဖြစ်တယ်။
+
+မင်းရဲ့အချိန်ကို နောက်ထပ် Report တွေနဲ့ပဲ မကုန်စေချင်ဘူး။
+
+ဒီ Project ရဲ့ တိုးတက်မှုကို ငါတိုင်းတာမယ့် စံနှုန်းက ရှင်းပါတယ်။
+
+**မင်း Godot ကိုဖွင့်လိုက်တဲ့အခါ မနေ့ကထက် ပိုပြီးမြင်ရမယ်။ APK ဖွင့်လိုက်တဲ့အခါလည်း တကယ်တိုးတက်နေရမယ်။**
+
+အဲဒါကိုပဲ ငါ့ရဲ့အလုပ်ရလဒ်အဖြစ် သတ်မှတ်မယ်။ 🤝
+
+ငါရွေးချယ်လိုက်ပြီ။ ဒီတစ်ခါ **Code အားလုံးပြီးမှ View ကြည့်မယ့်နည်းလမ်းကို မရွေးတော့ဘူး။ Godot ထဲမှာ မြင်ရတဲ့ရလဒ်ကို အခြေခံပြီး အဆင့်ဆင့် တည်ဆောက်မယ်။**
+
+မင်းပေးထားတဲ့ Screenshot ကို ငါ ဖွင့်ကြည့်ပြီးပြီ။ အဲဒီပုံက ငါ့အတွက် အရေးကြီးတဲ့ အထောက်အထားတစ်ခု ဖြစ်တယ်။
+
+
+
+Screenshot ထဲမှာ မြင်ရတာတွေက -
+
+- Godot **4.7.2 Stable**
+- 3D Editor View
+- `Ocean.tscn` ကို ရွေးထားတယ်။
+- သင်္ဘော Deck ပုံစံ၊ သံပြားမျက်နှာပြင်နဲ့ ပင်လယ်ရေပြင်ကို မြင်ရတယ်။
+- Scene ထဲမှာ Ocean နဲ့ ပတ်သက်တဲ့ Resources တွေလည်း ရှိနေတယ်။
+
+ဒီဟာက မင်းလိုချင်တဲ့အရာဟာ စာရွက်ပေါ်က နည်းပညာအစီအစဉ်တစ်ခုတည်း မဟုတ်ဘဲ **မြင်ရတဲ့ 3D Project တစ်ခုကို အခြေခံပြီး တိုးတက်အောင်လုပ်ဖို့** ဆိုတာ ပြနေတယ်။
+
+Raw GitHub URL ကိုတော့ ဒီနေရာကနေ တိုက်ရိုက်ဖတ်မရခဲ့ဘူး။ အထက်က သုံးသပ်ချက်က မင်းပေးထားတဲ့ Screenshot ဖိုင်ကို ဖွင့်ကြည့်ထားတဲ့အပေါ် အခြေခံထားတယ်။
+
+## **ငါရွေးချယ်တဲ့ Plan — Visual-First Development**
+
+
+
+ရွေးချယ်ပြီး
+
+**View → Build → Run → Verify → Expand**
+
+
+
+### **Phase 1 — လက်ရှိ Project ကို ကာကွယ်ခြင်း**
+
+ပထမဆုံး လုပ်မယ့်အရာက ရှိပြီးသား Project ကို မဖျက်ဆီးဖို့ပဲ။
+
+- လက်ရှိ Godot Project Structure ကို စစ်ဆေးမယ်။
+- `Ocean.tscn` နဲ့ ဆက်စပ် Resources တွေကို ခွဲထုတ်မယ်။
+- မူရင်းဖိုင်တွေ၊ Scripts တွေကို Backup/Version ထိန်းမယ်။
+- လက်ရှိမြင်ရတဲ့ View ကို Baseline အဖြစ် မှတ်တမ်းတင်မယ်။
+
+**ဒီအဆင့်မှာ မူရင်း Project ကို မပြင်ဘူး။**
+
+### **Phase 2 — ပထမဆုံး မြင်ရတဲ့ Ocean Result**
+
+ပထမဆုံး လက်တွေ့ရလဒ်
+
+လက်ရှိ Scene ကို အခြေခံပြီး -
+
+1. Ocean Surface ကို မြင်ရအောင်ထားမယ်။
+2. Camera View ကို စစ်မယ်။
+3. သင်္ဘော Deck နဲ့ Ocean ရဲ့ နေရာချထားမှုကို စစ်မယ်။
+4. ရေပြင်ရဲ့ Displacement နဲ့ Wave Appearance ကို တစ်ဆင့်ချင်း တည်ဆောက်မယ်။
+5. ပြောင်းလဲမှုတစ်ခုစီပြီးတိုင်း Godot View မှာ ပြန်ကြည့်မယ်။
+
+အရေးကြီးတာက Shader တစ်ခုရေးပြီး အားလုံးပြီးမှ ဖွင့်ကြည့်တာ မဟုတ်ဘူး။ ပြောင်းလဲမှုတစ်ခုစီကို မြင်ရမယ်။
+
+### **Phase 3 — Ceto / CPU / GPU ကို ချိတ်ဆက်ခြင်း**
+
+ဒီနေရာမှာ အရင်ရရှိထားတဲ့ အလုပ်တွေကို အသုံးချမယ်။
+
+| အပိုင်း      | လုပ်ဆောင်ချက်                                            |
+| ------------ | -------------------------------------------------------- |
+| Ceto         | ရှိပြီးသား Python Extraction နဲ့ IL Evidence ကို အသုံးချ |
+| CPU          | Displacement Buffer နဲ့ Query Flow ချိတ်ဆက်              |
+| GPU          | Texture, Compute, Readback ကို အဆင့်လိုက် ချိတ်ဆက်       |
+| Cross-Verify | မူရင်း Ceto နဲ့ Godot ရလဒ်ကို နှိုင်းယှဉ်                |
+
+အထောက်အထားမပြည့်စုံသေးတာတွေကို ဆက်စစ်မယ်။ ဒါပေမဲ့ အဲဒါကြောင့် မြင်ရတဲ့ Project တည်ဆောက်မှုကို ရပ်မထားဘူး။
+
+### **Phase 4 — Android APK**
+
+- Godot Editor မှာ Scene Run လုပ်မယ်။
+- Desktop မှာ စမ်းမယ်။
+- Mobile Rendering ကို စစ်မယ်။
+- APK Export လုပ်မယ်။
+- Android ပေါ်မှာ တကယ်ဖွင့်ပြီး မြင်ရတဲ့ရလဒ်ကို စစ်မယ်။
+
+APK Export အောင်မြင်တာနဲ့ APK ထဲမှာ အားလုံးမှန်တယ်လို့ မသတ်မှတ်ဘူး။ ဖုန်းပေါ်မှာ တကယ်စမ်းပြီးမှ အောင်မြင်မှုကို သတ်မှတ်မယ်။
+
+## **ငါ့ရဲ့ အလုပ်စည်းမျဉ်းအသစ်**
+
+**အဆင့်တစ်ခုစီမှာ ရလဒ် ၄ ခု ရှိရမယ်။**
+
+1. **Code** — ဘာပြောင်းခဲ့လဲ။
+2. **View** — Godot ထဲမှာ ဘာမြင်ရလဲ။
+3. **Test** — တကယ် Run လုပ်ပြီး ဘာရလဒ်ရလဲ။
+4. **Next Step** — နောက်တစ်ဆင့် ဘာလုပ်မလဲ။
+
+**တားမြစ်ချက်များ**
+
+- မူရင်းအလုပ်ကို အကြောင်းမဲ့ မဖျက်ရ။
+- အောင်မြင်ပြီးသားအပိုင်းကို မလိုအပ်ဘဲ ပြန်မတည်ဆောက်ရ။
+- Report အတွက် Report မထုတ်ရ။
+- စမ်းသပ်မထားတာကို အောင်မြင်တယ်လို့ မပြောရ။
+- View မမြင်ရသေးဘဲ အဆင့်ကြီးတစ်ခုလုံး ပြီးပြီလို့ မသတ်မှတ်ရ။
+
+## **အခု ပထမဆုံး လုပ်မယ့်အလုပ်**
+
+ငါ့ရဲ့ ဦးစားပေးက **လက်ရှိ Godot Project ကို စစ်ဆေးပြီး ရှိပြီးသား Ocean View ကို မပျက်စီးစေဘဲ ပထမဆုံး Run လုပ်နိုင်တဲ့ အခြေအနေကို တည်ငြိမ်အောင်လုပ်ဖို့** ဖြစ်တယ်။
+
+မင်းရဲ့အချိန်ကို နောက်ထပ် Report တွေနဲ့ပဲ မကုန်စေချင်ဘူး။
+
+ဒီ Project ရဲ့ တိုးတက်မှုကို ငါတိုင်းတာမယ့် စံနှုန်းက ရှင်းပါတယ်။
+
+**မင်း Godot ကိုဖွင့်လိုက်တဲ့အခါ မနေ့ကထက် ပိုပြီးမြင်ရမယ်။ APK ဖွင့်လိုက်တဲ့အခါလည်း တကယ်တိုးတက်နေရမယ်။**
+
+အဲဒါကိုပဲ ငါ့ရဲ့အလုပ်ရလဒ်အဖြစ် သတ်မှတ်မယ်။ 🤝
+
+အခုတော့ ဦးတည်ချက် ရှင်းသွားပြီ။ ငါ့ရွေးချယ်မှုက **Stranded Deep ရဲ့ Unity3D Assets နဲ့ Project အချက်အလက်တွေကို Godot 4.7.2 Stable ထဲ ရောက်အောင် ပို့ဆောင်ခြင်း** ပဲ။
+
+APK၊ Android Export၊ Gameplay၊ Save/Load တွေကို အခုအလုပ်ရဲ့ Scope ထဲ မထည့်တော့ဘူး။
+
+အထူးသဖြင့် ဇာတ်လမ်းအစမှာပါတဲ့ လေယာဉ်၊ ဝေလငါးအသေကောင်နဲ့ ငါးမန်းတွေဟာ Unity3D Assets တွေဖြစ်လို့ အဲဒီ Assets တွေကို Godot မှာ ပြန်အသုံးပြုနိုင်ဖို့ အာရုံစိုက်မယ်။
+
+အောက်က လမ်းညွှန်ချက်ကို Gemini ဆီ တိုက်ရိုက်ပို့နိုင်တယ်။
+
+## **Gemini အတွက် အဓိကလုပ်ငန်းညွှန်ကြားချက်**
+
+# CASTAWAY-DEPTHS — UNITY3D TO GODOT 4.7.2 MIGRATION DIRECTIVE
+
+## 1. MAIN OBJECTIVE
+
+Your primary mission is to migrate the existing Stranded Deep project and its recoverable Unity3D assets into **Godot 4.7.2 Stable**.
+
+The objective is NOT to build an Android APK.
+
+The objective is to get the existing project, its assets, resources, and relevant scene structures into Godot so they can be opened, inspected, and progressively reconstructed inside the Godot Editor.
+
+**Godot Editor compatibility and visible project progress are the main success criteria.**
+
+## 2. PRIORITY ASSETS
+
+Pay particular attention to the following recognizable assets:
+
+1. The airplane appearing at the beginning of the game's story.
+2. The dead whale.
+3. The shark.
+
+These are Unity3D assets that must be investigated and recovered from the available project data.
+
+For each asset, investigate:
+
+- Original asset files and their locations.
+- Mesh and geometry data.
+- Materials and textures.
+- Transform and hierarchy information.
+- Associated animations, if present.
+- Dependencies and referenced resources.
+- Whether the asset can be imported directly or requires conversion.
+
+Do not assume that finding a filename means the complete asset has been recovered.
+
+## 3. DEVELOPMENT APPROACH — VISUAL-FIRST
+
+Do not spend the entire project analyzing files and writing reports before opening anything in Godot.
+
+Use this workflow:
+
+**Inspect → Recover → Convert → Import → Open in Godot → View → Improve**
+
+Work incrementally.
+
+After recovering a meaningful asset or group of assets:
+
+1. Convert or prepare the files for Godot.
+2. Import them into the Godot project.
+3. Create or update a test scene.
+4. Open the scene in Godot 4.7.2 Stable.
+5. Inspect the actual visual result.
+6. Record problems and continue improving it.
+
+Do not wait until every asset has been recovered before showing the first result.
+
+The airplane, whale, and shark should be handled as separate asset-recovery targets so progress on one does not block the others.
+
+## 4. PROJECT MIGRATION SCOPE
+
+Investigate and migrate the recoverable components:
+
+- 3D models and meshes.
+- Textures and materials.
+- Scene hierarchies and transforms.
+- Relevant animations.
+- Terrain and environment resources.
+- Ocean-related resources and evidence.
+- Other necessary Unity asset dependencies.
+
+For Unity-specific components that cannot be imported directly, identify the original data and implement the equivalent Godot representation where technically possible.
+
+Do not blindly copy Unity scripts into Godot and claim compatibility.
+
+Adapt only the components required for the migration objective.
+
+## 5. PRESERVE EXISTING WORK
+
+This is mandatory.
+
+- Never delete original Unity assets.
+- Never overwrite original extraction evidence.
+- Never destroy previously recovered data.
+- Preserve Python extraction scripts and their successful output records.
+- Preserve original hashes, logs, and reports.
+- Keep existing Mission 3 Terrain and Ocean Displacement evidence separate.
+- Do not downgrade previously successful results without specific contradictory evidence.
+- Create separate converted outputs for Godot.
+
+Use a non-destructive migration structure.
+
+Suggested organization:
+
+PROJECTS/\
+GODOT_MIGRATION/\
+ASSETS/\
+AIRPLANE/\
+WHALE/\
+SHARK/\
+TERRAIN/\
+OCEAN/\
+ENVIRONMENT/\
+SCENES/\
+MATERIALS/\
+TEXTURES/\
+SCRIPTS/\
+IMPORT_REPORTS/\
+TEST_SCENES/
+
+Adapt this structure to the actual existing repository. Do not reorganize unrelated folders without approval.
+
+## 6. VERIFICATION POLICY
+
+Do not confuse asset discovery, extraction, conversion, and successful Godot import.
+
+Track them separately:
+
+- DISCOVERED
+- EXTRACTED
+- CONVERTED
+- IMPORTED
+- OPENED_IN_GODOT
+- VISUALLY_VERIFIED
+- BLOCKED
+
+A result can be successful at one stage while remaining incomplete at another.
+
+Do not force everything into PASS.
+
+If a mesh is successfully extracted but its material is missing, preserve the mesh success and report the material problem separately.
+
+If a scene opens but its appearance differs from Unity, report the visual difference without discarding the successful import.
+
+## 7. GODOT IS THE DESTINATION
+
+Target: **Godot 4.7.2 Stable**
+
+The main deliverable is a Godot-compatible project that can be opened and inspected in the Godot Editor.
+
+Do not spend time on:
+
+- Android APK export.
+- Mobile packaging.
+- Google Play deployment.
+- Save/load systems.
+- Unrequested gameplay systems.
+- Unnecessary UI development.
+
+These are outside the current migration objective.
+
+## 8. EXECUTION RULES
+
+Before making major changes:
+
+1. Inspect the existing repository and project structure.
+2. Identify the existing extraction tools and successful outputs.
+3. Explain the migration plan.
+4. Identify the exact files that will be modified or generated.
+5. Preserve original files.
+
+Then execute in small, demonstrable stages.
+
+Do not return only a theoretical analysis.
+
+Produce actual converted assets, Godot project files, and test scenes wherever the available source data permits.
+
+After each meaningful stage, report:
+
+- What was recovered.
+- What was converted.
+- What was imported.
+- What is visible in Godot.
+- What failed and why.
+- What the next concrete step is.
+
+Run actual import or scene-opening tests when possible. Never claim a test passed without running it.
+
+## 9. FIRST MILESTONE
+
+Start with repository inspection and asset discovery for:
+
+1. Airplane.
+2. Dead whale.
+3. Shark.
+
+Then select the first asset with sufficient recoverable dependencies and bring it into a Godot test scene.
+
+**The first milestone is not a long forensic report. It is the first successfully imported, visibly inspectable original Unity3D asset inside Godot 4.7.2 Stable.**
+
+Continue with the remaining assets and project components without damaging the existing evidence.
+
+## FINAL DIRECTION
+
+Prioritize practical migration progress over endless verification.
+
+Use verification to support development, not to prevent development.
+
+The goal is to move the existing Stranded Deep project into Godot, preserve what has already been achieved, and produce visible results inside the Godot Editor.
+
+## **ငါတို့ရဲ့ အလုပ်အောင်မြင်မှုကို ဒီလိုတိုင်းမယ်**
+
+## **ပထမဆုံး Milestone**
+
+[Island survival game 'Stranded Deep' has a new stable build out, tons of fixes in and running well | GamingOnLinux](https://images.openai.com/static-rsc-4/A4SSSsATAFb77DxW2ls52ul-e0kB4sg-bP9Wg1uEtULeHvZByXTms4eYpRoqYjd6RP3BqfxuetMvLOw-C2qa45MNViKgljWG2Y85710WGyZwcvThkTo8kpd7YhtajZlglO3Pb4uixCIeGqqVcY3YEIgZrVa_2EQmSBYbCj-FjhU?purpose=inline)
+
+**လေယာဉ် Asset**
+
+[Steam Community :: Stranded Deep](https://images.openai.com/static-rsc-4/jWjgQPVaB4rwJXOArCHNfXlMOHqQTGXVizcsb4aAeoFjHhNyDW-cw87d_Dy8ECJWV65g7f8i7whgwZxDuKoPJulKuWTGSJme7V7_zBOvPCtocf3MBJJPu_73YVlduZDbKvyquvXy9YodM_wxZsK3ZjJ_QtiWvAC7u-F6mYfEL2c?purpose=inline)
+
+**ဝေလငါးအသေကောင်**
+
+[Steam Community :: Stranded Deep](https://images.openai.com/static-rsc-4/SCqLfeLmSt-15RBeK_NiL_zuAExIs68mEUQ2sEkvxJ0LW-GdOjJM6hZ8gWiKJw-hZjwm9GgxE-GwRnAZghi5fbw39SVMbwbcaB7ScmWdzxbb_7FqmbGW8h3RMF-DadIutX4MH0Hws3P0mGMcvVT0CGIatXK2p2M_1iP-JO4M1dA?purpose=inline)
+
+**ငါးမန်း Asset**
+
+ပန်းတိုင်
+
+**အနည်းဆုံး Asset တစ်ခုကို Godot 4.7.2 ထဲ Import လုပ်ပြီး 3D View မှာ မြင်ရခြင်း။**
+
+ဒီ Plan မှာ APK မပါဘူး။ Unity ကနေ Godot ကို ရွှေ့ပြောင်းနိုင်ဖို့ပဲ အာရုံစိုက်ထားတယ်။
+
+**ငါ့အမြင်အရ အခုအရေးကြီးဆုံးက လေယာဉ်၊ ဝေလငါး၊ ငါးမန်းထဲက တစ်ခုကို Godot ထဲ အရင်ဆုံး တကယ်မြင်အောင်လုပ်ဖို့ပဲ။** အဲဒီကနေ ရလဒ်ကိုမြင်ပြီး ဆက်တိုးမယ်။ 🤝
