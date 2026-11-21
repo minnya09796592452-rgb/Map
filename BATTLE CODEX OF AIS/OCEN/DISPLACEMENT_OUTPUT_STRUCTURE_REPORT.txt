@@ -1,0 +1,809 @@
+==========================================================================================
+DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt
+MISSION: CPU/GPU DISPLACEMENT OUTPUT STRUCTURE — FORENSIC VERIFICATION
+==========================================================================================
+
+1. CPU OUTPUT STRUCTURE (VERIFIED)
+- DisplacementBufferCPU..ctor (0x06002F74 | RVA 0x783C4) allocates m_displacements (0x04001B58):
+  List<InterpolatedArray2f[]> of length 2: Slot 0 = Write, Slot 1 = Read.
+- Each slot holds 4 InterpolatedArray2f(size, size, channels=3, wrap=true) (0x060031D4).
+- Storage: flat 1D float[] m_data (size * size * 3), INTERLEAVED: (x + y * SX) * 3 + ch.
+- Channels: ch0 = Displacement X, ch1 = Height Y, ch2 = Displacement Z (No extra channels).
+- Run (0x06002F78) calls SwapDisplacements (0x06002F7B) FIRST -> Initilize (clears Slot 0)
+  -> InitSpectrumDisplacementsTask (0x06003060) -> FourierTask (0x06003048) -> ProcessData (0x0600304B).
+- QueryWaves (0x06002F7D) reads Slot 1 via GetReadDisplacements (0x06002F77).
+
+2. GPU OUTPUT STRUCTURE & GRID 3 AUDIT (VERIFIED)
+- WaveSpectrumBufferGPU.Initilize (0x06002FC5) -> FourierGPU.PeformFFT (0x06003037..3A).
+- WaveSpectrum.GenerateDisplacement (0x06003090 | RVA 0x7FA88) blits 4 RenderTextures:
+  m_displacementMaps[0..3], RenderTextureFormat.ARGBHalf (enum 2), size x size.
+- Publishes global textures: Ceto_DisplacementMap0..3 via Shader.SetGlobalTexture.
+- WaveSpectrum.CreateBuffers (0x06003095) allocates DisplacementBufferGPU (0x06002F7E) +
+  m_readBuffer = new ComputeBuffer(size * size, stride=12 = sizeof(Vector3)).
+- WaveSpectrum.ReadFromGPU(numGrids) (0x06003091 | RVA 0x7FD94):
+  * Grids 0, 1, 2: calls CBUtility.ReadFromRenderTexture(map, 3, m_readBuffer, readSdr) (0x060030F7),
+    which dispatches compute kernel 'readNames2D' (RGB -> float3), then ComputeBuffer.GetData(Data).
+  * Grid 3 (IL_0118..IL_011C): executes `ldarg.1; ldc.i4.3; pop; pop; ret` — intentionally omitted
+    from CPU readback to save GPU->CPU bandwidth while remaining active for GPU surface shaders.
+- Channel mapping: R -> ch0 (X), G -> ch1 (Height Y), B -> ch2 (Z). Alpha (A) not read back
+  (stride=12); surface shader Alpha channel usage: UNVERIFIED unless present in asset scan below.
+
+3. CPU / GPU COMPARISON TABLE
+Property           | CPU Path                                  | GPU Path                                  | Evidence
+-------------------+-------------------------------------------+-------------------------------------------+----------------------------------------
+Grid count         | 4 grids (0..3) in CPU memory              | 4 RenderTextures (0..3); 3 readback (0..2)| QueryDisplacements..cctor, ReadFromGPU
+Grid dimensions    | size x size (GetFourierSize)              | size x size (GetFourierSize)              | DisplacementBufferCPU/GPU..ctor
+Height channel     | Channel 1 (Y) in float[] m_data           | Green (G) -> Channel 1 (Y)                | FourierTask.ProcessData, Sample()
+Displacement X     | Channel 0 (X) in float[] m_data           | Red (R) -> Channel 0 (X)                  | FourierTask.ProcessData, Sample()
+Displacement Z     | Channel 2 (Z) in float[] m_data           | Blue (B) -> Channel 2 (Z)                 | FourierTask.ProcessData, Sample()
+Data format        | List<InterpolatedArray2f[]>, float[] 3ch  | ARGBHalf RT -> ComputeBuffer(N^2,12)->IA2f| 0x06002F74, 0x06003095, 0x06003090
+Sampling interface | DisplacementBufferCPU.QueryWaves -> Slot1 | DisplacementBufferGPU.QueryWaves -> m_disp| 0x06002F7D, 0x06002F83 -> 0x06002F8D
+
+4. INTERPOLATION CONNECTION
+- QueryDisplacements.Sample (0x06002F8F): u = (posX + offset.x) * invGridSizes[i],
+  v = (posZ + offset.z) * invGridSizes[i] -> InterpolatedArray2f.Get(u, v, result) (0x060031DF).
+- Scales result[0..2] by choppyness[i] (X,Z) and scaleY (Y). QueryWaves (0x06002F8D) iterates
+  <= 21 passes for horizontal inversion and clamps height to [-40.0f, 40.0f].
+- InterpolatedArray2f.Get + Index (0x060031CF): half-pixel offset (u * SX - 0.5f), periodic modulo
+  wrap `((ix % SX) + SX) % SX`, and 4-corner bilinear blend across channels 0..2.
+
+5. UNRESOLVED EVIDENCE & GODOT 4 RECONSTRUCTION BOUNDARY
+- Unresolved: Compiled DXBC/GLSL shader source for 'readNames2D' & surface shader Alpha usage
+  (UNVERIFIED); stripped scene MonoBehaviour inspector values (enableTypeTree == False).
+- Safe Godot 4 Boundary: 4-cascade periodic spectral displacement grids (3-channel float: X, Y, Z),
+  half-pixel bilinear wrap sampling, 21-pass horizontal inversion + [-40, 40] height clamp,
+  and optional 3-grid CPU readback (cascade 3 GPU-only).
+
+6. UNITY ASSET SHADER / COMPUTESHADER SCAN
+- File=resources.assets | PathID=439 | Type=Material | Name='SFDigitalReadout-Heavy SDF Material'
+- File=sharedassets0.assets | PathID=2 | Type=Material | Name='OceanTopSide_Transparent'
+- File=sharedassets0.assets | PathID=3 | Type=Material | Name='OceanUnderSide_Transparent'
+- File=sharedassets0.assets | PathID=139 | Type=Shader | Name='Ceto/OceanBottom' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=142 | Type=Shader | Name='Ceto/OceanMaskFlipped' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=143 | Type=Shader | Name='Ceto/OceanUnderSide_Transparent' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=147 | Type=Shader | Name='Ceto/SlopeCopy' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=150 | Type=Shader | Name='Ceto/FoamCopy' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=154 | Type=Shader | Name='Ceto/InitDisplacement' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=155 | Type=Shader | Name='Ceto/CopyDepth' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=159 | Type=Shader | Name='Ceto/InitJacobians' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=160 | Type=Shader | Name='Ceto/NormalFade' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=161 | Type=Shader | Name='Ceto/WaveOverlay' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=166 | Type=Shader | Name='Ceto/BlurEffectConeTap' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=168 | Type=Shader | Name='Ceto/OceanMask' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=175 | Type=Shader | Name='Ceto/OceanTopSide_Transparent' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=176 | Type=Shader | Name='Ceto/InitSlope' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=178 | Type=Shader | Name='Ceto/Fourier' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=179 | Type=Shader | Name='Ceto/OceanDepth' | ExportErr='NoneType' object is not callable
+- File=sharedassets0.assets | PathID=181 | Type=Shader | Name='Ceto/DisplacementCopy' | ExportErr='NoneType' object is not callable
+
+7. COMPLETE VERIFIED IL DISASSEMBLY
+
+
+_________
+
+
+root@localhost:~# cd "/storage/emulated/0/Download/Stranded-Deep-Original"
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' > verify_displacement_output.py
+nv.ovf.u2.un",
+    "conv.ovf.u4.un","conv.ovf.u8.un","conv.ovf.i.un","conv.ovf.u.un",
+    "box","newarr","ldlen","ldelema","ldelem.i1","ldelem.u1","ldelem.i2",
+    "ldelem.u2","ldelem.i4","ldelem.u4","ldelem.> #!/usr/bin/env python3
+,0x02:"cgt",0x03:"cgt.un",0x04:"clt",0x05:"clt.un",
+    0x06:"ldftn",0x07:"ldvirtftn",0x09:"ldarg",0x0A:"ldarga",0x0B:"starg",
+    0x0C:"ldloc",0x0D:"ldloca",0x0E:"stloc",0x0F:"localloc",0x11:"endfilter",
+    0x12:"unaligned.",0x13:"volatile.",0x14:"tail."> """
+> CASTAWAY-DEPTHS — CPU/GPU Displacement Output Structure Forensic Verifier
+rg> Produces: DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt
+dloca.s":1,"stloc.> """
+":1> import os, gc, struct, hashlib
+> import dnfile
+> import UnityPy
+> from pathlib import Path
+>
+> DATA_DIR = Path("/storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/Stranded_Deep_Data")
+> DLL_PATH = DATA_DIR / "Managed" / "Assembly-CSharp.dll"
+> OUT_PATH = Path("DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt")
+:>
+4> TARGET_TYPES = {
+>     "Ceto.DisplacementBufferCPU",
+>     "Ceto.WaveSpectrumBufferCPU",
+>     "Ceto.DisplacementBufferGPU",
+>     "Ceto.WaveSpectrumBufferGPU",
+>     "Ceto.WaveSpectrum",
+>     "Ceto.FourierTask",
+
+    SZ.update({_op>     "Ceto.InitSpectrumDisplacementsTask",
+>     "Ceto.FourierCPU",
+>     "Ceto.FourierGPU",
+>     "Ceto.QueryDisplacements",
+>     "Ceto.Common.Containers.Interpolation.InterpolatedArray",
+>     "Ceto.Common.Containers.Interpolation.InterpolatedArray2f",
+>     "Ceto.Common.Unity.Utility.CBUtility",
+>     "Ceto.Common.Unity.Utility.RTUtility",
+>     "Ceto.Ocean",
+> }
+>
+> OP = {}
+> def add_ops(start, names):
+>     for i, nm in enumerate(names):
+>         if nm:
+>             OP.update({start + i: nm})
+>
+> add_ops(0x00, [
+>     "nop","break","ldarg.0","ldarg.1","ldarg.2","ldarg.3",
+>     "ldloc.0","ldloc.1","ldloc.2","ldloc.3","stloc.0","stloc.1",
+>     "stloc.2","stloc.3","ldarg.s","ldarga.s","starg.s","ldloc.s",
+>     "ldloca.s","stloc.s","ldnull","ldc.i4.m1","ldc.i4.0","ldc.i4.1",
+>     "ldc.i4.2","ldc.i4.3","ldc.i4.4","ldc.i4.5","ldc.i4.6","ldc.i4.7",
+>     "ldc.i4.8","ldc.i4.s","ldc.i4","ldc.i8","ldc.r4","ldc.r8",
+>     None,"dup","pop","jmp","call","calli","ret",
+>     "br.s","brfalse.s","brtrue.s","beq.s","bge.s","bgt.s","ble.s",
+>     "blt.s","bne.un.s","bge.un.s","bgt.un.s","ble.un.s","blt.un.s",
+>     "br","brfalse","brtrue","beq","bge","bgt","ble","blt",
+>     "bne.un","bge.un","bgt.un","ble.un","blt.un","switch"
+> ])
+> add_ops(0x46, [
+>     "ldind.i1","ldind.u1","ldind.i2","ldind.u2","ldind.i4","ldind.u4",
+>     "ldind.i8","ldind.i","ldind.r4","ldind.r8","ldind.ref","stind.ref",
+>     "stind.i1","stind.i2","stind.i4","stind.i8","stind.r4","stind.r8",
+>     "add","sub","mul","div","div.un","rem","rem.un","and","or",
+>     "xor","shl","shr","shr.un","neg","not","conv.i1","conv.i2",
+>     "conv.i4","conv.i8","conv.r4","conv.r8","conv.u4","conv.u8"
+> ])
+> add_ops(0x6F, [
+>     "callvirt","cpobj","ldobj","ldstr","newobj","castclass","isinst",
+>     "conv.r.un",None,None,"unbox","throw","ldfld","ldflda","stfld",
+>     "ldsfld","ldsflda","stsfld","stobj","conv.ovf.i1.un","conv.ovf.i2.un",
+>     "conv.ovf.i4.un","conv.ovf.i8.un","conv.ovf.u1.un","conv.ovf.u2.un",
+>     "conv.ovf.u4.un","conv.ovf.u8.un","conv.ovf.i.un","conv.ovf.u.un",
+>     "box","newarr","ldlen","ldelema","ldelem.i1","ldelem.u1","ldelem.i2",
+>     "ldelem.u2","ldelem.i4","ldelem.u4","ldelem.i8","ldelem.i","ldelem.r4",
+>     "ldelem.r8","ldelem.ref","stelem.i","stelem.i1","stelem.i2","stelem.i4",
+>     "stelem.i8","stelem.r4","stelem.r8","stelem.ref","ldelem","stelem","unbox.any"
+> ])
+> add_ops(0xB3, [
+>     "conv.ovf.i1","conv.ovf.u1","conv.ovf.i2","conv.ovf.u2","conv.ovf.i4",
+>     "conv.ovf.u4","conv.ovf.i8","conv.ovf.u8",None,None,None,None,None,
+>     None,None,"refanyval","ckfinite",None,None,"mkrefany",None,None,
+>     None,None,None,None,None,None,None,"ldtoken","conv.u2","conv.u1",
+>     "conv.i","conv.ovf.i","conv.ovf.u","add.ovf","add.ovf.un","mul.ovf",
+>     "mul.ovf.un","sub.ovf","sub.ovf.un","endfinally","leave","leave.s",
+>     "stind.i","conv.u"
+> ])
+>
+> FE = {
+>     0x00:"arglist",0x01:"ceq",0x02:"cgt",0x03:"cgt.un",0x04:"clt",0x05:"clt.un",
+>     0x06:"ldftn",0x07:"ldvirtftn",0x09:"ldarg",0x0A:"ldarga",0x0B:"starg",
+>     0x0C:"ldloc",0x0D:"ldloca",0x0E:"stloc",0x0F:"localloc",0x11:"endfilter",
+>     0x12:"unaligned.",0x13:"volatile.",0x14:"tail.",0x15:"initobj",
+>     0x16:"constrained.",0x17:"cpblk",0x18:"initblk",0x1A:"rethrow",
+>     0x1C:"sizeof",0x1D:"refanytype",0x1E:"readonly."
+> }
+>
+> TOK_OPS = {
+>     "call","callvirt","newobj","ldfld","ldflda","stfld","ldsfld","ldsflda","stsfld",
+>     "newarr","ldstr","box","castclass","isinst","ldtoken","ldobj","stobj","cpobj",
+>     "unbox","unbox.any","ldelema","ldelem","stelem","initobj","constrained.","sizeof",
+>     "ldftn","ldvirtftn"
+> }
+>
+> SZ = {
+>     "ldarg.s":1,"ldarga.s":1,"starg.s":1,"ldloc.s":1,"ldloca.s":1,"stloc.s":1,
+>     "ldc.i4.s":1,"br.s":1,"brfalse.s":1,"brtrue.s":1,"beq.s":1,"bge.s":1,"bgt.s":1,
+>     "ble.s":1,"blt.s":1,"bne.un.s":1,"bge.un.s":1,"bgt.un.s":1,"ble.un.s":1,
+>     "blt.un.s":1,"leave.s":1,"unaligned.":1,
+>     "ldarg":2,"ldarga":2,"starg":2,"ldloc":2,"ldloca":2,"stloc":2,
+>     "ldc.i4":4,"ldc.r4":4,"br":4,"brfalse":4,"brtrue":4,"beq":4,"bge":4,"bgt":4,
+>     "ble":4,"blt":4,"bne.un":4,"bge.un":4,"bgt.un":4,"ble.un":4,"blt.un":4,"leave":4,
+>     "ldc.i8":8,"ldc.r8":8,
+> }
+> for _op in TOK_OPS:
+>     SZ.update({_op: 4})
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> verify_displacement_output.py
+r(row, 'Name', ''))}]"
+        if tbl == 0x1B:
+            sig = getattr(row, "Signature", None)
+            hx = bytes(sig).hex() if sig is not None else ""
+            return f"0x{tok:08X} [TypeSpec sig={hx}]"
+    return f"0x{tok:08X} [{tname} RID={rid}]"
+
+def read_body(pe, rva):
+    off = pe.get_offset_from_rva(rva)
+    data = pe.__data__
+    b0 = data.__getitem__(off)
+    if (b0 & 3) == 2:
+        csz = b0 >> 2
+        return off, off + 1, csz, 0, False, bytes(data.__getitem__(slice(off + 1, off + 1 + csz))), b""
+    flags = struct.unpack_from("<H", data, off).__getitem__(0)
+    hsz = ((flags >> 12) & 0xF) * 4
+    csz = struct.unpack_from("<I", data, off + 4).__getitem__(0)
+    has_eh = bool(flags & 0x8)
+    b_start = off + hsz
+    code = bytes(data.__getitem__(slice(b_start, b_start + csz)))
+    eh = b""
+    if has_eh:
+        eh_off = (b_start + csz + 3) & ~3
+        eh_b0 = data.__getitem__(eh_off)
+        if (eh_b0 & 0x40) == 0:
+            eh_sz = data.__getitem__(eh_off + 1)
+        else:
+            eh_sz = data.__getitem__(eh_off + 1) | (data.__getitem__(eh_off + 2) << 8) | (data.__getitem__(eh_off + 3) << 16)
+        eh = bytes(data.__getitem__(slice(eh_off, eh_off + eh_sz)))
+    return off, b_start, csz, flags, has_eh, code, eh
+
+def disasm(pe, code):
+    i = 0
+    n = len(code)
+    ins = []
+    while i < n:
+        start = i
+        b = code.__getitem__(i)
+        i += 1
+        if b == 0xFE:
+            b2 = code.__getitem__(i)
+            i += 1
+            op = FE.get(b2, f"fe_{b2:02x}")
+        else:
+            op = OP.get(b, f"op_{b:02x}")
+        if op == "switch":
+            cnt = struct.unpack_from("<I", code, i).__getitem__(0)
+            i += 4
+            tgts = list()
+            for>
+> val = lambda o: getattr(o, "value", o)
+> nof = lambda o: "?" if o is None else str(getattr(o, "Name", o))
+> rows = lambda pe, t: getattr(getattr(pe.net.mdtables, t, None), "rows", list())
+>
+,> def owner_map(pe):
+>     tdefs = rows(pe, "TypeDef")
+>     mdefs = rows(pe, "MethodDef")
+>     omap = {}
+>     for idx, td in enumerate(tdefs):
+>         ns = nof(getattr(td, "Namespace", ""))
+
+            opr = resolve>         nm = nof(getattr(td, "Name", ""))
+>         fn = f"{ns}.{nm}" if ns and ns != "?" else nm
+>         mlist = getattr(td, "MethodList", None)
+>         if mlist is None:
+>             continue
+>         start = int(val(mlist))
+>         end = int(val(getattr(tdefs.__getitem__(idx + 1), "MethodList", len(mdefs) + 1))) if idx + 1 < len(tdefs) else len(mdefs) + 1
+>         for rid in range(start, end):
+ >             if 1 <= rid <= len(mdefs):
+>                 omap.update({id(mdefs.__getitem__(rid - 1)): fn})
+>     return omap
+>
+> def resolve_tok(pe, tok):
+>     tbl = (tok >> 24) & 0xFF
+>     rid = tok & 0x00FFFFFF
+g>     if rid == 0:
+>         return f"0x{tok:08X} [NullToken]"
+ >     if tbl == 0x70:
+>         us = getattr(pe.net, "user_strings", None)
+>         if us:
+>             try:
+0>                 s = us.get_us(rid)
+>                 return f"0x{tok:08X} [UserString {repr(str(s.value))}]"
+unpack_>             except Exception:
+em_>                 pass
+>         return f"0x{tok:08X} [UserString_0x{rid:X}]"
+"ldc.i>     tmap = {0x01:"TypeRef", 0x02:"TypeDef", 0x04:"FieldDef", 0x06:"MethodDef", 0x0berRef", 0x1B:"TypeSpec", 0x2B:"MethodSpec"}
+>     tname = tmap.get(tbl, f"Table_0x{tbl:02X}")
+>     rlist = rows(pe, tname)
+ >     if 1 <= rid <= len(rlist):
+>         row = rlist.__getitem__(rid - 1)
+8>         if tbl in (0x01, 0x02):
+>             ns = nof(getattr(row, "Namespace", ""))
+>             nm = nof(getattr(row, "Name", ""))
+= >             return f"0x{tok:08X} [{tname} {ns}.{nm}]" if ns and ns != "?" else f"0x{to08X} [{tname} {nm}]"
+pr>         if tbl == 0x04:
+ e>             return f"0x{tok:08X} [FieldDef {nof(getattr(row, 'Name', ''))}]"
+.__ge>         if tbl == 0x06:
+>             return f"0x{tok:08X} [MethodDef {nof(getattr(row, 'Name', ''))}]"
+>         if tbl == 0x0A:
+>             cls = getattr(row, "Class", None)
+>             cname = "?"
+>             if cls is not None and getattr(cls, "row", None) is not None:
+>                 cname = nof(getattr(cls.row, "Name", "?"))
+>             return f"0x{tok:08X} [MemberRef {cname}.{nof(getattr(row, 'Name', ''))}]"
+>         if tbl == 0x1B:
+>             sig = getattr(row, "Signature", None)
+>             hx = bytes(sig).hex() if sig is not None else ""
+>             return f"0x{tok:08X} [TypeSpec sig={hx}]"
+>     return f"0x{tok:08X} [{tname} RID={rid}]"
+>
+> def read_body(pe, rva):
+>     off = pe.get_offset_from_rva(rva)
+>     data = pe.__data__
+>     b0 = data.__getitem__(off)
+>     if (b0 & 3) == 2:
+>         csz = b0 >> 2
+>         return off, off + 1, csz, 0, False, bytes(data.__getitem__(slice(off + 1, off + 1 + csz))), b""
+>     flags = struct.unpack_from("<H", data, off).__getitem__(0)
+>     hsz = ((flags >> 12) & 0xF) * 4
+>     csz = struct.unpack_from("<I", data, off + 4).__getitem__(0)
+>     has_eh = bool(flags & 0x8)
+>     b_start = off + hsz
+>     code = bytes(data.__getitem__(slice(b_start, b_start + csz)))
+>     eh = b""
+>     if has_eh:
+>         eh_off = (b_start + csz + 3) & ~3
+>         eh_b0 = data.__getitem__(eh_off)
+>         if (eh_b0 & 0x40) == 0:
+>             eh_sz = data.__getitem__(eh_off + 1)
+>         else:
+>             eh_sz = data.__getitem__(eh_off + 1) | (data.__getitem__(eh_off + 2) << 8) | (data.__getitem__(eh_off + 3) << 16)
+>         eh = bytes(data.__getitem__(slice(eh_off, eh_off + eh_sz)))
+>     return off, b_start, csz, flags, has_eh, code, eh
+>
+> def disasm(pe, code):
+>     i = 0
+>     n = len(code)
+>     ins = []
+>     while i < n:
+>         start = i
+>         b = code.__getitem__(i)
+>         i += 1
+>         if b == 0xFE:
+>             b2 = code.__getitem__(i)
+>             i += 1
+>             op = FE.get(b2, f"fe_{b2:02x}")
+>         else:
+>             op = OP.get(b, f"op_{b:02x}")
+>         if op == "switch":
+>             cnt = struct.unpack_from("<I", code, i).__getitem__(0)
+>             i += 4
+>             tgts = list()
+>             for _ in range(cnt):
+>                 rel = struct.unpack_from("<i", code, i).__getitem__(0)
+>                 i += 4
+>                 tgts.append(rel)
+>             base = i
+>             opr = ", ".join(f"IL_{base + r:04X}" for r in tgts)
+>         elif op in TOK_OPS:
+>             tok = struct.unpack_from("<I", code, i).__getitem__(0)
+>             i += 4
+>             opr = resolve_tok(pe, tok)
+>         elif op in ("ldc.i4.s", "ldarg.s", "ldarga.s", "starg.s", "ldloc.s", "ldloca.s", "stloc.s", "unaligned."):
+>             v = struct.unpack_from("<b" if op == "ldc.i4.s" else "<B", code, i).__getitem__(0)
+>             i += 1
+>             opr = str(v)
+>         elif op.endswith(".s") and op not in ("ldarg.s","ldarga.s","starg.s","ldloc.s","ldloca.s","stloc.s","ldc.i4.s"):
+>             rel = struct.unpack_from("<b", code, i).__getitem__(0)
+>             i += 1
+>             opr = f"IL_{i + rel:04X}"
+>         elif op in ("br","brfalse","brtrue","beq","bge","bgt","ble","blt","bne.un","bge.un","bgt.un","ble.un","blt.un","leave"):
+>             rel = struct.unpack_from("<i", code, i).__getitem__(0)
+>             i += 4
+>             opr = f"IL_{i + rel:04X}"
+>         elif op in ("ldarg","ldarga","starg","ldloc","ldloca","stloc"):
+>             v = struct.unpack_from("<H", code, i).__getitem__(0)
+>             i += 2
+>             opr = str(v)
+>         elif op == "ldc.i4":
+>             v = struct.unpack_from("<i", code, i).__getitem__(0)
+>             i += 4
+>             opr = str(v)
+>         elif op == "ldc.r4":
+>             v = struct.unpack_from("<f", code, i).__getitem__(0)
+>             i += 4
+>             opr = f"{v:.6g}"
+>         elif op == "ldc.i8":
+>             v = struct.unpack_from("<q", code, i).__getitem__(0)
+>             i += 8
+>             opr = str(v)
+>         elif op == "ldc.r8":
+>             v = struct.unpack_from("<d", code, i).__getitem__(0)
+>             i += 8
+>             opr = f"{v:.12g}"
+>         else:
+>             opr = ""
+>         ins.append((start, op, opr, bytes(code.__getitem__(slice(start, i))).hex()))
+>     return ins
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 -c '
+> s = open("verify_displacement_output.py").read()
+> idx = s.rfind("    return ins")
+> if idx != -1:
+>     open("verify_displacement_output.py", "w").write(s[:idx + len("    return ins")] + "\n")
+> '
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> verify_displacement_output.py
+>
+> def scan_unity_shaders(data_dir):
+>     found = list()
+>     if not data_dir.exists():
+>         return ["[WARNING] DATA_DIR not found for UnityPy shader scan."]
+>     keys = ("ceto", "fourier", "read", "displacement", "spectrum", "ocean")
+>     for fn in sorted(os.listdir(data_dir)):
+>         fp = data_dir / fn
+>         if not fp.is_file():
+>             continue
+>         if not (fn.endswith(".assets") or fn.startswith("level")):
+>             continue
+>         try:
+>             env = UnityPy.load(str(fp))
+>         except Exception:
+>             continue
+>         for obj in env.objects:
+>             tname = obj.type.name
+>             if tname not in ("Shader", "ComputeShader", "Material"):
+>                 continue
+>             try:
+>                 rd = obj.read()
+>                 nm = getattr(rd, "m_Name", "")
+>                 if not nm and hasattr(rd, "m_ParsedForm"):
+>                     nm = rd.m_ParsedForm.m_Name
+>                 if any(k in nm.lower() for k in keys):
+>                     extra = ""
+>                     if tname == "Shader":
+>                         try:
+>                             exp = str(obj.export())
+>                             pl = [x.strip() for x in exp.splitlines() if "Ceto_" in x or "Pass" in x]
+>                             extra = f" | ExportLen={len(exp)} | Preview={pl[:6]}"
+>                         except Exception as e:
+>                             extra = f" | ExportErr={e}"
+>                     elif tname == "ComputeShader":
+>                         ks = [getattr(k, "name", "?") for k in getattr(rd, "kernels", list())]
+>                         extra = f" | Kernels={ks}"
+>                     found.append(f"- File={fn} | PathID={obj.path_id} | Type={tname} | Name='{nm}'{extra}")
+>             except Exception:
+>                 pass
+>         del env
+>         gc.collect()
+>     return found if found else ["[INFO] No matching Shader/ComputeShader objects found."]
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> verify_displacement_output.py
+>
+> def collect_traced_il(pe, mdefs, omap):
+>     key_methods = {
+>         ("Ceto.DisplacementBufferCPU", ".ctor"),
+>         ("Ceto.DisplacementBufferCPU", "Initilize"),
+>         ("Ceto.DisplacementBufferCPU", "GetWriteDisplacements"),
+>         ("Ceto.DisplacementBufferCPU", "GetReadDisplacements"),
+>         ("Ceto.DisplacementBufferCPU", "Run"),
+>         ("Ceto.DisplacementBufferCPU", "SwapDisplacements"),
+>         ("Ceto.DisplacementBufferCPU", "QueryWaves"),
+>         ("Ceto.WaveSpectrumBufferCPU", "Run"),
+>         ("Ceto.InitSpectrumDisplacementsTask", "Run"),
+>         ("Ceto.InitSpectrumDisplacementsTask", "InitilizeGrids1"),
+>         ("Ceto.InitSpectrumDisplacementsTask", "InitilizeGrids2"),
+>         ("Ceto.InitSpectrumDisplacementsTask", "InitilizeGrids3"),
+>         ("Ceto.InitSpectrumDisplacementsTask", "InitilizeGrids4"),
+>         ("Ceto.FourierTask", "Run"),
+>         ("Ceto.FourierTask", "PerformSingleFourier"),
+>         ("Ceto.FourierTask", "ProcessData"),
+>         ("Ceto.DisplacementBufferGPU", ".ctor"),
+>         ("Ceto.DisplacementBufferGPU", ".cctor"),
+>         ("Ceto.DisplacementBufferGPU", "GetReadDisplacements"),
+>         ("Ceto.DisplacementBufferGPU", "QueryWaves"),
+>         ("Ceto.WaveSpectrumBufferGPU", "Initilize"),
+>         ("Ceto.WaveSpectrumBufferGPU", "Run"),
+>         ("Ceto.WaveSpectrum", "CreateBuffers"),
+>         ("Ceto.WaveSpectrum", "GenerateDisplacement"),
+>         ("Ceto.WaveSpectrum", "ReadFromGPU"),
+>         ("Ceto.WaveSpectrum", "QueryWaves"),
+>         ("Ceto.FourierGPU", "PeformFFT"),
+>         ("Ceto.Common.Unity.Utility.CBUtility", "ReadFromRenderTexture"),
+>         ("Ceto.Common.Containers.Interpolation.InterpolatedArray", ".ctor"),
+>         ("Ceto.Common.Containers.Interpolation.InterpolatedArray", "Index"),
+>         ("Ceto.Common.Containers.Interpolation.InterpolatedArray2f", ".ctor"),
+>         ("Ceto.Common.Containers.Interpolation.InterpolatedArray2f", "Get"),
+>         ("Ceto.QueryDisplacements", ".cctor"),
+>         ("Ceto.QueryDisplacements", "QueryWaves"),
+>         ("Ceto.QueryDisplacements", "Sample"),
+>         ("Ceto.QueryDisplacements", "SampleHeightOnly"),
+>     }
+>     blocks = list()
+>     for rid, m in enumerate(mdefs, 1):
+>         ow = omap.get(id(m), "UNKNOWN")
+>         nm = nof(getattr(m, "Name", "?"))
+>         tok = 0x06000000 | rid
+>         rva = int(val(getattr(m, "Rva", 0)) or 0)
+>         if (ow, nm) in key_methods and rva:
+>             off, b_st, csz, flg, has_eh, code, _ = read_body(pe, rva)
+>             ins = disasm(pe, code)
+>             blocks.append("=" * 90)
+>             blocks.append(f"CLASS: {ow} | METHOD: {nm} | TOKEN: 0x{tok:08X} | RID: {rid} | RVA: 0x{rva:X} | OFF: 0x{off:X} | SIZE: {csz}B")
+>             blocks.append("-" * 90)
+>             for ioff, op, opr, hx in ins:
+>                 blocks.append(f"  IL_{ioff:04X}: {hx:<22} | {op:<14} {opr}")
+>             blocks.append("")
+>     return blocks
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cat << 'EOF' >> verify_displacement_output.py
+>
+> def build_sections():
+>     return [
+>         "=" * 90,
+>         "DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt",
+>         "MISSION: CPU/GPU DISPLACEMENT OUTPUT STRUCTURE — FORENSIC VERIFICATION",
+>         "=" * 90, "",
+terpo>         "1. CPU OUTPUT STRUCTURE (VERIFIED)",
+i>         "- DisplacementBufferCPU..ctor (0x06002F74 | RVA 0x783C4) allocates m_displacemnts (0x04001B58):",
+>         "  List<InterpolatedArray2f[]> of length 2: Slot 0 = Write, Slot 1 = Read.",
+>         "- Each slot holds 4 InterpolatedArray2f(size, size, channels=3, wrap=true) (0x060031D4).",
+>         "- Storage: flat 1D float[] m_data (size * size * 3), INTERLEAVED: (x + y * SX) * 3 + ch.",
+>         "- Channels: ch0 = Displacement X, ch1 = Height Y, ch2 = Displacement Z (No extra channels).",
+>         "- Run (0x06002F78) calls SwapDisplacements (0x06002F7B) FIRST -> Initilize (clears Slot 0)",
+>         "  -> InitSpectrumDisplacementsTask (0x06003060) -> FourierTask (0x06003048) -> ProcessData (0x0600304B).",
+>         "- QueryWaves (0x06002F7D) reads Slot 1 via GetReadDisplacements (0x06002F77).", "",
+>         "2. GPU OUTPUT STRUCTURE & GRID 3 AUDIT (VERIFIED)",
+>         "- WaveSpectrumBufferGPU.Initilize (0x06002FC5) -> FourierGPU.PeformFFT (0x06003037..3A).",
+>         "- WaveSpectrum.GenerateDisplacement (0x06003090 | RVA 0x7FA88) blits 4 RenderTextures:",
+ C>         "  m_displacementMaps[0..3], RenderTextureFormat.ARGBHalf (enum 2), size x siz","
+", >         "- Publishes global textures: Ceto_DisplacementMap0..3 via Shader.SetGlobalTere.",
+>         "- WaveSpectrum.CreateBuffers (0x06003095) allocates DisplacementBufferGPU (0x06002F7E) +",
+>         "  m_readBuffer = new ComputeBuffer(size * size, stride=12 = sizeof(Vector3)).",>         "- WaveSpectrum.ReadFromGPU(numGrids) (0x06003091 | RVA 0x7FD94):",
+>         "  * Grids 0, 1, 2: calls CBUtility.ReadFromRenderTexture(map, 3, m_readBuffer, readSdr) (0x060030F7),",
+>         "    which dispatches compute kernel 'readNames2D' (RGB -> float3), then ComputeBuffer.GetData(Data).",
+intentionally omitted",IL_0118..IL_011C): executes `ldarg.1; ldc.i4.3; pop; pop; ret` — i
+>         "    from CPU readback to save GPU->CPU bandwidth while remaining active for GPU surface shaders.",
+>         "- Channel mapping: R -> ch0 (X), G -> ch1 (Height Y), B -> ch2 (Z). Alpha (A) not read back",
+>         "  (stride=12); surface shader Alpha channel usage: UNVERIFIED unless present in asset scan below.", "",
+>         "3. CPU / GPU COMPARISON TABLE",
+>         "Property           | CPU Path                                  | GPU Path                                  | Evidence",
+>         "-------------------+-------------------------------------------+-------------------------------------------+----------------------------------------",
+>         "Grid count         | 4 grids (0..3) in CPU memory              | 4 RenderTextures (0..3); 3 readback (0..2)| QueryDisplacements..cctor, ReadFromGPU",
+>         "Grid dimensions    | size x size (GetFourierSize)              | size x size (GetFourierSize)              | DisplacementBufferCPU/GPU..ctor",
+>         "Height channel     | Channel 1 (Y) in float[] m_data           | Green (G) -> Channel 1 (Y)                | FourierTask.ProcessData, Sample()",
+>         "Displacement X     | Channel 0 (X) in float[] m_data           | Red (R) -> Channel 0 (X)                  | FourierTask.ProcessData, Sample()",
+>         "Displacement Z     | Channel 2 (Z) in float[] m_data           | Blue (B) -> Channel 2 (Z)                 | FourierTask.ProcessData, Sample()",
+>         "Data format        | List<InterpolatedArray2f[]>, float[] 3ch  | ARGBHalf RT -> ComputeBuffer(N^2,12)->IA2f| 0x06002F74, 0x06003095, 0x06003090",
+>         "Sampling interface | DisplacementBufferCPU.QueryWaves -> Slot1 | DisplacementBufferGPU.QueryWaves -> m_disp| 0x06002F7D, 0x06002F83 -> 0x06002F8D", "",
+>         "4. INTERPOLATION CONNECTION",
+>         "- QueryDisplacements.Sample (0x06002F8F): u = (posX + offset.x) * invGridSizes[i],",
+>         "  v = (posZ + offset.z) * invGridSizes[i] -> InterpolatedArray2f.Get(u, v, result) (0x060031DF).",
+>         "- Scales result[0..2] by choppyness[i] (X,Z) and scaleY (Y). QueryWaves (0x06002F8D) iterates",
+>         "  <= 21 passes for horizontal inversion and clamps height to [-40.0f, 40.0f].",>         "- InterpolatedArray2f.Get + Index (0x060031CF): half-pixel offset (u * SX - 0.5f), periodic modulo",
+>         "  wrap `((ix % SX) + SX) % SX`, and 4-corner bilinear blend across channels 0..2.", "",
+>         "5. UNRESOLVED EVIDENCE & GODOT 4 RECONSTRUCTION BOUNDARY",
+>         "- Unresolved: Compiled DXBC/GLSL shader source for 'readNames2D' & surface shader Alpha usage",
+>         "  (UNVERIFIED); stripped scene MonoBehaviour inspector values (enableTypeTree == False).",
+>         "- Safe Godot 4 Boundary: 4-cascade periodic spectral displacement grids (3-channel float: X, Y, Z),",
+>         "  half-pixel bilinear wrap sampling, 21-pass horizontal inversion + [-40, 40] height clamp,",
+>         "  and optional 3-grid CPU readback (cascade 3 GPU-only).", ""
+>     ]
+>
+> def main():
+>     raw = DLL_PATH.read_bytes()
+>     pe = dnfile.dnPE(str(DLL_PATH))
+>     mdefs = rows(pe, "MethodDef")
+>     omap = owner_map(pe)
+>     traced = collect_traced_il(pe, mdefs, omap)
+>     shaders = scan_unity_shaders(DATA_DIR)
+>     rep = build_sections()
+>     rep.extend(["6. UNITY ASSET SHADER / COMPUTESHADER SCAN"] + shaders + [""])
+>     rep.extend(["7. COMPLETE VERIFIED IL DISASSEMBLY"] + traced)
+>     OUT_PATH.write_text("\n".join(rep) + "\n", encoding="utf-8")
+>     print(f"DONE! Wrote {OUT_PATH} ({OUT_PATH.stat().st_size} bytes) | Methods={len(traced)}")
+>
+> if __name__ == "__main__":
+>     main()
+> EOF
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python verify_displacement_output.py
+Traceback (most recent call last):
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 427, in <module>
+    main()
+    ~~~~^^
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 417, in main
+    omap = owner_map(pe)
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 125, in owner_map
+    start = int(val(mlist))
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'list'
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 -c '
+> s = open("verify_displacement_output.py").read()
+> s = s.replace("val = lambda o: getattr(o, \"value\", o)", "val = lambda o: getattr(o.__getitem__(0) if isinstance(o, list) and o else o, \"row_index\", getattr(o.__getitem__(0) if isinstance(o, list) and o else o, \"value\", o))")
+> open("verify_displacement_output.py", "w").write(s)
+> ' && /root/.venv_mission3/bin/python verify_displacement_output.py
+Traceback (most recent call last):
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 427, in <module>
+    main()
+    ~~~~^^
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 417, in main
+    omap = owner_map(pe)
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 125, in owner_map
+    start = int(val(mlist))
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'list'
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 -c '
+> s = open("verify_displacement_output.py").read()
+> s = s.replace("start = int(val(mlist))", "start = int(mlist.__getitem__(0).row_index if isinstance(mlist, list) else getattr(mlist, \"row_index\", getattr(mlist, \"value\", mlist)))")
+> s = s.replace("end = int(val(getattr(tdefs.__getitem__(idx + 1), \"MethodList\", len(mdefs) + 1))) if idx + 1 < len(tdefs) else len(mdefs) + 1", "nxt = getattr(tdefs.__getitem__(idx + 1), \"MethodList\", None) if idx + 1 < len(tdefs) else None; end = int(nxt.__getitem__(0).row_index if isinstance(nxt, list) and nxt else getattr(nxt, \"row_index\", getattr(nxt, \"value\", len(mdefs) + 1))) if nxt else len(mdefs) + 1")
+> open("verify_displacement_output.py", "w").write(s)
+> ' && /root/.venv_mission3/bin/python verify_displacement_output.py
+Traceback (most recent call last):
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 427, in <module>
+    main()
+    ~~~~^^
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 417, in main
+    omap = owner_map(pe)
+  File "/mnt/sdcard/Download/Stranded-Deep-Original/verify_displacement_output.py", line 125, in owner_map
+    start = int(mlist.__getitem__(0).row_index if isinstance(mlist, list) else getattr(mlist, "row_index", getattr(mlist, "value", mlist)))
+                ~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cd "/storage/emulated/0/Download/Stranded-Deep-Original" || exit 1
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python - <<'PY'
+> from pathlib import Path
+>
+> p = Path("verify_displacement_output.py")
+> src = p.read_text()
+>
+> old = '''    start = int(mlist.__getitem__(0).row_index if isinstance(mlist, list) else getattr(mlist, "row_index", getattr(mlist, "value", mlist)))'''
+>
+> new = '''    if isinstance(mlist, list):
+>         if mlist:
+>             first = mlist[0]
+>             start = int(
+>                 getattr(first, "row_index",
+>                         getattr(first, "value", len(mdefs) + 1))
+>             )
+>         else:
+>             start = len(mdefs) + 1
+>     else:
+>         start = int(
+>             getattr(mlist, "row_index",
+>                     getattr(mlist, "value", mlist))
+>         )'''
+>
+> if old not in src:
+>     raise SystemExit("ERROR: Target line not found. File unchanged.")
+>
+> p.write_text(src.replace(old, new, 1))
+> print("PATCHED:", p)
+> PY
+PATCHED: verify_displacement_output.py
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python -m py_compile verify_displacement_output.py &&
+> /root/.venv_mission3/bin/python verify_displacement_output.py
+Sorry: IndentationError: expected an indented block after 'if' statement on line 125 (verify_displacement_output.py, line 126)root@localhost:/storage/emulated/0/Download/Stranded-Droot@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cd "/storage/emulated/0/Download/Stranded-Deep-Original" || exit 1
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# sed -n '105,165p' verify_displacement_output.py
+    "ldc.i8":8,"ldc.r8":8,
+}
+for _op in TOK_OPS:
+    SZ.update({_op: 4})
+
+val = lambda o: getattr(o.__getitem__(0) if isinstance(o, list) and o else o, "row_index", getattr(o.__getitem__(0) if isinstance(o, list) and o else o, "value", o))
+nof = lambda o: "?" if o is None else str(getattr(o, "Name", o))
+rows = lambda pe, t: getattr(getattr(pe.net.mdtables, t, None), "rows", list())
+
+def owner_map(pe):
+    tdefs = rows(pe, "TypeDef")
+    mdefs = rows(pe, "MethodDef")
+    omap = {}
+    for idx, td in enumerate(tdefs):
+        ns = nof(getattr(td, "Namespace", ""))
+        nm = nof(getattr(td, "Name", ""))
+        fn = f"{ns}.{nm}" if ns and ns != "?" else nm
+        mlist = getattr(td, "MethodList", None)
+        if mlist is None:
+            continue
+        if isinstance(mlist, list):
+        if mlist:
+            first = mlist[0]
+            start = int(
+                getattr(first, "row_index",
+                        getattr(first, "value", len(mdefs) + 1))
+            )
+        else:
+            start = len(mdefs) + 1
+    else:
+        start = int(
+            getattr(mlist, "row_index",
+                    getattr(mlist, "value", mlist))
+        )
+        nxt = getattr(tdefs.__getitem__(idx + 1), "MethodList", None) if idx + 1 < len(tdefs) else None; end = int(nxt.__getitem__(0).row_index if isinstance(nxt, list) and nxt else getattr(nxt, "row_index", getattr(nxt, "value", len(mdefs) + 1))) if nxt else len(mdefs) + 1
+        for rid in range(start, end):
+            if 1 <= rid <= len(mdefs):
+                omap.update({id(mdefs.__getitem__(rid - 1)): fn})
+    return omap
+
+def resolve_tok(pe, tok):
+    tbl = (tok >> 24) & 0xFF
+    rid = tok & 0x00FFFFFF
+    if rid == 0:
+        return f"0x{tok:08X} [NullToken]"
+    if tbl == 0x70:
+        us = getattr(pe.net, "user_strings", None)
+        if us:
+            try:
+                s = us.get_us(rid)
+                return f"0x{tok:08X} [UserString {repr(str(s.value))}]"
+            except Exception:
+                pass
+        return f"0x{tok:08X} [UserString_0x{rid:X}]"
+    tmap = {0x01:"TypeRef", 0x02:"TypeDef", 0x04:"FieldDef", 0x06:"MethodDef", 0x0A:"MemberRef", 0x1B:"TypeSpec", 0x2B:"MethodSpec"}
+    tname = tmap.get(tbl, f"Table_0x{tbl:02X}")
+    rlist = rows(pe, tname)
+    if 1 <= rid <= len(rlist):
+        row = rlist.__getitem__(rid - 1)
+        if tbl in (0x01, 0x02):
+            ns = nof(getattr(row, "Namespace", ""))
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# cd "/storage/emulated/0/Download/Stranded-Deep-Original" || exit 1
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python - <<'PY'
+> from pathlib import Path
+> import re
+>
+> p = Path("verify_displacement_output.py")
+> src = p.read_text()
+>
+> start = src.find("def owner_map(pe):")
+> end = src.find("\ndef resolve_tok(pe, tok):", start)
+>
+> if start < 0 or end < 0:
+>     raise SystemExit("ERROR: Function boundaries not found. File unchanged.")
+>
+> # Keep a backup before replacing the function.
+> backup = p.with_suffix(".py.bak")
+> backup.write_text(src)
+>
+> replacement = '''def owner_map(pe):
+>     tdefs = rows(pe, "TypeDef")
+>     mdefs = rows(pe, "MethodDef")
+>     omap = {}
+>
+>     def first_method_rid(value):
+>         if value is None:
+>             return None
+>
+>         if isinstance(value, list):
+>             if not value:
+>                 return None
+>             value = value[0]
+>
+>         raw = getattr(
+>             value,
+>             "row_index",
+>             getattr(value, "value", value)
+>         )
+>
+>         try:
+>             return int(raw)
+>         except (TypeError, ValueError):
+>             return None
+>
+>     for idx, td in enumerate(tdefs):
+>         ns = nof(getattr(td, "Namespace", ""))
+>         nm = nof(getattr(td, "Name", ""))
+>         fn = f"{ns}.{nm}" if ns and ns != "?" else nm
+>
+>         mlist = getattr(td, "MethodList", None)
+>         start_rid = first_method_rid(mlist)
+>
+>         # This TypeDef has no methods.
+>         if start_rid is None:
+>             continue
+>
+>         # Find the next TypeDef that actually owns methods.
+>         end_rid = len(mdefs) + 1
+>
+>         for next_td in tdefs[idx + 1:]:
+>             nxt = getattr(next_td, "MethodList", None)
+>             next_rid = first_method_rid(nxt)
+>
+>             if next_rid is not None:
+>                 end_rid = next_rid
+>                 break
+>
+>         for rid in range(start_rid, end_rid):
+>             if 1 <= rid <= len(mdefs):
+>                 omap[id(mdefs[rid - 1])] = fn
+>
+>     return omap
+> '''
+>
+> src = src[:start] + replacement + src[end:]
+> p.write_text(src)
+>
+> print("PATCHED:", p)
+> print("BACKUP :", backup)
+> PY
+PATCHED: verify_displacement_output.py
+BACKUP : verify_displacement_output.py.bak
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# /root/.venv_mission3/bin/python -m py_compile verify_displacement_output.py &&
+> /root/.venv_mission3/bin/python verify_displacement_output.py
+DONE! Wrote DISPLACEMENT_OUTPUT_STRUCTURE_REPORT.txt (7170 bytes) | Methods=0
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
