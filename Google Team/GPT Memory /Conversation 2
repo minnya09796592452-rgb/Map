@@ -961,3 +961,156 @@ Compiled Shader / ComputeShader နဲ့ Serialized Scene Parameters တွေ�
 
 နောက်တစ်ဆင့်မှာ ဒီတွေ့ရှိချက်တွေကို အခြေခံပြီး V2 နှစ်ခုအတွက် **သီးခြား One-Click ပြင်ဆင်ရေးညွှန်ကြားချက်** ရေးနိုင်တယ်။
 
+V3 နှစ်ခုလုံးကို GitHub ရဲ့ လက်ရှိ main branch ကနေ ပြန်စစ်နေပါတယ်။ ဒီတစ်ကြိမ်မှာ V2 ကနေ ဘာတွေပြင်ထားသလဲဆိုတာသာမက စစ်ဆေးတဲ့ Python script ကိုယ်တိုင်က အမှန်တကယ် အဲဒီအချက်တွေကို စစ်နိုင်သလား၊ Report ထဲက VERIFIED ဆိုတဲ့အဆင့်က သက်သေနဲ့ကိုက်ညီသလား ဆိုတာကိုပါ ခွဲစစ်ပါမယ်။
+
+လက်ရှိစစ်ဆေးထားတဲ့ commit က 538a17ee8de007e9092b9f7f28615c1729097ffb ဖြစ်ပါတယ်။
+စစ်ဆေးပြီးပါပြီ။ V3 နှစ်ခုလုံးမှာ V2 ထက် သိသာတဲ့တိုးတက်မှုတွေ ရှိပါတယ်။ ဒါပေမဲ့ V3 ဆိုတဲ့အမည်နဲ့ Report ထဲက VERIFIED အရေအတွက်ကိုကြည့်ပြီး အပြည့်အဝမှန်ကန်ပြီလို့ သတ်မှတ်လို့မရသေးပါဘူး။
+စစ်ဆေးမှုအနှစ်ချုပ်
+Gemini Ai Core V3
+PARTIALLY VERIFIED
+
+Google Ai Core V3
+PARTIALLY VERIFIED
+
+Code နှင့် Report များကို static inspection လုပ်ထားခြင်းဖြစ်ပြီး DLL ကို ဒီနေရာမှာ ပြန်လည် run စစ်ဆေးထားခြင်း မဟုတ်ပါ။
+
+1. Gemini Ai Core V3
+V2 ထက် တိုးတက်လာတဲ့အချက်များ
+- Recursive file discovery ထည့်ထားတယ်။ max_depth=4 နဲ့ folder အတွင်းထိ ရှာဖွေနိုင်တယ်။
+- BASE_DIR နဲ့ DATA_DIR ကို သီးခြားစီ resolve လုပ်ထားတယ်။
+- Duplicate files၊ missing files၊ path errors တွေကို ခွဲပြထားတယ်။
+- SHA-256 hash တွေ ထုတ်ထားတယ်။
+- Combined CORE + PIPE + COMBINED စစ်ဆေးမှုကို method-body hash အထိ တိုးချဲ့ထားတယ်။
+- Grid 3 bandwidth-saving အကြောင်းပြချက်ကို အတည်ပြုထားတဲ့အချက်အဖြစ် မဖော်ပြတော့ဘူး။ ဒါက မှန်ကန်တဲ့ပြင်ဆင်မှုပါ။
+V3 Report ထဲက အမှန်တကယ်ရလဒ်
+စစ်ဆေးချက်	ရလဒ်
+Input files တွေ့ရှိမှု	11 / 11
+Missing files	0
+Duplicate files	0
+CORE method records	545
+PIPE method records	483
+COMBINED method records	1,028
+CORE / PIPE / COMBINED token union	ကိုက်ညီ
+Method body hash mismatches	7
+သတ်မှတ်ထားသော method-size checks	UNVERIFIED
+
+အရေးကြီးဆုံးက Combined validation ရလဒ်ဖြစ်ပါတယ်။
+
+PARTIALLY VERIFIED
+ CONFLICTING_OR_EXTRA_CONTENT
+Token union ကတော့ ကိုက်ညီနေပါတယ်။ ဒါပေမဲ့ method-body hash mismatch ၇ ခု ရှိနေတယ်။ ထို့ကြောင့် V3 က exact union ဖြစ်တယ်လို့ မကြေညာထားတာ မှန်ပါတယ်။
+
+ကျန်ရှိနေတဲ့ အဓိကပြဿနာများ
+1. parse_methods_and_tokens() က တကယ့် IL method body ကို parse လုပ်တာမဟုတ်ပါ။ METHOD: စာသားနဲ့ summary line တွေကို regex နဲ့ရှာတယ်။
+2. Body hash ထုတ်တဲ့အခါ method တစ်ခုရဲ့ အစမှ နောက်ထပ် 4,000 characters ကိုယူပြီး IL_, ld, call, st, br ပါတဲ့စာကြောင်းတွေကို ရွေးတယ်။ ဒါဟာ method body ရဲ့ တကယ့် boundary ကို အတည်ပြုထားခြင်း မဟုတ်ပါ။
+3. Method hash တွေကို method name တစ်ခုတည်းနဲ့ dictionary ထဲသိမ်းထားတဲ့အတွက် Start, Update, .ctor လို နာမည်တူ method တွေ ပေါင်းသွားနိုင်တယ်။
+4. CORE နဲ့ PIPE မှာ method name တူတဲ့အခါ union_bodies = {**core_bodies, **pipe_bodies} က PIPE ရဲ့တန်ဖိုးနဲ့ CORE ရဲ့တန်ဖိုးကို အစားထိုးနိုင်တယ်။ Duplicate method identity ကို သေချာမခွဲထားဘူး။
+5. Method-size ၈ ခုလုံးကို report ထဲမှာ UNVERIFIED လို့ ပြထားတယ်။ ဒါကြောင့် method-size validation ကို အောင်မြင်တယ်လို့ မယူဆနိုင်ဘူး။
+6. Technical claim တွေကို raw IL အပြည့်အစုံနဲ့ မစစ်သေးဘဲ loaded report ထဲက စာသားတွေရှိမရှိနဲ့ PARTIALLY VERIFIED ပေးထားတယ်။
+Gemini V3 ဆုံးဖြတ်ချက်: File discovery နဲ့ evidence bookkeeping ပိုင်းမှာ တိုးတက်လာတယ်။ ဒါပေမဲ့ method-level forensic verification ကို အပြည့်အဝလုပ်နိုင်တဲ့ parser မဖြစ်သေးဘူး။
+
+Source: Gemini Ai Core V3 folder · Audit Python script
+
+2. Google Ai Core V3
+ဒီအပိုင်းက V2 ထက် ပိုပြီး အရေးကြီးတဲ့ပြင်ဆင်မှုတွေ ရှိပါတယ်။
+
+တကယ်တိုးတက်လာတဲ့အချက်များ
+- Decoder B ကို Decoder A ရဲ့ ONE_BYTE / TWO_BYTE opcode tables မသုံးဘဲ သီးခြားရေးထားတယ်။
+- Decoder B က operand value နဲ့ branch / switch target တွေကိုပါ ထုတ်တယ်။
+- Decoder A နဲ့ B ရဲ့ instruction offset၊ operand၊ jump target တွေကို နှိုင်းယှဉ်ထားတယ်။
+- Metadata stream တွေကို Metadata Root boundary အတွင်းရှိမရှိ စစ်ထားတယ်။
+- EH filter offset နဲ့ try/handler overlap စစ်ဆေးမှုတွေ ထပ်တိုးထားတယ်။
+- Abstract / extern method တွေအတွက် RVA၊ flags၊ impl_flags တွေကို manifest ထဲ ထည့်ထားတယ်။
+- --dll နဲ့ --out-dir argument တွေ ထည့်ထားတယ်။
+ဒါတွေဟာ V2 မှာ တွေ့ခဲ့တဲ့ အားနည်းချက်တချို့ကို တကယ်ပြင်ဆင်ထားတာပါ။
+Google V3 ရဲ့ Report အရေအတွက်
+980
+VERIFIED
+
+Report အရ
+
+
+84
+ABSTRACT_EXCLUDED
+
+RVA = 0
+
+
+1,064
+Total scanned
+
+ရွေးချယ်ထားသော Ceto / Ocean ဆိုင်ရာ methods
+
+
+0
+Reported disagreements
+
+Decoder A/B နှိုင်းယှဉ်မှု
+
+
+
+သတိပြုရန် — 1,064 ဆိုတာ Assembly-CSharp.dll တစ်ခုလုံးရဲ့ methods အားလုံး မဟုတ်ပါ။ Ceto.၊ Ocean၊ Wave၊ Fourier၊ Displacement နဲ့ သက်ဆိုင်တဲ့ methods တွေကို filter လုပ်ထားတဲ့ အရေအတွက်ပါ။
+ကျန်နေသေးတဲ့ အားနည်းချက်များ
+A. Decoder B က independent ဖြစ်လာပေမဲ့ အပြည့်အဝ independent validation မဟုတ်သေးဘူး။
+
+ဒီအချက်ကို ခွဲပြောဖို့လိုပါတယ်။
+- Instruction decoding အတွက် Decoder A နဲ့ B က opcode table မျှဝေသုံးတာ မရှိတော့ဘူး။
+- Operand နဲ့ branch/switch target တွေကို နှိုင်းယှဉ်တာလည်း တိုးတက်လာတယ်။
+- ဒါပေမဲ့ EH clause validation ကို Decoder A တစ်ခုတည်းက လုပ်တယ်။ Decoder B က EH section ကို သီးခြား parse လုပ်ပြီး ပြန်မစစ်ဘူး။
+အဲဒါကြောင့် 0 disagreements ဆိုတာ instruction stream နှစ်ခု ကိုက်ညီတယ်ဆိုတဲ့ အဓိပ္ပာယ်နဲ့သာ ယူရမယ်။ EH validation အပါအဝင် အရာအားလုံးကို independent dual-decoder နဲ့ အတည်ပြုပြီးပြီလို့ မဆိုနိုင်ဘူး။
+
+B. Method body ရဲ့ PE section boundary ကို မပြည့်စုံစွာ စစ်ထားဘူး။
+
+rva_to_offset() က method ရဲ့အစ RVA ကို raw file offset အဖြစ် ပြောင်းပေးတယ်။
+
+ဒါပေမဲ့ parse_method_structure() ထဲမှာ—
+- body_off + code_size <= pe.size ကိုသာ အဓိကစစ်ထားတယ်။
+- Method body တစ်ခုလုံးက သက်ဆိုင်ရာ PE section ရဲ့ raw data အတွင်းမှာ ရှိနေသလားဆိုတာ မစစ်ထားဘူး။
+- EH section တွေကိုလည်း file boundary နဲ့သာ အဓိကစစ်ထားတယ်။
+ဒါဟာ structural validation အတွက် ကျန်နေတဲ့ အရေးကြီးတဲ့ gap ဖြစ်ပါတယ်။
+
+C. Metadata token resolution မပြည့်စုံသေးဘူး။
+
+resolve_token() က MethodDef၊ Field၊ MemberRef၊ TypeRef၊ TypeDef တို့ကို lookup လုပ်နိုင်တယ်။
+
+ဒါပေမဲ့ TypeSpec၊ MethodSpec၊ StandAloneSig တို့ကို row-count အဆင့်နဲ့သာ စစ်ထားတယ်။ Signature blob နဲ့ coded index တွေရဲ့ အတွင်းပိုင်းမှန်ကန်မှုကို အပြည့်အဝစစ်ထားတာ မဟုတ်ဘူး။
+
+D. EH validation ပိုင်း
+
+Filter offset နဲ့ try/handler overlap ကို စစ်ထားတာ တိုးတက်မှုပါ။ သို့သော် clause အားလုံးရဲ့ nesting၊ protected-region semantics နဲ့ section chain boundary တွေကို ECMA-335 စည်းမျဉ်းအပြည့်အဝနဲ့ စစ်ထားတယ်လို့ မသက်သေပြနိုင်သေးဘူး။
+
+E. Self-audit script က အားနည်းနေသေးတယ်။
+
+check_v2_weaknesses.py ကိုကြည့်တဲ့အခါ—
+- V3 folder ထဲမှာရှိပေမဲ့ Google Ai Core V2 folder ကို output နဲ့ manifest အတွက် ရည်ညွှန်းထားတယ်။
+- Python source ထဲမှာ string ရှိမရှိကို စစ်ပြီး PASS ပေးတယ်။
+- Decoder B က အမှန်တကယ် independent ဖြစ်မဖြစ်၊ EH parser က malformed input တွေကို မှန်ကန်စွာ reject လုပ်မလုပ်ကို test case တွေနဲ့ မစစ်ဘူး။
+ဒါကြောင့် သူ့ရဲ့ ALL 5 AUDIT GAPS RESOLVED ဆိုတဲ့ report ကို အပြည့်အဝ independent test အဖြစ် လက်မခံသင့်ဘူး။
+
+Source: Google Ai Core V3 folder · Hardened audit script · Self-audit script
+
+3. Ocean Displacement အတွက် အဓိပ္ပာယ်က ဘာလဲ?
+ဒီ V3 နှစ်ခုက Ocean system ကို Godot ထဲ ပြောင်းရွှေ့ဖို့ အထောက်အကူဖြစ်စေမယ့် evidence quality ကို တိုးတက်အောင်လုပ်ထားတာပါ။ ဒါပေမဲ့ V3 တစ်ခုတည်းနဲ့ အောက်ပါအချက်တွေကို အပြီးသတ်အတည်ပြုလို့ မရသေးပါဘူး။
+Ocean အချက်	လက်ရှိဆုံးဖြတ်ချက်
+CPU buffer swap sequence	C# IL evidence ရှိ၊ runtime မစစ်ရသေး
+Grid 3 GPU readback	C# IL မှာ readback မလုပ်ထားတာကို တွေ့နိုင်
+Grid 3 shader consumption	Shader/ComputeShader evidence မပြည့်စုံ
+FFT calculation	C# call flow ရှိ၊ GPU shader math မပြည့်စုံ
+GPU texture binding	Binding code ရှိ၊ end-to-end consumption မပြည့်စုံ
+Serialized scene parameters	မစစ်ရသေး
+
+Google V3 report ကိုယ်တိုင်လည်း compiled Shader / ComputeShader နဲ့ serialized scene parameters တွေကို UNVERIFIED လို့ ထားထားတယ်။ ဒါကို ဆက်လက်ထိန်းသိမ်းရပါမယ်။
+4. နောက်ဆုံးဆုံးဖြတ်ချက်
+အပိုင်း	V3 အခြေအနေ	နောက်တစ်ဆင့်
+Gemini V3	PARTIAL	Method body parser ကို တကယ့် method boundary အလိုက် ပြန်တည်ဆောက်ရန်
+Google V3	PARTIAL	PE section bounds၊ EH independent validation၊ metadata signature validation
+Shader evidence	UNVERIFIED	Shader / ComputeShader assets စစ်ရန်
+Runtime behavior	UNVERIFIED	လိုအပ်တဲ့ runtime evidence ရရှိမှ စစ်ရန်
+
+ကျွန်တော့်အမြင်အရ Google Ai Core V3 က အဓိက decoder အလုပ်အတွက် ပိုမိုခိုင်မာတဲ့အခြေခံ ရရှိလာပါပြီ။ Gemini V3 ကတော့ evidence စုစည်းခြင်းနဲ့ comparison ပိုင်းကို တိုးတက်စေတယ်။ ဒါပေမဲ့ နှစ်ခုလုံးကို final forensic proof လို့ မသတ်မှတ်သင့်သေးပါဘူး။
+5. စစ်ဆေးမှုကန့်သတ်ချက်
+- GitHub မှာရှိတဲ့ script၊ report၊ manifest တွေကို ဖတ်ပြီး source-level audit လုပ်ထားတယ်။
+- Google V3 manifest မှာ DLL SHA-256 က V2 နဲ့တူတူ d5501ae7a2c09499cdf569c5b52578401f039c2f4aa5e7e9240c22faeef214bc ဖြစ်တယ်။
+- DLL ကို ဒီ runtime မှာ မရရှိတဲ့အတွက် V3 Python script ကို DLL နဲ့ ပြန်မ run နိုင်ခဲ့ဘူး။
+- Repo ထဲက files တစ်ခုမှ ပြင်ဆင်ခြင်း၊ commit လုပ်ခြင်း မရှိပါ။
+အရေးကြီးတဲ့ နောက်ဆုံးအကြံပြုချက်: အခုချိန်မှာ Godot migration ကို မစသေးဘဲ Google V3 ရဲ့ structural verification gap တွေကို အရင်ပိတ်ပြီး Gemini V3 ရဲ့ combined method comparison ကို မှန်ကန်တဲ့ method identity နဲ့ ပြန်စစ်သင့်ပါတယ်။
