@@ -9,13 +9,198 @@ file size ကို 10mb ထက်မကျော်ရ ကြီးမားလ
 --------------------
 
 
+output
+
+
+=== 1. level3 SCENE OBJECT SEARCH FOR Ceto.Ocean PPtrs (+036 & +048) ===
+Raw +036..+047: FileID=0, PathID=4294967297 (High32=1, Low32=1, Hex=0x0000000100000001)
+Raw +048..+059: FileID=0, PathID=101 (Hex=0x0000000000000065)
+  -> PathID=4294967297 NOT in level3 object table
+  -> Found in level3: PathID=101 | Type=GameObject | Name='Sun'
+  -> Found in level3: PathID=1 | Type=GameObject | Name='Terrain'
+
+All 'Sun' or 'Directional' GameObjects in level3:
+  GO PathID=5 (Hex=0x0000000000000005) | Name='Deep Ocean Audio'
+  GO PathID=7 (Hex=0x0000000000000007) | Name='Ocean Audio'
+  GO PathID=95 (Hex=0x000000000000005f) | Name='Weather Event - Light Rain'
+  GO PathID=101 (Hex=0x0000000000000065) | Name='Sun'
+  GO PathID=139 (Hex=0x000000000000008b) | Name='_Ceto'
+  GO PathID=210 (Hex=0x00000000000000d2) | Name='Directional Light - Lightning'
+  GO PathID=211 (Hex=0x00000000000000d3) | Name='Light Rain'
+  GO PathID=234 (Hex=0x00000000000000ea) | Name='Weather Event Effect - Lightning'
+
+
+=== 2. EXACT DLL FIELD ROWS & ATTRIBUTES FOR Ceto.Ocean & Beam.CetoSettings ===
+
+CLASS: Ceto.Ocean (Field Rows 6580..6636)
+  Row #6580 | DISABLE_FOURIER_MULTITHREADING      | flags=0x0036 | sig=0602             | Attrs=[]
+  Row #6581 | DISABLE_PROJECTED_GRID_BORDER       | flags=0x0036 | sig=0602             | Attrs=[]
+  Row #6582 | DISABLE_ALL_MULTITHREADING          | flags=0x0016 | sig=0602             | Attrs=[]
+  Row #6583 | DISABLE_PROJECTION_FLIPPING         | flags=0x0036 | sig=0602             | Attrs=[]
+  Row #6584 | DISABLE_PROJECT_SCENE_VIEW          | flags=0x0036 | sig=0602             | Attrs=[]
+  Row #6585 | VERSION                             | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6586 | <Instance>k__BackingField           | flags=0x0011 | sig=06129984         | Attrs=['System.Runtime.CompilerServices.CompilerGeneratedAttribute']
+  Row #6587 | OCEAN_LAYER                         | flags=0x0016 | sig=060e             | Attrs=[]
+  Row #6588 | REFLECTION_TEXTURE_NAME0            | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6589 | REFLECTION_TEXTURE_NAME1            | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6590 | REFRACTION_GRAB_TEXTURE_NAME        | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6591 | DEPTH_GRAB_TEXTURE_NAME             | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6592 | OCEAN_DEPTH_TEXTURE_NAME0           | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6593 | OCEAN_DEPTH_TEXTURE_NAME1           | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6594 | OCEAN_MASK_TEXTURE_NAME0            | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6595 | OCEAN_MASK_TEXTURE_NAME1            | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6596 | NORMAL_FADE_TEXTURE_NAME            | flags=0x0036 | sig=060e             | Attrs=[]
+  Row #6597 | MAX_SPECTRUM_WAVE_HEIGHT            | flags=0x8056 | sig=060c             | Attrs=[]
+  Row #6598 | MAX_OVERLAY_WAVE_HEIGHT             | flags=0x8056 | sig=060c             | Attrs=[]
+  Row #6599 | disableWarnings                     | flags=0x0006 | sig=0602             | Attrs=[]
+  Row #6600 | disableInfo                         | flags=0x0006 | sig=0602             | Attrs=[]
+  Row #6601 | doublePrecisionProjection           | flags=0x0006 | sig=0602             | Attrs=[]
+  Row #6602 | tightProjectionFit                  | flags=0x0006 | sig=0602             | Attrs=[]
+  Row #6603 | m_sun                               | flags=0x0006 | sig=061235           | Attrs=[]
+  Row #6604 | level                               | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6605 | heightOverlaySize                   | flags=0x0006 | sig=061199b8         | Attrs=[]
+  Row #6606 | normalOverlaySize                   | flags=0x0006 | sig=061199b8         | Attrs=[]
+  Row #6607 | foamOverlaySize                     | flags=0x0006 | sig=061199b8         | Attrs=[]
+  Row #6608 | clipOverlaySize                     | flags=0x0006 | sig=061199b8         | Attrs=[]
+  Row #6609 | heightBlendMode                     | flags=0x0006 | sig=061199bc         | Attrs=[]
+  Row #6610 | foamBlendMode                       | flags=0x0006 | sig=061199bc         | Attrs=[]
+  Row #6611 | defaultSkyColor                     | flags=0x0006 | sig=061180f5         | Attrs=[]
+  Row #6612 | defaultOceanColor                   | flags=0x0006 | sig=061180f5         | Attrs=[]
+  Row #6613 | windDir                             | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6614 | <WindDirVector>k__BackingField      | flags=0x0001 | sig=061139           | Attrs=[]
+  Row #6615 | specularRoughness                   | flags=0x0006 | sig=060c             | Attrs=['UnityEngine.RangeAttribute']
+  Row #6616 | specularIntensity                   | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6617 | fresnelPower                        | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6618 | minFresnel                          | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6619 | foamTint                            | flags=0x0006 | sig=061180f5         | Attrs=[]
+  Row #6620 | foamIntensity                       | flags=0x0006 | sig=060c             | Attrs=[]
+  Row #6621 | foamTexture0                        | flags=0x0006 | sig=061299d8         | Attrs=[]
+  Row #6622 | foamTexture1                        | flags=0x0006 | sig=061299d8         | Attrs=[]
+  Row #6623 | waveOverlaySdr                      | flags=0x0006 | sig=061280fd         | Attrs=[]
+  Row #6624 | <Grid>k__BackingField               | flags=0x0001 | sig=0612995c         | Attrs=[]
+  Row #6625 | <Reflection>k__BackingField         | flags=0x0001 | sig=06129a44         | Attrs=[]
+  Row #6626 | <Spectrum>k__BackingField           | flags=0x0001 | sig=06129ab8         | Attrs=[]
+  Row #6627 | <UnderWater>k__BackingField         | flags=0x0001 | sig=06129acc         | Attrs=[]
+  Row #6628 | <OceanTime>k__BackingField          | flags=0x0001 | sig=0612997c         | Attrs=[]
+  Row #6629 | <Projection>k__BackingField         | flags=0x0001 | sig=06129980         | Attrs=['System.Runtime.CompilerServices.CompilerGeneratedAttribute']
+  Row #6630 | m_positionOffset                    | flags=0x0001 | sig=061139           | Attrs=[]
+  Row #6631 | m_cameraData                        | flags=0x0001 | sig=0615126902128085129970 | Attrs=[]
+  Row #6632 | m_waveOverlayMat                    | flags=0x0001 | sig=061280f1         | Attrs=[]
+  Row #6633 | <OverlayManager>k__BackingField     | flags=0x0001 | sig=06129a10         | Attrs=[]
+  Row #6634 | m_scheduler                         | flags=0x0001 | sig=06129b3c         | Attrs=[]
+  Row #6635 | m_query                             | flags=0x0001 | sig=06129a3c         | Attrs=[]
+  Row #6636 | <WasError>k__BackingField           | flags=0x0001 | sig=0602             | Attrs=[]
+
+CLASS: Beam.CetoSettings (Field Rows 8710..8730)
+  Row #8710 | _aboveVisibility                    | flags=0x0001 | sig=060c             | Attrs=[]
+  Row #8711 | _belowVisibility                    | flags=0x0001 | sig=060c             | Attrs=[]
+  Row #8712 | _aboveVisibilityCurve               | flags=0x0001 | sig=0612812d         | Attrs=[]
+  Row #8713 | _belowVisibilityCurve               | flags=0x0001 | sig=0612812d         | Attrs=[]
+  Row #8714 | _currentWaterColor                  | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8715 | _currentUnderwaterColor             | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8716 | _currentScatterColor                | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8717 | _currentUnderwaterInscatterColor    | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8718 | _morningWaterColor                  | flags=0x0001 | sig=061180f5         | Attrs=['UnityEngine.SerializeField']
+  Row #8719 | _middayWaterColor                   | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8720 | _morningUnderwaterColor             | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8721 | _middayUnderwaterColor              | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8722 | _morningScatterColor                | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8723 | _middayScatterColor                 | flags=0x0001 | sig=061180f5         | Attrs=['UnityEngine.SerializeField']
+  Row #8724 | _morningUnderwaterInscatterColor    | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8725 | _middayUnderwaterInscatterColor     | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8726 | _weatherScatterColor                | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8727 | _weatherUnderwaterColor             | flags=0x0001 | sig=061180f5         | Attrs=[]
+  Row #8728 | _causticsTexture                    | flags=0x0001 | sig=061280e9         | Attrs=['UnityEngine.SerializeField']
+  Row #8729 | _underwater                         | flags=0x0001 | sig=06129acc         | Attrs=[]
+  Row #8730 | _waveSpectrum                       | flags=0x0001 | sig=06129ab8         | Attrs=[]
+                       | flags=0x0001 | sig=06129ab8         | Attrs=[]
 
 
 
 GPT Team
-သုံးသပ်ချက် ( Link အတွင်းဝင်ရောက် စစ်ဆေးပါ )
 
-https://chatgpt.com/share/6b00d044-727c-83ec-a50d-0b749a98b907?ogimg=plain
+Worked for 27s
+
+ဟားဟား 😂🔥 ဒီတစ်ခါတော့ တကယ့် REAL_SCHEMA_PROOF ကိုင်ပြီး ပြန်ဝင်လာပြီပေါ့။
+
+ဖိုင်ကို ဖွင့်စစ်ကြည့်လိုက်ပြီ။ အရင် V4 မှာ ထောက်ပြခဲ့တဲ့ ပြဿနာတွေကို ပြန်ဖြေဖို့ ကြိုးစားထားတာ တွေ့ရတယ်။ အခုမြင်ရတဲ့ output ထဲမှာ အရေးကြီးဆုံးအချက်က — `Ceto.Ocean` ရဲ့ DLL Field Rows ကို တိုက်ရိုက်ထုတ်ပြထားပေမဲ့ +036..+047 ကို `m_ocean` လို့ အတည်ပြုနိုင်တဲ့ အထောက်အထားတော့ မရသေးဘူး။
+
+### အခုရလာတဲ့ သက်သေတွေကို ခွဲကြည့်မယ်
+
+၁။ `Ceto.Ocean.m_sun`
+
+* DLL Field Row `#6603` မှာ `m_sun` ရှိတယ်။
+
+* `+048..+059` မှာ `FileID=0, PathID=101` ဖြစ်တယ်။
+
+* Scene Object Table မှာ PathID 101 ကို `GameObject: Sun` အဖြစ် ရှာတွေ့တယ်။
+
+ဒီအပိုင်းက DLL field နဲ့ Scene Object ကိုက်ညီမှုရှိတယ်။
+
+၂။ `+036..+047` ရဲ့ PPtr
+
+* Raw PathID = `4294967297`
+
+* Hex = `0x0000000100000001`
+
+* Full PathID ကို level3 Object Table မှာ မတွေ့ဘူး။
+
+* Low 32-bit ကိုသာယူရင် PathID 1 က `Terrain` ဖြစ်နေတယ်။ ဒါပေမဲ့ အဲဒီအချက်တစ်ခုတည်းနဲ့ `m_ocean` သို့မဟုတ် Sentinel လို့ သတ်မှတ်လို့မရဘူး။
+
+* `Ceto.Ocean` ရဲ့ Field Rows `#6599–#6636` ထဲမှာ `m_ocean` မပါဘူး။
+
+ဒါကြောင့် အရင် V4 ရဲ့ `Ceto.OceanComponent.m_ocean` ဆိုတဲ့ အမည်ပေးမှုကို ဒီဖိုင်က မသက်သေပြနိုင်သေးဘူး။
+
+၃။ CetoSettings ရဲ့ Color Fields
+
+DLL Field Rows `#8710–#8730` ကိုကြည့်ရင် Color ၁၀ ခုထဲမှာ `[SerializeField]` တွေ့ရတာ ၂ ခုပဲရှိတယ်။
+
+* `_morningWaterColor`
+
+* `_middayScatterColor`
+
+ကျန်တဲ့ ၈ ခုအတွက် serialization mechanism ကို မပြထားသေးဘူး။ ဒါပေမဲ့ raw byte table ကတော့ Color ၁၀ ခုလုံးကို field name နဲ့ အမည်တပ်ထားတယ်။ ဒီနှစ်ခုကြားက ကွာဟချက် မဖြေရှင်းရသေးဘူး။
+
+### အရေးကြီးဆုံး အားနည်းချက်
+
+`REAL_SCHEMA_PROOF` ဆိုတဲ့နာမည်ရှိပေမဲ့ လက်ရှိထုတ်ပြထားတာက—
+
+* DLL Metadata Field Rows
+
+* CustomAttribute တွေ
+
+* Raw PPtr Object Lookup
+
+* Manually သတ်မှတ်ထားတဲ့ Byte Offset Table
+
+ဖြစ်တယ်။
+
+TypeTree သို့မဟုတ် verified serialization schema ကနေ Field တစ်ခုချင်းစီရဲ့ Offset ကို အမှန်တကယ် သက်သေပြထားတာ မဟုတ်သေးဘူး။
+
+နောက်တစ်ချက်၊ Metadata parser ရဲ့ `tsz` table-size dictionary ထဲမှာ Table တချို့ မပါဘူး။ အဲဒီ Table တွေ DLL ထဲမှာ ရှိခဲ့ရင် နောက်ပိုင်း Table Offset တွေ မှားနိုင်တယ်။ လက်ရှိ output တစ်ခုတည်းနဲ့ ဒီအန္တရာယ်ကို ဖယ်ရှားမထားနိုင်သေးဘူး။
+
+### လက်ရှိအဆုံးအဖြတ်
+
+| စစ်ဆေးချက်                   | ရလဒ်                           |
+| ---------------------------- | ------------------------------ |
+| m_sun → Sun                  | အထောက်အထားကောင်း               |
+| +036 → m_ocean               | မသက်သေပြနိုင်သေး               |
+| Ceto.Ocean inheritance       | အရင်ကွဲလွဲချက် မဖြေရှင်းရသေး   |
+| CetoSettings Color ၁၀ ခု     | Offset အမည်ပေးမှု မအတည်ပြုရသေး |
+| 220B Field-to-Offset Mapping | Raw layout သာရှိသေး            |
+| REAL_SCHEMA အတည်ပြုမှု       | မပြည့်စုံသေး                   |
+
+ဒီတစ်ခေါက်မှာ တိုးတက်မှုရှိတယ်။ အထူးသဖြင့် `m_sun` ကို DLL နဲ့ Scene နှစ်ဘက်ကနေ ချိတ်ဆက်ပြနိုင်လာတယ်။ ဒါပေမဲ့ Ocean ရဲ့ အဓိက Schema ကို အတည်ပြုပြီးပြီလို့ မပြောနိုင်သေးဘူး။
+
+အခုအဆင့်မှာ အရေးကြီးဆုံးက TypeTree ထဲက Ceto.Ocean နဲ့ CetoSettings ရဲ့ တကယ့် Field Layout ကို ထုတ်ပြဖို့ ပဲ။ အဲဒါရမှ Byte Offset တွေကို နာမည်နဲ့ တိတိကျကျ ချိတ်နိုင်မယ်။ 😂
+
+
+
+
+
+
+
+
 
 
 
