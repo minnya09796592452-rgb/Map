@@ -1,0 +1,25 @@
+{
+  "name": "Beam Team/Atmosphere/Atmosphere BRDF",
+  "archive": "resources.assets",
+  "path_id": 3068,
+  "props": {
+    "m_Props": [
+      {
+        "m_Name": "_PolarisingColor",
+        "m_Description": "",
+        "m_Attributes": [],
+        "m_Type": 0,
+        "m_Flags": 0,
+        "m_DefValue[0]": 0.0,
+        "m_DefValue[1]": 0.0,
+        "m_DefValue[2]": 0.0,
+        "m_DefValue[3]": 1.0,
+        "m_DefTexture": {
+          "m_DefaultName": "",
+          "m_TexDim": 1
+        }
+      }
+    ]
+  },
+  "subshaders": 1
+}

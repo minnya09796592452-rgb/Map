@@ -1,0 +1,9 @@
+{
+  "name": "Hidden/FogVolume",
+  "archive": "resources.assets",
+  "path_id": 3105,
+  "props": {
+    "m_Props": []
+  },
+  "subshaders": 1
+}

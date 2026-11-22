@@ -1,0 +1,25 @@
+{
+  "name": "Hidden/kode80/CloudBlender",
+  "archive": "resources.assets",
+  "path_id": 3096,
+  "props": {
+    "m_Props": [
+      {
+        "m_Name": "_MainTex",
+        "m_Description": "Base (RGB)",
+        "m_Attributes": [],
+        "m_Type": 4,
+        "m_Flags": 0,
+        "m_DefValue[0]": 0.0,
+        "m_DefValue[1]": 0.0,
+        "m_DefValue[2]": 0.0,
+        "m_DefValue[3]": 0.0,
+        "m_DefTexture": {
+          "m_DefaultName": "white",
+          "m_TexDim": 2
+        }
+      }
+    ]
+  },
+  "subshaders": 1
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Beam Team/Post Effects/Atmospheric Fog",
+  "archive": "resources.assets",
+  "path_id": 3078,
+  "props": {
+    "m_Props": []
+  },
+  "subshaders": 1
+}

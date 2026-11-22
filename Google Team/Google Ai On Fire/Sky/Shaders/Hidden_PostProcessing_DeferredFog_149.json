@@ -1,0 +1,9 @@
+{
+  "name": "Hidden/PostProcessing/DeferredFog",
+  "archive": "sharedassets0.assets",
+  "path_id": 149,
+  "props": {
+    "m_Props": []
+  },
+  "subshaders": 1
+}
