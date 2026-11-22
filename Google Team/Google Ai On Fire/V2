@@ -1,0 +1,182 @@
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+> import shutil
+> from pathlib import Path
+>
+> SRC = Path(
+>     "/storage/emulated/0/Download/"                                                                    >     "Stranded-Deep-Original/Godot Project"
+> ).resolve()
+> WORK = Path("Castaway_Depths_Work").resolve()
+>
+> # 1. Copy .glb.import files if present in SRC/Glb
+> for imp in (SRC / "Glb").glob("*.import"):
+>     shutil.copy2(imp, WORK / "Glb" / imp.name)
+>
+> # 2. Copy imported cache from SRC/.godot/imported so 4 GLBs load instantly
+> src_imp = SRC / ".godot/imported"
+> dst_imp = WORK / ".godot/imported"
+> if src_imp.exists():
+>     dst_imp.mkdir(parents=True, exist_ok=True)
+>     prefixes = (
+>         "mission_shark.glb",
+>         "mission_eel.glb",
+>         "introscene.glb",
+>         "beepi.glb",
+>     )                                                                                                  >     cnt = 0
+>     for f in src_imp.glob("*"):
+>         if any(f.name.startswith(p) for p in prefixes):
+>             shutil.copy2(f, dst_imp / f.name)
+>             cnt += 1
+>     print(f"COPIED_IMPORT_CACHE={cnt}")
+>
+> # 3. Pre-configure editor_layout.cfg so castaway_showcase.tscn opens automatically
+> ed_dir = WORK / ".godot/editor"
+> ed_dir.mkdir(parents=True, exist_ok=True)
+> (ed_dir / "editor_layout.cfg").write_text(
+> """[EditorNode]
+>
+> open_scenes=["res://scenes/castaway_showcase.tscn"]
+> current_scene="res://scenes/castaway_showcase.tscn"
+> """,
+>     encoding="utf-8",
+> )
+> print("AUTO_OPEN_SCENE_SET_OK")
+> EOF
+COPIED_IMPORT_CACHE=8
+AUTO_OPEN_SCENE_SET_OK
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original# python3 - << 'EOF'
+ > import shutil
+> from pathlib import Path
+ ty>
+> SRC = Path(
+>     "/storage/emulated/0/Download/"
+>     "Stranded-Deep-Original/Godot Project"
+> ).resolve()
+ pa> BAK = Path(
+>     "Castaway_Depths_Audit/backup_original"
+> ).resolve()
+> BAK.mkdir(parents=True, exist_ok=True)
+>
+ > # 1. Backup original node.tscn & project.godot first
+> for fn in ("node.tscn", "project.godot"):                                                              >     fp = SRC / fn
+>     if fp.exists() and not (BAK / fn).exists():
+>         shutil.copy2(fp, BAK / fn)
+>
+> # 2. Ensure shaders & showcase script exist in SRC
+> (SRC / "shaders").mkdir(exist_ok=True)
+> shader_lines = [
+ourcePreloader" type="ResourcePreloader>     "shader_type spatial;",
+>     "render_mode cull_disabled, specular_schlick_ggx;",
+O>     "uniform vec4 deep_color : source_color = vec4(0.01, 0.14, 0.26, 0.96);",
+>     "uniform vec4 shallow_color : source_color = vec4(0.05, 0.42, 0.52, 0.90);",
+'>     "uniform float wave_speed = 1.2;",                                                                >     "uniform float wave_height = 0.65;",
+."]>     "void vertex() {",
+cn">     "    float t = TIME * wave_speed;",
+>     "    float w1 = sin(VERTEX.x * 0.12 + t) * cos(VERTEX.z * 0.10 + t * 0.8);",
+>     "    float w2 = sin((VERTEX.x + VERTEX.z) * 0.25 - t * 1.3) * 0.35;",
+)
+>     "    VERTEX.y += (w1 + w2) * wave_height;",
+>     "}",
+>     "void fragment() {",
+>     "    float fresnel = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);",
+>     "    ALBEDO = mix(deep_color.rgb, shallow_color.rgb, fresnel);",
+>     "    ROUGHNESS = 0.12;",
+>     "    METALLIC = 0.15;",                                                                            >     "    ALPHA = 0.94;",
+>     "}",
+> ]
+> (SRC / "shaders/ocean_surface.gdshader").write_text(                                                   >     "\n".join(shader_lines) + "\n", encoding="utf-8"
+> )
+>
+> # 3. Link Ocean + 4 GLB Scenes directly under Node3D inside node.tscn
+> node_tscn = [
+>     '[gd_scene load_steps=9 format=3 uid="uid://dcrueayrv0ld0"]',
+>     '',
+>     '[ext_resource type="Shader" path="res://shaders/ocean_surface.gdshader" id="1"]',
+>     '[ext_resource type="PackedScene" path="res://Glb/mission_shark.glb" id="2"]',
+>     '[ext_resource type="PackedScene" path="res://Glb/mission_eel.glb" id="3"]',                       >     '[ext_resource type="PackedScene" path="res://Glb/introscene.glb" id="4"]',
+>     '[ext_resource type="PackedScene" path="res://Glb/beepi.glb" id="5"]',                             >     '',
+>     '[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_nxiqb"]',
+>     '',
+>     '[sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]',
+>     'size = Vector2(400, 400)',
+>     'subdivide_width = 128',
+>     'subdivide_depth = 128',
+>     '',
+>     '[sub_resource type="ShaderMaterial" id="ShaderMaterial_ocean"]',
+>     'render_priority = 0',
+>     'shader = ExtResource("1")',
+>     '',
+>     '[node name="Node" type="Node"]',
+>     '',
+>     '[node name="Node3D" type="Node3D" parent="."]',
+>     '',
+>     '[node name="OceanSurface" type="MeshInstance3D" parent="Node3D"]',
+>     'mesh = SubResource("PlaneMesh_ocean")',
+>     'surface_material_override/0 = SubResource("ShaderMaterial_ocean")',
+>     '',
+>     '[node name="MissionShark" parent="Node3D" instance=ExtResource("2")]',
+>     'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, -18)',
+>     '',
+>     '[node name="MissionEel" parent="Node3D" instance=ExtResource("3")]',
+>     'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, -4, -25)',                                 >     '',
+>     '[node name="IntroScene" parent="Node3D" instance=ExtResource("4")]',
+>     'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 2, -20)',
+>     '',
+>     '[node name="BeepiWatch" parent="Node3D" instance=ExtResource("5")]',
+>     'transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 2.5, -6)',
+>     '',
+>     '[node name="MainCamera3D" type="Camera3D" parent="Node3D"]',
+>     'transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 12, 22)',
+>     'current = true',
+>     'far = 1000.0',
+>     '',
+>     '[node name="Node2D" type="Node2D" parent="."]',
+>     '',
+>     '[node name="Control" type="Control" parent="."]',
+>     'layout_mode = 3',
+>     'anchors_preset = 0',
+>     '',
+>     '[node name="AnimationPlayer" type="AnimationPlayer" parent="."]',
+>     '',
+>     '[node name="AnimationTree" type="AnimationTree" parent="."]',
+>     '',
+>     '[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]',
+>     '',
+>     '[node name="CanvasLayer" type="CanvasLayer" parent="."]',
+>     '',
+>     '[node name="HTTPRequest" type="HTTPRequest" parent="."]',
+>     '',
+>     '[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]',
+>     '',
+>     '[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]',
+>     'replication_config = SubResource("SceneReplicationConfig_nxiqb")',
+>     '',
+>     '[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]',
+>     '',
+>     '[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]',
+>     '',
+>     '[node name="ResourcePreloader" type="ResourcePreloader" parent="."]',
+>     '',
+>     '[node name="ShaderGlobalsOverride" type="ShaderGlobalsOverride" parent="."]',
+>     '',
+>     '[node name="StatusIndicator" type="StatusIndicator" parent="."]',
+>     '',
+>     '[node name="Timer" type="Timer" parent="."]',
+>     '',
+>     '[node name="WorldEnvironment" type="WorldEnvironment" parent="."]',                               > ]
+> (SRC / "node.tscn").write_text(                                                                        >     "\n".join(node_tscn) + "\n", encoding="utf-8"
+> )
+>
+> # 4. Point project.godot main_scene to res://node.tscn
+> pg_path = SRC / "project.godot"
+> pg = pg_path.read_text(encoding="utf-8")
+> pg = pg.replace(
+>     'run/main_scene="res://scenes/terrain_preview.tscn"',
+>     'run/main_scene="res://node.tscn"',
+> )
+> pg_path.write_text(pg, encoding="utf-8")
+> print("LINKED_TO_MAIN_NODE_OK")
+> EOF
+LINKED_TO_MAIN_NODE_OK
+root@localhost:/storage/emulated/0/Download/Stranded-Deep-Original#
+
+
