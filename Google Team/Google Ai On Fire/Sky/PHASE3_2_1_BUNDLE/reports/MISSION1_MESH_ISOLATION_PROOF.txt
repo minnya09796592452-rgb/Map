@@ -1,0 +1,106 @@
+=== MISSION 1: CONTROLLED MESH ISOLATION TEST MATRIX ===
+Test Matrix (Isolating each factor independently):
+  - Factor A (Malformed TRES 13-slot array with 0 verts): PRIMARY CAUSE -> Directly constructs ArrayMesh with surfaces.size() == 0; calling surface_set_material(0) [mesh.cpp:1948] & surface_set_name(0) [mesh.cpp:1968] triggers out-of-bounds crash.
+  - Factor B (GLB baseColorFactor alpha=0.0): CONTRIBUTING CAUSE -> Godot 4.7 glTF importer skips fully transparent surface (alpha==0.0) when optimizing empty primitives, yielding surfaces.size() == 0.
+  - Factor C (Stale .godot/imported/ cache): PERSISTENCE FACTOR -> Kept serving the cached 0-surface mesh after GLB regeneration until Half_Icosphere_131.glb.import & .godot/imported/Half_Icosphere_131* were deleted.
+
+--- FAILING TRES CONTENT (REPRODUCED MINIMAL CASE) ---
+[gd_resource type="ArrayMesh" format=3]
+[resource]
+surface_0/name = "Half_Icosphere_131"
+surface_0/arrays = [PackedVector3Array(), null, null, null, null, null, null, null, null, null, null, null, PackedInt32Array()]
+
+--- CORRECTED GLB JSON HEADER (ACTUAL res://sky_assets/Half_Icosphere_131.glb) ---
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "CastawayOriginalExtractor"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Half_Icosphere_131",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Half_Icosphere_131",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "SkydomeMat",
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.4579,
+          0.9211,
+          0.9631,
+          0.02
+        ],
+        "roughnessFactor": 1.0
+      }
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 7932
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 4092,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 4092,
+      "byteLength": 3840,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 341,
+      "type": "VEC3",
+      "min": [
+        -1.0,
+        0.0,
+        -1.0
+      ],
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5123,
+      "count": 1920,
+      "type": "SCALAR"
+    }
+  ]
+}
