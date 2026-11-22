@@ -1,0 +1,26 @@
+=== MISSION 3: TEXTURE RESOURCE CONNECTION AUDIT ===
+1. stars_tex:
+   - Godot Path: res://sky_assets/stars_texture_70.png
+   - Unity Source: SKY_LIGHTING/Textures/stars_texture_70.png (PathID=70, 2048x2048 RGBA32)
+   - Material Assign: Sky_Lighting_Test.tscn L16 -> shader_parameter/stars_tex = ExtResource("2")
+   - Shader Code: L2 decl | L39 texture(stars_tex, uv1 * 1.5).rgb -> added to COLOR at zenith/night.
+2. cloud_tex:
+   - Godot Path: res://sky_assets/MostlyCloud_6807535986202380995.png
+   - Unity Source: SKY_LIGHTING/Textures/MostlyCloud_6807535986202380995.png (1024x1024 DXT5)
+   - Material Assign: Sky_Lighting_Test.tscn L17 -> shader_parameter/cloud_tex = ExtResource("3")
+   - Shader Code: L3 decl | L34-L35 texture(cloud_tex, uv1).r & uv2.g -> mixed into COLOR via cld_mask.
+3. inscatter_lut:
+   - Godot Path: res://sky_assets/inscatter1Table16x1_Polarised_98.png
+   - Unity Source: SKY_LIGHTING/Textures/inscatter1Table16x1_Polarised_98.png (PathID=98, 256x16)
+   - Material Assign: Sky_Lighting_Test.tscn L18 -> shader_parameter/inscatter_lut = ExtResource("4")
+   - Shader Code: L4 decl | L24 texture(inscatter_lut, ...) -> added to sky_grad COLOR.
+4. transmittance_lut:
+   - Godot Path: res://sky_assets/transmittance_77_float32.pfm
+   - Unity Source: SKY_LIGHTING/Textures/transmittance_77.bin (PathID=77, 256x64 Unity RGBAHalf=17 -> Float32 PFM)
+   - Material Assign: Sky_Lighting_Test.tscn L19 -> shader_parameter/transmittance_lut = ExtResource("5")
+   - Shader Code: L5 decl | L22 texture(transmittance_lut, ...) -> multiplies Rayleigh+Mie scatter_col.
+5. irradiance_lut:
+   - Godot Path: res://sky_assets/irradiance_69_float32.pfm
+   - Unity Source: SKY_LIGHTING/Textures/irradiance_69.bin (PathID=69, 64x16 Unity RGBAHalf=17 -> Float32 PFM)
+   - Material Assign: Sky_Lighting_Test.tscn L20 -> shader_parameter/irradiance_lut = ExtResource("6")
+   - Shader Code: L6 decl | L23 texture(irradiance_lut, ...) -> added to sky_grad COLOR.

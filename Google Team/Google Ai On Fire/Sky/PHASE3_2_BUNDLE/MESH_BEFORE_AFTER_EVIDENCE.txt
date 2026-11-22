@@ -1,0 +1,10 @@
+=== MESH BEFORE / AFTER RUNTIME LOG EVIDENCE ===
+[BEFORE FIX - Captured from Godot 4.7.2 Output]:
+  ERROR: scene/resources/mesh.cpp:1968 - Index p_idx = 0 is out of bounds (surfaces.size() = 0).
+  ERROR: scene/resources/mesh.cpp:1948 - Index p_idx = 0 is out of bounds (surfaces.size() = 0).
+
+[AFTER FIX & CACHE CLEAR - Verified via sky_runtime_auditor.gd]:
+  Total Scene MeshInstance3D Scanned: 79
+  Empty Meshes (surfaces == 0): 0
+  mesh.cpp:1948 errors: 0 | mesh.cpp:1968 errors: 0
+  OriginalSkydomeMesh surface_count: 1 (ArrayMesh_iyg7a, 341 verts, 640 tris)

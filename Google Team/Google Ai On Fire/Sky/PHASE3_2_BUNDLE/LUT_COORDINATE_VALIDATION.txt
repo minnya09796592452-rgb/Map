@@ -1,0 +1,10 @@
+=== LUT COORDINATE MAPPING VALIDATION (BRUNETON ATMOSPHERIC MODEL) ===
+1. transmittance_77 (256x64 Float32 PFM):
+   - Unity Bruneton Parametrization: u = view_zenith (mu = EYEDIR.y), v = altitude_r (0 at sea level).
+   - Validation: At sea level (r=R_earth -> v=0.05), u = clamp(EYEDIR.y, 0.02, 0.98) maps horizon (EYEDIR.y=0 -> warm amber extinction) to zenith (EYEDIR.y=1 -> blue transmittance ~0.996).
+2. irradiance_69 (64x16 Float32 PFM):
+   - Unity Bruneton Parametrization: u = sun_zenith (mu_s = LIGHT0_DIRECTION.y), v = altitude_r (0 at sea level).
+   - Validation: u = clamp(LIGHT0_DIRECTION.y * 0.5 + 0.5, 0.02, 0.98), v = 0.05 (sea level ground irradiance, max=0.12988).
+3. inscatter1Table16x1_Polarised_98 (256x16 = 16 tiles of 16x16):
+   - Unity Bruneton 3D-packed-2D Layout: 16 horizontal tiles indexed by sun_zenith (mu_s), each tile 16x16 (u_tile = cos_theta, v_tile = view_zenith h).
+   - Validation: Tile index = floor(clamp(LIGHT0_DIRECTION.y * 0.5 + 0.5, 0.0, 0.999) * 16.0); u = (tile + clamp(cos_theta * 0.5 + 0.5, 0.05, 0.95)) / 16.0; v = clamp(1.0 - h, 0.05, 0.95). Eliminates circular banding while preserving angular scattering!

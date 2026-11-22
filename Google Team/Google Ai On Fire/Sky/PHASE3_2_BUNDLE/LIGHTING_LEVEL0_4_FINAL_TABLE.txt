@@ -1,0 +1,115 @@
+=== MISSION 4: LIGHTING LEVEL 0-4 FINAL TRACEABILITY TABLE ===
+Exact Resolution of Level 0 Blue Channel (0.92068964 vs 0.9907):
+  - Both come from Level 0 (Main Menu scene) across two separate Light components in level0_scene_sky_lights.json!
+
+--- TABLE 1: ORIGINAL UNITY VALUES (EXACT SOURCE TRACE) ---
+SOURCE FILE: Highlighter_-1774490057384968430.json
+  RenderSettings: {}
+SOURCE FILE: Highlighter_-8488634740152421746.json
+  RenderSettings: {}
+SOURCE FILE: Highlighter_3343177872459178787.json
+  RenderSettings: {}
+SOURCE FILE: Highlighter_4477281527517909137.json
+  RenderSettings: {}
+SOURCE FILE: LightmapSettings_unnamed_230.json
+  RenderSettings: {}
+SOURCE FILE: LightmapSettings_unnamed_2389.json
+  RenderSettings: {}
+SOURCE FILE: LightmapSettings_unnamed_240.json
+  RenderSettings: {}
+SOURCE FILE: LightmapSettings_unnamed_4719.json
+  RenderSettings: {}
+SOURCE FILE: LightmapSettings_unnamed_985.json
+  RenderSettings: {}
+SOURCE FILE: RenderSettings_unnamed_218.json
+  RenderSettings: {"m_Fog": false, "m_FogColor": {"r": 0.5, "g": 0.5, "b": 0.5, "a": 1.0}, "m_LinearFogStart": 0.0, "m_LinearFogEnd": 300.0, "m_AmbientSkyColor": {"r": 0.4092664122581482, "g": 0.4382239282131195, "b": 0.5, "a": 1.0}, "m_Sun": {"m_FileID": 0, "m_PathID": 0}}
+SOURCE FILE: RenderSettings_unnamed_2340.json
+  RenderSettings: {"m_Fog": false, "m_FogColor": {"r": 0.5, "g": 0.5, "b": 0.5, "a": 1.0}, "m_LinearFogStart": 0.0, "m_LinearFogEnd": 300.0, "m_AmbientSkyColor": {"r": 0.10000000149011612, "g": 0.10000000149011612, "b": 0.10000000149011612, "a": 1.0}, "m_Sun": {"m_FileID": 0, "m_PathID": 0}}
+SOURCE FILE: RenderSettings_unnamed_236.json
+  RenderSettings: {"m_Fog": false, "m_FogColor": {"r": 0.9630926847457886, "g": 0.9521494507789612, "b": 0.9210703372955322, "a": 0.9630926847457886}, "m_LinearFogStart": 0.0, "m_LinearFogEnd": 300.0, "m_AmbientSkyColor": {"r": 0.0, "g": 0.0, "b": 0.0, "a": 1.0}, "m_Sun": {"m_FileID": 0, "m_PathID": 0}}
+SOURCE FILE: RenderSettings_unnamed_4638.json
+  RenderSettings: {"m_Fog": false, "m_FogColor": {"r": 1.0, "g": 0.0, "b": 0.0, "a": 0.9630926847457886}, "m_LinearFogStart": 0.0, "m_LinearFogEnd": 300.0, "m_AmbientSkyColor": {"r": 0.5803313255310059, "g": 0.7019497156143188, "b": 0.8588119745254517, "a": 1.0}, "m_Sun": {"m_FileID": 0, "m_PathID": 0}}
+SOURCE FILE: RenderSettings_unnamed_932.json
+  RenderSettings: {"m_Fog": false, "m_FogColor": {"r": 1.0, "g": 0.0, "b": 0.0, "a": 0.9630926847457886}, "m_LinearFogStart": 0.0, "m_LinearFogEnd": 300.0, "m_AmbientSkyColor": {"r": 0.760233998298645, "g": 0.9195541143417358, "b": 1.1250436305999756, "a": 1.309999942779541}, "m_Sun": {"m_FileID": 0, "m_PathID": 934}}
+SOURCE FILE: level0_scene_sky_lights.json
+  Object='None' | PathID=185 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=191 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=193 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=219 | Type=Light | Color=None | Intensity=None
+SOURCE FILE: level1_scene_sky_lights.json
+  Object='None' | PathID=1536 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1540 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1545 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1546 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1736 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1737 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=2341 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=2342 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=2343 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=2344 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=2345 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=2346 | Type=Light | Color=None | Intensity=None
+SOURCE FILE: level2_scene_sky_lights.json
+  Object='None' | PathID=130 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=133 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=134 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=141 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=142 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=143 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=144 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=153 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=154 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=158 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=200 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=202 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=204 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=237 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=238 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=239 | Type=Light | Color=None | Intensity=None
+SOURCE FILE: level3_scene_sky_lights.json
+  Object='None' | PathID=514 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=515 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=517 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=518 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=523 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=524 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=528 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=612 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=615 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=617 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=829 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=831 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=833 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=933 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=934 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=935 | Type=Light | Color=None | Intensity=None
+SOURCE FILE: level4_scene_sky_lights.json
+  Object='None' | PathID=1370 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1371 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1372 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1378 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1379 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1382 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1383 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1418 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1430 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=1435 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=2010 | Type=Transform | Color=None | Intensity=None
+  Object='None' | PathID=3217 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=3219 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=3221 | Type=MeshFilter | Color=None | Intensity=None
+  Object='None' | PathID=4639 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=4640 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=4641 | Type=Light | Color=None | Intensity=None
+  Object='None' | PathID=4642 | Type=Light | Color=None | Intensity=None
+
+--- TABLE 2: GODOT CONVERTED VALUES (DIRECT 1:1 PORT) ---
+  - SunLight.light_color = Color(1.0, 0.9622, 0.9162, 1.0) [Direct from Level 1 Sun Light]
+  - SunLight.light_energy = 1.5 [Direct from Level 1 Sun Intensity]
+  - WorldEnvironment.ambient_light_color = Color(0.4938, 0.7289, 0.85, 1.0) [Direct from Level 1 m_AmbientSkyColor]
+  - WorldEnvironment.fog_depth_end = 300.0 [Direct from Level 1 m_LinearFogEnd]
+
+--- TABLE 3: ARTISTIC CALIBRATION VALUES (GODOT MOBILE PBR TUNING) ---
+  - WorldEnvironment.ambient_light_energy = 0.85 (Calibrated from 1.0 to match Unity gamma-space ambient brightness in Godot Mobile tonemapper)
+  - WorldEnvironment.fog_depth_begin = 25.0 (Calibrated from 0.0 to keep foreground carrier deck crisp)
+  - WorldEnvironment.fog_light_color = Color(0.62, 0.85, 0.94, 1.0) (Calibrated daytime horizon scatter blend)

@@ -1,0 +1,16 @@
+=== PHASE 3.2 MISSION 1: REPRODUCIBLE ROOT CAUSE PROOF ===
+1. Failing Resource & Node: res://sky_assets/Half_Icosphere_131.tres -> Node '/root/Sky_Lighting_Test/OriginalSkydomeMesh'.
+2. Exact Engine Failure Mechanism:
+   - Calling ArrayMesh.surface_set_material(0, mat) [mesh.cpp:1948] and ArrayMesh.surface_set_name(0, name) [mesh.cpp:1968] on an ArrayMesh with surfaces.size() == 0.
+   - Triggered by: (a) malformed TRES array slot count (13 vs 12) yielding 0 surfaces, and (b) GLB baseColorFactor alpha=0.0 causing Godot 4.7 glTF importer to prune surface 0, compounded by stale .godot/imported/Half_Icosphere_131* cache.
+3. Cache & Re-import Proof: Deleting Half_Icosphere_131.glb.import and .godot/imported/Half_Icosphere_131* followed by re-importing 341-vert/640-tri GLB (alpha=0.02) permanently eliminated mesh.cpp:1948 & 1968.
+
+=== MISSION 2: HALF_ICOSPHERE_131 3-WAY SEPARATE TEST ===
+A. Original Half_Icosphere_131.obj (Untouched Unity Extract):
+   - Import Result: Rejected/Incomplete UV lookup in Godot OBJ importer.
+   - Counts: Verts=341, Tris=640, Normals=341, UVs(vt)=0.
+   - Why 'f 3/3/3': UnityPy's Wavefront OBJ exporter writes 'v/v/vn' index triplets unconditionally even when mesh m_UV0 channel is empty (vt=0).
+B. Half_Icosphere_131_clean_test.obj (Separate v//vn copy - Original NOT overwritten):
+   - Import Result: Valid canonical OBJ geometry (341 verts, 640 tris, 341 normals, 0 UVs).
+C. Half_Icosphere_131.glb (Runtime Skydome in Sky_Lighting_Test.tscn):
+   - Import Result: SUCCESS | Surfaces=1 | Verts=341 | Tris=640 | Normals=341 | UV=Procedural EYEDIR Spherical | Material=BLEND DoubleSided (alpha=0.02, scale=450).

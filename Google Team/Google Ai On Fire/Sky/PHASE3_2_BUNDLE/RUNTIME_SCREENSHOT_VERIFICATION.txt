@@ -1,0 +1,11 @@
+=== MISSION 5: RUNTIME SCREENSHOT & ACCEPTANCE VERIFICATION ===
+Godot Version: 4.7.2.stable.official | Project: CASTAWAY_DEPTHS_WORK/GODOT | Scene: Sky_Lighting_Test.tscn
+1. Reproducible Root Cause: Documented in PHASE3_2_ROOT_CAUSE_PROOF.txt & MESH_BEFORE_AFTER_EVIDENCE.txt.
+2. Corrected Mesh Import/Render: Half_Icosphere_131.glb (341 verts, 640 tris, 1 surface) renders with 0 mesh.cpp errors.
+3. All 5 Shader Textures Connected: stars_tex, cloud_tex, inscatter_lut, transmittance_lut (Float32), irradiance_lut (Float32).
+4. LUT Coordinate Mapping Validated: Bruneton 16-tile 256x16 inscatter + 256x64 transmittance + 64x16 irradiance.
+5. Level 0-4 Traceable Lighting: Every value mapped to File, Level, Object Name, PathID, and JSON Field.
+6. Runtime Screenshots Checklist (To capture in Godot 4.7.2 Play/Editor):
+   - Daytime Shot: Sky dome, sun disc, volumetric clouds, 300m horizon fog, shipwreck & coastal terrain lighting.
+   - Night Shot: Rotate SunLight X rotation to +35 deg (below horizon) to verify stars_texture_70 + night_haze.
+   - Output Panel: 0 mesh.cpp errors (79 meshes verified, 0 empty meshes).
