@@ -1,0 +1,9 @@
+=== PHASE B: HALF_ICOSPHERE_131.OBJ DIAGNOSTIC ===
+Source: /storage/emulated/0/Download/Stranded-Deep-Original/Stranded Deep/CASTAWAY_UNITY_EXTRACT/SKY_LIGHTING/Meshes/Half_Icosphere_131.obj
+Vertices (v): 341
+UVs (vt): 0
+Normals (vn): 341
+Faces (f): 640
+Sample Face Records: ['f 3/3/3 2/2/2 1/1/1', 'f 1/1/1 2/2/2 4/4/4', 'f 2/2/2 5/5/5 4/4/4', 'f 6/6/6 3/3/3 1/1/1', 'f 7/7/7 3/3/3 6/6/6']
+UV Status: MISSING (vt=0) -> requires v//vn format
+Clean Test Copy Saved: /storage/emulated/0/Download/CASTAWAY_DEPTHS_WORK/PHASE3_REPORTS/Half_Icosphere_131_clean_test.obj

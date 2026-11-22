@@ -1,0 +1,66 @@
+=== PHASE A: RECURSIVE GLB/MESH RUNTIME AUDIT ===
+
+FILE: res://Glb/beepi.glb (nodes=10, meshes=2)
+  Mesh[0] name='mesh_0' | surfaces=1 | nodes=['ub-mesh-0']
+  Mesh[1] name='mesh_1' | surfaces=1 | nodes=['ub-mesh-1']
+
+FILE: res://Glb/introscene.glb (nodes=409, meshes=33)
+  Mesh[0] name='mesh_0' | surfaces=1 | nodes=['ub-mesh-0', 'ub-mesh-0']
+  Mesh[1] name='mesh_1' | surfaces=1 | nodes=['ub-mesh-1', 'ub-mesh-1']
+  Mesh[2] name='mesh_2' | surfaces=1 | nodes=['ub-mesh-2', 'ub-mesh-2']
+  Mesh[3] name='mesh_3' | surfaces=1 | nodes=['ub-mesh-3', 'ub-mesh-3']
+  Mesh[4] name='mesh_4' | surfaces=1 | nodes=['ub-mesh-4', 'ub-mesh-4']
+  Mesh[5] name='mesh_5' | surfaces=1 | nodes=['ub-mesh-5']
+  Mesh[6] name='mesh_6' | surfaces=1 | nodes=['ub-mesh-6', 'ub-mesh-6', 'ub-mesh-6', 'ub-mesh-6']
+  Mesh[7] name='mesh_7' | surfaces=4 | nodes=['ub-mesh-7']
+  Mesh[8] name='mesh_8' | surfaces=3 | nodes=['ub-mesh-8']
+  Mesh[9] name='mesh_9' | surfaces=1 | nodes=['ub-mesh-9']
+  Mesh[10] name='mesh_10' | surfaces=1 | nodes=['ub-mesh-10']
+  Mesh[11] name='mesh_11' | surfaces=1 | nodes=['ub-mesh-11']
+  Mesh[12] name='mesh_12' | surfaces=1 | nodes=['ub-mesh-12']
+  Mesh[13] name='mesh_13' | surfaces=2 | nodes=['ub-mesh-13']
+  Mesh[14] name='mesh_14' | surfaces=2 | nodes=['ub-mesh-14']
+  Mesh[15] name='mesh_15' | surfaces=1 | nodes=['ub-mesh-15']
+  Mesh[16] name='mesh_16' | surfaces=2 | nodes=['ub-mesh-16']
+  Mesh[17] name='mesh_17' | surfaces=1 | nodes=['ub-mesh-17']
+  Mesh[18] name='mesh_18' | surfaces=1 | nodes=['ub-mesh-18', 'ub-mesh-18']
+  Mesh[19] name='mesh_19' | surfaces=1 | nodes=['ub-mesh-19', 'ub-mesh-19', 'ub-mesh-19', 'ub-mesh-19', 'ub-mesh-19', 'ub-mesh-19', 'ub-mesh-19']
+  Mesh[20] name='mesh_20' | surfaces=1 | nodes=['ub-mesh-20']
+  Mesh[21] name='mesh_21' | surfaces=1 | nodes=['ub-mesh-21', 'ub-mesh-21', 'ub-mesh-21', 'ub-mesh-21']
+  Mesh[22] name='mesh_22' | surfaces=1 | nodes=['ub-mesh-22', 'ub-mesh-22', 'ub-mesh-22', 'ub-mesh-22', 'ub-mesh-22']
+  Mesh[23] name='mesh_23' | surfaces=1 | nodes=['ub-mesh-23', 'ub-mesh-23', 'ub-mesh-23', 'ub-mesh-23']
+  Mesh[24] name='mesh_24' | surfaces=1 | nodes=['ub-mesh-24']
+  Mesh[25] name='mesh_25' | surfaces=1 | nodes=['ub-mesh-25']
+  Mesh[26] name='mesh_26' | surfaces=2 | nodes=['ub-mesh-26', 'ub-mesh-26']
+  Mesh[27] name='mesh_27' | surfaces=2 | nodes=['ub-mesh-27']
+  Mesh[28] name='mesh_28' | surfaces=1 | nodes=['ub-mesh-28']
+  Mesh[29] name='mesh_29' | surfaces=2 | nodes=['ub-mesh-29', 'ub-mesh-29', 'ub-mesh-29', 'ub-mesh-29', 'ub-mesh-29', 'ub-mesh-29', 'ub-mesh-29']
+  Mesh[30] name='mesh_30' | surfaces=1 | nodes=['ub-mesh-30']
+  Mesh[31] name='mesh_31' | surfaces=4 | nodes=['ub-mesh-31']
+  Mesh[32] name='mesh_32' | surfaces=1 | nodes=['ub-mesh-32']
+
+FILE: res://Glb/mission_eel.glb (nodes=34, meshes=4)
+  Mesh[0] name='mesh_0' | surfaces=2 | nodes=['ub-mesh-0']
+  Mesh[1] name='mesh_1' | surfaces=3 | nodes=['ub-mesh-1']
+  Mesh[2] name='mesh_2' | surfaces=1 | nodes=['ub-mesh-2']
+  Mesh[3] name='mesh_3' | surfaces=1 | nodes=['ub-mesh-3']
+
+FILE: res://Glb/mission_shark.glb (nodes=44, meshes=9)
+  Mesh[0] name='mesh_0' | surfaces=3 | nodes=['ub-mesh-0']
+  Mesh[1] name='mesh_1' | surfaces=2 | nodes=['ub-mesh-1']
+  Mesh[2] name='mesh_2' | surfaces=1 | nodes=['ub-mesh-2']
+  Mesh[3] name='mesh_3' | surfaces=1 | nodes=['ub-mesh-3']
+  Mesh[4] name='mesh_4' | surfaces=1 | nodes=['ub-mesh-4']
+  Mesh[5] name='mesh_5' | surfaces=1 | nodes=['ub-mesh-5']
+  Mesh[6] name='mesh_6' | surfaces=1 | nodes=['ub-mesh-6']
+  Mesh[7] name='mesh_7' | surfaces=1 | nodes=['ub-mesh-7']
+  Mesh[8] name='mesh_8' | surfaces=1 | nodes=['ub-mesh-8']
+
+FILE: res://sky_assets/Half_Icosphere_131.glb (nodes=1, meshes=1)
+  Mesh[0] name='Half_Icosphere_131' | surfaces=1 | nodes=['Half_Icosphere_131']
+
+=== EMPTY MESHES (surface_count == 0) ===
+None in GLB files (check importer empty sub-meshes)
+
+=== GDSCRIPT SURFACE SETTER SCAN ===
+No .gd scripts calling surface_set_material/name

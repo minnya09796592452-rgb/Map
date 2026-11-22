@@ -1,0 +1,5 @@
+=== PHASE C: HDR LUT DECODING & SHADER COMPLETENESS ===
+irradiance_69: 64x16 | UnityFormat=17 | bytes=8192 (expected_mip0=8192)
+  -> Decoded True Float32 HDR: irradiance_69_float32.pfm (min=0.00000, max=0.12988)
+transmittance_77: 256x64 | UnityFormat=17 | bytes=131072 (expected_mip0=131072)
+  -> Decoded True Float32 HDR: transmittance_77_float32.pfm (min=0.00000, max=0.99609)

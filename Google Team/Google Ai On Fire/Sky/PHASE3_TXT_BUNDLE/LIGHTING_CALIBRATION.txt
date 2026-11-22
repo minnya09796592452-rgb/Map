@@ -1,0 +1,14 @@
+=== PHASE D: ORIGINAL LIGHTING CALIBRATION ===
+1. ORIGINAL EXTRACTED VALUES (Stranded Deep Unity Source):
+   - Level 0 Sun Light: Color=(1.0, 0.9978, 0.9907), Intensity=1.5
+   - Level 1 Sun Light: Color=(1.0, 0.9622, 0.9162), Intensity=1.5, Shadows=Soft(2)
+   - Level 0 RenderSettings: Fog=False
+   - Level 1 RenderSettings: Fog=True (Linear 0.0 -> 300.0), AmbientSky=(0.4938, 0.7289, 0.85)
+   - Skydome_MAT_8: _SkyColor=(0.4579, 0.9211, 0.9631), _SunColor=(0.9631, 0.9521, 0.9211)
+   - Skydome_MAT_8 Scattering: _BetaRayleigh=(2.19e-5, 5.12e-5, 1.14e-4), _BetaMie=(6.80e-8, 1.03e-7, 1.50e-7)
+
+2. GODOT CALIBRATION VALUES (Sky_Lighting_Test.tscn):
+   - DirectionalLight3D: Color=(1.0, 0.9622, 0.9162), Energy=1.5 (Calibrated from Level 1 Daytime)
+   - WorldEnvironment Ambient: Color=(0.4938, 0.7289, 0.85), Energy=0.85
+   - WorldEnvironment Fog: Linear Depth 25.0m -> 300.0m, Color=(0.62, 0.85, 0.94)
+   - Shader Scattering: Bruneton Rayleigh + Mie + Henyey-Greenstein(g=0.6975) + inscatter_lut + stars_tex + cloud_tex

@@ -1,0 +1,28 @@
+=== PHASE 3 RUNTIME ERROR VERIFICATION SUMMARY ===
+Total Scene MeshInstance3D Scanned: 79
+Empty Meshes (surfaces == 0) in Scene: 0
+Godot Engine Log ERROR lines captured: 4
+Root Cause Note: All scene meshes have >= 1 valid surface. Any FreeType/Gizmo message originates from Godot 4.7.2 Android Editor UI initialization, NOT Sky_Lighting_Test.tscn runtime.
+
+--- CAPTURED ENGINE ERROR LINES (IF ANY) ---
+ERROR: FreeType: Error loading font: '' (face_index=0).
+ERROR: Condition "!_ensure_cache_for_size(fd, size, ffsd)" is true.
+ERROR: FreeType: Error loading font: '' (face_index=0).
+ERROR: Condition "!_ensure_cache_for_size(fd, size, ffsd)" is true.
+
+--- VERIFIED SCENE MESHES (FIRST 15) ---
+MESH: /root/Sky_Lighting_Test/OriginalSkydomeMesh/Half_Icosphere_131 | res=res://sky_assets/Half_Icosphere_131.glb::ArrayMesh_iyg7a | surfaces=1
+MESH: /root/Sky_Lighting_Test/ShipwreckRef/mission_eel/ENVIRONMENT/Submarine/Details/ub-mesh-0 | res=res://Glb/mission_eel.glb::ArrayMesh_aemy2 | surfaces=2
+MESH: /root/Sky_Lighting_Test/ShipwreckRef/mission_eel/ENVIRONMENT/Submarine/Submarine2/ub-mesh-1 | res=res://Glb/mission_eel.glb::ArrayMesh_7ymuw | surfaces=3
+MESH: /root/Sky_Lighting_Test/ShipwreckRef/mission_eel/ENVIRONMENT/Submarine_Terrain/ub-mesh-2 | res=res://Glb/mission_eel.glb::ArrayMesh_u8u8v | surfaces=1
+MESH: /root/Sky_Lighting_Test/ShipwreckRef/mission_eel/GOAL_EEL/Eel_Idle/Eel_Rig_Final_Eel_Mesh/ub-mesh-3 | res=res://Glb/mission_eel.glb::ArrayMesh_mh36c | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character/Survivor_01_Reference/Survivor_01_Hips/Survivor_01_Spine/Survivor_01_Spine1/Survivor_01_Spine2/Survivor_01_Spine3/Survivor_01_LeftShoulder/Survivor_01_LeftShoulderExtra/Survivor_01_LeftArm/Survivor_01_LeftArmRoll/Survivor_01_LeftForeArm/Survivor_01_LeftForeArmRoll/Survivor_01_LeftHand/Watch/ub-mesh-0 | res=res://Glb/introscene.glb::ArrayMesh_6l86c | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character/survivor_group/lowerBody/survivor_pants/ub-mesh-1 | res=res://Glb/introscene.glb::ArrayMesh_bab3i | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character/survivor_group/lowerBody/survivor_shoes/ub-mesh-2 | res=res://Glb/introscene.glb::ArrayMesh_5kvh7 | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character/survivor_group/upperBody/survivor_shirt/ub-mesh-3 | res=res://Glb/introscene.glb::ArrayMesh_fnp2n | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character/survivor_group/upperBody/survivor_tie/ub-mesh-4 | res=res://Glb/introscene.glb::ArrayMesh_1p7hl | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character_2/Survivor_01_Reference2/Survivor_01_Hips2/Survivor_01_Spine4/Survivor_01_Spine12/Survivor_01_Spine22/Survivor_01_Spine32/Survivor_01_LeftShoulder2/Survivor_01_LeftShoulderExtra2/Survivor_01_LeftArm2/Survivor_01_LeftArmRoll2/Survivor_01_LeftForeArm2/Survivor_01_LeftForeArmRoll2/Survivor_01_LeftHand2/Watch2/ub-mesh-02 | res=res://Glb/introscene.glb::ArrayMesh_6l86c | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character_2/survivor_group2/lowerBody2/survivor_pants2/ub-mesh-12 | res=res://Glb/introscene.glb::ArrayMesh_bab3i | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character_2/survivor_group2/lowerBody2/survivor_shoes2/ub-mesh-22 | res=res://Glb/introscene.glb::ArrayMesh_5kvh7 | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character_2/survivor_group2/upperBody2/survivor_shirt2/ub-mesh-32 | res=res://Glb/introscene.glb::ArrayMesh_fnp2n | surfaces=1
+MESH: /root/Sky_Lighting_Test/SeaplaneRef/introscene/Intro_Assets/Setup/Character_2/survivor_group2/upperBody2/survivor_tie2/ub-mesh-42 | res=res://Glb/introscene.glb::ArrayMesh_1p7hl | surfaces=1
