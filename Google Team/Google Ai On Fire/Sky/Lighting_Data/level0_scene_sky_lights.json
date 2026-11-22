@@ -1,0 +1,225 @@
+[
+  {
+    "type": "Transform",
+    "go_name": "CONTAINER - Start Screen",
+    "path_id": 185,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 69
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 140
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 133
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 193
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 146
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 180
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 155
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 163
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Directional light",
+    "path_id": 191,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 76
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.9961947202682495,
+        "z": -0.087155781686306,
+        "w": 0.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 193
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Atmosphere",
+    "path_id": 193,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 78
+      },
+      "m_LocalRotation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 191
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 185
+      }
+    }
+  },
+  {
+    "type": "Light",
+    "go_name": "Directional light",
+    "path_id": 219,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 76
+      },
+      "m_Enabled": 1,
+      "m_Type": 1,
+      "m_Shape": 0,
+      "m_Color": {
+        "r": 1.0,
+        "g": 0.9978121519088745,
+        "b": 0.9206896424293518,
+        "a": 1.0
+      },
+      "m_Intensity": 1.5,
+      "m_Range": 10.0,
+      "m_SpotAngle": 30.0,
+      "m_InnerSpotAngle": 21.802080154418945,
+      "m_CookieSize": 10.0,
+      "m_Shadows": {
+        "m_Type": 0,
+        "m_Resolution": -1,
+        "m_CustomResolution": -1,
+        "m_Strength": 1.0,
+        "m_Bias": 0.05000000074505806,
+        "m_NormalBias": 0.4000000059604645,
+        "m_NearPlane": 0.20000000298023224,
+        "m_CullingMatrixOverride": {
+          "e00": 1.0,
+          "e01": 0.0,
+          "e02": 0.0,
+          "e03": 0.0,
+          "e10": 0.0,
+          "e11": 1.0,
+          "e12": 0.0,
+          "e13": 0.0,
+          "e20": 0.0,
+          "e21": 0.0,
+          "e22": 1.0,
+          "e23": 0.0,
+          "e30": 0.0,
+          "e31": 0.0,
+          "e32": 0.0,
+          "e33": 1.0
+        },
+        "m_UseCullingMatrixOverride": false
+      },
+      "m_Cookie": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_DrawHalo": false,
+      "m_BakingOutput": {
+        "probeOcclusionLightIndex": -1,
+        "occlusionMaskChannel": -1,
+        "lightmapBakeMode": {
+          "lightmapBakeType": 4,
+          "mixedLightingMode": 2
+        },
+        "isBaked": false
+      },
+      "m_Flare": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_RenderMode": 0,
+      "m_CullingMask": {
+        "m_Bits": 4294967295
+      },
+      "m_RenderingLayerMask": 1,
+      "m_Lightmapping": 4,
+      "m_LightShadowCasterMode": 0,
+      "m_AreaSize": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "m_BounceIntensity": 1.0,
+      "m_ColorTemperature": 6570.0,
+      "m_UseColorTemperature": false,
+      "m_BoundingSphereOverride": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+      },
+      "m_UseBoundingSphereOverride": false,
+      "m_UseViewFrustumForShadowCasterCull": true
+    }
+  }
+]

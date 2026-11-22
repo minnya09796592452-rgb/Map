@@ -1,0 +1,816 @@
+[
+  {
+    "type": "Transform",
+    "go_name": "Clouds - Volumetric",
+    "path_id": 1370,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 14
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1371
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Skydome",
+    "path_id": 1371,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 27
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1400.0,
+        "y": 1400.0,
+        "z": 1400.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 1370
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 1372
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1378
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Clouds",
+    "path_id": 1372,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 28
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 0.9900000095367432,
+        "y": 0.9900000095367432,
+        "z": 0.9900000095367432
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1371
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "_Atmosphere",
+    "path_id": 1378,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 20
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 1371
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 1380
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 1377
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Sun",
+    "path_id": 1379,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 21
+      },
+      "m_LocalRotation": {
+        "x": 0.1873813271522522,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.9822872281074524
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1380
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Moon",
+    "path_id": 1382,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 24
+      },
+      "m_LocalRotation": {
+        "x": -0.3826967179775238,
+        "y": 0.5997155904769897,
+        "z": 0.39472150802612305,
+        "w": 0.5814459323883057
+      },
+      "m_LocalPosition": {
+        "x": -0.39489173889160156,
+        "y": -0.9175577759742737,
+        "z": 0.012218987569212914
+      },
+      "m_LocalScale": {
+        "x": 40.0,
+        "y": 40.0,
+        "z": 40.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 1375
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 1381
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1380
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Weather Event - Light Rain",
+    "path_id": 1383,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 25
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 1384
+        },
+        {
+          "m_FileID": 0,
+          "m_PathID": 1385
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1377
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Directional Light - Lightning",
+    "path_id": 1418,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 75
+      },
+      "m_LocalRotation": {
+        "x": 0.7071068286895752,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 0.7071068286895752
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1430
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Weather Event Effect - Lightning",
+    "path_id": 1430,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 83
+      },
+      "m_LocalRotation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [
+        {
+          "m_FileID": 0,
+          "m_PathID": 1418
+        }
+      ],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1373
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Light Rain",
+    "path_id": 1435,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 76
+      },
+      "m_LocalRotation": {
+        "x": -0.0,
+        "y": -0.0,
+        "z": -0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 1385
+      }
+    }
+  },
+  {
+    "type": "Transform",
+    "go_name": "Light",
+    "path_id": 2010,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 909
+      },
+      "m_LocalRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "m_LocalPosition": {
+        "x": 0.0,
+        "y": 0.05000000074505806,
+        "z": -0.024000000208616257
+      },
+      "m_LocalScale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "m_Children": [],
+      "m_Father": {
+        "m_FileID": 0,
+        "m_PathID": 2282
+      }
+    }
+  },
+  {
+    "type": "MeshFilter",
+    "go_name": "Skydome",
+    "path_id": 3217,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 27
+      },
+      "m_Mesh": {
+        "m_FileID": 3,
+        "m_PathID": 131
+      }
+    }
+  },
+  {
+    "type": "MeshFilter",
+    "go_name": "Moon",
+    "path_id": 3219,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 24
+      },
+      "m_Mesh": {
+        "m_FileID": 3,
+        "m_PathID": 129
+      }
+    }
+  },
+  {
+    "type": "MeshFilter",
+    "go_name": "Clouds",
+    "path_id": 3221,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 28
+      },
+      "m_Mesh": {
+        "m_FileID": 3,
+        "m_PathID": 131
+      }
+    }
+  },
+  {
+    "type": "Light",
+    "go_name": "Moon",
+    "path_id": 4639,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 24
+      },
+      "m_Enabled": 0,
+      "m_Type": 1,
+      "m_Shape": 0,
+      "m_Color": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 1.0
+      },
+      "m_Intensity": 0.1655304729938507,
+      "m_Range": 10.0,
+      "m_SpotAngle": 30.0,
+      "m_InnerSpotAngle": 21.802080154418945,
+      "m_CookieSize": 0.0,
+      "m_Shadows": {
+        "m_Type": 2,
+        "m_Resolution": -1,
+        "m_CustomResolution": -1,
+        "m_Strength": 0.8999999761581421,
+        "m_Bias": 0.019999999552965164,
+        "m_NormalBias": 0.019999999552965164,
+        "m_NearPlane": 10.0,
+        "m_CullingMatrixOverride": {
+          "e00": 1.0,
+          "e01": 0.0,
+          "e02": 0.0,
+          "e03": 0.0,
+          "e10": 0.0,
+          "e11": 1.0,
+          "e12": 0.0,
+          "e13": 0.0,
+          "e20": 0.0,
+          "e21": 0.0,
+          "e22": 1.0,
+          "e23": 0.0,
+          "e30": 0.0,
+          "e31": 0.0,
+          "e32": 0.0,
+          "e33": 1.0
+        },
+        "m_UseCullingMatrixOverride": false
+      },
+      "m_Cookie": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_DrawHalo": false,
+      "m_BakingOutput": {
+        "probeOcclusionLightIndex": -1,
+        "occlusionMaskChannel": -1,
+        "lightmapBakeMode": {
+          "lightmapBakeType": 4,
+          "mixedLightingMode": 2
+        },
+        "isBaked": false
+      },
+      "m_Flare": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_RenderMode": 1,
+      "m_CullingMask": {
+        "m_Bits": 4294928351
+      },
+      "m_RenderingLayerMask": 1,
+      "m_Lightmapping": 4,
+      "m_LightShadowCasterMode": 0,
+      "m_AreaSize": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "m_BounceIntensity": 1.0,
+      "m_ColorTemperature": 6570.0,
+      "m_UseColorTemperature": false,
+      "m_BoundingSphereOverride": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+      },
+      "m_UseBoundingSphereOverride": false,
+      "m_UseViewFrustumForShadowCasterCull": true
+    }
+  },
+  {
+    "type": "Light",
+    "go_name": "Sun",
+    "path_id": 4640,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 21
+      },
+      "m_Enabled": 1,
+      "m_Type": 1,
+      "m_Shape": 0,
+      "m_Color": {
+        "r": 1.0,
+        "g": 0.9922216534614563,
+        "b": 0.9852941036224365,
+        "a": 1.0
+      },
+      "m_Intensity": 1.0,
+      "m_Range": 10.0,
+      "m_SpotAngle": 30.0,
+      "m_InnerSpotAngle": 21.802080154418945,
+      "m_CookieSize": 2000.0,
+      "m_Shadows": {
+        "m_Type": 2,
+        "m_Resolution": -1,
+        "m_CustomResolution": -1,
+        "m_Strength": 1.0,
+        "m_Bias": 0.019999999552965164,
+        "m_NormalBias": 0.019999999552965164,
+        "m_NearPlane": 10.0,
+        "m_CullingMatrixOverride": {
+          "e00": 1.0,
+          "e01": 0.0,
+          "e02": 0.0,
+          "e03": 0.0,
+          "e10": 0.0,
+          "e11": 1.0,
+          "e12": 0.0,
+          "e13": 0.0,
+          "e20": 0.0,
+          "e21": 0.0,
+          "e22": 1.0,
+          "e23": 0.0,
+          "e30": 0.0,
+          "e31": 0.0,
+          "e32": 0.0,
+          "e33": 1.0
+        },
+        "m_UseCullingMatrixOverride": false
+      },
+      "m_Cookie": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_DrawHalo": false,
+      "m_BakingOutput": {
+        "probeOcclusionLightIndex": -1,
+        "occlusionMaskChannel": -1,
+        "lightmapBakeMode": {
+          "lightmapBakeType": 4,
+          "mixedLightingMode": 2
+        },
+        "isBaked": false
+      },
+      "m_Flare": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_RenderMode": 0,
+      "m_CullingMask": {
+        "m_Bits": 4294928351
+      },
+      "m_RenderingLayerMask": 1,
+      "m_Lightmapping": 4,
+      "m_LightShadowCasterMode": 0,
+      "m_AreaSize": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "m_BounceIntensity": 1.0,
+      "m_ColorTemperature": 6570.0,
+      "m_UseColorTemperature": false,
+      "m_BoundingSphereOverride": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+      },
+      "m_UseBoundingSphereOverride": false,
+      "m_UseViewFrustumForShadowCasterCull": true
+    }
+  },
+  {
+    "type": "Light",
+    "go_name": "Directional Light - Lightning",
+    "path_id": 4641,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 75
+      },
+      "m_Enabled": 0,
+      "m_Type": 1,
+      "m_Shape": 0,
+      "m_Color": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "m_Intensity": 8.0,
+      "m_Range": 10.0,
+      "m_SpotAngle": 30.0,
+      "m_InnerSpotAngle": 21.802080154418945,
+      "m_CookieSize": 10.0,
+      "m_Shadows": {
+        "m_Type": 0,
+        "m_Resolution": -1,
+        "m_CustomResolution": -1,
+        "m_Strength": 1.0,
+        "m_Bias": 0.05000000074505806,
+        "m_NormalBias": 0.4000000059604645,
+        "m_NearPlane": 0.20000000298023224,
+        "m_CullingMatrixOverride": {
+          "e00": 1.0,
+          "e01": 0.0,
+          "e02": 0.0,
+          "e03": 0.0,
+          "e10": 0.0,
+          "e11": 1.0,
+          "e12": 0.0,
+          "e13": 0.0,
+          "e20": 0.0,
+          "e21": 0.0,
+          "e22": 1.0,
+          "e23": 0.0,
+          "e30": 0.0,
+          "e31": 0.0,
+          "e32": 0.0,
+          "e33": 1.0
+        },
+        "m_UseCullingMatrixOverride": false
+      },
+      "m_Cookie": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_DrawHalo": false,
+      "m_BakingOutput": {
+        "probeOcclusionLightIndex": -1,
+        "occlusionMaskChannel": -1,
+        "lightmapBakeMode": {
+          "lightmapBakeType": 4,
+          "mixedLightingMode": 2
+        },
+        "isBaked": false
+      },
+      "m_Flare": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_RenderMode": 1,
+      "m_CullingMask": {
+        "m_Bits": 2684053471
+      },
+      "m_RenderingLayerMask": 1,
+      "m_Lightmapping": 4,
+      "m_LightShadowCasterMode": 0,
+      "m_AreaSize": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "m_BounceIntensity": 0.0,
+      "m_ColorTemperature": 6570.0,
+      "m_UseColorTemperature": false,
+      "m_BoundingSphereOverride": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+      },
+      "m_UseBoundingSphereOverride": false,
+      "m_UseViewFrustumForShadowCasterCull": true
+    }
+  },
+  {
+    "type": "Light",
+    "go_name": "Light",
+    "path_id": 4642,
+    "data": {
+      "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 909
+      },
+      "m_Enabled": 1,
+      "m_Type": 2,
+      "m_Shape": 0,
+      "m_Color": {
+        "r": 0.9251730442047119,
+        "g": 0.9813625812530518,
+        "b": 1.0,
+        "a": 1.0
+      },
+      "m_Intensity": 1.8778618574142456,
+      "m_Range": 5.0,
+      "m_SpotAngle": 30.0,
+      "m_InnerSpotAngle": 21.802080154418945,
+      "m_CookieSize": 2000.0,
+      "m_Shadows": {
+        "m_Type": 0,
+        "m_Resolution": 0,
+        "m_CustomResolution": -1,
+        "m_Strength": 0.8999999761581421,
+        "m_Bias": 0.10000000149011612,
+        "m_NormalBias": 0.4000000059604645,
+        "m_NearPlane": 0.20000000298023224,
+        "m_CullingMatrixOverride": {
+          "e00": 1.0,
+          "e01": 0.0,
+          "e02": 0.0,
+          "e03": 0.0,
+          "e10": 0.0,
+          "e11": 1.0,
+          "e12": 0.0,
+          "e13": 0.0,
+          "e20": 0.0,
+          "e21": 0.0,
+          "e22": 1.0,
+          "e23": 0.0,
+          "e30": 0.0,
+          "e31": 0.0,
+          "e32": 0.0,
+          "e33": 1.0
+        },
+        "m_UseCullingMatrixOverride": false
+      },
+      "m_Cookie": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_DrawHalo": false,
+      "m_BakingOutput": {
+        "probeOcclusionLightIndex": -1,
+        "occlusionMaskChannel": -1,
+        "lightmapBakeMode": {
+          "lightmapBakeType": 4,
+          "mixedLightingMode": 2
+        },
+        "isBaked": false
+      },
+      "m_Flare": {
+        "m_FileID": 0,
+        "m_PathID": 0
+      },
+      "m_RenderMode": 0,
+      "m_CullingMask": {
+        "m_Bits": 2582819580
+      },
+      "m_RenderingLayerMask": 1,
+      "m_Lightmapping": 1,
+      "m_LightShadowCasterMode": 0,
+      "m_AreaSize": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "m_BounceIntensity": 1.0,
+      "m_ColorTemperature": 6570.0,
+      "m_UseColorTemperature": false,
+      "m_BoundingSphereOverride": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+      },
+      "m_UseBoundingSphereOverride": false,
+      "m_UseViewFrustumForShadowCasterCull": true
+    }
+  }
+]
