@@ -1,0 +1,257 @@
+{
+  "m_Name": "Clouds_MAT",
+  "m_Shader": {
+    "m_FileID": 0,
+    "m_PathID": 165
+  },
+  "m_ShaderKeywords": "VOLUMETRIC_CLOUDS_ON",
+  "m_LightmapFlags": 5,
+  "m_EnableInstancingVariants": false,
+  "m_DoubleSidedGI": false,
+  "m_CustomRenderQueue": -1,
+  "stringTagMap": [],
+  "disabledShaderPasses": [],
+  "m_SavedProperties": {
+    "m_TexEnvs": [
+      [
+        "_AltoCumulusCloudLayer",
+        {
+          "m_Texture": {
+            "m_FileID": 0,
+            "m_PathID": 36
+          },
+          "m_Scale": {
+            "x": 1.0,
+            "y": 1.0
+          },
+          "m_Offset": {
+            "x": 0.0,
+            "y": 0.0
+          }
+        }
+      ],
+      [
+        "_AltoCumulusCloudNormals",
+        {
+          "m_Texture": {
+            "m_FileID": 0,
+            "m_PathID": 66
+          },
+          "m_Scale": {
+            "x": 1.0,
+            "y": 1.0
+          },
+          "m_Offset": {
+            "x": 0.0,
+            "y": 0.0
+          }
+        }
+      ],
+      [
+        "_CirrusCloudLayer",
+        {
+          "m_Texture": {
+            "m_FileID": 0,
+            "m_PathID": 33
+          },
+          "m_Scale": {
+            "x": 1.0,
+            "y": 1.0
+          },
+          "m_Offset": {
+            "x": 0.0,
+            "y": 0.0
+          }
+        }
+      ],
+      [
+        "_CloudTex",
+        {
+          "m_Texture": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Scale": {
+            "x": 1.0,
+            "y": 1.0
+          },
+          "m_Offset": {
+            "x": 0.0,
+            "y": 0.0
+          }
+        }
+      ]
+    ],
+    "m_Ints": [],
+    "m_Floats": [
+      [
+        "_AltoCumulusCloudDensity",
+        0.800000011920929
+      ],
+      [
+        "_AltoCumulusCloudScale1",
+        5.0
+      ],
+      [
+        "_AltoCumulusCloudScale2",
+        6.0
+      ],
+      [
+        "_AltoCumulusCloudShading",
+        0.800000011920929
+      ],
+      [
+        "_AltoCumulusCloudSharpness",
+        1.0
+      ],
+      [
+        "_AltoCumulusCloudSpeed1",
+        0.07000000029802322
+      ],
+      [
+        "_AltoCumulusCloudSpeed2",
+        0.15000000596046448
+      ],
+      [
+        "_AltoCumulusCloudTone",
+        1.0
+      ],
+      [
+        "_AltoCumulusIntensity",
+        1.0
+      ],
+      [
+        "_AltoCumulusScatteringIntensity",
+        7.0
+      ],
+      [
+        "_CirrusCloudDensity",
+        0.10000000149011612
+      ],
+      [
+        "_CirrusCloudScale1",
+        30.0
+      ],
+      [
+        "_CirrusCloudScale2",
+        20.0
+      ],
+      [
+        "_CirrusCloudShading",
+        1.0
+      ],
+      [
+        "_CirrusCloudSharpness",
+        1.5
+      ],
+      [
+        "_CirrusCloudSpeed1",
+        0.15000000596046448
+      ],
+      [
+        "_CirrusCloudSpeed2",
+        0.25
+      ],
+      [
+        "_CirrusCloudTone",
+        1.0
+      ],
+      [
+        "_CloudDensity",
+        0.800000011920929
+      ],
+      [
+        "_CloudScale1",
+        3.0
+      ],
+      [
+        "_CloudScale2",
+        9.0
+      ],
+      [
+        "_CloudShading",
+        1.0
+      ],
+      [
+        "_CloudSharpness",
+        1.0
+      ],
+      [
+        "_CloudSpeed1",
+        0.20000000298023224
+      ],
+      [
+        "_CloudSpeed2",
+        0.4000000059604645
+      ],
+      [
+        "_CloudTone",
+        1.0
+      ],
+      [
+        "_Cutoff",
+        0.0
+      ],
+      [
+        "_NoiseScale",
+        1.0
+      ],
+      [
+        "_NoiseSpeed",
+        1.5
+      ],
+      [
+        "_OneOverGamma",
+        1.0
+      ]
+    ],
+    "m_Colors": [
+      [
+        "_CloudColor",
+        {
+          "r": 1.0,
+          "g": 1.0,
+          "b": 1.0,
+          "a": 1.0
+        }
+      ],
+      [
+        "_Color",
+        {
+          "r": 1.0,
+          "g": 1.0,
+          "b": 1.0,
+          "a": 1.0
+        }
+      ],
+      [
+        "_LightColor",
+        {
+          "r": 0.9999999403953552,
+          "g": 0.9999999403953552,
+          "b": 0.9999999403953552,
+          "a": 1.0
+        }
+      ],
+      [
+        "_LightDirection",
+        {
+          "r": 0.0,
+          "g": 0.0,
+          "b": 0.0,
+          "a": 0.0
+        }
+      ],
+      [
+        "_WindDirection",
+        {
+          "r": 2.0,
+          "g": 1.0,
+          "b": 2.0,
+          "a": 1.0
+        }
+      ]
+    ]
+  },
+  "m_BuildTextureStacks": []
+}
