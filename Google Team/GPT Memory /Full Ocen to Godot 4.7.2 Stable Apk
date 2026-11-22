@@ -1,28 +1,7 @@
-Grid 3 Full Trace
-နောက်တစ်ဆင့်
-Shader Consumption, Query Buffer Population, Sample Index 3 နဲ့ Alternate Path။
-
-
-
-CPU Buffer State Verification
-
-Swap နဲ့ Task Completion အကြား Caller Order၊ Initialization နဲ့ Buffer Data Validity။
-
-
-
-Independent Decoder
-
-1,028 Method တွေကို Raw Byte Decoder နဲ့ ပြန်တိုက်စစ်ရန်။
-
-
-
-Compiled Shader / FFT
-
-Shader Source နဲ့ GPU Compute အလုပ်လုပ်ပုံကို သီးခြားအတည်ပြုရန်။
-
-
-
-Godot 4.7.2 Reconstruction Specification
-
-အထက်ပါအထောက်အထားတွေ ပြည့်စုံပြီးမှ ဆက်လုပ်ရန်။
-
+CASTAWAY-DEPTHS — GRAPHIC FIDELITY RULES
+Original Graphic Preservation — မူရင်းဂိမ်းရဲ့ အရောင်၊ အလင်း၊ အရိပ်၊ Texture၊ Material၊ Sky၊ Ocean၊ Terrain၊ Model တို့ကို ကိုယ့်စိတ်ကြိုက် ပြောင်းလဲခြင်းမလုပ်ရ။
+No Graphic Generation — မူရင်းမှာ မရှိတဲ့ Graphic အသစ်တွေကို AI နဲ့ ဖန်တီးထည့်သွင်းခြင်း မလုပ်ရ။
+Engine Adaptation — Unity နဲ့ Godot ရဲ့ Rendering System မတူလို့ လိုအပ်တဲ့ Conversion၊ Shader၊ Mapping၊ Exposure၊ Color Space၊ Tone Mapping တို့ကို Godot ဘက်မှာပဲ ညှိရမယ်။
+Visual Output Matching — တန်ဖိုးနံပါတ်တူဖို့ မဟုတ်ဘဲ နောက်ဆုံးထွက်လာတဲ့ Pixel၊ Color၊ Brightness၊ Contrast နဲ့ Visual Appearance တူဖို့ ဦးစားပေးရမယ်။
+Original Asset Priority — မူရင်း Asset ရှိပြီးသားဆိုရင် အဲဒီ Asset ကိုပဲ သုံးရမယ်။ မူရင်းနဲ့ မတူတဲ့ Replacement မလုပ်ရ။
+Internal Freedom — နောက်ကွယ်က Processing၊ Data Structure၊ Shader Architecture၊ Rendering Pipeline ကိုတော့ လိုအပ်သလို ပြောင်းလဲခွင့်ရှိတယ်။
