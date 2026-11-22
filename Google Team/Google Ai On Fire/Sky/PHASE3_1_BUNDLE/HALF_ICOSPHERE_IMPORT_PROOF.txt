@@ -1,0 +1,4 @@
+=== HALF_ICOSPHERE_131 IMPORT PROOF ===
+Original OBJ: 341 verts, 0 UVs (vt=0), 341 normals, 640 faces ('f 3/3/3 ...' invalid vt index).
+Clean Test OBJ (Half_Icosphere_131_clean_test.obj): Separate v//vn copy (341 verts, 341 normals, 640 faces).
+Runtime GLB (Half_Icosphere_131.glb): Surface=1, Verts=341, Tris=640, Procedural EYEDIR spherical UV in Sky Shader.

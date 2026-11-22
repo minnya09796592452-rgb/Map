@@ -1,0 +1,56 @@
+=== SHADER SOURCE AUDIT (LINE NUMBERS) ===
+UNIFORM stars_tex: Decl=['L2: uniform sampler2D stars_tex : source_color;'] | Assign=['L17: shader_parameter/stars_tex = ExtResource("2")'] | Sample=['L43: vec3 stars = texture(stars_tex, uv1 * 1.5).rgb * smoothstep(0.35, 0.90, h) * mix(0.85, 0.10, day_factor);']
+UNIFORM inscatter_lut: Decl=['L4: uniform sampler2D inscatter_lut : filter_linear, repeat_disable;'] | Assign=['L19: shader_parameter/inscatter_lut = ExtResource("4")'] | Sample=['L24: vec3 inscat = texture(inscatter_lut, vec2(0.5, clamp(1.0 - h, 0.05, 0.95))).rgb;']
+UNIFORM irradiance_lut: Decl=['L6: uniform sampler2D irradiance_lut : filter_linear, repeat_disable;'] | Assign=['L21: shader_parameter/irradiance_lut = ExtResource("6")'] | Sample=['L23: vec3 irrad = texture(irradiance_lut, vec2(sun_elev, clamp(1.0 - h, 0.05, 0.95))).rgb;']
+UNIFORM transmittance_lut: Decl=['L5: uniform sampler2D transmittance_lut : filter_linear, repeat_disable;'] | Assign=['L20: shader_parameter/transmittance_lut = ExtResource("5")'] | Sample=['L22: vec3 trans = texture(transmittance_lut, vec2(clamp(1.0 - h, 0.05, 0.95), sun_elev)).rgb;']
+UNIFORM cloud_tex: Decl=['L3: uniform sampler2D cloud_tex : source_color;'] | Assign=['L18: shader_parameter/cloud_tex = ExtResource("3")'] | Sample=['L38: float c1 = texture(cloud_tex, uv1).r;', 'L39: float c2 = texture(cloud_tex, uv2).g;']
+
+=== FULL SHADER CODE ===
+01 | shader_type sky;
+02 | uniform sampler2D stars_tex : source_color;
+03 | uniform sampler2D cloud_tex : source_color;
+04 | uniform sampler2D inscatter_lut : filter_linear, repeat_disable;
+05 | uniform sampler2D transmittance_lut : filter_linear, repeat_disable;
+06 | uniform sampler2D irradiance_lut : filter_linear, repeat_disable;
+07 | uniform vec3 beta_rayleigh = vec3(0.000021896, 0.000051163, 0.00011414);
+08 | uniform vec3 beta_mie = vec3(0.000000068, 0.000000103, 0.000000150);
+09 | uniform float mie_g = 0.6975;
+10 | uniform vec3 sky_color : source_color = vec3(0.4579, 0.9211, 0.9631);
+11 | uniform vec3 zenith_color : source_color = vec3(0.14, 0.48, 0.78);
+12 | uniform vec3 horizon_color : source_color = vec3(0.68, 0.88, 0.96);
+13 | uniform vec3 night_haze : source_color = vec3(0.0172, 0.0229, 0.0300);
+14 | uniform vec3 sun_tint : source_color = vec3(0.9631, 0.9521, 0.9211);
+15 | uniform float cloud_coverage = 0.52;
+16 | uniform float cloud_speed = 0.008;
+17 | void sky() {
+18 |     float h = clamp(EYEDIR.y, 0.0, 1.0);
+19 |     float cos_theta = dot(EYEDIR, LIGHT0_DIRECTION);
+20 |     float sun_amt = max(cos_theta, 0.0);
+21 |     float sun_elev = clamp(LIGHT0_DIRECTION.y * 0.5 + 0.5, 0.05, 0.95);
+22 |     vec3 trans = texture(transmittance_lut, vec2(clamp(1.0 - h, 0.05, 0.95), sun_elev)).rgb;
+23 |     vec3 irrad = texture(irradiance_lut, vec2(sun_elev, clamp(1.0 - h, 0.05, 0.95))).rgb;
+24 |     vec3 inscat = texture(inscatter_lut, vec2(0.5, clamp(1.0 - h, 0.05, 0.95))).rgb;
+25 |     float phase_r = 0.75 * (1.0 + cos_theta * cos_theta);
+26 |     float g2 = mie_g * mie_g;
+27 |     float phase_m = 1.5 * ((1.0 - g2) / (2.0 + g2)) * ((1.0 + cos_theta * cos_theta) / pow(max(1.0 + g2 - 2.0 * mie_g * cos_theta, 0.001), 1.5));
+28 |     vec3 scatter_col = (beta_rayleigh * phase_r + beta_mie * phase_m * 180.0) * 4200.0 * trans;
+29 |     vec3 base_sky = mix(horizon_color, sky_color, smoothstep(0.0, 0.35, h));
+30 |     base_sky = mix(base_sky, zenith_color, pow(h, 0.75));
+31 |     float day_factor = smoothstep(-0.15, 0.25, LIGHT0_DIRECTION.y);
+32 |     vec3 sky_grad = mix(night_haze, base_sky + scatter_col + inscat * 0.12 + irrad * 0.15, day_factor);
+33 |     if (EYEDIR.y < 0.0) {
+34 |         sky_grad = mix(horizon_color * day_factor + night_haze, vec3(0.047, 0.08, 0.14), clamp(-EYEDIR.y * 5.0, 0.0, 1.0));
+35 |     }
+36 |     vec2 uv1 = EYEDIR.xz / (abs(EYEDIR.y) + 0.30) * 0.22 + vec2(TIME * cloud_speed, TIME * cloud_speed * 0.4);
+37 |     vec2 uv2 = EYEDIR.xz / (abs(EYEDIR.y) + 0.30) * 0.45 - vec2(TIME * cloud_speed * 0.5, 0.0);
+38 |     float c1 = texture(cloud_tex, uv1).r;
+39 |     float c2 = texture(cloud_tex, uv2).g;
+40 |     float cld_mask = smoothstep(1.0 - cloud_coverage - 0.18, 1.0 - cloud_coverage + 0.32, c1 * 0.65 + c2 * 0.35) * smoothstep(0.02, 0.25, h);
+41 |     vec3 cld_col = mix(vec3(0.92, 0.95, 0.98), sun_tint, pow(sun_amt, 4.0)) * max(day_factor, 0.12);
+42 |     vec3 col = mix(sky_grad, cld_col, cld_mask * 0.68);
+43 |     vec3 stars = texture(stars_tex, uv1 * 1.5).rgb * smoothstep(0.35, 0.90, h) * mix(0.85, 0.10, day_factor);
+44 |     col += stars * (1.0 - cld_mask);
+45 |     col += sun_tint * pow(sun_amt, 360.0) * 3.8 * day_factor;
+46 |     col += sun_tint * pow(sun_amt, 10.0) * 0.24 * day_factor;
+47 |     COLOR = col;
+48 | }

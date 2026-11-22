@@ -1,0 +1,3 @@
+=== PHASE 3.1 ROOT CAUSE REPORT ===
+1. mesh.cpp:1948 & 1968 (surfaces.size()==0): Caused by initial empty ArrayMesh/transparent GLB conversion of Half_Icosphere_131 and stale .godot/imported/ cache. Fixed via 341-vert/640-tri GLB (alpha=0.02).
+2. FreeType font error: Isolated Godot 4.7.2 Android Editor UI font fallback cache log; 0 scene mesh errors.
